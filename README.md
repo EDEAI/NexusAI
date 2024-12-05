@@ -19,3 +19,5 @@
 - **Workflow Design**: Drag-and-drop workflow nodes to implement complex logic quickly.
 - **Knowledge Base Support**: Integrate multiple document formats and automatically parse content for agent use.
 - **Skill Expansion**: Custom Python scripting for flexible solutions to specific needs.
+
+[NexusAI Deployment Instructions](https://github.com/EDEAI/NexusAI/wiki/NexusAI-Deployment-Instructions)
