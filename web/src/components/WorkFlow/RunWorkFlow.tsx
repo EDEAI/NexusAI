@@ -196,7 +196,7 @@ export default memo(() => {
         <div ref={parent} className="fixed z-20">
             {appId ? (
                 <ProCard
-                    className="w-[400px] border user_pro_card_overflow_y border-blue-300 fixed z-20  top-[65px] right-2 "
+                    className="w-[400px] border  border-blue-300 fixed z-20  top-[65px] right-2 "
                     style={{ height: 'calc(100vh - 10px - 75px)' }}
                     title={
                         <Typography.Title level={5}>

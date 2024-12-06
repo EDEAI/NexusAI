@@ -102,7 +102,7 @@ class ORM(SQLDatabase):
         Initializes the MySQL database connection using settings from the config module.
         """
         db_url = (
-            f"mysql+mysqldb://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}"
+            f"mysql+pymysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}"
             f"@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.MYSQL_DB}"
             "?charset=utf8mb4"
         )

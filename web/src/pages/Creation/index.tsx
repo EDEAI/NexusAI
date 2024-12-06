@@ -24,6 +24,7 @@ import { history } from 'umi';
 import CreationModal from '../../components/creationModal';
 import AddCreation from './components/AddCreation';
 import Profilephoto from './components/profilephoto';
+import useUserStore from "@/store/user";
 const { Text, Paragraph } = Typography;
 
 const { TextArea } = Input;
@@ -290,6 +291,13 @@ const Creation: React.FC = () => {
                   },
         );
     };
+  const setRunId = useUserStore(state => state.setRunId);
+  const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
+  const setDealtWithData = useUserStore(state => state.setDealtWithData);
+    const toRunWorkFlow=(item)=>{
+
+      setRunId(item.app_id)
+    }
     return (
         <div
             className=" pb-[10px] flex flex-col"
@@ -680,16 +688,27 @@ const Creation: React.FC = () => {
                                                                   </Popover>
                                                               ) : null}
                                                           </div>
-                                                          {/* <div className='flex-1 flex justify-end items-center'>1313</div> */}
-                                                          <div>
-                                                              {!JSON.parse(
-                                                                  creationsearchdata('GET')
-                                                                      ?.searchType,
-                                                              ) ? (
-                                                                  <Popover
-                                                                      placement="rightTop"
-                                                                      open={
-                                                                          opensetting == i
+                                                        {
+                                                          (item?.mode===2)?<div className='flex-1 flex justify-end items-center'>
+                                                            {
+                                                              (item?.publish_status == 1) ?
+                                                                <img onClick={() => toRunWorkFlow(item)}
+                                                                     src='/icons/operation_icon.svg'
+                                                                     className='mr-2'/> :
+                                                                <img src='/icons/operation_disable_icon.svg'
+                                                                     className='mr-2'/>
+                                                            }
+                                                          </div>:null
+                                                        }
+                                                        <div>
+                                                          {!JSON.parse(
+                                                            creationsearchdata('GET')
+                                                              ?.searchType,
+                                                          ) ? (
+                                                            <Popover
+                                                              placement="rightTop"
+                                                              open={
+                                                                opensetting == i
                                                                               ? true
                                                                               : false
                                                                       }

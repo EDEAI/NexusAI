@@ -42,7 +42,7 @@ def log_sql(sql, params):
 def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
     sql_logger.info(f"SQL Statement: {statement}")
     sql_logger.info(f"Parameters: {parameters}")
-    sql_logger.info(f"SQL Statement & Parameters: {log_sql(statement, parameters)}")
+    # sql_logger.info(f"SQL Statement & Parameters: {log_sql(statement, parameters)}")
 
 
 class OAuth2PasswordBearerWithCookie(OAuth2Model):
@@ -55,12 +55,7 @@ oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/v1/auth/login")
 app = FastAPI(
     title="NexusAI API",
     description="There are APIs that does NexusAI things.",
-    version="1.0.0",
-    contact={
-        "name": "Nexua AI",
-        "url": "https://www.atyun.com",
-        "email": "7835761@qq.com",
-    }
+    version="1.0.0"
 )
 
 """

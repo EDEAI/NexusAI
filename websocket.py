@@ -9,12 +9,7 @@ from core.websocket.websocket_queue_pop import queue_processor
 app = FastAPI(
     title="NexusAI WebSocket Server",
     description="WebSocket server for handling real-time connections.",
-    version="1.0.0",
-    contact={
-        "name": "Nexus AI",
-        "url": "https://www.atyun.com",
-        "email": "7835761@qq.com",
-    }
+    version="1.0.0"
 )
 
 app.add_middleware(

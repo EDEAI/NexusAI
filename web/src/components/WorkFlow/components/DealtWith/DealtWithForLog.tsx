@@ -651,7 +651,7 @@ export default memo((props: any) => {
     };
     return show ? (
         <ProCard
-            className="w-[400px] border border-blue-300 fixed  top-[65px] right-2 z-20"
+            className="w-[400px] border border-blue-300 fixed  top-[65px] right-2 z-20 run_workflow"
             style={{ height: 'calc(100vh - 10px - 75px)' }}
             extra={
                 <div className="flex gap-2">
@@ -675,6 +675,7 @@ export default memo((props: any) => {
                 overflowY: 'auto',
                 marginTop: '20px',
                 boxSizing: 'border-box',
+              height:'100%'
             }}
         >
             <div>
