@@ -1,0 +1,6 @@
+docker/volumes/*
+docker/docker-compose.yml
+logs/*
+models/*
+storage/*
+upload_files/*

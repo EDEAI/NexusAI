@@ -1,0 +1,31 @@
+/*
+ * @LastEditors: biz
+ */
+export default {
+    'component.tagSelect.expand': '展开',
+    'component.tagSelect.collapse': '收起',
+    'component.tagSelect.all': '全部',
+    'component.menu.title1': '菜单标题1',
+    'component.menu.dashboard': '首页',
+    'component.menu.chatRoomList': '会议室列表',
+    'component.menu.chatRoom': '会议室',
+    'component.menu.title2': '菜单标题2',
+    'component.menu.workspace': '工作区',
+    'component.menu.workflow': '工作流',
+    'component.menu.title3': '菜单标题3',
+    'component.menu.creation': '创造',
+    'component.menu.agent': '智能体',
+    'component.menu.skill': '技能',
+    'component.menu.knowledgeBase': '知识库',
+    'component.menu.teamAgent': '团队Agent',
+    'component.menu.teamSkill': '团队技能',
+    'component.label.teamVisible': '团队可见',
+    'component.tooltip.publishWorkflowFirst': '请先发布工作流',
+    'component.menu.backToPreviousPage': '返回前一页',
+    'component.menu.edit': '编辑',
+    'component.menu.setting': '设置',
+    'component.menu.arrange': '编排',
+    'component.menu.accessAPI': '访问API',
+    'component.tooltip.enableAPIFirst': '请先开启API',
+    'component.menu.log': '日志',
+};

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="17px" viewBox="0 0 16 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title></title>
+    <g id="nexusAI" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="" transform="translate(-1075.000000, -155.000000)">
+            <g id="-11" transform="translate(657.000000, 133.000000)">
+                <g id="-23" transform="translate(418.000000, 22.000000)">
+                    <g id="" transform="translate(0.000000, 0.960000)">
+                        <rect id="" fill="#000000" fill-rule="nonzero" opacity="0" x="0" y="0.04" width="16" height="16"></rect>
+                        <path d="M8,3.04 C8.35898509,3.04 8.65,3.33101491 8.65,3.69 L8.649,7.389 L12.35,7.39 C12.7089851,7.39 13,7.68101491 13,8.04 C13,8.39898509 12.7089851,8.69 12.35,8.69 L8.649,8.689 L8.65,12.39 C8.65,12.7489851 8.35898509,13.04 8,13.04 C7.64101491,13.04 7.35,12.7489851 7.35,12.39 L7.349,8.689 L3.65,8.69 C3.29101491,8.69 3,8.39898509 3,8.04 C3,7.68101491 3.29101491,7.39 3.65,7.39 L7.349,7.389 L7.35,3.69 C7.35,3.33101491 7.64101491,3.04 8,3.04 Z" id="" fill="#1B64F3"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

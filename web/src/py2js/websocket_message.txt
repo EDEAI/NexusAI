@@ -1,0 +1,110 @@
+，
+{
+    "type": "workflow_run_debug",
+    "data": {                     ，，node_exec_data
+        "app_id": 29,                                id
+        "workflow_id": 22,                           id
+        "app_run_id": 45,                            id
+        "type": 1,                                    1： 2：，，1
+        "level": 8,
+        "status": 3,                                  1： 2： 3：
+        "error": null,
+        "completed_steps": 22,
+        "need_human_confirm": 0,                      0： 1：
+        "elapsed_time": 82.59331214018249,
+        "prompt_tokens": 7272,                       LLMtoken
+        "completion_tokens": 6992,                   LLMtoken
+        "total_tokens": 14264,                       LLMtoken（ + ）
+        "embedding_tokens": 0,                       embeddingtoken
+        "reranking_tokens": 0,                       rerankingtoken
+        "total_steps": 22,
+        "finished_time": "2024-08-17 15:45:30",
+        "node_exec_data": {                          ，error，
+            "node_exec_id": 248,                                            id
+            "level": 8,
+            "edge_id": "6185a262-4ac3-4e6d-acce-fa9e339f452f",              edge id
+            "pre_node_id": "7f71deac-8593-42c2-9be1-07c933702cae",          id
+            "node_id": "3e979c0c-ff3a-4755-814b-98731c7fdc7b",              id
+            "node_type": "end",
+            "node_name": "End Node",
+            "status": 3,                                                     0： 1： 2： 3： 4：
+            "error": null,
+            "inputs": null,                                                 Object
+            "messages": [],                                                 LLM
+            "finished_time": "2024-08-17 15:45:30",
+            "elapsed_time": 0.00003314018249511719,
+            "output_type": 1,                                               ，
+            "outputs": {                                                    Object
+                "name": "output_var",
+                "type": "string",
+                "value": "",
+                "max_length": 0
+            },
+            "prompt_tokens": 7272,                                          LLMtoken
+            "completion_tokens": 6992,                                      LLMtoken
+            "total_tokens": 14264,                                          LLMtoken（ + ）
+            "embedding_tokens": 0,                                          embeddingtoken
+            "reranking_tokens": 0,                                          rerankingtoken
+        }
+    }
+}
+messages : [  LLM，：systemuser(human)，Object
+    [
+        "system",
+        {
+            "name": "system",
+            "type": "string",
+            "value": "APImysqlAPI。",
+            "max_length": 0
+        }
+    ],
+    [
+        "human",
+        {
+            "name": "user",
+            "type": "string",
+            "value": "xxxxxxxx",
+            "max_length": 0
+        }
+    ]
+]
+
+
+
+{
+    "type": "workflow_run_progress",
+    "data": {
+        "app_id": 29,                                id
+        "app_name": "Test workflow"
+        "workflow_id": 22,                           id
+        "app_run_id": 45,                            id
+        "type": 1,                                    1： 2：
+        "run_name": "websocket"
+        "status": 3,                                  1： 2： 3：
+        "created_time": "2024-08-20 19:47:07",
+        "elapsed_time": 82.59331214018249,
+        "completed_progress": "22%",                 （）
+    }
+}
+
+
+
+{
+    "type": "workflow_need_human_confirm",
+    "data": {                              ，，node_exec_data
+        "app_id": 29,                                id
+        "app_name": "Test workflow"
+        "workflow_id": 22,                           id
+        "app_run_id": 45,                            id
+        "type": 1,                                    1： 2：
+        "run_name": "websocket"
+        "node_exec_data": {
+            "node_exec_id": 248,                                            id
+            "level": 8,
+            "edge_id": "6185a262-4ac3-4e6d-acce-fa9e339f452f",              edge id
+            "node_id": "3e979c0c-ff3a-4755-814b-98731c7fdc7b",              id
+            "node_type": "end",
+            "node_name": "End Node",
+        }
+    }
+}

@@ -1,0 +1,233 @@
+
+x-common-environment-backend: &common-environment-backend
+  MYSQL_HOST: mysql
+  MYSQL_PORT: 3306
+  MYSQL_USER: nexus_ai
+  MYSQL_PASSWORD: mysqlpwd
+  MYSQL_DB: nexus_ai
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+  REDIS_DB: 0
+  REDIS_PASSWORD: redispwd
+  WEBSOCKET_MESSAGE_QUEUE_KEY: websocket_message_queue
+  VDB_TYPE: Milvus
+  VDB_HOST: milvus-standalone
+  VDB_PORT: 19530
+  VDB_USER: root
+  VDB_PASSWORD: milvuspwd
+  RETRIEVER_TYPE: VectorStoreRetriever
+  RETRIEVER_K: 4
+  RETRIEVER_SCORE_THRESHOLD: 0
+  ACCESS_TOKEN_SECRET_KEY: nexus_ai
+  ACCESS_TOKEN_EXPIRE_MINUTES: 14400
+  LOG_ROTATE_INTERVAL: 6
+  LOG_BACKUP_COUNT: 20
+  HTTP_CONNECT_TIMEOUT: 300
+  HTTP_READ_TIMEOUT: 600
+  HTTP_WRITE_TIMEOUT: 600
+  HTTP_RESPONSE_MAX_BINARY_SIZE: 10485760
+  HTTP_RESPONSE_MAX_TEXT_SIZE: 1048576
+  SANDBOX_HOST: 127.0.0.1
+  SANDBOX_PORT: 9464
+  SANDBOX_FASTAPI_WORKERS: 2
+  DEFAULT_LLM_SUPPLIER_CONFIG_ID: 1
+  DEFAULT_LLM_CONFIG_ID: 3
+  API_PORT: 9472
+  WEBSOCKET_PORT: 9473
+  CHATROOM_WEBSOCKET_PORT: 9474
+  WEB_URL: http://127.0.0.1:9470
+  ICON_URL: http://127.0.0.1:9470
+  APP_API_TIMEOUT: 60
+  FASTAPI_WORKERS: 2
+  CELERY_WORKERS: 4
+  INIT_ADMIN_PASSWORD: nexusaipwd
+
+x-common-environment-frontend: &common-environment-frontend
+  WEB_API_URL: http://127.0.0.1:9470
+  WEB_WS_URL: ws://127.0.0.1:9470/ws
+  WEB_CHAT_URL: ws://127.0.0.1:9470/ws_chat
+
+# Use network proxy as needed
+# x-common-environment-proxy: &common-environment-proxy
+#   HTTP_PROXY: http://192.168.0.241:10809
+#   HTTPS_PROXY: http://192.168.0.241:10809
+
+services:
+  multi_service:
+    image: edeai/multi_service:0.0.2
+    environment:
+      <<: *common-environment-backend
+      # <<: [*common-environment-backend, *common-environment-proxy]
+    volumes:
+      - ./volumes/logs/multi_service:/NexusAI/logs
+      - ./volumes/upload_files:/NexusAI/upload_files
+      - ../models:/NexusAI/models
+    depends_on:
+      - mysql
+      - redis
+      - milvus-standalone
+    networks:
+      - my_network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  celery:
+    image: edeai/celery:0.0.2
+    environment:
+      <<: *common-environment-backend
+      # <<: [*common-environment-backend, *common-environment-proxy]
+    volumes:
+      - ./volumes/logs/celery:/NexusAI/logs
+      - ../models:/NexusAI/models
+    depends_on:
+      - mysql
+      - redis
+      - milvus-standalone
+    networks:
+      - my_network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  sandbox:
+    image: edeai/sandbox:0.0.2
+    environment:
+      <<: *common-environment-backend
+    volumes:
+      - ../storage:/storage
+    ports:
+      - "9464:8001"
+    networks:
+      - my_network
+    privileged: true
+
+  web:
+    image: edeai/web:0.0.2
+    environment:
+      <<: *common-environment-frontend
+    networks:
+      - my_network
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: nexus_ai
+      MYSQL_DATABASE: nexus_ai
+      MYSQL_USER: nexus_ai 
+      MYSQL_PASSWORD: mysqlpwd
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/db_init:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "9461:3306"
+    networks:
+      - my_network
+
+  redis:
+    image: redis:6.2
+    command: redis-server --requirepass redispwd
+    volumes:
+      - redis_data:/data
+    ports:
+      - "9462:6379"
+    networks:
+      - my_network
+
+  etcd:
+    container_name: milvus-etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: 1000
+      ETCD_QUOTA_BACKEND_BYTES: 4294967296
+      ETCD_SNAPSHOT_COUNT: 50000
+    volumes:
+      - etcd_data:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - my_network
+
+  minio:
+    container_name: milvus-minio
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    volumes:
+      - minio_data:/minio_data
+    command: minio server /minio_data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - my_network
+
+  milvus-standalone:
+    container_name: milvus-standalone
+    image: milvusdb/milvus:v2.3.1
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+      MILVUS_AUTHORIZATION_ENABLED: true
+      MILVUS_USERNAME: root
+      MILVUS_PASSWORD: milvuspwd
+    volumes:
+      - milvus_data:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      start_period: 90s
+      timeout: 20s
+      retries: 3
+    depends_on:
+      - etcd
+      - minio
+    ports:
+      - "9463:19530"
+    networks:
+      - my_network
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/http_proxy.conf:/etc/nginx/http_proxy.conf
+      - ./nginx/websocket_proxy.conf:/etc/nginx/websocket_proxy.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ../assets/tool:/app/tool_icon
+      - ./volumes/logs/nginx:/var/log/nginx
+    depends_on:
+      - web
+      - multi_service
+    ports:
+      - "9470:80"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  mysql_data:
+  milvus_data:
+  minio_data:
+  etcd_data:

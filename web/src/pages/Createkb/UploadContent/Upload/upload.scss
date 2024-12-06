@@ -1,0 +1,13 @@
+:where(.css-dev-only-do-not-override-14brfei).ant-upload-wrapper .ant-upload-list.ant-upload-list-picture .ant-upload-list-item, :where(.css-dev-only-do-not-override-14brfei).ant-upload-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item, :where(.css-dev-only-do-not-override-14brfei).ant-upload-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item {
+        height: 50px;
+}
+:where(.css-dev-only-do-not-override-14brfei).ant-upload-wrapper .ant-upload-list.ant-upload-list-picture .ant-upload-list-item .ant-upload-list-item-thumbnail, :where(.css-dev-only-do-not-override-14brfei).ant-upload-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item .ant-upload-list-item-thumbnail, :where(.css-dev-only-do-not-override-14brfei).ant-upload-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item .ant-upload-list-item-thumbnail{
+        height: 30px;
+        width: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+}
+:where(.css-dev-only-do-not-override-14brfei).ant-upload-wrapper .ant-upload-list.ant-upload-list-picture .ant-upload-list-item .ant-upload-list-item-thumbnail .anticon, :where(.css-dev-only-do-not-override-14brfei).ant-upload-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item .ant-upload-list-item-thumbnail .anticon, :where(.css-dev-only-do-not-override-14brfei).ant-upload-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item .ant-upload-list-item-thumbnail .anticon{
+        font-size: 20px;
+}

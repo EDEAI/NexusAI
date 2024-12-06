@@ -1,0 +1,11 @@
+/*
+ * @LastEditors: biz
+ */
+export default {
+    dev: {
+        API_URL: 'http://127.0.0.1:9472',
+        WS_URL: 'ws://127.0.0.1:9473/ws',
+        CHAT_URL: 'ws://127.0.0.1:9474',
+        OUTPUT_PATH: 'dist',
+    }
+};

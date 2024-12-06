@@ -1,0 +1,31 @@
+/*
+ * @LastEditors: biz
+ */
+export default {
+    'component.tagSelect.expand': 'Expand',
+    'component.tagSelect.collapse': 'Collapse',
+    'component.tagSelect.all': 'All',
+    'component.menu.title1': 'Menu Title 1',
+    'component.menu.dashboard': 'Home',
+    'component.menu.chatRoomList': 'Meeting Room List',
+    'component.menu.chatRoom': 'Meeting Room',
+    'component.menu.title2': 'Menu Title 2',
+    'component.menu.workspace': 'Workspace',
+    'component.menu.workflow': 'Workflow',
+    'component.menu.title3': 'Menu Title 3',
+    'component.menu.creation': 'Creation',
+    'component.menu.agent': 'Agent',
+    'component.menu.skill': 'Skill',
+    'component.menu.knowledgeBase': 'Knowledge Base',
+    'component.menu.teamAgent': 'Team Agent',
+    'component.menu.teamSkill': 'Team Skill',
+    'component.label.teamVisible': 'Team Visible',
+    'component.tooltip.publishWorkflowFirst': 'Please publish the workflow first',
+    'component.menu.backToPreviousPage': 'Back to Previous Page',
+    'component.menu.edit': 'Edit',
+    'component.menu.setting': 'Setting',
+    'component.menu.arrange': 'Arrange',
+    'component.menu.accessAPI': 'Access API',
+    'component.tooltip.enableAPIFirst': 'Please enable the API first',
+    'component.menu.log': 'Log',
+};

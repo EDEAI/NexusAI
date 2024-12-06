@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title> 17</title>
+    <defs>
+        <linearGradient x1="19.1347018%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#887BFF" offset="0%"></stop>
+            <stop stop-color="#5670FB" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="27.1827009%" y1="94.5406757%" x2="47.1697104%" y2="47.4950928%" id="linearGradient-2">
+            <stop stop-color="#B1DAF7" offset="0%"></stop>
+            <stop stop-color="#0598FF" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-3">
+            <stop stop-color="#0EEFFE" offset="0%"></stop>
+            <stop stop-color="#BEF8FC" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="nexusai" transform="translate(-695.000000, -299.000000)">
+            <g id="" transform="translate(660.000000, 225.000000)">
+                <g id="-17" transform="translate(35.000000, 74.000000)">
+                    <path d="M18.9031658,22 L8.61290323,22 C7.16983662,22 6,20.8301634 6,19.3870968 L6,6.61290323 C6,5.89049905 6.29316556,5.23656737 6.76701454,4.7635903 L19.8885253,19.8357126 C20.362295,20.3799116 20.3052007,21.2051383 19.7610016,21.678908 C19.5231755,21.8859549 19.2184905,22 18.9031658,22 Z" id="" fill="url(#linearGradient-1)"></path>
+                    <path d="M19.8129107,12.1501764 L10.2157782,18.4568781 L6.33899154,5.32489407 C6.60540053,4.85557409 7.01291045,4.47683918 7.50384174,4.24636893 L19.6806757,10.1341931 C20.2580824,10.4133846 20.4998335,11.1077947 20.220642,11.6852014 C20.1292573,11.8741974 19.9883503,12.0348872 19.8129107,12.1501764 Z" id="" fill="url(#linearGradient-2)" opacity="0.5"></path>
+                    <path d="M8.61290323,4 L19.5878806,4 C20.1490731,4 20.6040096,4.45493646 20.6040096,5.01612903 C20.6040096,5.28279365 20.4991837,5.53877125 20.3121452,5.72884137 L13.5580636,12.5923999 L6.76677959,4.76382485 C7.23950484,4.29185029 7.89212139,4 8.61290323,4 Z" id="" fill="url(#linearGradient-3)" opacity="0.598764329"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

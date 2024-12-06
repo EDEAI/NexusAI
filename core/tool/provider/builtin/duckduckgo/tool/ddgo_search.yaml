@@ -1,0 +1,38 @@
+identity:
+  name: ddgo_search
+  author: Yash Parmar
+  label:
+    en_US: DuckDuckGo Search
+    zh_Hans: DuckDuckGo 搜索
+description:
+  human:
+    en_US: Perform searches on DuckDuckGo and get results.
+    zh_Hans: 在 DuckDuckGo 上进行搜索并获取结果。
+  llm: Perform searches on DuckDuckGo and get results.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+    human_description:
+      en_US: The search query.
+      zh_Hans: 搜索查询语句。
+    llm_description: Key words for searching
+    form: llm
+  - name: max_results
+    type: number
+    required: true
+    default: 5
+    label:
+      en_US: Max results
+      zh_Hans: 最大结果数量
+    form: form
+output:
+  - name: text
+    type: json
+    human_description:
+      en_US: Return result of DuckDuckGo search
+      zh_Hans: DuckDuckGo 搜索的返回结果
+      pt_BR: Return result of DuckDuckGo search
