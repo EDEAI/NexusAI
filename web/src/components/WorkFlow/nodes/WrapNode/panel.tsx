@@ -10,7 +10,7 @@ import { useLocalStorageState } from 'ahooks';
 import { Button, Tooltip, Typography } from 'antd';
 import _ from 'lodash';
 import { memo, useCallback, useEffect, useRef } from 'react';
-import { NOT_RUN_NODE_TYPE } from '../../config';
+import { NODE_COLOR, NOT_RUN_NODE_TYPE } from '../../config';
 import { useResizePanel } from '../../hooks/use-resize-panel';
 import useNodeIdUpdate from '../../hooks/useNodeIdUpdate';
 import useStore from '../../store';
@@ -84,14 +84,14 @@ const NodeForm = memo(({ node, updateNodeData }: NodeFormParams) => {
         if (node?.data?.baseData?.icon) {
             if (node?.type == BlockEnum.Tool) {
                 return (
-                    <div className="  size-8 rounded-md flex justify-center items-center">
+                    <div className="  size-8 rounded-md flex justify-center items-center" style={{backgroundColor:NODE_COLOR[node?.type]}}>
                         <img src={node?.data?.baseData?.icon} className="size-6" alt="" />
                     </div>
                 );
             }
         }
         return (
-            <div className=" bg-gray-300 size-8 rounded-md flex justify-center items-center">
+            <div className=" bg-gray-300 size-8 rounded-md flex justify-center items-center"  style={{backgroundColor:NODE_COLOR[node?.type]}}>
                 <img src={`/icons/${node?.type}.svg`} className="size-6" alt="" />
             </div>
         );

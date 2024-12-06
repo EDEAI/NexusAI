@@ -11,6 +11,7 @@ import { memo, useRef, useState } from 'react';
 import useStore from '../../store';
 import { resetFormNodes } from '../../utils/resetFormNodes';
 import CustomHandle from '../CustomHandle';
+import { NODE_COLOR } from '../../config';
 
 export default memo((props: NodeProps) => {
     const intl = useIntl();
@@ -88,7 +89,7 @@ export default memo((props: NodeProps) => {
                     className=" -mr-2 p-2 flex flex-col bg-slate-100 transition hover:bg-slate-200 cursor-pointer rounded-md gap-2 text-xs"
                 >
                     <div className="flex gap-2 items-center">
-                        <div className="bg-blue-400 p-1 rounded">
+                        <div style={{ backgroundColor: NODE_COLOR[x.type] }} className="bg-blue-400 p-1 rounded">
                             <img src={`/icons/${x.type}.svg`} className="size-4" alt="" />
                         </div>
                         {x?.data?.title}

@@ -27,6 +27,7 @@ import { AppNode, BlockEnum } from '../../types';
 import { resetFormNodes } from '../../utils/resetFormNodes';
 import CreateNodesToolbar from '../CreateNodesToolbar';
 import { getBaseNode } from '../nodeDisperse';
+import { NODE_COLOR } from '../../config';
 type PromptItem = {
     serializedContent: string;
     value: object;
@@ -185,7 +186,7 @@ export default memo(({ node }: { node: AppNode }) => {
                     className="group p-2 min-h-[40px] relative border border-gray-300 hover:border-blue-400 rounded-md cursor-pointer flex flex-col justify-center"
                 >
                     <div className="flex items-center">
-                        <div className="bg-blue-400 p-1 mr-2 rounded">
+                        <div style={{ backgroundColor: NODE_COLOR[e.type] }} className="p-1 mr-2 rounded">
                             <img src={`/icons/${e.type}.svg`} alt="" />
                         </div>
                         <Typography.Paragraph className="!mb-0" ellipsis>

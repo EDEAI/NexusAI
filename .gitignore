@@ -6,7 +6,7 @@ upload_files
 test
 logs
 storage
-models
+/models
 nexcoder
 nexcoder_test
 .idea

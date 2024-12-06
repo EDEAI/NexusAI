@@ -36,3 +36,27 @@ export enum WORKFLOW_ICON {
 
 export const NOT_SHOW_INPUT_RESULT_NODE = [BlockEnum.LLM, BlockEnum.End];
 export const NOT_SHOW_OUTPUT_RESULT_NODE = [BlockEnum.Start];
+
+
+export const NODE_COLOR={
+    [BlockEnum.Start]:'#0765C2',
+    [BlockEnum.End]: '#0765C2',
+
+    [BlockEnum.CustomCode]: '#1AA3B3',
+    [BlockEnum.TemplateConversion]: '#1AA3B3',
+
+    [BlockEnum.TaskExecution]: '#209058',
+    [BlockEnum.TaskGeneration]: '#209058',
+
+    [BlockEnum.ConditionBranch]: '#E49B68',
+    [BlockEnum.RequirementCategory]: '#E49B68',
+    [BlockEnum.Retriever]: '#E49B68',
+
+    [BlockEnum.Agent]: '#7967C8',
+    [BlockEnum.Human]: '#2382DF',
+    [BlockEnum.LLM]: '#AF68D0',
+    [BlockEnum.VariableAggregation]: '#D569AF',
+    [BlockEnum.Skill]: '#DBAF16',
+    [BlockEnum.HttpRequest]: '#E086AB',
+    [BlockEnum.Tool]: '#5A8852',
+}

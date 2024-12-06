@@ -270,7 +270,7 @@ EXIT;
 mysql -u nexus_ai -p<mysqlpwd> nexus_ai < docker/mysql/db_init/nexus_ai.sql
 ```
 
-Create and activate the basic conda environment, The default Python version we use is 3.10.13, We recommend using 3.10 or 3.11
+Create and activate the basic conda environment. The default Python version we use is 3.10.13, We recommend using Python version >= 3.10 and <= 3.12 for compatibility.
 ```bash
 cd NexusAI
 conda create --name nexus_ai python=3.10.13 --no-default-packages
