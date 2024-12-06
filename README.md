@@ -411,4 +411,4 @@ docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage ed
 
 5. Note that the updated content in `.env.template` is synchronized to `.env`, and the updated content in `web/config/envConfig.ts.template` is synchronized to `web/config/envConfig.ts`
 
-6. Restart each service in turn `API` `Celery` `websocket` `meeting room` `workflow` `web`
+6. Restart each service in turn `API` `Celery` `websocket` `meeting room` `workflow` `web` 
