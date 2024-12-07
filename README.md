@@ -241,7 +241,7 @@ Before deploying NexusAI locally, we need to deploy the following basic services
 2. [nginx](https://nginx.org/en/docs/install.html)
 3. [MySQL](https://dev.mysql.com/doc/refman/8.0/en/installing.html)
 4. [Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/)
-5. [Milvus](https://milvus.io/docs/install-overview.md)
+5. [Milvus](https://milvus.io/docs/install_standalone-docker-compose.md)
 6. [Anaconda](https://docs.anaconda.com/anaconda/install/)
 7. [Node.js (>=20.0)](https://nodejs.org/en/download/package-manager)
 
