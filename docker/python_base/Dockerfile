@@ -6,8 +6,8 @@ FROM ubuntu:22.04
 
 RUN apt-get clean && apt-get update && apt-get install -y firejail
 
-COPY Anaconda3-2023.03-0-Linux-x86_64.sh /tmp/anaconda.sh
-COPY nexus_ai.yml /tmp/nexus_ai.yml
+COPY conda/Anaconda3-2023.03-0-Linux-x86_64.sh /tmp/anaconda.sh
+COPY conda/nexus_ai.yml /tmp/nexus_ai.yml
 
 RUN bash /tmp/anaconda.sh -b -p /opt/conda && rm /tmp/anaconda.sh
 

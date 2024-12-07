@@ -1,4 +1,4 @@
-FROM docker.io/edeai/nexusai_python_base:0.0.2
+FROM edeai/nexusai_python_base:0.0.2
 
 WORKDIR /NexusAI
 
