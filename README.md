@@ -252,7 +252,7 @@ Before deploying NexusAI locally, we need to deploy the following basic services
 
 [Cloning the Embedding and Reranker models for offline mode](#cloning-the-embedding-and-reranker-models-for-offline-mode)
 
-Create a database
+Initialize the database, If your MySQL version is >= 8.0, you need to add "mysql_native_password=ON" to the MySQL configuration file.
 ```bash
 cd NexusAI
 
