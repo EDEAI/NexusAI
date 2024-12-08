@@ -54,6 +54,7 @@ x-common-environment-frontend: &common-environment-frontend
 
 services:
   multi_service:
+    container_name: nexusai-docker-multi-service
     image: edeai/multi_service:0.0.2
     environment:
       <<: *common-environment-backend
@@ -77,6 +78,7 @@ services:
               capabilities: [gpu]
 
   celery:
+    container_name: nexusai-docker-celery
     image: edeai/celery:0.0.2
     environment:
       <<: *common-environment-backend
@@ -99,6 +101,7 @@ services:
               capabilities: [gpu]
 
   sandbox:
+    container_name: nexusai-docker-sandbox
     image: edeai/sandbox:0.0.2
     environment:
       <<: *common-environment-backend
@@ -111,6 +114,7 @@ services:
     privileged: true
 
   web:
+    container_name: nexusai-docker-web
     image: edeai/web:0.0.2
     environment:
       <<: *common-environment-frontend
@@ -118,6 +122,7 @@ services:
       - my_network
 
   mysql:
+    container_name: nexusai-docker-mysql
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: nexus_ai
@@ -134,6 +139,7 @@ services:
       - my_network
 
   redis:
+    container_name: nexusai-docker-redis
     image: redis:6.2
     command: redis-server --requirepass redispwd
     volumes:
@@ -144,7 +150,7 @@ services:
       - my_network
 
   etcd:
-    container_name: milvus-etcd
+    container_name: nexusai-docker-milvus-etcd
     image: quay.io/coreos/etcd:v3.5.5
     environment:
       ETCD_AUTO_COMPACTION_MODE: revision
@@ -163,7 +169,7 @@ services:
       - my_network
 
   minio:
-    container_name: milvus-minio
+    container_name: nexusai-docker-milvus-minio
     image: minio/minio:RELEASE.2023-03-20T20-16-18Z
     environment:
       MINIO_ACCESS_KEY: minioadmin
@@ -180,7 +186,7 @@ services:
       - my_network
 
   milvus-standalone:
-    container_name: milvus-standalone
+    container_name: nexusai-docker-milvus-standalone
     image: milvusdb/milvus:v2.3.1
     command: ["milvus", "run", "standalone"]
     environment:
@@ -206,6 +212,7 @@ services:
       - my_network
 
   nginx:
+    container_name: nexusai-docker-nginx
     image: nginx:latest
     volumes:
       - ./nginx/http_proxy.conf:/etc/nginx/http_proxy.conf
