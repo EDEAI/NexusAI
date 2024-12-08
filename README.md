@@ -62,7 +62,7 @@ Enter the Docker directory of the NexusAI source code
 cd NexusAI/docker
 ```
 
-Copy `docker-compose.yml`
+Copy `docker-compose.yml` and replace `SANDBOX_HOST` with the real IP address of the host
 ```bash
 cp docker-compose.yml.template docker-compose.yml
 ```
@@ -287,6 +287,8 @@ conda env update -f conda/nexus_ai.yml
 ```
 
 Copy `.env` and modify the `.env` configuration items as needed, For configuration instructions, refer to [docker-compose.yml configuration instructions](#docker-composeyml-configuration-instructions)
+
+Note that you need to replace SANDBOX_HOST with the real IP address of the host.
 ```bash
 cp .env.template .env
 ```
