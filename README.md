@@ -53,6 +53,9 @@ git clone https://huggingface.co/GanymedeNil/text2vec-large-chinese
 git clone https://huggingface.co/BAAI/bge-reranker-v2-m3
 ```
 
+## Milvus Authentication
+If you want to enable Milvus authentication, refer to [Milvus Authentication](https://milvus.io/docs/authenticate.md) to set up Milvus authentication and modify the milvus-standalone service settings in `docker-compose.yml`
+
 ## Launch NexusAI
 Enter the Docker directory of the NexusAI source code
 ```bash
@@ -248,6 +251,9 @@ Before deploying NexusAI locally, we need to deploy the following basic services
 7. [Node.js (>=20.0)](https://nodejs.org/en/download/package-manager)
 
 [Clone the NexusAI source code to your local environment](#clone-nexusai)
+
+## Milvus Authentication
+If you want to enable Milvus authentication, refer to [Milvus Authentication](https://milvus.io/docs/authenticate.md) to set up Milvus authentication.
 
 ## Server deployment
 [Initialize the model directory and storage directory](#initialize-the-model-directory-and-storage-directory)
