@@ -307,8 +307,10 @@ Start the sandbox container
 # The docker image tag should be consistent with the configuration in docker-compose.yml
 docker pull edeai/sandbox:<tag>
 
-# SANDBOX_PORT should be consistent with .env, and the mounted local storage directory should be changed to the real path
-docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage edeai/sandbox:<tag>
+# SANDBOX_PORT should be consistent with .env
+# The mounted local storage directory should be changed to the real path
+# SANDBOX_FASTAPI_WORKERS: The number of workers for the sandbox service
+docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<tag>
 ```
 
 Note that before executing all the Python scripts below, you must first execute `conda activate nexus_ai`
@@ -409,8 +411,10 @@ docker rmi edeai/sandbox:<old tag>
 # The docker image tag should be consistent with the configuration in docker-compose.yml
 docker pull edeai/sandbox:<new tag>
 
-# SANDBOX_PORT should be consistent with .env, and the mounted local storage directory should be changed to the real path
-docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage edeai/sandbox:<new tag>
+# SANDBOX_PORT should be consistent with .env
+# The mounted local storage directory should be changed to the real path
+# SANDBOX_FASTAPI_WORKERS: The number of workers for the sandbox service
+docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<new tag>
 ```
 
 5. Note that the updated content in `.env.template` is synchronized to `.env`, and the updated content in `web/config/envConfig.ts.template` is synchronized to `web/config/envConfig.ts`
