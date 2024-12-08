@@ -62,7 +62,7 @@ Enter the Docker directory of the NexusAI source code
 cd NexusAI/docker
 ```
 
-Copy `docker-compose.yml`
+Copy `docker-compose.yml` and replace `SANDBOX_HOST` with the real IP address of the host
 ```bash
 cp docker-compose.yml.template docker-compose.yml
 ```
