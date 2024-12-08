@@ -311,6 +311,8 @@ docker pull edeai/sandbox:<tag>
 docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage edeai/sandbox:<tag>
 ```
 
+Note that before executing all the Python scripts below, you must first execute `conda activate nexus_ai`
+
 Start the API service
 ```bash
 python app.py
