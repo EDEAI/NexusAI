@@ -117,8 +117,10 @@ Email:
 administrator@gmail.com
 
 Password:
-Refer to the environment variable in docker-compose.yml: INIT_ADMIN_PASSWORD
+nexusaipwd
 ```
+
+Note that the initial administrator password is updated through the environment variable `INIT_ADMIN_PASSWORD` in `docker-compose.yml`
 
 ## Pull NexusAI
 Please execute the commands in the following order:
@@ -363,7 +365,7 @@ Email:
 administrator@gmail.com
 
 Password:
-123456
+nexusaipwd
 ```
 
 Note: To update the initial administrator password
