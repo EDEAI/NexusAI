@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter
 from core.database.models import Apps
 from core.database.models.agents import Agents
@@ -18,6 +19,8 @@ from api.schema.apps import *
 from api.utils.jwt import *
 
 from languages import get_language_content
+
+os.environ['DATABASE_AUTO_COMMIT'] = 'False'
 router = APIRouter()
 
 @router.get('/apps_list', response_model=ResAppListSchema, summary="Fetching a Paginated List of Applications for the Current User or Team")
