@@ -29,7 +29,7 @@ export default {
     'user.save': 'Save',
     'user.systemModelSettings': 'System Model Settings',
     'user.settings': 'Settings',
-    'user.numberOfModels': 'Number of Models',
+    'user.numberOfModels': ' models',
 
     'register.success': 'Registration successful!',
     'register.error': 'Registration failed!',
