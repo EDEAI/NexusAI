@@ -5,7 +5,7 @@ import { setLang } from '@/api/workflow';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { setLocale, SelectLang as UmiSelectLang } from '@umijs/max';
 
-export type SiderTheme = 'light' | 'dark';
+
 
 const LangIconLoaded = () => <img src="/icons/lang.svg" />;
 
