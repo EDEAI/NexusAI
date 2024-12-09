@@ -1,10 +1,7 @@
-import React, { useEffect } from 'react';
-
+import React from 'react';
 
 const bottomlabel: React.FC = () => {
- 
 
-    useEffect(() => {}, []);
     return (
         <div
             className="text-xs text-[#9B9B9B] "
