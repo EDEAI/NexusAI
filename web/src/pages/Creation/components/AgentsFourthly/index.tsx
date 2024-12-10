@@ -126,9 +126,9 @@ const AgentsFourthly: React.FC<ChildProps> = ({
         const res = await PutagentPublish(newagentid ? newagentid : Detaillist.agent.agent_id);
 
         if (res.code == 0) {
-            message.success('');
+            message.success(intl.formatMessage({id:'agent.message.success.publish'}));
         } else {
-            message.error('');
+            message.error(intl.formatMessage({id:'agent.message.fail.publish'}));
         }
     };
 

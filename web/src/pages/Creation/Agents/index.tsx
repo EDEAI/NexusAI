@@ -49,7 +49,7 @@ const Agents: React.FC = () => {
     const [callwordlist, setCallwordlist] = useState(null);
     const [fromdata, setFromdata] = useState(null);
     const [newagentid, setNewagentid] = useState(null);
-    const [creationappid, setcreationappid] = useState(null); 
+    const [creationappid, setcreationappid] = useState(null);
     const [loading, setLoading] = useState(false);
     const [agentmenudisabled, setAgentmunudisabled] = useState({
         first: false,
@@ -315,7 +315,7 @@ const Agents: React.FC = () => {
                         .then(value => {
 
                             creationagentid = value.data.agent.agent_id;
-                            agentfirst(creationagentid); 
+                            agentfirst(creationagentid);
                             setTimeout(() => {
                                 agentsecond(creationagentid);
                                 message.success(
@@ -342,7 +342,7 @@ const Agents: React.FC = () => {
                 .then(value => {
 
                     creationagentid = value.data.agent.agent_id;
-                    agentfirst(creationagentid); 
+                    agentfirst(creationagentid);
                     setTimeout(() => {
                         agentsecond(creationagentid);
                         message.success(intl.formatMessage({ id: 'skill.conserve.success' }));
@@ -366,13 +366,13 @@ const Agents: React.FC = () => {
                 const putBasedata = {
                     agent_id: agent_id,
                     data: {
-                        is_public: Detaillist.app.is_public, 
-                        enable_api: Detaillist.app.enable_api, 
-                        obligations: Detaillist.agent.obligations, 
-                        input_variables: arraytoobject(Ffromref.getFieldsValue()), 
+                        is_public: Detaillist.app.is_public,
+                        enable_api: Detaillist.app.enable_api,
+                        obligations: Detaillist.agent.obligations,
+                        input_variables: arraytoobject(Ffromref.getFieldsValue()),
                         dataset_ids: repository,
                         m_config_id: Fourthly_config_id,
-                        allow_upload_file: Detaillist.agent.allow_upload_file, 
+                        allow_upload_file: Detaillist.agent.allow_upload_file,
                         default_output_format: Detaillist.agent.default_output_format,
                     },
                 };
@@ -469,7 +469,7 @@ const Agents: React.FC = () => {
                 item.name,
                 item.type ? item.type : 'string',
                 item.value ? item.value : '',
-                item.content, 
+                item.content,
                 item.status,
             );
             input_variables.addProperty(item.name, variable);
@@ -515,9 +515,9 @@ const Agents: React.FC = () => {
                                 window.open(BASE_URL + Detaillist.app.api_url);
                             }}
                         >
-                            <div className="mr-[20px]">
-                                <DesktopOutlined className="mr-2" />
-                                {intl.formatMessage({ id: 'agent.visit' })}API
+                            <div className="mr-[20px] text-base font-medium text-[#213044] -mt-1">
+                                <DesktopOutlined className="mr-3" />
+                                {intl.formatMessage({ id: 'agent.visit' })} API
                             </div>
                         </div>
                     ) : null}

@@ -1,6 +1,9 @@
+/*
+ * @LastEditors: biz
+ */
 export default {
     // 'agent': 'agent',
-    'agent': '智能体',
+    agent: '智能体',
     'agent.menu.basicsetup': '基本设置',
     'agent.menu.Capacityoutput': '能力和输出',
     'agent.menu.operation': '调试',
@@ -8,6 +11,8 @@ export default {
 
     'agent.menu': '默认',
     'agent.message.success.save': '保存成功',
+    'agent.message.success.publish': '发布成功',
+    'agent.message.fail.publish': '发布失败',
     'agent.message.success.runpublish': '运行成功',
     'agent.message.listwarning': '您正在查看已发布版本数据，不可修改',
     'agent.message.warning.variable': '请定义变量名',
