@@ -14,12 +14,13 @@ interface siderPm {
     messageApi?: any;
     roomDetail?: any;
     disableInput?: any;
+    setAgent?:any
 }
 
 const Sider: React.FC<siderPm> = porpos => {
     const intl = useIntl();
 
-    let { setsendMessage, truncatable, messageApi, roomDetail, disableInput } = porpos;
+    let { setsendMessage, truncatable, messageApi, roomDetail, disableInput,setAgent } = porpos;
 
     const { id } = useParams<{ id: string }>();
 
@@ -138,8 +139,8 @@ const Sider: React.FC<siderPm> = porpos => {
             obj.checkAgent.map((item: any) => {
                 item.active = item.active == undefined ? 1 : item.active;
             });
-            console.log(obj.checkAgent);
             setAgentList([...obj.checkAgent]);
+            setAgent.current = [...obj.checkAgent]
             messageApi.open({
                 type: 'success',
                 content: intl.formatMessage({ id: 'app.chatroom.content.addAgentTips' }),

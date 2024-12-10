@@ -528,7 +528,7 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                                 <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
                             )}
                         </div>
-                        <div className="flex1 max-w-[560px]" id={`currentContent${index}`}>
+                        <div className="flex1 max-w-[560px] text-right" id={`currentContent${index}`}>
                             <div
                                 className={`text-left font-[500] text-[14px] text-[#213044] pb-[8px]`}
                             >
@@ -680,7 +680,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
             if (data.indexOf('--NEXUSAI-INSTRUCTION-') !== -1) {
                 let agentId = JSON.parse(data.slice(22, -2))[1];
                 agentText.current = '';
-                chatReturn.current = true;
+                chatReturn.current = true;                
                 let currentAgent = agentList.current.filter(
                     (item: any) => item.agent_id == agentId,
                 )[0];
@@ -771,7 +771,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                             <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
                         )}
                     </div>
-                    <div className="flex1 max-w-[560px]" id={`addcontent`}>
+                    <div className="flex1 max-w-[560px] text-right" id={`addcontent`}>
                         <div className={`text-left font-[500] text-[14px] text-[#213044] pb-[8px]`}>
                             {currentMessage.name
                                 ? currentMessage.name
@@ -857,6 +857,7 @@ const Chatroom: React.FC = memo(() => {
                     setsendMessage={setsendMessage}
                     truncatable={truncatable}
                     disableInput={disableInput}
+                    setAgent={agentList}
                 ></Sidebar>
                 <div className="flex-1">
                     <div
