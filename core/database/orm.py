@@ -1,6 +1,6 @@
 import os
 from typing import Any, Dict, List, Union, Optional
-from sqlalchemy import Table, select, text, and_, or_, func
+from sqlalchemy import Table, select, text, and_, or_, func, JSON
 from sqlalchemy.exc import SQLAlchemyError
 from . import SQLDatabase
 from config import settings
@@ -102,7 +102,7 @@ class ORM(SQLDatabase):
         Initializes the MySQL database connection using settings from the config module.
         """
         db_url = (
-            f"mysql+pymysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}"
+            f"mariadb+pymysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}"
             f"@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.MYSQL_DB}"
             "?charset=utf8mb4"
         )
@@ -142,6 +142,9 @@ class ORM(SQLDatabase):
         session = cls.get_session()
         auto_commit = is_auto_commit()
         table = Table(table_name, cls._metadata, autoload_with=cls._engine)
+        for column in table.columns:
+            if str(column.type) == 'LONGTEXT':
+                column.type = JSON()
         try:
             query = table.insert().values(data)
             # print(str(query.compile(compile_kwargs={"literal_binds": True})))
@@ -173,6 +176,9 @@ class ORM(SQLDatabase):
         session = cls.get_session()
         auto_commit = is_auto_commit()
         table = Table(table_name, cls._metadata, autoload_with=cls._engine)
+        for column in table.columns:
+            if str(column.type) == 'LONGTEXT':
+                column.type = JSON()
         try:
             if conditions:
                 if isinstance(conditions, List) and isinstance(conditions[0], Dict):
@@ -228,6 +234,9 @@ class ORM(SQLDatabase):
         offset = kwargs.get('offset')
         
         table = Table(table_name, cls._metadata, autoload_with=cls._engine)
+        for column in table.columns:
+            if str(column.type) == 'LONGTEXT':
+                column.type = JSON()
         tables = {table_name: table}
         
         if joins:
@@ -236,6 +245,9 @@ class ORM(SQLDatabase):
                 join_table_name = join_table_name.strip()
                 if join_table_name not in tables:
                     tables[join_table_name] = Table(join_table_name, cls._metadata, autoload_with=cls._engine)
+                    for column in tables[join_table_name].columns:
+                        if str(column.type) == 'LONGTEXT':
+                            column.type = JSON()
         
         query = select()
         
@@ -402,6 +414,9 @@ class ORM(SQLDatabase):
         session = cls.get_session()
         auto_commit = is_auto_commit()
         table = Table(table_name, cls._metadata, autoload_with=cls._engine)
+        for column in table.columns:
+            if str(column.type) == 'LONGTEXT':
+                column.type = JSON()
         try:
             if conditions:
                 if isinstance(conditions, List) and isinstance(conditions[0], Dict):
