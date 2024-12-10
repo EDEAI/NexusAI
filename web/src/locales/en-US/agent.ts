@@ -72,7 +72,7 @@ export default {
     'agent.unpublish': 'Unpublished',
     'agent.compile': 'Edit',
     'agent.agents': "'s Agents",
-    'agent.created': 'Created',
+    'agent.created': 'Create ',
     'agent.btn.nextstep': 'next Step',
     'agent.btn.back': 'cancel',
     'agent.btn.savedebug': 'Save and debug',
