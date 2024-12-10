@@ -55,7 +55,7 @@ x-common-environment-frontend: &common-environment-frontend
 services:
   multi_service:
     container_name: nexusai-docker-multi-service
-    image: edeai/multi_service:0.0.2
+    image: edeai/multi_service:0.0.3
     environment:
       <<: *common-environment-backend
       # <<: [*common-environment-backend, *common-environment-proxy]
@@ -67,29 +67,7 @@ services:
       - mysql
       - redis
       - milvus-standalone
-    networks:
-      - my_network
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-
-  celery:
-    container_name: nexusai-docker-celery
-    image: edeai/celery:0.0.2
-    environment:
-      <<: *common-environment-backend
-      # <<: [*common-environment-backend, *common-environment-proxy]
-    volumes:
-      - ./volumes/logs/celery:/NexusAI/logs
-      - ../models:/NexusAI/models
-    depends_on:
-      - mysql
-      - redis
-      - milvus-standalone
+      - sandbox
     networks:
       - my_network
     deploy:
@@ -102,7 +80,7 @@ services:
 
   sandbox:
     container_name: nexusai-docker-sandbox
-    image: edeai/sandbox:0.0.2
+    image: edeai/sandbox:0.0.3
     environment:
       <<: *common-environment-backend
     volumes:
@@ -217,9 +195,6 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ../assets/tool:/app/tool_icon
       - ./volumes/logs/nginx:/var/log/nginx
-    depends_on:
-      - web
-      - multi_service
     ports:
       - "9470:80"
     networks:
