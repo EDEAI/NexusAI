@@ -83,6 +83,7 @@
         "react-transition-group": "^4.4.5",
         "reactflow": "^11.11.4",
         "rehype-highlight": "^7.0.0",
+        "rehype-raw": "^7.0.0",
         "remark-gfm": "^4.0.0",
         "slate": "^0.103.0",
         "slate-history": "^0.100.0",

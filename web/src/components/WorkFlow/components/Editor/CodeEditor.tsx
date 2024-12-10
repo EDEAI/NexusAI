@@ -9,8 +9,8 @@ import type { FC } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
-import { useResizePanel } from '../../hooks/use-resize-panel';
 import remarkGfm from 'remark-gfm';
+import { useResizePanel } from '../../hooks/use-resize-panel';
 // load file from local instead of cdn https://github.com/suren-atoyan/monaco-react/issues/482
 loader.config({ paths: { vs: '/vs' } });
 
@@ -194,7 +194,7 @@ const CodeEditor: FC<Props> = ({
     const RenderFix = () => {
         return (
             <div
-                style={{ background: isFocus||!editorTypeJson ? '#ffffff' : '#f2f4f7' }}
+                style={{ background: isFocus || !editorTypeJson ? '#ffffff' : '#f2f4f7' }}
                 className={`relative h-full w-full top-0 flex flex-col p-2 border rounded-md  box-border border-slate-200`}
             >
                 <div className="h-8">{title && <div className="font-bold pb-2">{title}</div>}</div>
@@ -217,7 +217,12 @@ const CodeEditor: FC<Props> = ({
                     </div>
                 ) : (
                     <div className="w-full h-full flex-1 overflow-auto p-4">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>{mdValue}</ReactMarkdown>
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeHighlight]}
+                        >
+                            {mdValue}
+                        </ReactMarkdown>
                     </div>
                 )}
             </div>

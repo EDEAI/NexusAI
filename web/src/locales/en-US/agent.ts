@@ -1,3 +1,6 @@
+/*
+ * @LastEditors: biz
+ */
 export default {
     agent: 'Agent',
     'agent.menu.basicsetup': 'Basic Settings',
@@ -7,6 +10,8 @@ export default {
 
     'agent.menu': 'Default',
     'agent.message.success.save': 'Successfully saved',
+    'agent.message.success.publish': 'Publication successful',
+    'agent.message.fail.publish': 'Publication failed',
     'agent.message.success.runpublish': 'Successfully run and published',
     'agent.message.listwarning': 'You are viewing published version data, which cannot be modified',
     'agent.message.warning.variable': 'Please define a variable name',
@@ -23,7 +28,7 @@ export default {
 
     'agent.back': 'Return to Creation',
     'agent.back_meeting': 'Return to Meeting Room',
-    'agent.visit': 'Save',
+    'agent.visit': 'Visit',
     'agent.appname': 'Agent Name',
     'agent.cannotmodify': '(You are viewing published version data, which cannot be modified)',
     'agent.appdescription': 'Agent Description',
@@ -67,7 +72,7 @@ export default {
     'agent.unpublish': 'Unpublished',
     'agent.compile': 'Edit',
     'agent.agents': "'s Agents",
-    'agent.created': 'Created',
+    'agent.created': 'Create ',
     'agent.btn.nextstep': 'next Step',
     'agent.btn.back': 'cancel',
     'agent.btn.savedebug': 'Save and debug',
