@@ -432,7 +432,7 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='User Data Table';
 
 INSERT INTO `users` (`id`, `team_id`, `role`, `inviter_id`, `nickname`, `phone`, `email`, `password`, `password_salt`, `avatar`, `created_time`, `updated_time`, `last_login_time`, `last_login_ip`, `language`, `status`) VALUES
-(1, 1, 1, 0, 'administrator', NULL, 'administrator@gmail.com', 'af734e08e3e31ea6fa3af1d2631ddfbf', '1732612122', NULL, '2024-11-26 17:11:42', NULL, NULL, NULL, 'en', 1);
+(1, 1, 1, 0, 'administrator', NULL, 'admin@nexusai.com', 'af734e08e3e31ea6fa3af1d2631ddfbf', '1732612122', NULL, '2024-11-26 17:11:42', NULL, NULL, NULL, 'en', 1);
 
 CREATE TABLE `workflows` (
   `id` int NOT NULL COMMENT 'Workflow ID',
