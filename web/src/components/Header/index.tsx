@@ -5,11 +5,13 @@ import { history, Link, useIntl } from '@umijs/max';
 import React from 'react';
 import { SelectLang } from '../RightContent';
 import { AvatarDropdown, AvatarName } from '../RightContent/AvatarDropdown';
+import {creationsearchdata} from "@/utils/useUser";
 
 const Header: React.FC = () => {
     const { location } = history;
     const pathname = location?.pathname;
     const intl = useIntl();
+
     const menuList = [
         {
             name: intl.formatMessage({ id: 'component.menu.dashboard', defaultMessage: '' }),
@@ -124,6 +126,7 @@ const Header: React.FC = () => {
                             <div
                                 key={index}
                                 onClick={() => {
+                                    creationsearchdata('SET',6)
                                     history.push(item.children[0].path);
                                 }}
                                 className="flex items-center justify-center bg-white h-8 px-[15px] py-[6px] rounded-lg shadow-black mr-5 cursor-pointer"
@@ -137,7 +140,9 @@ const Header: React.FC = () => {
                         <div
                             key={index}
                             onClick={() => {
+                                creationsearchdata('SET',6)
                                 history.push(item.children[0].path);
+
                             }}
                             className="flex items-center justify-center h-8 px-[15px] py-[6px] rounded-lg shadow-black mr-5 cursor-pointer hover:bg-[#EEEFF1]"
                         >

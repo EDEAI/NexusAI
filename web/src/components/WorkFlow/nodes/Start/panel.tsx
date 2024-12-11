@@ -26,10 +26,7 @@ export default memo(({ node }: { node: AppNode }) => {
     const [variables, setVariables] = useState([]);
     useMount(() => {
         setNodeInfo(node);
-        // const fieldNames = Object.keys(formRef.current.getFieldsValue());
-        // fieldNames.forEach((e) => {
-        //     formRef.current.setFieldsValue({ [e]: nodeInfo.data[e] });
-        // });
+      
         const reset = resetFormNodes(formRef, node);
         setTimeout(() => {
             reset();

@@ -73,12 +73,7 @@ export default memo(({ node }: { node: AppNode }) => {
             form: allValue,
         });
     };
-    const handleCodeChange = e => {
-        console.log(e);
-        updateNodeData(node.id, {
-            code: e,
-        });
-    };
+
     //
     const getToolAuthorization = async e => {
         const res = await getToolAuthorizationStatus(node.data?.baseData?.groupName, e);

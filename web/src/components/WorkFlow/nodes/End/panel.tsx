@@ -9,7 +9,6 @@ import { Button, Tooltip } from 'antd';
 import { memo, useRef, useState } from 'react';
 import useStore from '../../store';
 import { AppNode } from '../../types';
-import { createPrompt } from '../../utils/createNode';
 import { resetFormNodes } from '../../utils/resetFormNodes';
 
 type PromptItem = {
@@ -21,18 +20,7 @@ interface Prompt {
     user: PromptItem;
     assistant: PromptItem;
 }
-const modelList = [
-    { label: 'GPT-3', value: 'GPT-3' },
-    { label: 'GPT-Neo', value: 'GPT-Neo' },
-    { label: 'GPT-4', value: 'GPT-4' },
-    { label: 'GPT-4-32k', value: 'GPT-4-32k' },
-    { label: 'GPT-4-Turbo', value: 'GPT-4-Turbo' },
-    { label: 'GPT-4-Turbo-16k', value: 'GPT-4-Turbo-16k' },
-    { label: 'GPT-4-Turbo-16k-0613', value: 'GPT-4-Turbo-16k-0613' },
-    { label: 'GPT-4-Turbo-0613', value: 'GPT-4-Turbo-0613' },
-    { label: 'GPT-4-0613', value: 'GPT-4-0613' },
-    { label: 'GPT-3-Turbo', value: 'GPT-3-Turbo' },
-];
+
 export default memo(({ node }: { node: AppNode }) => {
     const intl = useIntl();
     const promptObj = useReactive<Prompt>({
@@ -46,13 +34,8 @@ export default memo(({ node }: { node: AppNode }) => {
 
     const updateNodeData = useStore(state => state.updateNodeData);
     const getVariables = useStore(state => state.getOutputVariables);
-    // const getVariables = useVariables();
-    useMount(() => {
-        // const fieldNames = Object.keys(formRef.current.getFieldsValue());
-        // fieldNames.forEach(e => {
-        //     formRef.current.setFieldsValue({ [e]: node.data[e] });
-        // });
 
+    useMount(() => {
         const reset = resetFormNodes(formRef, node);
         setTimeout(() => {
             reset();
@@ -78,16 +61,6 @@ export default memo(({ node }: { node: AppNode }) => {
             promptObj.user = { serializedContent: '', value: {} };
             promptObj.assistant = { serializedContent: '', value: {} };
         }
-    };
-    const editorChange = (e: any, type: string) => {
-        promptObj[type] = e;
-
-        updateNodeData(node.id, {
-            prompt: {
-                free: createPrompt(promptObj),
-                value: JSON.stringify(promptObj),
-            },
-        });
     };
     const setNodeChange = (addItem: { [key: string]: any }, allVals) => {
         updateNodeData(node.id, allVals);

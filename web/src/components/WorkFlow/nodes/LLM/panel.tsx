@@ -51,21 +51,10 @@ export default memo(({ node }: { node: AppNode }) => {
     const [modelList, setModelList] = useState([]);
     const [editorOptions, setEditorOptions] = useState([]);
     const getNode = useStore(state => state.getNode);
-    // const [node,setNode]=useState(null)
+  
     useMount(() => {
         setEditorLoading(true);
-        // const fieldNames = Object.keys(formRef.current.getFieldsValue());
-        // fieldNames.forEach((e) => {
-        //     formRef.current.setFieldsValue({ [e]: node.data[e] });
-        // });
-
-        // console.log(123,nodeProps,useStore.getState().nodes);
-        // const node=nodeProps
-        // console.log(node);
-
-        // setNode(node)
-        // resetFormNodes(formRef,node)
-        console.log(node);
+    
 
         const reset = resetFormNodes(formRef, node);
         setTimeout(() => {
@@ -202,13 +191,6 @@ export default memo(({ node }: { node: AppNode }) => {
                         name={`model_config_id`}
                     ></SelectModelConfigId>
                     <div className="user-form">
-                        {/* <ProFormSwitch name="requires_upload" label=""></ProFormSwitch> */}
-                        {/* <ProFormSwitch
-            name="wait_for_all_predecessors"
-            label=""
-        ></ProFormSwitch> */}
-                        {/* <ProFormSwitch name="task_splitting" label=""></ProFormSwitch> */}
-
                         <SwitchManualConfirmation></SwitchManualConfirmation>
                         {!node?.data?.['isChild'] && (
                             <SwitchImportToKnowledgeBase></SwitchImportToKnowledgeBase>

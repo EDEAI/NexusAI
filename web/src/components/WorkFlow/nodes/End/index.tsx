@@ -14,9 +14,7 @@ export default memo((props: NodeProps) => {
                 params={props}
                 position={Position.Left}
             ></CustomHandle>
-            {/* <CustomHandle id="start_source" type='source' position={Position.Right}></CustomHandle> */}
-            {/* <CreateNodesToolbar {...props} position="left" ></CreateNodesToolbar> */}
-            {/* <CreateNodesToolbar {...props} position="right" ></CreateNodesToolbar> */}
+   
         </div>
     );
 });

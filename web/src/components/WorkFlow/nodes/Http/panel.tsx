@@ -116,11 +116,6 @@ export default memo(({ node }: { node: AppNode }) => {
         }, 500);
     });
 
-    // useUpdateEffect(() => {
-    //     // setUpdateEditor(() => updateEditor + 1);
-
-    // }, [node.id]);
-
     const setNodeChange = (addItem: { [key: string]: any }) => {
         console.log(addItem);
         if (editorLoading) return;
@@ -154,16 +149,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                 defaultMessage: 'API',
                             })}
                         </div>
-                        <div>
-                            {/* <Button
-                type="text"
-                className="text-xs"
-                onClick={() => setShowToken(true)}
-                icon={<SettingOutlined></SettingOutlined>}
-            >
-                {intl.formatMessage({ id: 'workflow.button.auth', defaultMessage: '' })}
-            </Button> */}
-                        </div>
+                        <div></div>
                     </div>
                     <div className="flex gap-2 w-full">
                         <ProFormSelect
@@ -269,8 +255,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                                 tooltip={{
                                                     title: intl.formatMessage({
                                                         id: 'workflow.tooltip.connectTimeout',
-                                                        defaultMessage:
-                                                            '（）',
+                                                        defaultMessage: '（）',
                                                     }),
                                                     placement: 'right',
                                                     overlayClassName: 'custom-overlay',
@@ -295,8 +280,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                                 tooltip={{
                                                     title: intl.formatMessage({
                                                         id: 'workflow.tooltip.readTimeout',
-                                                        defaultMessage:
-                                                            '（）',
+                                                        defaultMessage: '（）',
                                                     }),
                                                     placement: 'right',
                                                     overlayClassName: 'custom-overlay',
@@ -321,8 +305,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                                 tooltip={{
                                                     title: intl.formatMessage({
                                                         id: 'workflow.tooltip.writeTimeout',
-                                                        defaultMessage:
-                                                            '（）',
+                                                        defaultMessage: '（）',
                                                     }),
                                                     placement: 'right',
                                                     overlayClassName: 'custom-overlay',
@@ -351,9 +334,7 @@ export default memo(({ node }: { node: AppNode }) => {
                     </div>
                 </ProForm>
             </div>
-            {/* <Modal open={showToken} title='' onCancel={()=>setShowToken(false)}>
-                22222222222222222222222222222
-            </Modal> */}
+          
         </>
     );
 });

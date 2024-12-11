@@ -136,8 +136,7 @@ export const Panel = memo(() => {
     );
 });
 export const ChildPanel = memo(() => {
-    // const [CurrentNode, setCurrentNode] = useState(null);
-    const setRunPanelNodeShow = useStore(state => state.setRunPanelNodeShow);
+   
     const CurrentNode = useStore(state => state.showChildNode);
     const RenderPanel = useCallback(
         props => {
