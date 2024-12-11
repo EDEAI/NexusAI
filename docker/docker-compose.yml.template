@@ -1,6 +1,6 @@
 
 x-common-environment-backend: &common-environment-backend
-  MYSQL_HOST: mysql
+  MYSQL_HOST: mariadb
   MYSQL_PORT: 3306
   MYSQL_USER: nexus_ai
   MYSQL_PASSWORD: mysqlpwd
@@ -60,11 +60,12 @@ services:
       <<: *common-environment-backend
       # <<: [*common-environment-backend, *common-environment-proxy]
     volumes:
+      - ./volumes/logs/supervisor:/var/log/supervisor
       - ./volumes/logs/multi_service:/NexusAI/logs
       - ./volumes/upload_files:/NexusAI/upload_files
       - ../models:/NexusAI/models
     depends_on:
-      - mysql
+      - mariadb
       - redis
       - milvus-standalone
       - sandbox
@@ -99,9 +100,9 @@ services:
     networks:
       - my_network
 
-  mysql:
-    container_name: nexusai-docker-mysql
-    image: mysql:8.0
+  mariadb:
+    container_name: nexusai-docker-mariadb
+    image: mariadb:11.4
     environment:
       MYSQL_ROOT_PASSWORD: nexus_ai
       MYSQL_DATABASE: nexus_ai
@@ -110,7 +111,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/db_init:/docker-entrypoint-initdb.d
-    command: --default-authentication-plugin=mysql_native_password
     ports:
       - "9461:3306"
     networks:
