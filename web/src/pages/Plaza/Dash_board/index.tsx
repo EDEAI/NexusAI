@@ -284,8 +284,8 @@ const MoreOrAdd = (item: any, setIsModalOpen: any, setCreationType: any, intl: a
         // console.log(item);
         let addCreationTyp =
             item.key == 'my_agent'
-                ? { name: 'Agent', path: 'Agents', id: 1 }
-                : { name: 'WorkFlow', path: 'workspace/workflow', id: 2 };
+                ? { name: 'Agent', path: 'Agents', apps_mode: 1 }
+                : { name: 'WorkFlow', path: 'workspace/workflow', apps_mode: 2 };
         setCreationType((pre: any) => {
             return {
                 ...pre,

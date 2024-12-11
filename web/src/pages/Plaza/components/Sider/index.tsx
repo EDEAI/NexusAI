@@ -1,9 +1,9 @@
 // import Scroll from '@/components/InfiniteScroll';
 import { roomDetails, roomRecent, upAgentStatus, updataRoom, upRoomStatus } from '@/api/plaza';
 import { headportrait } from '@/utils/useUser';
-import { ArrowLeftOutlined, EllipsisOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, EllipsisOutlined, QuestionCircleOutlined,ExclamationCircleFilled } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Empty, Spin, Switch, Tooltip } from 'antd';
+import { Button, Empty, Spin, Switch, Tooltip,Modal } from 'antd';
 import { throttle } from 'lodash';
 import { memo, useEffect, useRef, useState } from 'react';
 import { history, useParams } from 'umi';
@@ -39,7 +39,18 @@ const Sider: React.FC<siderPm> = porpos => {
 
     // Clear memory
     const clearContext = () => {
-        setsendMessage('TRUNCATE', '0');
+        const { confirm } = Modal;
+        confirm({
+            title: intl.formatMessage({ id: 'app.chatroom.clear.title' }),
+            icon: <ExclamationCircleFilled />,
+            content: intl.formatMessage({ id: 'app.chatroom.clear.tips' }),
+            okText: intl.formatMessage({ id: 'app.chatroom.clear.confirm' }),
+            okType: 'danger',
+            cancelText: intl.formatMessage({ id: 'app.chatroom.clear.cancel' }),
+            onOk() {
+                setsendMessage('TRUNCATE', '0');
+            },
+        });
     };
     // Get agent_list details
     const getRoomDetails = async () => {

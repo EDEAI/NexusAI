@@ -71,5 +71,10 @@ export default {
     'app.chatroom.del.confirm': 'Delete',
     'app.chatroom.del.tips': 'Do you want to delete the current room?',
     'app.chatroom.del.cancel': 'Cancel',
-    'app.chatroom.del.delsuccess': 'Deleted Successfully'
+    'app.chatroom.del.delsuccess': 'Deleted Successfully',
+
+    'app.chatroom.clear.title': 'Clear Memory',
+    'app.chatroom.clear.confirm': 'Clear',
+    'app.chatroom.clear.tips': 'Do you want to clear the agent memory?',
+    'app.chatroom.clear.cancel': 'Cancel',
 };
