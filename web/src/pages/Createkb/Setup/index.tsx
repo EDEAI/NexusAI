@@ -130,7 +130,7 @@ const Setup = ({ createkbInfo, fun }: any) => {
                                 ? intl.formatMessage({
                                       id: 'createkb.knowledge.base.of',
                                       defaultMessage: '',
-                                  }) + datacontent.nickname
+                                  }) +' '+ datacontent.nickname
                                 : appType == 1
                                 ? intl.formatMessage({
                                       id: 'createkb.editKB',

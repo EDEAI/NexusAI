@@ -169,7 +169,7 @@ const Kbtext = ({ createkbInfo }: any) => {
                                 ? intl.formatMessage({
                                       id: 'createkb.knowledge.base.of',
                                       defaultMessage: '',
-                                  }) + userData.dataset_detail.nickname
+                                  }) +' '+ userData.dataset_detail.nickname
                                 : intl.formatMessage({
                                       id: 'createkb.editKB',
                                       defaultMessage: '',

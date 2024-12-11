@@ -327,7 +327,7 @@ const UploadList = ({ fun, createkbInfo }: any) => {
                                 {appType == 2
                                     ? intl.formatMessage({
                                           id: 'createkb.knowledge.base.of',
-                                      }) + datacontent.dataset_detail.nickname 
+                                      }) + ' ' + datacontent.dataset_detail.nickname 
                                     : appType == 1
                                     ? intl.formatMessage({
                                           id: 'createkb.editKB',
