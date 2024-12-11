@@ -166,8 +166,7 @@ const Kbtext = ({ createkbInfo }: any) => {
                         <img src="/icons/flag.svg" className="w-4 h-4" />
                         <span className="ml-[10px] text-[#213044] text-base font-medium">
                             {!createkbInfo.type && userData != null
-                                ? userData.dataset_detail.nickname +
-                                  intl.formatMessage({
+                                ? intl.formatMessage({
                                       id: 'createkb.knowledge.base.of',
                                       defaultMessage: '',
                                   })
