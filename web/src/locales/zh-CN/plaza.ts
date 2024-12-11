@@ -69,7 +69,12 @@ export default {
 
     'app.chatroom.del.title': '删除',
     'app.chatroom.del.confirm': '删除',
-    'app.chatroom.del.tips':'是否删除当前房间',
+    'app.chatroom.del.tips':'是否删除当前房间？',
     'app.chatroom.del.cancel':'取消',
-    'app.chatroom.del.delsuccess':'删除成功'
+    'app.chatroom.del.delsuccess':'删除成功',
+
+    'app.chatroom.clear.title': '清除记忆',
+    'app.chatroom.clear.confirm': '清除',
+    'app.chatroom.clear.tips':'是否清除智能体记忆？',
+    'app.chatroom.clear.cancel':'取消',
 };
