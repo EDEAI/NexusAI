@@ -27,7 +27,7 @@ export default memo((props: NodeProps) => {
                 position={Position.Left}
             ></CustomHandle>
 
-            {/* <CreateNodesToolbar {...props} position="left"></CreateNodesToolbar> */}
+           
 
             <div className="flex flex-col gap-2 mb-2">
                 {data.model && (
@@ -63,12 +63,7 @@ export default memo((props: NodeProps) => {
                                         type="source"
                                         position={Position.Right}
                                     ></CustomHandle>
-                                    {/* <CreateNodesToolbar
-                                        {...props}
-                                        sourceHandle={`${index}`}
-                                        style={{ top: 'auto' }}
-                                        position="right"
-                                    ></CreateNodesToolbar> */}
+                                  
                                 </div>
                             </div>
                         </div>

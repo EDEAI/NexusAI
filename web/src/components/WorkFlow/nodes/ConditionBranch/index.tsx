@@ -14,8 +14,6 @@ export default memo((props: NodeProps) => {
     const [variables, setVariables] = useState([]);
     const getVariables = useStore(state => state.getOutputVariables);
     useMount(() => {
-        console.log('variables', getVariables(id));
-
         setVariables(getVariables(id));
     });
     return (

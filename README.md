@@ -117,7 +117,7 @@ http://127.0.0.1:9470
 When you visit for the first time, you can log in using the following initial administrator account
 ```
 Email:
-administrator@gmail.com
+admin@nexusai.com
 
 Password:
 nexusaipwd
@@ -372,7 +372,7 @@ http://127.0.0.1:9471
 When you visit for the first time, you can log in using the following initial administrator account
 ```
 Email:
-administrator@gmail.com
+admin@nexusai.com
 
 Password:
 nexusaipwd

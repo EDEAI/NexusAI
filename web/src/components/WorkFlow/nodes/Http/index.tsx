@@ -21,8 +21,7 @@ export default memo((props: NodeProps) => {
                 params={props}
                 position={Position.Right}
             ></CustomHandle>
-            {/* <CreateNodesToolbar {...props} position="left"></CreateNodesToolbar>
-            <CreateNodesToolbar {...props} position="right"></CreateNodesToolbar> */}
+         
             <div>
                 <div className="relative mb-2 box-border -mr-2 flex  bg-slate-100 px-2 py-1 rounded-md  gap-2 text-xs">
                     <div className="flex items-center">{props?.data?.method}</div>

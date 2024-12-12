@@ -22,31 +22,6 @@ interface Prompt {
     assistant: PromptItem;
 }
 
-const modelList = [
-    { label: 'GPT-3', value: 'GPT-3' },
-    { label: 'GPT-Neo', value: 'GPT-Neo' },
-    { label: 'GPT-4', value: 'GPT-4' },
-    { label: 'GPT-4-32k', value: 'GPT-4-32k' },
-    { label: 'GPT-4-Turbo', value: 'GPT-4-Turbo' },
-    { label: 'GPT-4-Turbo-16k', value: 'GPT-4-Turbo-16k' },
-    { label: 'GPT-4-Turbo-16k-0613', value: 'GPT-4-Turbo-16k-0613' },
-    { label: 'GPT-4-Turbo-0613', value: 'GPT-4-Turbo-0613' },
-    { label: 'GPT-4-0613', value: 'GPT-4-0613' },
-    { label: 'GPT-3-Turbo', value: 'GPT-3-Turbo' },
-];
-const transformSelectOptions = options => {
-    return options.map(group => {
-        return {
-            label: <span>{group.label}</span>,
-            title: group.value,
-            options:
-                group.options?.map(item => ({
-                    label: <span>{item.label}</span>,
-                    value: item.value,
-                })) || [],
-        };
-    });
-};
 
 export default memo(({ node }: { node: AppNode }) => {
     const formRef = useRef(null);
@@ -65,7 +40,7 @@ export default memo(({ node }: { node: AppNode }) => {
         }, 200);
     });
 
-    // useUpdateEffect(() => {}, [node.id]);
+    
 
     const setNodeChange = (addItem: { [key: string]: any }, allValues) => {
         console.log(addItem);

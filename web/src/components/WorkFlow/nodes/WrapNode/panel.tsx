@@ -56,10 +56,6 @@ const NodeForm = memo(({ node, updateNodeData }: NodeFormParams) => {
 
     const [searchParams] = useSearchParams();
     const publishStatus = searchParams.get('type') == 'true';
-    // useNodeIdUpdate((nodeId, node) => {
-    //     formRef?.current?.setFieldsValue({ desc: node?.data['desc'] || '' });
-    //     formRef?.current?.setFieldsValue({ title: node?.data['title'] || '' });
-    // });
 
     useEffect(() => {
         formRef?.current?.setFieldsValue({ desc: node?.data['desc'] || '' });

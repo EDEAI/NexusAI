@@ -40,10 +40,7 @@ export default memo(({ node }: { node: AppNode }) => {
     const datasetData = useStore(state => state.teamDatasetData);
     const updateNodeData = useStore(state => state.updateNodeData);
     useMount(() => {
-        // const fieldNames = Object.keys(formRef.current.getFieldsValue());
-        // fieldNames.forEach(e => {
-        //     formRef.current.setFieldsValue({ [e]: node.data[e] });
-        // });
+    
         const reset = resetFormNodes(formRef, node);
         setTimeout(() => {
             reset();
