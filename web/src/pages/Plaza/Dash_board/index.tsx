@@ -11,7 +11,7 @@ import { useIntl } from '@umijs/max';
 import { Button, Col, Empty, Row, Spin } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
-import Menus from '../components/Menus/index';
+// import Menus from '../components/Menus/index';
 
 // Subtitle
 const SubTitle = ({ subtitle }) => {
@@ -552,7 +552,7 @@ const Plaza: React.FC = () => {
                     margin: '0 auto',
                 }}
             >
-                <Menus keys="dash_board" path="/meeting"></Menus>
+                {/* <Menus keys="dash_board" path="/meeting"></Menus> */}
                 <div className="flex-1" style={{ minHeight: 0 }}>
                     <Row
                         gutter={[20, 20]}
