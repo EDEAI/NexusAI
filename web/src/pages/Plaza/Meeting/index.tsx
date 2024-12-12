@@ -231,7 +231,7 @@ const MeetingCont = () => {
         <div
             className="pt-0 w-full"
             id="Meeting"
-            style={{ height: 'calc(100vh - 124px)', overflowY: 'auto' }}
+            style={{ height: 'calc(100vh - 94px)', overflowY: 'auto' }}
         >
             <Scroll
                 dataLength={meeting && meeting.list.length}
@@ -241,7 +241,7 @@ const MeetingCont = () => {
                 isFooter={true}
                 pageNumber={parameter.page}
             >
-                <div className="px-[30px]">
+                <div className="px-[30px] pt-[30px]">
                     <Row gutter={[20, 20]} style={{ margin: 0 }}>
                         {closeLoading && (
                             <AddRoom

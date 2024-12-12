@@ -9,9 +9,9 @@ import {creationsearchdata} from "@/utils/useUser";
 
 const Header: React.FC = () => {
     const { location } = history;
-    const pathname = location?.pathname;
+    let pathname = location?.pathname;
     const intl = useIntl();
-
+    if(pathname.indexOf('chat_room')!=-1){ pathname = '/chat_room'}
     const menuList = [
         {
             name: intl.formatMessage({ id: 'component.menu.dashboard', defaultMessage: '' }),
@@ -24,20 +24,6 @@ const Header: React.FC = () => {
                         defaultMessage: '',
                     }),
                     path: '/plaza',
-                },
-                {
-                    name: intl.formatMessage({
-                        id: 'component.menu.chatRoomList',
-                        defaultMessage: '',
-                    }),
-                    path: '/meeting',
-                },
-                {
-                    name: intl.formatMessage({
-                        id: 'component.menu.chatRoom',
-                        defaultMessage: '',
-                    }),
-                    path: '/chat_room',
                 },
             ],
         },
@@ -111,6 +97,27 @@ const Header: React.FC = () => {
                 },
             ],
         },
+        {
+            name: intl.formatMessage({ id: 'component.menu.meeting', defaultMessage: '' }),
+            icon: '/icons/plaza_m2_c2.svg',
+            activeIcon: '/icons/plaza_m2_c1.svg',
+            children: [
+                {
+                    name: intl.formatMessage({
+                        id: 'component.menu.chatRoomList',
+                        defaultMessage: '',
+                    }),
+                    path: '/meeting',
+                },
+                {
+                    name: intl.formatMessage({
+                        id: 'component.menu.chatRoom',
+                        defaultMessage: '',
+                    }),
+                    path: '/chat_room',
+                },
+            ],
+        },
     ];
     return (
         <div className="w-full h-full bg-[#F7F7F7] flex items-center justify-between px-[30px]">
@@ -121,7 +128,9 @@ const Header: React.FC = () => {
             </div>
             <div className="flex-1 flex justify-center items-center">
                 {menuList.map((item, index) => {
+                
                     if (item.children.some(x => x.path == pathname)) {
+                        
                         return (
                             <div
                                 key={index}
