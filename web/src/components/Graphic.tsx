@@ -13,6 +13,7 @@ interface GraphicProps {
     operation?: any;
     progress?: any;
     status?: any;
+    backlogTips?:any;
 }
 
 const Graphic: React.FC<GraphicProps> = (props: GraphicProps) => {
@@ -27,6 +28,7 @@ const Graphic: React.FC<GraphicProps> = (props: GraphicProps) => {
         operation = '',
         progress,
         status,
+        backlogTips,
     } = props;
     const [progressVal, setProgressVal] = useState(0);
     // const [progressEase,setProgressEase] = useState('')
@@ -109,6 +111,7 @@ const Graphic: React.FC<GraphicProps> = (props: GraphicProps) => {
                         </span>
                     </div>
                 </div>
+                {backlogTips?backlogTips:<></>}
                 {operation && (
                     <div className="flex items-center w-[24px]">
                         <span className="operation">{operation}</span>

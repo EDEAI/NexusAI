@@ -77,4 +77,7 @@ export default {
     'app.chatroom.clear.confirm': 'Clear',
     'app.chatroom.clear.tips': 'Do you want to clear the agent memory?',
     'app.chatroom.clear.cancel': 'Cancel',
+
+    'app.workflow.needHumanConfirm': 'Need human confirmation',
+    'app.workflow.noHumanConfirm': 'Human confirmation processed',
 };

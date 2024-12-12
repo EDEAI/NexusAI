@@ -6,21 +6,22 @@ import Graphic from '@/components/Graphic';
 import useUserStore from '@/store/user';
 import useSocketStore from '@/store/websocket';
 import { creationsearchdata } from '@/utils/useUser';
-import { SwapRightOutlined } from '@ant-design/icons';
+import { SwapRightOutlined,CheckCircleOutlined,ExclamationCircleOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Col, Empty, Row, Spin } from 'antd';
+import { Button, Col, Empty, Row, Spin,Tooltip } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 // import Menus from '../components/Menus/index';
 
 // Subtitle
 const SubTitle = ({ subtitle }) => {
+    let titleClassName = `pl-[10px] text-[#1B64F3] text-[12px] ${subtitle.need_human_confirm ? 'text-[#1B64F3]' : 'text-[#808183] '}`
     return (
         <div className="pr-4">
             <div className="truncate w-full">
                 <span className="pr-[10px] text-[#666666] text-[12px]">{subtitle.app_name}</span>
                 <SwapRightOutlined />
-                <span className="pl-[10px] text-[#1B64F3] text-[12px]">
+                <span className={titleClassName}>
                     {subtitle.node_name || subtitle.node_exec_data?.node_name}
                 </span>
             </div>
@@ -149,6 +150,9 @@ const BlockList = ({ blocklsit, item, blockIndex }) => {
                 break;
             case 'backlogs':
                 // history.push(`/workspace/workflow?app_id=${item.list[blockIndex].app_id}&type=true`);
+                if(item.list[i].need_human_confirm == 0){
+                    return
+                }
                 setDealtWithData(item.list[i]);
                 setRunId(null);
                 setRunPanelLogRecord(false);
@@ -184,6 +188,7 @@ const BlockList = ({ blocklsit, item, blockIndex }) => {
                                     jumpDetails(index);
                                 }}
                                 lineClamp={1}
+                                backlogTips={item.needHuman(i)}
                                 // iconType={'workflow_icon'}
                             ></Graphic>
                         )}
@@ -316,6 +321,29 @@ const Coldom = () => {
             title: intl.formatMessage({ id: 'app.dashboard.backlog' }),
             key: 'backlogs',
             substitle: true,
+            needHuman:(item:any)=>{
+                return (
+                    <div className='align-center'>
+                        {item.need_human_confirm ? (
+                            <Tooltip
+                                title={intl.formatMessage({
+                                    id: 'app.workflow.needHumanConfirm',
+                                })}
+                            >
+                                <ExclamationCircleOutlined className="text-[#1B64F3]" />
+                            </Tooltip>
+                        ) : (
+                            <Tooltip
+                                title={intl.formatMessage({
+                                    id: 'app.workflow.noHumanConfirm',
+                                })}
+                            >
+                                <CheckCircleOutlined className="text-[#808183]" />
+                            </Tooltip>
+                        )}
+                    </div>
+                )
+            },
         },
         {
             title: intl.formatMessage({ id: 'app.dashboard.myagent' }),

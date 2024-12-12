@@ -77,4 +77,7 @@ export default {
     'app.chatroom.clear.confirm': '清除',
     'app.chatroom.clear.tips':'是否清除智能体记忆？',
     'app.chatroom.clear.cancel':'取消',
+
+    "app.workflow.needHumanConfirm":"需要人工确认",
+    "app.workflow.noHumanConfirm":"已处理人工确认"
 };
