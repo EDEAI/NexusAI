@@ -245,7 +245,7 @@ class DatasetManagement:
                 type_, config = convert_to_type_and_config(process_rule['config'])
             return TextSplitter(text_splitter_type=type_, **config)
         
-        dataset = datasets.get_dataset_by_id(dataset_id)
+        dataset = datasets.get_dataset_by_id(dataset_id, check_is_reindexing=True)
         collection_name = dataset['collection_name']
         embeddings_config_id = dataset['embedding_model_config_id']
         _, vdb = get_embeddings_and_vector_database(embeddings_config_id, collection_name)
@@ -315,7 +315,7 @@ class DatasetManagement:
     @classmethod
     def enable_document(cls, document_id: int) -> Optional[bool]:
         document = documents.get_document_by_id(document_id)
-        dataset = datasets.get_dataset_by_id(document['dataset_id'])
+        dataset = datasets.get_dataset_by_id(document['dataset_id'], check_is_reindexing=True)
         _, vdb = get_embeddings_and_vector_database(
             dataset['embedding_model_config_id'],
             dataset['collection_name']
@@ -374,7 +374,7 @@ class DatasetManagement:
     @classmethod
     def disable_document(cls, document_id: int) -> Optional[bool]:
         document = documents.get_document_by_id(document_id)
-        dataset = datasets.get_dataset_by_id(document['dataset_id'])
+        dataset = datasets.get_dataset_by_id(document['dataset_id'], check_is_reindexing=True)
         segments = document_segments.select(
             columns=['id', 'index_id'],
             conditions=[
@@ -405,7 +405,7 @@ class DatasetManagement:
                 }
             )
             return True
-        dataset = datasets.get_dataset_by_id(document['dataset_id'])
+        dataset = datasets.get_dataset_by_id(document['dataset_id'], check_is_reindexing=True)
         segments = document_segments.select(
             columns=['index_id', 'content', 'status'],
             conditions=[
@@ -522,7 +522,13 @@ class DatasetManagement:
         return result
 
     @classmethod
-    def reindex_dataset(cls, dataset_id: int, new_embeddings_config_id: int) -> str:
+    def reindex_dataset(cls, dataset_id: int, new_embeddings_config_id: int) -> None:
+        dataset = datasets.get_dataset_by_id(dataset_id, check_is_reindexing=True)
+        datasets.update(
+            {'column': 'id', 'value': dataset_id},
+            {'collection_name': 'reindexing'}
+        )
+
         enabled_documents = documents.select(
             columns=['id', 'name', 'upload_file_id', 'node_exec_id'],
             conditions=[
@@ -553,7 +559,6 @@ class DatasetManagement:
             )
         
         # Delete dataset from vector database
-        dataset = datasets.get_dataset_by_id(dataset_id)
         collection_name = dataset['collection_name']
         embeddings_config_id = dataset['embedding_model_config_id']
         _, vdb = get_embeddings_and_vector_database(embeddings_config_id, collection_name)
@@ -636,12 +641,15 @@ class DatasetManagement:
                     )
                     document_segments.commit()
         
-        return collection_name
+        datasets.update(
+            {'column': 'id', 'value': dataset_id},
+            {'collection_name': collection_name}
+        )
 
     @classmethod
     def delete_dataset(cls, dataset_id: int):
         # Delete dataset from vector database
-        dataset = datasets.get_dataset_by_id(dataset_id)
+        dataset = datasets.get_dataset_by_id(dataset_id, check_is_reindexing=True)
         collection_name = dataset['collection_name']
         embeddings_config_id = dataset['embedding_model_config_id']
         _, vdb = get_embeddings_and_vector_database(embeddings_config_id, collection_name)
@@ -730,7 +738,7 @@ class DatasetRetrieval:
                 user = users.get_user_by_id(user_id)
                 assert user, 'User not found!'
                 team_id = user['team_id']
-                dataset = datasets.get_dataset_by_id(dataset_id)
+                dataset = datasets.get_dataset_by_id(dataset_id, check_is_reindexing=True)
                 app = apps.get_app_by_id(dataset['app_id'])
                 apps.increment_execution_times(app['id'])
                 collection_name = dataset['collection_name']
@@ -848,7 +856,7 @@ class DatasetRetrieval:
                     apps.increment_execution_times(app['id'])
                 overall_result = []
                 for dataset_id in dataset_ids:
-                    dataset = datasets.get_dataset_by_id(dataset_id)
+                    dataset = datasets.get_dataset_by_id(dataset_id, check_is_reindexing=True)
                     collection_name = dataset['collection_name']
                     embeddings_config_id = dataset['embedding_model_config_id']
                     _, vdb = get_embeddings_and_vector_database(embeddings_config_id, collection_name)

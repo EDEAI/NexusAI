@@ -74,18 +74,22 @@ docker-compose up -d
 
 After running the command, you should see output similar to the following, showing the status of all containers
 ```bash
-[+] Running 11/11
- ✔ Network docker_my_network         Created                   0.1s 
- ✔ Container docker-web-1            Started                   1.5s 
- ✔ Container docker-redis-1          Started                   1.3s 
- ✔ Container milvus-minio            Started                   1.3s 
- ✔ Container docker-sandbox-1        Started                   1.8s 
- ✔ Container milvus-etcd             Started                   1.3s 
- ✔ Container docker-mysql-1          Started                   1.8s 
- ✔ Container milvus-standalone       Started                   1.9s 
- ✔ Container docker-celery-1         Started                   2.5s 
- ✔ Container docker-multi_service-1  Started                   2.5s 
- ✔ Container docker-nginx-1          Started                   0.8s
+[+] Running 15/15
+ ✔ Network docker_my_network                   Created                          0.1s
+ ✔ Volume "docker_mysql_data"                  Created                          0.0s
+ ✔ Volume "docker_minio_data"                  Created                          0.0s
+ ✔ Volume "docker_milvus_data"                 Created                          0.0s
+ ✔ Volume "docker_etcd_data"                   Created                          0.0s
+ ✔ Volume "docker_redis_data"                  Created                          0.0s
+ ✔ Container nexusai-docker-sandbox            Started                          2.6s
+ ✔ Container nexusai-docker-milvus-etcd        Started                          2.6s
+ ✔ Container nexusai-docker-nginx              Started                          2.6s
+ ✔ Container nexusai-docker-milvus-minio       Started                          2.6s
+ ✔ Container nexusai-docker-redis              Started                          2.6s
+ ✔ Container nexusai-docker-web                Started                          2.6s
+ ✔ Container nexusai-docker-mariadb            Started                          2.5s
+ ✔ Container nexusai-docker-milvus-standalone  Started                          2.4s
+ ✔ Container nexusai-docker-multi-service      Started                          5.5s
 ```
 
 Finally, you can check whether all containers are running normally
@@ -93,19 +97,18 @@ Finally, you can check whether all containers are running normally
 docker-compose ps
 ```
 
-In the output below, you can see three business service containers `celery` `multi_service` `web`, and the rest are basic service containers
+In the output below, you can see three business service containers `nexusai-docker-multi-service` `nexusai-docker-web`, and the rest are basic service containers
 ```bash
-NAME                     IMAGE                                      COMMAND                  SERVICE             CREATED              STATUS                                 PORTS
-docker-celery-1          edeai/celery:0.0.1                         "python celery_app.py"   celery              About a minute ago   Up About a minute                      
-docker-multi_service-1   edeai/multi_service:0.0.1                  "sh -c 'python docke…"   multi_service       About a minute ago   Up About a minute                      
-docker-mysql-1           mysql:8.0                                  "docker-entrypoint.s…"   mysql               About a minute ago   Up About a minute                      33060/tcp, 0.0.0.0:9461->3306/tcp, [::]:9461->3306/tcp
-docker-nginx-1           nginx:latest                               "/docker-entrypoint.…"   nginx               About a minute ago   Up About a minute                      0.0.0.0:9470->80/tcp, [::]:9470->80/tcp
-docker-redis-1           redis:6.2                                  "docker-entrypoint.s…"   redis               About a minute ago   Up About a minute                      0.0.0.0:9462->6379/tcp, [::]:9462->6379/tcp
-docker-sandbox-1         edeai/sandbox:0.0.1                        "python api_server.py"   sandbox             About a minute ago   Up About a minute                      0.0.0.0:9464->8001/tcp, [::]:9464->8001/tcp
-docker-web-1             edeai/web:0.0.1                            "docker-entrypoint.s…"   web                 About a minute ago   Up About a minute                      
-milvus-etcd              quay.io/coreos/etcd:v3.5.5                 "etcd -advertise-cli…"   etcd                About a minute ago   Up About a minute (healthy)            2379-2380/tcp
-milvus-minio             minio/minio:RELEASE.2023-03-20T20-16-18Z   "/usr/bin/docker-ent…"   minio               About a minute ago   Up About a minute (healthy)            9000/tcp
-milvus-standalone        milvusdb/milvus:v2.3.1                     "/tini -- milvus run…"   milvus-standalone   About a minute ago   Up About a minute (health: starting)   0.0.0.0:9463->19530/tcp, [::]:9463->19530/tcp
+NAME                               IMAGE                                      COMMAND                   SERVICE             CREATED          STATUS                    PORTS
+nexusai-docker-mariadb             mariadb:11.4                               "docker-entrypoint.s…"   mariadb             50 minutes ago   Up 50 minutes             0.0.0.0:9461->3306/tcp
+nexusai-docker-milvus-etcd         quay.io/coreos/etcd:v3.5.5                 "etcd -advertise-cli…"   etcd                50 minutes ago   Up 50 minutes (healthy)   2379-2380/tcp
+nexusai-docker-milvus-minio        minio/minio:RELEASE.2023-03-20T20-16-18Z   "/usr/bin/docker-ent…"   minio               50 minutes ago   Up 50 minutes (healthy)   9000/tcp
+nexusai-docker-milvus-standalone   milvusdb/milvus:v2.3.1                     "/tini -- milvus run…"   milvus-standalone   50 minutes ago   Up 50 minutes (healthy)   0.0.0.0:9463->19530/tcp
+nexusai-docker-multi-service       edeai/multi_service:0.0.3                  "supervisord -c /etc…"   multi_service       50 minutes ago   Up 50 minutes
+nexusai-docker-nginx               nginx:latest                               "/docker-entrypoint.…"   nginx               50 minutes ago   Up 40 minutes             0.0.0.0:9470->80/tcp
+nexusai-docker-redis               redis:6.2                                  "docker-entrypoint.s…"   redis               50 minutes ago   Up 50 minutes             0.0.0.0:9462->6379/tcp
+nexusai-docker-sandbox             edeai/sandbox:0.0.3                        "python api_server.py"   sandbox             50 minutes ago   Up 50 minutes             0.0.0.0:9464->8001/tcp
+nexusai-docker-web                 edeai/web:0.0.2                            "docker-entrypoint.s…"   web                 50 minutes ago   Up 50 minutes
 ```
 
 ## Visit NexusAI
@@ -135,6 +138,7 @@ Please execute the commands in the following order:
 cd NexusAI/docker
 docker-compose down
 git pull origin main
+# Make sure to synchronize the updated content in `docker-compose.yml.template` to `docker-compose.yml`
 docker-compose up -d
 ```
 
@@ -149,7 +153,7 @@ docker-compose up -d
 ## docker-compose.yml configuration instructions
 Backend environment variables
 ```yaml
-# MySQL related configuration
+# Database related configuration
 MYSQL_HOST: mysql
 MYSQL_PORT: 3306
 MYSQL_USER: nexus_ai
@@ -204,7 +208,7 @@ SANDBOX_FASTAPI_WORKERS: 2
 DEFAULT_LLM_SUPPLIER_CONFIG_ID: 1
 DEFAULT_LLM_CONFIG_ID: 3
 
-# API, websocket and meeting room websocket service port configuration
+# API, websocket and roundtable websocket service port configuration
 API_PORT: 9472
 WEBSOCKET_PORT: 9473
 CHATROOM_WEBSOCKET_PORT: 9474
@@ -232,9 +236,9 @@ Front-end environment variables
 ```yaml
 # Backend API service access address
 WEB_API_URL: http://127.0.0.1:9470
-# Backend websocket service address (except meeting room service)
+# Backend websocket service address (except roundtable service)
 WEB_WS_URL: ws://127.0.0.1:9470/ws
-# Backend meeting room service websocket service address
+# Backend roundtable service websocket service address
 WEB_CHAT_URL: ws://127.0.0.1:9470/ws_chat
 ```
 
@@ -244,7 +248,7 @@ WEB_CHAT_URL: ws://127.0.0.1:9470/ws_chat
 Before deploying NexusAI locally, we need to deploy the following basic services:
 1. [Docker](https://docs.docker.com/engine/install/)
 2. [nginx](https://nginx.org/en/docs/install.html)
-3. [MySQL](https://dev.mysql.com/doc/refman/8.0/en/installing.html)
+3. [MariaDB](https://mariadb.org/download/)
 4. [Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/)
 5. [Milvus](https://milvus.io/docs/install_standalone-docker-compose.md)
 6. [Anaconda](https://docs.anaconda.com/anaconda/install/)
@@ -260,22 +264,22 @@ If you want to enable Milvus authentication, refer to [Milvus Authentication](ht
 
 [Cloning the Embedding and Reranker models for offline mode](#cloning-the-embedding-and-reranker-models-for-offline-mode)
 
-Initialize the database, If your MySQL version is >= 8.0, you need to add "mysql_native_password=ON" to the MySQL configuration file.
+Initialize the database
 ```bash
 cd NexusAI
 
-# Login to mysql
-mysql -u root -p
+# Login to mariadb
+mariadb -u root -p
 
 # Create a database, user, and grant permissions
 CREATE DATABASE nexus_ai DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-CREATE USER 'nexus_ai'@'%' IDENTIFIED WITH mysql_native_password BY '<mysqlpwd>';
+CREATE USER 'nexus_ai'@'%' IDENTIFIED BY '<mysqlpwd>';
 GRANT ALL PRIVILEGES ON nexus_ai.* TO 'nexus_ai'@'%';
 FLUSH PRIVILEGES;
 EXIT;
 
 # Data import
-mysql -u nexus_ai -p<mysqlpwd> nexus_ai < docker/mysql/db_init/nexus_ai.sql
+mariadb -u nexus_ai -p<mysqlpwd> nexus_ai < docker/mysql/db_init/nexus_ai.sql
 ```
 
 Create and activate the basic conda environment. The default Python version we use is 3.10.13, We recommend using Python version >= 3.10 and <= 3.12 for compatibility.
@@ -294,7 +298,7 @@ cp .env.template .env
 Configure icon access rules through nginx
 ```nginx
 server {
-    listen 9475; # The port should be consistent with ICON_URL in .env
+    listen 9475; # The port should be consistent with ICON_URL in `.env`
 
     location /tool_icon {
         alias NexusAI/assets/tool; # Fill in the real path of the project
@@ -310,10 +314,10 @@ systemctl restart nginx
 
 Start the sandbox container
 ```bash
-# The docker image tag should be consistent with the configuration in docker-compose.yml
+# The docker image tag should be consistent with the configuration in `docker-compose.yml`
 docker pull edeai/sandbox:<tag>
 
-# SANDBOX_PORT should be consistent with .env
+# SANDBOX_PORT should be consistent with `.env`
 # The mounted local storage directory should be changed to the real path
 # SANDBOX_FASTAPI_WORKERS: The number of workers for the sandbox service
 docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<tag>
@@ -336,7 +340,7 @@ Start the websocket service
 python websocket.py
 ```
 
-Start meeting room service
+Start roundtable service
 ```bash
 python task/chatroom_run.py
 ```
@@ -360,7 +364,7 @@ npm install
 
 Start the web service
 ```bash
-# You can also use other instructions in package.json:scripts
+# You can also use other instructions in `package.json:scripts`
 npm run start
 ```
 
@@ -414,10 +418,10 @@ docker rm <container_id>
 # Delete old images
 docker rmi edeai/sandbox:<old tag>
 
-# The docker image tag should be consistent with the configuration in docker-compose.yml
+# The docker image tag should be consistent with the configuration in `docker-compose.yml`
 docker pull edeai/sandbox:<new tag>
 
-# SANDBOX_PORT should be consistent with .env
+# SANDBOX_PORT should be consistent with `.env`
 # The mounted local storage directory should be changed to the real path
 # SANDBOX_FASTAPI_WORKERS: The number of workers for the sandbox service
 docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<new tag>
@@ -425,4 +429,4 @@ docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -e
 
 5. Note that the updated content in `.env.template` is synchronized to `.env`, and the updated content in `web/config/envConfig.ts.template` is synchronized to `web/config/envConfig.ts`
 
-6. Restart each service in turn `API` `Celery` `websocket` `meeting room` `workflow` `web` 
+6. Restart each service in turn `API` `Celery` `websocket` `roundtable` `workflow` `web` 

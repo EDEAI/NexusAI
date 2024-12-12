@@ -197,6 +197,9 @@ services:
       - ./volumes/logs/nginx:/var/log/nginx
     ports:
       - "9470:80"
+    depends_on:
+      - multi_service
+      - web
     networks:
       - my_network
 

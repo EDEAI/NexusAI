@@ -17,7 +17,13 @@ class Datasets(MySQL):
     """
     have_updated_time = True
 
-    def get_dataset_id(self, app_id: int, user_id: int = 0, language_key: str = 'api_vector_available_dataset') -> int:
+    def get_dataset_id(
+        self,
+        app_id: int,
+        user_id: int = 0,
+        language_key: str = 'api_vector_available_dataset',
+        check_is_reindexing: bool = False
+    ) -> int:
         """
         Retrieves the dataset ID associated with the given app ID.
 
@@ -33,14 +39,16 @@ class Datasets(MySQL):
             conditions.append({'column': 'user_id', 'value': user_id})
 
 
-        datasets_id = self.select_one(
-            columns=['id'],
+        dataset = self.select_one(
+            columns=['id', 'collection_name'],
             conditions=conditions,
         )
-        assert datasets_id, get_language_content(language_key)
-        return datasets_id['id']
+        assert dataset, get_language_content(language_key)
+        if check_is_reindexing:
+            assert dataset['collection_name'] != 'reindexing', get_language_content('api_vector_indexing')
+        return dataset['id']
 
-    def get_dataset_by_id(self, dataset_id: int) -> Dict[str, Any]:
+    def get_dataset_by_id(self, dataset_id: int, check_is_reindexing: bool = False) -> Dict[str, Any]:
         """
         Retrieves the dataset information for the given dataset ID.
 
@@ -62,6 +70,8 @@ class Datasets(MySQL):
             ]
         )
         assert dataset, get_language_content('api_vector_available_dataset')
+        if check_is_reindexing:
+            assert dataset['collection_name'] != 'reindexing', get_language_content('api_vector_indexing')
         return dataset
 
     def get_dataset_find(self, dataset_id: int, user_id: int, team_id: int) -> Dict[str, Any]:
