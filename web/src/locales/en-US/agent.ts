@@ -39,7 +39,7 @@ export default {
     'agent.pleaseselect': 'Please select',
     'agent.functiondescription': 'Function Description',
     'agent.inputvariable': 'Input Variable',
-    'agent.add': 'Add',
+    'agent.add': 'Add Ability',
     'agent.associatedknowledgebase': 'Link Knowledge Base',
     'agent.defaultoutputformat': 'Default Output Format',
     'agent.variable.name': 'Variable Name',

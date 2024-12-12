@@ -42,7 +42,7 @@ export default () => {
         };
     };
     const { data, loading, pagination } = usePagination(getDetail, {
-        defaultPageSize: 8,
+        defaultPageSize: 10,
     });
     useUpdateEffect(() => {
         if (proListRef.current) {

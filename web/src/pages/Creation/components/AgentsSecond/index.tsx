@@ -11,7 +11,7 @@ interface ChildProps {
     Detaillist: any;
     setDetaillist: any;
     Sformref: any;
-    Operationbentate: any; 
+    Operationbentate: any;
     pageKeyfun: any;
     secondjudgingcondition: any;
     SkillMenuClick: any;
@@ -30,7 +30,6 @@ const AgentsSecond: React.FC<ChildProps> = ({
     SkillMenuClick,
     agentupdata,
 }) => {
-   
     const intl = useIntl();
     const [messageApi, contextHolder] = message.useMessage();
     const [agentAbilities, setAgentAbilities] = useState({
@@ -46,9 +45,7 @@ const AgentsSecond: React.FC<ChildProps> = ({
     });
 
     useEffect(() => {});
-  
 
-  
     const nextStep = (values: any) => {
         // const messagetype = values.users.filter((item: any) => item.status)
         if (
@@ -86,7 +83,7 @@ const AgentsSecond: React.FC<ChildProps> = ({
             SecondValue({ ...agentAbilities });
         }
     };
-  
+
     const AgentAbilitiesSet = async () => {
         if (secondjudgingcondition()) {
         } else {
@@ -94,7 +91,6 @@ const AgentsSecond: React.FC<ChildProps> = ({
         }
     };
 
-   
     const AutoSwitch = (checked: boolean) => {
         setDetaillist({
             ...Detaillist,
@@ -136,7 +132,7 @@ const AgentsSecond: React.FC<ChildProps> = ({
                                     <div className=" text-[#555555] text-xs font-medium">
                                         {intl.formatMessage({ id: 'agent.capability' })}
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <Button
                                             type="link"
                                             onClick={() => add()}
@@ -145,7 +141,7 @@ const AgentsSecond: React.FC<ChildProps> = ({
                                         >
                                             {intl.formatMessage({ id: 'agent.add' })}
                                         </Button>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 {fields.map(({ key, name, ...restField }) => (
                                     <div className="bg-[#F7F7F7] p-[15px] rounded-lg mb-[20px]">
@@ -270,6 +266,12 @@ const AgentsSecond: React.FC<ChildProps> = ({
                                         </Form.Item>
                                     </div>
                                 ))}
+                                <div
+                                    onClick={() => add()}
+                                    className="w-full p-6  flex items-center gap-1 justify-center border  border-transparent  hover:border-dashed  hover:border-[#1B64F3] hover:text-[#1B64F3] cursor-pointer bg-[#F7F7F7] rounded-lg mb-4"
+                                >
+                                    <PlusOutlined /> {intl.formatMessage({ id: 'agent.add' })}
+                                </div>
                             </>
                         )}
                     </Form.List>

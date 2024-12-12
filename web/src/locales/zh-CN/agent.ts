@@ -39,7 +39,7 @@ export default {
     'agent.pleaseselect': '请选择',
     'agent.functiondescription': '职能描述',
     'agent.inputvariable': '输入变量',
-    'agent.add': '添加',
+    'agent.add': '添加能力',
     'agent.associatedknowledgebase': '关联知识库',
     'agent.defaultoutputformat': '默认输出格式',
     'agent.variable.name': '变量名',
