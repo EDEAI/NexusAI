@@ -323,7 +323,7 @@ const Coldom = () => {
             substitle: true,
             needHuman:(item:any)=>{
                 return (
-                    <div className='align-center'>
+                    <div className='flex items-center'>
                         {item.need_human_confirm ? (
                             <Tooltip
                                 title={intl.formatMessage({
