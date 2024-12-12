@@ -9,7 +9,7 @@ export default {
     'component.menu.dashboard': '首页',
     'component.menu.chatRoomList': '会议室列表',
     'component.menu.chatRoom': '会议室',
-    'component.menu.meeting': '会议',
+    'component.menu.meeting': '圆桌',
     'component.menu.title2': '菜单标题2',
     'component.menu.workspace': '工作区',
     'component.menu.workflow': '工作流',
