@@ -271,7 +271,7 @@ const AgentsSecond: React.FC<ChildProps> = ({
                                     onClick={() => add()}
                                     className="w-full p-6  flex items-center gap-1 justify-center border  border-transparent  hover:border-dashed  hover:border-[#1B64F3] hover:text-[#1B64F3] cursor-pointer bg-[#F7F7F7] rounded-lg mb-4"
                                 >
-                                    <PlusOutlined /> {intl.formatMessage({ id: 'agent.add' })}
+                                    <PlusOutlined /> {intl.formatMessage({ id: 'agent.addAbility' })}
                                 </div>
                             </>
                         )}

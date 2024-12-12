@@ -14,7 +14,7 @@ interface ChildProps {
     setRepository: any;
     Newproperties: any;
     setNewproperties: any;
-    Operationbentate: any; 
+    Operationbentate: any;
     Ffromref: any;
     setFourthly_config_id: any;
     Fourthly_config_id: any;
@@ -49,18 +49,17 @@ const AgentsFirst: React.FC<ChildProps> = ({
         agent_id: 0,
         data: {
             is_public: 1,
-            enable_api: 0, 
+            enable_api: 0,
             obligations: null,
             input_variables: {},
-            dataset_ids: [], 
+            dataset_ids: [],
         },
     });
     useEffect(() => {
         getDataset();
     }, []);
-  
+
     const FourthlySelect = (value: any) => {
-       
         setFourthly_config_id(value);
         // setDetaillist({ ...Detaillist, agent: { ...Detaillist.agent, m_config_id: value } })
     };
@@ -76,7 +75,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
             agent: { ...Detaillist.agent, obligations: e.target.value },
         });
     };
-   
+
     const hasDuplicateField = (array: any[], field: string) => {
         const uniqueValues = new Set();
         return array.some(item => {
@@ -86,7 +85,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                 : uniqueValues.add(value) && false;
         });
     };
-   
+
     const FirstTeam = (SwitchValue: boolean) => {
         setDetaillist({
             ...Detaillist,
@@ -97,9 +96,8 @@ const AgentsFirst: React.FC<ChildProps> = ({
             data: { ...AgentsFirstData.data, is_public: SwitchValue ? 1 : 0 },
         });
     };
-  
-    const FirstAPI = (SwitchValue: boolean) => {
 
+    const FirstAPI = (SwitchValue: boolean) => {
         setDetaillist({
             ...Detaillist,
             app: { ...Detaillist.app, enable_api: SwitchValue ? 1 : 0 },
@@ -109,7 +107,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
             data: { ...AgentsFirstData.data, enable_api: SwitchValue ? 1 : 0 },
         });
     };
-   
+
     const TPUpload = (checked: boolean) => {
         // AgentengineSet(null, checked ? 1 : 0)
         // setFourthly_config_id(checked ? 1 : 0)
@@ -118,7 +116,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
             agent: { ...Detaillist.agent, allow_upload_file: checked ? 1 : 0 },
         });
     };
-   
+
     const handleChange = (value: any) => {
         setAgentsFirstData({
             ...AgentsFirstData,
@@ -126,7 +124,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
         });
         setRepository(value);
     };
-   
+
     const getDataset = async () => {
         const res = await GetdatasetList();
         setDataset(
@@ -136,7 +134,6 @@ const AgentsFirst: React.FC<ChildProps> = ({
         );
     };
 
-   
     const PutBaseUpdate = async () => {
         if (firstjudgingcondition()) {
         } else {
@@ -144,9 +141,8 @@ const AgentsFirst: React.FC<ChildProps> = ({
             setAgentmunudisabled({ ...agentmenudisabled, first: false, second: false });
         }
     };
-   
+
     const overallRadiochange = (e: any) => {
-      
         setDetaillist({
             ...Detaillist,
             agent: { ...Detaillist.agent, default_output_format: e.target.value },
@@ -233,12 +229,13 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         <div className="mb-[30px]  font-medium">
                                             <div className="mb-[15px] text-[#555555] text-xs">
                                                 {intl.formatMessage({ id: 'agent.APIswitch' })}
-
                                             </div>
                                             <Switch
                                                 size="small"
                                                 onChange={FirstAPI}
-                                                checked={Detaillist&&Detaillist.app.enable_api === 1}
+                                                checked={
+                                                    Detaillist && Detaillist.app.enable_api === 1
+                                                }
                                                 disabled={Detaillist?.app?.publish_status !== 1}
                                             />
                                         </div>
@@ -283,10 +280,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         />
                                     </div>
                                 </Form.Item>
-                                <Form.Item
-                                    className="mb-[30px]"
-                                    name={'obligations'}
-                                >
+                                <Form.Item className="mb-[30px]" name={'obligations'}>
                                     <div className="w-full">
                                         <div className="mb-[15px] text-[#555555] text-xs">
                                             <Callword
@@ -325,7 +319,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                             })}
                                         />
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <Button
                                             type="link"
                                             onClick={() => add()}
@@ -334,7 +328,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         >
                                             {intl.formatMessage({ id: 'agent.add' })}
                                         </Button>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
                                     <div className="w-48 mr-5 ml-[10px]">
@@ -361,7 +355,6 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                 className="m-0"
                                                 {...restField}
                                                 name={[name, 'name']}
-                                               
                                                 rules={[
                                                     {
                                                         required: true,
@@ -437,7 +430,14 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         </div>
                                         // </Space>
                                     ))}
+                                    <div
+                                        onClick={() => add()}
+                                        className="w-full p-2 mt-4  flex items-center gap-1 justify-center border  border-transparent  hover:border-dashed  hover:border-[#1B64F3] hover:text-[#1B64F3] cursor-pointer bg-[#F7F7F7] rounded-lg mb-4"
+                                    >
+                                        <PlusOutlined /> {intl.formatMessage({ id: 'agent.add' })}
+                                    </div>
                                 </div>
+
                                 <Form.Item className="mb-[30px]">
                                     <div className="text-[#555555] text-xs mb-[15px]">
                                         <Callword
