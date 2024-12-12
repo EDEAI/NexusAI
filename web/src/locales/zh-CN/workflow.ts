@@ -238,5 +238,13 @@ export default {
     "workflow.vars.variableNamePattern": "变量名称只能包含字母、数字和下划线",
     "workflow.vars.variableNameExists": "变量名称已存在",
     "workflow.vars.displayName": "显示名称",
-    "workflow.vars.isRequired": "是否必填"
+    "workflow.vars.isRequired": "是否必填",
+
+    "workflow.needHumanConfirm":"需要人工确认",
+    "workflow.noHumanConfirm":"已处理人工确认"
+
+
+
+
+
 };

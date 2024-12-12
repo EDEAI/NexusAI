@@ -247,4 +247,7 @@ export default {
     'workflow.vars.variableNameExists': 'Variable name already exists',
     'workflow.vars.displayName': 'Display Name',
     'workflow.vars.isRequired': 'Is Required',
+
+    'workflow.needHumanConfirm': 'Need human confirmation',
+    'workflow.noHumanConfirm': 'Human confirmation processed',
 };

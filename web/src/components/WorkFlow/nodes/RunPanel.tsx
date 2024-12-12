@@ -63,7 +63,6 @@ export default memo(() => {
         setTabKey('4');
     };
 
-
     useUpdateEffect(() => {
         // setLoading(false);
 
@@ -207,7 +206,7 @@ export default memo(() => {
                         if (nodeInfo.status == 3 || (nodeInfo.status == 2 && item?.children)) {
                             return (
                                 <div className="flex flex-col gap-2">
-                                     {nodeInfo?.prompt_data?.length > 0 && (
+                                    {nodeInfo?.prompt_data?.length > 0 && (
                                         <div className="h-80">
                                             <CodeEditor
                                                 language="python3"
@@ -358,18 +357,13 @@ export default memo(() => {
                             );
                         }
                         if (nodeInfo?.status == 0) {
-
                         }
                         if (nodeInfo?.status == 1) {
-
                         }
                         if (nodeInfo?.status == 2) {
-
-
                             return <LoadingOutlined />;
                         }
                         if (nodeInfo?.status == 3) {
-
                             return (
                                 <>
                                     <span>
@@ -384,7 +378,6 @@ export default memo(() => {
                                 </>
                             );
                         } else if (nodeInfo?.status == 4) {
-
                             return <span className="text-red-500">ERROR</span>;
                         }
 
@@ -512,9 +505,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
     const run = async value => {
         const findEnd = nodes.find(x => x.type == BlockEnum.End);
         if (!findEnd) {
-            return message.error(
-                intl.formatMessage({ id: 'workflow.notEnd', defaultMessage: '' }),
-            );
+            return message.error(intl.formatMessage({ id: 'workflow.notEnd', defaultMessage: '' }));
         }
 
         setSubmitLoading(true);
@@ -639,7 +630,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                             return (
                                 <ProFormDigit
                                     key={index}
-                                    label={item.createVar.display_name||item.createVar.name}
+                                    label={item.createVar.display_name || item.createVar.name}
                                     name={item.createVar.name}
                                     required={item.createVar.required}
                                     rules={[
@@ -656,7 +647,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                         return (
                             <ProFormTextArea
                                 key={index}
-                                label={item.createVar.display_name||item.createVar.name}
+                                label={item.createVar.display_name || item.createVar.name}
                                 name={item.createVar.name}
                                 required={item.createVar.required}
                                 rules={[
@@ -667,7 +658,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                                 ]}
                             ></ProFormTextArea>
                         );
-                    })}
+                })}
                 {nodes[0]?.data?.requires_upload && (
                     <div>
                         <Typography.Title level={5}>
