@@ -187,7 +187,10 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
     file_ids = data.file_ids
     user_id = userinfo.uid
     try:
-        dataset_id = Datasets().get_dataset_id(app_id, user_id, 'api_vector_auth')
+        dataset_id = Datasets().get_dataset_id(
+            app_id, user_id, 'api_vector_auth',
+            check_is_reindexing=True
+        )
     except AssertionError as e:
         msg = str(e)
         logger.info('add_document: %s desc: Current user id %s',
@@ -245,7 +248,7 @@ async def enable_segment(segment_id: int, userinfo: TokenData = Depends(get_curr
         document = Documents().get_document_by_id(segment['document_id'], user_id, 'api_vector_auth')
         if document['archived'] == 1:
             return response_error("The current document has been archived and cannot be operated")
-        dataset = Datasets().get_dataset_by_id(document['dataset_id'])
+        dataset = Datasets().get_dataset_by_id(document['dataset_id'], check_is_reindexing=True)
         document_segments_indexing_status = DocumentSegments().get_segment_indexing_status(segment_id)
         if document_segments_indexing_status:
             return response_error(get_language_content("api_vector_indexing"))
@@ -273,7 +276,7 @@ async def disable_segment(segment_id: int, userinfo: TokenData = Depends(get_cur
     try:
         segment = DocumentSegments().get_segment_by_id(segment_id)
         document = Documents().get_document_by_id(segment['document_id'], user_id, 'api_vector_auth')
-        dataset = Datasets().get_dataset_by_id(document['dataset_id'])
+        dataset = Datasets().get_dataset_by_id(document['dataset_id'], check_is_reindexing=True)
         if document['archived'] == 1:
             return response_error("The current document has been archived and cannot be operated")
 
@@ -336,7 +339,7 @@ async def delete_dataset(app_id: int, userinfo: TokenData = Depends(get_current_
     """
     user_id = userinfo.uid
     try:
-        dataset_id = Datasets().get_dataset_id(app_id, user_id, 'api_vector_auth')
+        dataset_id = Datasets().get_dataset_id(app_id, user_id, 'api_vector_auth', check_is_reindexing=True)
         indexing_status_dataset_data = Datasets().get_dataset_is_indexing_status(dataset_id)
         if indexing_status_dataset_data:
             return response_error(get_language_content("api_vector_indexing"))
@@ -570,7 +573,7 @@ async def disable_document(documents_id: int, userinfo: TokenData = Depends(get_
             ],
             {'status': 2}
         )
-        DatasetManagement().disable_document(documents_id)
+        DatasetManagement.disable_document(documents_id)
         return response_success({}, get_language_content("api_vector_success"))
     except AssertionError as e:
         msg = str(e)
@@ -609,7 +612,7 @@ async def enable_document(documents_id: int, userinfo: TokenData = Depends(get_c
             ],
             {'status': 1}
         )
-        DatasetManagement().enable_document(documents_id)
+        DatasetManagement.enable_document(documents_id)
         return response_success({}, get_language_content("api_vector_success"))
     except AssertionError as e:
         msg = str(e)
@@ -641,7 +644,7 @@ async def archive_document(document_id: int, userinfo: TokenData = Depends(get_c
         documents_data = Documents().get_document_by_id(document_id, user_id, 'api_vector_auth')
 
         if documents_data['status'] == 1:
-            DatasetManagement().disable_document(document_id)
+            DatasetManagement.disable_document(document_id)
 
         Documents().update(
             [
@@ -682,7 +685,7 @@ async def cancel_archive_document(document_id: int, userinfo: TokenData = Depend
         documents_data = Documents().get_document_by_id(document_id, user_id, 'api_vector_auth')
 
         if documents_data['status'] == 1:
-            DatasetManagement().enable_document(document_id)
+            DatasetManagement.enable_document(document_id)
 
         Documents().update(
             [
@@ -724,7 +727,7 @@ async def dataset_set(
     user_id = userinfo.uid
     team_id = userinfo.team_id
     try:
-        dataset_id = Datasets().get_dataset_id(app_id, user_id, 'api_vector_auth')
+        dataset_id = Datasets().get_dataset_id(app_id, user_id, 'api_vector_auth', check_is_reindexing=True)
     except AssertionError as e:
         msg = str(e)
         logger.info('dataset_set: %s desc: Current user id %s',

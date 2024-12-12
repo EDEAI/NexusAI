@@ -242,11 +242,7 @@ def run_node(
 
 @celery_app.task
 def reindex_dataset(dataset_id: int, new_embeddings_config_id: int):
-    new_collection_name = DatasetManagement.reindex_dataset(dataset_id, new_embeddings_config_id)
-    Datasets().update(
-        {'column': 'id', 'value': dataset_id},
-        {'collection_name': new_collection_name}
-    )
+    DatasetManagement.reindex_dataset(dataset_id, new_embeddings_config_id)
 
 @celery_app.task
 def import_output_variable_to_knowledge_base(

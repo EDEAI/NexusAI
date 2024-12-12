@@ -344,7 +344,8 @@ language_packs = {
             '2. If your responsibilities and capabilities are not directly related to the current meeting topic, please try to adapt to the topic and provide relevant responses, rather than being limited to your specific responsibilities and capabilities.\n'
             '3. Note that historical messages are for reference only. Do not meaninglessly repeat content from historical messages in your response.\n'
             '4. Make sure to respond with text content only, do not wrap your response in the JSON structure used in the message history.\n'
-            '5. The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
+            '5. The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.\n'
+            '6. Do not explicitly mention the current topic in your response unless the user specifically asks about it.'
         ),
 
         'chatroom_agent_user_with_abilities': (
