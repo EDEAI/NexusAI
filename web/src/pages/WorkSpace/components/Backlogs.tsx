@@ -69,6 +69,7 @@ export default () => {
                             <div
                                 key={item.exec_id}
                                 onClick={() => {
+                                    if (!item.need_human_confirm) return;
                                     setDealtWithData(item);
                                     setRunPanelLogRecord(false);
                                 }}
@@ -98,7 +99,15 @@ export default () => {
                                 <div className="flex flex-col gap-1 truncate flex-1">
                                     <div>
                                         <span>{item.app_name}</span> <SwapRightOutlined />
-                                        <span className="text-[#1B64F3]">{item.node_name}</span>
+                                        <span
+                                            className={
+                                                item.need_human_confirm
+                                                    ? 'text-[#1B64F3]'
+                                                    : 'text-[#808183]'
+                                            }
+                                        >
+                                            {item.node_name}
+                                        </span>
                                     </div>
                                     <div className="text-[#999999] text-xs truncate">
                                         {item.app_run_name}
