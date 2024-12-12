@@ -11,7 +11,13 @@ const Header: React.FC = () => {
     const { location } = history;
     let pathname = location?.pathname;
     const intl = useIntl();
-    if(pathname.indexOf('chat_room')!=-1){ pathname = '/chat_room'}
+    //chat_room Check whether the route is a dynamic one
+    if(pathname.indexOf('chat_room')!=-1){
+        let pathnameArray:any =  pathname.split('/')
+        let isPathnameId = pathnameArray[pathnameArray.length-1] - 1
+        if(!isNaN(isPathnameId)){ pathname = '/chat_room'}
+    }
+   
     const menuList = [
         {
             name: intl.formatMessage({ id: 'component.menu.dashboard', defaultMessage: '' }),
