@@ -99,6 +99,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
     };
   
     const FirstAPI = (SwitchValue: boolean) => {
+
         setDetaillist({
             ...Detaillist,
             app: { ...Detaillist.app, enable_api: SwitchValue ? 1 : 0 },
@@ -232,15 +233,13 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         <div className="mb-[30px]  font-medium">
                                             <div className="mb-[15px] text-[#555555] text-xs">
                                                 {intl.formatMessage({ id: 'agent.APIswitch' })}
+
                                             </div>
                                             <Switch
                                                 size="small"
                                                 onChange={FirstAPI}
-                                                checked={
-                                                    Detaillist && Detaillist.app.enable_api === 1
-                                                        ? true
-                                                        : false
-                                                }
+                                                checked={Detaillist&&Detaillist.app.enable_api === 1}
+                                                disabled={Detaillist?.app?.publish_status !== 1}
                                             />
                                         </div>
                                         <div className="font-medium">

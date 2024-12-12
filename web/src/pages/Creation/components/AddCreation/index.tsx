@@ -7,6 +7,7 @@ import { importWorkflow } from '@/api/workflow';
 import { ImportOutlined, InboxOutlined } from '@ant-design/icons';
 import { ProFormUploadDragger, ProFormUploadDraggerProps } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
+import { useLocation } from 'umi';
 import CreationModal from '../../../../components/creationModal';
 interface ChildProps {
     optionsModalId: any;
@@ -14,6 +15,7 @@ interface ChildProps {
 
 const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
     const intl = useIntl();
+    const [showPopupTop, showPopupTopFun] = useState(true); // Card image
     const { TextArea } = Input;
     const transformData = [
         {
@@ -34,7 +36,28 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
             unselected: '/icons/creation/unselectedprocess.svg',
             apps_mode: 2,
         },
+        // {
+        //     name: intl.formatMessage({ id: 'creation.repository' }),
+        //     path: 'Createkb',
+        //     icon: '/icons/creation/zhishik1.svg',
+        //     pitchicon: '/icons/creation/pitchskill.svg',
+        //     signicon: '/icons/creation/signskill.svg',
+        //     unselected: '/icons/creation/unselectedskill.svg',
+        //     apps_mode: 3,
+        // },
+       
         {
+            name: intl.formatMessage({ id: 'creation.skill' }),
+            path: 'Skill',
+            icon: '/icons/creation/jienng1.svg',
+            pitchicon: '/icons/creation/pitchzhishik.svg',
+            signicon: '/icons/creation/signzhishik.svg',
+            unselected: '/icons/creation/unselectedrepository.svg',
+            apps_mode: 4,
+        },
+    ];
+    if(location.pathname=='/knowledgebase'){
+        transformData.push( {
             name: intl.formatMessage({ id: 'creation.repository' }),
             path: 'Createkb',
             icon: '/icons/creation/jienng1.svg',
@@ -42,17 +65,10 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
             signicon: '/icons/creation/signzhishik.svg',
             unselected: '/icons/creation/unselectedrepository.svg',
             apps_mode: 3,
-        },
-        {
-            name: intl.formatMessage({ id: 'creation.skill' }),
-            path: 'Skill',
-            icon: '/icons/creation/zhishik1.svg',
-            pitchicon: '/icons/creation/pitchskill.svg',
-            signicon: '/icons/creation/signskill.svg',
-            unselected: '/icons/creation/unselectedskill.svg',
-            apps_mode: 4,
-        },
-    ];
+        })
+    }
+
+   
     const [isModalOpen, setIsModalOpen] = useState(false); // Create modal
     const [CreationType, setcreationType] = useState({
         name: intl.formatMessage({ id: 'creation.agent' }),
@@ -65,8 +81,13 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
     const [CreationName, setCreationName] = useState(''); // Card name
     const [DescribeValue, setDescribeValue] = useState(''); // Card description
     const [PitchOnPhone, setPitchOnPhone] = useState({ id: 12, icon: '😒' }); // Card image
+
     // Card id
-    useEffect(() => {});
+    useEffect(() => {
+        if(location.pathname=='/knowledgebase'){
+            showPopupTopFun(false)
+        }
+    });
     const showModal = (type: any) => {
         const newtype = transformData.filter((value: any) => {
             return value.apps_mode == type;
@@ -308,7 +329,7 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
             <CreationModal
                 setIsModalOpen={setIsModalOpen} // Toggle modal switch
                 isModalOpen={isModalOpen} // Toggle modal switch
-                ModalType={true} // Toggle button display
+                ModalType={showPopupTop} // Toggle button display
                 CreationType={CreationType} // Card creation type { name: "Agent", path: "Agents", id: 1, }
                 setcreationType={setcreationType} // Toggle card button type (optional)
                 transformData={transformData} // Button switch type total type (optional)

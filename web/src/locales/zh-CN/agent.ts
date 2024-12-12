@@ -76,6 +76,7 @@ export default {
     'agent.btn.nextstep': '下一步',
     'agent.btn.back': '取消',
     'agent.btn.savedebug': '保存并调试',
+    'agent.save.and.click': '请先保存agent',
 
     'agent.explain.teamvisibility': 'agent发布后团队内其他成员也可以使用',
     'agent.explain.function':

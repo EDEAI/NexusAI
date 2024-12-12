@@ -73,13 +73,13 @@ const Header: React.FC = () => {
                     }),
                     path: '/Skill',
                 },
-                {
-                    name: intl.formatMessage({
-                        id: 'component.menu.knowledgeBase',
-                        defaultMessage: '',
-                    }),
-                    path: '/createkb',
-                },
+                // {
+                //     name: intl.formatMessage({
+                //         id: 'component.menu.knowledgeBase',
+                //         defaultMessage: '',
+                //     }),
+                //     path: '/createkb',
+                // },
                 {
                     name: intl.formatMessage({
                         id: 'component.menu.teamAgent',
@@ -121,6 +121,27 @@ const Header: React.FC = () => {
                         defaultMessage: '',
                     }),
                     path: '/chat_room',
+                },
+            ],
+        },
+        {
+            name: intl.formatMessage({ id: 'component.menu.knowledgeBase', defaultMessage: '' }),
+            icon: '/icons/creation/zhishik1.svg',
+            activeIcon: '/icons/creation/pitchzhishik.svg',
+            children: [
+                {
+                    name: intl.formatMessage({
+                        id: 'component.menu.knowledgeBase',
+                        defaultMessage: '',
+                    }),
+                    path: '/knowledgebase',
+                },
+                {
+                    name: intl.formatMessage({
+                        id: 'component.menu.knowledgeBase',
+                        defaultMessage: '',
+                    }),
+                    path: '/createkb',
                 },
             ],
         },

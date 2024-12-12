@@ -76,6 +76,7 @@ export default {
     'agent.btn.nextstep': 'next Step',
     'agent.btn.back': 'cancel',
     'agent.btn.savedebug': 'Save and debug',
+    'agent.save.and.click': 'Please save the agent first',
 
     'agent.explain.teamvisibility':
         'Once the agent is published, other members within the team can also use it',

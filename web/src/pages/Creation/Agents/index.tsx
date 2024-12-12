@@ -340,7 +340,6 @@ const Agents: React.FC = () => {
         } else {
             GetagentInfo(creationappid, false)
                 .then(value => {
-
                     creationagentid = value.data.agent.agent_id;
                     agentfirst(creationagentid);
                     setTimeout(() => {
@@ -509,10 +508,18 @@ const Agents: React.FC = () => {
                     {Detaillist &&
                     Detaillist.app.enable_api === 1 &&
                     Detaillist.app.publish_status === 1 ? (
-                        <div
-                            className="w-full h-[40px] rounded-lg text-[#000] hover:bg-[#f0f0f0] p-[12px] pl-[16px] cursor-pointer"
-                            onClick={() => {
-                                window.open(BASE_URL + Detaillist.app.api_url);
+                        <div className="w-full h-[40px] rounded-lg text-[#000] hover:bg-[#f0f0f0] p-[12px] pl-[16px] cursor-pointer"
+                            onClick={ async () => {
+                                let params = new URLSearchParams(window.location.search);
+                                let res =null;
+                                if(params.get('app_id')){
+                                    res = await GetagentInfo(params.get('app_id'), params.get('type'));
+                                }
+                                if(res!=null&&res.data.app.enable_api===1&&res.data.app.publish_status === 1){
+                                    window.open(BASE_URL + Detaillist.app.api_url);
+                                }else{
+                                    message.warning(intl.formatMessage({ id: 'agent.save.and.click' }), 5);
+                                }
                             }}
                         >
                             <div className="mr-[20px] text-base font-medium text-[#213044] -mt-1">
@@ -575,7 +582,7 @@ const Agents: React.FC = () => {
                             <AgentsFirst
                                 FirstValue={handleValueFromChid}
                                 Ffromref={Ffromref}
-                                Detaillist={Detaillist}
+                                Detaillist={Detaillist} 
                                 setDetaillist={setDetaillist}
                                 repository={repository}
                                 setRepository={setRepository}

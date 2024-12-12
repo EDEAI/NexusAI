@@ -12,6 +12,7 @@ import {
     Spin,
     Typography,
 } from 'antd';
+import { useLocation } from 'umi';
 import React, { useEffect, useState } from 'react';
 // import {Ellipsis} from '@ant-design/pro-components';
 import { DeleteCreation, GetChatroom, PutappsUpdate } from '@/api/creation';
@@ -29,6 +30,7 @@ const { Text, Paragraph } = Typography;
 
 const { TextArea } = Input;
 const Creation: React.FC = () => {
+   
     const intl = useIntl();
     const [CreationList, setCreationList] = useState(null);
     const [apppage, setAPPPage] = useState(1);
@@ -36,6 +38,8 @@ const Creation: React.FC = () => {
     const [CreationName, setCreationName] = useState('');
     const [CreationContent, setCreationContent] = useState('');
     const [CardData, setCardData] = useState(null);
+    const [showTab, showTabfun] = useState(true);
+    
 
     const [establishModal, setEstablishModal] = useState(false);
     const [CreationType, setcreationType] = useState({
@@ -74,15 +78,15 @@ const Creation: React.FC = () => {
             pitchicon: '/icons/creation/pitchgongzuoliu.svg',
             signicon: '/icons/creation/signgongzuoliu.svg',
         },
-        {
-            apps_mode: 3,
-            name: intl.formatMessage({ id: 'creation.repository' }),
-            path: 'Createkb',
-            icon: '/icons/creation/zhishik1.svg',
-            unselected: '/icons/creation/unselectedrepository.svg',
-            pitchicon: '/icons/creation/pitchzhishik.svg',
-            signicon: '/icons/creation/signzhishik.svg',
-        },
+        // {
+        //     apps_mode: 3,
+        //     name: intl.formatMessage({ id: 'creation.repository' }),
+        //     path: 'Createkb',
+        //     icon: '/icons/creation/zhishik1.svg',
+        //     unselected: '/icons/creation/unselectedrepository.svg',
+        //     pitchicon: '/icons/creation/pitchzhishik.svg',
+        //     signicon: '/icons/creation/signzhishik.svg',
+        // },
         {
             apps_mode: 4,
             name: intl.formatMessage({ id: 'creation.skill' }),
@@ -93,6 +97,8 @@ const Creation: React.FC = () => {
             signicon: '/icons/creation/signskill.svg',
         },
     ];
+
+
 
     const [optionsModalId, setOptionsModalId] = useState(6);
     const [searchType, setSearchType] = useState(false);
@@ -154,7 +160,19 @@ const Creation: React.FC = () => {
     };
     useEffect(() => {
         getlist();
-        getChatRoomList(1, null);
+       
+        if(location.pathname=='/knowledgebase'){
+            let item =   {
+                    apps_mode: 3,
+                    name: intl.formatMessage({ id: 'creation.repository' }),
+                    path: 'Createkb',
+                    
+                };
+            appModalChange(item);
+            showTabfun(false)
+        }else{
+            getChatRoomList(1, null);
+        }
 
 
     }, []);
@@ -173,7 +191,7 @@ const Creation: React.FC = () => {
         );
         getChatRoomList(1, searchType, value.apps_mode);
     };
-
+   
 
     const appNameChange = (e: any) => {
         setFuzzySearchName(e.target.value);
@@ -298,15 +316,16 @@ const Creation: React.FC = () => {
 
       setRunId(item.app_id)
     }
+
+
     return (
         <div
             className=" pb-[10px] flex flex-col"
             style={{ height: 'calc(-60px + 100vh)', width: '100%', margin: '0 auto' }}
         >
             <div className="flex px-[30px] py-[20px] mx-[8px] items-center justify-between">
-                <div className="flex items-center">
-
-                    {optionsModal.map((item: any, i: number) => {
+            <div className="flex items-center">
+                    { showTab?optionsModal.map((item: any, i: number) => {
                         return (
                             // <Button color="primary" variant="filled"
                             // icon={ <img src={item.icon} alt="" />}
@@ -338,8 +357,10 @@ const Creation: React.FC = () => {
                                 <div>{item.name}</div>
                             </div>
                         );
-                    })}
+                    }):''}
                 </div>
+              
+               
                 <div className="flex items-center">
                     <div className="min-w-40 flex justify-end mr-5">
                         <Radio.Group
@@ -423,20 +444,7 @@ const Creation: React.FC = () => {
                                                                                   item.icon,
                                                                               )}
                                                                               icon={
-                                                                                  creationsearchdata(
-                                                                                      'GET',
-                                                                                  )
-                                                                                      .optionsModalId ===
-                                                                                  6
-                                                                                      ? optionsModal.filter(
-                                                                                            (
-                                                                                                value: any,
-                                                                                            ) =>
-                                                                                                value.apps_mode ===
-                                                                                                item.mode,
-                                                                                        )[0]
-                                                                                            .signicon
-                                                                                      : null
+                                                                                  creationsearchdata('GET',).optionsModalId === 6 ? optionsModal.filter( ( value: any, ) => value.apps_mode === item.mode, )[0]?.signicon : null
                                                                               }
                                                                           />
                                                                       </div>
