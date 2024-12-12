@@ -38,7 +38,7 @@ const Creation: React.FC = () => {
     const [CreationName, setCreationName] = useState('');
     const [CreationContent, setCreationContent] = useState('');
     const [CardData, setCardData] = useState(null);
-    const [showTab, showTabfun] = useState(true);
+    const [showTab, showTabfun] = useState(false);
     
 
     const [establishModal, setEstablishModal] = useState(false);
@@ -169,8 +169,9 @@ const Creation: React.FC = () => {
                     
                 };
             appModalChange(item);
-            showTabfun(false)
+           
         }else{
+            showTabfun(true)
             getChatRoomList(1, null);
         }
 
