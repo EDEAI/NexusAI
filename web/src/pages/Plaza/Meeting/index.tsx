@@ -8,7 +8,7 @@ import { Col, Dropdown, Empty, message, Modal, Row, Spin, Switch } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 import CreationChatRoom from '../components/CreationChatRoom/index';
-import Menus from '../components/Menus/index';
+// import Menus from '../components/Menus/index';
 
 // Add new application
 const AddRoom = (obj: any) => {
@@ -231,7 +231,7 @@ const MeetingCont = () => {
         <div
             className="pt-0 w-full"
             id="Meeting"
-            style={{ height: 'calc(100vh - 124px)', overflowY: 'auto' }}
+            style={{ height: 'calc(100vh - 94px)', overflowY: 'auto' }}
         >
             <Scroll
                 dataLength={meeting && meeting.list.length}
@@ -241,7 +241,7 @@ const MeetingCont = () => {
                 isFooter={true}
                 pageNumber={parameter.page}
             >
-                <div className="px-[30px]">
+                <div className="px-[30px] pt-[30px]">
                     <Row gutter={[20, 20]} style={{ margin: 0 }}>
                         {closeLoading && (
                             <AddRoom
@@ -427,9 +427,9 @@ const Meeting: React.FC = () => {
     return (
         <>
             <div className="w-full">
-                <div className="px-[30px] w-full">
+                {/* <div className="px-[30px] w-full">
                     <Menus path="/plaza" keys="meeting"></Menus>
-                </div>
+                </div> */}
                 <MeetingCont></MeetingCont>
             </div>
         </>
