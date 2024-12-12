@@ -544,7 +544,7 @@ const Plaza: React.FC = () => {
             style={{ height: 'calc(100vh - 56px)', maxHeight: 'calc(100vh - 56px)' }}
         >
             <div
-                className="px-[30px] pb-[10px] flex flex-col"
+                className="px-[30px] pb-[10px] flex flex-col pt-[30px]"
                 style={{
                     width: '100%',
                     height: 'calc(100vh - 92px)',
