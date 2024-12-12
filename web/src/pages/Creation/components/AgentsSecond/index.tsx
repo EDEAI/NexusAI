@@ -175,6 +175,7 @@ const AgentsSecond: React.FC<ChildProps> = ({
                                                 placeholder={intl.formatMessage({
                                                     id: 'agent.capabilityname',
                                                 })}
+                                                maxLength={50}
                                                 className="w-full"
                                             />
                                         </Form.Item>
