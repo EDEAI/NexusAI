@@ -3,13 +3,17 @@
  */
 import { getBacklogsList } from '@/api/workflow';
 import useUserStore from '@/store/user';
-import { SwapRightOutlined } from '@ant-design/icons';
+import {
+    CheckCircleOutlined,
+    ExclamationCircleOutlined,
+    SwapRightOutlined,
+} from '@ant-design/icons';
 import { usePagination, useSessionStorageState, useUpdateEffect } from 'ahooks';
 
 import Headportrait from '@/components/headportrait';
 import { headportrait } from '@/utils/useUser';
 import { useIntl } from '@umijs/max';
-import { Empty, Spin } from 'antd';
+import { Empty, Spin, Tooltip } from 'antd';
 import { useRef } from 'react';
 import { Title } from './TableTitle';
 export default () => {
@@ -91,7 +95,7 @@ export default () => {
                                     Image={headportrait('single', item.icon)}
                                     // icon={`/icons/creation/${WORKFLOW_ICON.WorkFlow}.svg`}
                                 ></Headportrait>
-                                <div className="flex flex-col gap-1 truncate">
+                                <div className="flex flex-col gap-1 truncate flex-1">
                                     <div>
                                         <span>{item.app_name}</span> <SwapRightOutlined />
                                         <span className="text-[#1B64F3]">{item.node_name}</span>
@@ -99,6 +103,25 @@ export default () => {
                                     <div className="text-[#999999] text-xs truncate">
                                         {item.app_run_name}
                                     </div>
+                                </div>
+                                <div>
+                                    {item.need_human_confirm ? (
+                                        <Tooltip
+                                            title={intl.formatMessage({
+                                                id: 'workflow.needHumanConfirm',
+                                            })}
+                                        >
+                                            <ExclamationCircleOutlined className="text-[#1B64F3]" />
+                                        </Tooltip>
+                                    ) : (
+                                        <Tooltip
+                                            title={intl.formatMessage({
+                                                id: 'workflow.noHumanConfirm',
+                                            })}
+                                        >
+                                            <CheckCircleOutlined className="text-[#808183]" />
+                                        </Tooltip>
+                                    )}
                                 </div>
                             </div>
                         );

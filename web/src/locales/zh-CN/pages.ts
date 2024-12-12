@@ -2,7 +2,7 @@
  * @LastEditors: biz
  */
 export default {
-    'pages.layouts.userLayout.title': 'NexusAI-人工智能平台',
+    'pages.layouts.userLayout.title': 'NexusAI-人机协作共生',
     'pages.login.accountLogin.tab': '账户密码登录',
     'pages.login.accountLogin.errorMessage': '邮箱或密码错误，请重试！',
     'pages.login.failure': '登录失败，请重试！',
