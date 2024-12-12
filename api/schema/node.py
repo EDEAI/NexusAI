@@ -55,6 +55,7 @@ class BackListData(BaseModel):
     node_id: Optional[str] = None
     node_name: Optional[str] = None
     exec_id: Optional[int] = None
+    need_human_confirm: Optional[int] = None
     icon: Optional[str] = None
     icon_background: Optional[str] = None
 

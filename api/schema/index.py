@@ -11,6 +11,7 @@ class BackLogsData(BaseModel):
     node_execution_id: Optional[int] = None
     node_name: Optional[str] = None
     exec_id: Optional[int] = None
+    need_human_confirm: Optional[int] = None
     icon_background: Optional[str] = None
     icon: Optional[str] = None
 

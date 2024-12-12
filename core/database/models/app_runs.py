@@ -78,10 +78,10 @@ class AppRuns(MySQL):
         conditions = [
             {"column": "apps.status", "value": 1},
             {"column": "app_runs.workflow_id", "op": ">", "value": 0},
-            {"column": "app_runs.need_human_confirm", "value": 1},
+            # {"column": "app_runs.need_human_confirm", "value": 1},
             {"column": "app_runs.status", "op": "!=", "value": 3},
             {'column': 'app_node_executions.correct_output', 'value': 0},
-            {'column': 'app_node_executions.need_human_confirm', 'value': 1}
+            # {'column': 'app_node_executions.need_human_confirm', 'value': 1}
         ]
 
         if data['user_id'] > 0:
@@ -100,7 +100,18 @@ class AppRuns(MySQL):
         )[0]["count_id"]
 
         list = self.select(
-            columns=['app_runs.id AS app_run_id', 'app_runs.name AS app_run_name', 'apps.name AS app_name', 'apps.mode', 'app_node_user_relation.node_id','app_node_executions.node_graph', 'app_node_executions.node_name', 'app_node_executions.id AS exec_id', 'apps.icon', 'apps.icon_background'],
+            columns=[
+                'app_runs.id AS app_run_id', 
+                'app_runs.name AS app_run_name', 
+                'apps.name AS app_name', 
+                'apps.mode', 
+                'app_node_user_relation.node_id',
+                'app_node_executions.node_graph', 
+                'app_node_executions.node_name', 
+                'app_node_executions.id AS exec_id', 
+                'app_node_executions.need_human_confirm',
+                'apps.icon', 
+                'apps.icon_background'],
             joins= [
                 ["inner", "apps", "app_runs.app_id = apps.id"],
                 ["inner", "app_node_user_relation", "app_node_user_relation.app_run_id = app_runs.id"],
