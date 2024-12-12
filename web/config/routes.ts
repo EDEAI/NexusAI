@@ -53,9 +53,13 @@ export default [
         menuRender: false,
     },
     {
+        path: '/knowledgebase',
+        name: 'knowledgebase',
+        component: './Creation/index',
+    },
+    {
         path: '/creation',
         name: 'creation',
-
         component: './Creation/index',
     },
     {
