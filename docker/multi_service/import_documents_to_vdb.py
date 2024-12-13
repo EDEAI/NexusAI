@@ -38,34 +38,29 @@ def wait_for_mysql():
 
 def _import_document(document_name: int, user_id: int):
     while True:
-        documents_data = Documents().get_document_find_by_name(document_name, user_id)
-        if documents_data:
-            print(documents_data)
-            dataset_data = Datasets().get_dataset_by_id(documents_data['dataset_id'])
-            if dataset_data:
-                embedding_model_config_id = dataset_data['embedding_model_config_id']
-                models_data = Models().get_model_by_config_id(embedding_model_config_id)
-                if models_data:
-                    model_config = models_data['supplier_config']
-                    if model_config == {} or model_config == None or model_config == '':
-                        print('model_config is null')
-                        time.sleep(30)
-                        continue
-                    else:
-                        Documents().update(
-                            [
-                                {'column': 'id', 'value': documents_data['id']},
-                                {'column': 'status', 'op': '<', 'value': 3},
-                            ],
-                            {'status': 1}
-                        )
-                        try:
+        try:
+            documents_data = Documents().get_document_find_by_name(document_name, user_id)
+            if documents_data:
+                print(documents_data)
+                dataset_data = Datasets().get_dataset_by_id(documents_data['dataset_id'])
+                if dataset_data:
+                    embedding_model_config_id = dataset_data['embedding_model_config_id']
+                    models_data = Models().get_model_by_config_id(embedding_model_config_id)
+                    if models_data:
+                        model_config = models_data['supplier_config']
+                        if model_config:
+                            Documents().update(
+                                [
+                                    {'column': 'id', 'value': documents_data['id']},
+                                    {'column': 'status', 'op': '<', 'value': 3},
+                                ],
+                                {'status': 1}
+                            )
                             DatasetManagement.enable_document(documents_data['id'])
                             break
-                        except Exception as e:
-                            print(traceback.format_exc())
-                            print(f'Failed to enable document {documents_data["id"]}: {e}')
-                            time.sleep(30)
+        except Exception as e:
+            print(f'Failed to enable document {documents_data["id"]}: {e}')
+        time.sleep(30)
 
 
 def import_documents(batch_number: int):
