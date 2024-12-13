@@ -140,6 +140,27 @@ class Documents(MySQL):
         )
         assert result, get_language_content('api_vector_auth')
         return result
+    
+    def get_document_find_by_name(self, document_name: str, user_id: int) -> Dict[str, Any]:
+        """
+        Retrieves the document information for the given document ID.
+
+        :param document_id: The ID of the document.
+        :return: A dictionary containing the document information.
+        """
+        result = self.select_one(
+            columns=['documents.id','documents.dataset_id'],
+            joins=[
+                ['left', 'datasets', 'documents.dataset_id = datasets.id'],
+            ],
+            conditions=[
+                {'column': 'documents.name', 'value': document_name},
+                {'column': 'documents.user_id', 'value': user_id},
+                {'column': 'datasets.user_id', 'value': user_id},
+            ],
+        )
+        assert result, get_language_content('api_vector_auth')
+        return result
 
 
     def get_file_path_by_id(self, document_id: int) -> Optional[str]:

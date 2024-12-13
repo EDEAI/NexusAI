@@ -10,11 +10,11 @@ from core.database.models import Documents,Datasets,Models
 from core.dataset import DatasetManagement
 os.environ['DATABASE_AUTO_COMMIT'] = 'True'
 
-MYSQL_HOST = settings.MYSQL_HOST
-MYSQL_PORT = settings.MYSQL_PORT
-MYSQL_USER = settings.MYSQL_USER
-MYSQL_PASSWORD = settings.MYSQL_PASSWORD
-MYSQL_DB = settings.MYSQL_DB
+MYSQL_HOST = os.getenv('MYSQL_HOST')
+MYSQL_PORT = int(os.getenv('MYSQL_PORT', 3306))
+MYSQL_USER = os.getenv('MYSQL_USER')
+MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
+MYSQL_DB = os.getenv('MYSQL_DB')
 
 project_root = Path(__file__).absolute().parent.parent
 log_dir = project_root.joinpath('logs', 'import_documents_to_vdb')
@@ -49,7 +49,7 @@ def _import_document(document_name: int, user_id: int):
                     model_config = models_data['supplier_config']
                     if model_config == {} or model_config == None or model_config == '':
                         print('model_config is null')
-                        time.sleep(2)
+                        time.sleep(30)
                         continue
                     else:
                         Documents().update(
@@ -65,7 +65,7 @@ def _import_document(document_name: int, user_id: int):
                         except Exception as e:
                             print(traceback.format_exc())
                             print(f'Failed to enable document {documents_data["id"]}: {e}')
-                            time.sleep(2)
+                            time.sleep(30)
 
 
 def import_documents(batch_number: int):
