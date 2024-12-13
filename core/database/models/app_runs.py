@@ -78,10 +78,10 @@ class AppRuns(MySQL):
         conditions = [
             {"column": "apps.status", "value": 1},
             {"column": "app_runs.workflow_id", "op": ">", "value": 0},
-            # {"column": "app_runs.need_human_confirm", "value": 1},
             {"column": "app_runs.status", "op": "!=", "value": 3},
+            {"column": "app_node_executions.status", "op": ">", "value": 2},
             {'column': 'app_node_executions.correct_output', 'value': 0},
-            # {'column': 'app_node_executions.need_human_confirm', 'value': 1}
+            {'column': 'app_node_executions.condition_id', 'op': 'is null'},
         ]
 
         if data['user_id'] > 0:
@@ -118,7 +118,7 @@ class AppRuns(MySQL):
                 ["inner", "app_node_executions", "app_node_executions.node_id = app_node_user_relation.node_id and app_node_executions.app_run_id = app_runs.id"]
             ],
             conditions=conditions,
-            order_by = "app_node_user_relation.id DESC",
+            order_by = "app_node_executions.id DESC",
             limit = data['page_size'],
             offset = (data['page'] - 1) * data['page_size']
         )
