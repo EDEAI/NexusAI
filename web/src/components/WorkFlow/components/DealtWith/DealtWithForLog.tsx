@@ -20,7 +20,7 @@ import {
 import { useIntl } from '@umijs/max';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import { Alert, Button, List, message, Typography } from 'antd';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { NOT_SHOW_INPUT_RESULT_NODE, UPLOAD_FILES_KEY } from '../../config';
 import useStore from '../../store';
@@ -35,6 +35,7 @@ export default memo((props: any) => {
     const [show, setShow] = useState(false);
     const dealtWithData = useUserStore(state => state.dealtWithData);
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
+    const setPrevConfirmDealtWith= useUserStore(state => state.setPrevConfirmDealtWith);
     const setSubmitPromptId = useUserStore(state => state.setSubmitPromptId);
     const setFlowMessage = useSocketStore(state => state.setFlowMessage);
     const getNeedHumanConfirmMessage = useSocketStore(state => state.getNeedHumanConfirmMessage);
@@ -48,6 +49,7 @@ export default memo((props: any) => {
     });
     useEffect(() => {
         setShow(!!dealtWithData);
+        // setPrevConfirmDealtWith(null)
         const id = dealtWithData?.exec_id;
         console.log(dealtWithData, id);
         setExecId(id);
@@ -95,6 +97,7 @@ export default memo((props: any) => {
                 setShow(false);
                 props?.onSubmit?.(execId);
                 setSubmitPromptId(execId);
+                setPrevConfirmDealtWith(dealtWithData)
                 setDealtWithData(null);
             }
         });
@@ -119,7 +122,7 @@ export default memo((props: any) => {
                 setShow(false);
                 setSubmitPromptId(execId);
                 delHumanMessage(execId);
-
+                setPrevConfirmDealtWith(dealtWithData)
                 setDealtWithData(null);
             }
         });
@@ -296,6 +299,7 @@ export default memo((props: any) => {
             }).then(res => {
                 if (res.code == 0) {
                     setShow(false);
+                    setPrevConfirmDealtWith(dealtWithData)
                     setDealtWithData(null);
                     setSubmitPromptId(execId);
                     delHumanMessage(execId);
@@ -482,6 +486,7 @@ export default memo((props: any) => {
                         setShow(false);
                         setSubmitPromptId(execId);
                         delHumanMessage(execId);
+                        setPrevConfirmDealtWith(dealtWithData)
                         setDealtWithData(null);
                     }
                 });
@@ -599,6 +604,7 @@ export default memo((props: any) => {
                                 }
                                 delHumanMessage(dealtWithInfo.exec_id);
                                 setShow(false);
+                                setPrevConfirmDealtWith(dealtWithData)
                                 setDealtWithData(null);
                                 props?.onSubmit?.(execId);
                                 setSubmitPromptId(execId);

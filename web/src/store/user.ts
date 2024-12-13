@@ -11,6 +11,8 @@ type FlowState = {
     setRunId: (id: string) => void;
     dealtWithData: any;
     setDealtWithData: (value: any) => void;
+    prevConfirmDealtWith: any;
+    setPrevConfirmDealtWith: (value: any) => void;
     submitPromptId: string;
     setSubmitPromptId: (id: string) => void;
     currentUpdateNodeValue: any;
@@ -26,6 +28,10 @@ const useUserStore = create(
         submitPromptId: null,
         currentUpdateNodeValue: null,
         currentUpdateNodePanel:null,
+        prevConfirmDealtWith: null,
+        setPrevConfirmDealtWith: (value: any) => {
+            set({ prevConfirmDealtWith: value });
+        },
         setCurrentUpdateNodePanel: (value: any) => {
             set({ currentUpdateNodePanel: value });
         },

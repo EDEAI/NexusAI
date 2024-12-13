@@ -514,13 +514,12 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
         const vals = getOutputVariables(nodes[0].id);
         const regex = /^(file|run_name|dataset\..*)/;
         for (const key in value) {
-            console.log(key);
             const item = value[key];
-
-            if (!regex.test(key)) {
-                const val = vals.find(x => x.createVar.name == key);
-                const variable = new Variable(key, val?.createVar.type, item);
-                input.addProperty(key, variable);
+            if (key.startsWith('var.')) {
+                const varName = key.replace('var.', '');
+                const val = vals.find(x => x.createVar.name == varName);
+                const variable = new Variable(varName, val?.createVar.type, item);
+                input.addProperty(varName, variable);
             }
         }
         const freeFile = new ArrayVariable(UPLOAD_FILES_KEY, 'array[number]');
@@ -542,6 +541,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                 knowledge_base_mapping.input[UPLOAD_FILES_KEY][key.replace('dataset.', '')] = value;
             }
         });
+
         const params = {
             run_name: value.run_name,
             inputs: input,
@@ -549,6 +549,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
             node_confirm_users: {},
             knowledge_base_mapping,
         };
+        debugger;
         runWorkFlow(app_id, params)
             .then(res => {
                 console.log(res);
@@ -624,14 +625,12 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                 <TextareaRunName name={'run_name'}></TextareaRunName>
                 {nodes[0]?.id &&
                     getOutputVariables(nodes[0].id).map((item, index) => {
-                        console.log(item);
-
                         if (item?.createVar?.type == 'number') {
                             return (
                                 <ProFormDigit
                                     key={index}
                                     label={item.createVar.display_name || item.createVar.name}
-                                    name={item.createVar.name}
+                                    name={`var.${item.createVar.name}`}
                                     required={item.createVar.required}
                                     rules={[
                                         {
@@ -648,7 +647,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                             <ProFormTextArea
                                 key={index}
                                 label={item.createVar.display_name || item.createVar.name}
-                                name={item.createVar.name}
+                                name={`var.${item.createVar.name}`}
                                 required={item.createVar.required}
                                 rules={[
                                     {
@@ -658,7 +657,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                                 ]}
                             ></ProFormTextArea>
                         );
-                })}
+                    })}
                 {nodes[0]?.data?.requires_upload && (
                     <div>
                         <Typography.Title level={5}>

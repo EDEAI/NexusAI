@@ -14,21 +14,33 @@ import Headportrait from '@/components/headportrait';
 import { headportrait } from '@/utils/useUser';
 import { useIntl } from '@umijs/max';
 import { Empty, Spin, Tooltip } from 'antd';
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Title } from './TableTitle';
 export default () => {
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
+    const prevConfirmDealtWith = useUserStore(state => state.prevConfirmDealtWith);
+    const dealtWithData = useUserStore(state => state.dealtWithData);
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const submitPromptId = useUserStore(state => state.submitPromptId);
     const intl = useIntl();
     const proListRef = useRef(null);
-
+    const [beforeConfirmItem, setBeforeConfirmItem] = useState(null);
     const [pageNumber, setPageNumber] = useSessionStorageState('pageNumber');
 
     const showDealtWith = item => {
         console.log(item);
         setDealtWithData(item);
     };
+
+    useUpdateEffect(() => {
+        const newList = data.list.map(item => {
+            if (item.exec_id == prevConfirmDealtWith.exec_id) {
+                item.need_human_confirm = 0;
+            }
+            return item;
+        });
+        setData({ ...data, list: newList });
+    }, [prevConfirmDealtWith]);
     const getDetail = async ({ current, pageSize }) => {
         const res = await getBacklogsList({
             current,
@@ -41,15 +53,44 @@ export default () => {
             total: res.data.total_count,
         };
     };
-    const { data, loading, pagination } = usePagination(getDetail, {
+    const {
+        data: initialData,
+        loading,
+        pagination,
+    } = usePagination(getDetail, {
         defaultPageSize: 10,
     });
+    const [data, setData] = useState(initialData);
+
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
     useUpdateEffect(() => {
         if (proListRef.current) {
             proListRef.current.reload();
         }
     }, [submitPromptId]);
 
+    const RenderTaskContent = useCallback(
+        ({ item }) => {
+            return (
+                <div className="flex flex-col gap-1 truncate flex-1">
+                    <div>
+                        <span>{item.app_name}</span> <SwapRightOutlined />
+                        <span
+                            className={
+                                item.need_human_confirm == 1 ? 'text-[#1B64F3]' : 'text-[#808183]'
+                            }
+                        >
+                            {item.node_name}
+                        </span>
+                    </div>
+                    <div className="text-[#999999] text-xs truncate">{item.app_run_name}</div>
+                </div>
+            );
+        },
+        [data],
+    );
     return (
         <Spin spinning={loading}>
             <div style={{ height: 'calc(100vh - 596px)' }}>
@@ -69,8 +110,11 @@ export default () => {
                             <div
                                 key={item.exec_id}
                                 onClick={() => {
+                                    console.log(item);
+
                                     if (!item.need_human_confirm) return;
                                     setDealtWithData(item);
+                                    setBeforeConfirmItem(item);
                                     setRunPanelLogRecord(false);
                                 }}
                                 className="flex items-center gap-5 cursor-pointer duration-200 rounded-lg  p-2.5 hover:bg-[#fafafa]"
@@ -96,7 +140,9 @@ export default () => {
                                     Image={headportrait('single', item.icon)}
                                     // icon={`/icons/creation/${WORKFLOW_ICON.WorkFlow}.svg`}
                                 ></Headportrait>
-                                <div className="flex flex-col gap-1 truncate flex-1">
+
+                                <RenderTaskContent item={item}></RenderTaskContent>
+                                {/* <div className="flex flex-col gap-1 truncate flex-1">
                                     <div>
                                         <span>{item.app_name}</span> <SwapRightOutlined />
                                         <span
@@ -112,7 +158,7 @@ export default () => {
                                     <div className="text-[#999999] text-xs truncate">
                                         {item.app_run_name}
                                     </div>
-                                </div>
+                                </div> */}
                                 <div>
                                     {item.need_human_confirm ? (
                                         <Tooltip
