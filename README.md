@@ -75,12 +75,12 @@ docker-compose up -d
 After running the command, you should see output similar to the following, showing the status of all containers
 ```bash
 [+] Running 15/15
- ✔ Network docker_my_network                   Created                          0.1s
- ✔ Volume "docker_mysql_data"                  Created                          0.0s
- ✔ Volume "docker_minio_data"                  Created                          0.0s
- ✔ Volume "docker_milvus_data"                 Created                          0.0s
- ✔ Volume "docker_etcd_data"                   Created                          0.0s
- ✔ Volume "docker_redis_data"                  Created                          0.0s
+ ✔ Network nexusai_my_network                  Created                          0.1s
+ ✔ Volume "nexusai_mysql_data"                 Created                          0.0s
+ ✔ Volume "nexusai_minio_data"                 Created                          0.0s
+ ✔ Volume "nexusai_milvus_data"                Created                          0.0s
+ ✔ Volume "nexusai_etcd_data"                  Created                          0.0s
+ ✔ Volume "nexusai_redis_data"                 Created                          0.0s
  ✔ Container nexusai-docker-sandbox            Started                          2.6s
  ✔ Container nexusai-docker-milvus-etcd        Started                          2.6s
  ✔ Container nexusai-docker-nginx              Started                          2.6s
