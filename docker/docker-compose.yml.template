@@ -1,3 +1,4 @@
+name: nexusai
 
 x-common-environment-backend: &common-environment-backend
   MYSQL_HOST: mariadb
