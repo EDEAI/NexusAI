@@ -1,11 +1,9 @@
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).absolute().parent.parent))
+sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
 import time
 import pymysql
 import os
-import traceback
-from config import settings
 from core.database.models import Documents,Datasets,Models
 from core.dataset import DatasetManagement
 os.environ['DATABASE_AUTO_COMMIT'] = 'True'
@@ -16,7 +14,7 @@ MYSQL_USER = os.getenv('MYSQL_USER')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 MYSQL_DB = os.getenv('MYSQL_DB')
 
-project_root = Path(__file__).absolute().parent.parent
+project_root = Path(__file__).absolute().parent.parent.parent
 log_dir = project_root.joinpath('logs', 'import_documents_to_vdb')
 
 
