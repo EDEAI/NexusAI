@@ -4,32 +4,33 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
-CREATE DATABASE IF NOT EXISTS `nexus_ai` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci */;
+CREATE DATABASE IF NOT EXISTS `nexus_ai` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `nexus_ai`;
 
 CREATE TABLE IF NOT EXISTS `agents` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Agent ID',
-  `team_id` int(11) NOT NULL COMMENT 'Team ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `app_id` int(11) NOT NULL COMMENT 'App ID',
-  `obligations` text DEFAULT NULL COMMENT 'Agent obligations',
-  `input_variables` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Input variables' CHECK (json_valid(`input_variables`)),
-  `auto_match_ability` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Whether to automatically match abilities 0: No 1: Yes',
-  `default_output_format` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Default output format 1: text 2: json 3: code',
-  `model_config_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Model configuration ID',
-  `allow_upload_file` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Is it allowed to upload files? 0: No 1: Yes',
-  `publish_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Agent publish status 0: Draft 1: Published',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Agent ID',
+  `team_id` int NOT NULL COMMENT 'Team ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `app_id` int NOT NULL COMMENT 'App ID',
+  `obligations` text COLLATE utf8mb4_general_ci COMMENT 'Agent obligations',
+  `input_variables` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Input variables',
+  `auto_match_ability` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Whether to automatically match abilities 0: No 1: Yes',
+  `default_output_format` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Default output format 1: text 2: json 3: code',
+  `model_config_id` int NOT NULL DEFAULT '0' COMMENT 'Model configuration ID',
+  `allow_upload_file` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Is it allowed to upload files? 0: No 1: Yes',
+  `publish_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Agent publish status 0: Draft 1: Published',
   `published_time` datetime DEFAULT NULL COMMENT 'Agent published time',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Agent created time',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Agent created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Agent updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Agent status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Agent status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `team_id` (`team_id`),
   KEY `status` (`status`),
   KEY `model_id` (`model_config_id`),
   KEY `app_id` (`app_id`),
-  KEY `publish_status` (`publish_status`)
+  KEY `publish_status` (`publish_status`),
+  CONSTRAINT `agents_chk_1` CHECK (json_valid(`input_variables`))
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Agent Data Table';
 
 /*!40000 ALTER TABLE `agents` DISABLE KEYS */;
@@ -39,15 +40,15 @@ INSERT INTO `agents` (`id`, `team_id`, `user_id`, `app_id`, `obligations`, `inpu
 /*!40000 ALTER TABLE `agents` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `agent_abilities` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Ability ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `agent_id` int(11) NOT NULL COMMENT 'Agent ID',
-  `name` varchar(50) NOT NULL COMMENT 'Ability name',
-  `content` text NOT NULL COMMENT 'Ability content',
-  `output_format` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Output format 0: defalut 1: text 2: json 3: code',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Ability created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Ability ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `agent_id` int NOT NULL COMMENT 'Agent ID',
+  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Ability name',
+  `content` text COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Ability content',
+  `output_format` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Output format 0: defalut 1: text 2: json 3: code',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Ability created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Ability updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Ability status 1: Normal 2: Disabled 3: Deleted	',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Ability status 1: Normal 2: Disabled 3: Deleted	',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `agent_id` (`agent_id`),
@@ -61,9 +62,9 @@ INSERT INTO `agent_abilities` (`id`, `user_id`, `agent_id`, `name`, `content`, `
 /*!40000 ALTER TABLE `agent_abilities` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `agent_dataset_relation` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Agent dataset relation ID',
-  `agent_id` int(11) NOT NULL COMMENT 'Agent ID',
-  `dataset_id` int(11) NOT NULL COMMENT 'Dataset ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Agent dataset relation ID',
+  `agent_id` int NOT NULL COMMENT 'Agent ID',
+  `dataset_id` int NOT NULL COMMENT 'Dataset ID',
   PRIMARY KEY (`id`),
   UNIQUE KEY `agent_database_id` (`agent_id`,`dataset_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Agent Dataset Relation Data Table';
@@ -75,22 +76,22 @@ INSERT INTO `agent_dataset_relation` (`id`, `agent_id`, `dataset_id`) VALUES
 /*!40000 ALTER TABLE `agent_dataset_relation` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `apps` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'App ID',
-  `team_id` int(11) NOT NULL COMMENT 'Team ID',
-  `user_id` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID',
-  `name` varchar(50) NOT NULL COMMENT 'App name',
-  `description` varchar(255) DEFAULT NULL COMMENT 'App description',
-  `icon` varchar(150) DEFAULT NULL COMMENT 'App icon',
-  `icon_background` varchar(10) DEFAULT NULL COMMENT 'App icon background',
-  `mode` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'App mode 1: agent 2: workflow 3: dataset 4: custom tool 5: chatroom',
-  `enable_api` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Whether to enable API 0: No 1: Yes',
-  `api_token` varchar(100) DEFAULT NULL COMMENT 'API Token',
-  `is_public` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Is it open to team members? 0: No 1: Yes',
-  `publish_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Publish status 0: Draft 1: Published',
-  `execution_times` int(11) NOT NULL DEFAULT 0 COMMENT 'App execution times',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'App created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'App ID',
+  `team_id` int NOT NULL COMMENT 'Team ID',
+  `user_id` int NOT NULL DEFAULT '0' COMMENT 'User ID',
+  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'App name',
+  `description` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'App description',
+  `icon` varchar(150) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'App icon',
+  `icon_background` varchar(10) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'App icon background',
+  `mode` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'App mode 1: agent 2: workflow 3: dataset 4: custom tool 5: chatroom',
+  `enable_api` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Whether to enable API 0: No 1: Yes',
+  `api_token` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'API Token',
+  `is_public` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Is it open to team members? 0: No 1: Yes',
+  `publish_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Publish status 0: Draft 1: Published',
+  `execution_times` int NOT NULL DEFAULT '0' COMMENT 'App execution times',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'App created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'App updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'App status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'App status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   UNIQUE KEY `api_token` (`api_token`) USING BTREE,
   KEY `user_id` (`user_id`),
@@ -100,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `apps` (
   KEY `is_public` (`is_public`),
   KEY `publish_status` (`publish_status`),
   KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=926 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='App Data Table';
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='App Data Table';
 
 /*!40000 ALTER TABLE `apps` DISABLE KEYS */;
 INSERT INTO `apps` (`id`, `team_id`, `user_id`, `name`, `description`, `icon`, `icon_background`, `mode`, `enable_api`, `api_token`, `is_public`, `publish_status`, `execution_times`, `created_time`, `updated_time`, `status`) VALUES
@@ -110,50 +111,50 @@ INSERT INTO `apps` (`id`, `team_id`, `user_id`, `name`, `description`, `icon`, `
 	(4, 1, 1, 'Generate weekly report', 'Enter daily work and generate industry weekly reports', '1', '', 2, 0, 'app-gXgq6pPfbAFq2LWSQjKPUA91TsXW6pNhJRzs2A', 1, 1, 0, '2024-12-02 15:23:48', '2024-12-14 14:13:12', 1),
 	(5, 1, 1, 'Resume Agent', 'This agent is designed to filter and extract the most relevant resumes based on the input keywords.', '1', '', 1, 0, 'app-V7PV5z1kolCjPTsC8o35CNePiLbJLtOxxodCtQLQ', 1, 1, 0, '2024-12-02 15:47:01', '2024-12-13 07:18:15', 1),
 	(6, 1, 1, 'Smart Recruitment', 'HR can quickly and accurately filter through all resumes in the database and match the best ones.', '5', '', 2, 0, 'app-iv1mT2wMX6HqSnTQufQpcuGcajklcRqsAUwEkF', 1, 1, 0, '2024-12-02 17:22:39', '2024-12-14 14:13:19', 1),
-	(7, 1, 1, 'Resume Database', 'Establish a resume archive library for the resumes submitted to the company.', '6', '', 3, 0, NULL, 1, 1, 0, '2024-12-02 15:29:32', '2024-12-13 07:18:15', 1),
+	(7, 1, 1, 'Resume Database', 'Establish a resume archive library for the resumes submitted to the company.', '6', '', 3, 0, NULL, 1, 0, 0, '2024-12-02 15:29:32', '2024-12-13 07:18:15', 1),
 	(8, 1, 1, 'AI customer service workflow', 'The workflow receives user questions, analyzes and generates answers with the help of a large language model, feeds back to users, and provides high-quality answer services.', '1', '', 2, 0, 'app-Hz5XEwNXK8PJOOQbeCwBQXVnxYnLTT8bDQ', 1, 1, 0, '2024-11-29 11:19:58', '2024-12-14 14:15:07', 1),
 	(9, 1, 1, 'Requirement document', 'Enter the project name and project overview to generate a document.', '1', '', 2, 0, 'app-SyaMGb8QgiubQ9Db6SsES7sPlOY52CYhA', 1, 1, 0, '2024-12-02 15:54:53', '2024-12-14 14:11:02', 1),
 	(10, 1, 1, 'Data Comparison Work', 'This workflow compares the table structure submitted by the user with the structure of the uploaded', '1', '', 2, 0, 'app-7wRSvFUi2bGSkPmt69uxdPgVRPOlyTaFA', 1, 1, 0, '2024-12-02 15:22:27', '2024-12-14 14:14:32', 1),
-	(11, 1, 1, 'Technical terms', 'Terminology of Computer Software Technology', '1', '', 3, 0, NULL, 1, 1, 0, '2024-12-02 15:29:19', '2024-12-02 15:29:41', 1),
-	(12, 1, 1, 'Store activities', 'Store activities', '1', '', 3, 0, NULL, 0, 1, 0, '2024-12-02 10:12:25', '2024-12-03 17:14:34', 1),
-	(13, 1, 1, 'Pre-sale of goods', 'Pre-sale of goods', '1', '', 3, 0, NULL, 0, 1, 0, '2024-12-02 10:20:49', '2024-12-02 18:27:56', 1),
-	(14, 1, 1, 'Logistics consulting', 'Logistics consulting', '1', '', 3, 0, NULL, 0, 1, 0, '2024-12-02 10:21:03', '2024-12-02 15:46:56', 1),
-	(15, 1, 1, 'After-sales support', 'After-sales support', '1', '', 3, 0, NULL, 0, 1, 0, '2024-12-02 10:42:26', '2024-12-02 15:02:14', 1);
+	(11, 1, 1, 'Technical terms', 'Terminology of Computer Software Technology', '1', '', 3, 0, NULL, 1, 0, 0, '2024-12-02 15:29:19', '2024-12-02 15:29:41', 1),
+	(12, 1, 1, 'Store activities', 'Store activities', '1', '', 3, 0, NULL, 1, 0, 0, '2024-12-02 10:12:25', '2024-12-03 17:14:34', 1),
+	(13, 1, 1, 'Pre-sale of goods', 'Pre-sale of goods', '1', '', 3, 0, NULL, 1, 0, 0, '2024-12-02 10:20:49', '2024-12-02 18:27:56', 1),
+	(14, 1, 1, 'Logistics consulting', 'Logistics consulting', '1', '', 3, 0, NULL, 1, 0, 0, '2024-12-02 10:21:03', '2024-12-02 15:46:56', 1),
+	(15, 1, 1, 'After-sales support', 'After-sales support', '1', '', 3, 0, NULL, 1, 0, 0, '2024-12-02 10:42:26', '2024-12-02 15:02:14', 1);
 /*!40000 ALTER TABLE `apps` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `app_node_executions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Node execution ID',
-  `workflow_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Workflow ID',
-  `chatroom_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Chatroom ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `app_run_id` int(11) NOT NULL DEFAULT 0 COMMENT 'App run ID',
-  `type` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Trigger type 1: Debug 2: Run application 3: API',
-  `level` int(11) NOT NULL DEFAULT 0 COMMENT 'The current level of edge',
-  `child_level` int(11) NOT NULL DEFAULT 0 COMMENT 'Child node level',
-  `edge_id` varchar(255) DEFAULT NULL COMMENT 'Edge ID',
-  `pre_node_id` varchar(100) DEFAULT NULL COMMENT 'Predecessor node ID or chat agent ID',
-  `node_id` varchar(100) NOT NULL COMMENT 'Node ID or chat agent ID',
-  `node_type` varchar(50) NOT NULL COMMENT 'Node Type',
-  `node_name` varchar(50) NOT NULL COMMENT 'Node name or chat agent name',
-  `node_graph` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Node graphical data' CHECK (json_valid(`node_graph`)),
-  `correct_output` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Human correct output 0: No 1: Yes',
-  `inputs` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Inputs' CHECK (json_valid(`inputs`)),
-  `correct_prompt` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Prompt for correcting LLM output results' CHECK (json_valid(`correct_prompt`)),
-  `model_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Data required for AI models' CHECK (json_valid(`model_data`)),
-  `task_id` varchar(100) DEFAULT NULL COMMENT 'Task ID to be executed',
-  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Execute status 0: Cannot execute 1: Can execute 2: Executing 3: Successfully executed 4: Failed to execute',
-  `error` text DEFAULT NULL COMMENT 'Error message',
-  `condition_id` varchar(100) DEFAULT NULL COMMENT 'Condition id of the logical branch or Task id',
-  `outputs` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Outputs' CHECK (json_valid(`outputs`)),
-  `output_type` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Output type 0: no output 1: variables 2: text 3: database 4: code 5: document',
-  `need_human_confirm` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Need human confirm 0: No 1: Yes',
-  `elapsed_time` decimal(10,6) NOT NULL DEFAULT 0.000000 COMMENT 'Elapsed time',
-  `prompt_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Prompt tokens',
-  `completion_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Completion tokens',
-  `total_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Total tokens',
-  `embedding_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Embedding tokens',
-  `reranking_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Reranking tokens',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Execution created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Node execution ID',
+  `workflow_id` int NOT NULL DEFAULT '0' COMMENT 'Workflow ID',
+  `chatroom_id` int NOT NULL DEFAULT '0' COMMENT 'Chatroom ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `app_run_id` int NOT NULL DEFAULT '0' COMMENT 'App run ID',
+  `type` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Trigger type 1: Debug 2: Run application 3: API',
+  `level` int NOT NULL DEFAULT '0' COMMENT 'The current level of edge',
+  `child_level` int NOT NULL DEFAULT '0' COMMENT 'Child node level',
+  `edge_id` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Edge ID',
+  `pre_node_id` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Predecessor node ID or chat agent ID',
+  `node_id` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Node ID or chat agent ID',
+  `node_type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Node Type',
+  `node_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Node name or chat agent name',
+  `node_graph` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Node graphical data',
+  `correct_output` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Human correct output 0: No 1: Yes',
+  `inputs` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Inputs',
+  `correct_prompt` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Prompt for correcting LLM output results',
+  `model_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Data required for AI models',
+  `task_id` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Task ID to be executed',
+  `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Execute status 0: Cannot execute 1: Can execute 2: Executing 3: Successfully executed 4: Failed to execute',
+  `error` text COLLATE utf8mb4_general_ci COMMENT 'Error message',
+  `condition_id` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Condition id of the logical branch or Task id',
+  `outputs` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Outputs',
+  `output_type` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Output type 0: no output 1: variables 2: text 3: database 4: code 5: document',
+  `need_human_confirm` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Need human confirm 0: No 1: Yes',
+  `elapsed_time` decimal(10,6) NOT NULL DEFAULT '0.000000' COMMENT 'Elapsed time',
+  `prompt_tokens` int NOT NULL DEFAULT '0' COMMENT 'Prompt tokens',
+  `completion_tokens` int NOT NULL DEFAULT '0' COMMENT 'Completion tokens',
+  `total_tokens` int NOT NULL DEFAULT '0' COMMENT 'Total tokens',
+  `embedding_tokens` int NOT NULL DEFAULT '0' COMMENT 'Embedding tokens',
+  `reranking_tokens` int NOT NULL DEFAULT '0' COMMENT 'Reranking tokens',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Execution created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Execution updated time',
   `finished_time` datetime DEFAULT NULL COMMENT 'Execution finished time',
   PRIMARY KEY (`id`),
@@ -172,18 +173,23 @@ CREATE TABLE IF NOT EXISTS `app_node_executions` (
   KEY `level` (`level`),
   KEY `need_human_confirm` (`need_human_confirm`),
   KEY `user_id` (`user_id`),
-  KEY `child_level` (`child_level`)
+  KEY `child_level` (`child_level`),
+  CONSTRAINT `app_node_executions_chk_1` CHECK (json_valid(`node_graph`)),
+  CONSTRAINT `app_node_executions_chk_2` CHECK (json_valid(`inputs`)),
+  CONSTRAINT `app_node_executions_chk_3` CHECK (json_valid(`correct_prompt`)),
+  CONSTRAINT `app_node_executions_chk_4` CHECK (json_valid(`model_data`)),
+  CONSTRAINT `app_node_executions_chk_5` CHECK (json_valid(`outputs`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='App Node Execution Data Table';
 
 /*!40000 ALTER TABLE `app_node_executions` DISABLE KEYS */;
 /*!40000 ALTER TABLE `app_node_executions` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `app_node_user_relation` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'App node user relation ID',
-  `app_run_id` int(11) NOT NULL COMMENT 'App Run ID',
-  `node_id` varchar(100) NOT NULL COMMENT 'Node ID',
-  `team_id` int(11) NOT NULL COMMENT 'Team ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'App node user relation ID',
+  `app_run_id` int NOT NULL COMMENT 'App Run ID',
+  `node_id` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Node ID',
+  `team_id` int NOT NULL COMMENT 'Team ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `app_run_id` (`app_run_id`),
@@ -195,38 +201,38 @@ CREATE TABLE IF NOT EXISTS `app_node_user_relation` (
 /*!40000 ALTER TABLE `app_node_user_relation` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `app_runs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Run ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `app_id` int(11) NOT NULL COMMENT 'App ID',
-  `agent_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Agent ID',
-  `workflow_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Workflow ID',
-  `dataset_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Dataset id',
-  `tool_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Custom tool ID',
-  `chatroom_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Chatroom ID',
-  `type` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Trigger type 1: Debug 2: Run application 3: API',
-  `name` varchar(50) DEFAULT NULL COMMENT 'Run name',
-  `graph` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Workflow graphical data' CHECK (json_valid(`graph`)),
-  `inputs` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Inputs' CHECK (json_valid(`inputs`)),
-  `knowledge_base_mapping` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Knowledge base mapping' CHECK (json_valid(`knowledge_base_mapping`)),
-  `level` int(11) NOT NULL DEFAULT 0 COMMENT 'The current level of operation',
-  `context` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Execute context' CHECK (json_valid(`context`)),
-  `completed_edges` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Completed edges' CHECK (json_valid(`completed_edges`)),
-  `skipped_edges` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Skipped edges' CHECK (json_valid(`skipped_edges`)),
-  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Execute status 0: Cannot execute 1: Can execute 2: Executing 3: Successfully executed 4: Failed to execute',
-  `completed_steps` int(11) NOT NULL DEFAULT 0 COMMENT 'Completed steps',
-  `actual_completed_steps` int(11) NOT NULL DEFAULT 0 COMMENT 'Actual number of completed steps',
-  `need_human_confirm` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Need human confirm 0: No 1: Yes',
-  `need_correct_llm` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Need correct LLM output 0: No 1: Yes',
-  `error` text DEFAULT NULL COMMENT 'Error message',
-  `outputs` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Outputs' CHECK (json_valid(`outputs`)),
-  `elapsed_time` decimal(20,6) NOT NULL DEFAULT 0.000000 COMMENT 'Elapsed time',
-  `prompt_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Prompt tokens',
-  `completion_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Completion tokens',
-  `total_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Total tokens',
-  `embedding_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Embedding tokens',
-  `reranking_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Reranking tokens',
-  `total_steps` int(11) NOT NULL DEFAULT 0 COMMENT 'Total steps',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Run created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Run ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `app_id` int NOT NULL COMMENT 'App ID',
+  `agent_id` int NOT NULL DEFAULT '0' COMMENT 'Agent ID',
+  `workflow_id` int NOT NULL DEFAULT '0' COMMENT 'Workflow ID',
+  `dataset_id` int NOT NULL DEFAULT '0' COMMENT 'Dataset id',
+  `tool_id` int NOT NULL DEFAULT '0' COMMENT 'Custom tool ID',
+  `chatroom_id` int NOT NULL DEFAULT '0' COMMENT 'Chatroom ID',
+  `type` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Trigger type 1: Debug 2: Run application 3: API',
+  `name` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Run name',
+  `graph` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Workflow graphical data',
+  `inputs` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Inputs',
+  `knowledge_base_mapping` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Knowledge base mapping',
+  `level` int NOT NULL DEFAULT '0' COMMENT 'The current level of operation',
+  `context` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Execute context',
+  `completed_edges` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Completed edges',
+  `skipped_edges` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Skipped edges',
+  `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Execute status 0: Cannot execute 1: Can execute 2: Executing 3: Successfully executed 4: Failed to execute',
+  `completed_steps` int NOT NULL DEFAULT '0' COMMENT 'Completed steps',
+  `actual_completed_steps` int NOT NULL DEFAULT '0' COMMENT 'Actual number of completed steps',
+  `need_human_confirm` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Need human confirm 0: No 1: Yes',
+  `need_correct_llm` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Need correct LLM output 0: No 1: Yes',
+  `error` text COLLATE utf8mb4_general_ci COMMENT 'Error message',
+  `outputs` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Outputs',
+  `elapsed_time` decimal(20,6) NOT NULL DEFAULT '0.000000' COMMENT 'Elapsed time',
+  `prompt_tokens` int NOT NULL DEFAULT '0' COMMENT 'Prompt tokens',
+  `completion_tokens` int NOT NULL DEFAULT '0' COMMENT 'Completion tokens',
+  `total_tokens` int NOT NULL DEFAULT '0' COMMENT 'Total tokens',
+  `embedding_tokens` int NOT NULL DEFAULT '0' COMMENT 'Embedding tokens',
+  `reranking_tokens` int NOT NULL DEFAULT '0' COMMENT 'Reranking tokens',
+  `total_steps` int NOT NULL DEFAULT '0' COMMENT 'Total steps',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Run created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Run updated time',
   `finished_time` datetime DEFAULT NULL COMMENT 'Run finished time',
   PRIMARY KEY (`id`),
@@ -240,47 +246,54 @@ CREATE TABLE IF NOT EXISTS `app_runs` (
   KEY `need_human_confirm` (`need_human_confirm`),
   KEY `chatroom_id` (`chatroom_id`),
   KEY `user_id` (`user_id`),
-  KEY `need_correct_llm` (`need_correct_llm`)
+  KEY `need_correct_llm` (`need_correct_llm`),
+  CONSTRAINT `app_runs_chk_1` CHECK (json_valid(`graph`)),
+  CONSTRAINT `app_runs_chk_2` CHECK (json_valid(`inputs`)),
+  CONSTRAINT `app_runs_chk_3` CHECK (json_valid(`knowledge_base_mapping`)),
+  CONSTRAINT `app_runs_chk_4` CHECK (json_valid(`context`)),
+  CONSTRAINT `app_runs_chk_5` CHECK (json_valid(`completed_edges`)),
+  CONSTRAINT `app_runs_chk_6` CHECK (json_valid(`skipped_edges`)),
+  CONSTRAINT `app_runs_chk_7` CHECK (json_valid(`outputs`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='App Runs Data Table';
 
 /*!40000 ALTER TABLE `app_runs` DISABLE KEYS */;
 /*!40000 ALTER TABLE `app_runs` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `app_workflow_relation` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'App workflow relation ID',
-  `app_id` int(11) NOT NULL COMMENT 'App(Agent Skill Dataset) ID',
-  `workflow_id` int(11) NOT NULL COMMENT 'Workflow ID',
-  `workflow_app_id` int(11) NOT NULL COMMENT 'Workflow app ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'App workflow relation ID',
+  `app_id` int NOT NULL COMMENT 'App(Agent Skill Dataset) ID',
+  `workflow_id` int NOT NULL COMMENT 'Workflow ID',
+  `workflow_app_id` int NOT NULL COMMENT 'Workflow app ID',
   PRIMARY KEY (`id`),
   KEY `app_id` (`app_id`),
   KEY `workflow_id` (`workflow_id`),
   KEY `workflow_app_id` (`workflow_app_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='App(Agent/Skill/Dataset) Workflow Relation Data Table';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='App(Agent/Skill/Dataset) Workflow Relation Data Table';
 
 /*!40000 ALTER TABLE `app_workflow_relation` DISABLE KEYS */;
 INSERT INTO `app_workflow_relation` (`id`, `app_id`, `workflow_id`, `workflow_app_id`) VALUES
-	(36, 11, 1, 3),
-	(37, 5, 5, 6),
-	(40, 1, 11, 10),
-	(49, 12, 7, 8),
-	(50, 13, 7, 8),
-	(51, 14, 7, 8),
-	(52, 15, 7, 8);
+	(1, 11, 1, 3),
+	(2, 5, 5, 6),
+	(3, 1, 11, 10),
+	(4, 12, 7, 8),
+	(5, 13, 7, 8),
+	(6, 14, 7, 8),
+	(7, 15, 7, 8);
 /*!40000 ALTER TABLE `app_workflow_relation` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `chatrooms` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Chatroom ID',
-  `team_id` int(11) NOT NULL COMMENT 'Team ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `app_id` int(11) NOT NULL COMMENT 'App ID',
-  `max_round` int(11) NOT NULL COMMENT 'The maximum number of chat rounds',
-  `initial_message_id` int(11) NOT NULL DEFAULT 0 COMMENT 'The initial message ID of the chat history',
-  `chat_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Chat status 0: Stopped, 1: Chatting',
-  `smart_selection` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Agent Smart Selection 0: No 1: Yes',
-  `active` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Active 0: No 1: Yes',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Chatroom created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Chatroom ID',
+  `team_id` int NOT NULL COMMENT 'Team ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `app_id` int NOT NULL COMMENT 'App ID',
+  `max_round` int NOT NULL COMMENT 'The maximum number of chat rounds',
+  `initial_message_id` int NOT NULL DEFAULT '0' COMMENT 'The initial message ID of the chat history',
+  `chat_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Chat status 0: Stopped, 1: Chatting',
+  `smart_selection` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Agent Smart Selection 0: No 1: Yes',
+  `active` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Active 0: No 1: Yes',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Chatroom created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Chatroom updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Chatroom status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Chatroom status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   KEY `team_id` (`team_id`),
   KEY `user_id` (`user_id`),
@@ -293,10 +306,10 @@ CREATE TABLE IF NOT EXISTS `chatrooms` (
 /*!40000 ALTER TABLE `chatrooms` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `chatroom_agent_relation` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Chatroom agent relation ID',
-  `chatroom_id` int(11) NOT NULL COMMENT 'Chatroom ID',
-  `agent_id` int(11) NOT NULL COMMENT 'Agent ID',
-  `active` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Active 0: No 1: Yes',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Chatroom agent relation ID',
+  `chatroom_id` int NOT NULL COMMENT 'Chatroom ID',
+  `agent_id` int NOT NULL COMMENT 'Agent ID',
+  `active` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Active 0: No 1: Yes',
   PRIMARY KEY (`id`),
   UNIQUE KEY `chatroom_agent_id` (`chatroom_id`,`agent_id`),
   KEY `active` (`active`)
@@ -306,54 +319,59 @@ CREATE TABLE IF NOT EXISTS `chatroom_agent_relation` (
 /*!40000 ALTER TABLE `chatroom_agent_relation` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `chatroom_messages` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Chatroom message ID',
-  `chatroom_id` int(11) NOT NULL COMMENT 'Chatroom ID',
-  `app_run_id` int(11) NOT NULL COMMENT 'App run ID',
-  `user_id` int(11) NOT NULL DEFAULT 0 COMMENT 'ID of the user who sent the message (0 when the sender is an agent)',
-  `agent_id` int(11) NOT NULL DEFAULT 0 COMMENT 'ID of the agent who sent the message (0 when the sender is a user)',
-  `llm_input` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'LLM input messages in LangChain format' CHECK (json_valid(`llm_input`)),
-  `message` text NOT NULL COMMENT 'LLM output message string (or user input message)',
-  `topic` text DEFAULT NULL COMMENT 'Topic of the meeting',
-  `is_read` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Read status 0: Unread, 1: Read',
-  `prompt_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Prompt tokens',
-  `completion_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Completion tokens',
-  `total_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Total tokens',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Message created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Chatroom message ID',
+  `chatroom_id` int NOT NULL COMMENT 'Chatroom ID',
+  `app_run_id` int NOT NULL COMMENT 'App run ID',
+  `user_id` int NOT NULL DEFAULT '0' COMMENT 'ID of the user who sent the message (0 when the sender is an agent)',
+  `agent_id` int NOT NULL DEFAULT '0' COMMENT 'ID of the agent who sent the message (0 when the sender is a user)',
+  `llm_input` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'LLM input messages in LangChain format',
+  `message` text COLLATE utf8mb4_general_ci NOT NULL COMMENT 'LLM output message string (or user input message)',
+  `topic` text COLLATE utf8mb4_general_ci COMMENT 'Topic of the meeting',
+  `is_read` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Read status 0: Unread, 1: Read',
+  `prompt_tokens` int NOT NULL DEFAULT '0' COMMENT 'Prompt tokens',
+  `completion_tokens` int NOT NULL DEFAULT '0' COMMENT 'Completion tokens',
+  `total_tokens` int NOT NULL DEFAULT '0' COMMENT 'Total tokens',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Message created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Message updated time',
   PRIMARY KEY (`id`),
   KEY `chatroom_id` (`chatroom_id`),
   KEY `app_run_id` (`app_run_id`),
   KEY `user_id` (`user_id`),
   KEY `agent_id` (`agent_id`),
-  KEY `is_read` (`is_read`)
+  KEY `is_read` (`is_read`),
+  CONSTRAINT `chatroom_messages_chk_1` CHECK (json_valid(`llm_input`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Chatroom Message Data Table';
 
 /*!40000 ALTER TABLE `chatroom_messages` DISABLE KEYS */;
 /*!40000 ALTER TABLE `chatroom_messages` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `custom_tools` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Tool ID',
-  `team_id` int(11) NOT NULL COMMENT 'Team ID',
-  `user_id` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID',
-  `app_id` int(11) NOT NULL COMMENT 'App ID',
-  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Tool config' CHECK (json_valid(`config`)),
-  `input_variables` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Input variables' CHECK (json_valid(`input_variables`)),
-  `dependencies` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Tool dependencies' CHECK (json_valid(`dependencies`)),
-  `code` text DEFAULT NULL COMMENT 'Tool code',
-  `output_type` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Output type 1: text 2: database 3: code 4: document',
-  `output_variables` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Output variables' CHECK (json_valid(`output_variables`)),
-  `publish_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Tool publish status 0: Draft 1: Published',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Tool ID',
+  `team_id` int NOT NULL COMMENT 'Team ID',
+  `user_id` int NOT NULL DEFAULT '0' COMMENT 'User ID',
+  `app_id` int NOT NULL COMMENT 'App ID',
+  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Tool config',
+  `input_variables` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Input variables',
+  `dependencies` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Tool dependencies',
+  `code` text COLLATE utf8mb4_general_ci COMMENT 'Tool code',
+  `output_type` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Output type 1: text 2: database 3: code 4: document',
+  `output_variables` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Output variables',
+  `publish_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Tool publish status 0: Draft 1: Published',
   `published_time` datetime DEFAULT NULL COMMENT 'Tool published time',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Tool created time',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Tool created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Tool updated time',
-  `status` tinyint(1) DEFAULT 1 COMMENT 'Tool status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) DEFAULT '1' COMMENT 'Tool status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   KEY `status` (`status`),
   KEY `user_id` (`user_id`),
   KEY `team_id` (`team_id`),
   KEY `app_id` (`app_id`),
   KEY `publish_status` (`publish_status`),
-  KEY `output_type` (`output_type`)
+  KEY `output_type` (`output_type`),
+  CONSTRAINT `custom_tools_chk_1` CHECK (json_valid(`config`)),
+  CONSTRAINT `custom_tools_chk_2` CHECK (json_valid(`input_variables`)),
+  CONSTRAINT `custom_tools_chk_3` CHECK (json_valid(`dependencies`)),
+  CONSTRAINT `custom_tools_chk_4` CHECK (json_valid(`output_variables`))
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Custom Tool Data Table';
 
 /*!40000 ALTER TABLE `custom_tools` DISABLE KEYS */;
@@ -365,26 +383,27 @@ INSERT INTO `custom_tools` (`id`, `team_id`, `user_id`, `app_id`, `config`, `inp
 /*!40000 ALTER TABLE `custom_tools` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `datasets` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Dataset ID',
-  `team_id` int(11) NOT NULL COMMENT 'Team ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `app_id` int(11) NOT NULL COMMENT 'App ID',
-  `process_rule_id` int(11) NOT NULL DEFAULT 1 COMMENT 'Dataset process rule ID',
-  `data_source_type` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Data source type 1: Upload files 2: Synchronize other sites',
-  `collection_name` varchar(50) NOT NULL COMMENT 'Vector storage collection name',
-  `embedding_model_config_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Embedding model configuration ID',
-  `retriever_config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Retriever config' CHECK (json_valid(`retriever_config`)),
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Dataset created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Dataset ID',
+  `team_id` int NOT NULL COMMENT 'Team ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `app_id` int NOT NULL COMMENT 'App ID',
+  `process_rule_id` int NOT NULL DEFAULT '1' COMMENT 'Dataset process rule ID',
+  `data_source_type` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Data source type 1: Upload files 2: Synchronize other sites',
+  `collection_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Vector storage collection name',
+  `embedding_model_config_id` int NOT NULL DEFAULT '0' COMMENT 'Embedding model configuration ID',
+  `retriever_config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Retriever config',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Dataset created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Dataset updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Dataset status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Dataset status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   KEY `embedding_model_id` (`embedding_model_config_id`),
   KEY `status` (`status`),
   KEY `team_id` (`team_id`),
   KEY `user_id` (`user_id`),
   KEY `app_id` (`app_id`),
-  KEY `process_rule_id` (`process_rule_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Dataset Data Table';
+  KEY `process_rule_id` (`process_rule_id`),
+  CONSTRAINT `datasets_chk_1` CHECK (json_valid(`retriever_config`))
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Dataset Data Table';
 
 /*!40000 ALTER TABLE `datasets` DISABLE KEYS */;
 INSERT INTO `datasets` (`id`, `team_id`, `user_id`, `app_id`, `process_rule_id`, `data_source_type`, `collection_name`, `embedding_model_config_id`, `retriever_config`, `created_time`, `updated_time`, `status`) VALUES
@@ -397,14 +416,15 @@ INSERT INTO `datasets` (`id`, `team_id`, `user_id`, `app_id`, `process_rule_id`,
 /*!40000 ALTER TABLE `datasets` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `dataset_process_rules` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Rule ID',
-  `mode` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Processing mode 1: Automatic 2: Custom',
-  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Rule config' CHECK (json_valid(`config`)),
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Rule created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Rule ID',
+  `mode` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Processing mode 1: Automatic 2: Custom',
+  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Rule config',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Rule created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Rule updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Rule status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Rule status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
-  KEY `status` (`status`)
+  KEY `status` (`status`),
+  CONSTRAINT `dataset_process_rules_chk_1` CHECK (json_valid(`config`))
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Dataset Process Rule Data Table';
 
 /*!40000 ALTER TABLE `dataset_process_rules` DISABLE KEYS */;
@@ -413,62 +433,62 @@ INSERT INTO `dataset_process_rules` (`id`, `mode`, `config`, `created_time`, `up
 /*!40000 ALTER TABLE `dataset_process_rules` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `documents` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Document ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `dataset_id` int(11) NOT NULL COMMENT 'Dataset ID',
-  `name` varchar(100) NOT NULL COMMENT 'Document name',
-  `data_source_type` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Data source type 1: Upload files 2: Synchronize other sites 3: Workflow node output 4: Workflow node input',
-  `dataset_process_rule_id` int(11) NOT NULL COMMENT 'Dataset process rule ID',
-  `upload_file_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Upload file ID',
-  `node_exec_id` int(11) NOT NULL DEFAULT 0 COMMENT 'App node execution ID',
-  `word_count` int(11) NOT NULL COMMENT 'Word count',
-  `tokens` int(11) NOT NULL COMMENT 'Tokens',
-  `indexing_latency` decimal(10,6) NOT NULL DEFAULT 0.000000 COMMENT 'Indexing latency',
-  `archived` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Archived status 0: Normal, 1: Archived',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Document created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Document ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `dataset_id` int NOT NULL COMMENT 'Dataset ID',
+  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Document name',
+  `data_source_type` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Data source type 1: Upload files 2: Synchronize other sites 3: Workflow node output 4: Workflow node input',
+  `dataset_process_rule_id` int NOT NULL COMMENT 'Dataset process rule ID',
+  `upload_file_id` int NOT NULL DEFAULT '0' COMMENT 'Upload file ID',
+  `node_exec_id` int NOT NULL DEFAULT '0' COMMENT 'App node execution ID',
+  `word_count` int NOT NULL COMMENT 'Word count',
+  `tokens` int NOT NULL COMMENT 'Tokens',
+  `indexing_latency` decimal(10,6) NOT NULL DEFAULT '0.000000' COMMENT 'Indexing latency',
+  `archived` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Archived status 0: Normal, 1: Archived',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Document created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Document updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Document status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Document status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `dataset_id` (`dataset_id`),
   KEY `status` (`status`),
   KEY `upload_file_id` (`upload_file_id`),
   KEY `dataset_process_rule_id` (`dataset_process_rule_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=826 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Document Data Table';
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Document Data Table';
 
 /*!40000 ALTER TABLE `documents` DISABLE KEYS */;
 INSERT INTO `documents` (`id`, `user_id`, `dataset_id`, `name`, `data_source_type`, `dataset_process_rule_id`, `upload_file_id`, `node_exec_id`, `word_count`, `tokens`, `indexing_latency`, `archived`, `created_time`, `updated_time`, `status`) VALUES
-	(1, 1, 1, 'Michael Brown-builtin-1734079638.docx', 1, 1, 1, 0, 2440, 478, 3.925952, 0, '2024-12-02 15:54:25', '2024-12-02 15:54:29', 1),
-	(2, 1, 1, 'Jane Doe-builtin-1734079639.docx', 1, 1, 2, 0, 1510, 304, 2.695930, 0, '2024-12-02 15:54:25', '2024-12-02 15:54:28', 1),
-	(3, 1, 1, 'Emily Johnson-builtin-1734079640.docx', 1, 1, 3, 0, 1882, 371, 2.817976, 0, '2024-12-02 15:54:25', '2024-12-02 15:54:29', 1),
-	(4, 1, 1, 'John Smith-builtin-1734079641.docx', 1, 1, 4, 0, 1726, 340, 3.121843, 0, '2024-12-02 15:54:25', '2024-12-02 17:45:34', 1),
-	(5, 1, 2, 'Technical terms-builtin-1734079699.txt', 1, 1, 5, 0, 235, 99, 3.971313, 0, '2024-12-02 15:29:29', '2024-12-02 15:29:34', 1),
-	(6, 1, 3, 'Store platform activities-builtin-1734079713.txt', 1, 1, 6, 0, 307, 68, 0.663894, 0, '2024-12-02 15:34:36', '2024-12-02 15:34:37', 1),
-	(7, 1, 4, 'After-sales support-builtin-1734079723.txt', 1, 1, 7, 0, 1063, 200, 2.750910, 0, '2024-12-02 15:34:43', '2024-12-02 15:34:46', 1),
-	(8, 1, 5, 'Logistics consulting-builtin-1734079737.txt', 1, 1, 8, 0, 1343, 268, 2.462932, 0, '2024-12-02 15:34:52', '2024-12-02 15:34:55', 1),
-	(9, 1, 6, 'Pre-sale of goods-builtin-1734079747.txt', 1, 1, 9, 0, 1379, 280, 3.485012, 0, '2024-12-02 15:35:02', '2024-12-02 15:35:06', 1);
+	(1, 1, 1, 'Michael Brown-builtin-1734079638.docx', 1, 1, 1, 0, 2440, 478, 0.000000, 0, '2024-12-02 15:54:25', '2024-12-02 15:54:29', 1),
+	(2, 1, 1, 'Jane Doe-builtin-1734079639.docx', 1, 1, 2, 0, 1510, 304, 0.000000, 0, '2024-12-02 15:54:25', '2024-12-02 15:54:28', 1),
+	(3, 1, 1, 'Emily Johnson-builtin-1734079640.docx', 1, 1, 3, 0, 1882, 371, 0.000000, 0, '2024-12-02 15:54:25', '2024-12-02 15:54:29', 1),
+	(4, 1, 1, 'John Smith-builtin-1734079641.docx', 1, 1, 4, 0, 1726, 340, 0.000000, 0, '2024-12-02 15:54:25', '2024-12-02 17:45:34', 1),
+	(5, 1, 2, 'Technical terms-builtin-1734079699.txt', 1, 1, 5, 0, 235, 99, 0.000000, 0, '2024-12-02 15:29:29', '2024-12-02 15:29:34', 1),
+	(6, 1, 3, 'Store platform activities-builtin-1734079713.txt', 1, 1, 6, 0, 307, 68, 0.000000, 0, '2024-12-02 15:34:36', '2024-12-02 15:34:37', 1),
+	(7, 1, 4, 'After-sales support-builtin-1734079723.txt', 1, 1, 7, 0, 1063, 200, 0.000000, 0, '2024-12-02 15:34:43', '2024-12-02 15:34:46', 1),
+	(8, 1, 5, 'Logistics consulting-builtin-1734079737.txt', 1, 1, 8, 0, 1343, 268, 0.000000, 0, '2024-12-02 15:34:52', '2024-12-02 15:34:55', 1),
+	(9, 1, 6, 'Pre-sale of goods-builtin-1734079747.txt', 1, 1, 9, 0, 1379, 280, 0.000000, 0, '2024-12-02 15:35:02', '2024-12-02 15:35:06', 1);
 /*!40000 ALTER TABLE `documents` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `document_segments` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Segment ID',
-  `document_id` int(11) NOT NULL COMMENT 'Document ID',
-  `index_id` varchar(100) DEFAULT NULL COMMENT 'Corresponding to the id in the vector library',
-  `content` text NOT NULL COMMENT 'Segment content',
-  `word_count` int(11) NOT NULL COMMENT 'Segment word count',
-  `tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Segment tokens',
-  `hit_count` int(11) NOT NULL DEFAULT 0 COMMENT 'Hit count',
-  `indexing_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Indexing status 0: Not indexed 1: Being indexed 2: Successfully indexed 3: Failed to be indexed',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Segment ID',
+  `document_id` int NOT NULL COMMENT 'Document ID',
+  `index_id` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Corresponding to the id in the vector library',
+  `content` text COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Segment content',
+  `word_count` int NOT NULL COMMENT 'Segment word count',
+  `tokens` int NOT NULL DEFAULT '0' COMMENT 'Segment tokens',
+  `hit_count` int NOT NULL DEFAULT '0' COMMENT 'Hit count',
+  `indexing_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indexing status 0: Not indexed 1: Being indexed 2: Successfully indexed 3: Failed to be indexed',
   `indexing_time` datetime DEFAULT NULL COMMENT 'Indexing time',
   `completed_time` datetime DEFAULT NULL COMMENT 'Index completion time',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Segment created time',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Segment created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Segment updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Segment status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Segment status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   KEY `document_id` (`document_id`),
   KEY `hit_count` (`hit_count`),
   KEY `status` (`status`),
   KEY `indexing_status` (`indexing_status`)
-) ENGINE=InnoDB AUTO_INCREMENT=9076 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Document Segment Data Table';
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Document Segment Data Table';
 
 /*!40000 ALTER TABLE `document_segments` DISABLE KEYS */;
 INSERT INTO `document_segments` (`id`, `document_id`, `index_id`, `content`, `word_count`, `tokens`, `hit_count`, `indexing_status`, `indexing_time`, `completed_time`, `created_time`, `updated_time`, `status`) VALUES
@@ -513,39 +533,39 @@ INSERT INTO `document_segments` (`id`, `document_id`, `index_id`, `content`, `wo
 /*!40000 ALTER TABLE `document_segments` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `document_segment_rag_records` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Document segment RAG record ID',
-  `rag_record_id` int(11) NOT NULL DEFAULT 0 COMMENT 'RAG record ID',
-  `dataset_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Dataset ID',
-  `document_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Document ID',
-  `segment_id` int(11) NOT NULL DEFAULT 0 COMMENT 'ID of document segment retrieved',
-  `score` decimal(20,6) NOT NULL DEFAULT 0.000000 COMMENT 'Document similarity score',
-  `reranking_score` decimal(20,6) NOT NULL DEFAULT 0.000000 COMMENT 'Document reranking score',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Run created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Document segment RAG record ID',
+  `rag_record_id` int NOT NULL DEFAULT '0' COMMENT 'RAG record ID',
+  `dataset_id` int NOT NULL DEFAULT '0' COMMENT 'Dataset ID',
+  `document_id` int NOT NULL DEFAULT '0' COMMENT 'Document ID',
+  `segment_id` int NOT NULL DEFAULT '0' COMMENT 'ID of document segment retrieved',
+  `score` decimal(20,6) NOT NULL DEFAULT '0.000000' COMMENT 'Document similarity score',
+  `reranking_score` decimal(20,6) NOT NULL DEFAULT '0.000000' COMMENT 'Document reranking score',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Run created time',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `rag_record_id` (`rag_record_id`) USING BTREE,
   KEY `dataset_id` (`dataset_id`) USING BTREE,
   KEY `document_id` (`document_id`) USING BTREE,
   KEY `segment_id` (`segment_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='RAG Record Table By Document Segment';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='RAG Record Table By Document Segment';
 
 /*!40000 ALTER TABLE `document_segment_rag_records` DISABLE KEYS */;
 /*!40000 ALTER TABLE `document_segment_rag_records` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `models` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Model ID',
-  `supplier_id` int(11) NOT NULL COMMENT 'Model supplier ID',
-  `name` varchar(50) NOT NULL COMMENT 'Model name',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Model ID',
+  `supplier_id` int NOT NULL COMMENT 'Model supplier ID',
+  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Model name',
   `type` tinyint(1) NOT NULL COMMENT 'Model type 1: text-generation 2: embeddings 3: reranking 4: speech2text 5: tts 6: text2img 7: moderation',
-  `mode` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Request mode 1: online 2: local',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Model created time',
+  `mode` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Request mode 1: online 2: local',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Model created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Model updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Model status 1: Normal 2: Disabled 3: Deleted	',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Model status 1: Normal 2: Disabled 3: Deleted	',
   PRIMARY KEY (`id`),
   KEY `supplier_id` (`supplier_id`),
   KEY `type` (`type`),
   KEY `status` (`status`),
   KEY `mode` (`mode`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Model Data Table';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Model Data Table';
 
 /*!40000 ALTER TABLE `models` DISABLE KEYS */;
 INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `created_time`, `updated_time`, `status`) VALUES
@@ -560,18 +580,19 @@ INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `created_time
 /*!40000 ALTER TABLE `models` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `model_configurations` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Model supplier ID',
-  `team_id` int(11) NOT NULL COMMENT 'Team ID',
-  `model_id` int(11) NOT NULL COMMENT 'Model ID',
-  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Model configuration' CHECK (json_valid(`config`)),
-  `default_used` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Whether to use by default 0: no 1: yes',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Model configuration created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Model supplier ID',
+  `team_id` int NOT NULL COMMENT 'Team ID',
+  `model_id` int NOT NULL COMMENT 'Model ID',
+  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Model configuration',
+  `default_used` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Whether to use by default 0: no 1: yes',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Model configuration created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Model configuration updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Model configuration status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Model configuration status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   UNIQUE KEY `team_id` (`team_id`,`model_id`),
-  KEY `status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Model Configuration Data Table';
+  KEY `status` (`status`),
+  CONSTRAINT `model_configurations_chk_1` CHECK (json_valid(`config`))
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Model Configuration Data Table';
 
 /*!40000 ALTER TABLE `model_configurations` DISABLE KEYS */;
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `created_time`, `updated_time`, `status`) VALUES
@@ -586,39 +607,41 @@ INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `defa
 /*!40000 ALTER TABLE `model_configurations` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `rag_records` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'RAG record ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `agent_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Agent ID',
-  `workflow_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Workflow ID',
-  `dataset_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'IDs of datasets to retrieve from' CHECK (json_valid(`dataset_ids`)),
-  `type` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Trigger type 1: Debug 2: Run application',
-  `input` text DEFAULT NULL COMMENT 'Input',
-  `search_in_documents` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Names of documents to search in' CHECK (json_valid(`search_in_documents`)),
-  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1: Executing 2: Successfully executed 3: Failed to execute',
-  `error` text DEFAULT NULL COMMENT 'Error message',
-  `elapsed_time` decimal(20,6) NOT NULL DEFAULT 0.000000 COMMENT 'Elapsed time',
-  `embedding_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Embedding tokens',
-  `reranking_tokens` int(11) NOT NULL DEFAULT 0 COMMENT 'Reranking tokens',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Run created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'RAG record ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `agent_id` int NOT NULL DEFAULT '0' COMMENT 'Agent ID',
+  `workflow_id` int NOT NULL DEFAULT '0' COMMENT 'Workflow ID',
+  `dataset_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'IDs of datasets to retrieve from',
+  `type` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Trigger type 1: Debug 2: Run application',
+  `input` text COLLATE utf8mb4_general_ci COMMENT 'Input',
+  `search_in_documents` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Names of documents to search in',
+  `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1: Executing 2: Successfully executed 3: Failed to execute',
+  `error` text COLLATE utf8mb4_general_ci COMMENT 'Error message',
+  `elapsed_time` decimal(20,6) NOT NULL DEFAULT '0.000000' COMMENT 'Elapsed time',
+  `embedding_tokens` int NOT NULL DEFAULT '0' COMMENT 'Embedding tokens',
+  `reranking_tokens` int NOT NULL DEFAULT '0' COMMENT 'Reranking tokens',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Run created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Run updated time',
   PRIMARY KEY (`id`),
   KEY `agent_id` (`agent_id`),
   KEY `workflow_id` (`workflow_id`),
   KEY `type` (`type`),
   KEY `status` (`status`),
-  KEY `user_id` (`user_id`)
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `rag_records_chk_1` CHECK (json_valid(`dataset_ids`)),
+  CONSTRAINT `rag_records_chk_2` CHECK (json_valid(`search_in_documents`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='RAG Record Table';
 
 /*!40000 ALTER TABLE `rag_records` DISABLE KEYS */;
 /*!40000 ALTER TABLE `rag_records` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `suppliers` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Model supplier ID',
-  `name` varchar(50) NOT NULL COMMENT 'Model supplier name',
-  `mode` tinyint(1) DEFAULT 1 COMMENT 'Request mode 1:online 2:local',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Supplier created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Model supplier ID',
+  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Model supplier name',
+  `mode` tinyint(1) DEFAULT '1' COMMENT 'Request mode 1:online 2:local',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Supplier created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Supplier updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Supplier status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Supplier status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   KEY `status` (`status`,`mode`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Model Supplier Data Table';
@@ -630,16 +653,17 @@ INSERT INTO `suppliers` (`id`, `name`, `mode`, `created_time`, `updated_time`, `
 /*!40000 ALTER TABLE `suppliers` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `supplier_configurations` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Model supplier ID',
-  `team_id` int(11) NOT NULL COMMENT 'Team ID',
-  `supplier_id` int(11) NOT NULL COMMENT 'Model supplier ID',
-  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Model supplier configuration' CHECK (json_valid(`config`)),
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Supplier configuration created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Model supplier ID',
+  `team_id` int NOT NULL COMMENT 'Team ID',
+  `supplier_id` int NOT NULL COMMENT 'Model supplier ID',
+  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Model supplier configuration',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Supplier configuration created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Supplier configuration updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Supplier configuration status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Supplier configuration status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   UNIQUE KEY `team_id` (`team_id`,`supplier_id`),
-  KEY `status` (`status`)
+  KEY `status` (`status`),
+  CONSTRAINT `supplier_configurations_chk_1` CHECK (json_valid(`config`))
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Model Supplier Configuration Data Table';
 
 /*!40000 ALTER TABLE `supplier_configurations` DISABLE KEYS */;
@@ -648,14 +672,15 @@ INSERT INTO `supplier_configurations` (`id`, `team_id`, `supplier_id`, `config`,
 /*!40000 ALTER TABLE `supplier_configurations` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `teams` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Team ID',
-  `name` varchar(50) NOT NULL COMMENT 'Team name',
-  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Team config' CHECK (json_valid(`config`)),
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Team created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Team ID',
+  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Team name',
+  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Team config',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Team created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Team updated time',
-  `status` tinyint(4) NOT NULL DEFAULT 1 COMMENT 'Team status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint NOT NULL DEFAULT '1' COMMENT 'Team status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
-  KEY `status` (`status`)
+  KEY `status` (`status`),
+  CONSTRAINT `teams_chk_1` CHECK (json_valid(`config`))
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Team Data Table';
 
 /*!40000 ALTER TABLE `teams` DISABLE KEYS */;
@@ -664,30 +689,31 @@ INSERT INTO `teams` (`id`, `name`, `config`, `created_time`, `updated_time`, `st
 /*!40000 ALTER TABLE `teams` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `tool_authorizations` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Provider ID',
-  `team_id` int(11) DEFAULT NULL COMMENT 'Team ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `provider` varchar(50) NOT NULL COMMENT 'Provider Name',
-  `encrypted_credentials` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Provider Config' CHECK (json_valid(`encrypted_credentials`)),
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Provider created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Provider ID',
+  `team_id` int DEFAULT NULL COMMENT 'Team ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `provider` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Provider Name',
+  `encrypted_credentials` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Provider Config',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Provider created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Provider updated time',
   PRIMARY KEY (`id`),
   KEY `provider` (`provider`) USING BTREE,
-  KEY `team_id` (`team_id`) USING BTREE
+  KEY `team_id` (`team_id`) USING BTREE,
+  CONSTRAINT `tool_authorizations_chk_1` CHECK (json_valid(`encrypted_credentials`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tool Authorization Data Table';
 
 /*!40000 ALTER TABLE `tool_authorizations` DISABLE KEYS */;
 /*!40000 ALTER TABLE `tool_authorizations` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `upload_files` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'File ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `name` varchar(100) NOT NULL COMMENT 'File name',
-  `path` varchar(255) NOT NULL COMMENT 'Local path relative to project root path',
-  `size` int(11) NOT NULL COMMENT 'File size',
-  `extension` varchar(10) NOT NULL COMMENT 'File extension',
-  `mime_type` varchar(255) NOT NULL,
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'File uploaded time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'File ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'File name',
+  `path` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Local path relative to project root path',
+  `size` int NOT NULL COMMENT 'File size',
+  `extension` varchar(10) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'File extension',
+  `mime_type` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'File uploaded time',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Upload File Data Table';
@@ -706,22 +732,22 @@ INSERT INTO `upload_files` (`id`, `user_id`, `name`, `path`, `size`, `extension`
 /*!40000 ALTER TABLE `upload_files` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'User ID',
-  `team_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Team ID',
-  `role` tinyint(1) NOT NULL DEFAULT 2 COMMENT 'Team role 1: Administrator 2: Ordinary Member',
-  `inviter_id` int(11) NOT NULL DEFAULT 0 COMMENT 'Inviter ID',
-  `nickname` varchar(50) DEFAULT NULL COMMENT 'User''s nickname',
-  `phone` varchar(20) DEFAULT NULL COMMENT 'User''s mobile phone number',
-  `email` varchar(50) DEFAULT NULL COMMENT 'User''s email',
-  `password` varchar(100) NOT NULL COMMENT 'User login password',
-  `password_salt` varchar(100) NOT NULL COMMENT 'User login password encryption salt value',
-  `avatar` varchar(200) DEFAULT NULL COMMENT 'User''s avatar',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'User created time',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'User ID',
+  `team_id` int NOT NULL DEFAULT '0' COMMENT 'Team ID',
+  `role` tinyint(1) NOT NULL DEFAULT '2' COMMENT 'Team role 1: Administrator 2: Ordinary Member',
+  `inviter_id` int NOT NULL DEFAULT '0' COMMENT 'Inviter ID',
+  `nickname` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'User''s nickname',
+  `phone` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'User''s mobile phone number',
+  `email` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'User''s email',
+  `password` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'User login password',
+  `password_salt` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'User login password encryption salt value',
+  `avatar` varchar(200) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'User''s avatar',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'User created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'The user''s most recent updated time',
   `last_login_time` datetime DEFAULT NULL COMMENT 'The time the user last logged in',
-  `last_login_ip` varchar(20) DEFAULT NULL COMMENT 'The IP address of the user''s last login',
-  `language` varchar(10) NOT NULL DEFAULT 'en' COMMENT 'Current language',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'User status 1: Normal 2: Disabled 3: Deleted',
+  `last_login_ip` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'The IP address of the user''s last login',
+  `language` varchar(10) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'en' COMMENT 'Current language',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'User status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   KEY `phone` (`phone`),
   KEY `email` (`email`),
@@ -737,23 +763,25 @@ INSERT INTO `users` (`id`, `team_id`, `role`, `inviter_id`, `nickname`, `phone`,
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
 CREATE TABLE IF NOT EXISTS `workflows` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Workflow ID',
-  `team_id` int(11) NOT NULL COMMENT 'Team ID',
-  `user_id` int(11) NOT NULL COMMENT 'User ID',
-  `app_id` int(11) NOT NULL COMMENT 'App ID',
-  `graph` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Workflow graphical data' CHECK (json_valid(`graph`)),
-  `features` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Workflow features' CHECK (json_valid(`features`)),
-  `publish_status` tinyint(1) DEFAULT 0 COMMENT 'Workflow publish status 0: Draft 1: Published',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Workflow ID',
+  `team_id` int NOT NULL COMMENT 'Team ID',
+  `user_id` int NOT NULL COMMENT 'User ID',
+  `app_id` int NOT NULL COMMENT 'App ID',
+  `graph` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Workflow graphical data',
+  `features` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'Workflow features',
+  `publish_status` tinyint(1) DEFAULT '0' COMMENT 'Workflow publish status 0: Draft 1: Published',
   `published_time` datetime DEFAULT NULL COMMENT 'Workflow published time',
-  `created_time` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Workflow created time',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Workflow created time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Workflow updated time',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Workflow status 1: Normal 2: Disabled 3: Deleted',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Workflow status 1: Normal 2: Disabled 3: Deleted',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `team_id` (`team_id`),
   KEY `app_id` (`app_id`),
   KEY `status` (`status`),
-  KEY `publish_status` (`publish_status`)
+  KEY `publish_status` (`publish_status`),
+  CONSTRAINT `workflows_chk_1` CHECK (json_valid(`graph`)),
+  CONSTRAINT `workflows_chk_2` CHECK (json_valid(`features`))
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Workflow Data Table';
 
 /*!40000 ALTER TABLE `workflows` DISABLE KEYS */;
