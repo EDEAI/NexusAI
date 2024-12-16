@@ -65,7 +65,7 @@ def _import_document(document_name: int, user_id: int):
         except Exception as e:
             documents.close()
             print(f'Failed to enable document {documents_data["id"]}: {e}')
-        time.sleep(2)
+        time.sleep(30)
 
 
 def import_documents(batch_number: int):
