@@ -286,7 +286,6 @@ class DatasetManagement:
                     'indexing_time': indexing_time
                 }
             )
-            document_segments.commit()
             try:
                 index_id = vdb.add_documents([segment])[0]
             except:
@@ -294,7 +293,7 @@ class DatasetManagement:
                     {'column': 'id', 'value': segment_id},
                     {'indexing_status': 3}
                 )
-                document_segments.commit()
+                raise
             else:
                 completed_time = datetime.now()
                 num_tokens = vdb.embeddings.get_and_reset_num_tokens()
@@ -308,7 +307,7 @@ class DatasetManagement:
                         'completed_time': completed_time
                     }
                 )
-                document_segments.commit()
+                
         indexing_latency = monotonic() - overall_indexing_start_time
         return total_word_count, total_num_tokens, indexing_latency
 
@@ -342,7 +341,7 @@ class DatasetManagement:
                     'indexing_time': indexing_time
                 }
             )
-            document_segments.commit()
+            
             try:
                 index_id = vdb.add_texts(
                     [segment['content']],
@@ -353,7 +352,7 @@ class DatasetManagement:
                     {'column': 'id', 'value': segment_id},
                     {'indexing_status': 3}
                 )
-                document_segments.commit()
+                raise
             else:
                 completed_time = datetime.now()
                 num_tokens = vdb.embeddings.get_and_reset_num_tokens()
@@ -368,7 +367,7 @@ class DatasetManagement:
                     {'column': 'id', 'value': segment_id},
                     update_data
                 )
-                document_segments.commit()
+                
         return True
 
     @classmethod
@@ -391,7 +390,6 @@ class DatasetManagement:
             {'column': 'document_id', 'value': document_id},
             {'indexing_status': 0}
         )
-        document_segments.commit()
         return result
 
     @classmethod
@@ -442,7 +440,6 @@ class DatasetManagement:
                 {'column': 'id', 'value': segment['id']},
                 {'status': 1}
             )
-            document_segments.commit()
             return segment['index_id']
         _, vdb = get_embeddings_and_vector_database(
             dataset['embedding_model_config_id'],
@@ -463,7 +460,7 @@ class DatasetManagement:
                 'status': 1
             }
         )
-        document_segments.commit()
+        
         try:
             index_id = vdb.add_texts(
                 [segment['content']],
@@ -474,7 +471,6 @@ class DatasetManagement:
                 {'column': 'id', 'value': segment_id},
                 {'indexing_status': 3}
             )
-            document_segments.commit()
             raise
         completed_time = datetime.now()
         num_tokens = vdb.embeddings.get_and_reset_num_tokens()
@@ -489,7 +485,7 @@ class DatasetManagement:
             {'column': 'id', 'value': segment_id},
             update_data
         )
-        document_segments.commit()
+        
         return index_id
 
     @classmethod
@@ -504,7 +500,6 @@ class DatasetManagement:
                 {'column': 'id', 'value': segment['id']},
                 {'status': 2}
             )
-            document_segments.commit()
             return True
         _, vdb = get_embeddings_and_vector_database(
             dataset['embedding_model_config_id'],
@@ -518,7 +513,7 @@ class DatasetManagement:
                 'status': 2
             }
         )
-        document_segments.commit()
+        
         return result
 
     @classmethod
@@ -615,7 +610,7 @@ class DatasetManagement:
                         'indexing_time': indexing_time
                     }
                 )
-                document_segments.commit()
+                
                 try:
                     index_id = vdb.add_texts(
                         [segment['content']],
@@ -626,7 +621,7 @@ class DatasetManagement:
                         {'column': 'id', 'value': segment_id},
                         {'indexing_status': 3}
                     )
-                    document_segments.commit()
+                    raise
                 else:
                     completed_time = datetime.now()
                     num_tokens = vdb.embeddings.get_and_reset_num_tokens()
@@ -639,7 +634,6 @@ class DatasetManagement:
                             'completed_time': completed_time
                         }
                     )
-                    document_segments.commit()
         
         datasets.update(
             {'column': 'id', 'value': dataset_id},

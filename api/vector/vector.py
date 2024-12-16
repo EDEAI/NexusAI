@@ -55,36 +55,36 @@ async def get_cost(
     total_num_tokens = 0
     total_cost = 0.0
     currency = 'USD'
-    team_id_list = UploadFiles().get_by_team_id(file_ids)
-    if team_id_list:
-        for item in team_id_list:
-            if team_id != item['team_id']:
-                logger.info('get_cost: Insufficient permissions, desc: files_id %s is not currently on your team, Current user id %s', item['id'], user_id)
-                return response_error(get_language_content("api_vector_auth"))
-    else:
-        file_ids_str = ', '.join(map(str, file_ids))
-        logger.info('get_cost: The uploaded file information is not matched, desc: The current files id %s do not exist, Current user id %s', file_ids_str, user_id)
-        return response_error(get_language_content("api_vector_file_type"))
+    try:
+        team_id_list = UploadFiles().get_by_team_id(file_ids)
+        if team_id_list:
+            for item in team_id_list:
+                if team_id != item['team_id']:
+                    logger.info('get_cost: Insufficient permissions, desc: files_id %s is not currently on your team, Current user id %s', item['id'], user_id)
+                    return response_error(get_language_content("api_vector_auth"))
+        else:
+            file_ids_str = ', '.join(map(str, file_ids))
+            logger.info('get_cost: The uploaded file information is not matched, desc: The current files id %s do not exist, Current user id %s', file_ids_str, user_id)
+            return response_error(get_language_content("api_vector_file_type"))
 
-    if indexing_mode == 1:
-        process_rule = DatasetProcessRules().get_process_rule_by_id(process_rule_id)
-        if process_rule:
-            type_, config = convert_to_type_and_config(process_rule['config'])
-            for file_id in file_ids:
-                file = UploadFiles().get_file_by_id(file_id)
-                if file:
-                    try:
+        if indexing_mode == 1:
+            process_rule = DatasetProcessRules().get_process_rule_by_id(process_rule_id)
+            if process_rule:
+                type_, config = convert_to_type_and_config(process_rule['config'])
+                for file_id in file_ids:
+                    file = UploadFiles().get_file_by_id(file_id)
+                    if file:
                         segments = DatasetManagement.document_segmentation(
                             str(project_root.joinpath(file['path'])),
                             type_,
                             config
                         )
                         num_tokens, cost, currency = DatasetManagement.get_num_tokens(team_id, segments)
-                    except AssertionError as e:
-                        return response_error(str(e))
-                    total_num_tokens += num_tokens
-                    total_cost += cost
-    return response_success({'num_tokens': total_num_tokens, 'cost': total_cost, 'currency': currency},get_language_content("api_vector_success"))
+                        total_num_tokens += num_tokens
+                        total_cost += cost
+        return response_success({'num_tokens': total_num_tokens, 'cost': total_cost, 'currency': currency},get_language_content("api_vector_success"))
+    except Exception as e:
+        return response_error(str(e))
 
 
 @router.get('/dataset_list/{is_individual}', response_model=DatasetListResponse)
@@ -135,35 +135,35 @@ async def create_dataset(data: CreateDatasetSchema,userinfo: TokenData = Depends
     indexing_mode: Literal[1, 2] = data.indexing_mode
     try:
         embeddings_config_id = Models().get_model_by_type(2, team_id, indexing_mode, user_id)['model_config_id']
-    except AssertionError as e:
+        collection_name = DatasetManagement.create_dataset(embeddings_config_id)
+        retriever_config_dict = {item['key']: item['value'] for item in retriever_config}
+        app_id = Apps().insert(
+            {
+                'team_id': team_id,
+                'user_id': user_id,
+                'name': name,
+                'description': description,
+                'mode': 3,
+                'enable_api': enable_api,
+                'is_public': is_public,
+            }
+        )
+        dataset_id = Datasets().insert(
+            {
+                'team_id': team_id,
+                'user_id': user_id,
+                'app_id': app_id,
+                'process_rule_id': process_rule_id,
+                'data_source_type': data_source_type,
+                'collection_name': collection_name,
+                'embedding_model_config_id': embeddings_config_id,
+                'retriever_config': retriever_config_dict
+            }
+        )
+    except Exception as e:
         msg = str(e)
         logger.info('create_dataset: %s desc: Request model %s, Current user id %s', msg, user_id)
         return response_error(msg)
-    collection_name = DatasetManagement.create_dataset(embeddings_config_id)
-    retriever_config_dict = {item['key']: item['value'] for item in retriever_config}
-    app_id = Apps().insert(
-        {
-            'team_id': team_id,
-            'user_id': user_id,
-            'name': name,
-            'description': description,
-            'mode': 3,
-            'enable_api': enable_api,
-            'is_public': is_public,
-        }
-    )
-    dataset_id = Datasets().insert(
-        {
-            'team_id': team_id,
-            'user_id': user_id,
-            'app_id': app_id,
-            'process_rule_id': process_rule_id,
-            'data_source_type': data_source_type,
-            'collection_name': collection_name,
-            'embedding_model_config_id': embeddings_config_id,
-            'retriever_config': retriever_config_dict
-        }
-    )
     return response_success({'dataset_id': dataset_id}, get_language_content("api_vector_success"))
 
 @router.post('/add_document', response_model=AddDocumentResponse)
@@ -191,43 +191,43 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
             app_id, user_id, 'api_vector_auth',
             check_is_reindexing=True
         )
-    except AssertionError as e:
+        for file_id in file_ids:
+            file = UploadFiles().get_file_by_id(file_id)
+            document_id = Documents().insert(
+                {
+                    'user_id': user_id,
+                    'dataset_id': dataset_id,
+                    'name': file['name'] + file['extension'],
+                    'data_source_type': data_source_type,
+                    'dataset_process_rule_id': process_rule_id,
+                    'upload_file_id': file_id,
+                    'word_count': 0,
+                    'tokens': 0
+                }
+            )
+            result = DatasetManagement.add_document_to_dataset(
+                document_id=document_id,
+                dataset_id=dataset_id,
+                process_rule_id=process_rule_id,
+                file_path=str(project_root.joinpath(file['path']))
+            )
+            word_count, num_tokens, indexing_latency = result
+            Documents().update(
+                [
+                    {'column': 'id', 'value': document_id},
+                    {'column': 'status', 'value': 1}
+                ],
+                {
+                    'word_count': word_count,
+                    'tokens': num_tokens,
+                    'indexing_latency': indexing_latency
+                }
+            )
+    except Exception as e:
         msg = str(e)
         logger.info('add_document: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
-    for file_id in file_ids:
-        file = UploadFiles().get_file_by_id(file_id)
-        document_id = Documents().insert(
-            {
-                'user_id': user_id,
-                'dataset_id': dataset_id,
-                'name': file['name'] + file['extension'],
-                'data_source_type': data_source_type,
-                'dataset_process_rule_id': process_rule_id,
-                'upload_file_id': file_id,
-                'word_count': 0,
-                'tokens': 0
-            }
-        )
-        result = DatasetManagement.add_document_to_dataset(
-            document_id=document_id,
-            dataset_id=dataset_id,
-            process_rule_id=process_rule_id,
-            file_path=str(project_root.joinpath(file['path']))
-        )
-        word_count, num_tokens, indexing_latency = result
-        Documents().update(
-            [
-                {'column': 'id', 'value': document_id},
-                {'column': 'status', 'value': 1}
-            ],
-            {
-                'word_count': word_count,
-                'tokens': num_tokens,
-                'indexing_latency': indexing_latency
-            }
-        )
     return response_success({}, get_language_content("api_vector_success"))
 
 @router.put('/enable_segment/{segment_id}', response_model=EnableSegmentResponse)
@@ -254,7 +254,7 @@ async def enable_segment(segment_id: int, userinfo: TokenData = Depends(get_curr
             return response_error(get_language_content("api_vector_indexing"))
         DatasetManagement.enable_segment(segment, document, dataset)
         return response_success({}, get_language_content("api_vector_success"))
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('enable_segment: %s desc: Current user id %s',
                     msg, user_id)
@@ -286,7 +286,7 @@ async def disable_segment(segment_id: int, userinfo: TokenData = Depends(get_cur
 
         DatasetManagement.disable_segment(segment, document, dataset)
         return response_success({}, get_language_content("api_vector_success"))
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('disable_segment: %s desc: Current user id %s',
                     msg, user_id)
@@ -319,7 +319,7 @@ async def delete_document(document_id: int, userinfo: TokenData = Depends(get_cu
             if file_path.exists():
                 file_path.unlink()
         return response_success({}, get_language_content("api_vector_success"))
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('delete_document: %s desc: Current user id %s',
                     msg, user_id)
@@ -355,7 +355,7 @@ async def delete_dataset(app_id: int, userinfo: TokenData = Depends(get_current_
                 if file_path.is_file():
                     file_path.unlink()
         return response_success({}, get_language_content("api_vector_success"))
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('delete_dataset: %s desc: Current user id %s',
                     msg, user_id)
@@ -410,39 +410,39 @@ async def documents_list(
             Datasets().get_dataset_find(dataset_id, user_id, team_id)
             conditions.append({'column': 'documents.user_id', 'value': user_id}),
             is_where += f" AND documents.user_id = {user_id}"
-    except AssertionError as e:
+
+        dataset_detail = Datasets().get_dataset_detail(dataset_id)
+        if name and name.strip():
+            conditions.append({'column': 'documents.name', 'op': 'like', 'value': '%' + name + '%'})
+            is_where += f" AND documents.name LIKE '%{name}%'"
+        total_count = Documents().documents_list_count(is_where)
+        paging_information = paging_result(page, page_size, total_count)
+        paging_information['file_time'] = f'documents.created_time {sort}'
+        result = Documents().documents_list(paging_information, conditions)
+        for item in result['data']:
+            item['created_time'] = str(item['created_time'])
+            if item['sum_document_segments.hit_count'] is None:
+                item['hit_count'] = "0"
+            else:
+                item['hit_count'] = item['sum_document_segments.hit_count']
+            del item['sum_document_segments.hit_count']
+
+        response = {
+            'data': result['data'],
+            'dataset_detail':dataset_detail,
+            'paging_information': {
+                "total_pages": result['total_pages'],
+                "total_count": total_count,
+                "page": page,
+                "page_size": page_size,
+            }
+        }
+        return response_success(response, get_language_content("api_vector_success"))
+    except Exception as e:
         msg = str(e)
         logger.info('documents_list: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
-
-    dataset_detail = Datasets().get_dataset_detail(dataset_id)
-    if name and name.strip():
-        conditions.append({'column': 'documents.name', 'op': 'like', 'value': '%' + name + '%'})
-        is_where += f" AND documents.name LIKE '%{name}%'"
-    total_count = Documents().documents_list_count(is_where)
-    paging_information = paging_result(page, page_size, total_count)
-    paging_information['file_time'] = f'documents.created_time {sort}'
-    result = Documents().documents_list(paging_information, conditions)
-    for item in result['data']:
-        item['created_time'] = str(item['created_time'])
-        if item['sum_document_segments.hit_count'] is None:
-            item['hit_count'] = "0"
-        else:
-            item['hit_count'] = item['sum_document_segments.hit_count']
-        del item['sum_document_segments.hit_count']
-
-    response = {
-        'data': result['data'],
-        'dataset_detail':dataset_detail,
-        'paging_information': {
-            "total_pages": result['total_pages'],
-            "total_count": total_count,
-            "page": page,
-            "page_size": page_size,
-        }
-    }
-    return response_success(response, get_language_content("api_vector_success"))
 
 @router.get('/document_segments_list/{document_id}', response_model=DocumentSegmentsListResponse)
 async def document_segments_list(
@@ -500,48 +500,48 @@ async def document_segments_list(
         if is_public == 0:
             Documents().get_document_find(document_id, user_id)
             conditions.append({'column': 'documents.user_id', 'value': user_id})
-    except AssertionError as e:
+
+        if not hit_count:
+            hit_count = 'id'
+
+        if content and content.strip():
+            conditions.append({'column': 'document_segments.content', 'op': 'like', 'value': '%' + content + '%'})
+
+        if status == 1 or status == 2:
+            conditions.append({'column': 'document_segments.status',  'value': status})
+
+        total_count = Documents().document_segments_count(conditions)
+        segmented_information = DocumentSegments().document_segments_file_set(document_id)
+        file_information = Documents().documents_dataset_process_rules(document_id)
+        seg_set = {
+            'seg_Avg': segmented_information.get("avg_word_count", ""),
+            'seg_Num': segmented_information.get("count_id", ""),
+            'hit_Num': segmented_information.get("sum_hit_count", ""),
+            'Embedding_Time': file_information.get("indexing_latency", ''),
+            'Embedding_Token': file_information.get("tokens", ''),
+            'seg_Len': file_information.get('config', {}).get("chunk_size", ""),
+        }
+        paging_information = paging_result(page, page_size, total_count)
+        paging_information['hit_count'] = hit_count
+        result = Documents().document_segments_list(paging_information, conditions)
+        if result['data']:
+            result['data'] = [{**d, 'segnum': i} for i, d in enumerate(result['data'], start=1)]
+        response = {
+            'data': result['data'],
+            'seg_set': seg_set,
+            'paging_information': {
+                "total_pages": result['total_pages'],
+                "total_count": total_count,
+                "page": page,
+                "page_size": page_size,
+            }
+        }
+        return response_success(response, get_language_content("api_vector_success"))
+    except Exception as e:
         msg = str(e)
         logger.info('document_segments_list: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
-
-    if not hit_count:
-        hit_count = 'id'
-
-    if content and content.strip():
-        conditions.append({'column': 'document_segments.content', 'op': 'like', 'value': '%' + content + '%'})
-
-    if status == 1 or status == 2:
-        conditions.append({'column': 'document_segments.status',  'value': status})
-
-    total_count = Documents().document_segments_count(conditions)
-    segmented_information = DocumentSegments().document_segments_file_set(document_id)
-    file_information = Documents().documents_dataset_process_rules(document_id)
-    seg_set = {
-        'seg_Avg': segmented_information.get("avg_word_count", ""),
-        'seg_Num': segmented_information.get("count_id", ""),
-        'hit_Num': segmented_information.get("sum_hit_count", ""),
-        'Embedding_Time': file_information.get("indexing_latency", ''),
-        'Embedding_Token': file_information.get("tokens", ''),
-        'seg_Len': file_information.get('config', {}).get("chunk_size", ""),
-    }
-    paging_information = paging_result(page, page_size, total_count)
-    paging_information['hit_count'] = hit_count
-    result = Documents().document_segments_list(paging_information, conditions)
-    if result['data']:
-        result['data'] = [{**d, 'segnum': i} for i, d in enumerate(result['data'], start=1)]
-    response = {
-        'data': result['data'],
-        'seg_set': seg_set,
-        'paging_information': {
-            "total_pages": result['total_pages'],
-            "total_count": total_count,
-            "page": page,
-            "page_size": page_size,
-        }
-    }
-    return response_success(response, get_language_content("api_vector_success"))
 
 @router.put('/disable_document/{documents_id}', response_model=DisableDocumentResponse)
 async def disable_document(documents_id: int, userinfo: TokenData = Depends(get_current_user)) -> DisableDocumentResponse:
@@ -575,7 +575,7 @@ async def disable_document(documents_id: int, userinfo: TokenData = Depends(get_
         )
         DatasetManagement.disable_document(documents_id)
         return response_success({}, get_language_content("api_vector_success"))
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('disable_document: %s desc: Current user id %s',
                     msg, user_id)
@@ -614,7 +614,7 @@ async def enable_document(documents_id: int, userinfo: TokenData = Depends(get_c
         )
         DatasetManagement.enable_document(documents_id)
         return response_success({}, get_language_content("api_vector_success"))
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('enable_document: %s desc: Current user id %s',
                     msg, user_id)
@@ -654,7 +654,7 @@ async def archive_document(document_id: int, userinfo: TokenData = Depends(get_c
             {'archived': 1}
         )
         return response_success({}, get_language_content("api_vector_success"))
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('archive_document: %s desc: Current user id %s',
                     msg, user_id)
@@ -695,7 +695,7 @@ async def cancel_archive_document(document_id: int, userinfo: TokenData = Depend
             {'archived': 0}
         )
         return response_success({}, get_language_content("api_vector_success"))
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('cancel_archive_document: %s desc: Current user id %s',
                     msg, user_id)
@@ -728,14 +728,8 @@ async def dataset_set(
     team_id = userinfo.team_id
     try:
         dataset_id = Datasets().get_dataset_id(app_id, user_id, 'api_vector_auth', check_is_reindexing=True)
-    except AssertionError as e:
-        msg = str(e)
-        logger.info('dataset_set: %s desc: Current user id %s',
-                    msg, user_id)
-        return response_error(msg)
-    if (mode != 1 and mode != 2):
-        return response_error(get_language_content("api_vector_available_model"))
-    try:
+        if (mode != 1 and mode != 2):
+            return response_error(get_language_content("api_vector_available_model"))
         datasets_data = Datasets().get_dataset_by_id(dataset_id)
         conditions = [
             {'column': 'id', 'value': datasets_data['app_id']},
@@ -750,12 +744,7 @@ async def dataset_set(
             {'name': name, 'description': description, 'is_public': public}
         )
 
-        try:
-            embeddings_config_id = Models().get_model_by_type(2, team_id, mode, user_id)['model_config_id']
-        except AssertionError as e:
-            msg = str(e)
-            logger.info('dataset_set: %s desc: Request model %s, Current user id %s', msg, user_id)
-            return response_error(msg)
+        embeddings_config_id = Models().get_model_by_type(2, team_id, mode, user_id)['model_config_id']
 
         if datasets_data['embedding_model_config_id'] != embeddings_config_id:
             Datasets().update(
@@ -766,7 +755,7 @@ async def dataset_set(
             )
             reindex_dataset.delay(dataset_id, embeddings_config_id)
         return response_success({}, get_language_content("api_vector_success"))
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('dataset_set: %s desc: Current user id %s', msg, user_id)
         return response_error(msg)
@@ -818,7 +807,7 @@ async def retrieval_test(
             response_data.append(data)
         return response_success({'data':response_data}, get_language_content("api_vector_success"))
 
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('recall_test: %s desc: Current user id %s',
                     msg, user_id)
@@ -879,7 +868,7 @@ async def retrieval_history_list(
         }
         return response_success(response, get_language_content("api_vector_success"))
 
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('retrieval_history: %s desc: Current user id %s',
                     msg, user_id)
@@ -957,7 +946,7 @@ async def retrieval_history_detail(
             item['reranking_score'] = float(round(item['reranking_score'], 4))
         return response_success({'data': data}, get_language_content("api_vector_success"))
 
-    except AssertionError as e:
+    except Exception as e:
         msg = str(e)
         logger.info('recall_test: %s desc: Current user id %s',
                     msg, user_id)
