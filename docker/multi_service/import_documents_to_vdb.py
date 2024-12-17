@@ -6,7 +6,7 @@ import pymysql
 import os
 from core.database.models import Documents,Datasets,Models
 from core.dataset import DatasetManagement
-os.environ['DATABASE_AUTO_COMMIT'] = 'True'
+os.environ['DATABASE_AUTO_COMMIT'] = 'False'
 
 MYSQL_HOST = os.getenv('MYSQL_HOST')
 MYSQL_PORT = int(os.getenv('MYSQL_PORT', 3306))
@@ -17,7 +17,9 @@ MYSQL_DB = os.getenv('MYSQL_DB')
 project_root = Path(__file__).absolute().parent.parent.parent
 log_dir = project_root.joinpath('logs', 'import_documents_to_vdb')
 
-
+documents = Documents()
+datasets = Datasets()
+models = Models()
 def wait_for_mysql():
     while True:
         try:
@@ -37,17 +39,17 @@ def wait_for_mysql():
 def _import_document(document_name: int, user_id: int):
     while True:
         try:
-            documents_data = Documents().get_document_find_by_name(document_name, user_id)
+            documents_data = documents.get_document_find_by_name(document_name, user_id)
             if documents_data:
                 print(documents_data)
-                dataset_data = Datasets().get_dataset_by_id(documents_data['dataset_id'])
+                dataset_data = datasets.get_dataset_by_id(documents_data['dataset_id'])
                 if dataset_data:
                     embedding_model_config_id = dataset_data['embedding_model_config_id']
-                    models_data = Models().get_model_by_config_id(embedding_model_config_id)
+                    models_data = models.get_model_by_config_id(embedding_model_config_id)
                     if models_data:
                         model_config = models_data['supplier_config']
                         if model_config:
-                            Documents().update(
+                            documents.update(
                                 [
                                     {'column': 'id', 'value': documents_data['id']},
                                     {'column': 'status', 'op': '<', 'value': 3},
@@ -55,8 +57,11 @@ def _import_document(document_name: int, user_id: int):
                                 {'status': 1}
                             )
                             DatasetManagement.enable_document(documents_data['id'])
+                            documents.commit()
+                            documents.close()
                             break
         except Exception as e:
+            documents.close()
             print(f'Failed to enable document {documents_data["id"]}: {e}')
         time.sleep(30)
 
