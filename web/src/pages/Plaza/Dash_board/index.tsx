@@ -15,7 +15,7 @@ import { history } from 'umi';
 
 // Subtitle
 const SubTitle = ({ subtitle }) => {
-    let titleClassName = `pl-[10px] text-[#1B64F3] text-[12px] ${subtitle.need_human_confirm ? 'text-[#1B64F3]' : 'text-[#808183] '}`
+    let titleClassName = `pl-[10px] text-[#1B64F3] text-[12px] ${subtitle.need_human_confirm==1||subtitle.need_human_confirm==undefined ? 'text-[#1B64F3]' : 'text-[#808183] '}`
     return (
         <div className="pr-4">
             <div className="truncate w-full">
@@ -324,7 +324,7 @@ const Coldom = () => {
             needHuman:(item:any)=>{
                 return (
                     <div className='flex items-center'>
-                        {item.need_human_confirm ? (
+                        {item.need_human_confirm==1||item.need_human_confirm==undefined ? (
                             <Tooltip
                                 title={intl.formatMessage({
                                     id: 'app.workflow.needHumanConfirm',

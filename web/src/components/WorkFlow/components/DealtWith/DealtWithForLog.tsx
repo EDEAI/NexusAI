@@ -103,12 +103,17 @@ export default memo((props: any) => {
         });
     };
     const delHumanMessage = id => {
-        const newFlowMessage = flowMessage.filter(
-            item =>
-                !(
+        const newFlowMessage = flowMessage.map(
+            item =>{
+                if(
                     item?.data?.node_exec_data?.node_exec_id == id &&
                     item?.type == 'workflow_need_human_confirm'
-                ),
+                ){
+                    item.need_human_confirm=0
+                }
+                return item;
+            }
+                
         );
         setFlowMessage(newFlowMessage);
     };
@@ -130,7 +135,7 @@ export default memo((props: any) => {
 
     const LLMContent = useCallback(() => {
         const nodeType = dealtWithInfo?.node_type;
-        console.log(dealtWithInfo, nodeType);
+        // console.log(dealtWithInfo, nodeType);
 
         return (
             <>
