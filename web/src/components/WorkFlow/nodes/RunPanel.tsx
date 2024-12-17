@@ -549,7 +549,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
             node_confirm_users: {},
             knowledge_base_mapping,
         };
-        debugger;
+
         runWorkFlow(app_id, params)
             .then(res => {
                 console.log(res);
@@ -577,24 +577,6 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
             },
             action: getUploadUrl,
             beforeUpload(file) {
-                // const allowedTypes = [
-                //     'text/plain', // TXT
-                //     'text/markdown', // MARKDOWN
-                //     'application/pdf', // PDF
-                //     'text/html', // HTML
-                //     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // XLSX
-                //     'application/vnd.ms-excel', // XLS
-                //     'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // DOCX
-                //     'text/csv', // CSV
-                // ];
-
-                // // Check if the file type is allowed
-                // const isAllowedType = allowedTypes.includes(file.type);
-                // if (!isAllowedType) {
-                //     message.error('');
-                // }
-
-                // Check if the file size is less than 15MB
                 const isLt15M = file.size / 1024 / 1024 < 15;
                 if (!isLt15M) {
                     message.error(intl.formatMessage({ id: 'workflow.uploadFileErrorText' }));

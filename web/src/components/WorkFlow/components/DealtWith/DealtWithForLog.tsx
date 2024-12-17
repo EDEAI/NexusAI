@@ -20,7 +20,7 @@ import {
 import { useIntl } from '@umijs/max';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import { Alert, Button, List, message, Typography } from 'antd';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { NOT_SHOW_INPUT_RESULT_NODE, UPLOAD_FILES_KEY } from '../../config';
 import useStore from '../../store';
@@ -35,7 +35,7 @@ export default memo((props: any) => {
     const [show, setShow] = useState(false);
     const dealtWithData = useUserStore(state => state.dealtWithData);
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
-    const setPrevConfirmDealtWith= useUserStore(state => state.setPrevConfirmDealtWith);
+    const setPrevConfirmDealtWith = useUserStore(state => state.setPrevConfirmDealtWith);
     const setSubmitPromptId = useUserStore(state => state.setSubmitPromptId);
     const setFlowMessage = useSocketStore(state => state.setFlowMessage);
     const getNeedHumanConfirmMessage = useSocketStore(state => state.getNeedHumanConfirmMessage);
@@ -97,7 +97,7 @@ export default memo((props: any) => {
                 setShow(false);
                 props?.onSubmit?.(execId);
                 setSubmitPromptId(execId);
-                setPrevConfirmDealtWith(dealtWithData)
+                setPrevConfirmDealtWith(dealtWithData);
                 setDealtWithData(null);
             }
         });
@@ -122,7 +122,7 @@ export default memo((props: any) => {
                 setShow(false);
                 setSubmitPromptId(execId);
                 delHumanMessage(execId);
-                setPrevConfirmDealtWith(dealtWithData)
+                setPrevConfirmDealtWith(dealtWithData);
                 setDealtWithData(null);
             }
         });
@@ -299,7 +299,7 @@ export default memo((props: any) => {
             }).then(res => {
                 if (res.code == 0) {
                     setShow(false);
-                    setPrevConfirmDealtWith(dealtWithData)
+                    setPrevConfirmDealtWith(dealtWithData);
                     setDealtWithData(null);
                     setSubmitPromptId(execId);
                     delHumanMessage(execId);
@@ -441,12 +441,12 @@ export default memo((props: any) => {
         flatten(obj.properties);
         return result;
     };
-    const arrayToObject = arr => {
-        return arr.reduce((acc, item) => {
-            acc[item.name] = item.value;
-            return acc;
-        }, {});
-    };
+    // const arrayToObject = arr => {
+    //     return arr.reduce((acc, item) => {
+    //         acc[item.name] = item.value;
+    //         return acc;
+    //     }, {});
+    // };
     const CustomContent = useCallback(() => {
         console.log(dealtWithInfo);
         const input = dealtWithInfo?.inputs;
@@ -456,16 +456,8 @@ export default memo((props: any) => {
         const [messageApi, contextHolder] = message.useMessage();
         useMount(() => {
             if (dealtWithInfo?.outputs) {
-                console.log(input, flattenObjectProperties(dealtWithInfo?.outputs));
                 setOutputs(flattenObjectProperties(dealtWithInfo?.outputs));
                 setOutputsValue(JSON.stringify(flattenObjectProperties(dealtWithInfo?.outputs)));
-
-                // setTimeout(() => {
-                //     console.log(arrayToObject(flattenObjectProperties(dealtWithInfo?.outputs)));
-                //     formRef?.current?.setFieldsValue(
-                //         arrayToObject(flattenObjectProperties(dealtWithInfo?.outputs)),
-                //     );
-                // }, 1000);
             }
         });
         const submitOutputs = () => {
@@ -486,7 +478,7 @@ export default memo((props: any) => {
                         setShow(false);
                         setSubmitPromptId(execId);
                         delHumanMessage(execId);
-                        setPrevConfirmDealtWith(dealtWithData)
+                        setPrevConfirmDealtWith(dealtWithData);
                         setDealtWithData(null);
                     }
                 });
@@ -604,7 +596,7 @@ export default memo((props: any) => {
                                 }
                                 delHumanMessage(dealtWithInfo.exec_id);
                                 setShow(false);
-                                setPrevConfirmDealtWith(dealtWithData)
+                                setPrevConfirmDealtWith(dealtWithData);
                                 setDealtWithData(null);
                                 props?.onSubmit?.(execId);
                                 setSubmitPromptId(execId);
@@ -681,7 +673,7 @@ export default memo((props: any) => {
                 overflowY: 'auto',
                 marginTop: '20px',
                 boxSizing: 'border-box',
-              height:'100%'
+                height: '100%',
             }}
         >
             <div>
@@ -694,7 +686,6 @@ export default memo((props: any) => {
                     <Typography.Text>{dealtWithInfo?.node_graph?.data?.desc}</Typography.Text>
                 </div>
                 {RenderContent()}
-
             </div>
         </ProCard>
     ) : null;

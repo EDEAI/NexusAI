@@ -44,9 +44,9 @@ const AgentsThirdly: React.FC<ChildProps> = ({
     const agentOutputSet = async (values: any) => {
         const res = await PutagentOutputset(values);
         if (res.code == 0) {
-            // message.success('1111');
+
         } else {
-            // message.warning('22222');
+
         }
     };
 
