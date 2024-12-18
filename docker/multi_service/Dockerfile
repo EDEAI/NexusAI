@@ -13,7 +13,6 @@ RUN conda install -c conda-forge supervisor
 
 COPY api /NexusAI/api
 COPY core /NexusAI/core
-COPY docker/multi_service/db_migrations /NexusAI/docker/multi_service/db_migrations
 COPY docker/multi_service/init_admin_password.py /NexusAI/docker/multi_service/init_admin_password.py
 COPY docker/multi_service/migrations.py /NexusAI/docker/multi_service/migrations.py
 COPY docker/multi_service/import_documents_to_vdb.py /NexusAI/docker/multi_service/import_documents_to_vdb.py
