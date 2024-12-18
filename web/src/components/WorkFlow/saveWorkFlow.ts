@@ -62,13 +62,19 @@ const useSaveWorkFlow = () => {
         if (!app_id) {
             console.log('appid');
         }
-        console.log(graph.toObject(), JSON.stringify(graph.toObject()));
+        // console.log(graph.toObject(), JSON.stringify(graph.toObject()));
         console.log(graph);
-        const params = {
-            graph: graph.toObject(),
-            is_public: 1,
-            enable_api: 1,
-        };
+        let params = null
+        try{
+            params={
+                graph: graph.toObject(),
+                is_public: 1,
+                enable_api: 1,
+            };
+        }catch (e) {
+           console.error('graph error')
+        }
+        if(params==null) return
         console.log(workflowEditInfoLast);
 
         params.is_public = +(workflowEditInfoLast?.current?.is_public || false);
