@@ -63,6 +63,8 @@ services:
     volumes:
       - ./volumes/logs/supervisor:/var/log/supervisor
       - ./volumes/logs/multi_service:/NexusAI/logs
+      - ./multi_service/db_migrations:/NexusAI/docker/multi_service/db_migrations
+      - ./multi_service/vdb_migrations:/NexusAI/docker/multi_service/vdb_migrations
       - ./volumes/upload_files:/NexusAI/upload_files
       - ../models:/NexusAI/models
     depends_on:
