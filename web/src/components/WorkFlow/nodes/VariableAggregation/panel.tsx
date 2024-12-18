@@ -113,7 +113,7 @@ export default memo(({ node }: { node: AppNode }) => {
                         }}
                         label={intl.formatMessage({
                             id: 'workflow.label.selectAggregationVariables',
-                            defaultMessage: '（）',
+                            defaultMessage: '',
                         })}
                         mode="multiple"
                         options={getVariables(node.id) || []}

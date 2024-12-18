@@ -241,9 +241,10 @@ export default {
     "workflow.vars.isRequired": "是否必填",
 
     "workflow.needHumanConfirm":"需要人工确认",
-    "workflow.noHumanConfirm":"已处理人工确认"
+    "workflow.noHumanConfirm":"已处理人工确认",
 
-
+    'workflow.label.selectAggregationVariables':'选择聚合变量（可多选）',
+    'workflow.message.setVariablesFirst':'请先设置变量',
 
 
 

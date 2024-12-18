@@ -48,11 +48,17 @@ const useSaveWorkFlow = () => {
 
             return false;
         }
-        const graph = new Graph(freeData.freeNodes, freeData.freeEdges, {
-            edges: freeData.edges,
-            nodes: freeData.nodes,
-            viewPort,
-        });
+        let graph = null;
+        try {
+            graph=new Graph(freeData.freeNodes, freeData.freeEdges, {
+                edges: freeData.edges,
+                nodes: freeData.nodes,
+                viewPort,
+            });
+        }catch (e){
+            console.error('graph error')
+        }
+        if(!graph) return
         if (!app_id) {
             console.log('appid');
         }

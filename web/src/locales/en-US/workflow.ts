@@ -250,4 +250,6 @@ export default {
 
     'workflow.needHumanConfirm': 'Need human confirmation',
     'workflow.noHumanConfirm': 'Human confirmation processed',
+    "workflow.label.selectAggregationVariables": "Select aggregation variables (multiple selection allowed)",
+    "workflow.message.setVariablesFirst": "Please set variables first"
 };
