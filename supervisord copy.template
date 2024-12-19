@@ -1,39 +1,37 @@
-[supervisord]
-nodaemon=true
+[unix_http_server]
+file=/tmp/supervisor_nexusai.sock
 
-[program:init_admin_password]
-command=python docker/multi_service/init_admin_password.py
-autostart=true
-autorestart=false
-startretries=3
-stdout_logfile=/var/log/supervisor/init_admin_password.log
-stdout_logfile_maxbytes=10MB
-stdout_logfile_backups=5
-stderr_logfile=/var/log/supervisor/init_admin_password_err.log
-stderr_logfile_maxbytes=10MB
-stderr_logfile_backups=5
+[supervisord]
+pidfile=/tmp/supervisord_nexusai.pid
+nodaemon=false
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///tmp/supervisor_nexusai.sock
 
 [program:migrations]
-command=python docker/multi_service/migrations.py
+command=python scripts/migrations.py
 autostart=true
 autorestart=false
 startretries=3
-stdout_logfile=/var/log/supervisor/migrations.log
+stdout_logfile=logs/supervisor/migrations.log
 stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
-stderr_logfile=/var/log/supervisor/migrations_err.log
+stderr_logfile=logs/supervisor/migrations_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
 
 [program:import_documents_to_vdb]
-command=python docker/multi_service/import_documents_to_vdb.py
+command=python scripts/import_documents_to_vdb.py
 autostart=true
 autorestart=false
 startretries=3
-stdout_logfile=/var/log/supervisor/import_documents_to_vdb.log
+stdout_logfile=logs/supervisor/import_documents_to_vdb.log
 stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
-stderr_logfile=/var/log/supervisor/import_documents_to_vdb_err.log
+stderr_logfile=logs/supervisor/import_documents_to_vdb_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
 
@@ -42,10 +40,10 @@ command=python app.py
 autostart=true
 autorestart=true
 startretries=3
-stdout_logfile=/var/log/supervisor/api.log
+stdout_logfile=logs/supervisor/api.log
 stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
-stderr_logfile=/var/log/supervisor/api_err.log
+stderr_logfile=logs/supervisor/api_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
 
@@ -54,10 +52,10 @@ command=python websocket.py
 autostart=true
 autorestart=true
 startretries=3
-stdout_logfile=/var/log/supervisor/websocket.log
+stdout_logfile=logs/supervisor/websocket.log
 stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
-stderr_logfile=/var/log/supervisor/websocket_err.log
+stderr_logfile=logs/supervisor/websocket_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
 
@@ -66,10 +64,10 @@ command=python task/chatroom_run.py
 autostart=true
 autorestart=true
 startretries=3
-stdout_logfile=/var/log/supervisor/meeting.log
+stdout_logfile=logs/supervisor/meeting.log
 stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
-stderr_logfile=/var/log/supervisor/meeting_err.log
+stderr_logfile=logs/supervisor/meeting_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
 
@@ -78,10 +76,10 @@ command=python task/workflow_run.py
 autostart=true
 autorestart=true
 startretries=3
-stdout_logfile=/var/log/supervisor/workflow.log
+stdout_logfile=logs/supervisor/workflow.log
 stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
-stderr_logfile=/var/log/supervisor/workflow_err.log
+stderr_logfile=logs/supervisor/workflow_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
 
@@ -90,9 +88,21 @@ command=python celery_app.py
 autostart=true
 autorestart=true
 startretries=3
-stdout_logfile=/var/log/supervisor/celery.log
+stdout_logfile=logs/supervisor/celery.log
 stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
-stderr_logfile=/var/log/supervisor/celery_err.log
+stderr_logfile=logs/supervisor/celery_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+
+[program:web]
+command=/bin/bash -c "cd web && npm run start"
+autostart=true
+autorestart=true
+startretries=3
+stdout_logfile=logs/supervisor/web.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor/web_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5

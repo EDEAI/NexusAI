@@ -83,6 +83,7 @@ dependencies:
   - requests=2.32.3
   - setuptools=69.5.1
   - sqlite=3.45.3
+  - supervisor=4.2.5
   - sympy=1.12
   - tbb=2021.8.0
   - tk=8.6.14

@@ -16,3 +16,4 @@ docker/volumes
 envConfig.ts
 docker/docker-compose.yml
 scripts/test*.py
+/supervisord.conf

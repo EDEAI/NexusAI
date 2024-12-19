@@ -9,8 +9,6 @@ RUN conda env create -f /tmp/nexus_ai.yml --verbose && conda clean -afy && rm -r
 RUN echo "conda activate nexus_ai" >> ~/.bashrc
 ENV PATH /opt/conda/envs/nexus_ai/bin:/opt/conda/bin:$PATH
 
-RUN conda install -c conda-forge supervisor
-
 COPY api /NexusAI/api
 COPY core /NexusAI/core
 COPY docker/multi_service/init_admin_password.py /NexusAI/docker/multi_service/init_admin_password.py
