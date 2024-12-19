@@ -14,7 +14,7 @@ from core.database.models.apps import Apps
 from core.database import SQLDatabase
 from core.database.models.custom_tools import CustomTools
 from core.database.models.datasets import Datasets
-from core.helper import generate_api_token
+from core.helper import generate_api_token, encrypt_id
 from hashlib import md5
 
 from languages import get_language_content
@@ -81,11 +81,9 @@ class Workflows(MySQL):
                 return {"status": 2, "message": "Team members are not open"}
             if app["status"] != 1:
                 return {"status": 2, "message": "The app status is not normal"}
-
-        m = md5()
-        m.update(f'APP-{app_id}'.encode())
-        app_hash = m.hexdigest()
-        app['api_url'] = f'/v1/app-api/{app_hash}/run-docs'
+            
+        encrypted_id = encrypt_id(app_id)
+        app['api_url'] = f'/v1/app-api/{encrypted_id}/run-docs'
 
         conditions = [
             {"column": "app_id", "value": app_id},

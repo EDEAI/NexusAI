@@ -1,9 +1,13 @@
 import sys, json, uuid, base64, random, string
+from hashlib import md5
 from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
 
 from datetime import datetime
 from decimal import Decimal
+
+from Crypto.Cipher import AES
+
 from config import settings
 from core.database import redis
 
@@ -82,3 +86,12 @@ def generate_api_token() -> str:
     final_token = 'app-' + ''.join(token_list)
     
     return final_token
+
+_nexus_ai_md5 = md5(b'NEXUSAI')
+_aes = AES.new(_nexus_ai_md5.digest(), AES.MODE_ECB)
+
+def encrypt_id(id_: int):
+    return _aes.encrypt(id_.to_bytes(16, 'big')).hex()
+
+def decrypt_id(encrypted_id: str):
+    return int.from_bytes(_aes.decrypt(bytes.fromhex(encrypted_id)), 'big')

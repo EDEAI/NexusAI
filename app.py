@@ -12,6 +12,7 @@ from api.tools import router as tools_router
 from api.index import router as index_router
 from api.llm import router as llm_router
 
+from api.apps import app_api_router
 from api.apps import router as apps_router
 
 from api.agent import router as agent_router
@@ -23,7 +24,6 @@ from api.chatroom.chatroom import router as chatroom_router
 
 from api.workflow.node import router as node_router
 from api.supplier import router as supplier_router
-from api.utils.app_api import add_app_api, get_api_app_ids
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from config import settings
@@ -73,19 +73,13 @@ app.include_router(skill_router, prefix='/v1/skill', tags=["skill"])
 app.include_router(agent_router, prefix='/v1/agent', tags=["agent"])
 app.include_router(workspace_router, prefix='/v1/workspace', tags=["workspace"])
 app.include_router(chatroom_router, prefix='/v1/chatroom', tags=["chatroom"])
+app.include_router(app_api_router, prefix='/v1/app-api', tags=["app-api"])
 app.include_router(apps_router, prefix='/v1/apps', tags=["apps"])
 app.include_router(tools_router, prefix='/v1/tool', tags=["tool"])
 app.include_router(llm_router, prefix='/v1/llm', tags=["llm"])
 app.include_router(node_router, prefix='/v1/node', tags=["node"])
 app.include_router(supplier_router, prefix='/v1/supplier', tags=["supplier"])
 app.include_router(icon_router, prefix='/v1/icon', tags=["icon"])
-
-def add_app_apis():
-    for app_id in get_api_app_ids():
-        add_app_api(app, app_id)
-
-# app.add_event_handler("startup", start_queue_processor)
-app.add_event_handler("startup", add_app_apis)
 
 
 if __name__ == "__main__":

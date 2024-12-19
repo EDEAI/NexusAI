@@ -5,7 +5,6 @@ import random
 import yaml
 
 from fastapi import APIRouter, File, Request, Response, UploadFile, WebSocket, WebSocketDisconnect
-from api.utils.app_api import add_app_api, remove_app_api
 from api.utils.common import *
 from api.utils.connection import ConnectionManager
 from api.utils.jwt import *
@@ -85,11 +84,6 @@ async def publish(request: Request, app_id: int, userinfo: TokenData = Depends(g
         if result:
             # get apps info
             apps_info = apps.get_app_find(app_id, userinfo.uid, userinfo.team_id)
-            if apps_info:
-                if apps_info['enable_api']:
-                    add_app_api(request.app, app_id)
-                else:
-                    remove_app_api(request.app, app_id)
             return response_success({
                 'result': get_language_content("publish_success")
             })
@@ -225,10 +219,6 @@ async def workflow_app_update(request: Request, app_id: int, data: ReqWorkflowsA
     result = workflows_model.workflow_app_update(app_id, userinfo.uid, is_public, enable_api, graph)
 
     if result['status'] == 1:
-        if enable_api == 1:
-            add_app_api(request.app, app_id)
-        else:
-            remove_app_api(request.app, app_id)
         return response_success(result['data'])
 
     elif result['status'] == 2:
@@ -249,7 +239,6 @@ async def workflow_app_delete(request: Request, app_id: int, userinfo: TokenData
     result = workflows_model.workflow_app_delete(app_id, userinfo.uid)
 
     if result['status'] == 1:
-        remove_app_api(request.app, app_id)
         return response_success(result['data'])
 
     elif result['status'] == 2:
