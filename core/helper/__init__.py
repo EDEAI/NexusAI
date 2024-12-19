@@ -87,6 +87,37 @@ def generate_api_token() -> str:
     
     return final_token
 
+def get_tags_mode_by_app_modes(app_mode_ids_str):
+    """
+    Get corresponding tags_mode_list based on app_mode_ids string
+
+    Args:
+        app_mode_ids_str (str): String of application mode IDs, can be single number or comma separated numbers
+
+    Returns:
+        list: Returns unique tags_mode list for given app_mode_ids,
+              returns complete tags_mode_list if input is invalid
+    """
+    # Define mapping relationship between app_mode and tags_mode
+    app_to_tags_mode_mapping = {
+        "1": [1],  # agent -> app
+        "2": [1],  # workflow -> app
+        "3": [2],  # dataset -> dataset
+        "4": [1]  # custom tool -> app
+    }
+
+    # Split input string into list of app_mode_ids
+    app_mode_ids = [x.strip() for x in app_mode_ids_str.split(',')]
+
+    # Collect all tags modes for given app_mode_ids
+    result_tags = set()
+    for app_mode_id in app_mode_ids:
+        if app_mode_id in app_to_tags_mode_mapping:
+            result_tags.update(app_to_tags_mode_mapping[app_mode_id])
+
+    # If no valid app_mode_ids found, return complete tags_mode_list
+    return list(result_tags) if result_tags else [1, 2]
+
 _nexus_ai_md5 = md5(b'NEXUSAI')
 _aes = AES.new(_nexus_ai_md5.digest(), AES.MODE_ECB)
 

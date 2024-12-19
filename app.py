@@ -21,6 +21,7 @@ from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel, OAuth2 as OAut
 from fastapi.openapi.models import OAuthFlowPassword as OAuthFlowPasswordModel
 from api.workspace import router as workspace_router
 from api.chatroom.chatroom import router as chatroom_router
+from api.tag import router as tag_router
 
 from api.workflow.node import router as node_router
 from api.supplier import router as supplier_router
@@ -80,6 +81,7 @@ app.include_router(llm_router, prefix='/v1/llm', tags=["llm"])
 app.include_router(node_router, prefix='/v1/node', tags=["node"])
 app.include_router(supplier_router, prefix='/v1/supplier', tags=["supplier"])
 app.include_router(icon_router, prefix='/v1/icon', tags=["icon"])
+app.include_router(tag_router, prefix='/v1/tag', tags=["tag"])
 
 
 if __name__ == "__main__":
