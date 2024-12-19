@@ -1,6 +1,6 @@
 from core.helper import get_tags_mode_by_app_modes
 from fastapi import APIRouter, Depends
-from api.schema.tag import CreateTagRequest, UpdateTagRequest, DeleteTagRequest, TagResponse, CreateTagBindingRequest, \
+from api.schema.tags import CreateTagRequest, UpdateTagRequest, DeleteTagRequest, TagResponse, CreateTagBindingRequest, \
     DeleteTagBindingRequest, TageListRequest, TagListResponse
 from api.utils.common import response_error, response_success
 from api.utils.jwt import *
