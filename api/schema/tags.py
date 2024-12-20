@@ -34,6 +34,7 @@ class TagListBase(BaseModel):
     id: Optional[int] = None
     mode: Optional[int] = None
     name: Optional[str] = None
+    reference_count: Optional[int] = None
 
 class TagListResponse(BaseModel):
     code: Optional[int] = None

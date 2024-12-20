@@ -35,7 +35,7 @@ async def tag_list(request: TageListRequest, userinfo: TokenData = Depends(get_c
     if request.mode == 0:
         conditions = [
             {"column": "team_id", "value": userinfo.team_id},
-            {"column": "status", "value": 1}
+            {"column": "status", "value": 1},
         ]
     else:
         conditions = [
@@ -43,7 +43,21 @@ async def tag_list(request: TageListRequest, userinfo: TokenData = Depends(get_c
             {"column": "mode", "value": request.mode},
             {"column": "status", "value": 1}
         ]
-    tag_data = tag.select(columns="*", conditions=conditions)
+    tag_data = tag.select(columns="*", conditions=conditions,order_by = "created_time DESC",)
+
+    # Calculate reference count for each tag
+    for tag_item in tag_data:
+        tag_id = tag_item['id']
+        total_count = tag_bindings.select_one(
+            # table_name="tag_bindings",
+            aggregates={"id": "count"},
+            conditions=[{"column": "tag_id", "value": tag_id}]
+        )['count_id']
+        tag_item['reference_count'] = total_count if total_count else 0
+
+    # Sort tags by creation time, newest first
+    # tag_data.sort(key=lambda x: x['create_time'], reverse=True)
+
     return response_success(tag_data)
 
 
