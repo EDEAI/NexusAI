@@ -16,7 +16,6 @@ class CreateTagRequest(BaseModel):
     name: str
 
 class UpdateTagRequest(BaseModel):
-    tag_id: int
     name: str
 
 class DeleteTagRequest(BaseModel):
@@ -27,7 +26,7 @@ class CreateTagBindingRequest(BaseModel):
     app_ids: List[int]
 
 class DeleteTagBindingRequest(BaseModel):
-    tag_id: List[int]
+    tag_ids: List[int]
     app_id: int
 
 class TagListBase(BaseModel):
@@ -36,10 +35,7 @@ class TagListBase(BaseModel):
     name: Optional[str] = None
     reference_count: Optional[int] = None
 
-class TagListResponse(BaseModel):
+class TagsListResponse(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
     data: Optional[List[TagListBase]] = None
-
-class TageListRequest(BaseModel):
-    mode: int
