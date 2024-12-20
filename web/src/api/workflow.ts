@@ -284,7 +284,7 @@ export const exportWorkflow = async (app_id: string, publish_status: number = 0)
 
 export const getTagList = async (mode: Number ) => {
     return await aniRequest<any>(`/v1/tag/tags`, {
-        method: 'POST',
+        method: 'GET',
         data: {
             mode
         },
