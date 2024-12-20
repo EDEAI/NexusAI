@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 class ResponseBase(BaseModel):
     code: Optional[int] = None
@@ -12,36 +12,30 @@ class TagResponse(ResponseBase):
     data: Optional[OperationBase] = None
 
 class CreateTagRequest(BaseModel):
-    team_id: int
-    mode: str
+    mode: int
     name: str
 
 class UpdateTagRequest(BaseModel):
-    tag_id: int
     name: str
 
 class DeleteTagRequest(BaseModel):
     tag_id: int
 
 class CreateTagBindingRequest(BaseModel):
-    tag_id: list[int]
-    app_id: int
+    tag_ids: List[int]
+    app_ids: List[int]
 
 class DeleteTagBindingRequest(BaseModel):
-    tag_id: list[int]
+    tag_ids: List[int]
     app_id: int
 
 class TagListBase(BaseModel):
     id: Optional[int] = None
-    team_id: Optional[int] = None
     mode: Optional[int] = None
     name: Optional[str] = None
+    reference_count: Optional[int] = None
 
-class TagListResponse(BaseModel):
+class TagsListResponse(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
-    data: Optional[list[TagListBase]] = None
-
-class TageListRequest(BaseModel):
-    team_id: int
-    mode: int
+    data: Optional[List[TagListBase]] = None
