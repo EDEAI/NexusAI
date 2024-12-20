@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy import create_engine, MetaData, Engine
 from sqlalchemy.orm import sessionmaker, scoped_session, Session
 from sqlalchemy.ext.declarative import declarative_base
@@ -20,7 +22,11 @@ class SQLDatabase:
         :param db_url: The database URL for the connection.
         """
         if not SQLDatabase._engine:
-            SQLDatabase._engine = create_engine(db_url, pool_recycle=600)
+            SQLDatabase._engine = create_engine(
+                db_url,
+                pool_recycle=600,
+                json_serializer=lambda obj: json.dumps(obj, ensure_ascii=False)
+            )
             SQLDatabase._metadata = MetaData()
             SQLDatabase._Session = scoped_session(sessionmaker(bind=SQLDatabase._engine))
     
