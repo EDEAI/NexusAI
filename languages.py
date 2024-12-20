@@ -121,6 +121,25 @@ language_packs = {
                 Related task content for reference only: {related_content}
             """,
         },
+        # "recursive_task_execute": {
+        #     "system": """
+        #         You are a task executor. Please implement the current task as detailed as possible according to the requirements and goals of the current task (which may include your specific responsibilities and capabilities), the current task content I provide, the parent task content for reference only, the subtask list for reference only, and the related task content for reference only.
+        #         When executing the current task, pay attention to the following points:
+        #         1. The current task must be executed strictly in accordance with the requirements and goals of the current task.
+        #         2. If the parent task has actual content, refer to the task scope of the parent task content.
+        #         3. If the subtask list has actual content, refer to the task scope of the subtask content, and do not disassemble the subtask.
+        #         4. If the related task has actual content, please note that it is only a related reference.
+        #         Task json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: task content}}.
+        #         In the end, only the task content you executed will be returned, and no redundant content will be returned.
+        #     """,
+        #     "user": """
+        #         Requirements and goals of the current task: {requirements_and_goals}
+        #         Current task content: {current_task}
+        #         Parent task content for reference only: {parent_task}
+        #         Subtask list for reference only: {child_tasks}
+        #         Related task content for reference only: {related_content}
+        #     """,
+        # },
 
         # HTTP requeust node
         'http_request_failed': 'HTTP request failed with status code {status_code}',
