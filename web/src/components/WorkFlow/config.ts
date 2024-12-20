@@ -60,3 +60,31 @@ export const NODE_COLOR={
     [BlockEnum.HttpRequest]: '#E086AB',
     [BlockEnum.Tool]: '#5A8852',
 }
+export const NODES_GROUP={
+    custom:{
+        name:'Custom',
+        color:'#1AA3B3',
+        nodes:[BlockEnum.CustomCode,BlockEnum.TemplateConversion]
+    },
+    task:{
+        name:'Task',
+        color:'#209058',
+        nodes:[BlockEnum.TaskGeneration,BlockEnum.TaskExecution]
+    },
+    category:{
+        name:'Category',
+        color:'#E086AB',
+        nodes:[BlockEnum.RequirementCategory,BlockEnum.ConditionBranch,BlockEnum.Retriever]
+    },
+    [BlockEnum.Start]:'#0765C2',
+    [BlockEnum.End]: '#0765C2',
+    
+    [BlockEnum.Agent]: '#7967C8',
+    [BlockEnum.Human]: '#2382DF',
+    [BlockEnum.LLM]: '#AF68D0',
+    [BlockEnum.VariableAggregation]: '#D569AF',
+    [BlockEnum.Skill]: '#DBAF16',
+    [BlockEnum.HttpRequest]: '#E086AB',
+    [BlockEnum.Tool]: '#5A8852',
+
+}

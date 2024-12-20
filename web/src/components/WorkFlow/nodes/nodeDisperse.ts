@@ -396,40 +396,71 @@ export const NodeCustom = {
         },
     },
 };
-export const getBaseNode = (type?: BlockEnum) => {
-    const processNode = node => {
-        if (getLocale() === 'en-US') {
-            function replaceEnPrefix(obj) {
-                return Object.keys(obj).reduce((acc, key) => {
-                    const enKey = `en${key.charAt(0) + key.slice(1)}`;
-                    if (obj[enKey]) {
-                        acc[key] = obj[enKey];
-                    } else {
-                        acc[key] = obj[key];
-                    }
-                    if (typeof obj[key] === 'object') {
-                        acc[key] = replaceEnPrefix(obj[key]);
-                    }
-                    return acc;
-                }, {});
-            }
-            node.base.data = replaceEnPrefix(node.base.data);
-            node.title = node.entitle;
-        }
-        return node;
+
+interface NodeData {
+    title: string;
+    entitle: string;
+    desc: string;
+    descTools: string;
+    endescTools: string;
+    outputInfo: {
+      key: string;
+      type: string;
+      base: boolean;
     };
+  }
+  
+  interface BaseNode {
+    node: any; 
+    panel: any; 
+    icon: BlockEnum;
+    title: string;
+    entitle: string;
+    base: {
+      type: BlockEnum;
+      data: NodeData;
+    };
+  }
+  
+  type NodeCustomType = {
+    [key in BlockEnum]: BaseNode;
+  };
+  
 
-    if (type) {
-        const node = _.cloneDeep(NodeCustom[type]);
-        return processNode(node);
-    } else {
-        return Object.keys(NodeCustom).reduce((acc, key) => {
-            acc[key] = processNode(_.cloneDeep(NodeCustom[key]));
+  
+  export const getBaseNode = (type?: BlockEnum): BaseNode | NodeCustomType => {
+    const processNode = (node: BaseNode): BaseNode => {
+      if (getLocale() === 'en-US') {
+        function replaceEnPrefix(obj: any): any { 
+          return Object.keys(obj).reduce((acc, key) => {
+            const enKey = `en${key.charAt(0) + key.slice(1)}`;
+            if (obj[enKey]) {
+              acc[key] = obj[enKey];
+            } else {
+              acc[key] = obj[key];
+            }
+            if (typeof obj[key] === 'object') {
+              acc[key] = replaceEnPrefix(obj[key]);
+            }
             return acc;
-        }, {});
+          }, {});
+        }
+        node.base.data = replaceEnPrefix(node.base.data);
+        node.title = node.entitle;
+      }
+      return node;
+    };
+  
+    if (type) {
+      const node = _.cloneDeep(NodeCustom[type]);
+      return processNode(node);
+    } else {
+      return Object.keys(NodeCustom).reduce((acc, key) => {
+        acc[key] = processNode(_.cloneDeep(NodeCustom[key]));
+        return acc;
+      }, {} as NodeCustomType);
     }
-};
-
+  };
 export const NodeTypes = () => {
     const types = {};
     Object.keys(NodeCustom).forEach(key => {

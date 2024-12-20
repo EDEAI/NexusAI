@@ -281,3 +281,21 @@ export const exportWorkflow = async (app_id: string, publish_status: number = 0)
         },
     });
 };
+
+export const getTagList = async (mode: Number ) => {
+    return await aniRequest<any>(`/v1/tag/tags`, {
+        method: 'POST',
+        data: {
+            mode
+        },
+    });
+};
+export const createTag=async (name: string,mode=0) => {
+    return await aniRequest<any>(`/v1/tag/tags`, {
+        method: 'POST',
+        data: {
+            name,
+            mode
+        },
+    });
+};

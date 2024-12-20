@@ -64,6 +64,7 @@
         "autoprefixer": "^10.4.19",
         "classnames": "^2.5.1",
         "copy-to-clipboard": "^3.3.3",
+        "fuse.js": "^7.0.0",
         "lexical": "^0.17.0",
         "lodash": "^4.17.21",
         "moment": "^2.30.1",

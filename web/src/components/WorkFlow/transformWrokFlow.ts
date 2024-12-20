@@ -631,8 +631,6 @@ export const transformer = {
             return new RequirementCategoryNode(params);
         },
         context(freeNode) {
-            console.log(freeNode);
-
             return {
                 inputs: freeNode.data.input,
             };
@@ -697,7 +695,7 @@ export const transformer = {
             //     const variable = new Variable(key, type || 'string', value);
             //     input.addProperty(key, variable);
             // });
-            const input = node?.data?.infoData?.input_variables;
+            const input = node?.data?.infoData?.input_variables || new ObjectVariable('input');
             getVarFromData(node, 'variable.')?.forEach(({ key, value }) => {
                 if (input.properties[key]) {
                     input.properties[key].value = value;
@@ -707,6 +705,8 @@ export const transformer = {
             if (node?.data?.infoData?.output_variables) {
                 params.output = node?.data?.infoData?.output_variables;
             }
+            console.log(params, new SkillNode(params), node?.data?.infoData?.input_variables);
+
             return new SkillNode(params);
         },
         context(freeNode) {

@@ -179,7 +179,7 @@ const WorkFlowLeftMenu: React.FC = () => {
     };
     return (
         <>
-            <div className="fixed left-0 top-16 mt-2 transition-all duration-300 z-20">
+            <div className="fixed left-[400px] top-16 mt-2 transition-all duration-300 z-20">
                 {/* <Typography.Title level={5}></Typography.Title> */}
 
                 <Menu
