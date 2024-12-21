@@ -321,6 +321,7 @@ class DatasetManagement:
         )
         if document['upload_file_id']:
             file = upload_files.get_file_by_id(document['upload_file_id'])
+            project_root = Path(__file__).absolute().parent.parent.parent
             source_string = str(project_root.joinpath(file['path']))
         else:
             source_string = f'{document["name"]}-{document["node_exec_id"]}'
@@ -447,6 +448,7 @@ class DatasetManagement:
         )
         if document['upload_file_id']:
             file = upload_files.get_file_by_id(document['upload_file_id'])
+            project_root = Path(__file__).absolute().parent.parent.parent
             source_string = str(project_root.joinpath(file['path']))
         else:
             source_string = f'{document["name"]}-{document["node_exec_id"]}'
@@ -596,6 +598,7 @@ class DatasetManagement:
         for document in enabled_documents:
             if document['upload_file_id']:
                 file = upload_files.get_file_by_id(document['upload_file_id'])
+                project_root = Path(__file__).absolute().parent.parent.parent
                 source_string = str(project_root.joinpath(file['path']))
             else:
                 source_string = f'{document["name"]}-{document["node_exec_id"]}'
