@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 from typing import Dict, Any, Optional
+from copy import deepcopy
 from . import Node
 from ..variables import VariableTypes, validate_required_variable
 from ..context import Context, replace_variable_value_with_context
@@ -51,7 +52,8 @@ class VariableAggregationNode(Node):
             output = None
             for var in input.properties.values():
                 if not re.match(r'<<([0-9a-fA-F\-]+)\.(inputs|outputs)\.([^>]+)>>', str(var.value)):
-                    output = var
+                    input = var
+                    output = deepcopy(var)
                     output.name = "output"
                     break
             if not output:
