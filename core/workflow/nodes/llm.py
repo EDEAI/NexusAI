@@ -116,11 +116,11 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
                 )
                 prompt.system.value = f'{prompt.system.value}\n{reply_requirement}'
             
-            invoke_input = {'related_content': ''}
+            invoke_input = {'obligations': '', 'related_content': ''}
             if task:
                 prompt_config = get_language_content("recursive_task_execute")
                 task_prompt = Prompt(system=prompt_config["system"], user=prompt_config["user"])
-                invoke_input['obligations'] = prompt.get_system() + '\n' + prompt.get_user()
+                invoke_input['requirements_and_goals'] = prompt.get_system() + '\n' + prompt.get_user()
                 invoke_input['parent_task'] = json.dumps(task['parent'].to_dict(exclude_subcategories=True) if task['parent'] else "", ensure_ascii=False)
                 current_task_dict = task['current'].to_dict(first_level_only=True)
                 child_task_dict = current_task_dict.pop('subcategories', [])

@@ -249,17 +249,23 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     system=system_prompt,
                     user=self.duplicate_braces(user_prompt)
                 )
-                
-            invoke_input = {'related_content': ''}
+            
             if task:
-                prompt = self.data['prompt']
                 prompt_config = get_language_content("recursive_task_execute")
                 task_prompt = Prompt(system=prompt_config["system"], user=prompt_config["user"])
-                invoke_input['obligations'] = f'{prompt.get_system().format(**input_)}\n{prompt.get_user().format(**input_)}'
-                invoke_input['parent_task'] = json.dumps(task['parent'].to_dict(exclude_subcategories=True) if task['parent'] else "", ensure_ascii=False)
+                
                 current_task_dict = task['current'].to_dict(first_level_only=True)
                 child_task_dict = current_task_dict.pop('subcategories', [])
                 child_task_names = [task['name'] for task in child_task_dict]
+                
+                invoke_input = {
+                    'obligations': self.data['prompt'].get_system().format(**input_),
+                    'requirements_and_goals': self.data['prompt'].get_user().format(**input_),
+                    'current_task': json.dumps(current_task_dict, ensure_ascii=False),
+                    'parent_task': json.dumps(task['parent'].to_dict(exclude_subcategories=True) if task['parent'] else "", ensure_ascii=False),
+                    'child_tasks': json.dumps(child_task_names, ensure_ascii=False),
+                    'related_content': ''
+                }
                 
                 if self.data['retrieval_task_datasets']:
                     workflow = Workflows().get_workflow_app(workflow_id)
@@ -280,8 +286,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         previous_documents_results = DatasetRetrieval.get_full_documents(retrieval_result)
                         if previous_documents_results:
                             invoke_input['related_content'] = json.dumps(previous_documents_results, ensure_ascii=False)
-                invoke_input['current_task'] = json.dumps(current_task_dict, ensure_ascii=False)
-                invoke_input['child_tasks'] = json.dumps(child_task_names, ensure_ascii=False)
                 self.data["prompt"] = task_prompt
                 input_ = invoke_input
             

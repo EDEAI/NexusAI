@@ -86,16 +86,18 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
                 )
             )
             
-            prompt_config = get_language_content("recursive_task_generation")
+            invoke_input = {'requirement': get_first_variable_value(input)}
             if self.data["prompt"]:
-                prompt_config["system"] += "\n" + self.data["prompt"].get_system()
+                invoke_input["task_generation_goals"] = self.duplicate_braces(self.data["prompt"].get_system())
+                
+            prompt_config = get_language_content("recursive_task_generation")
             self.data["prompt"] = Prompt(system=prompt_config["system"], user=prompt_config["user"])
             
             model_data, tasks, prompt_tokens, completion_tokens, total_tokens = self.invoke(
                 app_run_id=app_run_id, 
                 edge_id=edge_id,
                 context=context, 
-                input={'requirement': get_first_variable_value(input)},
+                input=invoke_input,
                 file_list=file_list,
                 return_json=True,
                 correct_llm_output=correct_llm_output
