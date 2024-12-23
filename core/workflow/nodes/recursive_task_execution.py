@@ -164,6 +164,13 @@ class RecursiveTaskExecutionNode(ImportToKBBaseNode, LLMBaseNode):
                         context=context, 
                         input=invoke_input
                     )
+                    logger.debug(f"""
+                        Model data: {model_data}
+                        Executor ID: {executor_id}
+                        Prompt tokens: {prompt_tokens}
+                        Completion tokens: {completion_tokens}
+                        Total tokens: {total_tokens}
+                    """)
                     executor_id = self.extract_uuid_from_string(executor_id)
                 
                     executor_node = executor_list.get_node(executor_id)
