@@ -7,7 +7,7 @@ import {
     retrievalHistoryList,
     retrievalTest,
 } from '@/api/createkb';
-import { useIntl } from '@umijs/max';
+import { getLocale, useIntl } from '@umijs/max';
 import { Button, Card, Col, Input, message, Row, Table } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -54,6 +54,7 @@ const Kbtext = ({ createkbInfo }: any) => {
     let [inputText, inputTextfun] = useState('');
     const divRef = useRef(null);
     const [tabHeight, tabHeightfun] = useState(0);
+    const [appType, appTypefun] = useState(1);
 
     const testBtn = async () => {
         if (inputText != '') {
@@ -145,6 +146,7 @@ const Kbtext = ({ createkbInfo }: any) => {
                               }),
                 };
             });
+            console.log(res)
             userDatafun(res.data);
         }
     };
@@ -157,6 +159,9 @@ const Kbtext = ({ createkbInfo }: any) => {
                 tabHeightfun(divRef.current.offsetHeight - 55 - 82);
             }
         }, 200);
+        if (createkbInfo.app_id) {
+            appTypefun(!createkbInfo.type ? 1 : 2);
+        }
     }, []);
     return (
         <>
@@ -164,16 +169,19 @@ const Kbtext = ({ createkbInfo }: any) => {
                 <div className="h-full pb-[30px]">
                     <div className="w-full py-[30px] flex items-center ">
                         <img src="/icons/flag.svg" className="w-4 h-4" />
-                        <span className="ml-[10px] text-[#213044] text-base font-medium">
-                            {!createkbInfo.type && userData != null
-                                ? intl.formatMessage({
-                                      id: 'createkb.knowledge.base.of',
-                                      defaultMessage: '',
-                                  }) +' '+ userData.dataset_detail.nickname
-                                : intl.formatMessage({
-                                      id: 'createkb.editKB',
-                                      defaultMessage: '',
-                                  })}
+                        <span className="ml-[10px] text-[#213044] text-[18px] leading-[25px] font-medium">
+                                
+                                 {appType == 2
+                                    ? getLocale()=='zh-CN'?userData?userData.dataset_detail.nickname+intl.formatMessage({ id: 'createkb.knowledge.base.of', }):intl.formatMessage({ id: 'createkb.knowledge.base.of', }) :userData?intl.formatMessage({ id: 'createkb.knowledge.base.of', })+userData.dataset_detail.nickname:intl.formatMessage({ id: 'createkb.knowledge.base.of', })
+                                    : appType == 1
+                                    ? intl.formatMessage({
+                                          id: 'createkb.editKB',
+
+                                      })
+                                    : intl.formatMessage({
+                                          id: 'createkb.createKnowledgeBase',
+
+                                      })}
                         </span>
                     </div>
                     <div className="flex w-full" style={{ height: 'calc(100% - 84px)' }}>
