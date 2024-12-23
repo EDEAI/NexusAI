@@ -52,7 +52,9 @@ class LLMBaseNode(Node):
         input: Union[str, Dict[str, Any]] = {},
         file_list: Optional[ArrayVariable] = None,
         return_json: bool = False,
-        correct_llm_output: bool = False
+        correct_llm_output: bool = False,
+        requirements_and_goals: Optional[str] = None,
+        requirements_and_goals_kwargs: Optional[Dict[str, str]] = None
     ) -> Dict[str, Any]:
         """
         Workflow node invokes the LLM model to generate text using the language model.
@@ -65,6 +67,8 @@ class LLMBaseNode(Node):
             input (Dict[str, Any]): The input data to be passed to the model.
             return_json (bool): Indicates whether to return the output in JSON format.
             correct_llm_output (bool): Indicates whether to correct the LLM output using the correct prompt.
+            requirements_and_goals (Optional[str]): The requirements and goals to be passed to the model.
+            requirements_and_goals_kwargs (Optional[Dict[str, str]]): The keyword arguments to be passed to the requirements and goals.
             
         Returns:
             Dict[str, Any]: A dictionary containing the model data, content, prompt tokens, completion tokens, and total tokens.
@@ -125,7 +129,13 @@ class LLMBaseNode(Node):
             
             user_prompt = input['user_prompt']
             rag_result = retrieval_chain.invoke(user_prompt)
-            input['formatted_docs'] = format_docs(rag_result)
+            formatted_docs = format_docs(rag_result)
+            if requirements_and_goals_kwargs:
+                requirements_and_goals_kwargs['formatted_docs'] = formatted_docs
+            else:
+                input['formatted_docs'] = formatted_docs
+        if requirements_and_goals:
+            input['requirements_and_goals'] = requirements_and_goals.format(**requirements_and_goals_kwargs)
         ai_message = llm_pipeline.invoke(messages.to_langchain_format(), input)
         content = ai_message.content
         if return_json:

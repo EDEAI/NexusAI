@@ -774,13 +774,14 @@ prompt_keys = {
 }
 
 
-def get_language_content(key: str, uid: int = 0) -> Any:
+def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = True) -> Any:
     """
     Retrieves the content for the specified key based on the current language.
     Supports nested keys separated by dots.
 
     :param key: The key for the desired content, with nested keys separated by dots.
     :param uid: The user ID.
+    :param append_ret_lang_prompt: Whether to append the language prompt to the content.
     :return: The content string in the current language.
     """
     from api.utils.auth import get_current_language
@@ -796,13 +797,14 @@ def get_language_content(key: str, uid: int = 0) -> Any:
                 content = content.get(k, None)
             else:
                 return None
-        return_language_prompt = f"\n\nPlease note that the language of the returned content must be {language_names[current_language]}."
-        if isinstance(content, str):
-            content += return_language_prompt
-        elif isinstance(content, dict):
-            content = content.copy()
-            if 'system' in content:
-                content['system'] += return_language_prompt
+        if append_ret_lang_prompt:
+            return_language_prompt = f"\n\nPlease note that the language of the returned content must be {language_names[current_language]}."
+            if isinstance(content, str):
+                content += return_language_prompt
+            elif isinstance(content, dict):
+                content = content.copy()
+                if 'system' in content:
+                    content['system'] += return_language_prompt
         return content
 
     content = language_packs.get(current_language, {})

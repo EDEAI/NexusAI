@@ -146,6 +146,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             input_ = {'obligations': agent['obligations']}
             
             # Generate the system prompt based on the agent's abilities and output format
+            sys_prompt_append_ret_lang_prompt = not bool(task)
             ability_id = self.data['ability_id']
             default_output_format = agent['default_output_format']
             if ability_id == 0:
@@ -159,62 +160,92 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                                 ability['content'],
                                 get_language_content(
                                     'agent_output_format_'
-                                    f'{default_output_format if ability["output_format"] == 0 else ability["output_format"]}'
+                                    f'{default_output_format if ability["output_format"] == 0 else ability["output_format"]}',
+                                    append_ret_lang_prompt=False
                                 )
                             )
                             for ability in abilities
                         ]
-                        system_prompt = get_language_content('agent_system_prompt_with_auto_match_ability')
+                        system_prompt = get_language_content(
+                            'agent_system_prompt_with_auto_match_ability',
+                            append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                        )
                         input_['abilities_content_and_output_format'] = abilities_content_and_output_format
                         if self.data['task_splitting']:
                             input_['reply_requirement'] = get_language_content(
-                                'agent_reply_requirement_with_task_splitting_and_auto_match_ability'
+                                'agent_reply_requirement_with_task_splitting_and_auto_match_ability',
+                                append_ret_lang_prompt=False
                             )
                         else:
                             input_['reply_requirement'] = get_language_content(
-                                'agent_reply_requirement_with_auto_match_ability'
+                                'agent_reply_requirement_with_auto_match_ability',
+                                append_ret_lang_prompt=False
                             )
                     else:
                         output_format = default_output_format
                         abilities_content = '\n'.join(ability['content'] for ability in abilities)
-                        system_prompt = get_language_content('agent_system_prompt_with_abilities')
+                        system_prompt = get_language_content(
+                            'agent_system_prompt_with_abilities',
+                            append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                        )
                         input_['abilities_content'] = abilities_content
-                        input_['output_format'] = get_language_content(f'agent_output_format_{output_format}')
+                        input_['output_format'] = get_language_content(
+                            f'agent_output_format_{output_format}',
+                            append_ret_lang_prompt=False
+                        )
                         if self.data['task_splitting']:
                             input_['reply_requirement'] = get_language_content(
-                                'agent_reply_requirement_with_task_splitting_and_abilities'
+                                'agent_reply_requirement_with_task_splitting_and_abilities',
+                                append_ret_lang_prompt=False
                             )
                         else:
                             input_['reply_requirement'] = get_language_content(
-                                'agent_reply_requirement_with_abilities'
+                                'agent_reply_requirement_with_abilities',
+                                append_ret_lang_prompt=False
                             )
                 else:
                     output_format = default_output_format
-                    system_prompt = get_language_content('agent_system_prompt_with_no_ability')
-                    input_['output_format'] = get_language_content(f'agent_output_format_{output_format}')
+                    system_prompt = get_language_content(
+                        'agent_system_prompt_with_no_ability',
+                        append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                    )
+                    input_['output_format'] = get_language_content(
+                        f'agent_output_format_{output_format}',
+                        append_ret_lang_prompt=False
+                    )
                     if self.data['task_splitting']:
                         input_['reply_requirement'] = get_language_content(
-                            'agent_reply_requirement_with_task_splitting_and_no_ability'
+                            'agent_reply_requirement_with_task_splitting_and_no_ability',
+                            append_ret_lang_prompt=False
                         )
                     else:
                         input_['reply_requirement'] = get_language_content(
-                            'agent_reply_requirement_with_no_ability'
+                            'agent_reply_requirement_with_no_ability',
+                            append_ret_lang_prompt=False
                         )
             else:
                 ability = AgentAbilities().get_ability_by_id(ability_id)
                 output_format = ability['output_format']
                 if output_format == 0:
                     output_format = default_output_format
-                system_prompt = get_language_content('agent_system_prompt_with_abilities')
+                system_prompt = get_language_content(
+                    'agent_system_prompt_with_abilities',
+                    append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                )
                 input_['abilities_content'] = ability['content']
-                input_['output_format'] = get_language_content(f'agent_output_format_{output_format}')
+                input_['output_format'] = get_language_content(
+                    f'agent_output_format_{output_format}',
+                    append_ret_lang_prompt=False
+                )
                 if self.data['task_splitting']:
                     input_['reply_requirement'] = get_language_content(
-                        'agent_reply_requirement_with_task_splitting_and_abilities'
+                        'agent_reply_requirement_with_task_splitting_and_abilities',
+                        append_ret_lang_prompt=False
                     )
                 else:
                     input_['reply_requirement'] = get_language_content(
-                        'agent_reply_requirement_with_abilities'
+                        'agent_reply_requirement_with_abilities',
+                        append_ret_lang_prompt=False
                     )
                 
             replace_prompt_with_context(self.data['prompt'], context)
@@ -241,7 +272,10 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             if retrieval_chain:
                 self.data['prompt'] = Prompt(
                     system=system_prompt,
-                    user=get_language_content('agent_user_prompt_with_retrieved_docs')
+                    user=get_language_content(
+                        'agent_user_prompt_with_retrieved_docs',
+                        append_ret_lang_prompt=False
+                    )
                 )
                 input_['user_prompt'] = user_prompt
             else:
@@ -249,7 +283,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     system=system_prompt,
                     user=self.duplicate_braces(user_prompt)
                 )
-            
+            requirements_and_goals = None
+            requirements_and_goals_kwargs = None
             if task:
                 prompt_config = get_language_content("recursive_task_execute")
                 task_prompt = Prompt(system=prompt_config["system"], user=prompt_config["user"])
@@ -260,13 +295,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 
                 invoke_input = {
                     'obligations': self.data['prompt'].get_system().format(**input_),
-                    'requirements_and_goals': self.data['prompt'].get_user().format(**input_),
                     'current_task': json.dumps(current_task_dict, ensure_ascii=False),
                     'parent_task': json.dumps(task['parent'].to_dict(exclude_subcategories=True) if task['parent'] else "", ensure_ascii=False),
                     'child_tasks': json.dumps(child_task_names, ensure_ascii=False),
                     'related_content': ''
                 }
-                
+                requirements_and_goals = self.data['prompt'].get_user()
+                requirements_and_goals_kwargs = input_
                 if self.data['retrieval_task_datasets']:
                     workflow = Workflows().get_workflow_app(workflow_id)
                     if not workflow:
@@ -288,6 +323,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                             invoke_input['related_content'] = json.dumps(previous_documents_results, ensure_ascii=False)
                 self.data["prompt"] = task_prompt
                 input_ = invoke_input
+                if retrieval_chain:
+                    input_['user_prompt'] = user_prompt
             
             model_data, ai_content, prompt_tokens, completion_tokens, total_tokens = self.invoke(
                 app_run_id=app_run_id, 
@@ -297,9 +334,11 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 input=input_,
                 file_list=file_list,
                 return_json=True,
-                correct_llm_output=correct_llm_output
+                correct_llm_output=correct_llm_output,
+                requirements_and_goals=requirements_and_goals,
+                requirements_and_goals_kwargs=requirements_and_goals_kwargs
             )
-                
+            print(model_data)
             # Process the AI message
             if output_format is None:
                 ability_id = ai_content['ability_id']
