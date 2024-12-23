@@ -11,7 +11,7 @@ import {
     documentList,
     enableDocument,
 } from '@/api/createkb';
-import { useIntl } from '@umijs/max';
+import { getLocale, useIntl } from '@umijs/max';
 import Fileset from '../Fileset';
 let listPageNum = 1;
 let timer;
@@ -325,9 +325,8 @@ const UploadList = ({ fun, createkbInfo }: any) => {
                             <img src="/icons/flag.svg" className="w-4 h-4" />
                             <span className="ml-[10px] text-[#213044] text-[18px] leading-[25px] font-medium">
                                 {appType == 2
-                                    ? intl.formatMessage({
-                                          id: 'createkb.knowledge.base.of',
-                                      }) + ' ' + datacontent.dataset_detail.nickname 
+                                    ? getLocale()=='zh-CN'?datacontent.dataset_detail.nickname +intl.formatMessage({ id: 'createkb.knowledge.base.of', }) :intl.formatMessage({ id: 'createkb.knowledge.base.of', })+datacontent.dataset_detail.nickname 
+                                    
                                     : appType == 1
                                     ? intl.formatMessage({
                                           id: 'createkb.editKB',

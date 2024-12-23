@@ -2,7 +2,7 @@
 import { datasetSet, documentList, getInforMation } from '@/api/createkb';
 import { PostappsCreate } from '@/api/creation';
 import { createappdata } from '@/utils/useUser';
-import { useIntl } from '@umijs/max';
+import { getLocale, useIntl } from '@umijs/max';
 import { Button, Card, Col, Form, Row, Spin, Switch, message } from 'antd';
 import { useEffect, useState } from 'react';
 const Setup = ({ createkbInfo, fun }: any) => {
@@ -127,10 +127,8 @@ const Setup = ({ createkbInfo, fun }: any) => {
                         <img src="/icons/flag.svg" className="w-4 h-4" />
                         <span className="ml-[10px] text-[#213044] text-[18px] leading-[25px] font-medium">
                             {appType == 2
-                                ? intl.formatMessage({
-                                      id: 'createkb.knowledge.base.of',
-                                      defaultMessage: '',
-                                  }) +' '+ datacontent.nickname
+                                ? getLocale()=='zh-CN'?datacontent.nickname+intl.formatMessage({ id: 'createkb.knowledge.base.of', }) :intl.formatMessage({ id: 'createkb.knowledge.base.of', })+datacontent.nickname
+                              
                                 : appType == 1
                                 ? intl.formatMessage({
                                       id: 'createkb.editKB',
