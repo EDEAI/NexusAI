@@ -485,7 +485,6 @@ language_packs = {
             "exactly_one_start_node": "There must be exactly one start node.",
             "exactly_one_end_node": "There must be exactly one end node."
         },
-        'tag_create_success': 'Tag create success',
         'tag_id_not_found': 'Tag ID not found',
         'tag_update_success': 'Tag update success',
         'tag_delete_success': 'Tag delete success',
@@ -731,7 +730,6 @@ language_packs = {
             "exactly_one_start_node": "必须有且只有一个开始节点。",
             "exactly_one_end_node": "必须有且只有一个结束节点。"
         },
-        'tag_create_success': '标签创建成功',
         'tag_id_not_found': '标签ID不存在',
         'tag_update_success': '标签更新成功',
         'tag_delete_success': '标签删除成功',

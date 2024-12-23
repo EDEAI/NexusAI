@@ -5,11 +5,13 @@ class ResponseBase(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
 
-class OperationBase(BaseModel):
-    msg: Optional[str] = None
+class TagdataBase(BaseModel):
+    id: Optional[int] = None
+    team_id: Optional[int] = None
+    name: Optional[str] = None
 
 class TagResponse(ResponseBase):
-    data: Optional[OperationBase] = None
+    data: Optional[TagdataBase] = None
 
 class CreateTagRequest(BaseModel):
     mode: int

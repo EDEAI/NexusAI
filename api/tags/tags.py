@@ -79,12 +79,15 @@ async def create_tag(request: CreateTagRequest, userinfo: TokenData = Depends(ge
 
     if team_info:
         _mode = get_tags_mode_by_app_modes(request.mode)
-        tag.insert({
+        tag_id = tag.insert({
             'team_id': userinfo.team_id,
             'mode': _mode[0],
             'name': request.name,
         })
-        return response_success(detail=get_language_content('tag_create_success'))
+        new_tag = tag.select_one(columns={'id','team_id','name'}, conditions=[
+            {"column": "id", "value": tag_id}
+        ])
+        return response_success(new_tag)
     else:
         return response_error(get_language_content('team_id_not_found'))
 
