@@ -2,7 +2,7 @@ from core.helper import get_tags_mode_by_app_modes
 from fastapi import APIRouter, Depends
 from api.schema.tags import (
     CreateTagRequest, UpdateTagRequest, TagResponse, 
-    CreateTagBindingRequest, TagsListResponse
+    CreateTagBindingRequest, TagsListResponse,DeleteTagBindingRequest
 )
 from typing import List
 from api.utils.common import response_error, response_success
@@ -196,7 +196,7 @@ async def bind_tags(request: CreateTagBindingRequest, userinfo: TokenData = Depe
 
 
 @router.delete("/tags_bindings", response_model=TagResponse)
-async def unbind_tags(tag_ids: List[int], app_id: int, userinfo: TokenData = Depends(get_current_user)):
+async def unbind_tags(request: DeleteTagBindingRequest, userinfo: TokenData = Depends(get_current_user)):
     """
     Delete tag bindings.
 
@@ -208,6 +208,8 @@ async def unbind_tags(tag_ids: List[int], app_id: int, userinfo: TokenData = Dep
     Returns:
     - Success response
     """
+    tag_ids = request.tag_ids
+    app_id = request.app_id
     if not tag_ids:
         return response_error(get_language_content('tag_id_not_found'))
 
