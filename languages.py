@@ -13,12 +13,13 @@ language_packs = {
         "requirement_category": {
             "system": """
                 You are a content categorization assistant.
-                Based on the content I input and the provided set of all categories, analyze which category my input belongs to. If you are unsure, please choose the closest matching category.
+                Please analyze which category my input belongs to based on my input content, category judgment criteria, and all category sets. If you are not sure, please choose the category that is closest to my input content.
                 The result should be returned in JSON format, as follows: {format}.
             """,
             "user": """
-                My input content is: {requirement}.
-                All categories are as follows: {categories}.
+                My input content: {requirement}.
+                Category judgment criteria: {judgment_criteria}.
+                All category sets: {categories}.
             """,
         },
         "agent_system_prompt_with_auto_match_ability": (
@@ -81,43 +82,51 @@ language_packs = {
         ),
         "recursive_task_generation": {
             "system": """
-                Please generate detailed task data according to the requirements and task data structure I provided, and split the steps and levels of the task as detailed as possible.
+                Please generate detailed task data according to the requirements, task generation goals and task data structure I provided, and try to split the steps and levels of the task in more detail.
                 Task data json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: specific task content, subcategories: sub-task list}}.
                 Note that the hierarchical structure of task data is infinitely recursive, and the structure of each element in the sub-task list is consistent with the parent structure.
                 Pay attention to the uniqueness of the task id. You can use this format: parent task id-current task id. The previous parent task id is recursively superimposed according to the level, and finally splice task- in front of each task id.
                 Note that task keywords should be extracted according to the task content. The keywords should cover the task content as comprehensively as possible, but do not contain irrelevant words. Keywords are separated by commas.
                 Finally, they should be returned in json format according to the task data structure.
-                Note that the definition of "task data" mentioned above is not necessarily a "task" in the literal sense. It may be any content that can be split into steps or levels. It should be understood according to the actual situation. Refer to the following content for understanding and definition.
+                Note that the definition of "task data" mentioned above is not necessarily a "task" in the literal sense. It may be any content that can be split into steps or levels. It should be understood and defined according to the requirements and task generation goals I provided.
             """,
-            "user": "Requirement content: {requirement}",
+            "user": """
+                Requirement content: {requirement}
+                Task generation goals: {task_generation_goals}
+            """,
         },
         "recursive_task_assign": {
             "system": """
-                Please select the most suitable executor for the current task based on the current task content I provided, the parent task content for reference only, and all task executors. You should select according to the specific functions of each executor. If you are not sure, please select the executor with the closest function and task content.
+                Please select the most suitable executor for the current task based on the current task content, parent task content for reference only, executor selection requirements, and all task executors provided by me. Please select according to the executor selection requirements and the specific functions of each executor. If you are not sure, please select the executor with the closest function and task content.
                 Task json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: task corresponding requirement content}}.
-                Task executor json structure description: {{executor id: specific function of the executor}}.
+                Task executor json structure description: {{id: executor id, name: executor name, description: executor description, obligations: executor specific functions}}.
                 In the end, only the selected executor id must be returned, and no redundant content must be returned.
             """,
             "user": """
                 Current task content: {current_task}
                 Parent task content for reference only: {parent_task}
+                Executor selection requirements: {executor_selection_requirements}
                 All task executors: {executors}
             """,
         },
         "recursive_task_execute": {
             "system": """
-                You are a task executor. Please implement the current task as detailed as possible according to your specific functions, the current task content I provide, the upper-level task content for reference only, the sub-task list for reference only, and the related task content for reference only.
-                When implementing the current task, pay attention to two points:
-                1. If the upper-level task has actual content, refer to the task scope of the upper-level task content.
-                2. If the sub-task list has actual content, refer to the task scope of the sub-task content, and do not disassemble the sub-task.
-                Task json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: task corresponding requirement content}}.
-                In the end, only the task content you implemented must be returned, and no redundant content should be returned.
+                You are a task executor. Please perform the current task as detailed as possible according to your specific responsibilities and abilities, the requirements and goals of the current task, the current task content I provide, the parent task content for reference only, the subtask list for reference only, and the related task content for reference only.
+                When performing the current task, pay attention to the following points:
+                1. The current task must be performed strictly in accordance with the requirements and goals of the current task.
+                2. If your responsibilities and abilities have actual content, refer to your responsibilities and ability settings.
+                3. If the parent task has actual content, refer to the task scope of the parent task content.
+                4. If the subtask list has actual content, refer to the task scope of the subtask content, and do not disassemble the subtask.
+                5. If the related task has actual content, please note that it is only for related reference.
+                Task json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: task content}}.
+                In the end, only the task content you performed will be returned, and no redundant content will be returned.
             """,
             "user": """
-                Your specific duties: {obligations}
+                Your responsibilities and abilities: {obligations}
+                Requirements and goals of the current task: {requirements_and_goals}
                 Current task content: {current_task}
                 Parent task content for reference only: {parent_task}
-                Child task list for reference only: {child_tasks}
+                Subtask list for reference only: {child_tasks}
                 Related task content for reference only: {related_content}
             """,
         },
@@ -476,7 +485,6 @@ language_packs = {
             "exactly_one_start_node": "There must be exactly one start node.",
             "exactly_one_end_node": "There must be exactly one end node."
         },
-        'tag_create_success': 'Tag create success',
         'tag_id_not_found': 'Tag ID not found',
         'tag_update_success': 'Tag update success',
         'tag_delete_success': 'Tag delete success',
@@ -722,7 +730,6 @@ language_packs = {
             "exactly_one_start_node": "必须有且只有一个开始节点。",
             "exactly_one_end_node": "必须有且只有一个结束节点。"
         },
-        'tag_create_success': '标签创建成功',
         'tag_id_not_found': '标签ID不存在',
         'tag_update_success': '标签更新成功',
         'tag_delete_success': '标签删除成功',
@@ -793,13 +800,14 @@ prompt_keys = {
 }
 
 
-def get_language_content(key: str, uid: int = 0) -> Any:
+def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = True) -> Any:
     """
     Retrieves the content for the specified key based on the current language.
     Supports nested keys separated by dots.
 
     :param key: The key for the desired content, with nested keys separated by dots.
     :param uid: The user ID.
+    :param append_ret_lang_prompt: Whether to append the language prompt to the content.
     :return: The content string in the current language.
     """
     from api.utils.auth import get_current_language
@@ -815,13 +823,14 @@ def get_language_content(key: str, uid: int = 0) -> Any:
                 content = content.get(k, None)
             else:
                 return None
-        return_language_prompt = f"\n\nPlease note that the language of the returned content must be {language_names[current_language]}."
-        if isinstance(content, str):
-            content += return_language_prompt
-        elif isinstance(content, dict):
-            content = content.copy()
-            if 'system' in content:
-                content['system'] += return_language_prompt
+        if append_ret_lang_prompt:
+            return_language_prompt = f"\n\nPlease note that the language of the returned content must be {language_names[current_language]}."
+            if isinstance(content, str):
+                content += return_language_prompt
+            elif isinstance(content, dict):
+                content = content.copy()
+                if 'system' in content:
+                    content['system'] += return_language_prompt
         return content
 
     content = language_packs.get(current_language, {})

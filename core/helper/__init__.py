@@ -98,6 +98,14 @@ def get_tags_mode_by_app_modes(app_mode_ids_str):
         list: Returns unique tags_mode list for given app_mode_ids,
               returns complete tags_mode_list if input is invalid
     """
+    if isinstance(app_mode_ids_str, int):
+        app_mode_ids_str = str(app_mode_ids_str)
+        # Split input string into list of app_mode_ids
+        app_mode_ids = [x.strip() for x in app_mode_ids_str.split(',')]
+    elif isinstance(app_mode_ids_str, list):
+        app_mode_ids =  app_mode_ids_str
+    else:
+        return [1, 2]
     # Define mapping relationship between app_mode and tags_mode
     app_to_tags_mode_mapping = {
         "1": [1],  # agent -> app
@@ -105,10 +113,6 @@ def get_tags_mode_by_app_modes(app_mode_ids_str):
         "3": [2],  # dataset -> dataset
         "4": [1]  # custom tool -> app
     }
-
-    # Split input string into list of app_mode_ids
-    app_mode_ids = [x.strip() for x in app_mode_ids_str.split(',')]
-
     # Collect all tags modes for given app_mode_ids
     result_tags = set()
     for app_mode_id in app_mode_ids:

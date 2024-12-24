@@ -110,13 +110,21 @@ class Chatroom:
                 abilities = agent['abilities']
                 if abilities:
                     abilities_content = json.dumps([ability['content'] for ability in abilities], ensure_ascii=False)
-                    description: str = get_language_content('chatroom_agent_description_with_abilities', self._user_id)
+                    description: str = get_language_content(
+                        'chatroom_agent_description_with_abilities',
+                        self._user_id,
+                        append_ret_lang_prompt=False
+                    )
                     description = description.format(
                         obligations=agent['obligations'],
                         abilities=abilities_content
                     )
                 else:
-                    description: str = get_language_content('chatroom_agent_description_with_no_ability', self._user_id)
+                    description: str = get_language_content(
+                        'chatroom_agent_description_with_no_ability',
+                        self._user_id,
+                        append_ret_lang_prompt=False
+                    )
                     description = description.format(obligations=agent['obligations'])
                 info.append(
                     {
@@ -136,8 +144,8 @@ class Chatroom:
         '''
         messages = []
         for message in self._history_messages:
-            user_str = get_language_content('chatroom_role_user', self._user_id)
-            agent_str = get_language_content('chatroom_role_agent', self._user_id)
+            user_str = get_language_content('chatroom_role_user', self._user_id, append_ret_lang_prompt=False)
+            agent_str = get_language_content('chatroom_role_agent', self._user_id, append_ret_lang_prompt=False)
             agent_id = message['agent_id']
             message_for_llm = {
                 'id': agent_id,
@@ -191,7 +199,8 @@ class Chatroom:
                 )
                 user_prompt = get_language_content(
                     'chatroom_manager_user',
-                    self._user_id
+                    self._user_id,
+                    append_ret_lang_prompt=False
                 )
             else:
                 # If the last speaker is an agent,
@@ -206,7 +215,8 @@ class Chatroom:
                     )
                     user_prompt = get_language_content(
                         'chatroom_manager_user_with_optional_selection',
-                        self._user_id
+                        self._user_id,
+                        append_ret_lang_prompt=False
                     )
             messages, messages_in_last_section = self._get_history_messages_list()
             user_prompt = user_prompt.format(
@@ -221,7 +231,8 @@ class Chatroom:
                 # the Speaker Selector has tried more than once
                 user_prompt = get_language_content(
                     'chatroom_manager_user_invalid_selection',
-                    self._user_id
+                    self._user_id,
+                    append_ret_lang_prompt=False
                 ).format(
                     agent_id=agent_id
                 ) + user_prompt
@@ -298,7 +309,8 @@ class Chatroom:
             # If the agent has abilities, use the prompt template for agents with abilities
             agent_user_prompt = get_language_content(
                 'chatroom_agent_user_with_abilities',
-                self._user_id
+                self._user_id,
+                append_ret_lang_prompt=False
             ).format(
                 messages = json.dumps(messages, ensure_ascii=False),
                 topic = self._topic,
@@ -313,7 +325,8 @@ class Chatroom:
             # If the agent has no abilities, use the prompt template for agents with no abilities
             agent_user_prompt = get_language_content(
                 'chatroom_agent_user_with_no_ability',
-                self._user_id
+                self._user_id,
+                append_ret_lang_prompt=False
             ).format(
                 messages = json.dumps(messages, ensure_ascii=False),
                 topic = self._topic,

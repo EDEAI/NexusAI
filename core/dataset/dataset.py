@@ -38,6 +38,7 @@ from languages import get_language_content
 from log import Logger
 
 
+project_root = Path(__file__).absolute().parent.parent.parent
 logger = Logger.get_logger('dataset')
 
 apps = Apps()

@@ -8,7 +8,9 @@ import math
 from config import settings
 from core.database import SQLDatabase
 
+
 project_root = Path(__file__).absolute().parent.parent.parent
+
 
 def get_new_collection_name() -> str:
     """

@@ -339,8 +339,8 @@ class AppNodeExecutions(MySQL):
             ]
         )
 
-        task_assignments_total_time = task_assignments_total['sum_elapsed_time'] if task_assignments_total else 0
-        task_executions_total_time = task_executions_total['sum_elapsed_time'] if task_executions_total else 0
+        task_assignments_total_time = task_assignments_total['sum_elapsed_time'] if task_assignments_total and task_assignments_total['sum_elapsed_time'] else 0
+        task_executions_total_time = task_executions_total['sum_elapsed_time'] if task_executions_total and task_executions_total['sum_elapsed_time'] else 0
         total_elapsed_time = task_assignments_total_time + task_executions_total_time
 
         return {"total_elapsed_time": total_elapsed_time}

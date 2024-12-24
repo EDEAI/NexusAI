@@ -1,4 +1,4 @@
-import json
+import asyncio
 import os
 import traceback
 import random
@@ -153,6 +153,8 @@ async def node_run(data: WorkflowsNodeRunSchema,
             draft_info['id'],
             context.to_dict()
         )
+        while not task.ready():
+            await asyncio.sleep(0.1)
         result = task.get(timeout=100)
         return response_success(result)
     except Exception as e:

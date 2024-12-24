@@ -89,7 +89,7 @@ class Apps(MySQL):
         apps_mode_list = apps_mode.split(',')
         if len(apps_mode_list) == 1:
             if int(apps_mode) not in [1, 2, 3, 4]:
-                conditions.append({"column": "apps.mode", "op": "in", "value": [1, 2, 3, 4]})
+                conditions.append({"column": "apps.mode", "op": "in", "value": [1, 2, 4]})
             else:
                 conditions.append({"column": "apps.mode", "value": int(apps_mode)})
         else:
