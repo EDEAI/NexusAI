@@ -460,7 +460,7 @@ async def show_chatroom_details(chatroom_id: int, page: int = 1, page_size: int 
     return response_success(chatroom_history_msg)
 
 
-@router.post("/{chatroom_id}/chat_history_summary", response_model=ChatRoomResponseBase, summary="Chat History Summary")
+@router.post("/{chatroom_id}/chat_history_summary", response_model=ChatRoomResponseBase, summary="Chat History Summary")  
 async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummary, userinfo: TokenData = Depends(get_current_user)):
     """
     Use specified properties to query existing applications.
