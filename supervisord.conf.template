@@ -1,0 +1,115 @@
+[unix_http_server]
+file=/tmp/supervisor_nexusai.sock
+
+[supervisord]
+pidfile=/tmp/supervisord_nexusai.pid
+nodaemon=false
+logfile=logs/supervisord.log
+logfile_maxbytes=10MB
+logfile_backups=5
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///tmp/supervisor_nexusai.sock
+
+[program:migrations]
+command=python scripts/migrations.py
+autostart=true
+autorestart=false
+startretries=3
+stdout_logfile=logs/supervisor_migrations.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor_migrations_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+
+[program:import_documents_to_vdb]
+command=python scripts/import_documents_to_vdb.py
+autostart=true
+autorestart=false
+startretries=3
+stdout_logfile=logs/supervisor_import_documents_to_vdb.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor_import_documents_to_vdb_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+# environment=HTTP_PROXY="http://192.168.0.241:10809",HTTPS_PROXY="http://192.168.0.241:10809",NO_PROXY="localhost,127.0.0.1"
+
+[program:api]
+command=python app.py
+autostart=true
+autorestart=true
+startretries=3
+stdout_logfile=logs/supervisor_api.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor_api_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+# environment=HTTP_PROXY="http://192.168.0.241:10809",HTTPS_PROXY="http://192.168.0.241:10809",NO_PROXY="localhost,127.0.0.1"
+
+[program:websocket]
+command=python websocket.py
+autostart=true
+autorestart=true
+startretries=3
+stdout_logfile=logs/supervisor_websocket.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor_websocket_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+
+[program:roundtable]
+command=python task/chatroom_run.py
+autostart=true
+autorestart=true
+startretries=3
+stdout_logfile=logs/supervisor_roundtable.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor_roundtable_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+# environment=HTTP_PROXY="http://192.168.0.241:10809",HTTPS_PROXY="http://192.168.0.241:10809",NO_PROXY="localhost,127.0.0.1"
+
+[program:workflow]
+command=python task/workflow_run.py
+autostart=true
+autorestart=true
+startretries=3
+stdout_logfile=logs/supervisor_workflow.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor_workflow_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+
+[program:celery]
+command=python celery_app.py
+autostart=true
+autorestart=true
+startretries=3
+stdout_logfile=logs/supervisor_celery.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor_celery_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+# environment=HTTP_PROXY="http://192.168.0.241:10809",HTTPS_PROXY="http://192.168.0.241:10809",NO_PROXY="localhost,127.0.0.1"
+
+[program:web]
+command=/bin/bash -c "cd web && npm run start"
+autostart=true
+autorestart=true
+startretries=3
+stdout_logfile=logs/supervisor_web.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor_web_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5

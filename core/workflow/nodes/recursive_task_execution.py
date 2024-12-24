@@ -124,8 +124,19 @@ class RecursiveTaskExecutionNode(ImportToKBBaseNode, LLMBaseNode):
                     for executor in executor_list.nodes:
                         if isinstance(executor, AgentNode):
                             agent_id_dict[executor.id] = executor.data['agent_id']
+                            executor_prompt_dict[executor.id] = {
+                                'id': executor.id,
+                                'name': executor.data['title'],
+                                'description': executor.data['desc'],
+                                'obligations': ""
+                            }
                         elif isinstance(executor, LLMNode):
-                            executor_prompt_dict[executor.id] = executor.data['prompt'].get_system() + "\n" + executor.data['prompt'].get_user()
+                            executor_prompt_dict[executor.id] = {
+                                'id': executor.id,
+                                'name': executor.data['title'],
+                                'description': executor.data['desc'],
+                                'obligations': executor.data['prompt'].get_system() + "\n" + executor.data['prompt'].get_user()
+                            }
                     if agent_id_dict:
                         agents = Agents().select(
                             columns=['id', 'obligations'],
@@ -134,23 +145,32 @@ class RecursiveTaskExecutionNode(ImportToKBBaseNode, LLMBaseNode):
                         agent_obligation_dict = {agent['id']: agent['obligations'] for agent in agents}
                         for execuror_id, agent_id in agent_id_dict.items():
                             if agent_id in agent_obligation_dict:
-                                executor_prompt_dict[execuror_id] = agent_obligation_dict[agent_id]
+                                executor_prompt_dict[execuror_id]['obligations'] = agent_obligation_dict[agent_id]
+                                
+                    invoke_input = {
+                        'current_task': json.dumps(task_data['current'], ensure_ascii=False),
+                        'parent_task': json.dumps(task_data['parent'], ensure_ascii=False) if task_data['parent'] else "",
+                        'executors': json.dumps(list(executor_prompt_dict.values()), ensure_ascii=False)
+                    }
+                    if self.data["prompt"]:
+                        invoke_input["executor_selection_requirements"] = self.duplicate_braces(self.data["prompt"].get_system())
                     
                     prompt_config = get_language_content("recursive_task_assign")
-                    if self.data["prompt"]:
-                        prompt_config["system"] += "\n" + self.data["prompt"].get_system()
                     self.data["prompt"] = Prompt(system=prompt_config["system"], user=prompt_config["user"])
                     
                     model_data, executor_id, prompt_tokens, completion_tokens, total_tokens = self.invoke(
                         app_run_id=app_run_id, 
                         edge_id=edge_id,
                         context=context, 
-                        input={
-                            'current_task': json.dumps(task_data['current'], ensure_ascii=False),
-                            'parent_task': json.dumps(task_data['parent'], ensure_ascii=False) if task_data['parent'] else "",
-                            'executors': json.dumps(executor_prompt_dict, ensure_ascii=False)
-                        }
+                        input=invoke_input
                     )
+                    logger.debug(f"""
+                        Model data: {model_data}
+                        Executor ID: {executor_id}
+                        Prompt tokens: {prompt_tokens}
+                        Completion tokens: {completion_tokens}
+                        Total tokens: {total_tokens}
+                    """)
                     executor_id = self.extract_uuid_from_string(executor_id)
                 
                     executor_node = executor_list.get_node(executor_id)

@@ -7,6 +7,11 @@ class RealationInfo(BaseModel):
     mode:Optional[int] = None
     icon:Optional[str] = None
     icon_background:Optional[str] = None
+
+class AppListTagsData(BaseModel):
+    id:Optional[int] = None
+    name:Optional[str] = None
+
 class AppsListData(BaseModel):
     app_id:Optional[int] = None
     name: Optional[str] = None
@@ -18,6 +23,7 @@ class AppsListData(BaseModel):
     publish_status:Optional[int] =None
     published_time:Optional[Union[datetime, None]] = None
     published_creator:Optional[str] = None
+    tags:Optional[List[AppListTagsData]] = None
     list:Optional[List[RealationInfo]] =None
 
 class  ResAppsListData(BaseModel):
@@ -38,12 +44,6 @@ class ReqAppBaseCreateSchema(BaseModel):
     icon: Optional[str] = None
     icon_background: Optional[str] = None
     mode: Optional[int] = None
-class ReqAppBaseCreateSchema(BaseModel):
-    name: str
-    mode: int
-    icon: str
-    description: str
-    icon_background: str
 
 class ResAppsCreateData(BaseModel):
    app_id: Optional[int] = None

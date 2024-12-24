@@ -295,6 +295,12 @@ Copy `.env` and modify the `.env` configuration items as needed, For configurati
 cp .env.template .env
 ```
 
+Initialization vector database data
+```
+conda activate nexus_ai
+python scripts/import_documents_to_vdb.py
+```
+
 Configure icon access rules through nginx
 ```nginx
 server {
@@ -370,7 +376,7 @@ npm run start
 
 Visit NexusAI
 ```http
-http://127.0.0.1:9471
+http://localhost:9471
 ```
 
 When you visit for the first time, you can log in using the following initial administrator account
@@ -406,7 +412,13 @@ conda activate nexus_ai
 python scripts/migrations.py
 ```
 
-4. If the image corresponding to `docker-compose.yml:sandbox:image` is updated, you need to restart the sandbox container
+4. If there are `.json` file updates in the `docker/multi_service/vdb_migrations directory`, you need to update the vector database
+```bash
+conda activate nexus_ai
+python scripts/import_documents_to_vdb.py
+```
+
+5. If the image corresponding to `docker-compose.yml:sandbox:image` is updated, you need to restart the sandbox container
 ```bash
 # Find the running sandbox container
 docker ps | grep sandbox
@@ -427,6 +439,6 @@ docker pull edeai/sandbox:<new tag>
 docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<new tag>
 ```
 
-5. Note that the updated content in `.env.template` is synchronized to `.env`, and the updated content in `web/config/envConfig.ts.template` is synchronized to `web/config/envConfig.ts`
+6. Note that the updated content in `.env.template` is synchronized to `.env`, and the updated content in `web/config/envConfig.ts.template` is synchronized to `web/config/envConfig.ts`
 
-6. Restart each service in turn `API` `Celery` `websocket` `roundtable` `workflow` `web` 
+7. Restart each service in turn `API` `Celery` `websocket` `roundtable` `workflow` `web` 

@@ -24,7 +24,7 @@ os.environ['DATABASE_AUTO_COMMIT'] = 'False'
 router = APIRouter()
 
 @router.get('/apps_list', response_model=ResAppListSchema, summary="Fetching a Paginated List of Applications for the Current User or Team")
-async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str="",apps_mode:int="", userinfo: TokenData = Depends(get_current_user)):
+async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str="",apps_mode:str="",tag_ids:str="", userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a paginated list of applications for the current user or team.
 
@@ -47,7 +47,7 @@ async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str
     if search_type not in [1,2]:
         return response_error(get_language_content("app_search_type"))
 
-    request = Apps().get_app_list(page, page_size,search_type, apps_name,apps_mode, userinfo.uid, userinfo.team_id)
+    request = Apps().get_app_list(page, page_size,search_type, apps_name,apps_mode, userinfo.uid, userinfo.team_id,tag_ids)
     if search_type == 1:
         agent_model = Agents()
         agent_info = agent_model.select(

@@ -124,20 +124,22 @@ class RequirementCategoryNode(LLMBaseNode):
             replace_variable_value_with_context(input, context)
             validate_required_variable(input)
             
-            prompt_config = get_language_content("requirement_category")
+            invoke_input = {
+                'format': category_example_json,
+                'requirement': get_first_variable_value(input),
+                'categories': all_category_json
+            }
             if self.data["prompt"]:
-                prompt_config["system"] += "\n" + self.duplicate_braces(self.data["prompt"].get_system())
+                invoke_input["judgment_criteria"] = self.duplicate_braces(self.data["prompt"].get_system())
+            
+            prompt_config = get_language_content("requirement_category")
             self.data["prompt"] = Prompt(system=prompt_config["system"], user=prompt_config["user"])
             
             model_data, category, prompt_tokens, completion_tokens, total_tokens = self.invoke(
                 app_run_id=app_run_id, 
                 edge_id=edge_id,
                 context=context, 
-                input={
-                    'format': category_example_json,
-                    'requirement': get_first_variable_value(input),
-                    'categories': all_category_json
-                },
+                input=invoke_input,
                 return_json=True,
             )
             

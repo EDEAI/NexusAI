@@ -2,6 +2,7 @@ from typing import Any, Dict
 from core.database import MySQL
 import math
 from core.database.models.app_workflow_relation import AppWorkflowRelations
+from core.database.models.tag_bindings import TagBindings
 from core.helper import generate_api_token
 from languages import get_language_content
 
@@ -59,7 +60,7 @@ class Apps(MySQL):
         assert datasets, get_language_content('api_vector_available_apps')
         return datasets[0]['is_public']
 
-    def get_app_list(self, page, page_size, search_type,apps_name,apps_mode, user_id, team_id):
+    def get_app_list(self, page, page_size, search_type, apps_name, apps_mode, user_id, team_id, tag_ids):
         """
         Obtain apps list data based on parameters
         :param page: Page number.
@@ -69,28 +70,33 @@ class Apps(MySQL):
         :param search_type: Agent search type 1: my agent 2: team agent .
         :return: A dictionary representing the app list record.
         """
-
         if search_type == 1:
             conditions = [
                 {"column": "apps.user_id", "value": user_id},
                 {"column": "apps.status", "op": "in", "value": [1, 2]},
-                {"column": "apps.mode", "op": "in", "value": [1, 2, 3, 4]}
             ]
         else:
             conditions = [
                 {"column": "apps.team_id", "value": team_id},
                 {"column": "apps.is_public", "value": 1},
                 {"column": "apps.user_id", "op": "!=", "value": user_id},
-                {"column": "apps.publish_status","value":1},
+                {"column": "apps.publish_status", "value": 1},
                 {"column": "apps.status", "value": 1},
-                {"column": "apps.mode", "op": "in", "value": [1, 2, 3, 4]}
             ]
         if apps_name:
             conditions.append({"column": "apps.name", "op": "like", "value": "%" + apps_name + "%"})
 
-        if apps_mode  in [1,2,3,4] :
-            conditions.append({"column": "apps.mode", "value": apps_mode})
-
+        apps_mode_list = apps_mode.split(',')
+        if len(apps_mode_list) == 1:
+            if int(apps_mode) not in [1, 2, 3, 4]:
+                conditions.append({"column": "apps.mode", "op": "in", "value": [1, 2, 4]})
+            else:
+                conditions.append({"column": "apps.mode", "value": int(apps_mode)})
+        else:
+            conditions.append({"column": "apps.mode", "op": "in", "value": [int(i) for i in apps_mode_list]})
+        if tag_ids != '0' and tag_ids:
+            app_ids = TagBindings().get_tag_apps_by_tag_id(tag_ids, apps_mode)
+            conditions.append({"column": "apps.id", "op": "in", "value": app_ids})
         total_count = self.select_one(
             aggregates={"id": "count"},
             conditions=conditions,
@@ -98,17 +104,20 @@ class Apps(MySQL):
 
         all_app = self.select(
             columns=[
-                'apps.id AS app_id', 'apps.name', 'apps.description', 'apps.mode', 'apps.icon', 'apps.icon_background', 'apps.execution_times','apps.publish_status'
+                'apps.id AS app_id', 'apps.name', 'apps.description', 'apps.mode', 'apps.icon', 'apps.icon_background',
+                'apps.execution_times', 'apps.publish_status'
             ],
             conditions=conditions,
             order_by="apps.id DESC",
             limit=page_size,
             offset=(page - 1) * page_size
         )
-        
+
         workflow_app_ids = []
         other_app_ids = []
         for item in all_app:
+            tag_datas = TagBindings().get_tags_by_app_id(item['app_id'])
+            item['tags'] = tag_datas
             if item['mode'] == 2:  # Assuming mode 2 represents workflow apps
                 workflow_app_ids.append(item['app_id'])
             else:
@@ -130,7 +139,6 @@ class Apps(MySQL):
         )
         workflow_dict = {}
         other_dict = {}
-
         for item in all_app:
             if item['mode'] == 2:
                 workflow_dict[item['app_id']] = []
@@ -143,7 +151,8 @@ class Apps(MySQL):
 
         info_app = self.select(
             columns=[
-                'apps.id AS apps_id', 'apps.name', 'app_workflow_relation.workflow_app_id', 'apps.description', 'apps.mode', 'apps.icon',
+                'apps.id AS apps_id', 'apps.name', 'app_workflow_relation.workflow_app_id', 'apps.description',
+                'apps.mode', 'apps.icon',
                 'apps.icon_background'
             ],
             joins=[
@@ -158,10 +167,9 @@ class Apps(MySQL):
         for app_item in info_app:
             if app_item['workflow_app_id'] in workflow_dict:
                 workflow_dict[app_item['workflow_app_id']].append(app_item)
-        
 
         for data_item in all_app:
-            if data_item['mode']==2:
+            if data_item['mode'] == 2:
                 data_item['list'] = workflow_dict[data_item['app_id']]
             else:
                 data_item['list'] = other_dict[data_item['app_id']]

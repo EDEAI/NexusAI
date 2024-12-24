@@ -56,13 +56,15 @@ x-common-environment-frontend: &common-environment-frontend
 services:
   multi_service:
     container_name: nexusai-docker-multi-service
-    image: edeai/multi_service:0.0.3
+    image: edeai/multi_service:0.0.4
     environment:
       <<: *common-environment-backend
       # <<: [*common-environment-backend, *common-environment-proxy]
     volumes:
       - ./volumes/logs/supervisor:/var/log/supervisor
       - ./volumes/logs/multi_service:/NexusAI/logs
+      - ./multi_service/db_migrations:/NexusAI/docker/multi_service/db_migrations
+      - ./multi_service/vdb_migrations:/NexusAI/docker/multi_service/vdb_migrations
       - ./volumes/upload_files:/NexusAI/upload_files
       - ../models:/NexusAI/models
     depends_on:
@@ -95,7 +97,7 @@ services:
 
   web:
     container_name: nexusai-docker-web
-    image: edeai/web:0.0.2
+    image: edeai/web:0.0.3
     environment:
       <<: *common-environment-frontend
     networks:

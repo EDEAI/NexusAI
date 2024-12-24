@@ -1,5 +1,6 @@
+import asyncio
+
 from fastapi import APIRouter, Request
-from api.utils.app_api import add_app_api, remove_app_api
 from api.utils.common import *
 from api.utils.jwt import *
 from api.schema.agent import *
@@ -78,12 +79,6 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
         return response_error(result["message"])
     app_id = result["data"]["app_id"]
 
-    # add or remove API
-    if enable_api == 1:
-        add_app_api(request.app, app_id)
-    else:
-        remove_app_api(request.app, app_id)
-
     return response_success(result["data"], get_language_content("api_agent_success"))
 
 @router.put("/agent_abilities_set/{agent_id}", response_model = RespBaseSchema)
@@ -146,14 +141,6 @@ async def agent_publish(request: Request, agent_id: int, userinfo: TokenData = D
     result = agents_model.agent_publish(agent_id, userinfo.uid)
     if result["status"] != 1:
         return response_error(result["message"])
-    app_id = result["data"]["app_id"]
-    enable_api = result["data"]["enable_api"]
-
-    # add or remove API
-    if enable_api == 1:
-        add_app_api(request.app, app_id)
-    else:
-        remove_app_api(request.app, app_id)
 
     return response_success(result["data"], get_language_content("api_agent_success"))
 
@@ -171,9 +158,6 @@ async def agent_delete(request: Request, app_id: int, userinfo: TokenData = Depe
     result = agents_model.agent_delete(app_id, userinfo.uid)
     if result["status"] != 1:
         return response_error(result["message"])
-
-    # remove API
-    remove_app_api(request.app, app_id)
 
     return response_success(result["data"], get_language_content("api_agent_success"))
 
@@ -283,6 +267,8 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
             return response_error(get_language_content("api_agent_run_ability_status_not_normal"))
 
     task = run_app.delay(app_type = "agent", id_ = agent_id, user_id=uid, input_dict = input_dict, ability_id = ability_id, prompt = prompt)
+    while not task.ready():
+        await asyncio.sleep(0.1)
     result = task.get()
     if result["status"] != "success":
         return response_error(result["message"])

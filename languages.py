@@ -13,12 +13,13 @@ language_packs = {
         "requirement_category": {
             "system": """
                 You are a content categorization assistant.
-                Based on the content I input and the provided set of all categories, analyze which category my input belongs to. If you are unsure, please choose the closest matching category.
+                Please analyze which category my input belongs to based on my input content, category judgment criteria, and all category sets. If you are not sure, please choose the category that is closest to my input content.
                 The result should be returned in JSON format, as follows: {format}.
             """,
             "user": """
-                My input content is: {requirement}.
-                All categories are as follows: {categories}.
+                My input content: {requirement}.
+                Category judgment criteria: {judgment_criteria}.
+                All category sets: {categories}.
             """,
         },
         "agent_system_prompt_with_auto_match_ability": (
@@ -71,7 +72,7 @@ language_packs = {
             'Below is the text input by the user:\n'
             '{user_prompt}\n\n'
             'Below is the information retrieved from the knowledge base based on the user input text '
-                '(listed in the following JSON format: [{{"content": content, "source": source document name}}, ...])'
+            '(listed in the following JSON format: [{{"content": content, "source": source document name}}, ...])'
             ':\n'
             '{formatted_docs}\n\n'
             'Please reply to the user based on the above information.'
@@ -81,99 +82,107 @@ language_packs = {
         ),
         "recursive_task_generation": {
             "system": """
-                Please generate detailed task data according to the requirements and task data structure I provided, and split the steps and levels of the task as detailed as possible.
+                Please generate detailed task data according to the requirements, task generation goals and task data structure I provided, and try to split the steps and levels of the task in more detail.
                 Task data json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: specific task content, subcategories: sub-task list}}.
                 Note that the hierarchical structure of task data is infinitely recursive, and the structure of each element in the sub-task list is consistent with the parent structure.
                 Pay attention to the uniqueness of the task id. You can use this format: parent task id-current task id. The previous parent task id is recursively superimposed according to the level, and finally splice task- in front of each task id.
                 Note that task keywords should be extracted according to the task content. The keywords should cover the task content as comprehensively as possible, but do not contain irrelevant words. Keywords are separated by commas.
                 Finally, they should be returned in json format according to the task data structure.
-                Note that the definition of "task data" mentioned above is not necessarily a "task" in the literal sense. It may be any content that can be split into steps or levels. It should be understood according to the actual situation. Refer to the following content for understanding and definition.
+                Note that the definition of "task data" mentioned above is not necessarily a "task" in the literal sense. It may be any content that can be split into steps or levels. It should be understood and defined according to the requirements and task generation goals I provided.
             """,
-            "user": "Requirement content: {requirement}",
+            "user": """
+                Requirement content: {requirement}
+                Task generation goals: {task_generation_goals}
+            """,
         },
         "recursive_task_assign": {
             "system": """
-                Please select the most suitable executor for the current task based on the current task content I provided, the parent task content for reference only, and all task executors. You should select according to the specific functions of each executor. If you are not sure, please select the executor with the closest function and task content.
+                Please select the most suitable executor for the current task based on the current task content, parent task content for reference only, executor selection requirements, and all task executors provided by me. Please select according to the executor selection requirements and the specific functions of each executor. If you are not sure, please select the executor with the closest function and task content.
                 Task json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: task corresponding requirement content}}.
-                Task executor json structure description: {{executor id: specific function of the executor}}.
+                Task executor json structure description: {{id: executor id, name: executor name, description: executor description, obligations: executor specific functions}}.
                 In the end, only the selected executor id must be returned, and no redundant content must be returned.
             """,
             "user": """
                 Current task content: {current_task}
                 Parent task content for reference only: {parent_task}
+                Executor selection requirements: {executor_selection_requirements}
                 All task executors: {executors}
             """,
         },
         "recursive_task_execute": {
             "system": """
-                You are a task executor. Please implement the current task as detailed as possible according to your specific functions, the current task content I provide, the upper-level task content for reference only, the sub-task list for reference only, and the related task content for reference only.
-                When implementing the current task, pay attention to two points:
-                1. If the upper-level task has actual content, refer to the task scope of the upper-level task content.
-                2. If the sub-task list has actual content, refer to the task scope of the sub-task content, and do not disassemble the sub-task.
-                Task json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: task corresponding requirement content}}.
-                In the end, only the task content you implemented must be returned, and no redundant content should be returned.
+                You are a task executor. Please perform the current task as detailed as possible according to your specific responsibilities and abilities, the requirements and goals of the current task, the current task content I provide, the parent task content for reference only, the subtask list for reference only, and the related task content for reference only.
+                When performing the current task, pay attention to the following points:
+                1. The current task must be performed strictly in accordance with the requirements and goals of the current task.
+                2. If your responsibilities and abilities have actual content, refer to your responsibilities and ability settings.
+                3. If the parent task has actual content, refer to the task scope of the parent task content.
+                4. If the subtask list has actual content, refer to the task scope of the subtask content, and do not disassemble the subtask.
+                5. If the related task has actual content, please note that it is only for related reference.
+                Task json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: task content}}.
+                In the end, only the task content you performed will be returned, and no redundant content will be returned.
             """,
             "user": """
-                Your specific duties: {obligations}
+                Your responsibilities and abilities: {obligations}
+                Requirements and goals of the current task: {requirements_and_goals}
                 Current task content: {current_task}
                 Parent task content for reference only: {parent_task}
-                Child task list for reference only: {child_tasks}
+                Subtask list for reference only: {child_tasks}
                 Related task content for reference only: {related_content}
             """,
         },
-        
+
         # HTTP requeust node
         'http_request_failed': 'HTTP request failed with status code {status_code}',
         'http_response_content_oversize': 'HTTP response content is too large, max size is {max_size} bytes, but current size is {size} bytes',
 
         # register(user)
-        "register_nickname_empty":"login has failed，Nickname cannot be empty",
-        "register_nickname_long":"login has failed，Nickname too long",
-        "register_inviter_id_empty":"login has failed，The inviter ID is empty",
-        "register_team_id_empty":"login has failed，The Team ID is empty",
-        "register_phone_failed":"login has failed，The phone number cannot be empty",
-        "register_email_failed":"login has failed，Email cannot be empty",
-        "register_password_failed":"login has failed，Password cannot be empty",
-        "register_failed":"login has failed，try again",
-        "register_phone_illegality":"Registration failed, illegal phone number",
-        "register_email_illegality":"Registration failed, email address is invalid",
-        "register_phone_repeat":"Registration failed, duplicate phone number",
-        "register_email_repeat":"Registration failed, duplicate email address",
-        "register_email_empty":"Registration failed, the user has not been invited yet",
+        "register_nickname_empty": "login has failed，Nickname cannot be empty",
+        "register_nickname_long": "login has failed，Nickname too long",
+        "register_inviter_id_empty": "login has failed，The inviter ID is empty",
+        "register_team_id_empty": "login has failed，The Team ID is empty",
+        "register_phone_failed": "login has failed，The phone number cannot be empty",
+        "register_email_failed": "login has failed，Email cannot be empty",
+        "register_password_failed": "login has failed，Password cannot be empty",
+        "register_failed": "login has failed，try again",
+        "register_phone_illegality": "Registration failed, illegal phone number",
+        "register_email_illegality": "Registration failed, email address is invalid",
+        "register_phone_repeat": "Registration failed, duplicate phone number",
+        "register_email_repeat": "Registration failed, duplicate email address",
+        "register_email_empty": "Registration failed, the user has not been invited yet",
         # register(team)
-        "register_team_name_empty":"login has failed，Team name cannot be empty",
-        "register_team_name_repeat":"login has failed，Duplicate team names",
-        "register_team_name_legal":"login has failed，The team name is illegal",
+        "register_team_name_empty": "login has failed，Team name cannot be empty",
+        "register_team_name_repeat": "login has failed，Duplicate team names",
+        "register_team_name_legal": "login has failed，The team name is illegal",
         # login
-        "login_user_name_empty":"Login failed, Username cannot be empty",
-        "login_user_name_failed":"Login failed, Username incorrect",
-        "login_user_name_absent":"Login failed, Username does not exist",
-        "login_user_password_empty":"Login failed, Password cannot be empty",
-        "login_user_password_failed":"Login failed, Password error",
-        
-        "login_time_last_year":"Last year",
-        "login_time_a_month_ago":"A month ago",
-        "login_time_days_ago":"Days ago",
-        "login_time_hours_ago":"Hours ago",
-        "login_time_minutes_ago":"Minutes ago",
-        "login_time_just":"Just",
-        "login_time_never_logged_in":"Never logged in",
+        "login_user_name_empty": "Login failed, Username cannot be empty",
+        "login_user_name_failed": "Login failed, Username incorrect",
+        "login_user_name_absent": "Login failed, Username does not exist",
+        "login_user_password_empty": "Login failed, Password cannot be empty",
+        "login_user_password_failed": "Login failed, Password error",
+
+        "login_time_last_year": "Last year",
+        "login_time_a_month_ago": "A month ago",
+        "login_time_days_ago": "Days ago",
+        "login_time_hours_ago": "Hours ago",
+        "login_time_minutes_ago": "Minutes ago",
+        "login_time_just": "Just",
+        "login_time_never_logged_in": "Never logged in",
         # lnvitation
-        'lnvitation_already_failed':'Invitation failed, the email has already been registered',
-        'lnvitation_role_failed':'Invitation failed, insufficient role permissions',
-        'lnvitation_email_failed':'Invitation failed, email cannot be empty',
-        'lnvitation_team_failed':'Invitation failed, team data does not exist',
-        'lnvitation_failed':'Invitation failed, please try again',
+        'lnvitation_already_failed': 'Invitation failed, the email has already been registered',
+        'lnvitation_role_failed': 'Invitation failed, insufficient role permissions',
+        'lnvitation_email_failed': 'Invitation failed, email cannot be empty',
+        'lnvitation_team_failed': 'Invitation failed, team data does not exist',
+        'lnvitation_failed': 'Invitation failed, please try again',
         # workflow
-        'publish_failed':'Workflow publishing failure',
-        'publish_success':'Workflow published successfully',
-        'no_available_workflows':'There is no workflow available',
-        'node_id_is_not_exist':'The workflow node does not exist',
-        'executor_not_exist':'The executor does not exist',
-        'parent_node_is_not_rte_node':'The parent node is not Task Execution Node',
+        'publish_failed': 'Workflow publishing failure',
+        'publish_success': 'Workflow published successfully',
+        'no_available_workflows': 'There is no workflow available',
+        'node_id_is_not_exist': 'The workflow node does not exist',
+        'executor_not_exist': 'The executor does not exist',
+        'parent_node_is_not_rte_node': 'The parent node is not Task Execution Node',
         # language
-        'switch_the_language_failed':'Switch language failed',
-        'switch_the_language_success':'Switch language success',
+        'switch_the_language_failed': 'Switch language failed',
+        'switch_the_language_success': 'Switch language success',
         # agent
         'agent_does_not_exist': 'Agent does not exist',
         'agent_empty_obligation': 'Agent obligation should not be empty!',
@@ -385,7 +394,7 @@ language_packs = {
         ),
         'chatroom_role_user': 'user',
         'chatroom_role_agent': 'agent',
-        #vector
+        # vector
         'api_vector_auth': 'Insufficient permissions',
         'api_vector_file_type': 'The uploaded file information is not matched',
         'api_vector_success': 'success',
@@ -421,28 +430,28 @@ language_packs = {
         'database_insert_error': 'Database create failed',
         'skill_insert_error': 'Skill create failed',
         'apps_insert_success': 'App create success',
-        
+
         'app_id_is_required': 'APPID is error',
         'app_update_error': 'app update failed',
         'app_update_success': 'app update success',
         'no_modification_permission': 'no_modification_permission',
-        
+
         'supplier_not_found': 'Supplier not found',
-        'supplier_authorized_success': 'Supplier authorized successfully',  
-        
+        'supplier_authorized_success': 'Supplier authorized successfully',
+
         'model_not_found': 'Model not found',
         'model_authorized_success': 'Model authorized successfully',
-        
-        'model_switching_success': 'Model switching successfully',  
+
+        'model_switching_success': 'Model switching successfully',
         'model_switching_failed': 'Model switching failed',
-        
+
         'skill_does_not_exist': 'Skill does not exist',
         'skill_input_variables_error': 'Skill input variables error',
         'skill_output_variables_error': 'Skill output variables error',
         'skill_code_error': 'Skill code error',
-        
+
         'do_not_have_permission': 'Do not have permission',
-        
+
         'LLM_HELP': 'Set the default large language model. When you create an agent or use a large language model in a workflow, this model will be used by default.',
         'EMBEDDING_HELP': 'Set the default model for document embedding processing, the retrieval and import of knowledge bases both use this Embedding model for vectorization processing.',
         'RERANKING_HELP': 'Reranking model will reorder the candidate document list based on the semantic matching degree with the user\'s question, thereby improving the semantic sorting result',
@@ -450,15 +459,15 @@ language_packs = {
         'TTS_HELP': 'text-to-speech model, used to convert text content into natural speech output.',
         'TEXT2IMG_HELP': 'text-to-image model, used to generate images according to the input text description.',
         'MODERATION_HELP': 'Content moderation model, used to detect and filter inappropriate content to ensure that the generated content conforms to community standards.',
-        
-        'LLM_MODEL_TYPE_NAME':'LLM Model',
-        'EMBEDDING_MODEL_TYPE_NAME':'Embedding Model',
-        'RERANKING_MODEL_TYPE_NAME':'Rerank Model',
-        'SPEECH2TEXT_MODEL_TYPE_NAME':'Speech2Text Model',
-        'TTS_MODEL_TYPE_NAME':'TTS Model',
-        'TEXT2IMG_MODEL_TYPE_NAME':'Text2Img Model',
-        'MODERATION_MODEL_TYPE_NAME':'Moderation Model',
-        
+
+        'LLM_MODEL_TYPE_NAME': 'LLM Model',
+        'EMBEDDING_MODEL_TYPE_NAME': 'Embedding Model',
+        'RERANKING_MODEL_TYPE_NAME': 'Rerank Model',
+        'SPEECH2TEXT_MODEL_TYPE_NAME': 'Speech2Text Model',
+        'TTS_MODEL_TYPE_NAME': 'TTS Model',
+        'TEXT2IMG_MODEL_TYPE_NAME': 'Text2Img Model',
+        'MODERATION_MODEL_TYPE_NAME': 'Moderation Model',
+
         'recently_active_process': 'Recently active process',
         'recently_active_agent': 'Recently active Agent',
         "graph_validation_errors": {
@@ -476,60 +485,65 @@ language_packs = {
             "exactly_one_start_node": "There must be exactly one start node.",
             "exactly_one_end_node": "There must be exactly one end node."
         },
+        'tag_id_not_found': 'Tag ID not found',
+        'tag_update_success': 'Tag update success',
+        'tag_delete_success': 'Tag delete success',
+        'tag_binding_create_success': 'Tag binding create success',
+        'tag_binding_delete_success': 'Tag binding delete success',
+        'team_id_not_found': 'Team ID not found'
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
         'http_response_content_oversize': 'HTTP响应内容过大！最大不应超过{max_size}字节，而实际为{size}字节',
 
-        
-        "register_nickname_empty":"注册失败，昵称不能为空",
-        "register_nickname_long":"注册失败，昵称过长",
-        "register_team_id_empty":"注册失败，团队ID为空",
-        "register_inviter_id_empty":"注册失败，邀请人ID为空",
-        "register_phone_failed":"注册失败，手机号不能为空",
-        "register_email_failed":"注册失败，邮箱不能为空",
-        "register_password_failed":"注册失败，密码不能为空",
-        "register_failed":"注册失败，请重试",
-        "register_phone_illegality":"注册失败，手机号不合法",
-        "register_email_illegality":"注册失败，邮箱不合法",
-        "register_phone_repeat":"注册失败，手机号重复",
-        "register_email_repeat":"注册失败，邮箱重复",
-        "register_email_empty":"注册失败，暂未邀请该用户",
-        
-        "register_team_name_empty":"注册失败，团队名不能为空",
-        "register_team_name_repeat":"注册失败，团队名称重复",
-        "register_team_name_legal":"注册失败，团队名称不合法",
-        
-        "login_user_name_empty":"登录失败，用户名不能为空",
-        "login_user_name_failed":"登录失败，用户名错误",
-        "login_user_name_absent":"登录失败，用户名不存在",
-        "login_user_password_empty":"登录失败，密码不能为空",
-        "login_user_password_failed":"登录失败，密码错误",
-        
-        "login_time_last_year":"年前",
-        "login_time_a_month_ago":"月前",
-        "login_time_days_ago":"天前",
-        "login_time_hours_ago":"小时前",
-        "login_time_minutes_ago":"分钟前",
-        "login_time_just":"刚刚",
-        "login_time_never_logged_in":"从未登录",
+        "register_nickname_empty": "注册失败，昵称不能为空",
+        "register_nickname_long": "注册失败，昵称过长",
+        "register_team_id_empty": "注册失败，团队ID为空",
+        "register_inviter_id_empty": "注册失败，邀请人ID为空",
+        "register_phone_failed": "注册失败，手机号不能为空",
+        "register_email_failed": "注册失败，邮箱不能为空",
+        "register_password_failed": "注册失败，密码不能为空",
+        "register_failed": "注册失败，请重试",
+        "register_phone_illegality": "注册失败，手机号不合法",
+        "register_email_illegality": "注册失败，邮箱不合法",
+        "register_phone_repeat": "注册失败，手机号重复",
+        "register_email_repeat": "注册失败，邮箱重复",
+        "register_email_empty": "注册失败，暂未邀请该用户",
 
-        'lnvitation_already_failed':'邀请失败，该邮箱已注册',
-        'lnvitation_role_failed':'邀请失败，角色权限不足',
-        'lnvitation_email_failed':'邀请失败，邮箱不能为空',
-        'lnvitation_team_failed':'邀请失败，团队数据不存在',
-        'lnvitation_failed':'邀请失败，请重试',
-        
-        'publish_failed':'工作流发布失败',
-        'publish_success':'工作流发布成功',
-        'no_available_workflows':'没有可用的工作流',
-        'node_id_is_not_exist':'工作流节点不存在',
-        'executor_not_exist':'执行器不存在',
-        'parent_node_is_not_rte_node':'父节点不是任务执行节点',
-        
-        'switch_the_language_failed':'切换语言失败',
-        'switch_the_language_success':'切换语言成功',
-        
+        "register_team_name_empty": "注册失败，团队名不能为空",
+        "register_team_name_repeat": "注册失败，团队名称重复",
+        "register_team_name_legal": "注册失败，团队名称不合法",
+
+        "login_user_name_empty": "登录失败，用户名不能为空",
+        "login_user_name_failed": "登录失败，用户名错误",
+        "login_user_name_absent": "登录失败，用户名不存在",
+        "login_user_password_empty": "登录失败，密码不能为空",
+        "login_user_password_failed": "登录失败，密码错误",
+
+        "login_time_last_year": "年前",
+        "login_time_a_month_ago": "月前",
+        "login_time_days_ago": "天前",
+        "login_time_hours_ago": "小时前",
+        "login_time_minutes_ago": "分钟前",
+        "login_time_just": "刚刚",
+        "login_time_never_logged_in": "从未登录",
+
+        'lnvitation_already_failed': '邀请失败，该邮箱已注册',
+        'lnvitation_role_failed': '邀请失败，角色权限不足',
+        'lnvitation_email_failed': '邀请失败，邮箱不能为空',
+        'lnvitation_team_failed': '邀请失败，团队数据不存在',
+        'lnvitation_failed': '邀请失败，请重试',
+
+        'publish_failed': '工作流发布失败',
+        'publish_success': '工作流发布成功',
+        'no_available_workflows': '没有可用的工作流',
+        'node_id_is_not_exist': '工作流节点不存在',
+        'executor_not_exist': '执行器不存在',
+        'parent_node_is_not_rte_node': '父节点不是任务执行节点',
+
+        'switch_the_language_failed': '切换语言失败',
+        'switch_the_language_success': '切换语言成功',
+
         'agent_does_not_exist': '智能体不存在！',
         'agent_empty_obligation': '智能体职能不应为空！',
         'agent_empty_llm_model': '请填写智能体的LLM模型！',
@@ -608,7 +622,7 @@ language_packs = {
         'api_agent_delete_delete_app_error': '删除应用失败',
         'api_agent_delete_delete_agent_error': '删除智能体失败',
         'api_agent_delete_agent_delete_error': '智能体删除失败',
-        
+
         'chatroom_name_is_required': '会议室标题不能为空',
         'chatroom_max_round_is_required': '最大回合数不能为空',
         'chatroom_agent_is_required': '智能体不能为空',
@@ -625,7 +639,7 @@ language_packs = {
         'chatroom_agent_active_can_only_input': '智能体状态只能输入0或1',
         'chatroom_agent_relation_does_not_exist': '智能体关系不存在',
         'chatroom_agent_number_less_than_one': '会议室中必须存在至少1个智能体',
-        
+
         'api_vector_auth': '权限不足',
         'api_vector_file_type': '上传的文件信息不匹配',
         'api_vector_success': '成功',
@@ -638,14 +652,14 @@ language_packs = {
         'api_vector_available_apps': '没有可用的应用程序！',
         'api_vector_acquisition_failure': '数据采集失败',
         'api_vector_indexing': '知识库正在建立索引，不能更改',
-        
+
         'upload_files': '上传文件列表',
         'api_upload_unsupported': '不支持的文件类型',
         'api_upload_max_size': '文件大小超过15MB限制',
         'api_upload_size_not': '无法获取文件大小',
-        
+
         'app_search_type': '切换团队/个人错误',
-        
+
         'name_is_required': '应用名称是必填的',
         'mode_can_only_input': '应用类型错误',
         'apps_insert_error': '应用创建失败',
@@ -661,44 +675,44 @@ language_packs = {
         'database_insert_error': '知识库应用创建失败',
         'skill_insert_error': '技能应用创建失败',
         'apps_insert_success': '应用创建成功',
-        
+
         'app_id_is_required': '应用ID错误',
         'app_update_error': '应用更新失败',
         'app_update_success': '应该更新成功',
         'no_modification_permission': '无修改权限',
-        
+
         'supplier_not_found': '供应商不存在',
         'supplier_authorized_success': '供应商授权成功',
-        
+
         'model_not_found': '模型不存在',
-        'model_authorized_success': '模型授权成功', 
-        
+        'model_authorized_success': '模型授权成功',
+
         'model_switching_success': '模型切换成功',
         'model_switching_failed': '模型切换失败',
-        
+
         'skill_does_not_exist': '技能不存在',
         'skill_input_variables_error': '技能输入变量错误',
         'skill_output_variables_error': '技能输出变量错误',
         'skill_code_error': '技能代码错误',
-        
+
         'do_not_have_permission': '没有权限',
-        
-        'LLM_HELP':'设置默认大语言模型，创建智能体以及工作流中使用大语言模型的节点会默认使用该模型。',
-        'EMBEDDING_HELP':'设置知识库文档嵌入处理的默认模型，检索和导入知识库均使用该Embedding模型进行向量化处理。',
-        'RERANKING_HELP':'重排序模型将根据候选文档列表与用户问题语义匹配度进行重新排序，从而改进语义排序的结果',
-        'SPEECH2TEXT_HELP':'设置对话中语音转文字输入的默认使用模型。',
-        'TTS_HELP':'文本转语音模型，用于将文本内容转换为自然的语音输出。',
-        'TEXT2IMG_HELP':'文本生成图像模型，根据输入的文本描述生成相应的图像。',
-        'MODERATION_HELP':'内容审核模型，用于检测和过滤不当内容，确保生成内容符合社区标准。',
-        
-        'LLM_MODEL_TYPE_NAME':'LLM模型',
-        'EMBEDDING_MODEL_TYPE_NAME':'Embedding模型',
-        'RERANKING_MODEL_TYPE_NAME':'Rerank模型',
-        'SPEECH2TEXT_MODEL_TYPE_NAME':'Speech2Text模型',
-        'TTS_MODEL_TYPE_NAME':'TTS模型',
-        'TEXT2IMG_MODEL_TYPE_NAME':'Text2Img模型',
-        'MODERATION_MODEL_TYPE_NAME':'Moderation模型',
-        
+
+        'LLM_HELP': '设置默认大语言模型，创建智能体以及工作流中使用大语言模型的节点会默认使用该模型。',
+        'EMBEDDING_HELP': '设置知识库文档嵌入处理的默认模型，检索和导入知识库均使用该Embedding模型进行向量化处理。',
+        'RERANKING_HELP': '重排序模型将根据候选文档列表与用户问题语义匹配度进行重新排序，从而改进语义排序的结果',
+        'SPEECH2TEXT_HELP': '设置对话中语音转文字输入的默认使用模型。',
+        'TTS_HELP': '文本转语音模型，用于将文本内容转换为自然的语音输出。',
+        'TEXT2IMG_HELP': '文本生成图像模型，根据输入的文本描述生成相应的图像。',
+        'MODERATION_HELP': '内容审核模型，用于检测和过滤不当内容，确保生成内容符合社区标准。',
+
+        'LLM_MODEL_TYPE_NAME': 'LLM模型',
+        'EMBEDDING_MODEL_TYPE_NAME': 'Embedding模型',
+        'RERANKING_MODEL_TYPE_NAME': 'Rerank模型',
+        'SPEECH2TEXT_MODEL_TYPE_NAME': 'Speech2Text模型',
+        'TTS_MODEL_TYPE_NAME': 'TTS模型',
+        'TEXT2IMG_MODEL_TYPE_NAME': 'Text2Img模型',
+        'MODERATION_MODEL_TYPE_NAME': 'Moderation模型',
+
         'recently_active_process': '最近运行进程',
         'recently_active_agent': '最近活跃智能体',
         "graph_validation_errors": {
@@ -716,6 +730,12 @@ language_packs = {
             "exactly_one_start_node": "必须有且只有一个开始节点。",
             "exactly_one_end_node": "必须有且只有一个结束节点。"
         },
+        'tag_id_not_found': '标签ID不存在',
+        'tag_update_success': '标签更新成功',
+        'tag_delete_success': '标签删除成功',
+        'tag_binding_create_success': '标签绑定创建成功',
+        'tag_binding_delete_success': '标签绑定删除成功',
+        'team_id_not_found': '团队ID不存在'
     }
 }
 
@@ -753,13 +773,15 @@ prompt_keys = {
     "chatroom_role_agent"
 }
 
-def get_language_content(key: str, uid: int = 0) -> Any:
+
+def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = True) -> Any:
     """
     Retrieves the content for the specified key based on the current language.
     Supports nested keys separated by dots.
 
     :param key: The key for the desired content, with nested keys separated by dots.
     :param uid: The user ID.
+    :param append_ret_lang_prompt: Whether to append the language prompt to the content.
     :return: The content string in the current language.
     """
     from api.utils.auth import get_current_language
@@ -767,7 +789,7 @@ def get_language_content(key: str, uid: int = 0) -> Any:
     actual_uid = uid if uid > 0 else int(os.getenv('ACTUAL_USER_ID', 0))
     current_language = get_current_language(actual_uid)
     keys = key.split('.')
-    
+
     if key in prompt_keys:
         content = language_packs.get("en", {})
         for k in keys:
@@ -775,13 +797,14 @@ def get_language_content(key: str, uid: int = 0) -> Any:
                 content = content.get(k, None)
             else:
                 return None
-        return_language_prompt = f"\n\nPlease note that the language of the returned content must be {language_names[current_language]}."
-        if isinstance(content, str):
-            content += return_language_prompt
-        elif isinstance(content, dict):
-            content = content.copy()
-            if 'system' in content:
-                content['system'] += return_language_prompt
+        if append_ret_lang_prompt:
+            return_language_prompt = f"\n\nPlease note that the language of the returned content must be {language_names[current_language]}."
+            if isinstance(content, str):
+                content += return_language_prompt
+            elif isinstance(content, dict):
+                content = content.copy()
+                if 'system' in content:
+                    content['system'] += return_language_prompt
         return content
 
     content = language_packs.get(current_language, {})

@@ -8,7 +8,7 @@ from core.database.models.model_configurations import ModelConfigurations
 from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
 from core.database.models.users import Users
 from datetime import datetime
-from core.helper import generate_api_token
+from core.helper import generate_api_token, encrypt_id
 from hashlib import md5
 from languages import get_language_content
 import math
@@ -516,10 +516,8 @@ class Agents(MySQL):
             if app["status"] != 1:
                 return {"status": 2, "message": get_language_content("api_agent_info_app_status_not_normal")}
         # Generate api_url
-        m = md5()
-        m.update(f'APP-{app_id}'.encode())
-        app_hash = m.hexdigest()
-        app["api_url"] = f'/v1/app-api/{app_hash}/run-docs'
+        encrypted_id = encrypt_id(app_id)
+        app["api_url"] = f'/v1/app-api/{encrypted_id}/run-docs'
 
         # get agent
         agent = self.select_one(
