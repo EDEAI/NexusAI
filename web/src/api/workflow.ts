@@ -282,20 +282,55 @@ export const exportWorkflow = async (app_id: string, publish_status: number = 0)
     });
 };
 
-export const getTagList = async (mode: Number ) => {
+export const getTagList = async (mode: Number) => {
     return await aniRequest<any>(`/v1/tag/tags`, {
         method: 'GET',
         data: {
-            mode
+            mode,
         },
     });
 };
-export const createTag=async (name: string,mode=0) => {
+export const createTag = async (name: string, mode = 0) => {
     return await aniRequest<any>(`/v1/tag/tags`, {
         method: 'POST',
         data: {
             name,
-            mode
+            mode,
+        },
+    });
+};
+
+export const deleteTag = async tag_id => {
+    return await aniRequest<any>(`/v1/tag/tags/${tag_id}`, {
+        method: 'DELETE',
+    });
+};
+
+export const bindTag = async (tag_ids = [], app_ids = []) => {
+    return await aniRequest<any>(`/v1/tag/tags_bindings`, {
+        method: 'POST',
+        data: {
+            tag_ids,
+            app_ids,
+        },
+    });
+};
+
+export const unBindTag = async (tag_ids = [], app_id) => {
+    return await aniRequest<any>(`/v1/tag/tags_bindings`, {
+        method: 'DELETE',
+        data: {
+            tag_ids,
+            app_id,
+        },
+    });
+};
+
+export const updateTag = async (tag_id, name: string) => {
+    return await aniRequest<any>(`/v1/tag/tags/${tag_id}`, {
+        method: 'PUT',
+        data: {
+            name,
         },
     });
 };

@@ -34,4 +34,14 @@ export default {
     'creation.publish': '发布',
     'creation.havepublished': '已发布',
     'creation.unpublish': '未发布',
+
+    'addTag.all': '全部',
+    'addTag.addTag': '添加标签',
+    'addTag.inputTagName': '输入标签名称',
+    'addTag.deleteTag': '删除',
+    'addTag.deleteConfirmation1': '当前标签已关联',
+    'addTag.deleteConfirmation2': '个应用，确定删除？',
+    'addTag.confirm': '确认',
+    'addTag.cancel': '取消',
+    'addTag.pleaseSelect': '请选择',
 };

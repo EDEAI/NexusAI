@@ -242,5 +242,7 @@ const useSocketStore = create(
         { name: 'useSocketStore' },
     ),
 );
-
+useSocketStore.subscribe(e => {
+    console.log('socket store change', e.flowMessage);
+});
 export default createSelectors(useSocketStore);

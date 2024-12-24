@@ -9,25 +9,24 @@ import {
     Popover,
     Radio,
     Row,
-    Select,
     Spin,
     Typography,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 // import {Ellipsis} from '@ant-design/pro-components';
 import { DeleteCreation, GetChatroom, PutappsUpdate } from '@/api/creation';
+import { bindTag, unBindTag } from '@/api/workflow';
 import Headportrait from '@/components/headportrait';
 import Scroll from '@/components/InfiniteScroll';
+import TagSearch, { TagSelect, useTags } from '@/components/TagSearch';
 import useUserStore from '@/store/user';
 import { createappdata, creationsearchdata, getlist, headportrait } from '@/utils/useUser';
 import { useIntl } from '@umijs/max';
-import { SelectProps } from 'antd/lib';
 import moment from 'moment';
 import { history } from 'umi';
 import CreationModal from '../../components/creationModal';
 import AddCreation from './components/AddCreation';
 import Profilephoto from './components/profilephoto';
-import TagSearch from '@/components/TagSearch';
 const { Text, Paragraph } = Typography;
 
 const { TextArea } = Input;
@@ -304,12 +303,14 @@ const Creation: React.FC = () => {
         setRunId(item.app_id);
     };
 
-    const [tagList, setTagList] = useState<SelectProps['options']>([
-        {
-            label: 'All',
-            value: 'All',
-        },
-    ]);
+    // const [tagList, setTagList] = useState<SelectProps['options']>([
+    //     {
+    //         label: 'All',
+    //         value: 'All',
+    //     },
+    // ]);
+    const { tagList, refreshTags } = useTags();
+    useEffect(() => {}, [optionsModalId]);
 
     return (
         <div
@@ -366,7 +367,12 @@ const Creation: React.FC = () => {
                             style={{ width: '100%' }}
                             options={tagList}
                         /> */}
-                        <TagSearch modes={creationsearchdata('GET').optionsModalId}></TagSearch>
+                        <TagSearch
+                            modes={creationsearchdata('GET').optionsModalId}
+                            onTagChange={() => {
+                                refreshTags();
+                            }}
+                        ></TagSearch>
                     </div>
                     <div className=" mr-5">
                         <Radio.Group
@@ -575,7 +581,7 @@ const Creation: React.FC = () => {
                                                               description={
                                                                   <div
                                                                       style={{
-                                                                          height: 70,
+                                                                          height: 100,
                                                                           margin: '20px 0 20px 0',
                                                                       }}
                                                                   >
@@ -585,6 +591,7 @@ const Creation: React.FC = () => {
                                                                               tooltip:
                                                                                   item.description,
                                                                           }}
+                                                                          className="!mb-0"
                                                                       >
                                                                           <div
                                                                               style={{
@@ -594,6 +601,76 @@ const Creation: React.FC = () => {
                                                                               {item.description}
                                                                           </div>
                                                                       </Paragraph>
+                                                                      <div
+                                                                          onClick={e => {
+                                                                              e.stopPropagation();
+                                                                          }}
+                                                                          className="not_has_down_select hover:bg-gray-100 rounded-md"
+                                                                      >
+                                                                          {/* <Select
+                                                                              mode="multiple"
+                                                                              size="middle"
+                                                                              variant="borderless"
+                                                                              placeholder={intl.formatMessage(
+                                                                                  {
+                                                                                      id: 'addTag.pleaseSelect',
+                                                                                      defaultMessage:
+                                                                                          'Please select',
+                                                                                  },
+                                                                              )}
+                                                                              maxTagCount="responsive"
+                                                                              onChange={e => {}}
+                                                                          
+                                                                              style={{
+                                                                                  width: '100%',
+                                                                              }}
+                                                                              options={tagList}
+                                                                          /> */}
+                                                                          <TagSelect
+                                                                              onBlur={e => {
+                                                                                //   const changeList=item.changeTags||(item.tags.map(x=>x.id))
+                                                                                //   const removeList=item.tags.filter(x=>!changeList.some(y=>y==x.id)).map(x=>x.id)
+                                                                                //   if(removeList?.length){
+                                                                                //     unBindTag(removeList,item.app_id).then(res=>{
+                                                                                //         item.tags=item.changeTags
+                                                                                //     })
+                                                                                //   }
+                                                                                //   if(item.changeTags?.length){
+                                                                                //     bindTag(item.changeTags, [
+                                                                                //         item.app_id,
+                                                                                //     ]);
+                                                                                //   }
+                                                                                  
+                                                                              }}
+                                                                              key={item.app_id}
+                                                                              onChange={e => {
+                                                                                const removeList=item.tags.filter(x=>!(e).some(y=>y==x.id)).map(x=>x.id||x)
+                                                                                if(removeList?.length){
+                                                                                    unBindTag(removeList,item.app_id).then(res=>{
+                                                                                        item.tags=e
+                                                                                    })
+                                                                                }
+                                                                                // item.changeTags=e;
+
+                                                                                  bindTag(e, [
+                                                                                      item.app_id,
+                                                                                  ]);
+                                                                              }}
+                                                                              
+                                                                              placeholder={intl.formatMessage(
+                                                                                  {
+                                                                                      id: 'addTag.addTag',
+                                                                                  },
+                                                                              )}
+                                                                              defaultValue={item.tags?.map(
+                                                                                  item => item.id,
+                                                                              )}
+                                                                              maxTagCount={5}
+                                                                              options={tagList}
+                                                                              className="!w-full"
+                                                                              variant="borderless"
+                                                                          ></TagSelect>
+                                                                      </div>
                                                                   </div>
                                                               }
                                                           />
