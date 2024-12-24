@@ -1,4 +1,4 @@
-import json
+import asyncio
 import os.path
 from datetime import date
 from mimetypes import guess_type
@@ -795,6 +795,8 @@ async def retrieval_test(
             Datasets().get_dataset_find(dataset_id, user_id, team_id)
 
         task = run_dataset.delay(dataset_id=dataset_id, user_id=user_id, user_input=user_input)
+        while not task.ready():
+            await asyncio.sleep(0.1)
         result = task.get()
         if result['status'] == 'failed':
             return response_error(get_language_content("api_vector_acquisition_failure"))

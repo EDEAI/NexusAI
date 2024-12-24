@@ -95,6 +95,8 @@ async def run(
                 ability_id=0,
                 prompt=prompt.to_dict()
             )
+            while not task.ready():
+                await asyncio.sleep(0.1)
             result = task.get(timeout=settings.APP_API_TIMEOUT)
             if result['status'] != 'success':
                 return response_error(result['message'])
