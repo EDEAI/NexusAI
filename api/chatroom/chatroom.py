@@ -1,9 +1,12 @@
-from core.database.models import (Chatrooms, Apps, ChatroomAgentRelation, ChatroomMessages)
+from core.database.models import (Chatrooms, Apps, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows)
 from fastapi import APIRouter
 from api.utils.common import *
 from api.utils.jwt import *
 from api.schema.chat import *
 from languages import get_language_content
+from core.workflow import (create_graph_from_dict, flatten_variable)
+from core.llm import Messages
+import json
 router = APIRouter()
 
 
@@ -455,3 +458,105 @@ async def show_chatroom_details(chatroom_id: int, page: int = 1, page_size: int 
     )
 
     return response_success(chatroom_history_msg)
+
+
+@router.post("/{chatroom_id}/chat_history_summary", response_model=ChatRoomResponseBase, summary="Chat History Summary")
+async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummary, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Use specified properties to query existing applications.
+    Distinguish between agents and workFlows based on the current application
+    By using the parameter passing rules of agent&workFlows, the splicing parameters are disassembled and the chat history is summarized through LLM to obtain the meeting summary content
+    Parameters:
+    -Chatroom_id (int): The unique identifier of the chat room to be updated. Compulsory.
+    -Chat_dequest (ChatHistorySummary): app_id Application ID.
+    -Userinfo (TokenData): Information about the current user is provided through dependency injection. Compulsory.
+
+    Returns:
+    - A response object representing a successful operation and containing the parameters returned by LLM for front-end processing and manual authentication.
+
+    Raises:
+    - HTTPException: If any required parameters are missing or invalid, or if the user has not been authenticated.
+    """
+    chat_data = chat_request.dict(exclude_unset=True)
+    app_id: int = chat_data['app_id']
+    app_info = Apps().get_app_by_id_search(app_id)
+    if app_info is None:
+        return response_error(get_language_content("api_agent_info_app_error"))
+
+    if app_info['user_id'] != userinfo.uid:
+        if app_info['is_public'] != 1:
+            return response_error(get_language_content("api_agent_info_not_creators"))
+
+    find_chatroom = Chatrooms().search_chatrooms_id(chatroom_id, userinfo.uid)
+    if not find_chatroom['status']:
+        return response_error(get_language_content("chatroom_does_not_exist"))
+
+    # chat_message = ChatroomMessages().search_chatroom_message_asc_id(chatroom_id)
+
+    conditions = [
+        {"column": "chatroom_id", "value": chatroom_id}
+    ]
+
+    chat_message = ChatroomMessages().select(
+        columns=["message"],
+        conditions=conditions,
+        order_by="id ASC",
+    )
+
+    app_id = app_info["id"]
+
+    if app_info['mode'] == 1:
+        apps_model = Agents()
+        agent = apps_model.select_one(
+            columns=['input_variables'],
+            conditions=[
+                {"column": "app_id", "value": app_id},
+                {"column": "status", "value": 1},
+                {"column": "publish_status", "value": 1},
+            ]
+        )
+        print(agent)
+        exit()
+    if app_info['mode'] == 2:
+        workflow = Workflows().select_one(
+            columns=['graph'],
+            conditions=[
+                {'column': 'app_id', 'value': app_id},
+                {'column': 'status', 'value': 1},
+                {'column': 'publish_status', 'value': 1}
+            ]
+        )
+        if workflow is None:
+            return
+        graph = create_graph_from_dict(workflow['graph'])
+        input_var = graph.nodes.nodes[0].data['input']
+        input_var = flatten_variable(input_var)
+
+        # If the last speaker is the user, the Speaker Selector must choose an agent
+        system_prompt = get_language_content(
+            'chatroom_manager_system_with_optional_selection_return',
+            userinfo.uid
+        )
+
+        user_prompt = get_language_content(
+            'chatroom_manager_user_return',
+            userinfo.uid
+        )
+
+        user_prompt = user_prompt.format(
+            messages=json.dumps(chat_message, ensure_ascii=False),
+            input_var=input_var
+        )
+
+
+        print(system_prompt)
+        print(user_prompt)
+        exit()
+
+        # Prepare the input for the Speaker Selector
+        input_messages = Messages()
+        input_messages.add_prompt(Prompt(system_prompt, user_prompt))
+
+        print(flatten_variable(input_var))
+        exit()
+    # return response_success({'chatroom_id': chatroom_id})

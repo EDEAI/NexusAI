@@ -159,3 +159,7 @@ class ChatRoomResponseBase(ResponseBase):
 class ToggleSmartSelectionSwitch(BaseModel):
     smart_selection: Literal[0, 1]
 
+
+class ChatHistorySummary(BaseModel):
+    app_id: Optional[int] = None
+

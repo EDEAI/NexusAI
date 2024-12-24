@@ -228,3 +228,21 @@ class Apps(MySQL):
         sql = f"UPDATE {self.table_name} SET api_token = '{api_token}' WHERE id = {app_id} AND api_token IS NULL"
         result = self.execute_query(sql)
         return result.rowcount > 0
+
+    def get_app_by_id_search(self, app_id: int) -> Dict[str, Any]:
+        app = self.select_one(
+            columns=[
+                'id',
+                'team_id',
+                'mode',
+                'is_public',
+                'user_id'
+            ],
+            conditions=[
+                {'column': 'id', 'value': app_id},
+                {'column': 'status', 'value': 1},
+                {'column': 'mode', 'op': 'in', 'value': [1, 2]},
+                {'column': 'publish_status', 'value': 1}
+            ]
+        )
+        return app
