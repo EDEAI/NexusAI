@@ -27,6 +27,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { useIntl, useSearchParams } from 'umi';
 import { CustomWorkflowContextProvider } from './context';
 import useDnD from './hooks/useDnD';
+import NodePanel from './NodePanel'
 import './index.less';
 
 import { PlayCircleOutlined, SyncOutlined } from '@ant-design/icons';
@@ -305,12 +306,7 @@ const DnDFlow = () => {
             <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                 <CustomWorkflowContextProvider>
                     <Background></Background>
-                    {/* <Controls
-                        style={{
-                            display: 'table',
-                        }}
-                        position="top-right"
-                    ></Controls> */}
+                     
                     <div>
                         <MiniMap
                             className="table"
@@ -324,12 +320,7 @@ const DnDFlow = () => {
                 </CustomWorkflowContextProvider>
             </div>
             <div className="fixed left-8 top-16 flex  flex-col gap-2 pt-3 pl-4">
-                {/* <div className="cursor-pointer flex items-center" >
-                    <Button type="link" danger className="p-0">
-                        <ArrowLeftOutlined className="text-[#1B64F3] w-4 h-4" />
-                    </Button>
-                    <span className="ml-[5px] text-[#213044] text-sm"></span>
-                </div> */}
+             
                 <Typography.Title className="!m-0" level={5}>
                     {workFlowInfo?.app?.name}
                 </Typography.Title>
@@ -340,6 +331,7 @@ const DnDFlow = () => {
                 )}
                 <Typography.Text>{workFlowInfo?.app?.description}</Typography.Text>
             </div>
+            <NodePanel></NodePanel>
             <Tools />
 
 

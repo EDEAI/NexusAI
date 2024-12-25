@@ -242,7 +242,7 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    height: '174px',
+                    height: '194px',
                 }}
             >
                 {optionsModalId === 6 ? (

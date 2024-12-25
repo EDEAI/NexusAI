@@ -92,7 +92,7 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     return {
                         ...item,
                         title: item.name,
-                        icon: BlockEnum.Agent,
+                    
                     };
                 }) || [];
         } else if (e == '3') {
@@ -102,8 +102,7 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                 skillList?.map(item => {
                     return {
                         ...item,
-                        title: item.name,
-                        icon: BlockEnum.Skill,
+                        title: item.name
                     };
                 }) || [];
         }
@@ -152,6 +151,9 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     desc: item.description || '',
                     baseData: item,
                 };
+                if (item.icon) {
+                    createData.icon = item.icon;
+                }
             }
         }
 

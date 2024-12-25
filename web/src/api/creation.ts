@@ -56,3 +56,4 @@ export const PutappsUpdate = async (data: any) => {
     });
     return res;
 };
+

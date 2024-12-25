@@ -12,12 +12,14 @@ import {
     Spin,
     Typography,
 } from 'antd';
-import { useLocation } from 'umi';
 import React, { useEffect, useState } from 'react';
 // import {Ellipsis} from '@ant-design/pro-components';
 import { DeleteCreation, GetChatroom, PutappsUpdate } from '@/api/creation';
+import { bindTag, unBindTag } from '@/api/workflow';
 import Headportrait from '@/components/headportrait';
 import Scroll from '@/components/InfiniteScroll';
+import TagSearch, { TagSelect, useTags } from '@/components/TagSearch';
+import useUserStore from '@/store/user';
 import { createappdata, creationsearchdata, getlist, headportrait } from '@/utils/useUser';
 import { useIntl } from '@umijs/max';
 import moment from 'moment';
@@ -25,12 +27,10 @@ import { history } from 'umi';
 import CreationModal from '../../components/creationModal';
 import AddCreation from './components/AddCreation';
 import Profilephoto from './components/profilephoto';
-import useUserStore from "@/store/user";
 const { Text, Paragraph } = Typography;
 
 const { TextArea } = Input;
 const Creation: React.FC = () => {
-   
     const intl = useIntl();
     const [CreationList, setCreationList] = useState(null);
     const [apppage, setAPPPage] = useState(1);
@@ -39,7 +39,6 @@ const Creation: React.FC = () => {
     const [CreationContent, setCreationContent] = useState('');
     const [CardData, setCardData] = useState(null);
     const [showTab, showTabfun] = useState(false);
-    
 
     const [establishModal, setEstablishModal] = useState(false);
     const [CreationType, setcreationType] = useState({
@@ -98,8 +97,6 @@ const Creation: React.FC = () => {
         },
     ];
 
-
-
     const [optionsModalId, setOptionsModalId] = useState(6);
     const [searchType, setSearchType] = useState(false);
     const [fuzzySearchName, setFuzzySearchName] = useState('');
@@ -136,7 +133,6 @@ const Creation: React.FC = () => {
         slide?: Boolean,
         page_size?: Number,
     ) => {
-
         const parameter = {
             page: page ? page : apppage,
             page_size: 27,
@@ -160,22 +156,18 @@ const Creation: React.FC = () => {
     };
     useEffect(() => {
         getlist();
-       
-        if(location.pathname=='/knowledgebase'){
-            let item =   {
-                    apps_mode: 3,
-                    name: intl.formatMessage({ id: 'creation.repository' }),
-                    path: 'Createkb',
-                    
-                };
+
+        if (location.pathname == '/knowledgebase') {
+            let item = {
+                apps_mode: 3,
+                name: intl.formatMessage({ id: 'creation.repository' }),
+                path: 'Createkb',
+            };
             appModalChange(item);
-           
-        }else{
-            showTabfun(true)
+        } else {
+            showTabfun(true);
             getChatRoomList(1, null);
         }
-
-
     }, []);
 
     const pageonChange = () => {
@@ -192,7 +184,6 @@ const Creation: React.FC = () => {
         );
         getChatRoomList(1, searchType, value.apps_mode);
     };
-   
 
     const appNameChange = (e: any) => {
         setFuzzySearchName(e.target.value);
@@ -204,7 +195,6 @@ const Creation: React.FC = () => {
     };
 
     const handleOk = async () => {
-
         let param = {
             name: CreationName,
             description: CreationContent,
@@ -221,7 +211,6 @@ const Creation: React.FC = () => {
 
             getChatRoomList(1, searchType, null, null, null, apppage * 27);
         } else {
-
         }
     };
 
@@ -242,7 +231,6 @@ const Creation: React.FC = () => {
     };
 
     const EntryDetails = (data: any) => {
-
         event.stopPropagation();
         createappdata('SET', { ...data, type: creationsearchdata('GET').searchType });
         const Type = Modetype.filter((item: any) => {
@@ -256,7 +244,6 @@ const Creation: React.FC = () => {
                 }`,
             );
         } else {
-
             history.push(
                 `/${Type[0].path}?app_id=${data.app_id ? data.app_id : data.apps_id}&type=${
                     creationsearchdata('GET').searchType
@@ -279,8 +266,7 @@ const Creation: React.FC = () => {
                     message.error(intl.formatMessage({ id: 'creation.modal.delerror' }));
                 }
             },
-            onCancel() {
-            },
+            onCancel() {},
         });
     };
 
@@ -310,14 +296,21 @@ const Creation: React.FC = () => {
                   },
         );
     };
-  const setRunId = useUserStore(state => state.setRunId);
-  const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
-  const setDealtWithData = useUserStore(state => state.setDealtWithData);
-    const toRunWorkFlow=(item)=>{
+    const setRunId = useUserStore(state => state.setRunId);
+    const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
+    const setDealtWithData = useUserStore(state => state.setDealtWithData);
+    const toRunWorkFlow = item => {
+        setRunId(item.app_id);
+    };
 
-      setRunId(item.app_id)
-    }
-
+    // const [tagList, setTagList] = useState<SelectProps['options']>([
+    //     {
+    //         label: 'All',
+    //         value: 'All',
+    //     },
+    // ]);
+    const { tagList, refreshTags } = useTags();
+    useEffect(() => {}, [optionsModalId]);
 
     return (
         <div
@@ -325,45 +318,63 @@ const Creation: React.FC = () => {
             style={{ height: 'calc(-60px + 100vh)', width: '100%', margin: '0 auto' }}
         >
             <div className="flex px-[30px] py-[20px] mx-[8px] items-center justify-between">
-            <div className="flex items-center">
-                    { showTab?optionsModal.map((item: any, i: number) => {
-                        return (
-                            // <Button color="primary" variant="filled"
-                            // icon={ <img src={item.icon} alt="" />}
-                            // >
-                            //   {item.name}
-                            // </Button>
-                            <div
-                                onClick={() => {
-                                    appModalChange(item);
-                                }}
-                                className="flex justify-center items-center h-8 rounded-lg mr-4 cursor-pointer px-[10px]"
-                                style={
-                                    creationsearchdata('GET').optionsModalId == item.apps_mode
-                                        ? { color: '#1B64F3', backgroundColor: '#ffffff' }
-                                        : { color: '#9097a1' }
-                                }
-                            >
-                                <div className="mr-2">
-                                    <img
-                                        src={
-                                            creationsearchdata('GET').optionsModalId ==
-                                            item.apps_mode
-                                                ? item.pitchicon
-                                                : item.unselected
-                                        }
-                                        alt=""
-                                    />
-                                </div>
-                                <div>{item.name}</div>
-                            </div>
-                        );
-                    }):''}
-                </div>
-              
-               
                 <div className="flex items-center">
-                    <div className="min-w-40 flex justify-end mr-5">
+                    {showTab
+                        ? optionsModal.map((item: any, i: number) => {
+                              return (
+                                  // <Button color="primary" variant="filled"
+                                  // icon={ <img src={item.icon} alt="" />}
+                                  // >
+                                  //   {item.name}
+                                  // </Button>
+                                  <div
+                                      onClick={() => {
+                                          appModalChange(item);
+                                      }}
+                                      className="flex justify-center items-center h-8 rounded-lg mr-4 cursor-pointer px-[10px]"
+                                      style={
+                                          creationsearchdata('GET').optionsModalId == item.apps_mode
+                                              ? { color: '#1B64F3', backgroundColor: '#ffffff' }
+                                              : { color: '#9097a1' }
+                                      }
+                                  >
+                                      <div className="mr-2">
+                                          <img
+                                              src={
+                                                  creationsearchdata('GET').optionsModalId ==
+                                                  item.apps_mode
+                                                      ? item.pitchicon
+                                                      : item.unselected
+                                              }
+                                              alt=""
+                                          />
+                                      </div>
+                                      <div>{item.name}</div>
+                                  </div>
+                              );
+                          })
+                        : ''}
+                </div>
+
+                <div className="flex items-center">
+                    <div className="min-w-[200px] mr-4">
+                        {/* <Select
+                            mode="multiple"
+                            size='middle'
+                            placeholder="Please select"
+                            defaultValue={['a10', 'c12']}
+                            onChange={()=>{}}
+                            style={{ width: '100%' }}
+                            options={tagList}
+                        /> */}
+                        <TagSearch
+                            modes={creationsearchdata('GET').optionsModalId}
+                            onTagChange={() => {
+                                refreshTags();
+                            }}
+                        ></TagSearch>
+                    </div>
+                    <div className=" mr-5">
                         <Radio.Group
                             onChange={teamSwitch}
                             defaultValue={JSON.stringify(creationsearchdata('GET').searchType)}
@@ -445,7 +456,20 @@ const Creation: React.FC = () => {
                                                                                   item.icon,
                                                                               )}
                                                                               icon={
-                                                                                  creationsearchdata('GET',).optionsModalId === 6 ? optionsModal.filter( ( value: any, ) => value.apps_mode === item.mode, )[0]?.signicon : null
+                                                                                  creationsearchdata(
+                                                                                      'GET',
+                                                                                  )
+                                                                                      .optionsModalId ===
+                                                                                  6
+                                                                                      ? optionsModal.filter(
+                                                                                            (
+                                                                                                value: any,
+                                                                                            ) =>
+                                                                                                value.apps_mode ===
+                                                                                                item.mode,
+                                                                                        )[0]
+                                                                                            ?.signicon
+                                                                                      : null
                                                                               }
                                                                           />
                                                                       </div>
@@ -557,7 +581,7 @@ const Creation: React.FC = () => {
                                                               description={
                                                                   <div
                                                                       style={{
-                                                                          height: 70,
+                                                                          height: 100,
                                                                           margin: '20px 0 20px 0',
                                                                       }}
                                                                   >
@@ -567,6 +591,7 @@ const Creation: React.FC = () => {
                                                                               tooltip:
                                                                                   item.description,
                                                                           }}
+                                                                          className="!mb-0"
                                                                       >
                                                                           <div
                                                                               style={{
@@ -576,6 +601,76 @@ const Creation: React.FC = () => {
                                                                               {item.description}
                                                                           </div>
                                                                       </Paragraph>
+                                                                      <div
+                                                                          onClick={e => {
+                                                                              e.stopPropagation();
+                                                                          }}
+                                                                          className="not_has_down_select hover:bg-gray-100 rounded-md"
+                                                                      >
+                                                                          {/* <Select
+                                                                              mode="multiple"
+                                                                              size="middle"
+                                                                              variant="borderless"
+                                                                              placeholder={intl.formatMessage(
+                                                                                  {
+                                                                                      id: 'addTag.pleaseSelect',
+                                                                                      defaultMessage:
+                                                                                          'Please select',
+                                                                                  },
+                                                                              )}
+                                                                              maxTagCount="responsive"
+                                                                              onChange={e => {}}
+                                                                          
+                                                                              style={{
+                                                                                  width: '100%',
+                                                                              }}
+                                                                              options={tagList}
+                                                                          /> */}
+                                                                          <TagSelect
+                                                                              onBlur={e => {
+                                                                                //   const changeList=item.changeTags||(item.tags.map(x=>x.id))
+                                                                                //   const removeList=item.tags.filter(x=>!changeList.some(y=>y==x.id)).map(x=>x.id)
+                                                                                //   if(removeList?.length){
+                                                                                //     unBindTag(removeList,item.app_id).then(res=>{
+                                                                                //         item.tags=item.changeTags
+                                                                                //     })
+                                                                                //   }
+                                                                                //   if(item.changeTags?.length){
+                                                                                //     bindTag(item.changeTags, [
+                                                                                //         item.app_id,
+                                                                                //     ]);
+                                                                                //   }
+                                                                                  
+                                                                              }}
+                                                                              key={item.app_id}
+                                                                              onChange={e => {
+                                                                                const removeList=item.tags.filter(x=>!(e).some(y=>y==x.id)).map(x=>x.id||x)
+                                                                                if(removeList?.length){
+                                                                                    unBindTag(removeList,item.app_id).then(res=>{
+                                                                                        item.tags=e
+                                                                                    })
+                                                                                }
+                                                                                // item.changeTags=e;
+
+                                                                                  bindTag(e, [
+                                                                                      item.app_id,
+                                                                                  ]);
+                                                                              }}
+                                                                              
+                                                                              placeholder={intl.formatMessage(
+                                                                                  {
+                                                                                      id: 'addTag.addTag',
+                                                                                  },
+                                                                              )}
+                                                                              defaultValue={item.tags?.map(
+                                                                                  item => item.id,
+                                                                              )}
+                                                                              maxTagCount={5}
+                                                                              options={tagList}
+                                                                              className="!w-full"
+                                                                              variant="borderless"
+                                                                          ></TagSelect>
+                                                                      </div>
                                                                   </div>
                                                               }
                                                           />
@@ -627,22 +722,30 @@ const Creation: React.FC = () => {
                                                                                                   <div className="text-xs font-normal text-[#666]">
                                                                                                       {value?.mode ==
                                                                                                       1
-                                                                                                          ? intl.formatMessage({
-                                                                                                          id:'workflow.agent'
-                                                                                                        })
+                                                                                                          ? intl.formatMessage(
+                                                                                                                {
+                                                                                                                    id: 'workflow.agent',
+                                                                                                                },
+                                                                                                            )
                                                                                                           : value?.mode ==
                                                                                                             2
-                                                                                                          ? intl.formatMessage({
-                                                                                                            id:'component.menu.workflow'
-                                                                                                          })
+                                                                                                          ? intl.formatMessage(
+                                                                                                                {
+                                                                                                                    id: 'component.menu.workflow',
+                                                                                                                },
+                                                                                                            )
                                                                                                           : value?.mode ==
                                                                                                             3
-                                                                                                          ? intl.formatMessage({
-                                                                                                              id:'component.menu.knowledgeBase'
-                                                                                                            })
-                                                                                                          : intl.formatMessage({
-                                                                                                              id:'workflow.skill'
-                                                                                                            })}
+                                                                                                          ? intl.formatMessage(
+                                                                                                                {
+                                                                                                                    id: 'component.menu.knowledgeBase',
+                                                                                                                },
+                                                                                                            )
+                                                                                                          : intl.formatMessage(
+                                                                                                                {
+                                                                                                                    id: 'workflow.skill',
+                                                                                                                },
+                                                                                                            )}
                                                                                                   </div>
                                                                                               </div>
                                                                                           </div>
@@ -697,27 +800,33 @@ const Creation: React.FC = () => {
                                                                   </Popover>
                                                               ) : null}
                                                           </div>
-                                                        {
-                                                          (item?.mode===2)?<div className='flex-1 flex justify-end items-center'>
-                                                            {
-                                                              (item?.publish_status == 1) ?
-                                                                <img onClick={() => toRunWorkFlow(item)}
-                                                                     src='/icons/operation_icon.svg'
-                                                                     className='mr-2'/> :
-                                                                <img src='/icons/operation_disable_icon.svg'
-                                                                     className='mr-2'/>
-                                                            }
-                                                          </div>:null
-                                                        }
-                                                        <div>
-                                                          {!JSON.parse(
-                                                            creationsearchdata('GET')
-                                                              ?.searchType,
-                                                          ) ? (
-                                                            <Popover
-                                                              placement="rightTop"
-                                                              open={
-                                                                opensetting == i
+                                                          {item?.mode === 2 ? (
+                                                              <div className="flex-1 flex justify-end items-center">
+                                                                  {item?.publish_status == 1 ? (
+                                                                      <img
+                                                                          onClick={() =>
+                                                                              toRunWorkFlow(item)
+                                                                          }
+                                                                          src="/icons/operation_icon.svg"
+                                                                          className="mr-2"
+                                                                      />
+                                                                  ) : (
+                                                                      <img
+                                                                          src="/icons/operation_disable_icon.svg"
+                                                                          className="mr-2"
+                                                                      />
+                                                                  )}
+                                                              </div>
+                                                          ) : null}
+                                                          <div>
+                                                              {!JSON.parse(
+                                                                  creationsearchdata('GET')
+                                                                      ?.searchType,
+                                                              ) ? (
+                                                                  <Popover
+                                                                      placement="rightTop"
+                                                                      open={
+                                                                          opensetting == i
                                                                               ? true
                                                                               : false
                                                                       }
@@ -819,7 +928,6 @@ const Creation: React.FC = () => {
                         </div>
                     ) : null}
                 </div>
-
             </Spin>
             <Modal
                 title=""

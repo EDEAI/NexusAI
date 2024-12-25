@@ -2,7 +2,7 @@
  * @LastEditors: biz
  */
 export default {
-    'creation': 'Create',
+    creation: 'Create',
     'creation.all': 'All',
     'creation.agent': 'Agent',
     'creation.importWorkflow': 'Import Workflow',
@@ -34,4 +34,14 @@ export default {
     'creation.publish': 'Publish',
     'creation.havepublished': 'Released',
     'creation.unpublish': 'Unpublished',
+
+    'addTag.all': 'All',
+    'addTag.addTag': 'Add Tag',
+    'addTag.inputTagName': 'Enter tag name',
+    'addTag.deleteTag': 'Delete',
+    'addTag.deleteConfirmation1': 'The current Tag is associated with',
+    'addTag.deleteConfirmation2': 'applications, are you sure to delete?',
+    'addTag.confirm': 'Confirm',
+    'addTag.cancel': 'Cancel',
+    'addTag.pleaseSelect': 'Please select',
 };

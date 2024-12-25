@@ -430,9 +430,11 @@ const Coldom = () => {
             ?.filter(item => item.type == 'workflow_need_human_confirm')
             .map(({ data }) => data)
             ?.filter(item => item.type !== 1);
+
         let progress = flowMessage
             ?.filter(item => item.type == 'workflow_run_progress')
             .map(({ data }) => data);
+            
         if ((backlogs && backlogs.length) || (progress && progress.length)) {
             setColstate(pre => {
                 return pre.map((item: any) => {
