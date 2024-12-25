@@ -27,10 +27,6 @@ class CreateTagBindingRequest(BaseModel):
     tag_ids: List[int]
     app_ids: List[int]
 
-class DeleteTagBindingRequest(BaseModel):
-    tag_ids: List[int]
-    app_id: int
-
 class TagListBase(BaseModel):
     id: Optional[int] = None
     mode: Optional[int] = None
