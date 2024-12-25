@@ -14,7 +14,7 @@ class TagBindings(MySQL):
     """
     have_updated_time = True
 
-    def get_tag_apps_by_tag_id(self, tag_id: str, mode: str) -> list:
+    def get_tag_apps_by_tag_id(self, tag_id: str, user_id: int, mode: str) -> list:
         """
         Retrieves a tag by its ID.
 
@@ -35,6 +35,7 @@ class TagBindings(MySQL):
             ],
             conditions=[
                 {"column": "tags.id", "op": "in", "value": tag_ids},
+                {"column": "tags.user_id", "value": user_id},
                 {"column": "tags.mode", "op": "in", "value": _mode}
             ]
         )
@@ -43,7 +44,7 @@ class TagBindings(MySQL):
 
         return app_list
 
-    def get_tags_by_app_id(self, app_id: int) -> List[Dict[str, Any]]:
+    def get_tags_by_app_id(self, app_id: int, user_id: int) -> List[Dict[str, Any]]:
         """
         Retrieves all tags (with id and name) bound to a specific app.
 
@@ -61,6 +62,7 @@ class TagBindings(MySQL):
             ],
             conditions=[
                 {"column": "tag_bindings.app_id", "value": app_id},
+                {"column": "tags.user_id", "value": user_id},
                 {"column": "tags.status", "value": 1}
             ]
         )

@@ -13,7 +13,7 @@ class Tags(MySQL):
     """
     have_updated_time = True
 
-    def get_tag_by_id(self, tag_id: int) -> Dict[str, Any]:
+    def get_tag_by_id(self, tag_id: int, user_id: int, team_id: int) -> Dict[str, Any]:
         """
         Retrieves a tag by its ID.
 
@@ -33,6 +33,8 @@ class Tags(MySQL):
             ],
             conditions=[
                 {"column": "id", "value": tag_id},
+                {"column": "user_id", "value": user_id},
+                {"column": "team_id", "value": team_id},
                 {"column": "status", "value": 1}
             ]
         )
