@@ -6,6 +6,7 @@ from decimal import Decimal
 class BackLogsData(BaseModel):
     app_run_id: Optional[int] = None
     app_run_name: Optional[str] = None
+    app_id: Optional[int] = None
     app_name: Optional[str] = None
     mode: Optional[int] = None
     node_execution_id: Optional[int] = None
