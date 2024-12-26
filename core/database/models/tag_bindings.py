@@ -12,7 +12,7 @@ class TagBindings(MySQL):
     """
     Indicates whether the `tag_bindings` table has an `update_time` column that tracks when a record was last updated.
     """
-    have_updated_time = True
+    have_updated_time = False
 
     def get_tag_apps_by_tag_id(self, tag_id: str, user_id: int, mode: str) -> list:
         """
@@ -66,5 +66,65 @@ class TagBindings(MySQL):
                 {"column": "tags.status", "value": 1}
             ]
         )
-
         return tags
+
+    def get_tag_binding_by_count_id(self, tag_id: int) -> int:
+        '''
+        Get the count of bindings for a specific tag.
+        '''
+        result = self.select_one(
+            aggregates={"id": "count"},
+            conditions=[{"column": "tag_id", "value": tag_id}]
+        )
+        return result['count_id'] if result else 0
+
+    def batch_update_bindings(self, app_ids: List[int], tag_ids: List[int] = None) -> bool:
+        """
+        Update tag bindings for multiple apps.
+        If tag_ids is None, remove all bindings for the given apps.
+
+        Args:
+            app_ids (List[int]): List of app IDs
+            tag_ids (List[int], optional): List of tag IDs to bind. Defaults to None.
+
+        Returns:
+            bool: True if operation successful
+        """
+        try:
+            # Get existing bindings
+            existing_bindings = self.select(
+                columns=["tag_id", "app_id"],
+                conditions=[{"column": "app_id", "op": "in", "value": app_ids}]
+            )
+            
+            existing_map = {binding['app_id']: set() for binding in existing_bindings}
+            for binding in existing_bindings:
+                existing_map[binding['app_id']].add(binding['tag_id'])
+
+            for app_id in app_ids:
+                existing_tag_ids = existing_map.get(app_id, set())
+                
+                if not tag_ids:
+                    # Remove all bindings if tag_ids is empty
+                    self.delete([{"column": "app_id", "value": app_id}])
+                else:
+                    # Calculate differences
+                    tags_to_add = set(tag_ids) - existing_tag_ids
+                    tags_to_remove = existing_tag_ids - set(tag_ids)
+
+                    # Remove old bindings
+                    if tags_to_remove:
+                        self.delete([
+                            {"column": "tag_id", "op": "in", "value": list(tags_to_remove)},
+                            {"column": "app_id", "value": app_id}
+                        ])
+
+                    # Add new bindings
+                    for tag_id in tags_to_add:
+                        self.insert({
+                            'tag_id': tag_id,
+                            'app_id': app_id
+                        })
+            return True
+        except Exception:
+            return False

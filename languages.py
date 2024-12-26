@@ -487,6 +487,7 @@ language_packs = {
         },
         'tag_id_not_found': 'Tag ID not found',
         'tag_update_success': 'Tag update success',
+        'tag_update_failed': 'Tag update failed',
         'tag_delete_success': 'Tag delete success',
         'tag_binding_create_success': 'Tag binding create success',
         'tag_binding_delete_success': 'Tag binding delete success',
@@ -732,10 +733,11 @@ language_packs = {
         },
         'tag_id_not_found': '标签ID不存在',
         'tag_update_success': '标签更新成功',
+        'tag_update_failed': '标签更新失败',
         'tag_delete_success': '标签删除成功',
         'tag_binding_create_success': '标签绑定创建成功',
         'tag_binding_delete_success': '标签绑定删除成功',
-        'team_id_not_found': '团队ID不存在'
+        'team_id_not_found': '团队ID不存在',
     }
 }
 
