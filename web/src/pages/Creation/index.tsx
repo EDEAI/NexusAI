@@ -27,6 +27,7 @@ import { history } from 'umi';
 import CreationModal from '../../components/creationModal';
 import AddCreation from './components/AddCreation';
 import Profilephoto from './components/profilephoto';
+import { use } from '@reactuses/core';
 const { Text, Paragraph } = Typography;
 
 const { TextArea } = Input;
@@ -124,7 +125,7 @@ const Creation: React.FC = () => {
     ]); //1: agent 2: workflow 3: dataset 4: custom tool 5: chatroom
     const [loading, setLoading] = useState(true);
     const [opensetting, setOpensetting] = useState(-1);
-
+    const [selectedTags, setSelectedTags]=useState<string[]>([]);
     const getChatRoomList = async (
         page?: any,
         searchTypedata?: any,
@@ -132,6 +133,7 @@ const Creation: React.FC = () => {
         apps_name?: string,
         slide?: Boolean,
         page_size?: Number,
+        tag_ids?: string[],
     ) => {
         const parameter = {
             page: page ? page : apppage,
@@ -139,6 +141,7 @@ const Creation: React.FC = () => {
             search_type: creationsearchdata('GET').searchType == true ? 2 : 1,
             apps_mode: creationsearchdata('GET').optionsModalId,
             apps_name: apps_name || apps_name == '' ? apps_name : fuzzySearchName,
+            tag_ids:tag_ids?tag_ids.join(','):''
         };
         setLoading(true);
         let res = await GetChatroom(parameter);
@@ -189,7 +192,9 @@ const Creation: React.FC = () => {
         setFuzzySearchName(e.target.value);
         getChatRoomList(1, searchType, optionsModalId, e.target.value);
     };
-
+    useEffect(()=>{
+        getChatRoomList(1, searchType, optionsModalId, fuzzySearchName,null,null,selectedTags);
+    },[selectedTags])
     const handleCancel = () => {
         setIsModalOpen(false);
     };
@@ -310,6 +315,7 @@ const Creation: React.FC = () => {
     //     },
     // ]);
     const { tagList, refreshTags } = useTags();
+    
     useEffect(() => {}, [optionsModalId]);
 
     return (
@@ -368,9 +374,13 @@ const Creation: React.FC = () => {
                             options={tagList}
                         /> */}
                         <TagSearch
+                            allowClear
                             modes={creationsearchdata('GET').optionsModalId}
                             onTagChange={() => {
                                 refreshTags();
+                            }}
+                            onChange={(e)=>{
+                                setSelectedTags(e)
                             }}
                         ></TagSearch>
                     </div>
@@ -636,25 +646,25 @@ const Creation: React.FC = () => {
                                                                                 //     })
                                                                                 //   }
                                                                                 //   if(item.changeTags?.length){
-                                                                                //     bindTag(item.changeTags, [
-                                                                                //         item.app_id,
-                                                                                //     ]);
+                                                                                    bindTag(item.changeTags, [
+                                                                                        item.app_id,
+                                                                                    ]);
                                                                                 //   }
                                                                                   
                                                                               }}
                                                                               key={item.app_id}
                                                                               onChange={e => {
-                                                                                const removeList=item.tags.filter(x=>!(e).some(y=>y==x.id)).map(x=>x.id||x)
-                                                                                if(removeList?.length){
-                                                                                    unBindTag(removeList,item.app_id).then(res=>{
-                                                                                        item.tags=e
-                                                                                    })
-                                                                                }
-                                                                                // item.changeTags=e;
+                                                                                // const removeList=item.tags.filter(x=>!(e).some(y=>y==x.id)).map(x=>x.id||x)
+                                                                                // if(removeList?.length){
+                                                                                //     unBindTag(removeList,item.app_id).then(res=>{
+                                                                                //         item.tags=e
+                                                                                //     })
+                                                                                // }
+                                                                                item.changeTags=e;
 
-                                                                                  bindTag(e, [
-                                                                                      item.app_id,
-                                                                                  ]);
+                                                                                //   bindTag(e, [
+                                                                                //       item.app_id,
+                                                                                //   ]);
                                                                               }}
                                                                               
                                                                               placeholder={intl.formatMessage(
