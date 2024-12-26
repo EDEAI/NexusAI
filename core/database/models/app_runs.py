@@ -103,6 +103,7 @@ class AppRuns(MySQL):
             columns=[
                 'app_runs.id AS app_run_id', 
                 'app_runs.name AS app_run_name', 
+                'apps.id AS app_id',
                 'apps.name AS app_name', 
                 'apps.mode', 
                 'app_node_user_relation.node_id',

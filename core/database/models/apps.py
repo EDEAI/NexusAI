@@ -95,7 +95,7 @@ class Apps(MySQL):
         else:
             conditions.append({"column": "apps.mode", "op": "in", "value": [int(i) for i in apps_mode_list]})
         if tag_ids != '0' and tag_ids:
-            app_ids = TagBindings().get_tag_apps_by_tag_id(tag_ids, apps_mode)
+            app_ids = TagBindings().get_tag_apps_by_tag_id(tag_ids,user_id, apps_mode)
             conditions.append({"column": "apps.id", "op": "in", "value": app_ids})
         total_count = self.select_one(
             aggregates={"id": "count"},
@@ -116,7 +116,7 @@ class Apps(MySQL):
         workflow_app_ids = []
         other_app_ids = []
         for item in all_app:
-            tag_datas = TagBindings().get_tags_by_app_id(item['app_id'])
+            tag_datas = TagBindings().get_tags_by_app_id(item['app_id'],user_id)
             item['tags'] = tag_datas
             if item['mode'] == 2:  # Assuming mode 2 represents workflow apps
                 workflow_app_ids.append(item['app_id'])
