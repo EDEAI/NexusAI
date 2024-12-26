@@ -67,7 +67,7 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
         
     def run(
         self,
-        context: Context,
+        context: Context = None,
         workflow_id: int = 0,
         user_id: int = 0,
         type: int = 0,
@@ -100,7 +100,8 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             )
             
             prompt: Prompt = self.data["prompt"]
-            replace_prompt_with_context(prompt, context)
+            if context:
+                replace_prompt_with_context(prompt, context)
             
             # Escape braces in the prompt
             if system_prompt := prompt.get_system():
@@ -155,7 +156,8 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
                 context=context,
                 input=invoke_input,
                 file_list=file_list,
-                correct_llm_output=correct_llm_output
+                correct_llm_output=correct_llm_output,
+                return_json=kwargs.get('return_json', False)
             )
             outputs = Variable(name="text", type="string", value=content)
             if (

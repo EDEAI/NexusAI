@@ -4,17 +4,13 @@ os.environ['DATABASE_AUTO_COMMIT'] = 'True'
 
 from datetime import datetime
 from typing import List, Dict, Any, Literal, Optional
-
 from celery import Celery
-from langchain_core.documents import Document
 
 from config import settings
-from core.database.models import Agents, AppNodeExecutions, AppRuns, Apps, CustomTools, Datasets, UploadFiles, Workflows
-
+from core.database.models import Models, Agents, AppNodeExecutions, AppRuns, Apps, CustomTools, UploadFiles, Workflows
 from core.dataset import DatasetManagement, DatasetRetrieval
 from core.workflow import (
     ObjectVariable,
-    VariableTypes,
     create_variable_from_dict,
     Context,
     create_context_from_dict,
@@ -22,7 +18,7 @@ from core.workflow import (
     flatten_variable_with_values,
     get_first_variable_value
 )
-from core.workflow.nodes import AgentNode, SkillNode, create_node_from_dict, UPLOAD_FILES_KEY
+from core.workflow.nodes import AgentNode, LLMNode, SkillNode, create_node_from_dict, UPLOAD_FILES_KEY
 from core.workflow.nodes.base.import_to_kb_base import ImportToKBBaseNode
 from core.llm.prompt import create_prompt_from_dict
 from languages import get_language_content
@@ -267,6 +263,25 @@ def import_output_variable_to_knowledge_base(
         {'need_human_confirm': 0}
     )
 
+@celery_app.task
+def run_llm_tool(
+    team_id: int,
+    user_id: int,
+    app_run_id: int,
+    prompt_dict: Dict[str, Any],
+    return_json: bool = False,
+    correct_llm_output: bool = False,
+) -> Dict[str, Any]:
+    os.environ['ACTUAL_USER_ID'] = str(user_id)
+    models = Models()
+    model_info = models.get_model_by_type(1, team_id, uid=user_id)
+    prompt = create_prompt_from_dict(prompt_dict)
+    ai_tool = LLMNode(
+        title='AI Tool',
+        model_config_id=model_info['model_config_id'],
+        prompt=prompt,
+    )
+    return ai_tool.run(app_run_id=app_run_id, return_json=return_json, correct_llm_output=correct_llm_output)
 
 # Update Celery application configuration
 # Set the expiration time of task results to 3600 seconds (1 hour)
