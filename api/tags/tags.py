@@ -75,20 +75,20 @@ async def create_tag(request: CreateTagRequest, userinfo: TokenData = Depends(ge
         {"column": "status", "value": 1}
     ])
 
-    if team_info:
-        _mode = get_tags_mode_by_app_modes(request.mode)
-        tag_id = tag.insert({
-            'team_id': userinfo.team_id,
-            'user_id': userinfo.uid,
-            'mode': _mode[0],
-            'name': request.name,
-        })
-        new_tag = tag.select_one(columns={'id', 'team_id', 'user_id', 'name'}, conditions=[
-            {"column": "id", "value": tag_id}
-        ])
-        return response_success(new_tag)
-    else:
+    if not team_info:
         return response_error(get_language_content('team_id_not_found'))
+
+    _mode = get_tags_mode_by_app_modes(request.mode)
+    tag_id = tag.insert({
+        'team_id': userinfo.team_id,
+        'user_id': userinfo.uid,
+        'mode': _mode[0],
+        'name': request.name,
+    })
+    new_tag = tag.select_one(columns={'id', 'team_id', 'user_id', 'name'}, conditions=[
+        {"column": "id", "value": tag_id}
+    ])
+    return response_success(new_tag)
 
 @router.put("/tags/{tag_id}", response_model=TagResponse)
 async def update_tag(tag_id: int, request: UpdateTagRequest, userinfo: TokenData = Depends(get_current_user)):
@@ -108,7 +108,7 @@ async def update_tag(tag_id: int, request: UpdateTagRequest, userinfo: TokenData
     if not tag_info:
         return response_error(get_language_content('tag_id_not_found'))
     tag.update(
-        [{'column': 'id', 'value': tag_id}],
+        [{'column': 'id', 'value': tag_id}, {'column': 'team_id', 'value': userinfo.team_id}, {'column': 'user_id', 'value': userinfo.uid}],
         {'name': request.name}
     )
     return response_success(detail=get_language_content('tag_update_success'))
@@ -137,7 +137,7 @@ async def delete_tag(tag_id: int, userinfo: TokenData = Depends(get_current_user
 
     # Soft delete the tag by updating its status
     tag.update(
-        [{'column': 'id', 'value': tag_id}],
+        [{'column': 'id', 'value': tag_id}, {'column': 'team_id', 'value': userinfo.team_id}, {'column': 'user_id', 'value': userinfo.uid}],
         {'status': 3}  # 3 represents deleted status
     )
 
@@ -158,8 +158,6 @@ async def bind_tags(request: CreateTagBindingRequest, userinfo: TokenData = Depe
     tag_ids = request.tag_ids
     app_ids = request.app_ids
 
-    if not tag_ids:
-        return response_error(get_language_content('tag_id_not_found'))
     if not app_ids:
         return response_error(get_language_content('app_id_is_required'))
 
@@ -168,45 +166,45 @@ async def bind_tags(request: CreateTagBindingRequest, userinfo: TokenData = Depe
     if not app_data:
         return response_error(get_language_content('app_id_is_required'))
 
-    # Check if tags exist and are active
-    tag_info = tag.select(columns="*", conditions=[
-        {"column": "id", "op": "in", "value": tag_ids},
-        {"column": "team_id", "value": userinfo.team_id},
-        {"column": "user_id", "value": userinfo.uid},
-        {'column': 'status', 'value': 1}
-    ])
-    if not tag_info:
-        return response_error(get_language_content('tag_id_not_found'))
+    if tag_ids:
+        # Check if tags exist
+        tag_data = tag.select(columns="*", conditions=[{"column": "id", "op": "in", "value": tag_ids},{"column": "status", "value": 1},{"column": "team_id", "value": userinfo.team_id},{"column": "user_id", "value": userinfo.uid}])
+        if not tag_data:
+            return response_error(get_language_content('tag_id_not_found'))
 
     # Get all existing bindings for the given app_ids
     existing_bindings = tag_bindings.select(columns=["tag_id", "app_id"], conditions=[
         {"column": "app_id", "op": "in", "value": app_ids}
     ])
-    existing_bindings_dict = {}
+    existing_bindings_dict = {binding['app_id']: set() for binding in existing_bindings}
     for binding in existing_bindings:
-        if binding['app_id'] not in existing_bindings_dict:
-            existing_bindings_dict[binding['app_id']] = set()
         existing_bindings_dict[binding['app_id']].add(binding['tag_id'])
 
     for app_id in app_ids:
         existing_tag_ids = existing_bindings_dict.get(app_id, set())
 
-        # Determine tags to add and tags to remove
-        tags_to_add = set(tag_ids) - existing_tag_ids
-        tags_to_remove = existing_tag_ids - set(tag_ids)
-
-        # Remove bindings that are no longer needed
-        for tag_id in tags_to_remove:
+        if not tag_ids:
+            # Remove all bindings if tag_ids is empty
             tag_bindings.delete([
-                {"column": "tag_id", "value": tag_id},
                 {"column": "app_id", "value": app_id}
             ])
+        else:
+            # Determine tags to add and tags to remove
+            tags_to_add = set(tag_ids) - existing_tag_ids
+            tags_to_remove = existing_tag_ids - set(tag_ids)
 
-        # Add new bindings
-        for tag_id in tags_to_add:
-            tag_bindings.insert({
-                'tag_id': tag_id,
-                'app_id': app_id
-            })
+            # Remove bindings that are no longer needed
+            if tags_to_remove:
+                tag_bindings.delete([
+                    {"column": "tag_id", "op": "in", "value": list(tags_to_remove)},
+                    {"column": "app_id", "value": app_id}
+                ])
+
+            # Add new bindings
+            for tag_id in tags_to_add:
+                tag_bindings.insert({
+                    'tag_id': tag_id,
+                    'app_id': app_id
+                })
 
     return response_success(detail=get_language_content('tag_binding_create_success'))
