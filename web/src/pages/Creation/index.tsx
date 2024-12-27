@@ -555,7 +555,7 @@ const Creation: React.FC = () => {
                                                                                   </div>
                                                                                   <div>
                                                                                       {item.published_time ? (
-                                                                                          <span>
+                                                                                          <span className='text-[#1B64F3]'>
                                                                                               {moment(
                                                                                                   item.published_time,
                                                                                               ).format(

@@ -2,14 +2,7 @@
  * @LastEditors: biz
  */
 import { devLogin } from '@/api';
-import {
-    getAgentList,
-    getSkillList,
-    getToolsList,
-    getVectorList,
-    getWorkFlowInfo,
-    publishWorkFlow,
-} from '@/api/workflow';
+import { getWorkFlowInfo, publishWorkFlow } from '@/api/workflow';
 import { history } from '@umijs/max';
 import {
     Background,
@@ -27,7 +20,8 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { useIntl, useSearchParams } from 'umi';
 import { CustomWorkflowContextProvider } from './context';
 import useDnD from './hooks/useDnD';
-import NodePanel from './NodePanel'
+import useFetchData from './hooks/useFetchData'; // 引入自定义的hooks
+import NodePanel from './NodePanel';
 import './index.less';
 
 import { PlayCircleOutlined, SyncOutlined } from '@ant-design/icons';
@@ -38,45 +32,22 @@ import useSaveWorkFlow from './saveWorkFlow';
 import useStore from './store';
 import { AppNode, BlockEnum } from './types';
 import Tools from './components/Tools';
-import usePageVisibilityEffect from './hooks/usePageVisibilityEffect ';
+// import usePageVisibilityEffect from './hooks/usePageVisibilityEffect';
 
 const DnDFlow = () => {
     const intl = useIntl();
     const reactFlowWrapper = useRef(null);
-    // const {
-    //     resetNodes,
-    //     setNodeTypes,
-    //     addNode,
-    //     setAgentData,
-    //     createNode,
-    //     setNodes,
-    //     setEdges,
-    //     setAppId,
-    //     setSkillData,
-    //     setToolData,
-    //     setRunPanelShow,
-    //     setDatasetData,
-    //     getModelData,
-    //     setWorkFlowInfo,
-    //     setViewPort: storeSetViewPort,
-    // } = useStore();
     const resetNodes = useStore(state => state.resetNodes);
     const setNodeTypes = useStore(state => state.setNodeTypes);
     const addNode = useStore(state => state.addNode);
-    const setAgentData = useStore(state => state.setAgentData);
     const createNode = useStore(state => state.createNode);
     const setNodes = useStore(state => state.setNodes);
     const setEdges = useStore(state => state.setEdges);
     const setAppId = useStore(state => state.setAppId);
-    const setSkillData = useStore(state => state.setSkillData);
-    const setToolData = useStore(state => state.setToolData);
     const setRunPanelShow = useStore(state => state.setRunPanelShow);
     const runPanelShow = useStore(state => state.runPanelShow);
-    const setDatasetData = useStore(state => state.setDatasetData);
-    const setTeamDatasetData = useStore(state => state.setTeamDatasetData);
     const getModelData = useStore(state => state.getModelData);
     const setWorkFlowInfo = useStore(state => state.setWorkFlowInfo);
-    const storeSetViewPort = useStore(state => state.setViewPort);
     const setHandleList = useStore(state => state.setHandleList);
     const workFlowInfo = useStore(state => state.workFlowInfo);
     const setWorkflowEditInfo = useStore(state => state.setWorkflowEditInfo);
@@ -89,7 +60,7 @@ const DnDFlow = () => {
         includeHiddenNodes: false,
     });
     const documentVisibility = useDocumentVisibility();
-    const [viewPort, setViewPort] = useState(null);
+
 
     const saveWorkFlow = useSaveWorkFlow();
     const [toFn, setToFn] = useState(null);
@@ -99,7 +70,6 @@ const DnDFlow = () => {
     useOnViewportChange({
         onEnd: (viewport: Viewport) => {
             // setViewPort(viewport);
-            // storeSetViewPort(viewport);
         },
     });
     useMount(() => {
@@ -107,17 +77,18 @@ const DnDFlow = () => {
         resetNodes();
 
         devLogin();
-
         init();
         setHandleList([]);
     });
+
+    useFetchData(); // 使用自定义的hooks获取数据
+
     useEffect(() => {
         if (toFn) {
             history.push(toPath);
             return;
         }
         let unblock = history.block((location, action) => {
-            //
             if (runPanelShow) {
                 setToPath(location.location.pathname);
                 setIsModalOpen(true);
@@ -125,7 +96,7 @@ const DnDFlow = () => {
                 return;
             }
         });
-        // setToFn(unblock)
+
         if (!runPanelShow) {
             unblock?.();
         }
@@ -148,16 +119,18 @@ const DnDFlow = () => {
             }
         }
     }, [nodesInitialized]);
+
     useEffect(() => {
         const cleanup = onDnD((position: { x: number; y: number }, type, item) => {
             console.log(position, type, item);
             createNode(type, {
                 position,
                 data: {
-                    title: item.name,
-                    desc: item.description,
+                    // title: item.name,
+                    // desc: item.description,
                     drag: true,
-                    baseData: item,
+                    ...item.data,
+                    baseData: item.baseData,
                 },
             });
         });
@@ -166,18 +139,9 @@ const DnDFlow = () => {
 
     useUpdateEffect(() => {
         if (documentVisibility == 'hidden') {
-            // saveFlow()
             saveWorkFlow();
         }
     }, [documentVisibility]);
-
-    // usePageVisibilityEffect({
-    //     onBeforeUnload: (event) => {
-
-    //         saveWorkFlow();
-    //
-    //     },
-    // });
 
     const init = async () => {
         const appId = searchParams.get('app_id');
@@ -213,66 +177,10 @@ const DnDFlow = () => {
                 views?.edges && setEdges(views.edges);
                 if (views?.viewPort) {
                     // setViewport(views.viewPort);
-                } else {
                 }
             }
         });
-        getAgentList(2).then(res => {
-            if (res.code == 0) {
-                setAgentData({ team: res.data });
-            }
-        });
-
-        getAgentList(3).then(res => {
-            if (res.code == 0) {
-                setAgentData({ user: res.data });
-            }
-        });
-
-        getSkillList(2).then(res => {
-            if (res.code == 0) {
-                setSkillData({ team: res.data });
-            }
-        });
-        getSkillList(3).then(res => {
-            if (res.code == 0) {
-                setSkillData({ user: res.data });
-            }
-        });
-        getToolsList().then(res => {
-            if (res.code == 0) {
-                setToolData({
-                    list: Object.values(res.data),
-                });
-            }
-        });
         getModelData();
-        getVectorList().then(res => {
-            if (res.code == 0) {
-                setDatasetData({
-                    list: res.data.data.map(x => {
-                        return {
-                            ...x,
-                            label: x.name,
-                            value: x.dataset_id,
-                        };
-                    }),
-                });
-            }
-        });
-        getVectorList(2).then(res => {
-            if (res.code == 0) {
-                setTeamDatasetData({
-                    list: res.data.data.map(x => {
-                        return {
-                            ...x,
-                            label: x.name,
-                            value: x.dataset_id,
-                        };
-                    }),
-                });
-            }
-        });
     };
 
     const runFlow = () => {
@@ -306,7 +214,7 @@ const DnDFlow = () => {
             <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                 <CustomWorkflowContextProvider>
                     <Background></Background>
-                     
+
                     <div>
                         <MiniMap
                             className="table"
@@ -320,7 +228,6 @@ const DnDFlow = () => {
                 </CustomWorkflowContextProvider>
             </div>
             <div className="fixed left-8 top-16 flex  flex-col gap-2 pt-3 pl-4">
-             
                 <Typography.Title className="!m-0" level={5}>
                     {workFlowInfo?.app?.name}
                 </Typography.Title>
@@ -331,11 +238,9 @@ const DnDFlow = () => {
                 )}
                 <Typography.Text>{workFlowInfo?.app?.description}</Typography.Text>
             </div>
-            {/* <NodePanel></NodePanel> */}
+            <NodePanel></NodePanel>
             <Tools />
 
-
-            {/* <CreateWorkflowPanel /> */}
             <Panel></Panel>
             <ChildPanel></ChildPanel>
             <DealtWith></DealtWith>

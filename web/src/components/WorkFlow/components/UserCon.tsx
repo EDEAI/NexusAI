@@ -12,8 +12,6 @@ interface UserConProps {
 }
 export default memo((props: UserConProps) => {
     const { title, icon } = props;
-    console.log(icon);
-
     const RenderNodeIcon = useCallback(() => {
         if (icon?.startsWith('http:') || icon?.startsWith('https:')) {
             return (

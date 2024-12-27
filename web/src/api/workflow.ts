@@ -11,7 +11,7 @@ export const getAgentList = async (type = 1) => {
     return await aniRequest<any>(`/v1/agent/agent_list`, {
         method: 'GET',
         data: {
-            page_size: 100,
+            page_size: 999999,
             agent_search_type: type,
         },
     });
@@ -45,7 +45,7 @@ export const getSkillList = async skill_search_type => {
         data: {
             skill_search_type,
             page: 1,
-            page_size: 100,
+            page_size: 999999,
         },
     });
 };
