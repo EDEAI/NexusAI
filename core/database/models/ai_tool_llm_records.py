@@ -28,7 +28,7 @@ class AIToolLLMRecords(MySQL):
         """
         record = {
             'app_run_id': app_run_id,
-            'status': 2
+            'status': 1
         }
         if inputs is not None:
             record['inputs'] = inputs
@@ -70,6 +70,38 @@ class AIToolLLMRecords(MySQL):
         
         # Initialize the next correction record
         return self.initialize_execution_record(app_run_id, correct_prompt=correct_prompt)
+    
+    def get_pending_ai_tool_tasks(self) -> List[Dict[str, Any]]:
+        """
+        Queries pending AI tool tasks.
+        
+        Returns:
+            List[Dict[str, Any]]: A list of dictionaries, each containing task data.
+        """
+        return self.select(
+            columns=[
+                'id',
+                'app_run_id',
+                'app_runs.ai_tool_type',
+                'inputs',
+                'correct_prompt',
+                'outputs',
+                'status',
+                'elapsed_time',
+                'prompt_tokens',
+                'completion_tokens',
+                'total_tokens',
+                'created_time',
+                'finished_time'
+            ],
+            joins=[
+                ('inner', 'app_runs', 'ai_tool_llm_records.app_run_id = app_runs.id')
+            ],
+            conditions=[
+                {"column": "app_runs.status", "value": 1},
+                {"column": "status", "value": 1}
+            ]
+        )
     
     def get_history_record(self, app_run_id: int) -> List[Dict[str, Any]]:
         """
