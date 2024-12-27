@@ -43,5 +43,5 @@ export default {
     'addTag.deleteConfirmation2': '个应用，确定删除？',
     'addTag.confirm': '确认',
     'addTag.cancel': '取消',
-    'addTag.pleaseSelect': '请选择',
+    'addTag.pleaseSelect': '请选择标签',
 };

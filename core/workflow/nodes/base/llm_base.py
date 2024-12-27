@@ -11,7 +11,7 @@ from langchain_core.runnables.utils import Input, Output
 from . import Node
 from ...variables import ArrayVariable, Variable
 from ...context import Context
-from database.models import Models, AppNodeExecutions, DocumentSegments, Documents
+from database.models import Models, AppNodeExecutions, DocumentSegments, Documents, AIToolLLMRecords
 from llm.models import LLMPipeline
 from llm.prompt import create_prompt_from_dict, replace_prompt_with_context
 from llm.messages import Messages, create_messages_from_serialized_format
@@ -83,9 +83,12 @@ class LLMBaseNode(Node):
         llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config)
         
         if correct_llm_output:
-            history = AppNodeExecutions().get_node_history(app_run_id, edge_id)
+            if edge_id:
+                history = AppNodeExecutions().get_node_history(app_run_id, edge_id)
+            else:
+                history = AIToolLLMRecords().get_history_record(app_run_id)
             if not history or len(history) != 2:
-                raise Exception("Node history not found.")
+                raise Exception("history not found.")
             messages = create_messages_from_serialized_format(history[1]["model_data"]["messages"])
             # Escape braces in the output text
             ai_output_str = self.duplicate_braces(history[1]["model_data"]["raw_output"])
@@ -101,7 +104,8 @@ class LLMBaseNode(Node):
                 correct_prompt.assistant.value = self.duplicate_braces(assistant_prompt)
             messages.add_prompt(correct_prompt)
         else:
-            replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)
+            if context:
+                replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)
             messages = Messages()
             messages.add_prompt(self.data["prompt"])
             if file_list:

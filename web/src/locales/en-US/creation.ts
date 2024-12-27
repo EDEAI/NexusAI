@@ -43,5 +43,5 @@ export default {
     'addTag.deleteConfirmation2': 'applications, are you sure to delete?',
     'addTag.confirm': 'Confirm',
     'addTag.cancel': 'Cancel',
-    'addTag.pleaseSelect': 'Please select',
+    'addTag.pleaseSelect': 'Please select tag',
 };

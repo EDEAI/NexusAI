@@ -148,22 +148,26 @@ class ChatroomManager:
                     ]
                 ]
             )
-            all_agent_ids_in_history = set()
-            for message in history_messages:
-                if (agent_id := message['agent_id']) != 0:
-                    all_agent_ids_in_history.add(agent_id)
-            all_agent_ids = all_agent_ids_in_history.union(current_active_agent_ids)
-            absent_agent_ids = all_agent_ids_in_history.difference(current_active_agent_ids)
-            
-            # Create chatroom
-            chatroom = Chatroom(
-                user_id, team_id, chatroom_id, app_run_id,
-                all_agent_ids, absent_agent_ids,
-                chatroom_info['max_round'], bool(chatroom_info['smart_selection']),
-                self._ws_manager, user_message_id, topic
-            )
-            chatroom.load_history_messages(history_messages)
-            await chatroom.chat(user_input)
+            if user_input is None and not history_messages:
+                # Chat history has been cleared, then end the chat directly
+                pass
+            else:
+                all_agent_ids_in_history = set()
+                for message in history_messages:
+                    if (agent_id := message['agent_id']) != 0:
+                        all_agent_ids_in_history.add(agent_id)
+                all_agent_ids = all_agent_ids_in_history.union(current_active_agent_ids)
+                absent_agent_ids = all_agent_ids_in_history.difference(current_active_agent_ids)
+                
+                # Create chatroom
+                chatroom = Chatroom(
+                    user_id, team_id, chatroom_id, app_run_id,
+                    all_agent_ids, absent_agent_ids,
+                    chatroom_info['max_round'], bool(chatroom_info['smart_selection']),
+                    self._ws_manager, user_message_id, topic
+                )
+                chatroom.load_history_messages(history_messages)
+                await chatroom.chat(user_input)
             end_time = time()
             app_runs.update(
                 {'column': 'id', 'value': app_run_id},

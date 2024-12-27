@@ -300,7 +300,7 @@ const DnDFlow = () => {
             >
                 {intl.formatMessage({
                     id: 'workflow.modal.content',
-                    defaultMessage: '，?',
+                    defaultMessage: '',
                 })}
             </Modal>
             <div className="reactflow-wrapper" ref={reactFlowWrapper}>
@@ -331,7 +331,7 @@ const DnDFlow = () => {
                 )}
                 <Typography.Text>{workFlowInfo?.app?.description}</Typography.Text>
             </div>
-            <NodePanel></NodePanel>
+            {/* <NodePanel></NodePanel> */}
             <Tools />
 
 
