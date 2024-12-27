@@ -79,7 +79,7 @@ class AppRuns(MySQL):
             {"column": "apps.status", "value": 1},
             {"column": "app_runs.workflow_id", "op": ">", "value": 0},
             {"column": "app_runs.status", "op": "!=", "value": 3},
-            {"column": "app_node_executions.status", "op": ">", "value": 2},
+            {"column": "app_node_executions.status", "op": ">=", "value": 2},
             {'column': 'app_node_executions.correct_output', 'value': 0},
             {'column': 'app_node_executions.condition_id', 'op': 'is null'},
         ]
