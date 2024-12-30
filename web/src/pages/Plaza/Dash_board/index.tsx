@@ -9,12 +9,13 @@ import { creationsearchdata } from '@/utils/useUser';
 import { SwapRightOutlined,CheckCircleOutlined,ExclamationCircleOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Col, Empty, Row, Spin,Tooltip } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 // import Menus from '../components/Menus/index';
 
 // Subtitle
-const SubTitle = ({ subtitle }) => {
+const SubTitle :React.FC<{subtitle:any}> = parmas => {
+    let {subtitle} = parmas
     let titleClassName = `pl-[10px] text-[#1B64F3] text-[12px] ${subtitle.need_human_confirm==1||subtitle.need_human_confirm==undefined ? 'text-[#1B64F3]' : 'text-[#808183] '}`
     return (
         <div className="pr-4">
@@ -29,7 +30,8 @@ const SubTitle = ({ subtitle }) => {
     );
 };
 // Progress bar subtitle
-const ProgressContainer = ({ progressObj }) => {
+const ProgressContainer :React.FC<{progressObj:any}> = parmas => {
+    let {progressObj} = parmas
     const setEntime = () => {
         return parseFloat(progressObj.elapsed_time).toFixed(6);
     };
@@ -68,7 +70,8 @@ const ProgressContainer = ({ progressObj }) => {
     );
 };
 // Run button
-const OperationButton = ({ operationObj }) => {
+const OperationButton :React.FC<{operationObj:any}> = parmas => {
+    let {operationObj} = parmas;
     const setRunId = useUserStore(state => state.setRunId);
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
@@ -102,19 +105,19 @@ const OperationButton = ({ operationObj }) => {
     );
 };
 // Add
-const Addbtn = (Fn: any) => {
+const Addbtn :React.FC<{bindAdd: any,type:any}> = parmas => {
+    let {bindAdd,type} = parmas;
     return (
         <>
             {
-                <div onClick={Fn.bindAdd}>
+                <div onClick={bindAdd}>
                     <a
                         style={{ color: '#0077ED', fontSize: '0' }}
                         className="flex items-center  gap-x-[5px]"
                     >
-                        {/* <PlusOutlined style={{ paddingRight: '5px', fontSize: '12px' }} /> */}
                         <img src="/icons/plaza_add.svg" className="w-[16px] h-[16px] shrink-0" />
                         <span className="text-[#1B64F3]" style={{ fontSize: '12px' }}>
-                            {Fn.type}
+                            {type}
                         </span>
                     </a>
                 </div>
@@ -122,141 +125,314 @@ const Addbtn = (Fn: any) => {
         </>
     );
 };
-// List
-const BlockList = ({ blocklsit, item, blockIndex }) => {
-// Navigate to details
+const EmptyDom :React.FC<{}> = parmas =>{
+    const intl = useIntl();
+    return(
+        <div className="flex items-center h-full justify-center">
+            <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={intl.formatMessage({
+                    id: 'app.dashboard.None',
+                })}
+            ></Empty>
+        </div>
+    )
+}
+
+interface BlockParmas{
+    data?:any,
+    keyName?:any
+}
+// Backlogs
+const Backlogs :React.FC<BlockParmas> = parmas =>{
+    const {data} = parmas;
+    const intl = useIntl();
+    const renamedData = data.map((item:any)=>({
+        'app_name':item.app_name,
+        'app_run_id':item.app_run_id,
+        'icon':item.icon,
+        'icon_background':item.icon_background,
+        'need_human_confirm':item.need_human_confirm,
+        'node_exec_data':{
+            'node_name':item.node_name,
+            'node_id':item.node_execution_id,
+            'node_exec_id':item.exec_id
+        },
+        'exec_id':item.exec_id,
+        'run_name':item.app_run_name,
+        'mode':item.mode
+    }))
+    const [backData,setbackData]  = useState(renamedData);
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
     const setRunId = useUserStore(state => state.setRunId);
-    const jumpDetails = (i: any) => {
-        switch (item.key) {
-            case 'my_agent':
-                history.push(`/Agents?app_id=${item.list[i].app_id}&type=false`);
-                break;
-            case 'more_agent':
-                history.push(`/ReadOnlyAgent?app_id=${item.list[i].app_id}&type=true`);
-                break;
-            case 'my_workflow':
-                history.push(`/workspace/workflow?app_id=${item.list[i].app_id}&type=false`);
-                break;
-            case 'more_workflow':
-                history.push(`/workspace/workflow?app_id=${item.list[i].app_id}&type=true`);
-                break;
-            case 'workflow_log':
-                // history.push(`/workspace/workflow?app_id=${item.list[blockIndex].app_id}&type=true`);
-                setRunPanelLogRecord(item.list[i]);
-                setRunId(null);
-                setDealtWithData(false);
-                break;
-            case 'backlogs':
-                // history.push(`/workspace/workflow?app_id=${item.list[blockIndex].app_id}&type=true`);
-                if(item.list[i].need_human_confirm == 0){
-                    return
-                }
-                setDealtWithData(item.list[i]);
-                setRunId(null);
-                setRunPanelLogRecord(false);
-                break;
-            default:
-                break;
+    const submitPromptId = useUserStore(state => state.submitPromptId);
+    
+    const confirmConcat = (backlogs: any, list: any) => {
+        const seenExecIds  = new Set();
+        const combined = [...list.reverse(), ...backlogs];
+        const result = combined.filter((item) => {
+            const execId = item.node_exec_data?.node_exec_id || item.exec_id;
+            if(!item.exec_id && item.node_exec_data?.node_exec_id){
+                item.exec_id = item.node_exec_data?.node_exec_id
+            }
+            if (!execId) {
+                return false;
+            }
+
+            if (seenExecIds.has(execId)) {
+                return false;
+            }
+
+            seenExecIds.add(execId);
+            return true;
+        });
+        console.log(result);
+        
+        return result.reverse();
+    };
+    const setWebsocktdata = async () => {
+        let backlogs = flowMessage?.filter(item => item.type == 'workflow_need_human_confirm').map(({ data }) => data)?.filter(item => item.type !== 1);
+        console.log(backlogs);
+        
+        if(backlogs && backlogs.length){
+            setbackData(confirmConcat(backlogs,backData))
         }
     };
-    const setpercentage = (i: any) => {
-        if (i.completed_progress) {
-            return parseInt(i.completed_progress.slice(0, -1));
-        } else {
-            return false;
+    //websockt
+    const flowMessage = useSocketStore(state => state.flowMessage);
+    useEffect(() => {
+        setWebsocktdata();
+    }, [flowMessage]);
+    useEffect(()=>{
+        if(submitPromptId){
+            setbackData((pre:any)=>{
+                return pre.map((item:any)=>({
+                    ...item,
+                    'need_human_confirm':item.node_exec_data.node_exec_id == submitPromptId?0:item.need_human_confirm
+                }))
+            })
         }
-    };
+        
+    },[submitPromptId])
+    return (
+        <>
+            {backData && backData.length ? 
+                    <div
+                    className={`cardbox`}
+                    style={{ overflowY: 'auto', height: '100%', overflowX: 'hidden' }}
+                >
+                    <Row gutter={[30,0]}>
+                        {backData.map((item: any, index: any) => (
+                            <Col key={index} className="graphicHoverbox" span="24">
+                                <Graphic
+                                    icon={item.icon}
+                                    title={ item.node_exec_data?.node_name && <SubTitle subtitle={item} /> }
+                                    textDetails={item.run_name}
+                                    handleClick={() => {
+                                        if(item.need_human_confirm == 0){
+                                            return
+                                        }
+                                        setDealtWithData(item);
+                                        setRunId(null);
+                                        setRunPanelLogRecord(false);
+                                    }}
+                                    backlogTips={<div className='flex items-center'>
+                                        {item.need_human_confirm==1||item.need_human_confirm==undefined ? (
+                                            <Tooltip
+                                                title={intl.formatMessage({
+                                                    id: 'app.workflow.needHumanConfirm',
+                                                })}
+                                            >
+                                                <ExclamationCircleOutlined className="text-[#1B64F3]" />
+                                            </Tooltip>
+                                        ) : (
+                                            <Tooltip
+                                                title={intl.formatMessage({
+                                                    id: 'app.workflow.noHumanConfirm',
+                                                })}
+                                            >
+                                                <CheckCircleOutlined className="text-[#808183]" />
+                                            </Tooltip>
+                                        )}
+                                    </div>}
+                                ></Graphic>
+                            </Col>
+                        ))}
+                    </Row>
+                </div>
+            :<EmptyDom></EmptyDom>}
+        </>
+
+    )
+}
+// My Agent and Organization Agents
+const Agent :React.FC<BlockParmas> = parmas =>{
+    const  {data,keyName} = parmas;
     return (
         <div
-            className={`${item.key == 'workflow_log' ? 'px-[10px] cardbox' : 'cardbox'}`}
+            className={`cardbox`}
             style={{ overflowY: 'auto', height: '100%', overflowX: 'hidden' }}
         >
-            <Row gutter={[30, item.key == 'workflow_log' ? 20 : 0]}>
-                {blocklsit.map((i: any, index: any) => (
-                    <Col key={index} className="graphicHoverbox" span={item.biserial ? 12 : 24}>
-                        {item.key == 'backlogs' && (
-                            <Graphic
-                                icon={i.icon}
-                                title={
-                                    (i.node_name && <SubTitle subtitle={i} />) ||
-                                    (i.node_exec_data.node_name && <SubTitle subtitle={i} />)
+            <Row gutter={[30,0]}>
+                {data.map((item: any, index: any) => (
+                    <Col key={index} className="graphicHoverbox" span="12">
+                        <Graphic
+                            icon={item.icon}
+                            title={item.name}
+                            textDetails={item.description}
+                            handleClick={() => {
+                                // jumpDetails(index);
+                                console.log(keyName);
+                                
+                                if(keyName == 'my_agent'){
+                                    history.push(`/Agents?app_id=${item.app_id}&type=false`);
+                                }else{
+                                    history.push(`/ReadOnlyAgent?app_id=${item.app_id}&type=true`);
                                 }
-                                textDetails={i.app_run_name || i.run_name}
-                                handleClick={() => {
-                                    jumpDetails(index);
-                                }}
-                                lineClamp={1}
-                                backlogTips={item.needHuman(i)}
-                                // iconType={'workflow_icon'}
-                            ></Graphic>
-                        )}
-                        {(item.key == 'my_agent' || item.key == 'more_agent') && (
+                            }}
+                            // iconType={'robot_icon'}
+                        ></Graphic>
+                    </Col>
+                ))}
+            </Row>
+        </div>
+
+    )
+}
+// Workflow and OrganizationWorkflows
+const Workflow :React.FC<BlockParmas> = parmas =>{
+    let  {data,keyName} = parmas
+    return (
+        <div
+            className={`cardbox`}
+            style={{ overflowY: 'auto', height: '100%', overflowX: 'hidden' }}
+        >
+            <Row gutter={[30,0]}>
+                {data.map((item: any, index: any) => (
+                    <Col key={index} className="graphicHoverbox" span="12">
                             <Graphic
-                                icon={i.icon}
-                                title={i.name}
-                                textDetails={i.description}
+                                icon={item.icon}
+                                title={item.name}
+                                textDetails={item.description}
                                 handleClick={() => {
-                                    jumpDetails(index);
+                                    if(keyName == 'my_workflow'){
+                                        history.push(`/workspace/workflow?app_id=${item.app_id}&type=false`);
+                                    }else{
+                                        history.push(`/workspace/workflow?app_id=${item.app_id}&type=true`);
+                                    }
                                 }}
-                                lineClamp={1}
-                                // iconType={'robot_icon'}
-                            ></Graphic>
-                        )}
-                        {(item.key == 'my_workflow' || item.key == 'more_workflow') && (
-                            <Graphic
-                                icon={i.icon}
-                                title={i.name}
-                                textDetails={i.description}
-                                handleClick={() => {
-                                    jumpDetails(index);
-                                }}
-                                lineClamp={1}
-                                operation={<OperationButton operationObj={i}></OperationButton>}
+                                operation={<OperationButton operationObj={item}></OperationButton>}
                                 iconType={
-                                    item.key == 'my_workflow'
-                                        ? i.publish_status == 0
+                                    keyName == 'my_workflow'
+                                        ? item.publish_status == 0
                                             ? 'play_disable_icon'
                                             : 'play_icon'
                                         : ''
                                 }
                             ></Graphic>
-                        )}
-                        {item.key == 'workflow_log' && (
-                            <Graphic
-                                status={i.status}
-                                icon={i.icon}
-                                title={i.app_runs_name || i.run_name}
-                                textDetails={
-                                    <ProgressContainer progressObj={i}></ProgressContainer>
-                                }
-                                handleClick={() => {
-                                    jumpDetails(index);
-                                }}
-                                lineClamp={1}
-                                progress={i.percentage || setpercentage(i)}
-                                // iconType={'workflow_icon'}
-                            ></Graphic>
-                        )}
-
-                        {/* <Graphic
-                            icon={i.icon}
-                            title={i.name || i.app_run_name || i.run_name || i.app_name || i.app_runs_name}
-                            textDetails={i.description || i.created_time || (i.node_name && <SubTitle subtitle={i}/>) || (i.node_exec_data?.node_name && <SubTitle subtitle={i}/>)}
-                            subtitle={IsSubTitle(item, i)}
-                            handleClick={()=>{jumpDetails(index)}}
-                            lineClamp={1}
-                            // iconType={}
-                        ></Graphic> */}
                     </Col>
                 ))}
             </Row>
         </div>
-    );
-};
-// More list button
-const MoreList = ({ item, intl }: any) => {
+
+    )
+}
+// Run Logs
+const RunLogs :React.FC<BlockParmas> = parmas =>{
+    let  {data} = parmas
+    const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
+    const setDealtWithData = useUserStore(state => state.setDealtWithData);
+    const setRunId = useUserStore(state => state.setRunId);
+    const [runData,setRunData] = useState(data);
+    const progressConcat = (progress: any, list: any) => {
+        const map = new Map();
+        list.reverse().forEach((item: any) => {
+            map.set(item.app_run_id, item);
+        });
+        progress.forEach((item: any) => {
+            map.set(item.app_run_id, item); // Use the key attribute value as the key to store each object in the map
+        });
+        return Array.from(map.values()).reverse();
+    };
+    const setpercentage = (item: any) => {
+        if (item.completed_progress) {
+            return parseInt(item.completed_progress.slice(0, -1));
+        } else {
+            return false;
+        }
+    };
+    const setWebsocktdata = async () => {
+        let progress = flowMessage?.filter(item => item.type == 'workflow_run_progress').map(({ data }) => data);
+        if(progress && progress.length){
+            setRunData(progressConcat(progress,runData))
+        }
+    };
+    //websockt
+    const flowMessage = useSocketStore(state => state.flowMessage);
+    useEffect(() => {setWebsocktdata();}, [flowMessage]);
+    
+    return (
+        <>
+            {runData && runData.length?
+                <div
+                    className={`cardbox px-[10px]`}
+                    style={{ overflowY: 'auto', height: '100%', overflowX: 'hidden' }}
+                >
+                    <Row gutter={[30,20]}>
+                        {runData.map((item: any, index: any) => (
+                            <Col key={index} className="graphicHoverbox" span="24">
+                                    <Graphic
+                                        status={item.status}
+                                        icon={item.icon}
+                                        title={item.app_runs_name || item.run_name}
+                                        textDetails={
+                                            <ProgressContainer progressObj={item}></ProgressContainer>
+                                        }
+                                        handleClick={() => {
+                                            setRunPanelLogRecord(item);
+                                            setRunId(null);
+                                            setDealtWithData(false);
+                                        }}
+                                        progress={item.percentage || setpercentage(item)}
+                                    ></Graphic>
+                            </Col>
+                        ))}
+                    </Row>
+                </div>
+            :<EmptyDom></EmptyDom>}
+        </>
+    )
+}
+
+// CONTENT LIST
+interface contentListparmas{
+    item?:any,
+    data?:any
+}
+const ContentList : React.FC<contentListparmas> = params =>{
+    let {item,data} = params;
+    const isEmptyDom = (data:any,components:any) =>{ 
+        return data && data.length ? components : <EmptyDom></EmptyDom>
+    }
+    let components = {
+        'backlogs':(e:any)=><Backlogs data={e.data}></Backlogs>,
+        'my_agent':(e:any)=>isEmptyDom(data,<Agent data={e.data} keyName='my_agent'></Agent>),
+        'my_workflow':(e:any)=>isEmptyDom(data,<Workflow data={e.data} keyName='my_workflow'></Workflow>),
+        'workflow_log':(e:any)=><RunLogs data={e.data}></RunLogs>,
+        'more_agent':(e:any)=>isEmptyDom(data,<Agent data={e.data}></Agent>),
+        'more_workflow':(e:any)=>isEmptyDom(data,<Workflow data={e.data}></Workflow>),
+    }
+    return(
+        <>
+            { components[item.key]({data})}
+        </>
+    )
+}
+// View all button
+const MoreList : React.FC<{ item?: any }> = parmas => {
+    let {item} = parmas;
+    const intl = useIntl();
     const jumpMoreList = () => {
         const optionsModalId = item.key == 'my_agent' || item.key == 'more_agent' ? 1 : 2;
         const searchType = item.key == 'more_agent' || item.key == 'more_workflow' ? true : false;
@@ -284,7 +460,14 @@ const MoreList = ({ item, intl }: any) => {
     );
 };
 // More list and add new
-const MoreOrAdd = (item: any, setIsModalOpen: any, setCreationType: any, intl: any) => {
+interface MoreOrAddparmas{
+    item?:any,
+    setIsModalOpen?:any,
+    setCreationType?:any
+}
+const MoreOrAdd :React.FC<MoreOrAddparmas> = parmas => {
+    const intl = useIntl();
+    let {item,setIsModalOpen,setCreationType} = parmas
     const Addel = () => {
         // console.log(item);
         let addCreationTyp =
@@ -308,12 +491,12 @@ const MoreOrAdd = (item: any, setIsModalOpen: any, setCreationType: any, intl: a
     return (
         <div className="flex gap-x-[30px] items-center">
             {item.isAdd && <Addbtn bindAdd={Addel} type={item.isAdd && typeName}></Addbtn>}
-            <MoreList item={item} intl={intl}></MoreList>
+            <MoreList item={item}></MoreList>
         </div>
     );
 };
 // Main body
-const Coldom = () => {
+const Coldom : React.FC = () => {
     const intl = useIntl();
 // Card configuration file
     const cardList = [
@@ -321,29 +504,6 @@ const Coldom = () => {
             title: intl.formatMessage({ id: 'app.dashboard.backlog' }),
             key: 'backlogs',
             substitle: true,
-            needHuman:(item:any)=>{
-                return (
-                    <div className='flex items-center'>
-                        {item.need_human_confirm==1||item.need_human_confirm==undefined ? (
-                            <Tooltip
-                                title={intl.formatMessage({
-                                    id: 'app.workflow.needHumanConfirm',
-                                })}
-                            >
-                                <ExclamationCircleOutlined className="text-[#1B64F3]" />
-                            </Tooltip>
-                        ) : (
-                            <Tooltip
-                                title={intl.formatMessage({
-                                    id: 'app.workflow.noHumanConfirm',
-                                })}
-                            >
-                                <CheckCircleOutlined className="text-[#808183]" />
-                            </Tooltip>
-                        )}
-                    </div>
-                )
-            },
         },
         {
             title: intl.formatMessage({ id: 'app.dashboard.myagent' }),
@@ -375,11 +535,8 @@ const Coldom = () => {
     ];
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [CreationType, setCreationType] = useState({});
-    // Data list
-    const [colstate, setColstate] = useState(cardList);
-    // Card loading
-    // const [cardLoading, setCardLoading] = useState(false);
-    const [closeLoading, setcloseLoading] = useState(false);
+    const [closeLoading, setcloseLoading] = useState(true);
+    const [contntList,setContntList] = useState({})
     // Has retrieved list
     const isLoad = useRef(false);
     // Get list
@@ -387,102 +544,19 @@ const Coldom = () => {
         let res = await getIndex();
         if (res.code == 0) {
             let data = res.data;
+            setContntList(data)
             isLoad.current = true;
-            setColstate(prev => {
-                return prev.map((x: any) => {
-                    return {
-                        ...x,
-                        list: data[x.key],
-                    };
-                });
-            });
             setcloseLoading(true);
         }
     };
-    const progressConcat = (progress: any, list: any) => {
-        const map = new Map();
-        list.reverse().forEach((item: any) => {
-            map.set(item['app_run_id'], item);
-        });
-        progress.forEach((item: any) => {
-            map.set(item['app_run_id'], item); // Use the key attribute value as the key to store each object in the map
-        });
-        return Array.from(map.values()).reverse();
-    };
-    const confirmConcat = (backlogs: any, list: any) => {
-        const map = new Map();
-        list.reverse().forEach((item: any) => {
-            map.set(item.exec_id, item);
-        });
-        backlogs.forEach((item: any) => {
-            item.exec_id = item.node_exec_data?.node_exec_id;
-            if (item.node_exec_data?.node_exec_id) {
-                map.set(item.exec_id, item); // Use the key attribute value as the key to store each object in the map
-            }
-        });
-        return Array.from(map.values()).reverse();
-    };
-    const setWebsocktdata = async () => {
-        if (!isLoad.current) {
-            await getCardList();
-        }
-        let backlogs = flowMessage
-            ?.filter(item => item.type == 'workflow_need_human_confirm')
-            .map(({ data }) => data)
-            ?.filter(item => item.type !== 1);
+    useEffect(()=>{
+        if(!isLoad.current)getCardList();
+    },[])
 
-        let progress = flowMessage
-            ?.filter(item => item.type == 'workflow_run_progress')
-            .map(({ data }) => data);
-            
-        if ((backlogs && backlogs.length) || (progress && progress.length)) {
-            setColstate(pre => {
-                return pre.map((item: any) => {
-                    return item.list
-                        ? {
-                              ...item,
-                              list:
-                                  item.key == 'backlogs'
-                                      ? confirmConcat(backlogs, item.list)
-                                      : item.key == 'workflow_log'
-                                      ? progressConcat(progress, item.list)
-                                      : item.list,
-                          }
-                        : {
-                              ...item,
-                          };
-                });
-            });
-        }
-    };
-    //websockt
-    const flowMessage = useSocketStore(state => state.flowMessage);
-    useEffect(() => {
-        setWebsocktdata();
-    }, [flowMessage]);
-    const submitPromptId = useUserStore(state => state.submitPromptId);
-    useEffect(() => {
-        if (submitPromptId) {
-            setColstate(pre => {
-                return pre.map((item: any) => {
-                    return item.key == 'backlogs'
-                        ? {
-                              ...item,
-                              list: item.list?.filter(
-                                  (item: any) => item.exec_id != submitPromptId,
-                              ),
-                          }
-                        : {
-                              ...item,
-                          };
-                });
-            });
-        }
-    }, [submitPromptId]);
     return (
         <>
             {closeLoading &&
-                colstate.map((item: any, index: any) => (
+                cardList.map((item: any, index: any) => (
                     <Col
                         span={8}
                         key={index}
@@ -493,7 +567,6 @@ const Coldom = () => {
                         xl={8}
                         style={{ height: 'calc(50% - 20px)' }}
                     >
-                        {/* <div style={{height:'calc(50% - 10px)'}}></div> */}
                         <div
                             className="bg-[#fff] rounded-[8px] w-[100%] h-[100%]"
                             style={{ boxShadow: '0px 2px 4px 0px rgba(0,0,0,0.05)' }}
@@ -503,51 +576,25 @@ const Coldom = () => {
                                     {item.title}
                                 </span>
                                 <span>
-                                    {MoreOrAdd(item, setIsModalOpen, setCreationType, intl)}
+                                    {
+                                        <MoreOrAdd 
+                                            item={item}
+                                            setIsModalOpen={setIsModalOpen}
+                                            setCreationType={setCreationType}
+                                        />
+                                    }
                                 </span>
                             </div>
                             <div
                                 className="pt-[5px] pb-[20px] px-[10px]"
                                 style={{ height: 'calc(100% - 62px)' }}
-                            >
-                                {item.list && item.list.length ? (
-                                    <BlockList
-                                        blocklsit={item.list}
-                                        item={item}
-                                        blockIndex={index}
-                                    ></BlockList>
-                                ) : (
-                                    <div className="flex items-center h-full justify-center">
-                                        <Empty
-                                            image={Empty.PRESENTED_IMAGE_SIMPLE}
-                                            description={intl.formatMessage({
-                                                id: 'app.dashboard.None',
-                                            })}
-                                        ></Empty>
-                                    </div>
-                                )}
+                            >   
+                                {contntList[item.key] ? <ContentList item={item} data={contntList[item.key]} ></ContentList> :<></>}                          
                             </div>
                         </div>
-                        {/* <Card
-                        title={item.title}
-                        loading={cardLoading}
-                        hoverable={true}
-                        extra={MoreOrAdd(item,setIsModalOpen,setCreationType)}
-                        style={{ width: '100%',height:'100%'}}
-                        styles={{body:{padding:'5px 10px 20px 10px',height:'calc(100% - 62px)'},header:{border:0,fontSize:'14px',padding:'20px 20px',color:'#213044',}}}
-                    >
-                        {item.list && item.list.length ? (
-                            <BlockList
-                                blocklsit={item.list}
-                                item={item}
-                                blockIndex={index}
-                            ></BlockList>
-                        ) : (
-                            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}></Empty>
-                        )}
-                    </Card> */}
                     </Col>
-                ))}
+                ))
+            }
             {!closeLoading && (
                 <div
                     className="w-full h-full flex items-center justify-center "
