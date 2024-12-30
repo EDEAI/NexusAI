@@ -1,12 +1,21 @@
-from core.database.models import (Chatrooms, Apps, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows)
+from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows)
 from fastapi import APIRouter
 from api.utils.common import *
 from api.utils.jwt import *
 from api.schema.chat import *
 from languages import get_language_content
-from core.workflow import (create_graph_from_dict, flatten_variable)
-from core.llm import Messages
+from core.workflow import (create_graph_from_dict, flatten_variable, create_variable_from_dict)
+from core.llm import Messages, Prompt
 import json
+import sys, os
+from time import time
+from pathlib import Path
+sys.path.append(str(Path(__file__).absolute().parent.parent))
+from datetime import datetime
+# from api.utils.ai_tool import call_llm_for_ai_tool
+
+from core.database.models import AppRuns
+
 router = APIRouter()
 
 
@@ -460,6 +469,113 @@ async def show_chatroom_details(chatroom_id: int, page: int = 1, page_size: int 
     return response_success(chatroom_history_msg)
 
 
+@router.post("/{chatroom_id}/chat_history_message_summary", response_model=ChatRoomResponseBase, summary="Chat History Message Summary")
+async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessageSummary, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Use specified properties to query existing applications.
+    Distinguish between agents and workFlows based on the current application
+    By using the parameter passing rules of agent&workFlows, the splicing parameters are disassembled and the chat history is summarized through LLM to obtain the meeting summary content
+    Parameters:
+    -Chatroom_id (int): The unique identifier of the chat room to be updated. Compulsory.
+    -Chat_dequest (ChatHistorySummary): app_run_id App Runs Data Table,corrected_parameter Correction suggestions proposed by users.
+
+    -Userinfo (TokenData): Information about the current user is provided through dependency injection. Compulsory.
+
+
+    Returns:
+    - A response object representing a successful operation and containing the parameters returned by LLM for front-end processing and manual authentication.
+
+    Raises:
+    - HTTPException: If any required parameters are missing or invalid, or if the user has not been authenticated.
+    """
+    chat_data = chat_request.dict(exclude_unset=True)
+    find_chatroom = Chatrooms().search_chatrooms_id(chatroom_id, userinfo.uid)
+    if not find_chatroom['status']:
+        return response_error(get_language_content("chatroom_does_not_exist"))
+
+    conditions = [
+        {"column": "chatroom_id", "value": chatroom_id},
+        {'column': 'id', 'op': '>', 'value': find_chatroom['initial_message_id']},
+        [
+            {'column': 'chatroom_messages.agent_id', 'op': '!=', 'value': 0, 'logic': 'or'},
+            {'column': 'chatroom_messages.user_id', 'op': '!=', 'value': 0}
+        ]
+    ]
+
+    chat_message = ChatroomMessages().select(
+        columns=['agent_id', 'message', 'topic'],
+        conditions=conditions,
+        order_by="id ASC",
+    )
+
+    if chat_message is None:
+        return response_error(get_language_content("chatroom_message_is_null"))
+
+    chatMessageList = ChatroomMessages().get_history_list(chat_message)
+
+    system_prompt = get_language_content(
+        'chatroom_manager_system_message_return',
+        userinfo.uid
+    )
+
+    user_prompt = get_language_content(
+        'chatroom_user_message_return',
+        userinfo.uid
+    )
+    summary = ''
+    if chat_data['corrected_parameter'] != '':
+        meeting_summary = AIToolLLMRecords().select_one(
+            columns=['outputs'],
+            conditions=[
+                {"column": "app_run_id", "value": chat_data['app_run_id']}
+            ],
+            order_by="created_time DESC",
+        )
+        meeting_summary = meeting_summary['outputs']['value']
+        meeting_prompt = get_language_content(
+            'chatroom_user_message_return_update',
+            userinfo.uid
+        )
+        summary = meeting_prompt.format(
+            meeting_summary=meeting_summary,
+            update_meeting=chat_data['corrected_parameter']
+        )
+    else:
+        summary = ''
+
+    user_prompt = user_prompt.format(
+        messages=json.dumps(chatMessageList, ensure_ascii=False),
+        summary=summary
+    )
+
+    start_time = time()
+    start_datetime_str = datetime.fromtimestamp(start_time) \
+        .replace(microsecond=0).isoformat(sep='_')
+
+    input_messages = Prompt(system_prompt, user_prompt).to_dict()
+    if chat_data['app_run_id'] != '':
+        app_run_id = chat_data['app_run_id']
+        AppRuns().update(
+            {"column": "id", "value": app_run_id},
+            {'status': 1}
+        )
+        AIToolLLMRecords().initialize_correction_record(app_run_id, input_messages)
+    else:
+        app_run_id = AppRuns().insert(
+            {
+                'user_id': userinfo.uid,
+                'app_id': 0,
+                'type': 2,
+                'chatroom_id': chatroom_id,
+                'ai_tool_type': 3,
+                'name': f'Chat_history_summary_{start_datetime_str}',
+                'status': 1
+            }
+        )
+        AIToolLLMRecords().initialize_execution_record(app_run_id, input_messages)
+    return response_success({'app_run_id': app_run_id, 'message': get_language_content("chatroom_message_is_null")})
+
+
 @router.post("/{chatroom_id}/chat_history_summary", response_model=ChatRoomResponseBase, summary="Chat History Summary")  
 async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummary, userinfo: TokenData = Depends(get_current_user)):
     """
@@ -468,7 +584,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
     By using the parameter passing rules of agent&workFlows, the splicing parameters are disassembled and the chat history is summarized through LLM to obtain the meeting summary content
     Parameters:
     -Chatroom_id (int): The unique identifier of the chat room to be updated. Compulsory.
-    -Chat_dequest (ChatHistorySummary): app_id Application ID.
+    -Chat_dequest (ChatHistorySummary): app_id Application ID, app_run_id App Runs Data Table, status Update Status 1 First Request 2 Correction,return_app_run_id Need to correct the ID of the returned result,corrected_parameter Correction suggestions proposed by users.
     -Userinfo (TokenData): Information about the current user is provided through dependency injection. Compulsory.
 
     Returns:
@@ -479,6 +595,11 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
     """
     chat_data = chat_request.dict(exclude_unset=True)
     app_id: int = chat_data['app_id']
+    app_run_id: int = chat_data['app_run_id']
+    update_status: int = chat_data['status']
+    if update_status not in [1, 2]:
+        return response_error(get_language_content("chatroom_status_is_incorrect"))
+
     app_info = Apps().get_app_by_id_search(app_id)
     if app_info is None:
         return response_error(get_language_content("api_agent_info_app_error"))
@@ -490,36 +611,56 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
     find_chatroom = Chatrooms().search_chatrooms_id(chatroom_id, userinfo.uid)
     if not find_chatroom['status']:
         return response_error(get_language_content("chatroom_does_not_exist"))
-
-    # chat_message = ChatroomMessages().search_chatroom_message_asc_id(chatroom_id)
-
-    conditions = [
-        {"column": "chatroom_id", "value": chatroom_id}
-    ]
-
-    chat_message = ChatroomMessages().select(
-        columns=["message"],
-        conditions=conditions,
-        order_by="id ASC",
-    )
-
     app_id = app_info["id"]
 
+    appStatus = AppRuns().select_one(
+        columns=['status'],
+        conditions=[
+            {"column": "id", "value": app_run_id},
+            {"column": "status", "value": 3}
+        ]
+    )['status']
+
+    if appStatus is None:
+        return response_error(get_language_content("chatroom_app_run_id_not_found"))
+
+    # get ai request
+    meeting_summary = AIToolLLMRecords().select_one(
+        columns=['outputs'],
+        conditions=[
+            {"column": "app_run_id", "value": app_run_id}
+        ],
+        order_by="created_time DESC",
+    )
+    meeting_summary = meeting_summary['outputs']['value']
+
+    agent_id = 0
+    workflow_id = 0
+    prompt_variables = None
     if app_info['mode'] == 1:
         apps_model = Agents()
         agent = apps_model.select_one(
-            columns=['input_variables'],
+            columns=['input_variables', 'id'],
             conditions=[
                 {"column": "app_id", "value": app_id},
                 {"column": "status", "value": 1},
                 {"column": "publish_status", "value": 1},
             ]
         )
-        print(agent)
-        exit()
+
+        if agent is None:
+            return response_error(get_language_content("agent_does_not_exist"))
+        input_variable = create_variable_from_dict(agent['input_variables'])
+        prompt_variables = [
+            {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
+            for var in input_variable.properties.values()
+        ]
+        agent_id = agent['id']
+        workflow_id = 0
+
     if app_info['mode'] == 2:
         workflow = Workflows().select_one(
-            columns=['graph'],
+            columns=['graph', 'id'],
             conditions=[
                 {'column': 'app_id', 'value': app_id},
                 {'column': 'status', 'value': 1},
@@ -528,35 +669,76 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
         )
         if workflow is None:
             return
-        graph = create_graph_from_dict(workflow['graph'])
-        input_var = graph.nodes.nodes[0].data['input']
-        input_var = flatten_variable(input_var)
+        input_var = workflow['graph']['nodes'][0]['data']['input']
+        input_variable = create_variable_from_dict(input_var)
+        prompt_variables = [
+            {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
+            for var in input_variable.properties.values()
+        ]
+        agent_id = 0
+        workflow_id = workflow['id']
 
-        # If the last speaker is the user, the Speaker Selector must choose an agent
-        system_prompt = get_language_content(
-            'chatroom_manager_system_with_optional_selection_return',
+    # If the last speaker is the user, the Speaker Selector must choose an agent
+    system_prompt = get_language_content(
+        'chatroom_round_table_app_target_data_generator_system',
+        userinfo.uid
+    )
+
+    user_prompt = get_language_content(
+        'chatroom_round_table_app_target_data_generator_user',
+        userinfo.uid
+    )
+    if chat_data['status'] == 2:
+        meeting_summary_return = AIToolLLMRecords().select_one(
+            columns=['outputs'],
+            conditions=[
+                {"column": "app_run_id", "value": chat_data['return_app_run_id']}
+            ],
+            order_by="created_time DESC",
+        )
+        meeting_summary_return = meeting_summary_return['outputs']['value']
+
+        meeting_prompt = get_language_content(
+            'chatroom_round_table_app_target_data_generator_user_update',
             userinfo.uid
         )
-
-        user_prompt = get_language_content(
-            'chatroom_manager_user_return',
-            userinfo.uid
+        update_return_value = meeting_prompt.format(
+            value_meeting_summary=meeting_summary_return,
+            update_meeting=chat_data['corrected_parameter']
         )
+    else:
+        update_return_value = ''
+    user_prompt = user_prompt.format(
+        meeting_summary=meeting_summary,
+        prompt_variables=prompt_variables,
+        update_return_value=update_return_value
+    )
 
-        user_prompt = user_prompt.format(
-            messages=json.dumps(chat_message, ensure_ascii=False),
-            input_var=input_var
+    start_time = time()
+    start_datetime_str = datetime.fromtimestamp(start_time) \
+        .replace(microsecond=0).isoformat(sep='_')
+
+    input_messages = Prompt(system_prompt, user_prompt).to_dict()
+    if update_status == 1:
+        app_run_id = AppRuns().insert(
+            {
+                'user_id': userinfo.uid,
+                'app_id': 0,
+                'type': 2,
+                'agent_id': agent_id,
+                'workflow_id': workflow_id,
+                'ai_tool_type': 4,
+                'chatroom_id': chatroom_id,
+                'name': f'APP_summary_variable_{start_datetime_str}',
+                'status': 1
+            }
         )
-
-
-        print(system_prompt)
-        print(user_prompt)
-        exit()
-
-        # Prepare the input for the Speaker Selector
-        input_messages = Messages()
-        input_messages.add_prompt(Prompt(system_prompt, user_prompt))
-
-        print(flatten_variable(input_var))
-        exit()
-    # return response_success({'chatroom_id': chatroom_id})
+        AIToolLLMRecords().initialize_execution_record(app_run_id, input_messages)
+    else:
+        app_run_id = chat_data['return_app_run_id']
+        AppRuns().update(
+            {"column": "id", "value": app_run_id},
+            {'status': 1}
+        )
+        AIToolLLMRecords().initialize_correction_record(app_run_id, input_messages)
+    return response_success({'app_run_id': app_run_id, 'message': get_language_content("chatroom_message_is_null")})
