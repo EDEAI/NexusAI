@@ -422,6 +422,7 @@ const ChatRoomContent: FC<contentParameters> = memo(porpos => {
                                         : {
                                               borderRadius: '8px 0px 8px 8px',
                                               background: 'rgba(27,100,243,0.1)',
+                                              whiteSpace:'pre-wrap'
                                           }
                                 }
                                 id={`chilContent${index}`}
@@ -542,6 +543,8 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                                         : {
                                               borderRadius: '8px 0px 8px 8px',
                                               background: 'rgba(27,100,243,0.1)',
+                                              whiteSpace:'pre-wrap'
+                                              
                                           }
                                 }
                                 id={`currentChilContent${index}`}
@@ -785,6 +788,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                                     : {
                                           borderRadius: '8px 0px 8px 8px',
                                           background: 'rgba(27,100,243,0.1)',
+                                          whiteSpace:'pre-wrap'
                                       }
                             }
                             id={`addchilContent`}

@@ -50,6 +50,8 @@ const AgentContent: React.FC<Agentparam> = param => {
     });
 
     const isMyAagent = () => {
+        console.log(selectAgentType);
+        
         if (selectAgentType == 'my_agent') {
             return agentList && agentList.length > 0 ? agentList : [];
         } else {
@@ -76,9 +78,11 @@ const AgentContent: React.FC<Agentparam> = param => {
                 setIshasMore(res.data.total_pages > agentParameters.current.page);
                 selectAgentNumber('my_agent');
             } else {
+                console.log(isInit,);
+                
                 isInit
                     ? setMoreAgentList([...res.data.list])
-                    : setMoreAgentList([...agentList, ...res.data.list]);
+                    : setMoreAgentList([...moreAgentList, ...res.data.list]);
                 setMoreIshasMore(res.data.total_pages > moreAgentParameters.current.page);
                 selectAgentNumber('more_agent');
             }
