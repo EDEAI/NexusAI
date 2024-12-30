@@ -10,10 +10,7 @@ import useStore from '../../store';
 import { AppNode } from '../../types';
 import { resetFormNodes } from '../../utils/resetFormNodes';
 
-type PromptItem = {
-    serializedContent: string;
-    value: object;
-};
+
 
 export default memo(({ node }: { node: AppNode }) => {
     const formRef = useRef(null);
