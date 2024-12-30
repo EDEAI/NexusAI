@@ -1,14 +1,14 @@
 /*
- * @LastEditors: biz
+ * @LastEditors: wnagchi 1305bcd@gmail.com
  */
 
 import { getAgentList, getSkillList } from '@/api/workflow';
-import { SearchOutlined } from '@ant-design/icons';
+import { QuestionCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { ProForm, ProFormRadio, ProFormText } from '@ant-design/pro-components';
 import { useFloating, useHover, useInteractions } from '@floating-ui/react';
 import { getLocale, useIntl } from '@umijs/max';
 import { useSetState } from 'ahooks';
-import { Tabs, TabsProps } from 'antd';
+import { Tabs, TabsProps, Tooltip } from 'antd';
 import { memo, useEffect, useState } from 'react';
 import DraggablePanel from '../Panel/DraggablePanel';
 import UserCon from './components/UserCon';
@@ -127,53 +127,55 @@ export default memo(() => {
             setFilterData(all);
         }
     };
-    const RenderNodeList = () => {
-        const RenderNodeList = ({ list }) =>
-            list.map((item, index) => (
-                <div
-                    onDragStart={event => onDragStart(event, item.type, item)}
-                    draggable
-                    className="cursor-pointer hover:bg-blue-100 rounded-md px-2 box-border"
-                >
-                    <UserCon
-                        key={index}
-                        title={item.data.title}
-                        icon={item?.baseData?.icon || item.type}
-                    ></UserCon>
-                </div>
-            ));
-        const RenderToolsNodeList = ({ list }) =>
-            list.map((item, index) => {
-                const [isOpen, setIsOpen] = useState(false);
 
-                const { refs, floatingStyles, context } = useFloating({
-                    open: isOpen,
-                    onOpenChange: setIsOpen,
-                });
+    const RenderNodes = ({ list }) =>
+        list.map((item, index) => (
+            <div
+                onDragStart={event => onDragStart(event, item.type, item)}
+                draggable
+                className="cursor-pointer hover:bg-blue-100 rounded-md px-2 box-border"
+            >
+                <UserCon
+                    key={index}
+                    title={item.data.title}
+                    icon={item?.baseData?.icon || item.type}
+                ></UserCon>
+            </div>
+        ));
+    const RenderToolsNodeList = ({ list }) =>
+        list.map((item, index) => {
+            // const [isOpen, setIsOpen] = useState(false);
 
-                const hover = useHover(context);
+            // const { refs, floatingStyles, context } = useFloating({
+            //     open: isOpen,
+            //     onOpenChange: setIsOpen,
+            // });
 
-                const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
-                return (
-                    <div key={index}>
-                        {isOpen && (
-                            <div
-                                className="floating shadow-md"
-                                ref={refs.setFloating}
-                                style={floatingStyles}
-                                {...getFloatingProps()}
-                            >
-                                {item?.identity?.description[lang]}
-                            </div>
-                        )}
+            // const hover = useHover(context);
+
+            // const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+            return (
+                <div key={index}>
+                    {/* {isOpen && (
                         <div
-                            className="text-[#333333] mb-2"
-                            ref={refs.setReference}
-                            {...getReferenceProps()}
+                            className="floating shadow-md"
+                            ref={refs.setFloating}
+                            style={floatingStyles}
+                            {...getFloatingProps()}
                         >
-                            {item?.identity?.label[lang]}
+                            {item?.identity?.description[lang]}
                         </div>
-                        {item.tools.map((tool, toolIndex) => (
+                    )} */}
+                    <div
+                        className="text-[#333333] mb-2"
+                    >
+                        {item?.identity?.label[lang]}
+                        <Tooltip placement="right" title={item?.identity?.description[lang]}>
+                            <QuestionCircleOutlined className="cursor-pointer ml-1" />
+                        </Tooltip>
+                    </div>
+                    {item.tools.map((tool, toolIndex) => (
+                        <Tooltip placement="right" title={tool?.description?.human?.[lang]}>
                             <div
                                 onDragStart={event => onDragStart(event, item.type, item)}
                                 draggable
@@ -185,21 +187,23 @@ export default memo(() => {
                                     icon={item?.identity?.icon}
                                 ></UserCon>
                             </div>
-                        ))}
-                    </div>
-                );
-            });
+                        </Tooltip>
+                    ))}
+                </div>
+            );
+        });
+    const RenderNodeList = () => {
         return (
             <div>
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-y-2 gap-2 pt-5">
                     {/* <RenderNodeList list={searchNode} /> */}
-                    {showTypes.includes('1') && <RenderNodeList list={searchNode} />}
+                    {showTypes.includes('1') && <RenderNodes list={searchNode} />}
                     {showTypes.includes('2') && (
-                        <RenderNodeList list={searchNodeList[BlockEnum.Agent]} />
+                        <RenderNodes list={searchNodeList[BlockEnum.Agent]} />
                     )}
                     {showTypes.includes('3') && <RenderToolsNodeList list={searchTools} />}
                     {showTypes.includes('4') && (
-                        <RenderNodeList list={searchNodeList[BlockEnum.Skill]} />
+                        <RenderNodes list={searchNodeList[BlockEnum.Skill]} />
                     )}
                 </div>
             </div>
