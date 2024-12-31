@@ -495,7 +495,6 @@ def task_callback_thread():
 
                         end_time = time.time()
                         end_time = datetime.fromtimestamp(end_time)
-                        # update_app_run(app_run_id, {'status': 3, 'elapsed_time': result['data']['elapsed_time'], 'finished_time': end_time})
                         app_run_data = {
                             'status': 3,
                             'outputs': result['data']['outputs'],

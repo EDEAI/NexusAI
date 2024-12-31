@@ -759,7 +759,6 @@ language_packs = {
             '用户后续问题,请按照用户提出的问题和会议记录修正会议总结：\n'
             '{update_meeting}\n'
         ),
-
         'chatroom_round_table_app_target_data_generator_system': (
             '你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据格式进行数据导向转化。 \n'
             '注意一定要按照工作导向数据格式进行数据转化，最终只返回生成后的json格式内容，不要返回多余的内容。\n'
