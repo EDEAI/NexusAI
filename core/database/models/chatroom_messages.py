@@ -1,6 +1,10 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 from core.database import MySQL
 import math
+from core.database.models.apps import Apps
+from core.database.models.agents import Agents
+from languages import get_language_content
+from collections import deque
 
 
 class ChatroomMessages(MySQL):
@@ -156,3 +160,45 @@ class ChatroomMessages(MySQL):
             order_by="id DESC",
         )
         return info
+
+    def get_history_list(self, messageList: List[Dict]) -> List[Dict]:
+        """
+        Get all history messages and the last section of them as JSON strings in an AI prompt.
+        """
+
+        messages = []
+        for message in messageList:
+            agent_id = message['agent_id']
+            if agent_id > 0:
+                role = 'Agent'
+                info = Agents().select_one(
+                    columns=[
+                        'apps.name'
+                    ],
+                    joins=[
+                        ["left", "apps", "apps.id = agents.app_id"],
+                    ],
+                    conditions=[
+                        {'column': 'id', 'value': agent_id},
+                        {'column': 'status', 'value': 1},
+                    ]
+                )
+                name = info['name']
+            else:
+                role = 'User'
+                name = 'User'
+            message_for_llm = {
+                'id': agent_id,
+                'name': name,
+                'role': role,
+                'message': message['message']
+            }
+            if (topic := message['topic']) is not None:
+                message_for_llm['topic'] = topic
+            messages.append(message_for_llm)
+        messages_in_last_section = deque()
+        for message in reversed(messages):
+            messages_in_last_section.appendleft(message)
+            if message['id'] == 0:
+                break
+        return messages

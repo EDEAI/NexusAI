@@ -69,6 +69,19 @@ class AppRuns(MySQL):
             conditions=[{"column": "id", "value": app_run_id}, {"column": "status", "op": "in", "value": [2, 4]}]
         )
 
+    def get_running_app_run_ai(self, app_run_id: int) -> Dict[str, Any]:
+        """
+        Retrieves a running app run by its ID.
+
+        :param app_run_id: The ID of the running app run.
+        :return: A dictionary representing the running app run.
+        """
+        return self.select_one(
+            columns=['id AS app_run_id', 'user_id', 'app_id', 'workflow_id', 'type', 'level', 'context', 'completed_steps', 'actual_completed_steps', 'completed_edges', 'status', 'elapsed_time',
+                'prompt_tokens', 'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps', 'created_time', 'finished_time'],
+            conditions=[{"column": "id", "value": app_run_id}, {"column": "status", "value": 2}]
+        )
+
     def get_backlogs_list(self, data: Dict[str, Any]):
         """
         Get backlogs list
@@ -208,3 +221,25 @@ class AppRuns(MySQL):
         )
         result = self.execute_query(sql)
         return result.rowcount > 0
+
+    def get_search_app_run_team_id(self, app_run_id) -> [Dict[str, Any]]:
+        """
+        Gets the count of running app runs for a specific workflow.
+
+        :param app_run_id: The ID of the app_run.
+
+        Returns:
+            List[Dict[str, Any]]: A list of dictionaries, each containing task data.
+        """
+        result = self.select_one(
+            columns=[
+                "users.team_id", "users.id", "app_runs.user_id"
+            ],
+            joins=[
+                ["left", "users", "users.id = app_runs.user_id"]
+            ],
+            conditions=[
+                {"column": "app_runs.id", "value": app_run_id}
+            ]
+        )
+        return result

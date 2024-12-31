@@ -392,6 +392,7 @@ language_packs = {
             'Agent responsibilities (or identity):\n'
             '{obligations}'
         ),
+        'chatroom_request_sent_successfully': 'Request successful, please wait',
         'chatroom_role_user': 'user',
         'chatroom_role_agent': 'agent',
         # vector
@@ -738,6 +739,49 @@ language_packs = {
         'tag_binding_create_success': '标签绑定创建成功',
         'tag_binding_delete_success': '标签绑定删除成功',
         'team_id_not_found': '团队ID不存在',
+        'chatroom_app_run_id_not_found': '当前appRunID未找到',
+        'chatroom_status_is_incorrect': '当前状态不正确',
+        'chatroom_manager_system_message_return': (
+            '你是一个会议内容总结助手，请通过我提供的会议聊天历史进行会议总结。\n'
+            '注意最终只返回会议总结内容，不要返回多余的内容。\n'
+        ),
+
+        'chatroom_user_message_return': (
+            '会议聊天历史：\n'
+            '{messages}\n\n'
+            '{summary}\n'
+        ),
+
+        'chatroom_user_message_return_update': (
+            '会议总结内容如下：\n'
+            '{meeting_summary}\n\n'
+
+            '用户后续问题,请按照用户提出的问题和会议记录修正会议总结：\n'
+            '{update_meeting}\n'
+        ),
+
+        'chatroom_round_table_app_target_data_generator_system': (
+            '你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据格式进行数据导向转化。 \n'
+            '注意一定要按照工作导向数据格式进行数据转化，最终只返回生成后的json格式内容，不要返回多余的内容。\n'
+            '工作导向数据json格式说明：list[dict]类型，每个dict为一个数据拆分项 \n'
+            '[{name: 拆分项对应的变量名，不要更改此字段，display_name: 拆分项对应的变量显示名，可以作为拆分项的功能和用途说明，可以作为拆分项的提取依据，不要更改此字段， type: 拆分项对应的变量类型，可为"number"或者"string"，注意拆分项内容一定要与变量类型对应，不要更改此字段，value: 最终的工作导向拆分项内容}]'
+        ),
+        'chatroom_round_table_app_target_data_generator_user': (
+            '会议总结内容：\n'
+            '{meeting_summary}\n\n'
+            '工作导向数据：\n'
+            '{prompt_variables}\n\n'
+            '{update_return_value}\n\n'
+        ),
+
+        'chatroom_round_table_app_target_data_generator_user_update': (
+            '工作导向结果返回为：\n'
+            '{value_meeting_summary}\n\n'
+            
+            '用户后续问题,请按照用户提出的问题和会议记录修正会议总结：\n'
+            '{update_meeting}\n'
+        ),
+        'chatroom_request_sent_successfully': '请求成功，请等待',
     }
 }
 
