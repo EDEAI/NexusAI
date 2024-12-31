@@ -125,7 +125,7 @@ async def skill_publish(app_id: int, userinfo: TokenData = Depends(get_current_u
     if draft_info['status'] == 2:
         return response_error(get_language_content("Skill do not exist"))
     draft_info = draft_info['data']
-    app = Datasets().get_app_by_id(app_id)
+    app = Apps().get_app_by_id(app_id)
     node = SkillNode(
             title=app['name'],
             desc=app['description'],
