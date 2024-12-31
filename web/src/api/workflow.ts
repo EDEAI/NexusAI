@@ -334,3 +334,167 @@ export const updateTag = async (tag_id, name: string) => {
         },
     });
 };
+
+// Get workflow list
+// @param {number} type - Workflow search type, default is 1
+// @returns {Promise<any>} - Returns a Promise object with the workflow list
+export const getWorkflowList = async (type = 1) => {
+    return await aniRequest<any>(`/v1/workflow/workflows_list`, {
+        method: 'GET',
+        data: {
+            page_size: 999999,
+            workflows_search_type: type,
+        },
+    });
+};
+
+/**
+ * Interface for tag data structure
+ * @interface Tag
+ * @property {number} id - The unique identifier of the tag
+ * @property {string} name - The name of the tag
+ */
+interface Tag {
+    id: number;
+    name: string;
+}
+
+/**
+ * Parameters for app list query
+ * @interface AppListParams
+ * @property {number} [page] - Page number for pagination
+ * @property {number} [page_size] - Number of items per page
+ * @property {number} [search_type] - Search type (1: Personal, 2: Team)
+ * @property {string} [apps_name] - Filter by app name
+ * @property {'1'|'2'|'3'|'4'} [apps_mode] - App mode filter
+ *                                           1: Agent
+ *                                           2: Workflow
+ *                                           3: Knowledge Base
+ *                                           4: Skill
+ * @property {string} [tag_ids] - Filter by tag IDs
+ */
+interface AppListParams {
+    page?: number;
+    page_size?: number;
+    search_type?: number;
+    apps_name?: string;
+    apps_mode?: '1' | '2' | '3' | '4';
+    tag_ids?: string;
+}
+
+/**
+ * App list item data structure
+ * @interface AppListItem
+ * @property {number} app_id - The unique identifier of the app
+ * @property {string} name - App name
+ * @property {number} mode - App mode
+ * @property {string} description - App description
+ * @property {string} icon - App icon URL
+ * @property {string} icon_background - Icon background color
+ * @property {number} execution_times - Number of executions
+ * @property {number} publish_status - Publication status
+ * @property {string} published_time - Last publication time
+ * @property {string} published_creator - Publisher name
+ * @property {Tag[]} [tags] - Associated tags
+ * @property {Object[]} [list] - Sub-apps list
+ * @property {number} list[].apps_id - Sub-app ID
+ * @property {string} list[].name - Sub-app name
+ * @property {number} list[].mode - Sub-app mode
+ * @property {string} list[].icon - Sub-app icon URL
+ * @property {string} list[].icon_background - Sub-app icon background
+ */
+interface AppListItem {
+    app_id: number;
+    name: string;
+    mode: number;
+    description: string;
+    icon: string;
+    icon_background: string;
+    execution_times: number;
+    publish_status: number;
+    published_time: string;
+    published_creator: string;
+    tags?: Tag[];
+    list?: Array<{
+        apps_id: number;
+        name: string;
+        mode: number;
+        icon: string;
+        icon_background: string;
+    }>;
+}
+
+/**
+ * Response structure for app list API
+ * @interface AppListResponse
+ * @property {number} code - Response code (0 for success)
+ * @property {string} detail - Response message
+ * @property {Object} data - Response data
+ * @property {AppListItem[]} data.list - List of apps
+ * @property {number} data.total_count - Total number of items
+ * @property {number} data.total_pages - Total number of pages
+ * @property {number} data.page - Current page number
+ * @property {number} data.page_size - Items per page
+ */
+interface AppListResponse {
+    code: number;
+    detail: string;
+    data: {
+        list: AppListItem[];
+        total_count: number;
+        total_pages: number;
+        page: number;
+        page_size: number;
+    };
+}
+
+/**
+ * Fetch app list with filters and pagination
+ * @async
+ * @param {Partial<AppListParams>} params - Query parameters
+ * @returns {Promise<AppListResponse>} App list response
+ * @example
+ * // Get personal agent apps
+ * const response = await getAppList({
+ *   search_type: 1,
+ *   apps_mode: '1'
+ * });
+ */
+export const getAppList = async (params: Partial<AppListParams>) => {
+    return await aniRequest<AppListResponse>(`/v1/apps/apps_list`, {
+        method: 'GET',
+        data: {
+            page: 1,
+            page_size: 999999,
+            ...params,
+        },
+    });
+};
+type AppMode = 'agent' | 'workflow' | 'knowledge' | 'skill';
+
+const APP_MODE_MAP: Record<AppMode, '1' | '2' | '3' | '4'> = {
+    agent: '1',
+    workflow: '2',
+    knowledge: '3',
+    skill: '4',
+};
+
+interface GetAppListOptions {
+    search_type?: number;
+    apps_name?: string;
+    tag_ids?: string;
+    page?: number;
+    page_size?: number;
+}
+
+/**
+ * Enhanced app list fetcher with type-safe mode selection
+ * @param mode - The type of apps to fetch
+ * @param options - Additional options for the request
+ */
+export const getAppListByMode = async (mode: AppMode, options: GetAppListOptions = {}) => {
+    return await getAppList({
+        ...options,
+        apps_mode: APP_MODE_MAP[mode],
+    });
+};

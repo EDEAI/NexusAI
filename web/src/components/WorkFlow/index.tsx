@@ -238,7 +238,7 @@ const DnDFlow = () => {
                 )}
                 <Typography.Text>{workFlowInfo?.app?.description}</Typography.Text>
             </div>
-            <NodePanel></NodePanel>
+            <NodePanel visibleTabs={['agent','workflow']} ></NodePanel>
             <Tools />
 
             <Panel></Panel>

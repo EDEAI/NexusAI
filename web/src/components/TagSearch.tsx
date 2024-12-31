@@ -16,6 +16,7 @@ const { Paragraph } = Typography;
 interface TagSearchProps extends SelectProps {
     children?: React.ReactNode;
     modes?: number;
+    showAddButton?: boolean;
     [key: string]: any;
 }
 
@@ -45,7 +46,7 @@ const tagReducer = (state: TagState, action: TagAction): TagState => {
     }
 };
 
-const TagSearch: React.FC<TagSearchProps> = memo(({ children, ...props }) => {
+const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = true, ...props }) => {
     const intl = useIntl();
     const { modes = 0 } = props;
     const [openAddTag, setOpenAddTag] = useState(false);
@@ -246,13 +247,15 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, ...props }) => {
                 {ModalContent}
             </Modal>
 
-            <Button
-                onClick={() => setOpenAddTag(true)}
-                type="text"
-                className="shrink-0"
-                icon={<PlusOutlined className="cursor-pointer mr-1" />}
-                aria-label={intl.formatMessage({ id: 'addTag.button', defaultMessage: 'Add new tag' })}
-            />
+            {showAddButton && (
+                <Button
+                    onClick={() => setOpenAddTag(true)}
+                    type="text"
+                    className="shrink-0"
+                    icon={<PlusOutlined className="cursor-pointer mr-1" />}
+                    aria-label={intl.formatMessage({ id: 'addTag.button', defaultMessage: 'Add new tag' })}
+                />
+            )}
 
             <TagSelect
                 className="!w-[160px]"
