@@ -90,6 +90,7 @@ class AIToolLLMRecords(MySQL):
                 'app_run_id',
                 # 'app_runs.ai_tool_type',
                 'ai_tool_type',
+                'loop_count',
                 'inputs',
                 'correct_prompt',
                 'outputs',
