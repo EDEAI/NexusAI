@@ -9,23 +9,20 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 from typing import Dict, Optional, Any
 from log import Logger
-from core.database import redis
 from core.database.models import AppRuns, AIToolLLMRecords
-from core.workflow import *
-from core.workflow.nodes import *
-from core.helper import push_to_websocket_queue, get_websocket_queue_length
-from languages import get_language_content
+from core.helper import push_to_websocket_queue
 from celery_app import run_llm_tool
 
-logger = Logger.get_logger('ai_tool_llm_records_run')
+logger = Logger.get_logger('ai_tool_run')
 
 task_timeout = 60  # Timeout for Celery task execution
-global_tasks = [] # List to store tasks
+global_tasks = []  # List to store tasks
 running = True  # Global flag to control thread loops
 
 # Database models
 app_run = AppRuns()
 ai_tool_llm_records = AIToolLLMRecords()
+
 
 def update_app_run(app_run_id: int, data: dict) -> bool:
     """
@@ -48,7 +45,8 @@ def update_ai_run(id: int, data: dict) -> bool:
     """
     return ai_tool_llm_records.update(conditions={'column': 'id', 'value': id}, data=data)
 
-def push_human_confirm_message(
+
+def push_websocket_message(
         user_id: int,
         ai_tool_type: str,
         app_run_id: int,
@@ -70,7 +68,7 @@ def push_human_confirm_message(
         ai_total_tokens: int
 ):
     """
-    Pushes a human confirmation message to the WebSocket message queue.
+    Push messages to websocket.
 
     :param user_id: The ID of the user.
     :param ai_tool_type: Message Type.
@@ -122,6 +120,7 @@ def push_human_confirm_message(
     logger.info(
         f"Push results generated through AI:{user_id} run:{app_run_id} ai_tool_type:{ai_tool_type}:{status}:{error} exec_id:{exec_id} data:{data}")
 
+
 def create_celery_task(
     # team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output
     app_run_id: int,
@@ -156,6 +155,7 @@ def create_celery_task(
     global_tasks.append((task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type))
     logger.info(f"Task added for run:{app_run_id} id:{id} task_id:{task.id}")
 
+
 def remove_task_cache(item):
     """
     Removes a task from the global tasks list and level tasks dictionary.
@@ -163,6 +163,7 @@ def remove_task_cache(item):
     :param item: The task item to remove.
     """
     global_tasks.remove(item)  # Remove task from global tasks list
+
 
 def task_delay_thread():
     """
@@ -179,18 +180,28 @@ def task_delay_thread():
                 ai_tool_type = run['ai_tool_type']  # AI tool type 0: Regular APP (not an AI tool) 1: Agent generator 2: Skill generator 3: Round Table meeting summary generator 4: Round Table app target data generator
                 inputs = run['inputs']  # system prompt + user prompt
                 correct_prompt = run['correct_prompt'] # Prompt for correcting LLM output results
+                # run_type  Run type 1: First generation 2: Regeneration 3: AI correction 4: Batch generation
+                if run['run_type'] == 1:
+                    run_type = 'first'
+                elif run['run_type'] == 2:
+                    run_type = 'again'
+                elif run['run_type'] == 3:
+                    run_type = 'correct'
+                else:
+                    run_type = 'batch'
+
                 if ai_tool_type == 1:
                     return_json = True
-                    ai_tool_type = 'generate_agent'
+                    ai_tool_type = 'generate_agent_'+run_type
                 elif ai_tool_type == 2:
                     return_json = True
-                    ai_tool_type = 'generate_skill'
+                    ai_tool_type = 'generate_skill_'+run_type
                 elif ai_tool_type == 3:
                     return_json = False
-                    ai_tool_type = 'generate_meeting_summary'
+                    ai_tool_type = 'generate_meeting_summary_'+run_type
                 elif ai_tool_type == 4:
                     return_json = True
-                    ai_tool_type = 'generate_meeting_action_items'
+                    ai_tool_type = 'generate_meeting_action_items_'+run_type
                 else:
                     return_json = True
 
@@ -200,6 +211,8 @@ def task_delay_thread():
                 else:
                     prompt_dict = inputs
                     correct_llm_output = False
+                if run['loop_count'] > 0:
+                    ai_tool_llm_records.initialize_execution_record(app_run_id, run['ai_tool_type'], run['loop_count'], run['inputs'], run['correct_prompt'])
 
                 update_app_run(app_run_id, {'status': 2})
                 update_ai_run(id, {'status': 2})
@@ -207,11 +220,13 @@ def task_delay_thread():
                 create_celery_task(app_run_id, id, ai_tool_type, prompt_dict, return_json, correct_llm_output)
                 logger.debug(f"Task assigned completed and the App Run table ID is:{app_run_id}")
                 continue
+
             except:
                 logger.error(f"Error processing run:{run['app_run_id']} {traceback.format_exc()}")
         
         time.sleep(1)
-        
+
+
 def task_callback_thread():
     """
     Handles task callbacks in a separate thread.
@@ -264,30 +279,25 @@ def task_callback_thread():
                             'finished_time': end_time
                         }
                         update_ai_run(id, app_ai_run_data)
-                        redis.lpush(f'app_run_{app_run_id}_result', json.dumps({'status': result['message'], 'data': result['data']['outputs']}))
-                        redis.expire(f'app_run_{app_run_id}_result', 1)
 
-                        push_human_confirm_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens)
+                        push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens)
                     else:
                         update_app_run(app_run_id, {'status': 4, 'error': result['message']})
                         update_ai_run(id, {'status': 4, 'error': result['message']})
-                        redis.lpush(f'app_run_{app_run_id}_result', json.dumps({'status': result['message'], 'data': result['data']['outputs']}))
-                        redis.expire(f'app_run_{app_run_id}_result', 1)
                         end_time = time.time()
                         end_time = datetime.fromtimestamp(end_time)
-                        push_human_confirm_message(user_id, ai_tool_type, app_run_id, 4, result['message'], 0, 0, 0, 0, run['created_time'], end_time, id, 4, result['message'], {}, 0, 0, 0, 0)
+                        push_websocket_message(user_id, ai_tool_type, app_run_id, 4, result['message'], 0, 0, 0, 0, run['created_time'], end_time, id, 4, result['message'], {}, 0, 0, 0, 0)
                 except Exception as e:
                     logger.error(f"Error processing run:{app_run_id} {traceback.format_exc()}")
                     # Update records with failure status and error message if an exception occurred
-                    redis.lpush(f'app_run_{app_run_id}_result', json.dumps({'status': 'failed', 'message': str(e)}))
-                    redis.expire(f'app_run_{app_run_id}_result', 1)
                     update_app_run(app_run_id, {'status': 4, 'error': str(e), 'need_human_confirm': 1})
                     end_time = time.time()
                     end_time = datetime.fromtimestamp(end_time)
-                    push_human_confirm_message(user_id, ai_tool_type, app_run_id, 4, str(e), 0, 0, 0, 0, end_time, end_time, id, 4, str(e), {}, 0, 0, 0, 0)
+                    push_websocket_message(user_id, ai_tool_type, app_run_id, 4, str(e), 0, 0, 0, 0, end_time, end_time, id, 4, str(e), {}, 0, 0, 0, 0)
 
                 remove_task_cache(item)
         time.sleep(1)
+
 
 if __name__ == '__main__':
     delay_thread = threading.Thread(target=task_delay_thread)
