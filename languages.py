@@ -793,7 +793,7 @@ language_packs = {
             '{\n'
             'name: (string类型) 能力名称 content: (string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型 output_format:(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回\n'
             '}\n'
-            '} '
+            '}\n'
         ),
         'generate_agent_user_prompt': '',
         'regenerate_agent_user_prompt': (
@@ -810,7 +810,7 @@ language_packs = {
             '{history_agent}'
         ),
         'app_run_error': 'app运行记录不存在',
-        'api_agent_generate_failed': 'agent生成记录不存在',
+        'api_agent_generate_failed': 'agent生成记录失败',
         'api_agent_user_prompt_required': '提示词不能为空'
     }
 }

@@ -161,6 +161,11 @@ class ReqAgentRegenerateSchema(BaseModel):
 
 
 class ReqAgentSupplementSchema(BaseModel):
-    """Request schema for agent supplement"""
     app_run_id: Optional[int] = None
     supplement_prompt: Optional[str] = None
+
+
+class ReqAgentBatchGenerateSchema(BaseModel):
+    app_run_id: Optional[int] = None
+    supplement_prompt: Optional[str] = None
+    generate_number: Optional[int] = None
