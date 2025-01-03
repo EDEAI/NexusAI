@@ -13,7 +13,7 @@ class AIToolLLMRecords(MySQL):
     """
     have_updated_time = True
 
-    def initialize_execution_record(self, app_run_id: int, ai_tool_type: int, inputs: Dict[str, Any] = None, correct_prompt: Dict[str, Any] = None) -> int:
+    def initialize_execution_record(self, app_run_id: int, ai_tool_type: int, loop_count: int = 0, inputs: Dict[str, Any] = None, correct_prompt: Dict[str, Any] = None) -> int:
         """
         Initializes an execution record with the given parameters.
         
@@ -21,15 +21,18 @@ class AIToolLLMRecords(MySQL):
             app_run_id (int): The ID of the app run.
             inputs (Dict[str, Any]): The inputs for the execution record.
             ai_tool_type (int): AI tool type 0: Regular APP (not an AI tool) 1: Agent generator 2: Skill generator 3: Round Table meeting summary generator 4: Round Table app target data generator.
+            loop_count (int): The number of iterations required for looping.
             correct_prompt (Dict[str, Any]): The correct prompt for the execution record.
         
         Returns:
             int: The ID of the newly created record.
         """
+        loop_count = max(loop_count - 1, 0)
         record = {
             'app_run_id': app_run_id,
             'status': 1,
-            'ai_tool_type': ai_tool_type
+            'ai_tool_type': ai_tool_type,
+            'loop_count': loop_count
         }
         if inputs is not None:
             record['inputs'] = inputs
@@ -38,13 +41,14 @@ class AIToolLLMRecords(MySQL):
 
         return self.insert(record)
 
-    def initialize_correction_record(self, app_run_id: int, ai_tool_type: int, correct_prompt: Dict[str, Any] = None) -> int:
+    def initialize_correction_record(self, app_run_id: int, ai_tool_type: int, loop_count: int = 0, correct_prompt: Dict[str, Any] = None) -> int:
         """
         Initializes an AI correction record with the given parameters.
         
         Args:
             app_run_id (int): The ID of the app run.
             ai_tool_type (int): AI tool type 0: Regular APP (not an AI tool) 1: Agent generator 2: Skill generator 3: Round Table meeting summary generator 4: Round Table app target data generator.
+            loop_count (int): The number of iterations required for looping.
             correct_prompt (Dict[str, Any]): The correct prompt for the correction record.
         
         Returns:
@@ -71,7 +75,7 @@ class AIToolLLMRecords(MySQL):
         )
 
         # Initialize the next correction record
-        return self.initialize_execution_record(app_run_id, ai_tool_type, correct_prompt=correct_prompt)
+        return self.initialize_execution_record(app_run_id, ai_tool_type, loop_count, correct_prompt=correct_prompt)
 
     def get_pending_ai_tool_tasks(self) -> List[Dict[str, Any]]:
         """
@@ -103,12 +107,13 @@ class AIToolLLMRecords(MySQL):
             conditions=[
                 {"column": "app_runs.status", "value": 1},
                 {"column": "status", "value": 1}
-            ]
+            ],
+            order_by='id ASC'
         )
 
     def get_history_record(self, app_run_id: int) -> List[Dict[str, Any]]:
         """
-        Retrieves the last two node execution records for a given app run.
+        Retrieves the last two execution records for a given app run.
         
         Args:
             app_run_id (int): The ID of the app run.
@@ -124,27 +129,4 @@ class AIToolLLMRecords(MySQL):
             ],
             order_by='id DESC',
             limit=2
-        )
-
-    def get_ai_tool_llm_record(self, app_run_id: int) -> Dict[str, Any]:
-        """
-        Queries AI tool LLM records .
-
-        Returns:
-            Dict[str, Any]: dictionaries.
-        """
-        return self.select_one(
-            columns=[
-                'id as exec_id',
-                'status as ai_status',
-                'error.ai_error',
-                'outputs',
-                'elapsed_time as ai_elapsed_time',
-                'prompt_tokens as ai_prompt_tokens',
-                'completion_tokens as ai_completion_tokens',
-                'total_tokens as ai_total_tokens'
-            ],
-            conditions=[
-                {"column": "app_run_id", "value": app_run_id}
-            ]
         )
