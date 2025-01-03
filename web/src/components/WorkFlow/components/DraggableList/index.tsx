@@ -2,23 +2,21 @@
  * @Author: wnagchi 1305bcd@gmail.com
  * @Date: 2024-12-30 17:31:04
  * @LastEditors: biz
- * @LastEditTime: 2024-12-31 16:44:13
+ * @LastEditTime: 2025-01-03 09:50:13
  * @FilePath: \NexusAI_GITHUB\web\src\components\WorkFlow\components\DraggableList\index.tsx
  */
-import React, { memo, useState, useCallback, useEffect, useMemo } from 'react';
-import { Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { getLocale } from '@umijs/max';
-import UserCon from '../UserCon';
-import { useStore } from '@umijs/max';
-import { getAgentList, getSkillList, getWorkflowList } from '@/api/workflow';
-import { getBaseNode } from '../../nodes/nodeDisperse';
-import { BlockEnum } from '../../types';
+import { Tooltip } from 'antd';
+import React, { memo } from 'react';
+import UserCon, { UserConProps } from '../UserCon';
 
 interface DraggableListProps {
     list: any[];
     onDragStart: (event: React.DragEvent, nodeType: string, item: any) => void;
     type?: 'normal' | 'tools' | 'workflow';
+    typeBadge?: UserConProps['typeBadge'];
+    onItemClick?: (item: any) => void;
 }
 
 interface BaseNodeItemProps {
@@ -32,6 +30,8 @@ interface BaseNodeItemProps {
         };
     };
     onDragStart: DraggableListProps['onDragStart'];
+    typeBadge?: UserConProps['typeBadge'];
+    onItemClick?: (item: any) => void;
 }
 
 interface WorkflowNodeItemProps {
@@ -45,6 +45,8 @@ interface WorkflowNodeItemProps {
         };
     };
     onDragStart: DraggableListProps['onDragStart'];
+    typeBadge?: UserConProps['typeBadge'];
+    onItemClick?: (item: any) => void;
 }
 
 interface ToolNodeItemProps {
@@ -63,10 +65,21 @@ interface ToolNodeItemProps {
     category: {
         type: string;
         identity?: {
+            label: {
+                [key: string]: string;
+            };
+            description: {
+                [key: string]: string;
+            };
             icon?: string;
         };
+        tools: any[];
     };
     onDragStart: DraggableListProps['onDragStart'];
+    typeBadge?: UserConProps['typeBadge'];
+    onItemClick?: (category: any, item: any, categoryIndex: number, toolIndex: number) => void;
+    categoryIndex: number;
+    toolIndex: number;
 }
 
 interface ToolCategoryProps {
@@ -83,144 +96,120 @@ interface ToolCategoryProps {
         tools: any[];
     };
     onDragStart: DraggableListProps['onDragStart'];
+    typeBadge: UserConProps['typeBadge'];
+    onItemClick?: (category: any, item: any, categoryIndex: number, toolIndex: number) => void;
+    categoryIndex: number;
 }
 
 interface ToolNodeListProps {
     list: ToolCategoryProps['category'][];
     onDragStart: DraggableListProps['onDragStart'];
+    typeBadge: UserConProps['typeBadge'];
+    onItemClick?: (item: any) => void;
 }
 
-interface FetchDataParams {
-    type: 'node' | 'agent' | 'tool' | 'skill' | 'workflow';
-    team: number;
-    keyword?: string;
+interface NodeWrapperProps {
+    children: React.ReactNode;
+    onDragStart: DraggableListProps['onDragStart'];
+    onClick?: () => void;
+    type: string;
+    item: any;
 }
 
-interface FetchDataResult {
-    list: any[];
-    total?: number;
-}
-
-const fetchTabData = async ({ type, team, keyword }: FetchDataParams): Promise<FetchDataResult> => {
-    try {
-        const teamStatus = team === 1 ? 3 : 2;
-        let result: FetchDataResult = { list: [] };
-
-        switch (type) {
-            case 'agent':
-                const agentRes = await getAgentList(teamStatus);
-                if (agentRes?.code === 0) {
-                    result.list = agentRes.data.list;
-                }
-                break;
-
-            case 'skill':
-                const skillRes = await getSkillList(teamStatus);
-                if (skillRes?.code === 0) {
-                    result.list = skillRes.data.list;
-                }
-                break;
-
-            case 'workflow':
-                const workflowRes = await getWorkflowList(team === 1 ? 1 : 2);
-                if (workflowRes?.code === 0) {
-                    result.list = workflowRes.data.list;
-                }
-                break;
-
-            case 'tool':
-                // 工具数据从 store 获取
-                const toolData = useStore.getState().toolData;
-                result.list = toolData?.list || [];
-                break;
-
-            case 'node':
-                // 基础节点数据
-                const originNodes = getBaseNode();
-                result.list = Object.values(originNodes)
-                    .filter(
-                        item =>
-                            ![BlockEnum.Start, BlockEnum.Agent, BlockEnum.Tool, BlockEnum.Skill].includes(
-                                item.base.type,
-                            ),
-                    )
-                    .map(item => item.base);
-                break;
-        }
-
-        // 如果有关键字，进行过滤
-        if (keyword) {
-            result.list = result.list.filter(item => {
-                const searchText = type === 'workflow' 
-                    ? item.name 
-                    : item.data?.title || item.baseData?.name || '';
-                return searchText.toLowerCase().includes(keyword.toLowerCase());
-            });
-        }
-
-        return result;
-    } catch (error) {
-        console.error(`Failed to fetch ${type} data:`, error);
-        return { list: [] };
-    }
-};
-
-// Base node renderer
-const BaseNodeItem = memo(({ item, onDragStart }: BaseNodeItemProps) => (
+// 新增 NodeWrapper 组件
+const NodeWrapper = memo(({ children, onDragStart, onClick, type, item }: NodeWrapperProps) => (
     <div
         draggable
-        onDragStart={(e) => onDragStart(e, item.type, item)}
+        onDragStart={e => onDragStart(e, type, item)}
+        onClick={onClick}
         className="cursor-pointer hover:bg-blue-100 rounded-md px-2 box-border"
     >
-        <UserCon
-            title={item.data.title}
-            icon={item?.baseData?.icon || item.type}
-        />
+        {children}
     </div>
 ));
 
-// Workflow node renderer
-const WorkflowNodeItem = memo(({ item, onDragStart }: WorkflowNodeItemProps) => (
-    <div
-        draggable
-        onDragStart={(e) => onDragStart(e, item.type, item)}
-        className="cursor-pointer hover:bg-blue-100 rounded-md px-2 box-border"
-    >
-        <UserCon
-            title={item.baseData.name}
-            desc={item.baseData.description}
-            icon={item.baseData.icon || 'workflow'}
-            extra={
-                <div className="text-xs text-gray-500">
-                    {item.baseData.nickname}
-                </div>
-            }
-        />
-    </div>
+// 修改 BaseNodeItem
+const BaseNodeItem = memo(({ item, onDragStart, typeBadge, onItemClick }: BaseNodeItemProps & { onItemClick?: (item: any) => void }) => (
+    <Tooltip placement="right" title={item?.baseData?.description}>
+        <div>
+            <NodeWrapper 
+                onDragStart={onDragStart} 
+                type={item.type} 
+                item={item}
+                onClick={() => onItemClick?.(item)}
+            >
+                <UserCon
+                    title={item.data.title}
+                    icon={item?.baseData?.icon || item.type}
+                    typeBadge={typeBadge}
+                />
+            </NodeWrapper>
+        </div>
+    </Tooltip>
 ));
 
-// Tool node renderer
-const ToolNodeItem = memo(({ tool, category, onDragStart }: ToolNodeItemProps) => {
+// 修改 WorkflowNodeItem
+const WorkflowNodeItem = memo(({ item, onDragStart, typeBadge, onItemClick }: WorkflowNodeItemProps & { onItemClick?: (item: any) => void }) => (
+    <Tooltip placement="right" title={item.baseData?.description}>
+        <div>
+            <NodeWrapper 
+                onDragStart={onDragStart} 
+                type={item.type} 
+                item={item}
+                onClick={() => onItemClick?.(item)}
+            >
+                <UserCon
+                    title={item.baseData.name}
+                    // desc={item.baseData.description}
+                    icon={item.baseData.icon || 'workflow'}
+                    extra={<div className="text-xs text-gray-500">{item.baseData.nickname}</div>}
+                    typeBadge={typeBadge}
+                />
+            </NodeWrapper>
+        </div>
+    </Tooltip>
+));
+
+// 修改 ToolNodeItem
+const ToolNodeItem = memo(({ 
+    tool, 
+    category, 
+    onDragStart, 
+    typeBadge,
+    onItemClick,
+    categoryIndex,
+    toolIndex 
+}: ToolNodeItemProps) => {
     const lang = getLocale() === 'en-US' ? 'en_US' : 'zh_Hans';
 
     return (
         <Tooltip placement="right" title={tool?.description?.human?.[lang]}>
-            <div
-                draggable
-                onDragStart={(e) => onDragStart(e, category.type, category)}
-                className="cursor-pointer hover:bg-blue-100 rounded-md px-2 box-border"
-            >
-                <UserCon
-                    title={tool?.identity?.label[lang]}
-                    icon={category?.identity?.icon}
-                />
+            <div>
+                <NodeWrapper 
+                    onDragStart={onDragStart} 
+                    type={category.type} 
+                    item={category}
+                    onClick={() => onItemClick?.(category, tool, categoryIndex, toolIndex)}
+                >
+                    <UserCon
+                        title={tool?.identity?.label[lang]}
+                        icon={category?.identity?.icon}
+                        typeBadge={typeBadge}
+                    />
+                </NodeWrapper>
             </div>
         </Tooltip>
     );
 });
 
-// Tool category renderer
-const ToolCategory = memo(({ category, onDragStart }: ToolCategoryProps) => {
+// 修改 ToolCategory
+const ToolCategory = memo(({ 
+    category, 
+    onDragStart, 
+    typeBadge,
+    onItemClick,
+    categoryIndex 
+}: ToolCategoryProps) => {
     const lang = getLocale() === 'en-US' ? 'en_US' : 'zh_Hans';
 
     return (
@@ -237,38 +226,58 @@ const ToolCategory = memo(({ category, onDragStart }: ToolCategoryProps) => {
                     tool={tool}
                     category={category}
                     onDragStart={onDragStart}
+                    typeBadge={typeBadge}
+                    onItemClick={(category, item, catIndex, toolIdx) => onItemClick?.(category, item, catIndex, toolIdx)}
+                    categoryIndex={categoryIndex}
+                    toolIndex={toolIndex}
                 />
             ))}
         </div>
     );
 });
 
-// Tool node list renderer
-const ToolNodeList = memo(({ list, onDragStart }: ToolNodeListProps) => (
+// 修改 ToolNodeList
+const ToolNodeList = memo(({ list, onDragStart, typeBadge, onItemClick }: ToolNodeListProps) => (
     <>
-        {list.map((category, index) => (
+        {list.map((category, categoryIndex) => (
             <ToolCategory
-                key={index}
+                key={categoryIndex}
                 category={category}
+                typeBadge={typeBadge}
                 onDragStart={onDragStart}
+                onItemClick={onItemClick}
+                categoryIndex={categoryIndex}
             />
         ))}
     </>
 ));
 
-const DraggableList: React.FC<DraggableListProps> = ({ list, onDragStart, type = 'normal' }) => {
+const DraggableList: React.FC<DraggableListProps> = ({
+    list,
+    onDragStart,
+    type = 'normal',
+    typeBadge = null,
+    onItemClick
+}) => {
     if (!list?.length) return null;
 
     return (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-y-2 gap-2">
             {type === 'tools' ? (
-                <ToolNodeList list={list} onDragStart={onDragStart} />
+                <ToolNodeList 
+                    typeBadge={typeBadge} 
+                    list={list} 
+                    onDragStart={onDragStart}
+                    onItemClick={onItemClick}
+                />
             ) : type === 'workflow' ? (
                 list.map((item, index) => (
                     <WorkflowNodeItem
                         key={index}
                         item={item}
                         onDragStart={onDragStart}
+                        typeBadge={typeBadge}
+                        onItemClick={onItemClick}
                     />
                 ))
             ) : (
@@ -277,6 +286,8 @@ const DraggableList: React.FC<DraggableListProps> = ({ list, onDragStart, type =
                         key={index}
                         item={item}
                         onDragStart={onDragStart}
+                        typeBadge={typeBadge}
+                        onItemClick={onItemClick}
                     />
                 ))
             )}

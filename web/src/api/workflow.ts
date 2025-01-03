@@ -362,23 +362,13 @@ interface Tag {
 /**
  * Parameters for app list query
  * @interface AppListParams
- * @property {number} [page] - Page number for pagination
- * @property {number} [page_size] - Number of items per page
- * @property {number} [search_type] - Search type (1: Personal, 2: Team)
- * @property {string} [apps_name] - Filter by app name
- * @property {'1'|'2'|'3'|'4'} [apps_mode] - App mode filter
- *                                           1: Agent
- *                                           2: Workflow
- *                                           3: Knowledge Base
- *                                           4: Skill
- * @property {string} [tag_ids] - Filter by tag IDs
  */
 interface AppListParams {
     page?: number;
     page_size?: number;
     search_type?: number;
     apps_name?: string;
-    apps_mode?: '1' | '2' | '3' | '4';
+    apps_mode?: '1' | '2' | '3' | '4' | string;
     tag_ids?: string;
 }
 
@@ -489,12 +479,23 @@ interface GetAppListOptions {
 
 /**
  * Enhanced app list fetcher with type-safe mode selection
- * @param mode - The type of apps to fetch
+ * @param mode - The type(s) of apps to fetch, can be single mode or array of modes
  * @param options - Additional options for the request
+ * @example
+ * // Single mode
+ * await getAppListByMode('agent')
+ * // Multiple modes
+ * await getAppListByMode(['agent', 'skill'])
  */
-export const getAppListByMode = async (mode: AppMode, options: GetAppListOptions = {}) => {
+export const getAppListByMode = async (
+    mode: AppMode | AppMode[],
+    options: GetAppListOptions = {},
+) => {
+    const modes = Array.isArray(mode) ? mode : [mode];
+    const appModes = modes.map(m => APP_MODE_MAP[m]).join(',') as AppListParams['apps_mode'];
+
     return await getAppList({
         ...options,
-        apps_mode: APP_MODE_MAP[mode],
+        apps_mode: appModes,
     });
 };

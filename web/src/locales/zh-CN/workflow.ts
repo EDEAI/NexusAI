@@ -247,10 +247,10 @@ export default {
     'workflow.message.setVariablesFirst':'请先设置变量',
 
 
-    'workflow.nodeList': '节点列表',
+    'workflow.nodeList': '列表',
     'workflow.team': '团队',
     'workflow.mine': '我的',
-    'workflow.search': '搜索节点',
+    'workflow.search': '搜索App',
     'workflow.list': '工作流',
 
 

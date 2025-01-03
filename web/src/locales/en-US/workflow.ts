@@ -254,10 +254,10 @@ export default {
     "workflow.message.setVariablesFirst": "Please set variables first",
 
     // Node list related
-    'workflow.nodeList': 'Node List',
+    'workflow.nodeList': 'App List',
     'workflow.team': 'Team',
     'workflow.mine': 'Mine',
-    'workflow.search': 'Search Node',
+    'workflow.search': 'Search App',
     'workflow.list': 'Workflow',
 
     // Node types

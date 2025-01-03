@@ -21,7 +21,7 @@ import { useIntl, useSearchParams } from 'umi';
 import { CustomWorkflowContextProvider } from './context';
 import useDnD from './hooks/useDnD';
 import useFetchData from './hooks/useFetchData'; // 引入自定义的hooks
-import NodePanel from './NodePanel';
+
 import './index.less';
 
 import { PlayCircleOutlined, SyncOutlined } from '@ant-design/icons';
@@ -32,6 +32,7 @@ import useSaveWorkFlow from './saveWorkFlow';
 import useStore from './store';
 import { AppNode, BlockEnum } from './types';
 import Tools from './components/Tools';
+import NodePanel from './components/NodePanel';
 // import usePageVisibilityEffect from './hooks/usePageVisibilityEffect';
 
 const DnDFlow = () => {
@@ -238,7 +239,7 @@ const DnDFlow = () => {
                 )}
                 <Typography.Text>{workFlowInfo?.app?.description}</Typography.Text>
             </div>
-            <NodePanel visibleTabs={['agent','workflow']} ></NodePanel>
+            <NodePanel visibleTabs={['agent','workflow']}></NodePanel>
             <Tools />
 
             <Panel></Panel>

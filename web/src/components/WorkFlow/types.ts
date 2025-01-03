@@ -206,12 +206,12 @@ export interface LLMNodeData {
 }
 
 export interface TabConfig {
-    key: string;
+    key?: string;
     tabKey: 'node' | 'agent' | 'tool' | 'skill' | 'workflow';
     label: string;
     defaultMessage: string;
     type: 'normal' | 'tools' | 'workflow';
-    getData: () => any[];
+    getData: () => any;
     show?: boolean;
 }
 
