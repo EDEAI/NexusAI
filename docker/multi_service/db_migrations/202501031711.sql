@@ -1,0 +1,1 @@
+ALTER TABLE `ai_tool_llm_records` ADD `run_type` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Run type 1: First generation 2: Regeneration 3: AI correction 4: Batch generation' AFTER `ai_tool_type`, ADD INDEX (`run_type`);
