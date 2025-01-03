@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any, Union
 
 class AgentListData(BaseModel):
@@ -141,3 +141,26 @@ class ResAgentRunSchema(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
     data: Optional[AgentRunResponseData] = None
+
+class ReqAgentGenerateSchema(BaseModel):
+    user_prompt: Optional[str] = None
+
+class AgentGenerateResonseData(BaseModel):
+    app_run_id: Optional[int] = None
+    record_id: Optional[int] = None
+
+class ResAgentGenerateSchema(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Optional[AgentGenerateResonseData] = None
+
+
+class ReqAgentRegenerateSchema(BaseModel):
+    app_run_id: Optional[int] = None
+
+
+
+class ReqAgentSupplementSchema(BaseModel):
+    """Request schema for agent supplement"""
+    app_run_id: Optional[int] = None
+    supplement_prompt: Optional[str] = None

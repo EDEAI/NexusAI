@@ -7,12 +7,18 @@ from api.schema.agent import *
 from api.schema.base import *
 from core.database.models.agents import Agents
 from core.database.models.apps import Apps
+from core.database.models.app_runs import AppRuns
 from core.database.models.agent_abilities import AgentAbilities
 from core.workflow.nodes import AgentNode
 from core.workflow.variables import create_variable_from_dict
 from core.llm.prompt import create_prompt_from_dict, Prompt
+from core.llm.messages import Messages
 from celery_app import run_app
 from languages import get_language_content
+from time import time
+import json
+from core.database.models.ai_tool_llm_records import AIToolLLMRecords
+import traceback
 
 router = APIRouter()
 
@@ -274,3 +280,309 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
         return response_error(result["message"])
 
     return response_success({"outputs": result["data"]["outputs"], "outputs_md": result["data"]["outputs_md"]}, get_language_content("api_agent_success"))
+
+@router.post("/agent_generate", response_model=ResAgentGenerateSchema)
+async def agent_generate(data: ReqAgentGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Generate an agent based on user prompt
+    
+    Args:
+        data (ReqAgentGenerateSchema): Request data containing:
+            user_prompt (str): The prompt text used to generate the agent
+        userinfo (TokenData): User authentication information
+        
+    Returns:
+        JSON response containing:
+            app_run_id (int): The ID of the app run
+            record_id (int): The ID of the LLM record
+            
+    Raises:
+        - Returns error if prompt is empty
+        - Returns error if record creation fails
+    """
+    # Validate user prompt
+    if not data.user_prompt:
+        return response_error(get_language_content("api_agent_user_prompt_required"))
+
+    try:
+        # Create app run record
+        start_datetime_str = datetime.fromtimestamp(time()) \
+            .replace(microsecond=0).isoformat(sep='_')
+        app_run_id = AppRuns().insert({
+            'user_id': userinfo.uid,
+            'app_id': 0,
+            'type': 2,
+            'name': f'Agent_Generator_{start_datetime_str}',
+            'status': 1  # Initial status
+        })
+
+        # Prepare prompts for LLM
+        system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
+        input_ = Prompt(
+            system=system_prompt, 
+            user=data.user_prompt
+        ).to_dict()
+
+        # Initialize LLM execution record
+        record_id = AIToolLLMRecords().initialize_execution_record(
+            app_run_id=app_run_id,
+            ai_tool_type=1,  # Agent generator type
+            inputs=input_
+        )
+
+        if not record_id:
+            return response_error(get_language_content("api_agent_generate_failed"))
+
+        # Return successful response
+        return response_success(
+            {
+                "app_run_id": app_run_id,
+                "record_id": record_id
+            }, 
+            get_language_content("api_agent_success")
+        )
+
+    except Exception as e:
+        return response_error(get_language_content("api_agent_generate_failed"))
+
+@router.post('/agent_regenerate', response_model=ResAgentGenerateSchema)
+async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Regenerate an agent based on previous generation history
+    
+    Args:
+        data (ReqAgentRegenerateSchema): Request data containing:
+            app_run_id (int): The ID of the original app run
+        userinfo (TokenData): User authentication information
+        
+    Returns:
+        JSON response containing:
+            app_run_id (int): The ID of the app run
+            
+    Raises:
+        - Returns error if app_run_id is invalid
+        - Returns error if record retrieval fails
+    """
+    # Validate app run exists and belongs to user
+    app_run_info = AppRuns().select_one(
+        columns = ["id"],
+        conditions = [
+            {"column": "id", "value": data.app_run_id},
+            {"column": "user_id", "value": userinfo.uid}
+        ]
+    )
+
+    if not app_run_info:
+        return response_error(get_language_content('app_run_error'))
+    
+    # Get all LLM records for this app run
+    record_list = AIToolLLMRecords().select(
+        columns = ['id', 'inputs', 'outputs'],
+        conditions = [
+            {"column": "app_run_id", "value": data.app_run_id}
+        ]
+    )
+
+    # Extract original user prompt from first record
+    base_user_prompt = ""
+    first_record = record_list[0]
+    inputs = first_record.get('inputs', {})
+
+    # Get user prompt value from inputs
+    try:
+        if isinstance(inputs, dict) and 'user' in inputs:
+            user_dict = inputs['user']
+            if isinstance(user_dict, dict) and 'value' in user_dict:
+                base_user_prompt = user_dict['value']
+    except Exception as e:
+        # print(f"Error extracting user prompt: {str(e)}")
+        base_user_prompt = ""
+        
+    # Collect history agent list from all records
+    history_agent_list = []
+    for record in record_list:
+        try:
+            # Add outputs directly as they are already in dictionary format
+            if record.get('outputs'):
+                history_agent_list.append(record['outputs'])
+        except Exception as e:
+            # print(f"Error processing record: {str(e)}")
+            continue
+    
+    # Filter out None values
+    history_agent_list = [agent for agent in history_agent_list if agent]
+
+    # Get latest record for updating status
+    latest_record = AIToolLLMRecords().select_one(
+        columns = ['id', 'inputs', 'outputs'],
+        conditions = [
+            {"column": "app_run_id", "value": data.app_run_id}
+        ],
+        order_by='id DESC'
+    )
+
+    # Prepare prompts for regeneration
+    prompt_template = get_language_content(
+        'regenerate_agent_user_prompt',
+        userinfo.uid
+    )
+    system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
+    
+    # Format user prompt with history
+    user_prompt = prompt_template.format(
+        history_user_prompt=base_user_prompt,
+        history_agent_list=history_agent_list
+    )
+
+    # Prepare input for LLM
+    input_ = Prompt(system=system_prompt, user=user_prompt).to_dict()
+    
+    try:
+        # Mark previous record as processed
+        AIToolLLMRecords().update(
+            {'column': 'id', 'value': latest_record['id']},
+            {'correct_output': 1}
+        )
+
+        AppRuns().update(
+            {'column': 'id', 'value': data.app_run_id},
+            {'status': 1}
+        )
+
+        # Initialize new execution record
+        record_id = AIToolLLMRecords().initialize_execution_record(
+            app_run_id=data.app_run_id,
+            ai_tool_type=1,
+            inputs=input_
+        )
+
+        if not record_id:
+            return response_error(get_language_content("api_agent_generate_failed"))
+
+        return response_success(
+            {
+                'app_run_id': data.app_run_id,
+                'record_id': record_id
+             }, 
+            get_language_content("api_agent_success")
+        )
+
+    except Exception as e:
+        # print(f"Error in agent_regenerate: {str(e)}")
+        # print(traceback.format_exc())
+        return response_error(get_language_content("api_agent_generate_failed"))
+
+@router.post('/agent_supplement', response_model=ResAgentGenerateSchema)
+async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Supplement agent information based on existing agent and additional prompt
+    
+    Args:
+        data (ReqAgentSupplementSchema): Request data containing:
+            app_run_id (int): Original agent generation run ID
+            supplement_prompt (str): Additional prompt for supplementing agent info
+        userinfo (TokenData): User authentication information
+        
+    Returns:
+        JSON response containing:
+            app_run_id (int): The ID of the app run
+            
+    Raises:
+        - Returns error if app_run_id is invalid
+        - Returns error if record retrieval fails
+    """
+    # Validate app run exists and belongs to user
+    app_run_info = AppRuns().select_one(
+        columns = ["id"],
+        conditions = [
+            {"column": "id", "value": data.app_run_id},
+            {"column": "user_id", "value": userinfo.uid}
+        ]
+    )
+
+    if not app_run_info:
+        return response_error(get_language_content('app_run_error'))
+   
+    # Get first record to extract original user prompt
+    first_record = AIToolLLMRecords().select_one(
+        columns = ['inputs'],
+        conditions = [
+            {"column": "app_run_id", "value": data.app_run_id}
+        ],
+        order_by="id ASC"
+    )
+
+    # Extract original user prompt from inputs
+    base_user_prompt = ""
+    inputs = first_record.get('inputs', {})
+    try:
+        if isinstance(inputs, dict) and 'user' in inputs:
+            user_dict = inputs['user']
+            if isinstance(user_dict, dict) and 'value' in user_dict:
+                base_user_prompt = user_dict['value']
+    except Exception:
+        base_user_prompt = ""
+
+    # Get latest record for agent history and status update
+    last_record = AIToolLLMRecords().select_one(
+        columns = ['id', 'outputs'],
+        conditions = [
+            {"column": "app_run_id", "value": data.app_run_id}
+        ],
+        order_by='id DESC'
+    )
+
+    # Extract agent info from outputs
+    history_agent_info = {}
+    try:
+        if isinstance(last_record, dict) and 'outputs' in last_record:
+            outputs_dict = last_record['outputs']
+            if isinstance(outputs_dict, dict) and 'value' in outputs_dict:
+                history_agent_info = outputs_dict['value']
+    except Exception:
+        pass
+
+    # Prepare prompts for supplementation
+    prompt_template = get_language_content('ageng_supplement_user_prompt', userinfo.uid)
+    system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
+    
+    # Format user prompt with history and supplement
+    user_prompt = prompt_template.format(
+        history_user_prompt=base_user_prompt,
+        agent_supplement=data.supplement_prompt,
+        history_agent=history_agent_info
+    )
+
+    # Prepare input for LLM
+    input_ = Prompt(system=system_prompt, user=user_prompt).to_dict()
+    
+    try:
+        # Update app run status
+        AppRuns().update(
+            {'column': 'id', 'value': data.app_run_id},
+            {'status': 1}
+        )
+        
+        # Initialize new execution record
+        record_id = AIToolLLMRecords().initialize_correction_record(
+            app_run_id=data.app_run_id,
+            ai_tool_type=1,
+            correct_prompt=input_
+        )
+
+
+        if not record_id:
+            return response_error(get_language_content("api_agent_generate_failed"))
+
+        return response_success(
+            {
+                'app_run_id': data.app_run_id,
+                'record_id': record_id
+            }, 
+            get_language_content("api_agent_success")
+        )
+
+    except Exception:
+        return response_error(get_language_content("api_agent_generate_failed"))
+       
+

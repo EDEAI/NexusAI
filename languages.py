@@ -492,7 +492,8 @@ language_packs = {
         'tag_delete_success': 'Tag delete success',
         'tag_binding_create_success': 'Tag binding create success',
         'tag_binding_delete_success': 'Tag binding delete success',
-        'team_id_not_found': 'Team ID not found'
+        'team_id_not_found': 'Team ID not found',
+
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -781,6 +782,36 @@ language_packs = {
             '{update_meeting}\n'
         ),
         'chatroom_request_sent_successfully': '请求成功，请等待',
+        
+        'generate_agent_system_prompt': (
+            '你是一个AI智能体生成助手，\n'
+            '请通过我的需求内容，按照智能体的数据结构为我生成一个完整的智能体信息，智能体名称、描述要高度拟人化。\n'
+            '注意只返回智能体的json结构数据，不要返回多余的内容。\n'
+            '智能体数据json结构说明：\n'
+            '{\n'
+            'name: (string类型) 智能体名称,description: (string类型) 智能体描述,obligations:  (string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）,abilities: (list[dict]类型)  智能体的所有能力，智能体运行时可选择某个能力，决定运行结果的输出内容以及输出格式，每个能力的数据结构：\n'
+            '{\n'
+            'name: (string类型) 能力名称 content: (string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型 output_format:(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回\n'
+            '}\n'
+            '} '
+        ),
+        'generate_agent_user_prompt': '',
+        'regenerate_agent_user_prompt': (
+            '{history_user_prompt}\n\n'
+            '注意：生成的智能体不要与历史数据内容相同，要有不同的能力。\n'
+            '历史数据如下：\n'
+            '{history_agent_list}\n'
+        ),
+        'ageng_supplement_user_prompt': (
+            '{history_user_prompt}\n'
+            '{agent_supplement}\n'
+            '请通过我的内容强化智能体数据。\n'
+            '智能体数据如下。\n'
+            '{history_agent}'
+        ),
+        'app_run_error': 'app运行记录不存在',
+        'api_agent_generate_failed': 'agent生成记录不存在',
+        'api_agent_user_prompt_required': '提示词不能为空'
     }
 }
 
