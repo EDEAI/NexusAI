@@ -77,7 +77,7 @@ class AIToolLLMRecords(MySQL):
         )
 
         # Initialize the next correction record
-        return self.initialize_execution_record(app_run_id, ai_tool_type, 2, loop_count, correct_prompt=correct_prompt)
+        return self.initialize_execution_record(app_run_id, ai_tool_type, 3, loop_count, correct_prompt=correct_prompt)
 
     def get_pending_ai_tool_tasks(self) -> List[Dict[str, Any]]:
         """
@@ -90,6 +90,7 @@ class AIToolLLMRecords(MySQL):
             columns=[
                 'id',
                 'app_run_id',
+                'run_type',
                 # 'app_runs.ai_tool_type',
                 'ai_tool_type',
                 'loop_count',
