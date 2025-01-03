@@ -327,7 +327,8 @@ async def agent_generate(data: ReqAgentGenerateSchema, userinfo: TokenData = Dep
         record_id = AIToolLLMRecords().initialize_execution_record(
             app_run_id=app_run_id,
             ai_tool_type=1,  # Agent generator type
-            inputs=input_
+            inputs=input_,
+            run_type=1
         )
 
         if not record_id:
@@ -427,8 +428,16 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
         userinfo.uid
     )
     system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
+
+    # append_prompt = (
+    #         '{history_user_prompt}\n\n'
+    #         '注意：生成的智能体不要与历史数据内容相同，要有不同的能力。\n'
+    #         '历史数据如下：\n'
+    #     )
     
-    # Format user prompt with history
+    # append_prompt = append_prompt.format(history_user_prompt=base_user_prompt)
+
+     # Format user prompt with history
     user_prompt = prompt_template.format(
         history_user_prompt=base_user_prompt,
         history_agent_list=history_agent_list
@@ -453,7 +462,8 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
         record_id = AIToolLLMRecords().initialize_execution_record(
             app_run_id=data.app_run_id,
             ai_tool_type=1,
-            inputs=input_
+            inputs=input_,
+            run_type=2
         )
 
         if not record_id:
@@ -585,4 +595,25 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
     except Exception:
         return response_error(get_language_content("api_agent_generate_failed"))
        
+
+# @router.post('/agent_batch_generate', response_model=ResAgentGenerateSchema)
+# async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
+#     generate_number = data.generate_number
+#     agent_supplement = data.agent_supplement
+#     app_run_id = data.app_run_id
+
+
+#     app_run_info = AppRuns().select_one(
+#         columns = ["id"],
+#         conditions = [
+#             {"column": "id", "value": data.app_run_id},
+#             {"column": "user_id", "value": userinfo.uid}
+#         ]
+#     )
+
+#     if not app_run_info:
+#         return response_error(get_language_content('app_run_error'))
+    
+
+
 
