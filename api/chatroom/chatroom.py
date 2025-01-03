@@ -559,7 +559,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
             {"column": "id", "value": app_run_id},
             {'status': 1}
         )
-        AIToolLLMRecords().initialize_correction_record(app_run_id, input_messages)
+        record_id = AIToolLLMRecords().initialize_correction_record(app_run_id, 3, input_messages)
     else:
         app_run_id = AppRuns().insert(
             {
@@ -567,13 +567,13 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
                 'app_id': 0,
                 'type': 2,
                 'chatroom_id': chatroom_id,
-                'ai_tool_type': 3,
+                # 'ai_tool_type': 3,
                 'name': f'Chat_history_summary_{start_datetime_str}',
                 'status': 1
             }
         )
-        AIToolLLMRecords().initialize_execution_record(app_run_id, input_messages)
-    return response_success({'app_run_id': app_run_id, 'message': get_language_content("chatroom_message_is_null")})
+        record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 3, input_messages)
+    return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'message': 'Executing, please wait'})
 
 
 @router.post("/{chatroom_id}/chat_history_summary", response_model=ChatRoomResponseBase, summary="Chat History Summary")  
@@ -720,25 +720,29 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
 
     input_messages = Prompt(system_prompt, user_prompt).to_dict()
     if update_status == 1:
-        app_run_id = AppRuns().insert(
-            {
-                'user_id': userinfo.uid,
-                'app_id': 0,
-                'type': 2,
-                'agent_id': agent_id,
-                'workflow_id': workflow_id,
-                'ai_tool_type': 4,
-                'chatroom_id': chatroom_id,
-                'name': f'APP_summary_variable_{start_datetime_str}',
-                'status': 1
-            }
+        # app_run_id = AppRuns().insert(
+        #     {
+        #         'user_id': userinfo.uid,
+        #         'app_id': 0,
+        #         'type': 2,
+        #         'agent_id': agent_id,
+        #         'workflow_id': workflow_id,
+        #         # 'ai_tool_type': 4,
+        #         'chatroom_id': chatroom_id,
+        #         'name': f'APP_summary_variable_{start_datetime_str}',
+        #         'status': 1
+        #     }
+        # )
+        AppRuns().update(
+            {"column": "id", "value": app_run_id},
+            {'status': 1}
         )
-        AIToolLLMRecords().initialize_execution_record(app_run_id, input_messages)
+        record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 4, input_messages)
     else:
         app_run_id = chat_data['return_app_run_id']
         AppRuns().update(
             {"column": "id", "value": app_run_id},
             {'status': 1}
         )
-        AIToolLLMRecords().initialize_correction_record(app_run_id, input_messages)
-    return response_success({'app_run_id': app_run_id, 'message': get_language_content("chatroom_message_is_null")})
+        record_id = AIToolLLMRecords().initialize_correction_record(app_run_id, 4, input_messages)
+    return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'message': 'Executing, please wait'})
