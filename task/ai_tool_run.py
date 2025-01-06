@@ -127,6 +127,7 @@ def create_celery_task(
     id: int,
     ai_tool_type: str,
     loop_id: int,
+    loop_limit: int,
     loop_count: int,
     run_ai_tool_type: int,
     prompt_dict: Optional[Dict[str, Any]] = None,
@@ -137,6 +138,7 @@ def create_celery_task(
     Creates a Celery task to execute a node asynchronously.
 
     :param app_run_id: The name of the app run.
+    :param loop_limit: Number of cycles.
     :param loop_count: Number of cycles.
     :param loop_id: id of cycles.
     :param run_ai_tool_type: AI tool type 0: Regular APP (not an AI tool).
@@ -158,7 +160,7 @@ def create_celery_task(
         correct_llm_output=correct_llm_output
     )
     # Add task to global tasks list
-    global_tasks.append((task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type, loop_count, loop_id, run_ai_tool_type))
+    global_tasks.append((task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type, loop_count, loop_id, run_ai_tool_type, loop_limit))
     logger.info(f"Task added for run:{app_run_id} id:{id} task_id:{task.id}")
 
 
@@ -228,7 +230,7 @@ def task_delay_thread():
                 update_app_run(app_run_id, {'status': 2})
                 update_ai_run(id, {'status': 2})
 
-                create_celery_task(app_run_id, id, ai_tool_type, run['loop_id'], run['loop_count'], run['ai_tool_type'], prompt_dict, return_json, correct_llm_output)
+                create_celery_task(app_run_id, id, ai_tool_type, run['loop_id'], run['loop_limit'], run['loop_count'], run['ai_tool_type'], prompt_dict, return_json, correct_llm_output)
                 logger.debug(f"Task assigned completed and the App Run table ID is:{app_run_id}")
                 continue
 
@@ -245,7 +247,7 @@ def task_callback_thread():
     global running
     while running:
         for item in list(global_tasks):
-            task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type, loop_count, loop_id, run_ai_tool_type = item
+            task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type, loop_count, loop_id, run_ai_tool_type, loop_limit = item
             if task.ready():
                 try:
                     result = task.get(timeout=task_timeout)  # Wait for the task to complete with a timeout
@@ -271,7 +273,7 @@ def task_callback_thread():
                         app_run_total_tokens = run['total_tokens'] + total_tokens
                         if loop_count > 0:
                             inputs_new = ai_tool_llm_records.inputs_append_history_outputs(app_run_id, loop_id)
-                            ai_tool_llm_records.initialize_execution_record(app_run_id, run_ai_tool_type, 4, loop_id, loop_count, inputs_new)
+                            ai_tool_llm_records.initialize_execution_record(app_run_id, run_ai_tool_type, 4, loop_id, loop_limit, loop_count, inputs_new)
                             app_run_data = {
                                 'status': 1
                             }
