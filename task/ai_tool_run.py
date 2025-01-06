@@ -126,6 +126,7 @@ def create_celery_task(
     app_run_id: int,
     id: int,
     ai_tool_type: str,
+    loop_count: int,
     prompt_dict: Optional[Dict[str, Any]] = None,
     return_json: bool = False,
     correct_llm_output: bool = False,
@@ -134,6 +135,7 @@ def create_celery_task(
     Creates a Celery task to execute a node asynchronously.
 
     :param app_run_id: The name of the app run.
+    :param loop_count: Number of cycles.
     :param prompt_dict: cue word.
     :param return_json: Whether to return a JSON string.
     :param correct_llm_output: Flag to indicate if correct LLM output is found.
@@ -152,7 +154,7 @@ def create_celery_task(
         correct_llm_output=correct_llm_output
     )
     # Add task to global tasks list
-    global_tasks.append((task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type))
+    global_tasks.append((task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type, loop_count))
     logger.info(f"Task added for run:{app_run_id} id:{id} task_id:{task.id}")
 
 
@@ -216,11 +218,13 @@ def task_delay_thread():
                     if ai_tool_status is None:
                         inputs_new = ai_tool_llm_records.inputs_append_history_outputs(app_run_id, run['loop_id'])
                         ai_tool_llm_records.initialize_execution_record(app_run_id, run['ai_tool_type'], 4, run['loop_id'], run['loop_count'], inputs_new, run['correct_prompt'])
-
+                loop_count = run['loop_count']
+                if loop_count > 0:
+                    loop_count = max(loop_count - 1, 0)
                 update_app_run(app_run_id, {'status': 2})
                 update_ai_run(id, {'status': 2})
 
-                create_celery_task(app_run_id, id, ai_tool_type, prompt_dict, return_json, correct_llm_output)
+                create_celery_task(app_run_id, id, ai_tool_type, loop_count, prompt_dict, return_json, correct_llm_output)
                 logger.debug(f"Task assigned completed and the App Run table ID is:{app_run_id}")
                 continue
 
@@ -237,7 +241,7 @@ def task_callback_thread():
     global running
     while running:
         for item in list(global_tasks):
-            task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type = item
+            task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type, loop_count = item
             if task.ready():
                 try:
                     result = task.get(timeout=task_timeout)  # Wait for the task to complete with a timeout
@@ -261,15 +265,20 @@ def task_callback_thread():
                         app_run_prompt_tokens = run['prompt_tokens'] + prompt_tokens
                         app_run_completion_tokens = run['completion_tokens'] + completion_tokens
                         app_run_total_tokens = run['total_tokens'] + total_tokens
-                        app_run_data = {
-                            'status': 3,
-                            'outputs': result['data']['outputs'],
-                            'elapsed_time': app_run_elapsed_time,
-                            'prompt_tokens': app_run_prompt_tokens,
-                            'completion_tokens': app_run_completion_tokens,
-                            'total_tokens': app_run_total_tokens,
-                            'finished_time': end_time
-                        }
+                        if loop_count > 0:
+                            app_run_data = {
+                                'status': 1
+                            }
+                        else:
+                            app_run_data = {
+                                'status': 3,
+                                'outputs': result['data']['outputs'],
+                                'elapsed_time': app_run_elapsed_time,
+                                'prompt_tokens': app_run_prompt_tokens,
+                                'completion_tokens': app_run_completion_tokens,
+                                'total_tokens': app_run_total_tokens,
+                                'finished_time': end_time
+                            }
                         update_app_run(app_run_id, app_run_data)
                         app_ai_run_data = {
                             'status': 3,
