@@ -158,7 +158,7 @@ class AIToolLLMRecords(MySQL):
                 {"column": "ai_tool_type", "value": ai_tool_type},
                 {"column": "run_type", "value": run_type},
                 {"column": "loop_id", "value": loop_id},
-                {"column": "loop_count", "op": ">", "value": 0}
+                {"column": "loop_count", "op": ">", "value": 0},
                 {"column": "status", "op": "in", "value": [1, 2]}
             ]
         )
