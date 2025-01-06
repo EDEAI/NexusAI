@@ -553,7 +553,7 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
         pass
 
     # Prepare prompts for supplementation
-    prompt_template = get_language_content('ageng_supplement_user_prompt', userinfo.uid)
+    prompt_template = get_language_content('agent_supplement_user_prompt', userinfo.uid)
     system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
     
     # Format user prompt with history and supplement
@@ -596,24 +596,152 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
         return response_error(get_language_content("api_agent_generate_failed"))
        
 
-# @router.post('/agent_batch_generate', response_model=ResAgentGenerateSchema)
-# async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
-#     generate_number = data.generate_number
-#     agent_supplement = data.agent_supplement
-#     app_run_id = data.app_run_id
-
-
-#     app_run_info = AppRuns().select_one(
-#         columns = ["id"],
-#         conditions = [
-#             {"column": "id", "value": data.app_run_id},
-#             {"column": "user_id", "value": userinfo.uid}
-#         ]
-#     )
-
-#     if not app_run_info:
-#         return response_error(get_language_content('app_run_error'))
+@router.post('/agent_batch_generate', response_model=ResAgentBatchGenerateSchema)
+async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Batch generate multiple agents based on previous generation and supplementary requirements
     
+    Args:
+        data (ReqAgentBatchGenerateSchema): Request data containing:
+            app_run_id (int): The ID of the original app run
+            generate_number (int): Number of agents to generate (1-10)
+            supplement_prompt (str): Additional prompt to ensure diversity between agents
+        userinfo (TokenData): User authentication information
+        
+    Returns:
+        JSON response containing:
+            app_run_id (int): The ID of the app run
+            record_id (int): The ID of the LLM record
+    """
 
 
+    # result = AIToolLLMRecords().inputs_append_history_outputs(loop_id=data.loop_id, app_run_id=data.app_run_id)
+    # print('result1111111')
+    # print(result)
+    # return
+    # Validate app run exists and belongs to user
+    app_run_info = AppRuns().select_one(
+        columns = ["id"],
+        conditions = [
+            {"column": "id", "value": data.app_run_id},
+            {"column": "user_id", "value": userinfo.uid}
+        ]
+    )
+
+    if not app_run_info:
+        return response_error(get_language_content('app_run_error'))
+
+    try:
+        # Get current timestamp as loop_id
+        loop_id = int(time())
+
+        # Prepare prompts for batch generation
+        system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
+        agent_batch_generate_user_prompt = get_language_content('agent_batch_generate_user_prompt', userinfo.uid)
+        agent_reference_data = get_language_content('agent_reference_data', userinfo.uid)
+
+        last_record = AIToolLLMRecords().select_one(
+            columns = ['id', 'inputs', 'outputs'],
+            conditions = [
+                {"column": "app_run_id", "value": data.app_run_id}
+            ],
+            order_by='id DESC'
+        )
+
+        # Extract agent info from outputs
+        history_agent_info = {}
+        try:
+            if isinstance(last_record, dict) and 'outputs' in last_record:
+                outputs_dict = last_record['outputs']
+                if isinstance(outputs_dict, dict) and 'value' in outputs_dict:
+                    history_agent_info = outputs_dict['value']
+        except Exception:
+            pass
+        
+        agent_reference_data = agent_reference_data.format(
+            agent_data=history_agent_info
+        )
+
+        append_prompt = (
+            agent_batch_generate_user_prompt + agent_reference_data
+        )
+
+        system_prompt = system_prompt.format(
+            append_prompt=append_prompt
+        )
+        
+        # Prepare input for LLM
+        input_ = Prompt(
+            system=system_prompt, 
+            user=data.supplement_prompt
+        ).to_dict()
+
+
+        if data.loop_id > 0:
+            loop_id = data.loop_id
+            record_total = AIToolLLMRecords().select_one(
+                columns = ['id'],
+                conditions=[
+                    {"column": "app_run_id", "value": data.app_run_id},
+                    {"column": "loop_id", "value": data.loop_id}
+                ],
+                aggregates={"id": "count"}
+            )
+            print('有loop_id')
+
+            print('record_total11111')
+            print(record_total)
+            print(record_total['count_id'])
+
+
+            remaining_count = data.loop_limit - record_total['count_id']
+        else:
+            print('没有loop_id')
+            # New batch generation
+            loop_id = int(time())
+            remaining_count = data.loop_limit
+
+
+        if remaining_count > data.loop_count:
+            loop_count = data.loop_count
+        else:
+            loop_count = remaining_count
+
+        print('loop_count11111')
+        print(loop_count)
+
+
+        # Update app run status
+        AppRuns().update(
+            {'column': 'id', 'value': data.app_run_id},
+            {'status': 1}
+        )
+
+        # Initialize execution record
+        record_id = AIToolLLMRecords().initialize_execution_record(
+            app_run_id=data.app_run_id,
+            loop_limit=data.loop_limit,
+            ai_tool_type=1,  # Agent generator type
+            run_type=4,  # Batch generation
+            loop_id=loop_id,
+            loop_count=loop_count,
+            inputs=input_
+        )
+
+        if not record_id:
+            return response_error(get_language_content("api_agent_generate_failed"))
+
+        # Return successful response
+        return response_success(
+            {
+                "app_run_id": data.app_run_id,
+                "loop_id": loop_id
+            }, 
+            get_language_content("api_agent_success")
+        )
+
+    except Exception as e:
+        print(f"Error in agent_batch_generate: {str(e)}")
+        print(traceback.format_exc())
+        return response_error(get_language_content("api_agent_generate_failed"))
 

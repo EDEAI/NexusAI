@@ -167,5 +167,17 @@ class ReqAgentSupplementSchema(BaseModel):
 
 class ReqAgentBatchGenerateSchema(BaseModel):
     app_run_id: Optional[int] = None
+    loop_count: Optional[int] = 10              # Number of agents per batch
+    loop_limit: Optional[int] = None      # Total agents to generate
     supplement_prompt: Optional[str] = None
-    generate_number: Optional[int] = None
+    loop_id: Optional[int] = 0                       # Loop iteration ID
+
+class AgentBatchGenerateResonseData(BaseModel):
+    app_run_id: Optional[int] = None
+    loop_id: Optional[int] = None
+
+
+class ResAgentBatchGenerateSchema(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Optional[AgentBatchGenerateResonseData] = None
