@@ -99,6 +99,7 @@ class AIToolLLMRecords(MySQL):
                 'ai_tool_type',
                 'loop_id',
                 'loop_count',
+                'loop_limit',
                 'inputs',
                 'correct_prompt',
                 'outputs',
