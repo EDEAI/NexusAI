@@ -213,7 +213,7 @@ def task_delay_thread():
                     correct_llm_output = False
                 if run['loop_count'] > 0:
                     inputs_new = ai_tool_llm_records.inputs_append_history_outputs(app_run_id, run['loop_id'])
-                    ai_tool_llm_records.initialize_execution_record(app_run_id, run['ai_tool_type'], run['loop_id'], run['loop_count'], inputs_new, run['correct_prompt'])
+                    ai_tool_llm_records.initialize_execution_record(app_run_id, run['ai_tool_type'], 4, run['loop_id'], run['loop_count'], inputs_new, run['correct_prompt'])
 
                 update_app_run(app_run_id, {'status': 2})
                 update_ai_run(id, {'status': 2})
