@@ -1,0 +1,1 @@
+ALTER TABLE `ai_tool_llm_records` ADD `loop_limit` INT NOT NULL DEFAULT '0' COMMENT 'Loop Limit' AFTER `loop_id`, ADD INDEX (`loop_limit`);

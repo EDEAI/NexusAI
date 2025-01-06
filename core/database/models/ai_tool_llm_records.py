@@ -13,7 +13,7 @@ class AIToolLLMRecords(MySQL):
     """
     have_updated_time = True
 
-    def initialize_execution_record(self, app_run_id: int, ai_tool_type: int, run_type: int = 1, loop_id: int = 0, loop_count: int = 0, inputs: Dict[str, Any] = None, correct_prompt: Dict[str, Any] = None) -> int:
+    def initialize_execution_record(self, app_run_id: int, ai_tool_type: int, run_type: int = 1, loop_id: int = 0, loop_limit: int = 0, loop_count: int = 0, inputs: Dict[str, Any] = None, correct_prompt: Dict[str, Any] = None) -> int:
         """
         Initializes an execution record with the given parameters.
         
@@ -21,8 +21,9 @@ class AIToolLLMRecords(MySQL):
             app_run_id (int): The ID of the app run.
             ai_tool_type (int): AI tool type 0: Regular APP (not an AI tool) 1: Agent generator 2: Skill generator 3: Round Table meeting summary generator 4: Round Table app target data generator.
             run_type (int): The type of the current operation. 1: First generation 2: Regeneration 3: AI correction 4: Batch generation.
-            loop_count (int): The number of iterations required for looping.
             loop_id (int): The number of iterations required for looping, represented as a positive integer indicating how many times the execution process should iterate.
+            loop_limit (int): The maximum number of iterations allowed for looping.
+            loop_count (int): The number of iterations required for looping.
             inputs (Dict[str, Any]): The inputs for the execution record.
             correct_prompt (Dict[str, Any]): The correct prompt for the execution record.
         
@@ -36,6 +37,7 @@ class AIToolLLMRecords(MySQL):
             'ai_tool_type': ai_tool_type,
             'run_type': run_type,
             'loop_id': loop_id,
+            'loop_limit': loop_limit,
             'loop_count': loop_count
         }
         if inputs is not None:
