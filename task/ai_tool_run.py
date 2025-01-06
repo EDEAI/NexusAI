@@ -271,7 +271,7 @@ def task_callback_thread():
                         app_run_total_tokens = run['total_tokens'] + total_tokens
                         if loop_count > 0:
                             inputs_new = ai_tool_llm_records.inputs_append_history_outputs(app_run_id, loop_id)
-                            ai_tool_llm_records.initialize_execution_record(app_run_id, ai_tool_type, 4, loop_id, loop_count, inputs_new)
+                            ai_tool_llm_records.initialize_execution_record(app_run_id, run_ai_tool_type, 4, loop_id, loop_count, inputs_new)
                             app_run_data = {
                                 'status': 1
                             }
