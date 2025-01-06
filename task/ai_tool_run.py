@@ -267,6 +267,19 @@ def task_callback_thread():
 
                         end_time = time.time()
                         end_time = datetime.fromtimestamp(end_time)
+
+                        app_ai_run_data = {
+                            'status': 3,
+                            'model_data': result['data']['model_data'],
+                            'outputs': result['data']['outputs'],
+                            'elapsed_time': elapsed_time,
+                            'prompt_tokens': prompt_tokens,
+                            'completion_tokens': completion_tokens,
+                            'total_tokens': total_tokens,
+                            'finished_time': end_time
+                        }
+                        update_ai_run(id, app_ai_run_data)
+
                         app_run_elapsed_time = float(run['elapsed_time']) + elapsed_time
                         app_run_prompt_tokens = run['prompt_tokens'] + prompt_tokens
                         app_run_completion_tokens = run['completion_tokens'] + completion_tokens
@@ -288,17 +301,6 @@ def task_callback_thread():
                                 'finished_time': end_time
                             }
                         update_app_run(app_run_id, app_run_data)
-                        app_ai_run_data = {
-                            'status': 3,
-                            'model_data': result['data']['model_data'],
-                            'outputs': result['data']['outputs'],
-                            'elapsed_time': elapsed_time,
-                            'prompt_tokens': prompt_tokens,
-                            'completion_tokens': completion_tokens,
-                            'total_tokens': total_tokens,
-                            'finished_time': end_time
-                        }
-                        update_ai_run(id, app_ai_run_data)
 
                         push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens)
                     else:
