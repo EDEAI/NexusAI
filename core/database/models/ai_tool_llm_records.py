@@ -138,7 +138,7 @@ class AIToolLLMRecords(MySQL):
             limit=2
         )
 
-    def get_search_record(self, app_run_id: int, ai_tool_type: int, run_type: int, loop_id: int) -> int:
+    def get_search_record(self, app_run_id: int, ai_tool_type: int, run_type: int, loop_id: int) -> Dict[str, Any]:
         """
         Retrieves the search records based on the provided parameters.
 
@@ -149,16 +149,17 @@ class AIToolLLMRecords(MySQL):
             loop_id (int): The ID of the loop.
 
         Returns:
-            int: The Status of the search record.
+            Dict[str, A dictionary representing.
         """
-        return self.select_one(
+        status = self.select_one(
             columns=['status'],
             conditions=[
                 {"column": "app_run_id", "value": app_run_id},
                 {"column": "ai_tool_type", "value": ai_tool_type},
                 {"column": "run_type", "value": run_type},
                 {"column": "loop_id", "value": loop_id},
-                {"column": "loop_count", "op": ">", "value": 0}
+                {"column": "loop_count", "op": ">", "value": 0},
                 {"column": "status", "op": "in", "value": [1, 2]}
             ]
-        )['status']
+        )
+        return status
