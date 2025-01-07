@@ -497,6 +497,10 @@ language_packs = {
         'team_id_not_found': 'Team ID not found',
         'chatroom_app_run_id_not_found': 'Current appRunID not found',
 
+        'app_run_error': 'App run record not found',
+        'api_agent_generate_failed': 'Agent generate failed',
+        'api_agent_user_prompt_required': 'Agent user prompt required',
+        'api_agent_batch_size_invalid': 'Agent batch size invalid'
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -809,28 +813,31 @@ language_packs = {
             '}}\n'
             '{append_prompt}\n\n'
         ),
-        'generate_agent_user_prompt': '',
-        'regenerate_agent_user_prompt': (
+        'regenerate_agent_prompt': (
             '{history_user_prompt}\n\n'
             '注意：生成的智能体不要与历史数据内容相同，要有不同的能力。\n'
+        ),
+        'regenerate_agent_history_agent_list': (
             '历史数据如下：\n'
             '{history_agent_list}\n'
         ),
-        'agent_supplement_user_prompt': (
+        'agent_supplement_prompt':(
             '{history_user_prompt}\n'
             '{agent_supplement}\n'
             '请通过我的内容强化智能体数据。\n'
+        ),
+        'agent_supplement_user_prompt': (
             '智能体数据如下。\n'
             '{history_agent}'
         ),
         'agent_batch_generate_user_prompt':(
-            '注意：生成的智能体不要与历史智能体相同，要有不同的能力。\n'
-            '历史智能体如下：\n'
             '{history_agents} \n'
         ),
         'agent_reference_data':(
             '生成的agent智能体参照如下内容：\n'
             '{agent_data} \n'
+            '注意：生成的智能体不要与历史智能体相同，要有不同的能力。\n'
+            '历史智能体如下：\n'
         ),
         'app_run_error': 'app运行记录不存在',
         'api_agent_generate_failed': 'agent生成记录失败',
