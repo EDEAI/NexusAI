@@ -423,24 +423,23 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
     )
 
     # Prepare prompts for regeneration
-    prompt_template = get_language_content(
-        'regenerate_agent_user_prompt',
-        userinfo.uid
-    )
     system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
-
-    # append_prompt = (
-    #         '{history_user_prompt}\n\n'
-    #         '注意：生成的智能体不要与历史数据内容相同，要有不同的能力。\n'
-    #         '历史数据如下：\n'
-    #     )
     
-    # append_prompt = append_prompt.format(history_user_prompt=base_user_prompt)
-
-     # Format user prompt with history
-    user_prompt = prompt_template.format(
-        history_user_prompt=base_user_prompt,
+    # Format regenerate prompt with original user request
+    regenerate_prompt = get_language_content('regenerate_agent_prompt', userinfo.uid)
+    regenerate_prompt = regenerate_prompt.format(
+        history_user_prompt=base_user_prompt
+    )
+    
+    # Format user prompt with history agent list
+    user_prompt = get_language_content('regenerate_agent_history_agent_list', userinfo.uid)
+    user_prompt = user_prompt.format(
         history_agent_list=history_agent_list
+    )
+    
+    # Combine system prompt with regenerate prompt
+    system_prompt = system_prompt.format(
+        append_prompt=regenerate_prompt
     )
 
     # Prepare input for LLM
@@ -553,13 +552,20 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
         pass
 
     # Prepare prompts for supplementation
-    prompt_template = get_language_content('agent_supplement_user_prompt', userinfo.uid)
-    system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
-    
-    # Format user prompt with history and supplement
-    user_prompt = prompt_template.format(
+    agent_supplement_prompt = get_language_content('agent_supplement_prompt', userinfo.uid)
+    agent_supplement_prompt = agent_supplement_prompt.format(
         history_user_prompt=base_user_prompt,
         agent_supplement=data.supplement_prompt,
+    )
+
+    prompt_template = get_language_content('agent_supplement_user_prompt', userinfo.uid)
+    system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
+    system_prompt = system_prompt.format(
+        append_prompt=agent_supplement_prompt
+    )
+
+    # Format user prompt with history and supplement
+    user_prompt = prompt_template.format(
         history_agent=history_agent_info
     )
 
@@ -653,6 +659,9 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         # Prepare prompts for batch generation
         system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
         agent_batch_generate_user_prompt = get_language_content('agent_batch_generate_user_prompt', userinfo.uid)
+        agent_batch_generate_user_prompt = agent_batch_generate_user_prompt.format(
+            history_agents=''
+        )
         agent_reference_data = get_language_content('agent_reference_data', userinfo.uid)
 
         # Get latest record for reference
@@ -673,13 +682,14 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         agent_reference_data = agent_reference_data.format(
             agent_data=history_agent_info
         )
-        append_prompt = agent_batch_generate_user_prompt + agent_reference_data
+        append_prompt = data.supplement_prompt + '\n' + agent_reference_data
         system_prompt = system_prompt.format(append_prompt=append_prompt)
 
+        # data.supplement_prompt
         # Prepare input for LLM
         input_ = Prompt(
             system=system_prompt,
-            user=data.supplement_prompt
+            user=agent_batch_generate_user_prompt
         ).to_dict()
 
         # Update app run status
