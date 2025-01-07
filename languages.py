@@ -273,11 +273,13 @@ language_packs = {
         'chatroom_user_id_not_exist': 'meeting room Illegal user access',
         'chatroom_delete_success': 'meeting room delete success',
         'chatroom_smart_selection_status_is_required': 'meeting room smart selection status is required',
+        'chatroom_message_is_null': 'The message content cannot be empty',
         'chatroom_smart_selection_status_can_only_input': 'meeting room smart selection status can only input 0 or 1',
         'chatroom_agent_id_is_required': 'agent_id is required',
         'chatroom_agent_active_is_required': 'agent active is required',
         'chatroom_agent_active_can_only_input': 'agent active can only input 0 or 1',
         'chatroom_agent_relation_does_not_exist': 'agent relation does not exist',
+        'chatroom_status_is_incorrect': 'The current status is incorrect',
         'chatroom_agent_number_less_than_one': 'There must be at least 1 agent present in the meeting room.',
         'chatroom_manager_system': (
             'You are the moderator of the meeting room, where there is one user and at least one AI agent.\n'
@@ -493,6 +495,7 @@ language_packs = {
         'tag_binding_create_success': 'Tag binding create success',
         'tag_binding_delete_success': 'Tag binding delete success',
         'team_id_not_found': 'Team ID not found',
+        'chatroom_app_run_id_not_found': 'Current appRunID not found',
 
     },
     "zh": {
@@ -636,6 +639,7 @@ language_packs = {
         'chatroom_user_id_not_exist': '非法用户进入',
         'chatroom_delete_success': '删除会议室成功',
         'chatroom_smart_selection_status_is_required': '会议室择优应答状态不能为空',
+        'chatroom_message_is_null': '消息内容不能为空',
         'chatroom_smart_selection_status_can_only_input': '会议室择优应答状态只能输入0或1',
         'chatroom_agent_id_is_required': '智能体ID不能为空',
         'chatroom_agent_active_is_required': '智能体状态不能为空',
@@ -745,8 +749,9 @@ language_packs = {
         'chatroom_manager_system_message_return': (
             '你是一个会议内容总结助手，请通过我提供的会议聊天历史进行会议总结。\n'
             '注意最终只返回会议总结内容，不要返回多余的内容。\n'
+            '{system_update}\n'
         ),
-
+        'chatroom_system_update': '用户后续问题：请按照用户提出的问题和会议记录修正会议总结，返回结果不要相同。',
         'chatroom_user_message_return': (
             '会议聊天历史：\n'
             '{messages}\n\n'
@@ -757,14 +762,16 @@ language_packs = {
             '会议总结内容如下：\n'
             '{meeting_summary}\n\n'
 
-            '用户后续问题,请按照用户提出的问题和会议记录修正会议总结：\n'
+            '用户后续问题：\n'
             '{update_meeting}\n'
         ),
+
         'chatroom_round_table_app_target_data_generator_system': (
             '你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据格式进行数据导向转化。 \n'
             '注意一定要按照工作导向数据格式进行数据转化，最终只返回生成后的json格式内容，不要返回多余的内容。\n'
             '工作导向数据json格式说明：list[dict]类型，每个dict为一个数据拆分项 \n'
-            '[{name: 拆分项对应的变量名，不要更改此字段，display_name: 拆分项对应的变量显示名，可以作为拆分项的功能和用途说明，可以作为拆分项的提取依据，不要更改此字段， type: 拆分项对应的变量类型，可为"number"或者"string"，注意拆分项内容一定要与变量类型对应，不要更改此字段，value: 最终的工作导向拆分项内容}]'
+            '[{{name: 拆分项对应的变量名，不要更改此字段，display_name: 拆分项对应的变量显示名，可以作为拆分项的功能和用途说明，可以作为拆分项的提取依据，不要更改此字段， type: 拆分项对应的变量类型，可为"number"或者"string"，注意拆分项内容一定要与变量类型对应，不要更改此字段，value: 最终的工作导向拆分项内容}}] \n'
+            '{system_update}\n'
         ),
         'chatroom_round_table_app_target_data_generator_user': (
             '会议总结内容：\n'
@@ -778,7 +785,7 @@ language_packs = {
             '工作导向结果返回为：\n'
             '{value_meeting_summary}\n\n'
             
-            '用户后续问题,请按照用户提出的问题和会议记录修正会议总结：\n'
+            '用户后续问题：\n'
             '{update_meeting}\n'
         ),
         'chatroom_request_sent_successfully': '请求成功，请等待',

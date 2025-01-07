@@ -524,6 +524,12 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
     )
     summary = ''
     if chat_data['corrected_parameter'] != '':
+        # system prompt
+        system_prompt = system_prompt.format(
+            system_update=get_language_content('chatroom_system_update', userinfo.uid)
+        )
+
+        # user prompt
         meeting_summary = AIToolLLMRecords().select_one(
             columns=['outputs'],
             conditions=[
@@ -547,7 +553,6 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
         messages=json.dumps(chatMessageList, ensure_ascii=False),
         summary=summary
     )
-
     start_time = time()
     start_datetime_str = datetime.fromtimestamp(start_time) \
         .replace(microsecond=0).isoformat(sep='_')
@@ -559,7 +564,12 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
             {"column": "id", "value": app_run_id},
             {'status': 1}
         )
-        record_id = AIToolLLMRecords().initialize_correction_record(app_run_id, 3, 0, input_messages)
+        # record_id = AIToolLLMRecords().initialize_correction_record(app_run_id, 3, 0, input_messages)
+        record_id = AIToolLLMRecords().initialize_correction_record(
+            app_run_id=app_run_id,
+            ai_tool_type=3,
+            correct_prompt=input_messages
+        )
     else:
         app_run_id = AppRuns().insert(
             {
@@ -567,12 +577,16 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
                 'app_id': 0,
                 'type': 2,
                 'chatroom_id': chatroom_id,
-                # 'ai_tool_type': 3,
                 'name': f'Chat_history_summary_{start_datetime_str}',
                 'status': 1
             }
         )
-        record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 3, 1, 0, 0, 0, input_messages)
+        # record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 3, 1, 0, 0, 0, input_messages)
+        record_id = AIToolLLMRecords().initialize_execution_record(
+            app_run_id=app_run_id,
+            ai_tool_type=3,
+            inputs=input_messages
+        )
     return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'message': 'Executing, please wait'})
 
 
@@ -689,6 +703,12 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
         userinfo.uid
     )
     if chat_data['status'] == 2:
+        # system prompt
+        system_prompt = system_prompt.format(
+            system_update=get_language_content('chatroom_system_update', userinfo.uid)
+        )
+
+        # user prompt
         meeting_summary_return = AIToolLLMRecords().select_one(
             columns=['outputs'],
             conditions=[
@@ -714,9 +734,9 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
         update_return_value=update_return_value
     )
 
-    start_time = time()
-    start_datetime_str = datetime.fromtimestamp(start_time) \
-        .replace(microsecond=0).isoformat(sep='_')
+    # start_time = time()
+    # start_datetime_str = datetime.fromtimestamp(start_time) \
+    #     .replace(microsecond=0).isoformat(sep='_')
 
     input_messages = Prompt(system_prompt, user_prompt).to_dict()
     if update_status == 1:
@@ -737,12 +757,22 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             {"column": "id", "value": app_run_id},
             {'status': 1}
         )
-        record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 4, 1, 0, 0, 0,  input_messages)
+        # record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 4, 1, 0, 0, 0,  input_messages)
+        record_id = AIToolLLMRecords().initialize_execution_record(
+            app_run_id=app_run_id,
+            ai_tool_type=4,
+            inputs=input_messages
+        )
     else:
         app_run_id = chat_data['return_app_run_id']
         AppRuns().update(
             {"column": "id", "value": app_run_id},
             {'status': 1}
         )
-        record_id = AIToolLLMRecords().initialize_correction_record(app_run_id, 4, 0, input_messages)
+        # record_id = AIToolLLMRecords().initialize_correction_record(app_run_id, 4, 0, input_messages)
+        record_id = AIToolLLMRecords().initialize_correction_record(
+            app_run_id=app_run_id,
+            ai_tool_type=4,
+            correct_prompt=input_messages
+        )
     return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'message': 'Executing, please wait'})
