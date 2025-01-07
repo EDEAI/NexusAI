@@ -22,8 +22,10 @@ import traceback
 
 router = APIRouter()
 
-@router.get("/agent_list", response_model = ResAgentListSchema)
-async def agent_list(page: int = 1, page_size: int = 10, agent_search_type: int = 1, name: str = "", userinfo: TokenData = Depends(get_current_user)):
+
+@router.get("/agent_list", response_model=ResAgentListSchema)
+async def agent_list(page: int = 1, page_size: int = 10, agent_search_type: int = 1, name: str = "",
+                     userinfo: TokenData = Depends(get_current_user)):
     """
     agent list
 
@@ -37,8 +39,10 @@ async def agent_list(page: int = 1, page_size: int = 10, agent_search_type: int 
 
     return response_success(result, get_language_content("api_agent_success"))
 
-@router.put("/agent_base_update/{agent_id}", response_model = ResAgentBaseCreateSchema)
-async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseCreateSchema, userinfo: TokenData = Depends(get_current_user)):
+
+@router.put("/agent_base_update/{agent_id}", response_model=ResAgentBaseCreateSchema)
+async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseCreateSchema,
+                            userinfo: TokenData = Depends(get_current_user)):
     """
     agent base update
 
@@ -80,15 +84,19 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
         return response_error(get_language_content("api_agent_base_update_default_output_format_error"))
 
     agents_model = Agents()
-    result = agents_model.agent_base_update(agent_id, userinfo.uid, userinfo.team_id, is_public, enable_api, obligations, input_variables, dataset_ids, m_config_id, allow_upload_file, default_output_format)
+    result = agents_model.agent_base_update(agent_id, userinfo.uid, userinfo.team_id, is_public, enable_api,
+                                            obligations, input_variables, dataset_ids, m_config_id, allow_upload_file,
+                                            default_output_format)
     if result["status"] != 1:
         return response_error(result["message"])
     app_id = result["data"]["app_id"]
 
     return response_success(result["data"], get_language_content("api_agent_success"))
 
-@router.put("/agent_abilities_set/{agent_id}", response_model = RespBaseSchema)
-async def agent_abilities_set(agent_id: int, data: ReqAgentAbilitiesSetSchema, userinfo: TokenData = Depends(get_current_user)):
+
+@router.put("/agent_abilities_set/{agent_id}", response_model=RespBaseSchema)
+async def agent_abilities_set(agent_id: int, data: ReqAgentAbilitiesSetSchema,
+                              userinfo: TokenData = Depends(get_current_user)):
     """
     agent abilities set
 
@@ -116,7 +124,8 @@ async def agent_abilities_set(agent_id: int, data: ReqAgentAbilitiesSetSchema, u
 
     return response_success(result["data"], get_language_content("api_agent_success"))
 
-@router.put("/agent_publish/{agent_id}", response_model = RespBaseSchema)
+
+@router.put("/agent_publish/{agent_id}", response_model=RespBaseSchema)
 async def agent_publish(request: Request, agent_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
     agent publish
@@ -143,14 +152,15 @@ async def agent_publish(request: Request, agent_id: int, userinfo: TokenData = D
         node.validate()
     except Exception as e:
         return response_error(str(e))
-    
+
     result = agents_model.agent_publish(agent_id, userinfo.uid)
     if result["status"] != 1:
         return response_error(result["message"])
 
     return response_success(result["data"], get_language_content("api_agent_success"))
 
-@router.delete("/agent_delete/{app_id}", response_model = RespBaseSchema)
+
+@router.delete("/agent_delete/{app_id}", response_model=RespBaseSchema)
 async def agent_delete(request: Request, app_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
     agent delete
@@ -167,7 +177,8 @@ async def agent_delete(request: Request, app_id: int, userinfo: TokenData = Depe
 
     return response_success(result["data"], get_language_content("api_agent_success"))
 
-@router.get("/agent_info/{app_id}", response_model = ResAgentInfoSchema)
+
+@router.get("/agent_info/{app_id}", response_model=ResAgentInfoSchema)
 async def agent_info(app_id: int, publish_status: int, userinfo: TokenData = Depends(get_current_user)):
     """
     agent info
@@ -187,7 +198,8 @@ async def agent_info(app_id: int, publish_status: int, userinfo: TokenData = Dep
 
     return response_success(result["data"], get_language_content("api_agent_success"))
 
-@router.post("/agent_run", response_model = ResAgentRunSchema)
+
+@router.post("/agent_run", response_model=ResAgentRunSchema)
 async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_current_user)):
     """
     agent run
@@ -222,8 +234,8 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
     # get agent
     agents_model = Agents()
     agent = agents_model.select_one(
-        columns = "*",
-        conditions = [
+        columns="*",
+        conditions=[
             {"column": "id", "value": agent_id},
             {"column": "team_id", "value": team_id},
             {"column": "status", "op": "in", "value": [1, 2]}
@@ -240,8 +252,8 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
     # get app
     apps_model = Apps()
     app = apps_model.select_one(
-        columns = "*",
-        conditions = [
+        columns="*",
+        conditions=[
             {"column": "id", "value": agent["app_id"]},
             {"column": "team_id", "value": team_id},
             {"column": "mode", "value": 1},
@@ -260,8 +272,8 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
     if ability_id != 0:
         agent_abilities_model = AgentAbilities()
         ability = agent_abilities_model.select_one(
-            columns = "*",
-            conditions = [
+            columns="*",
+            conditions=[
                 {"column": "id", "value": ability_id},
                 {"column": "agent_id", "value": agent_id},
                 {"column": "status", "op": "in", "value": [1, 2]}
@@ -272,30 +284,33 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
         if ability["user_id"] != uid and ability["status"] != 1:
             return response_error(get_language_content("api_agent_run_ability_status_not_normal"))
 
-    task = run_app.delay(app_type = "agent", id_ = agent_id, user_id=uid, input_dict = input_dict, ability_id = ability_id, prompt = prompt)
+    task = run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id,
+                         prompt=prompt)
     while not task.ready():
         await asyncio.sleep(0.1)
     result = task.get()
     if result["status"] != "success":
         return response_error(result["message"])
 
-    return response_success({"outputs": result["data"]["outputs"], "outputs_md": result["data"]["outputs_md"]}, get_language_content("api_agent_success"))
+    return response_success({"outputs": result["data"]["outputs"], "outputs_md": result["data"]["outputs_md"]},
+                            get_language_content("api_agent_success"))
+
 
 @router.post("/agent_generate", response_model=ResAgentGenerateSchema)
 async def agent_generate(data: ReqAgentGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
     """
     Generate an agent based on user prompt
-    
+
     Args:
         data (ReqAgentGenerateSchema): Request data containing:
             user_prompt (str): The prompt text used to generate the agent
         userinfo (TokenData): User authentication information
-        
+
     Returns:
         JSON response containing:
             app_run_id (int): The ID of the app run
             record_id (int): The ID of the LLM record
-            
+
     Raises:
         - Returns error if prompt is empty
         - Returns error if record creation fails
@@ -319,7 +334,7 @@ async def agent_generate(data: ReqAgentGenerateSchema, userinfo: TokenData = Dep
         # Prepare prompts for LLM
         system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
         input_ = Prompt(
-            system=system_prompt, 
+            system=system_prompt,
             user=data.user_prompt
         ).to_dict()
 
@@ -339,35 +354,36 @@ async def agent_generate(data: ReqAgentGenerateSchema, userinfo: TokenData = Dep
             {
                 "app_run_id": app_run_id,
                 "record_id": record_id
-            }, 
+            },
             get_language_content("api_agent_success")
         )
 
     except Exception as e:
         return response_error(get_language_content("api_agent_generate_failed"))
 
+
 @router.post('/agent_regenerate', response_model=ResAgentGenerateSchema)
 async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData = Depends(get_current_user)):
     """
     Regenerate an agent based on previous generation history
-    
+
     Args:
         data (ReqAgentRegenerateSchema): Request data containing:
             app_run_id (int): The ID of the original app run
         userinfo (TokenData): User authentication information
-        
+
     Returns:
         JSON response containing:
             app_run_id (int): The ID of the app run
-            
+
     Raises:
         - Returns error if app_run_id is invalid
         - Returns error if record retrieval fails
     """
     # Validate app run exists and belongs to user
     app_run_info = AppRuns().select_one(
-        columns = ["id"],
-        conditions = [
+        columns=["id"],
+        conditions=[
             {"column": "id", "value": data.app_run_id},
             {"column": "user_id", "value": userinfo.uid}
         ]
@@ -375,11 +391,11 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
 
     if not app_run_info:
         return response_error(get_language_content('app_run_error'))
-    
+
     # Get all LLM records for this app run
     record_list = AIToolLLMRecords().select(
-        columns = ['id', 'inputs', 'outputs'],
-        conditions = [
+        columns=['id', 'inputs', 'outputs'],
+        conditions=[
             {"column": "app_run_id", "value": data.app_run_id}
         ]
     )
@@ -398,7 +414,7 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
     except Exception as e:
         # print(f"Error extracting user prompt: {str(e)}")
         base_user_prompt = ""
-        
+
     # Collect history agent list from all records
     history_agent_list = []
     for record in record_list:
@@ -409,14 +425,14 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
         except Exception as e:
             # print(f"Error processing record: {str(e)}")
             continue
-    
+
     # Filter out None values
     history_agent_list = [agent for agent in history_agent_list if agent]
 
     # Get latest record for updating status
     latest_record = AIToolLLMRecords().select_one(
-        columns = ['id', 'inputs', 'outputs'],
-        conditions = [
+        columns=['id', 'inputs', 'outputs'],
+        conditions=[
             {"column": "app_run_id", "value": data.app_run_id}
         ],
         order_by='id DESC'
@@ -434,10 +450,10 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
     #         '注意：生成的智能体不要与历史数据内容相同，要有不同的能力。\n'
     #         '历史数据如下：\n'
     #     )
-    
+
     # append_prompt = append_prompt.format(history_user_prompt=base_user_prompt)
 
-     # Format user prompt with history
+    # Format user prompt with history
     user_prompt = prompt_template.format(
         history_user_prompt=base_user_prompt,
         history_agent_list=history_agent_list
@@ -445,7 +461,7 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
 
     # Prepare input for LLM
     input_ = Prompt(system=system_prompt, user=user_prompt).to_dict()
-    
+
     try:
         # Mark previous record as processed
         AIToolLLMRecords().update(
@@ -473,7 +489,7 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
             {
                 'app_run_id': data.app_run_id,
                 'record_id': record_id
-             }, 
+            },
             get_language_content("api_agent_success")
         )
 
@@ -482,29 +498,30 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
         # print(traceback.format_exc())
         return response_error(get_language_content("api_agent_generate_failed"))
 
+
 @router.post('/agent_supplement', response_model=ResAgentGenerateSchema)
 async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData = Depends(get_current_user)):
     """
     Supplement agent information based on existing agent and additional prompt
-    
+
     Args:
         data (ReqAgentSupplementSchema): Request data containing:
             app_run_id (int): Original agent generation run ID
             supplement_prompt (str): Additional prompt for supplementing agent info
         userinfo (TokenData): User authentication information
-        
+
     Returns:
         JSON response containing:
             app_run_id (int): The ID of the app run
-            
+
     Raises:
         - Returns error if app_run_id is invalid
         - Returns error if record retrieval fails
     """
     # Validate app run exists and belongs to user
     app_run_info = AppRuns().select_one(
-        columns = ["id"],
-        conditions = [
+        columns=["id"],
+        conditions=[
             {"column": "id", "value": data.app_run_id},
             {"column": "user_id", "value": userinfo.uid}
         ]
@@ -512,11 +529,11 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
 
     if not app_run_info:
         return response_error(get_language_content('app_run_error'))
-   
+
     # Get first record to extract original user prompt
     first_record = AIToolLLMRecords().select_one(
-        columns = ['inputs'],
-        conditions = [
+        columns=['inputs'],
+        conditions=[
             {"column": "app_run_id", "value": data.app_run_id}
         ],
         order_by="id ASC"
@@ -535,8 +552,8 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
 
     # Get latest record for agent history and status update
     last_record = AIToolLLMRecords().select_one(
-        columns = ['id', 'outputs'],
-        conditions = [
+        columns=['id', 'outputs'],
+        conditions=[
             {"column": "app_run_id", "value": data.app_run_id}
         ],
         order_by='id DESC'
@@ -555,7 +572,7 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
     # Prepare prompts for supplementation
     prompt_template = get_language_content('agent_supplement_user_prompt', userinfo.uid)
     system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
-    
+
     # Format user prompt with history and supplement
     user_prompt = prompt_template.format(
         history_user_prompt=base_user_prompt,
@@ -565,21 +582,20 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
 
     # Prepare input for LLM
     input_ = Prompt(system=system_prompt, user=user_prompt).to_dict()
-    
+
     try:
         # Update app run status
         AppRuns().update(
             {'column': 'id', 'value': data.app_run_id},
             {'status': 1}
         )
-        
+
         # Initialize new execution record
         record_id = AIToolLLMRecords().initialize_correction_record(
             app_run_id=data.app_run_id,
             ai_tool_type=1,
             correct_prompt=input_
         )
-
 
         if not record_id:
             return response_error(get_language_content("api_agent_generate_failed"))
@@ -588,33 +604,36 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
             {
                 'app_run_id': data.app_run_id,
                 'record_id': record_id
-            }, 
+            },
             get_language_content("api_agent_success")
         )
 
     except Exception:
         return response_error(get_language_content("api_agent_generate_failed"))
-       
+
 
 @router.post('/agent_batch_generate', response_model=ResAgentBatchGenerateSchema)
 async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
     """
-    Batch generate multiple agents with loop control
-    
+    Batch generate multiple agents based on previous generation and supplementary requirements
+
     Args:
         data (ReqAgentBatchGenerateSchema): Request data containing:
-            app_run_id (int): The ID of the app run
-            loop_count (int): Number of agents to generate per batch (default: 10)
-            loop_limit (int): Total number of agents to generate
-            supplement_prompt (str): Additional prompt for agent generation
-            loop_id (int): The ID of the loop iteration (0 for new batch)
+            app_run_id (int): The ID of the original app run
+            generate_number (int): Number of agents to generate (1-10)
+            supplement_prompt (str): Additional prompt to ensure diversity between agents
         userinfo (TokenData): User authentication information
-        
+
     Returns:
         JSON response containing:
             app_run_id (int): The ID of the app run
-            loop_id (int): The ID of the current loop iteration
+            record_id (int): The ID of the LLM record
     """
+
+    # result = AIToolLLMRecords().inputs_append_history_outputs(loop_id=data.loop_id, app_run_id=data.app_run_id)
+    # print('result1111111')
+    # print(result)
+    # return
     # Validate app run exists and belongs to user
     app_run_info = AppRuns().select_one(
         columns=["id"],
@@ -628,12 +647,52 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         return response_error(get_language_content('app_run_error'))
 
     try:
-        # Get or create loop_id
-        loop_id = data.loop_id if data.loop_id > 0 else int(time())
+        # Get current timestamp as loop_id
+        loop_id = int(time())
 
-        # Calculate remaining count for batch generation
+        # Prepare prompts for batch generation
+        system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
+        agent_batch_generate_user_prompt = get_language_content('agent_batch_generate_user_prompt', userinfo.uid)
+        agent_reference_data = get_language_content('agent_reference_data', userinfo.uid)
+
+        last_record = AIToolLLMRecords().select_one(
+            columns=['id', 'inputs', 'outputs'],
+            conditions=[
+                {"column": "app_run_id", "value": data.app_run_id}
+            ],
+            order_by='id DESC'
+        )
+
+        # Extract agent info from outputs
+        history_agent_info = {}
+        try:
+            if isinstance(last_record, dict) and 'outputs' in last_record:
+                outputs_dict = last_record['outputs']
+                if isinstance(outputs_dict, dict) and 'value' in outputs_dict:
+                    history_agent_info = outputs_dict['value']
+        except Exception:
+            pass
+
+        agent_reference_data = agent_reference_data.format(
+            agent_data=history_agent_info
+        )
+
+        append_prompt = (
+                agent_batch_generate_user_prompt + agent_reference_data
+        )
+
+        system_prompt = system_prompt.format(
+            append_prompt=append_prompt
+        )
+
+        # Prepare input for LLM
+        input_ = Prompt(
+            system=system_prompt,
+            user=data.supplement_prompt
+        ).to_dict()
+
         if data.loop_id > 0:
-            # Get count of existing records for this loop
+            loop_id = data.loop_id
             record_total = AIToolLLMRecords().select_one(
                 columns=['id'],
                 conditions=[
@@ -642,45 +701,26 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
                 ],
                 aggregates={"id": "count"}
             )
+            print('有loop_id')
+
+            print('record_total11111')
+            print(record_total)
+            print(record_total['count_id'])
+
             remaining_count = data.loop_limit - record_total['count_id']
         else:
+            print('没有loop_id')
             # New batch generation
+            loop_id = int(time())
             remaining_count = data.loop_limit
 
-        # Determine batch size
-        loop_count = min(data.loop_count, remaining_count)
+        if remaining_count > data.loop_count:
+            loop_count = data.loop_count
+        else:
+            loop_count = remaining_count
 
-        # Prepare prompts for batch generation
-        system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
-        agent_batch_generate_user_prompt = get_language_content('agent_batch_generate_user_prompt', userinfo.uid)
-        agent_reference_data = get_language_content('agent_reference_data', userinfo.uid)
-
-        # Get latest record for reference
-        last_record = AIToolLLMRecords().select_one(
-            columns=['outputs'],
-            conditions=[
-                {"column": "app_run_id", "value": data.app_run_id}
-            ],
-            order_by='id DESC'
-        )
-
-        # Extract reference agent info
-        history_agent_info = {}
-        if last_record and isinstance(last_record.get('outputs', {}), dict):
-            history_agent_info = last_record['outputs'].get('value', {})
-
-        # Format prompts
-        agent_reference_data = agent_reference_data.format(
-            agent_data=history_agent_info
-        )
-        append_prompt = agent_batch_generate_user_prompt + agent_reference_data
-        system_prompt = system_prompt.format(append_prompt=append_prompt)
-
-        # Prepare input for LLM
-        input_ = Prompt(
-            system=system_prompt,
-            user=data.supplement_prompt
-        ).to_dict()
+        print('loop_count11111')
+        print(loop_count)
 
         # Update app run status
         AppRuns().update(
@@ -693,7 +733,7 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             app_run_id=data.app_run_id,
             loop_limit=data.loop_limit,
             ai_tool_type=1,  # Agent generator type
-            run_type=4,      # Batch generation
+            run_type=4,  # Batch generation
             loop_id=loop_id,
             loop_count=loop_count,
             inputs=input_
@@ -702,6 +742,7 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         if not record_id:
             return response_error(get_language_content("api_agent_generate_failed"))
 
+        # Return successful response
         return response_success(
             {
                 "app_run_id": data.app_run_id,
@@ -715,3 +756,26 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         print(traceback.format_exc())
         return response_error(get_language_content("api_agent_generate_failed"))
 
+
+@router.post("/agent_create", response_model=ResAgentBaseCreateSchema)
+async def agent_create(data: ReqAgentCreateSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Create a new agent with complete configurations
+
+    Args:
+        data (ReqAgentCreateSchema): Request data containing agent configuration
+        userinfo (TokenData): Current user authentication info
+
+    Returns:
+        AgentBaseCreateResponseData: Contains created app_id
+    """
+    agents_model = Agents()
+    result = agents_model.create_agent_with_configs(
+        data=data.dict(),
+        user_id=userinfo.uid,
+        team_id=userinfo.team_id
+    )
+
+    if result["status"] != 1:
+        return response_error(result["message"])
+    return response_success(data={"app_id": result["app_id"]}, detail=get_language_content("api_agent_success"))

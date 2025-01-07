@@ -6,25 +6,25 @@ from core.database.models.agent_dataset_relation import AgentDatasetRelation
 from core.database.models.agent_abilities import AgentAbilities
 from core.database.models.model_configurations import ModelConfigurations
 from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
+from core.database.models.tag_bindings import TagBindings
 from core.database.models.users import Users
 from datetime import datetime
 from core.helper import generate_api_token, encrypt_id
-from hashlib import md5
 from languages import get_language_content
 import math
+
 
 class Agents(MySQL):
     """
     A class that extends MySQL to manage operations on the {table_name} table.
     """
-    
+
     table_name = "agents"
     """
     Indicates whether the `agents` table has an `update_time` column that tracks when a record was last updated.
     """
     have_updated_time = True
 
-  
     def get_agent_by_id(self, agent_id: int, user_id: int = 0) -> Dict[str, Any]:
         """
         Retrieves an agent record from the {table_name} table based on the specified agent ID.
@@ -52,7 +52,8 @@ class Agents(MySQL):
         assert agent, get_language_content('agent_does_not_exist', user_id)
         return agent
 
-    def get_agent_list(self, page: int = 1, page_size: int = 10, uid: int = 0, team_id : int = 0, agent_search_type: int = 1, name: str = ""):
+    def get_agent_list(self, page: int = 1, page_size: int = 10, uid: int = 0, team_id: int = 0,
+                       agent_search_type: int = 1, name: str = ""):
         """
         Obtain agent list data based on parameters
 
@@ -94,24 +95,25 @@ class Agents(MySQL):
             conditions.append({"column": "apps.name", "op": "like", "value": "%" + name + "%"})
 
         total_count = self.select(
-            aggregates = {"id": "count"},
-            joins = [
+            aggregates={"id": "count"},
+            joins=[
                 ["left", "apps", "agents.app_id = apps.id"],
                 ["left", "users", "agents.user_id = users.id"]
             ],
-            conditions = conditions,
+            conditions=conditions,
         )[0]["count_id"]
 
         list = self.select(
-            columns = ["agents.id AS agent_id", "agents.app_id", "apps.name", "apps.description", "apps.icon", "apps.icon_background", "users.nickname", "users.avatar"],
-            joins = [
+            columns=["agents.id AS agent_id", "agents.app_id", "apps.name", "apps.description", "apps.icon",
+                     "apps.icon_background", "users.nickname", "users.avatar"],
+            joins=[
                 ["left", "apps", "agents.app_id = apps.id"],
                 ["left", "users", "agents.user_id = users.id"]
             ],
-            conditions = conditions,
-            order_by = "agents.id DESC",
-            limit = page_size,
-            offset = (page - 1) * page_size
+            conditions=conditions,
+            order_by="agents.id DESC",
+            limit=page_size,
+            offset=(page - 1) * page_size
         )
 
         return {
@@ -122,7 +124,9 @@ class Agents(MySQL):
             "page_size": page_size
         }
 
-    def agent_base_update(self, agent_id: int, uid: int = 0, team_id: int = 0, is_public: int = 0, enable_api: int = 0, obligations: str = "", input_variables: Dict[str, Any] = None, dataset_ids: List[int] = None, m_config_id: int = 0, allow_upload_file: int = 0, default_output_format: int = 0):
+    def agent_base_update(self, agent_id: int, uid: int = 0, team_id: int = 0, is_public: int = 0, enable_api: int = 0,
+                          obligations: str = "", input_variables: Dict[str, Any] = None, dataset_ids: List[int] = None,
+                          m_config_id: int = 0, allow_upload_file: int = 0, default_output_format: int = 1):
         """
         Update base agent data based on parameters
 
@@ -140,7 +144,10 @@ class Agents(MySQL):
         :return: A dictionary representing the result record.
         """
         # verify agent
-        agent = self.select_one(columns = "*", conditions = [{"column": "id", "value": agent_id}, {"column": "user_id", "value": uid}, {"column": "publish_status", "value": 0}, {"column": "status", "op": "in", "value": [1, 2]}])
+        agent = self.select_one(columns="*",
+                                conditions=[{"column": "id", "value": agent_id}, {"column": "user_id", "value": uid},
+                                            {"column": "publish_status", "value": 0},
+                                            {"column": "status", "op": "in", "value": [1, 2]}])
         if not agent:
             return {"status": 2, "message": get_language_content("api_agent_base_update_agent_error")}
 
@@ -148,11 +155,11 @@ class Agents(MySQL):
         if dataset_ids and dataset_ids != [0]:
             datasets_model = Datasets()
             datasets = datasets_model.select(
-                columns = ["datasets.id AS dataset_id", "datasets.app_id", "apps.name"],
-                joins = [
+                columns=["datasets.id AS dataset_id", "datasets.app_id", "apps.name"],
+                joins=[
                     ["left", "apps", "datasets.app_id = apps.id"]
                 ],
-                conditions = [
+                conditions=[
                     {"column": "datasets.id", "op": "in", "value": dataset_ids},
                     {"column": "datasets.team_id", "value": team_id},
                     {"column": "datasets.status", "value": 1},
@@ -219,11 +226,13 @@ class Agents(MySQL):
                 for dataset_id in dataset_ids:
                     res = agent_dataset_relation_model.insert({"agent_id": agent_id, "dataset_id": dataset_id})
                     if not res:
-                        return {"status": 2, "message": get_language_content("api_agent_base_update_agent_dataset_insert_error")}
+                        return {"status": 2,
+                                "message": get_language_content("api_agent_base_update_agent_dataset_insert_error")}
         except:
             return {"status": 2, "message": get_language_content("api_agent_base_update_agent_base_update_error")}
 
-        return {"status": 1, "message": get_language_content("api_agent_success"), "data": {"app_id": agent["app_id"], "agent_id": agent_id}}
+        return {"status": 1, "message": get_language_content("api_agent_success"),
+                "data": {"app_id": agent["app_id"], "agent_id": agent_id}}
 
     def agent_abilities_set(self, agent_id: int, uid: int, auto_match_ability: int, agent_abilities: List):
         """
@@ -236,7 +245,10 @@ class Agents(MySQL):
         :return: A dictionary representing the result record.
         """
         # verify agent
-        agent = self.select_one(columns = "*", conditions = [{"column": "id", "value": agent_id}, {"column": "user_id", "value": uid}, {"column": "publish_status", "value": 0}, {"column": "status", "op": "in", "value": [1, 2]}])
+        agent = self.select_one(columns="*",
+                                conditions=[{"column": "id", "value": agent_id}, {"column": "user_id", "value": uid},
+                                            {"column": "publish_status", "value": 0},
+                                            {"column": "status", "op": "in", "value": [1, 2]}])
         if not agent:
             return {"status": 2, "message": get_language_content("api_agent_abilities_set_agent_error")}
 
@@ -246,19 +258,22 @@ class Agents(MySQL):
                 if abilities_val.agent_ability_id > 0:
                     update_abilities_ids.append(abilities_val.agent_ability_id)
                 if not abilities_val.name:
-                    return {"status": 2, "message": get_language_content("api_agent_abilities_set_abilities_name_required")}
+                    return {"status": 2,
+                            "message": get_language_content("api_agent_abilities_set_abilities_name_required")}
                 if not abilities_val.content:
-                    return {"status": 2, "message": get_language_content("api_agent_abilities_set_abilities_content_required")}
+                    return {"status": 2,
+                            "message": get_language_content("api_agent_abilities_set_abilities_content_required")}
                 if abilities_val.status not in [1, 2]:
-                    return {"status": 2, "message": get_language_content("api_agent_abilities_set_abilities_status_error")}
+                    return {"status": 2,
+                            "message": get_language_content("api_agent_abilities_set_abilities_status_error")}
                 if abilities_val.output_format not in [0, 1, 2, 3]:
                     return {"status": 2, "message": get_language_content("api_agent_abilities_set_output_format_error")}
 
         agent_abilities_model = AgentAbilities()
         if update_abilities_ids:
             update_agent_abilities = agent_abilities_model.select(
-                columns = "*",
-                conditions = [
+                columns="*",
+                conditions=[
                     {"column": "id", "op": "in", "value": update_abilities_ids},
                     {"column": "user_id", "value": uid},
                     {"column": "agent_id", "value": agent_id},
@@ -300,9 +315,11 @@ class Agents(MySQL):
                             "status": abilities_value.status,
                             "output_format": abilities_value.output_format
                         }
-                        update_abilities_res = agent_abilities_model.update({"column": "id", "value": abilities_value.agent_ability_id}, update_abilities_data)
+                        update_abilities_res = agent_abilities_model.update(
+                            {"column": "id", "value": abilities_value.agent_ability_id}, update_abilities_data)
                         if not update_abilities_res:
-                            return {"status": 2, "message": get_language_content("api_agent_abilities_set_abilities_update_error")}
+                            return {"status": 2,
+                                    "message": get_language_content("api_agent_abilities_set_abilities_update_error")}
                     else:
                         # create abilities
                         create_abilities_data = {
@@ -317,7 +334,8 @@ class Agents(MySQL):
                         }
                         create_abilities_res = agent_abilities_model.insert(create_abilities_data)
                         if not create_abilities_res:
-                            return {"status": 2, "message": get_language_content("api_agent_abilities_set_abilities_insert_error")}
+                            return {"status": 2,
+                                    "message": get_language_content("api_agent_abilities_set_abilities_insert_error")}
         except:
             return {"status": 2, "message": get_language_content("api_agent_abilities_set_agent_abilities_set_error")}
 
@@ -332,34 +350,42 @@ class Agents(MySQL):
         :return: A dictionary representing the result record.
         """
         # verify agent
-        agent = self.select_one(columns = "*", conditions = [{"column": "id", "value": agent_id}, {"column": "user_id", "value": uid}, {"column": "publish_status", "value": 0}, {"column": "status", "op": "in", "value": [1, 2]}])
+        agent = self.select_one(columns="*",
+                                conditions=[{"column": "id", "value": agent_id}, {"column": "user_id", "value": uid},
+                                            {"column": "publish_status", "value": 0},
+                                            {"column": "status", "op": "in", "value": [1, 2]}])
         if not agent:
             return {"status": 2, "message": get_language_content("api_agent_publish_agent_error")}
 
         # verify app
         apps_model = Apps()
-        app = apps_model.select_one(columns = "*", conditions = [{"column": "id", "value": agent["app_id"]}, {"column": "user_id", "value": uid}, {"column": "mode", "value": 1}, {"column": "status", "op": "in", "value": [1, 2]}])
+        app = apps_model.select_one(columns="*", conditions=[{"column": "id", "value": agent["app_id"]},
+                                                             {"column": "user_id", "value": uid},
+                                                             {"column": "mode", "value": 1},
+                                                             {"column": "status", "op": "in", "value": [1, 2]}])
         if not app:
             return {"status": 2, "message": get_language_content("api_agent_publish_app_error")}
 
         agent_dataset_relation_model = AgentDatasetRelation()
         agent_dataset_relation_list = agent_dataset_relation_model.select(
-            columns = "*",
-            conditions = [
+            columns="*",
+            conditions=[
                 {"column": "agent_id", "value": agent_id},
             ]
         )
 
         agent_abilities_model = AgentAbilities()
         agent_abilities_list = agent_abilities_model.select(
-            columns = "*",
-            conditions = [
+            columns="*",
+            conditions=[
                 {"column": "agent_id", "value": agent_id},
                 {"column": "status", "op": "in", "value": [1, 2]}
             ]
         )
 
-        published_agent = self.select_one(columns = "*", conditions = [{"column": "app_id", "value": agent["app_id"]}, {"column": "publish_status", "value": 1}, {"column": "status", "op": "in", "value": [1, 2]}])
+        published_agent = self.select_one(columns="*", conditions=[{"column": "app_id", "value": agent["app_id"]},
+                                                                   {"column": "publish_status", "value": 1},
+                                                                   {"column": "status", "op": "in", "value": [1, 2]}])
 
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         try:
@@ -390,7 +416,8 @@ class Agents(MySQL):
                 agent_dataset_relation_model.delete({"column": "agent_id", "value": published_agent_id})
 
                 # delete publish abilities
-                agent_abilities_model.soft_delete([{"column": "agent_id", "value": published_agent_id}, {"column": "status", "op": "in", "value": [1, 2]}])
+                agent_abilities_model.soft_delete([{"column": "agent_id", "value": published_agent_id},
+                                                   {"column": "status", "op": "in", "value": [1, 2]}])
             else:
                 # create publish agent
                 agents_data["created_time"] = current_time
@@ -401,9 +428,11 @@ class Agents(MySQL):
             # create agent dataset relation
             if agent_dataset_relation_list:
                 for dataset_relation_val in agent_dataset_relation_list:
-                    insert_relation_res = agent_dataset_relation_model.insert({"agent_id": published_agent_id, "dataset_id": dataset_relation_val["dataset_id"]})
+                    insert_relation_res = agent_dataset_relation_model.insert(
+                        {"agent_id": published_agent_id, "dataset_id": dataset_relation_val["dataset_id"]})
                     if not insert_relation_res:
-                        return {"status": 2, "message": get_language_content("api_agent_publish_agent_dataset_insert_error")}
+                        return {"status": 2,
+                                "message": get_language_content("api_agent_publish_agent_dataset_insert_error")}
 
             # create abilities
             if agent_abilities_list:
@@ -420,7 +449,8 @@ class Agents(MySQL):
                     }
                     create_abilities_res = agent_abilities_model.insert(create_abilities_data)
                     if not create_abilities_res:
-                        return {"status": 2, "message": get_language_content("api_agent_publish_abilities_insert_error")}
+                        return {"status": 2,
+                                "message": get_language_content("api_agent_publish_abilities_insert_error")}
 
             # update publish app
             app_data = {
@@ -436,7 +466,8 @@ class Agents(MySQL):
         except:
             return {"status": 2, "message": get_language_content("api_agent_publish_agent_publish_error")}
 
-        return {"status": 1, "message": get_language_content("api_agent_success"), "data": {"app_id": app["id"], "enable_api": app["enable_api"]}}
+        return {"status": 1, "message": get_language_content("api_agent_success"),
+                "data": {"app_id": app["id"], "enable_api": app["enable_api"]}}
 
     def agent_delete(self, app_id: int, uid: int):
         """
@@ -448,12 +479,17 @@ class Agents(MySQL):
         """
         # verify app
         apps_model = Apps()
-        app = apps_model.select_one(columns = "*", conditions = [{"column": "id", "value": app_id}, {"column": "user_id", "value": uid}, {"column": "mode", "value": 1}, {"column": "status", "op": "in", "value": [1, 2]}])
+        app = apps_model.select_one(columns="*",
+                                    conditions=[{"column": "id", "value": app_id}, {"column": "user_id", "value": uid},
+                                                {"column": "mode", "value": 1},
+                                                {"column": "status", "op": "in", "value": [1, 2]}])
         if not app:
             return {"status": 2, "message": get_language_content("api_agent_delete_app_error")}
 
         # verify agent
-        agents = self.select(columns = "*", conditions = [{"column": "app_id", "value": app_id}, {"column": "user_id", "value": uid}, {"column": "status", "op": "in", "value": [1, 2]}])
+        agents = self.select(columns="*",
+                             conditions=[{"column": "app_id", "value": app_id}, {"column": "user_id", "value": uid},
+                                         {"column": "status", "op": "in", "value": [1, 2]}])
         if not agents:
             return {"status": 2, "message": get_language_content("api_agent_delete_agent_error")}
 
@@ -475,7 +511,8 @@ class Agents(MySQL):
 
                 # delete abilities
                 agent_abilities_model = AgentAbilities()
-                agent_abilities_model.soft_delete([{"column": "agent_id", "value": agent_val["id"]}, {"column": "status", "op": "in", "value": [1, 2]}])
+                agent_abilities_model.soft_delete([{"column": "agent_id", "value": agent_val["id"]},
+                                                   {"column": "status", "op": "in", "value": [1, 2]}])
 
                 # delete chatroom agent relation
                 chatroom_agent_relation_model = ChatroomAgentRelation()
@@ -498,8 +535,9 @@ class Agents(MySQL):
         # get app
         apps_model = Apps()
         app = apps_model.select_one(
-            columns = ["id AS app_id", "user_id", "name", "description", "icon", "icon_background", "is_public", "publish_status", "api_token", "enable_api", "created_time", "status"],
-            conditions = [
+            columns=["id AS app_id", "user_id", "name", "description", "icon", "icon_background", "is_public",
+                     "publish_status", "api_token", "enable_api", "created_time", "status"],
+            conditions=[
                 {"column": "id", "value": app_id},
                 {"column": "team_id", "value": team_id},
                 {"column": "mode", "value": 1},
@@ -521,8 +559,10 @@ class Agents(MySQL):
 
         # get agent
         agent = self.select_one(
-            columns = ["id AS agent_id", "user_id", "obligations", "input_variables", "auto_match_ability", "default_output_format", "model_config_id AS m_config_id", "allow_upload_file", "publish_status", "published_time", "created_time", "status"],
-            conditions = [
+            columns=["id AS agent_id", "user_id", "obligations", "input_variables", "auto_match_ability",
+                     "default_output_format", "model_config_id AS m_config_id", "allow_upload_file", "publish_status",
+                     "published_time", "created_time", "status"],
+            conditions=[
                 {"column": "app_id", "value": app_id},
                 {"column": "team_id", "value": team_id},
                 {"column": "publish_status", "value": publish_status},
@@ -537,12 +577,12 @@ class Agents(MySQL):
         # get agent dataset relation
         agent_dataset_relation_model = AgentDatasetRelation()
         agent_dataset_relation_list = agent_dataset_relation_model.select(
-            columns = ["agent_dataset_relation.dataset_id", "datasets.app_id", "apps.name"],
-            joins = [
+            columns=["agent_dataset_relation.dataset_id", "datasets.app_id", "apps.name"],
+            joins=[
                 ["left", "datasets", "agent_dataset_relation.dataset_id = datasets.id"],
                 ["left", "apps", "datasets.app_id = apps.id"]
             ],
-            conditions = [
+            conditions=[
                 {"column": "agent_dataset_relation.agent_id", "value": agent["agent_id"]},
                 {"column": "datasets.status", "value": 1},
                 {"column": "apps.mode", "value": 3},
@@ -553,8 +593,8 @@ class Agents(MySQL):
         # get agent abilities
         agent_abilities_model = AgentAbilities()
         agent_abilities_list = agent_abilities_model.select(
-            columns = ["id AS agent_ability_id", "name", "content", "output_format", "status"],
-            conditions = [
+            columns=["id AS agent_ability_id", "name", "content", "output_format", "status"],
+            conditions=[
                 {"column": "agent_id", "value": agent["agent_id"]},
                 {"column": "status", "op": "in", "value": [1, 2]}
             ]
@@ -563,19 +603,20 @@ class Agents(MySQL):
         # get model configurations
         model_configurations_model = ModelConfigurations()
         m_configurations_list = model_configurations_model.select(
-            columns = ["model_configurations.id AS m_config_id", "model_configurations.model_id AS m_id", "models.name AS m_name", "models.supplier_id", "suppliers.name AS supplier_name"],
-            joins = [
+            columns=["model_configurations.id AS m_config_id", "model_configurations.model_id AS m_id",
+                     "models.name AS m_name", "models.supplier_id", "suppliers.name AS supplier_name"],
+            joins=[
                 ["left", "models", "model_configurations.model_id = models.id"],
                 ["left", "suppliers", "models.supplier_id = suppliers.id"]
             ],
-            conditions = [
+            conditions=[
                 {"column": "model_configurations.team_id", "value": team_id},
                 {"column": "model_configurations.status", "value": 1},
                 {"column": "models.type", "value": 1},
                 {"column": "models.status", "value": 1},
                 {"column": "suppliers.status", "value": 1}
             ],
-            order_by = "model_configurations.id ASC"
+            order_by="model_configurations.id ASC"
         )
 
         # get user
@@ -597,3 +638,114 @@ class Agents(MySQL):
             "creator_nickname": user["nickname"] if user else None
         }
         return {"status": 1, "message": get_language_content("api_agent_success"), "data": data}
+
+    def create_agent_with_configs(self, data: dict, user_id: int, team_id: int) -> dict:
+        """
+        Create a new agent with complete configurations including app, base settings and abilities.
+
+        Args:
+            data (dict): Complete agent configuration data containing:
+                name (str): Agent name
+                description (str): Agent description
+                obligations (str): Agent obligations/responsibilities
+                agent_abilities (list): List of abilities with each containing:
+                    name (str): Ability name
+                    content (str): Ability content/description
+                    output_format (int): Output format (0: Default, 1: Text, 2: JSON, 3: Code)
+                tags (list, optional): List of tag IDs
+
+            user_id (int): Current user ID
+            team_id (int): Current team ID
+
+        Returns:
+            dict: Contains:
+                status (int): 1 for success, 2 for failure
+                message (str): Success/error message
+                app_id (int): Created app ID if successful
+        """
+        # 1. Extract and validate base data
+        base_data = {
+            "name": data["name"],
+            "description": data["description"],
+            "mode": 1,  # Fixed mode for agent
+            "publish_status": 0  # Initial draft status
+        }
+
+        # 2. Prepare timestamps and user info
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        base_data.update({
+            "team_id": team_id,
+            "user_id": user_id,
+            "created_time": current_time,
+            "updated_time": current_time
+        })
+        # 3. Create app record
+        app_model = Apps()
+        app_id = app_model.insert(base_data)
+        if not app_id:
+            return {"status": 2, "message": get_language_content("apps_insert_error")}
+
+        # 4. Handle tags
+        if data.get("tags", []):
+            tag_bindings = TagBindings()
+            if not tag_bindings.batch_update_bindings([app_id], data.get("tags", [])):
+                return {"status": 2, "message": get_language_content("tag_binding_create_failed")}
+
+        # 5. Create initial agent record
+        agent_data = {
+            "team_id": team_id,
+            "user_id": user_id,
+            "app_id": app_id,
+            "created_time": current_time,
+            "updated_time": current_time
+        }
+        agent_id = self.insert(agent_data)
+        if not agent_id:
+            return {"status": 2, "message": get_language_content("agents_insert_error")}
+
+        # 6. Update agent configurations
+        model_id = ModelConfigurations().get_models_default_used_by_id(team_id=team_id, _type=1)
+        if not model_id:
+            return {"status": 2, "message": get_language_content("api_agent_base_update_model_configuration_error")}
+        agent_config = {
+            "input_variables": {"name": "input", "type": "object", "properties": {
+                "default_var": {"name": "default_var", "type": "string", "value": "",
+                                "display_name": "Default variable", "required": 0, "max_length": 0}},
+                                "display_name": "", "to_string_keys": ""},
+            "obligations": data["obligations"],
+            'm_config_id': model_id
+        }
+
+        base_update_result = self.agent_base_update(
+            agent_id=agent_id,
+            uid=user_id,
+            team_id=team_id,
+            **agent_config
+        )
+        if base_update_result["status"] != 1:
+            return base_update_result
+
+        # 7. Set agent abilities
+        from api.schema.agent import AgentAbilitiesData
+        agent_abilities = []
+        for ability in data["agent_abilities"]:
+            agent_abilities.append(AgentAbilitiesData(
+                agent_ability_id=0,  # New ability
+                name=ability["name"],
+                content=ability["content"],
+                status=1,  # Default to active
+                output_format=ability.get("output_format", 0)  # Default to 0 if not specified
+            ))
+
+        ability_result = self.agent_abilities_set(
+            agent_id=agent_id,
+            uid=user_id,
+            auto_match_ability=1,
+            agent_abilities=agent_abilities
+        )
+        if ability_result["status"] != 1:
+            return ability_result
+        publish = self.agent_publish(agent_id, user_id)
+        if publish["status"] != 1:
+            return {"status": 2, "message": get_language_content("api_agent_publish_agent_publish_error")}
+        return {"status": 1, "message": get_language_content("api_agent_success"), "app_id": app_id}

@@ -35,8 +35,8 @@ class ReqAgentBaseCreateSchema(BaseModel):
     default_output_format: Optional[int] = None
 
 class AgentBaseCreateResponseData(BaseModel):
-    app_id: Optional[int] = None
-    agent_id: Optional[int] = None
+    """Response schema for agent creation"""
+    app_id: int
 
 class ResAgentBaseCreateSchema(BaseModel):
     code: Optional[int] = None
@@ -181,3 +181,19 @@ class ResAgentBatchGenerateSchema(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
     data: Optional[AgentBatchGenerateResonseData] = None
+
+
+class AgentAbilityCreateSchema(BaseModel):
+    """Schema for single agent ability creation"""
+    name: str
+    content: str
+    status: int = 1
+    output_format: int = 0
+
+class ReqAgentCreateSchema(BaseModel):
+    """Schema for agent creation request"""
+    name: str
+    description: str
+    obligations: str
+    agent_abilities: List[AgentAbilityCreateSchema]
+    tags: Optional[List[int]] = []
