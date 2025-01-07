@@ -599,30 +599,26 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
 @router.post('/agent_batch_generate', response_model=ResAgentBatchGenerateSchema)
 async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
     """
-    Batch generate multiple agents based on previous generation and supplementary requirements
+    Batch generate multiple agents with loop control
     
     Args:
         data (ReqAgentBatchGenerateSchema): Request data containing:
-            app_run_id (int): The ID of the original app run
-            generate_number (int): Number of agents to generate (1-10)
-            supplement_prompt (str): Additional prompt to ensure diversity between agents
+            app_run_id (int): The ID of the app run
+            loop_count (int): Number of agents to generate per batch (default: 10)
+            loop_limit (int): Total number of agents to generate
+            supplement_prompt (str): Additional prompt for agent generation
+            loop_id (int): The ID of the loop iteration (0 for new batch)
         userinfo (TokenData): User authentication information
         
     Returns:
         JSON response containing:
             app_run_id (int): The ID of the app run
-            record_id (int): The ID of the LLM record
+            loop_id (int): The ID of the current loop iteration
     """
-
-
-    # result = AIToolLLMRecords().inputs_append_history_outputs(loop_id=data.loop_id, app_run_id=data.app_run_id)
-    # print('result1111111')
-    # print(result)
-    # return
     # Validate app run exists and belongs to user
     app_run_info = AppRuns().select_one(
-        columns = ["id"],
-        conditions = [
+        columns=["id"],
+        conditions=[
             {"column": "id", "value": data.app_run_id},
             {"column": "user_id", "value": userinfo.uid}
         ]
@@ -632,84 +628,59 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         return response_error(get_language_content('app_run_error'))
 
     try:
-        # Get current timestamp as loop_id
-        loop_id = int(time())
+        # Get or create loop_id
+        loop_id = data.loop_id if data.loop_id > 0 else int(time())
 
-        # Prepare prompts for batch generation
-        system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
-        agent_batch_generate_user_prompt = get_language_content('agent_batch_generate_user_prompt', userinfo.uid)
-        agent_reference_data = get_language_content('agent_reference_data', userinfo.uid)
-
-        last_record = AIToolLLMRecords().select_one(
-            columns = ['id', 'inputs', 'outputs'],
-            conditions = [
-                {"column": "app_run_id", "value": data.app_run_id}
-            ],
-            order_by='id DESC'
-        )
-
-        # Extract agent info from outputs
-        history_agent_info = {}
-        try:
-            if isinstance(last_record, dict) and 'outputs' in last_record:
-                outputs_dict = last_record['outputs']
-                if isinstance(outputs_dict, dict) and 'value' in outputs_dict:
-                    history_agent_info = outputs_dict['value']
-        except Exception:
-            pass
-        
-        agent_reference_data = agent_reference_data.format(
-            agent_data=history_agent_info
-        )
-
-        append_prompt = (
-            agent_batch_generate_user_prompt + agent_reference_data
-        )
-
-        system_prompt = system_prompt.format(
-            append_prompt=append_prompt
-        )
-        
-        # Prepare input for LLM
-        input_ = Prompt(
-            system=system_prompt, 
-            user=data.supplement_prompt
-        ).to_dict()
-
-
+        # Calculate remaining count for batch generation
         if data.loop_id > 0:
-            loop_id = data.loop_id
+            # Get count of existing records for this loop
             record_total = AIToolLLMRecords().select_one(
-                columns = ['id'],
+                columns=['id'],
                 conditions=[
                     {"column": "app_run_id", "value": data.app_run_id},
                     {"column": "loop_id", "value": data.loop_id}
                 ],
                 aggregates={"id": "count"}
             )
-            print('有loop_id')
-
-            print('record_total11111')
-            print(record_total)
-            print(record_total['count_id'])
-
-
             remaining_count = data.loop_limit - record_total['count_id']
         else:
-            print('没有loop_id')
             # New batch generation
-            loop_id = int(time())
             remaining_count = data.loop_limit
 
+        # Determine batch size
+        loop_count = min(data.loop_count, remaining_count)
 
-        if remaining_count > data.loop_count:
-            loop_count = data.loop_count
-        else:
-            loop_count = remaining_count
+        # Prepare prompts for batch generation
+        system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
+        agent_batch_generate_user_prompt = get_language_content('agent_batch_generate_user_prompt', userinfo.uid)
+        agent_reference_data = get_language_content('agent_reference_data', userinfo.uid)
 
-        print('loop_count11111')
-        print(loop_count)
+        # Get latest record for reference
+        last_record = AIToolLLMRecords().select_one(
+            columns=['outputs'],
+            conditions=[
+                {"column": "app_run_id", "value": data.app_run_id}
+            ],
+            order_by='id DESC'
+        )
 
+        # Extract reference agent info
+        history_agent_info = {}
+        if last_record and isinstance(last_record.get('outputs', {}), dict):
+            history_agent_info = last_record['outputs'].get('value', {})
+
+        # Format prompts
+        agent_reference_data = agent_reference_data.format(
+            agent_data=history_agent_info
+        )
+        append_prompt = agent_batch_generate_user_prompt + agent_reference_data
+        system_prompt = system_prompt.format(append_prompt=append_prompt)
+
+        # Prepare input for LLM
+        input_ = Prompt(
+            system=system_prompt,
+            user=data.supplement_prompt
+        ).to_dict()
 
         # Update app run status
         AppRuns().update(
@@ -722,7 +693,7 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             app_run_id=data.app_run_id,
             loop_limit=data.loop_limit,
             ai_tool_type=1,  # Agent generator type
-            run_type=4,  # Batch generation
+            run_type=4,      # Batch generation
             loop_id=loop_id,
             loop_count=loop_count,
             inputs=input_
@@ -731,12 +702,11 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         if not record_id:
             return response_error(get_language_content("api_agent_generate_failed"))
 
-        # Return successful response
         return response_success(
             {
                 "app_run_id": data.app_run_id,
                 "loop_id": loop_id
-            }, 
+            },
             get_language_content("api_agent_success")
         )
 
