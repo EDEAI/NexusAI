@@ -24,7 +24,7 @@ os.environ['DATABASE_AUTO_COMMIT'] = 'False'
 router = APIRouter()
 
 @router.get('/apps_list', response_model=ResAppListSchema, summary="Fetching a Paginated List of Applications for the Current User or Team")
-async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str="",apps_mode:str="",tag_ids:str="", userinfo: TokenData = Depends(get_current_user)):
+async def get_app_list(page: int, page_size: int, search_type: int, apps_name: str = "", apps_mode: str = "", tag_ids: str = "", userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a paginated list of applications for the current user or team.
 
@@ -43,16 +43,15 @@ async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str
     - HTTPException: If the 'search_type' is not valid, or if the user is not properly authenticated.
     """
 
-
-    if search_type not in [1,2]:
+    if search_type not in [1, 2]:
         return response_error(get_language_content("app_search_type"))
 
-    request = Apps().get_app_list(page, page_size,search_type, apps_name,apps_mode, userinfo.uid, userinfo.team_id,tag_ids)
+    request = Apps().get_app_list(page, page_size, search_type, apps_name, apps_mode, userinfo.uid, userinfo.team_id, tag_ids)
     if search_type == 1:
         agent_model = Agents()
         agent_info = agent_model.select(
             columns=[
-                'app_id', 'published_time'
+                'app_id', 'published_time', 'id as agent_id'
             ],
             conditions=[
                 {"column": "status", "op": "in", "value": [1, 2]},
@@ -62,10 +61,11 @@ async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str
         )
 
         agent_publish_time = {}
+        agent_ids = {}
 
         for agent_item in agent_info:
             agent_publish_time[agent_item['app_id']] = agent_item['published_time']
-
+            agent_ids[agent_item['app_id']] = agent_item['agent_id']
 
         workflow_model = Workflows()
         workflow_info = workflow_model.select(
@@ -83,7 +83,6 @@ async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str
         for workflow_item in workflow_info:
             workflow_publish_time[workflow_item['app_id']] = workflow_item['published_time']
 
-
         skill_model = CustomTools()
         skill_info = skill_model.select(
             columns=[
@@ -99,10 +98,9 @@ async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str
         for skill_item in skill_info:
             skill_publish_time[skill_item['app_id']] = skill_item['published_time']
 
-
         for item in request['list']:
-
             if item['mode'] == 1:
+                item['agent_id'] = agent_ids.get(item['app_id'])
                 if item['publish_status'] == 1:
                     item['published_time'] = agent_publish_time[item['app_id']]
                 else:
@@ -114,17 +112,17 @@ async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str
                     item['published_time'] = None
             elif item['mode'] == 3:
                 item['published_time'] = None
-
             else:
                 if item['publish_status'] == 1:
                     item['published_time'] = skill_publish_time[item['app_id']]
                 else:
                     item['published_time'] = None
+
     if search_type == 2:
         agent_model = Agents()
         agent_info = agent_model.select(
             columns=[
-                'app_id', 'published_time','users.nickname'
+                'app_id', 'published_time', 'users.nickname', 'id as agent_id'
             ],
             joins=[
                 ["left", "users", "users.id = agents.user_id"],
@@ -138,14 +136,16 @@ async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str
 
         agent_publish_time = {}
         agent_publish_creator = {}
+        agent_ids = {}
         for agent_item in agent_info:
             agent_publish_time[agent_item['app_id']] = agent_item['published_time']
             agent_publish_creator[agent_item['app_id']] = agent_item['nickname']
+            agent_ids[agent_item['app_id']] = agent_item['agent_id']
 
         workflow_model = Workflows()
         workflow_info = workflow_model.select(
             columns=[
-                'app_id', 'published_time','users.nickname'
+                'app_id', 'published_time', 'users.nickname'
             ],
             joins=[
                 ["left", "users", "users.id = workflows.user_id"],
@@ -165,7 +165,7 @@ async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str
         skill_model = CustomTools()
         skill_info = skill_model.select(
             columns=[
-                'app_id', 'published_time','users.nickname'
+                'app_id', 'published_time', 'users.nickname'
             ],
             joins=[
                 ["left", "users", "users.id = custom_tools.user_id"],
@@ -198,12 +198,11 @@ async def get_app_list(page: int, page_size: int,search_type: int, apps_name:str
 
         datasets_publish_creator = {}
         for datasets_item in datasets:
-
             datasets_publish_creator[datasets_item['app_id']] = datasets_item['nickname']
+
         for item in request['list']:
-
             if item['mode'] == 1:
-
+                item['agent_id'] = agent_ids.get(item['app_id'])
                 item['published_time'] = agent_publish_time[item['app_id']]
                 item['published_creator'] = agent_publish_creator[item['app_id']]
             elif item['mode'] == 2:

@@ -24,7 +24,8 @@ class AppsListData(BaseModel):
     published_time:Optional[Union[datetime, None]] = None
     published_creator:Optional[str] = None
     tags:Optional[List[AppListTagsData]] = None
-    list:Optional[List[RealationInfo]] =None
+    list:Optional[List[RealationInfo]] = None
+    agent_id:Optional[int] = None
 
 class  ResAppsListData(BaseModel):
     list: Optional[List[AppsListData]] = None
