@@ -273,11 +273,13 @@ language_packs = {
         'chatroom_user_id_not_exist': 'meeting room Illegal user access',
         'chatroom_delete_success': 'meeting room delete success',
         'chatroom_smart_selection_status_is_required': 'meeting room smart selection status is required',
+        'chatroom_message_is_null': 'The message content cannot be empty',
         'chatroom_smart_selection_status_can_only_input': 'meeting room smart selection status can only input 0 or 1',
         'chatroom_agent_id_is_required': 'agent_id is required',
         'chatroom_agent_active_is_required': 'agent active is required',
         'chatroom_agent_active_can_only_input': 'agent active can only input 0 or 1',
         'chatroom_agent_relation_does_not_exist': 'agent relation does not exist',
+        'chatroom_status_is_incorrect': 'The current status is incorrect',
         'chatroom_agent_number_less_than_one': 'There must be at least 1 agent present in the meeting room.',
         'chatroom_manager_system': (
             'You are the moderator of the meeting room, where there is one user and at least one AI agent.\n'
@@ -493,6 +495,7 @@ language_packs = {
         'tag_binding_create_success': 'Tag binding create success',
         'tag_binding_delete_success': 'Tag binding delete success',
         'team_id_not_found': 'Team ID not found',
+        'chatroom_app_run_id_not_found': 'Current appRunID not found',
 
     },
     "zh": {
@@ -636,6 +639,7 @@ language_packs = {
         'chatroom_user_id_not_exist': '非法用户进入',
         'chatroom_delete_success': '删除会议室成功',
         'chatroom_smart_selection_status_is_required': '会议室择优应答状态不能为空',
+        'chatroom_message_is_null': '消息内容不能为空',
         'chatroom_smart_selection_status_can_only_input': '会议室择优应答状态只能输入0或1',
         'chatroom_agent_id_is_required': '智能体ID不能为空',
         'chatroom_agent_active_is_required': '智能体状态不能为空',
