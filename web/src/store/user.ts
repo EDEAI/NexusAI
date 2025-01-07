@@ -19,6 +19,8 @@ type FlowState = {
     setCurrentUpdateNodeValue: (value: any) => void;
     currentUpdateNodePanel:any;
     setCurrentUpdateNodePanel: (value: any) => void,
+    agentCreateOpen: boolean;
+    setAgentCreateOpen: (value: boolean) => void;
 };
 const useUserStore = create(
     devtools<FlowState>((set, get) => ({
@@ -29,6 +31,10 @@ const useUserStore = create(
         currentUpdateNodeValue: null,
         currentUpdateNodePanel:null,
         prevConfirmDealtWith: null,
+        agentCreateOpen: false,
+        setAgentCreateOpen: (value: boolean) => {
+            set({ agentCreateOpen: value });
+        },
         setPrevConfirmDealtWith: (value: any) => {
             set({ prevConfirmDealtWith: value });
         },

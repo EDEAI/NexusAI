@@ -6,9 +6,20 @@ import {
 } from '@/api/workflow';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { useMount, useDebounce } from 'ahooks';
-import { Button, Input, Modal, Popconfirm, Select, SelectProps, Tag, Typography, message } from 'antd';
-import { memo, useCallback, useEffect, useState, useMemo, useReducer } from 'react';
+import { useDebounce, useMount } from 'ahooks';
+import {
+    Button,
+    Input,
+    Modal,
+    Popconfirm,
+    Select,
+    SelectProps,
+    Tag,
+    Typography,
+    message,
+} from 'antd';
+import { memo, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { EditableItem } from './DivEditable';
 
 const { Paragraph } = Typography;
 
@@ -95,52 +106,88 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
             }
         } catch (error) {
             dispatch({ type: 'SET_ERROR', payload: error.message });
-            message.error(intl.formatMessage({ id: 'error.fetchTags', defaultMessage: 'Failed to fetch tags' }));
+            message.error(
+                intl.formatMessage({
+                    id: 'error.fetchTags',
+                    defaultMessage: 'Failed to fetch tags',
+                }),
+            );
         } finally {
             dispatch({ type: 'SET_LOADING', payload: false });
         }
     }, [modes, intl]);
 
-    const createTag = useCallback(async (name: string) => {
-        if (!name.trim()) {
-            message.warning(intl.formatMessage({ id: 'addTag.emptyName', defaultMessage: 'Tag name cannot be empty' }));
-            return;
-        }
-
-        try {
-            dispatch({ type: 'SET_LOADING', payload: true });
-            const res = await apiCreateTag(name, modes);
-            if (res.code === 0) {
-                setKeyword('');
-                getTags();
-                props?.onTagChange?.();
-                message.success(intl.formatMessage({ id: 'addTag.success', defaultMessage: 'Tag created successfully' }));
-            } else {
-                throw new Error(res.message || 'Failed to create tag');
+    const createTag = useCallback(
+        async (name: string) => {
+            if (!name.trim()) {
+                message.warning(
+                    intl.formatMessage({
+                        id: 'addTag.emptyName',
+                        defaultMessage: 'Tag name cannot be empty',
+                    }),
+                );
+                return;
             }
-        } catch (error) {
-            message.error(intl.formatMessage({ id: 'error.createTag', defaultMessage: 'Failed to create tag' }));
-        } finally {
-            dispatch({ type: 'SET_LOADING', payload: false });
-        }
-    }, [modes, intl, props?.onTagChange]);
 
-    const deleteTag = useCallback(async (tag_id: string) => {
-        try {
-            dispatch({ type: 'SET_LOADING', payload: true });
-            const res = await apiDeleteTag(tag_id);
-            if (res.code === 0) {
-                getTags();
-                message.success(intl.formatMessage({ id: 'deleteTag.success', defaultMessage: 'Tag deleted successfully' }));
-            } else {
-                throw new Error(res.message || 'Failed to delete tag');
+            try {
+                dispatch({ type: 'SET_LOADING', payload: true });
+                const res = await apiCreateTag(name, modes);
+                if (res.code === 0) {
+                    setKeyword('');
+                    getTags();
+                    props?.onTagChange?.();
+                    message.success(
+                        intl.formatMessage({
+                            id: 'addTag.success',
+                            defaultMessage: 'Tag created successfully',
+                        }),
+                    );
+                } else {
+                    throw new Error(res.message || 'Failed to create tag');
+                }
+            } catch (error) {
+                message.error(
+                    intl.formatMessage({
+                        id: 'error.createTag',
+                        defaultMessage: 'Failed to create tag',
+                    }),
+                );
+            } finally {
+                dispatch({ type: 'SET_LOADING', payload: false });
             }
-        } catch (error) {
-            message.error(intl.formatMessage({ id: 'error.deleteTag', defaultMessage: 'Failed to delete tag' }));
-        } finally {
-            dispatch({ type: 'SET_LOADING', payload: false });
-        }
-    }, [intl]);
+        },
+        [modes, intl, props?.onTagChange],
+    );
+
+    const deleteTag = useCallback(
+        async (tag_id: string) => {
+            try {
+                dispatch({ type: 'SET_LOADING', payload: true });
+                const res = await apiDeleteTag(tag_id);
+                if (res.code === 0) {
+                    getTags();
+                    message.success(
+                        intl.formatMessage({
+                            id: 'deleteTag.success',
+                            defaultMessage: 'Tag deleted successfully',
+                        }),
+                    );
+                } else {
+                    throw new Error(res.message || 'Failed to delete tag');
+                }
+            } catch (error) {
+                message.error(
+                    intl.formatMessage({
+                        id: 'error.deleteTag',
+                        defaultMessage: 'Failed to delete tag',
+                    }),
+                );
+            } finally {
+                dispatch({ type: 'SET_LOADING', payload: false });
+            }
+        },
+        [intl],
+    );
 
     // Mount effect
     useMount(() => {
@@ -148,83 +195,94 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
     });
 
     // Modal content component
-    const ModalContent = useMemo(() => (
-        <div className="flex flex-wrap gap-2">
-            <Input
-                suffix={
-                    <PlusOutlined
-                        onClick={() => keyword.trim() && createTag(keyword)}
-                        className={`cursor-pointer mx-1 ${!keyword.trim() ? 'text-gray-300' : ''}`}
-                    />
-                }
-                placeholder={intl.formatMessage({
-                    id: 'addTag.inputTagName',
-                    defaultMessage: 'Enter tag name',
-                })}
-                maxLength={10}
-                value={keyword}
-                onChange={e => setKeyword(e.target.value)}
-                onPressEnter={e => {
-                    e.preventDefault();
-                    if (keyword.trim()) {
-                        createTag(keyword);
-                    }
-                }}
-            />
-            {state.tagList.map(item => (
-                <div
-                    key={item.id}
-                    className="p-0.5 cursor-pointer border border-gray-300 text-gray-600 hover:border-[#1B64F3] rounded-md flex flex-wrap items-center transition-all duration-300"
-                >
-                    <div className="pl-3 pr-1">
-                        <EditableItem
-                            onUpdate={async (newName) => {
-                                try {
-                                    await updateTag(item.id, newName);
-                                    getTags();
-                                    props?.onTagChange?.();
-                                } catch (error) {
-                                    message.error(intl.formatMessage({ id: 'error.updateTag', defaultMessage: 'Failed to update tag' }));
-                                }
-                            }}
-                        >
-                            {item.name}
-                        </EditableItem>
-                    </div>
-                    {item.reference_count === 0 ? (
-                        <Button
-                            onClick={() => deleteTag(item.id)}
-                            type="text"
-                            icon={<DeleteOutlined />}
+    const ModalContent = useMemo(
+        () => (
+            <div className="flex flex-wrap gap-2">
+                <Input
+                    suffix={
+                        <PlusOutlined
+                            onClick={() => keyword.trim() && createTag(keyword)}
+                            className={`cursor-pointer mx-1 ${
+                                !keyword.trim() ? 'text-gray-300' : ''
+                            }`}
                         />
-                    ) : (
-                        <Popconfirm
-                            title={intl.formatMessage({
-                                id: 'addTag.deleteTag',
-                                defaultMessage: 'Delete',
-                            })}
-                            description={`${intl.formatMessage({
-                                id: 'addTag.deleteConfirmation1',
-                            })} ${item.reference_count} ${intl.formatMessage({
-                                id: 'addTag.deleteConfirmation2',
-                            })}`}
-                            onConfirm={() => deleteTag(item.id)}
-                            okText={intl.formatMessage({
-                                id: 'addTag.confirm',
-                                defaultMessage: 'Confirm',
-                            })}
-                            cancelText={intl.formatMessage({
-                                id: 'addTag.cancel',
-                                defaultMessage: 'Cancel',
-                            })}
-                        >
-                            <Button type="text" icon={<DeleteOutlined />} />
-                        </Popconfirm>
-                    )}
-                </div>
-            ))}
-        </div>
-    ), [state.tagList, keyword, intl, createTag, deleteTag]);
+                    }
+                    placeholder={intl.formatMessage({
+                        id: 'addTag.inputTagName',
+                        defaultMessage: 'Enter tag name',
+                    })}
+                    maxLength={10}
+                    value={keyword}
+                    onChange={e => setKeyword(e.target.value)}
+                    onPressEnter={e => {
+                        e.preventDefault();
+                        if (keyword.trim()) {
+                            createTag(keyword);
+                        }
+                    }}
+                />
+                {state.tagList.map(item => (
+                    <div
+                        key={item.id}
+                        className="p-0.5 cursor-pointer border border-gray-300 text-gray-600 hover:border-[#1B64F3] rounded-md flex flex-wrap items-center transition-all duration-300"
+                    >
+                        <div className="pl-3 pr-1">
+                            <EditableItem
+                                maxLength={10}
+                                onUpdate={async newName => {
+                                    try {
+                                        await updateTag(item.id, newName);
+                                        getTags();
+                                        props?.onTagChange?.();
+                                    } catch (error) {
+                                        message.error(
+                                            intl.formatMessage({
+                                                id: 'error.updateTag',
+                                                defaultMessage: 'Failed to update tag',
+                                            }),
+                                        );
+                                    }
+                                }}
+                            >
+                                {item.name}
+                            </EditableItem>
+                        </div>
+                        {item.reference_count === 0 ? (
+                            <Button
+                                onClick={() => deleteTag(item.id)}
+                                type="text"
+                                icon={<DeleteOutlined />}
+                            />
+                        ) : (
+                            <Popconfirm
+                                title={intl.formatMessage({
+                                    id: 'addTag.deleteTag',
+                                    defaultMessage: 'Delete',
+                                })}
+                                description={`${intl.formatMessage({
+                                    id: 'addTag.deleteConfirmation1',
+                                })} ${item.reference_count} ${intl.formatMessage({
+                                    id: 'addTag.deleteConfirmation2',
+                                })}`}
+                                onConfirm={() => deleteTag(item.id)}
+                                okText={intl.formatMessage({
+                                    id: 'addTag.confirm',
+                                    defaultMessage: 'Confirm',
+                                })}
+                                cancelText={intl.formatMessage({
+                                    id: 'addTag.cancel',
+                                    defaultMessage: 'Cancel',
+                                })}
+                            >
+                                <Button type="text" icon={<DeleteOutlined />} />
+                            </Popconfirm>
+                        )}
+                    </div>
+                ))}
+            </div>
+        ),
+        [state.tagList, keyword, intl, createTag, deleteTag],
+    );
 
     return (
         <div className="flex items-center gap-1">
@@ -253,7 +311,10 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                     type="text"
                     className="shrink-0"
                     icon={<PlusOutlined className="cursor-pointer mr-1" />}
-                    aria-label={intl.formatMessage({ id: 'addTag.button', defaultMessage: 'Add new tag' })}
+                    aria-label={intl.formatMessage({
+                        id: 'addTag.button',
+                        defaultMessage: 'Add new tag',
+                    })}
                 />
             )}
 
@@ -310,31 +371,6 @@ const tagRender: TagRender = props => {
     );
 };
 
-export const EditableItem = ({ children, onUpdate, maxLength = 10 }) => {
-    const handleInput = e => {
-        const content = e.currentTarget.textContent;
-        if (content.length > maxLength) {
-            e.currentTarget.textContent = content.substring(0, maxLength);
-        }
-    };
-
-    const handleBlur = e => {
-        const newValue = e.currentTarget.textContent;
-        onUpdate(newValue);
-    };
-
-    return (
-        <div
-            contentEditable
-            onInput={handleInput}
-            onBlur={handleBlur}
-            suppressContentEditableWarning={true}
-        >
-            {children}
-        </div>
-    );
-};
-
 // Add useTags hook back with improvements
 export const useTags = (initialModes = 0) => {
     const intl = useIntl();
@@ -350,27 +386,35 @@ export const useTags = (initialModes = 0) => {
         error: null,
     });
 
-    const fetchTags = useCallback(async (currentModes: number) => {
-        try {
-            dispatch({ type: 'SET_LOADING', payload: true });
-            const res = await getTagList(currentModes);
-            if (res.code === 0) {
-                const formattedTags = res.data?.map(x => ({
-                    ...x,
-                    label: x.name,
-                    value: x.id,
-                }));
-                dispatch({ type: 'SET_TAGS', payload: formattedTags });
-            } else {
-                throw new Error(res.message || 'Failed to fetch tags');
+    const fetchTags = useCallback(
+        async (currentModes: number) => {
+            try {
+                dispatch({ type: 'SET_LOADING', payload: true });
+                const res = await getTagList(currentModes);
+                if (res.code === 0) {
+                    const formattedTags = res.data?.map(x => ({
+                        ...x,
+                        label: x.name,
+                        value: x.id,
+                    }));
+                    dispatch({ type: 'SET_TAGS', payload: formattedTags });
+                } else {
+                    throw new Error(res.message || 'Failed to fetch tags');
+                }
+            } catch (error) {
+                dispatch({ type: 'SET_ERROR', payload: error.message });
+                message.error(
+                    intl.formatMessage({
+                        id: 'error.fetchTags',
+                        defaultMessage: 'Failed to fetch tags',
+                    }),
+                );
+            } finally {
+                dispatch({ type: 'SET_LOADING', payload: false });
             }
-        } catch (error) {
-            dispatch({ type: 'SET_ERROR', payload: error.message });
-            message.error(intl.formatMessage({ id: 'error.fetchTags', defaultMessage: 'Failed to fetch tags' }));
-        } finally {
-            dispatch({ type: 'SET_LOADING', payload: false });
-        }
-    }, [intl]);
+        },
+        [intl],
+    );
 
     useEffect(() => {
         fetchTags(modes);

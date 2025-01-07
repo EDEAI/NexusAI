@@ -499,3 +499,43 @@ export const getAppListByMode = async (
         apps_mode: appModes,
     });
 };
+
+/**
+ * Generate an agent based on user prompt
+ * @async
+ * @param {string} user_prompt - The prompt text to generate agent
+ * @returns {Promise<ApiResponse>} Generated agent data
+ */
+export const agentGenerate = async (user_prompt: string) => {
+    return await aniRequest<any>(`/v1/agent/agent_generate`, {
+        method: 'POST',
+        data: { user_prompt },
+    });
+};
+
+/**
+ * Regenerate an agent with existing run ID
+ * @async
+ * @param {string} app_run_id - The run ID of the agent to regenerate
+ * @returns {Promise<ApiResponse>} Regenerated agent data
+ */
+export const agentReGenerate = async (app_run_id: string) => {
+    return await aniRequest<any>(`/v1/agent/agent_regenerate`, {
+        method: 'POST',
+        data: { app_run_id },
+    });
+};
+
+/**
+ * Supplement an existing agent with additional prompt
+ * @async
+ * @param {string} supplement_prompt - Additional prompt text
+ * @param {string} app_run_id - The run ID of the agent to supplement
+ * @returns {Promise<ApiResponse>} Updated agent data
+ */
+export const agentSupplement = async (supplement_prompt: string, app_run_id: string) => {
+    return await aniRequest<any>(`/v1/agent/agent_supplement`, {
+        method: 'POST',
+        data: { supplement_prompt, app_run_id },
+    });
+};

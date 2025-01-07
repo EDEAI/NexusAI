@@ -6,13 +6,11 @@
  */
 
 export namespace REQ_TYPE {
-    export interface ApiResponse {
+    export interface ApiResponse<T = any> {
         detail: string;
         code: number;
         message: string;
-        data: {
-            [key: string]: any;
-        };
+        data: T;
         access_token?: string;
     }
 }

@@ -382,6 +382,7 @@ const Creation: React.FC = () => {
                             onChange={(e)=>{
                                 setSelectedTags(e)
                             }}
+                            
                         ></TagSearch>
                     </div>
                     <div className=" mr-5">

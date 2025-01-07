@@ -1,7 +1,8 @@
 import { PostappsCreate } from '@/api/creation';
+import useUserStore from '@/store/user';
 import { createappdata } from '@/utils/useUser';
 import { useIntl } from '@umijs/max';
-import { Input, Modal } from 'antd';
+import { Button, Input, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
 import Profilephoto from '../pages/Creation/components/profilephoto';
@@ -9,11 +10,11 @@ const { TextArea } = Input;
 
 interface ChildProps {
     setIsModalOpen: any;
-    isModalOpen: boolean; 
-    CreationType: any; 
+    isModalOpen: boolean;
+    CreationType: any;
     ModalType: Boolean;
     transformData?: any;
-    setcreationType?: any; 
+    setcreationType?: any;
 }
 const CreationModal: React.FC<ChildProps> = ({
     setIsModalOpen,
@@ -29,18 +30,19 @@ const CreationModal: React.FC<ChildProps> = ({
     //     id: 1,
     // },)
     const intl = useIntl();
-    const [CreationName, setCreationName] = useState(''); 
-    const [DescribeValue, setDescribeValue] = useState(''); 
+    const [CreationName, setCreationName] = useState('');
+    const [DescribeValue, setDescribeValue] = useState('');
     const [PitchOnPhone, setPitchOnPhone] = useState({
         id: 1,
         icon: '/icons/headportrait/Android.svg',
     });
+    const { setAgentCreateOpen } = useUserStore();
     useEffect(() => {}, []);
-   
+
     const IconName = (e: any) => {
         setCreationName(e.target.value);
     };
-   
+
     const CreationDescribe = (e: any) => {
         setDescribeValue(e.target.value);
     };
@@ -50,23 +52,22 @@ const CreationModal: React.FC<ChildProps> = ({
             name: CreationName,
             mode: CreationType.apps_mode,
             description: DescribeValue,
-            icon: JSON.stringify(PitchOnPhone.id), 
+            icon: JSON.stringify(PitchOnPhone.id),
             icon_background: '',
         }; /* || CreationType.apps_mode == 4 */
         if (CreationType.apps_mode == 2) {
             let res = await PostappsCreate(data);
             if (res.code === 0) {
                 setIsModalOpen(false);
-              
+
                 Createpage(res.data.app_id);
             }
         } else {
-          
-            createappdata('SET', { ...data, type: false }); 
+            createappdata('SET', { ...data, type: false });
             Createpage();
         }
     };
-  
+
     const RadioChange = (value: any) => {
         transformData.map((item: any) => {
             if (item.name == value.name) {
@@ -93,7 +94,7 @@ const CreationModal: React.FC<ChildProps> = ({
             okButtonProps={{ disabled: CreationName !== '' ? false : true }}
             width={820}
         >
-            <div className='pb-1'>
+            <div className="pb-1">
                 {ModalType ? (
                     <div>
                         <div className="font-medium text-xs mb-4 mt-8">
@@ -141,9 +142,16 @@ const CreationModal: React.FC<ChildProps> = ({
                     </div>
                 ) : null}
 
-                <div>
+                <div className=" mt-5">
+                    {CreationType.apps_mode == 1 && (
+                        <div className="mb-2">
+                            <Button onClick={()=>{
+                                setAgentCreateOpen(true)
+                            }}>辅助生成智能体</Button>
+                        </div>
+                    )}
                     <div className="mb-5">
-                        <p className="text-xs mt-5">
+                        <p className="text-xs">
                             {CreationType.apps_mode == 1
                                 ? intl.formatMessage({ id: 'creation.agent' })
                                 : CreationType.apps_mode == 2
