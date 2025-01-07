@@ -572,7 +572,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
                 'status': 1
             }
         )
-        record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 3, 1, 0, 0, input_messages)
+        record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 3, 1, 0, 0, 0, input_messages)
     return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'message': 'Executing, please wait'})
 
 
@@ -737,7 +737,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             {"column": "id", "value": app_run_id},
             {'status': 1}
         )
-        record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 4, 1, 0, 0, input_messages)
+        record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 4, 1, 0, 0, 0,  input_messages)
     else:
         app_run_id = chat_data['return_app_run_id']
         AppRuns().update(
