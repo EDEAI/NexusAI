@@ -43,11 +43,11 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
     - HTTPException: If the 'search_type' is not valid, or if the user is not properly authenticated.
     """
 
-    if search_type not in [1, 2]:
+    if search_type not in [1, 2, 3]:
         return response_error(get_language_content("app_search_type"))
 
     request = Apps().get_app_list(page, page_size, search_type, apps_name, apps_mode, userinfo.uid, userinfo.team_id, tag_ids)
-    if search_type == 1:
+    if search_type in [1, 3]:
         agent_model = Agents()
         agent_info = agent_model.select(
             columns=[
@@ -214,7 +214,6 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
             else:
                 item['published_time'] = skill_publish_time[item['app_id']]
                 item['published_creator'] = skill_publish_creator[item['app_id']]
-
     return response_success(request)
 
 @router.post("/apps_create", response_model = ResAppsBaseCreateSchema)

@@ -195,5 +195,5 @@ class ReqAgentCreateSchema(BaseModel):
     name: str
     description: str
     obligations: str
-    agent_abilities: List[AgentAbilityCreateSchema]
+    abilities: List[AgentAbilityCreateSchema]
     tags: Optional[List[int]] = []
