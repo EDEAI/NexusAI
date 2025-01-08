@@ -314,7 +314,8 @@ def push_workflow_progress_message(
     created_time: Optional[datetime], 
     total_steps: int, 
     elapsed_time: float, 
-    completed_steps: int
+    completed_steps: int,
+    need_human_confirm: int
 ):
     """
     Pushes a workflow progress message to the websocket queue for the specified users.
@@ -341,7 +342,7 @@ def push_workflow_progress_message(
     for user_id in user_ids:
         queue_data = {
             'user_id': user_id,
-            'type': 'workflow_run_progress', 
+            'type': 'workflow_run_progress',
             'data': {
                 'app_id': app_id,
                 'app_name': app_name,
@@ -355,23 +356,24 @@ def push_workflow_progress_message(
                 'created_time': created_time,
                 'elapsed_time': elapsed_time,
                 'completed_progress': f"{int((completed_steps / total_steps) * 100)}%",
+                'need_human_confirm': need_human_confirm
             }
         }
         push_to_websocket_queue(queue_data)
         logger.info(f"Progress message pushed for user_id:{user_id} run:{app_run_id} data:{queue_data} queue_length:{get_websocket_queue_length()}")
 
 def push_human_confirm_message(
-    user_id: int, 
-    app_id: int, 
-    app_name: str, 
+    user_id: int,
+    app_id: int,
+    app_name: str,
     icon: str,
     icon_background: str,
-    workflow_id: int, 
-    app_run_id: int, 
-    run_type:int, 
-    run_name: str, 
-    edge: Optional[Edge], 
-    node: Node, 
+    workflow_id: int,
+    app_run_id: int,
+    run_type:int,
+    run_name: str,
+    edge: Optional[Edge],
+    node: Node,
     exec_id: int,
     run_status: int = 2,
     parent_exec_id: int = 0,
@@ -379,7 +381,7 @@ def push_human_confirm_message(
 ):
     """
     Pushes a human confirmation message to the WebSocket message queue.
-    
+
     :param user_id: The ID of the user.
     :param app_id: The ID of the app.
     :param app_name: The name of the app.
@@ -404,7 +406,7 @@ def push_human_confirm_message(
     for uid in user_ids:
         data = {
             'user_id': uid,
-            'type': 'workflow_need_human_confirm', 
+            'type': 'workflow_need_human_confirm',
             'data': {
                 'app_id': app_id,
                 'app_name': app_name,
@@ -430,15 +432,15 @@ def push_human_confirm_message(
         logger.info(f"Human confirm message pushed for user_id:{uid} run:{app_run_id} node:{node.id}:{node.data['type']}:{node.data['title']} exec_id:{exec_id} data:{data} queue_length:{get_websocket_queue_length()}")
 
 def push_remove_human_confirm_message(
-    user_id: int, 
-    app_id: int, 
-    workflow_id: int, 
-    app_run_id: int, 
+    user_id: int,
+    app_id: int,
+    workflow_id: int,
+    app_run_id: int,
     exec_id: int
 ):
     """
     Pushes a remove human confirmation message to the WebSocket message queue.
-    
+
     :param user_id: The ID of the user.
     :param app_id: The ID of the app.
     :param workflow_id: The ID of the workflow.
@@ -447,7 +449,7 @@ def push_remove_human_confirm_message(
     """
     data = {
         'user_id': user_id,
-        'type': 'workflow_remove_human_confirm', 
+        'type': 'workflow_remove_human_confirm',
         'data': {
             'app_id': app_id,
             'workflow_id': workflow_id,
@@ -491,10 +493,10 @@ def task_delay_thread():
                 edge_maps = graph.edges.build_edge_maps()  # Build edge maps for the graph
                 current_level_edge_count = 0  # Initialize the current level edge count
                 current_level_completed_edge_count = 0  # Initialize the current level completed edge count
-                
+
                 if level == 0: # start node
                     target_node = graph.nodes.nodes[0]  # Get the target node
-                    
+
                     # Prepare data for node execution record
                     node_exec_data = {
                         'workflow_id': workflow_id,
@@ -508,10 +510,10 @@ def task_delay_thread():
                         'status': 2,  # Status indicating the node execution has started
                     }
                     exec_id = app_node_exec.insert(node_exec_data)  # Insert node execution record into the database
-                    
+
                     # Update app run status to indicate it is running and increment the level
                     update_app_run(app_run_id, {'level': level + 1, 'status': 2})
-                    
+
                     # Update target node with input variable
                     target_node.data['input'] = target_node.data['output'] = create_variable_from_dict(run['inputs'])
                     if (
@@ -520,29 +522,29 @@ def task_delay_thread():
                         and (knowledge_base_mapping_for_upload_files := knowledge_base_mapping_for_input.get(UPLOAD_FILES_KEY))
                     ):
                         target_node.data['knowledge_base_mapping']['input'][UPLOAD_FILES_KEY] = knowledge_base_mapping_for_upload_files
-                    
+
                     # Execute the node asynchronously using Celery
                     create_celery_task(team_id, app_id, run['app_name'], run['icon'], run['icon_background'], workflow_id, app_user_id, user_id, app_run_id, run_type, run['run_name'], exec_id, None, target_node)
-                    
+
                     continue
-                
+
                 for edge in graph.edges.edges: # Iterate over edges starting from the completed steps
                     if edge.level != level: # Check if the source node level matches the run level
                         continue
                     current_level_edge_count += 1
-                    
+
                     if edge.id in completed_edges: # Check if the edge has been completed
                         current_level_completed_edge_count += 1
                         logger.debug(f"Edge already completed for run:{app_run_id} edge:{edge.id}")
                         continue
-                    
+
                     if edge.id in skipped_edges: # Check if the edge has been skipped
                         completed_edges.append(edge.id)
                         completed_steps += 1
                         update_app_run(app_run_id, {'completed_edges': completed_edges, 'completed_steps': completed_steps})
                         logger.debug(f"Edge already skipped for run:{app_run_id} edge:{edge.id}")
                         continue
-                    
+
                     logger.info(f"Processing edge:{edge.to_dict()}")
                     target_node = None # target node for the edge
                     all_predecessors_executed = True # Flag to indicate if all predecessors have been executed
@@ -551,12 +553,12 @@ def task_delay_thread():
                     task_data = None # task data
                     task_operation = '' # task operation
                     parent_exec_id = 0 # parent node execution ID
-                    
+
                     source_node_execution = app_node_exec.get_node_successful_execution(app_run_id, edge.source_node_id)
                     if not source_node_execution: # Check if the source node execution record exists
                         logger.error(f"Source node execution record not found for run {app_run_id} edge {edge.id}")
                         raise Exception(f"Source node execution record not found for run {app_run_id} edge {edge.id}")
-                    
+
                     if edge.is_logical_branch:
                         if not edge.condition_id or not source_node_execution['condition_id']: # Check if condition ID is missing
                             logger.error(f"Condition ID is missing run {app_run_id} edge {edge.id}")
@@ -574,7 +576,7 @@ def task_delay_thread():
                             completed_steps += 1
                             update_app_run(app_run_id, {'completed_edges': completed_edges, 'skipped_edges': skipped_edges, 'completed_steps': completed_steps})
                             continue
-                    
+
                     # Get the task assignment level or task execution node
                     if edge.target_node_type == 'recursive_task_execution':
                         task_condition = app_node_exec.get_recursive_task_condition(app_run_id, level, edge.target_node_id)
@@ -594,14 +596,14 @@ def task_delay_thread():
                             parent_output = create_variable_from_dict(task_condition['parent_output'])
                             task_data = json.loads(parent_output.properties['task'].value)
                             parent_exec_id = task_condition['first_execution_id']
-                    else:    
+                    else:
                         target_node = graph.nodes.get_node(edge.target_node_id)
-                        
+
                     if not target_node:  # Check if the target node exists
                         logger.error(f"Target node not found for run {app_run_id} edge {edge.id}")
                         raise Exception(f"Target node not found for run {app_run_id} edge {edge.id}")
                     target_node_dict = target_node.to_dict()  # Convert the target node to a dictionary
-                    
+
                     # Check if the target node waits for all predecessors
                     for e in graph.edges.edges:
                         if e.level >= level and e.id != edge.id and e.target_node_id == target_node.id and e.id not in skipped_edges and e.id not in completed_edges:
@@ -618,16 +620,16 @@ def task_delay_thread():
                         completed_steps += 1
                         update_app_run(app_run_id, {'completed_edges': completed_edges, 'completed_steps': completed_steps})
                         continue
-                    
+
                     # Create a context object from the run's context dictionary and filter records based on the ancestor node IDs
                     ancestor_node_ids = graph.edges.get_all_ancestor_node_ids(parent_node.id if parent_node else target_node.id)
                     ancestor_context = context.get_related_records(level, ancestor_node_ids)
                     # logger.debug(f"Context for ancestor_node_ids:{ancestor_node_ids} records:{context.to_dict()}")
-                    
+
                     if app_run_status == 1:
                         update_app_run(app_run_id, {'status': 2}) # Update app run status to indicate it is running
                         app_run_status = 2
-                    
+
                     correct_llm_output = False # Flag to indicate if correct LLM output is found
                     if target_node.data['type'] in llm_correctable_node_types: # Check if the target node type is correctable
                         correct_llm_output_execution_id, last_llm_execution_id = app_node_exec.get_correct_llm_output_execution_ids(app_run_id, level, edge.id)
@@ -637,7 +639,7 @@ def task_delay_thread():
                             logger.debug(f"Correct LLM output found for run:{app_run_id} edge:{edge.id} node:{target_node.id} exec_id:{exec_id}")
                             # Push remove human confirmation message
                             push_remove_human_confirm_message(user_id, app_id, workflow_id, app_run_id, last_llm_execution_id)
-                    
+
                     """
                     Status of the human confirmation node execution.
                     0: Non-human confirmation node
@@ -662,7 +664,7 @@ def task_delay_thread():
                             need_human_confirm = 1
                             update_app_run(app_run_id, {'status': 1, 'need_human_confirm': 1}) # Update app run record to indicate human confirmation is needed
                         logger.debug(f"Human node run status:{human_node_run_status}")
-                        
+
                     if not (correct_llm_output or (target_node.data['type'] == 'human' and human_node_run_status != 1)):
                         # Prepare data for node execution record
                         need_human_confirm = 1 if target_node.data['type'] == 'human' else 0
@@ -683,40 +685,40 @@ def task_delay_thread():
                             'need_human_confirm': need_human_confirm
                         }
                         exec_id = app_node_exec.insert(node_exec_data)  # Insert node execution record into the database
-                    
+
                     if target_node.data['type'] == 'human' and human_node_run_status == 1:
                         need_human_confirm = 1
                         # Push a workflow debug message to the WebSocket message queue
-                        push_workflow_debug_message(user_id, app_id, workflow_id, app_run_id, run_type, level, edge, target_node, 1, None, completed_steps, actual_completed_steps, 1, 
-                            run['elapsed_time'], run['prompt_tokens'], run['completion_tokens'], run['total_tokens'], run['embedding_tokens'], run['reranking_tokens'], 
+                        push_workflow_debug_message(user_id, app_id, workflow_id, app_run_id, run_type, level, edge, target_node, 1, None, completed_steps, actual_completed_steps, 1,
+                            run['elapsed_time'], run['prompt_tokens'], run['completion_tokens'], run['total_tokens'], run['embedding_tokens'], run['reranking_tokens'],
                             run['total_steps'], run['created_time'], run['finished_time'], exec_id, 0, 0, {'status': 2, 'error': None, 'need_human_confirm': 1})
                         # Push human confirmation message to the WebSocket message queue
                         push_human_confirm_message(user_id, app_id, run['app_name'], run['icon'], run['icon_background'], workflow_id, app_run_id, run_type, run['run_name'], edge, target_node, exec_id)
-                    
+
                     # Execute the node asynchronously using Celery
                     if not (target_node.data['type'] == 'human' and human_node_run_status != 3):
-                        create_celery_task(team_id, app_id, run['app_name'], run['icon'], run['icon_background'], workflow_id, app_user_id, user_id, app_run_id, run_type, run['run_name'], 
+                        create_celery_task(team_id, app_id, run['app_name'], run['icon'], run['icon_background'], workflow_id, app_user_id, user_id, app_run_id, run_type, run['run_name'],
                             exec_id, edge, target_node, task_level, task_data, task_operation, parent_exec_id, context, ancestor_context, correct_llm_output)
-                        
+
                         if not (correct_llm_output or target_node.data['type'] == 'end' or (task_operation == 'assign_task' and task_level > 0)):
                             # Push a workflow debug message to the WebSocket message queue
-                            push_workflow_debug_message(user_id, app_id, workflow_id, app_run_id, run_type, level, edge, target_node, 1, None, completed_steps, actual_completed_steps, 0, 
-                                run['elapsed_time'], run['prompt_tokens'], run['completion_tokens'], run['total_tokens'], run['embedding_tokens'], run['reranking_tokens'], 
+                            push_workflow_debug_message(user_id, app_id, workflow_id, app_run_id, run_type, level, edge, target_node, 1, None, completed_steps, actual_completed_steps, 0,
+                                run['elapsed_time'], run['prompt_tokens'], run['completion_tokens'], run['total_tokens'], run['embedding_tokens'], run['reranking_tokens'],
                                 run['total_steps'], run['created_time'], run['finished_time'], exec_id, parent_exec_id, 0, {'status': 2, 'error': None, 'need_human_confirm': 0})
-                
+
                 if current_level_edge_count == 0:
                     logger.error(f"No edges found for run:{app_run_id} level:{level}")
                     update_app_run(app_run_id, {'status': 4, 'error': f'No edges found for run:{app_run_id} level:{level}'})
                     continue
-                
+
                 if need_human_confirm == 0 and current_level_edge_count == current_level_completed_edge_count: # Check if all edges for the level have been completed
                     logger.debug(f"All edges completed for run:{app_run_id} level:{level}")
-                    update_app_run(app_run_id, {'level': level + 1}) 
+                    update_app_run(app_run_id, {'level': level + 1})
             except:
                 logger.error(f"Error processing run:{app_run_id} {traceback.format_exc()}")
-        
+
         time.sleep(1)
-        
+
 def task_callback_thread():
     """
     Handles task callbacks in a separate thread.
@@ -731,7 +733,7 @@ def task_callback_thread():
                     result = task.get(timeout=task_timeout)  # Wait for the task to complete with a timeout
                     current_time = datetime.now()  # Current timestamp
                     logger.info(f"Task completed for run:{app_run_id} level:{level} node:{target_node.id}:{target_node.data['type']}:{target_node.data['title']} task_result:{result}")
-                    
+
                     run = app_run.get_running_app_run(app_run_id)  # Retrieve the running app run record
                     if not run:
                         logger.error(f"App run not found for run:{app_run_id}")
@@ -740,7 +742,7 @@ def task_callback_thread():
                     completed_edges = run['completed_edges'] if run['completed_edges'] else []  # Get completed edges
                     completed_steps = run['completed_steps']  # Get completed steps
                     actual_completed_steps = run['actual_completed_steps']  # Get actual completed steps
-                    
+
                     if result['status'] == 'success':
                         # Process successful execution result
                         inputs = result['data'].get('inputs', None)
@@ -752,7 +754,7 @@ def task_callback_thread():
                         total_tokens = result['data'].get('total_tokens', 0)
                         embedding_tokens = result['data'].get('embedding_tokens', 0)
                         reranking_tokens = result['data'].get('reranking_tokens', 0)
-                        
+
                         if edge:
                             if inputs:
                                 # Create input variable from input dictionary
@@ -766,29 +768,29 @@ def task_callback_thread():
                                 completed_edges.append(edge.id)  # Add edge to completed edges
                                 completed_steps += 1  # Increment completed steps
                                 actual_completed_steps += 1  # Increment actual completed steps
-                            
+
                         if (not task_operation or (task_operation == 'assign_task' and not task_id)) and (target_node.data.get('input') or target_node.data.get('output')):
                             context.add_node(level, target_node)  # Add node to context
-                        
+
                         need_human_confirm = 1 if target_node.data['type'] != 'human' and \
                             not (task_operation == 'assign_task' and task_id) and \
                             target_node.data.get('manual_confirmation', False) else 0
                         node_exec_data = {'status': 3, 'error': None, 'need_human_confirm': need_human_confirm, 'finished_time': current_time, **result['data']}
                         app_run_data = {
-                            'context': context.to_dict(), 
+                            'context': context.to_dict(),
                             'completed_edges': completed_edges,
                             'completed_steps': completed_steps,
                             'actual_completed_steps': actual_completed_steps,
-                            'need_human_confirm': need_human_confirm, 
+                            'need_human_confirm': need_human_confirm,
                             'error': None,
-                            'elapsed_time': float(run['elapsed_time']) + elapsed_time, 
+                            'elapsed_time': float(run['elapsed_time']) + elapsed_time,
                             'prompt_tokens': run['prompt_tokens'] + prompt_tokens,
                             'completion_tokens': run['completion_tokens'] + completion_tokens,
                             'total_tokens': run['total_tokens'] + total_tokens,
                             'embedding_tokens': run['embedding_tokens'] + embedding_tokens,
                             'reranking_tokens': run['reranking_tokens'] + reranking_tokens
                         }
-                        
+
                         if target_node.data['type'] == 'end':
                             # If the target node is an end node, update the app run record with completion details
                             app_run_data['outputs'] = outputs
@@ -809,33 +811,33 @@ def task_callback_thread():
                         redis.expire(f'app_run_{app_run_id}_result', 1)
                         if run['type'] == 2:
                             app_node_user_relation.add_node_user_relation(app_run_id, target_node.id, team_id, run['user_id'])
-                    
+
                     update_node_exec(exec_id, node_exec_data) # Update the node execution record with the new data
                     update_app_run(app_run_id, app_run_data) # Update the app run record with the new data
-                    
+
                     if target_node.data['type'] != 'human' and not (task_operation == 'assign_task' and task_id):
                         # External running status 1: Running 2: Running successfully 3: Running failed
                         run_status = app_run_data.get('status', run['status'])
                         run_status = run_status if run_status == 1 else run_status - 1
-                                
+
                         if task_operation == 'assign_task' and not task_id:
                             first_task_exec_id = app_node_exec.get_first_recursive_task_execution_id(app_run_id, level, target_node.id)
                             node_exec_data['elapsed_time'] = app_node_exec.get_task_total_data(app_run_id, level, target_node.id)['total_elapsed_time']
                         else:
                             first_task_exec_id = 0
-                        
+
                         # Push a workflow debug message to the WebSocket message queue
                         push_workflow_debug_message(run['user_id'], run['app_id'], run['workflow_id'], app_run_id, run['type'], level, edge, target_node, run_status,
-                            app_run_data['error'], app_run_data.get('completed_steps', completed_steps), app_run_data.get('actual_completed_steps', actual_completed_steps), app_run_data['need_human_confirm'], 
+                            app_run_data['error'], app_run_data.get('completed_steps', completed_steps), app_run_data.get('actual_completed_steps', actual_completed_steps), app_run_data['need_human_confirm'],
                             app_run_data.get('elapsed_time', run['elapsed_time']), app_run_data.get('prompt_tokens', run['prompt_tokens']),
-                            app_run_data.get('completion_tokens', run['completion_tokens']), app_run_data.get('total_tokens', run['total_tokens']), 
+                            app_run_data.get('completion_tokens', run['completion_tokens']), app_run_data.get('total_tokens', run['total_tokens']),
                             app_run_data.get('embedding_tokens', run['embedding_tokens']), app_run_data.get('reranking_tokens', run['reranking_tokens']), run['total_steps'],
                             run['created_time'], app_run_data.get('finished_time', run['finished_time']), exec_id, parent_exec_id, first_task_exec_id, node_exec_data)
-                        
-                        if not task_operation or (task_operation == 'assign_task' and not task_id):
-                            # Push workflow progress websocket message
-                            push_workflow_progress_message(app_user_id, run['user_id'], run['app_id'], app_name, icon, icon_background, run['workflow_id'], app_run_id, run['type'], run_name, 
-                                run_status, run['created_time'], run['total_steps'], app_run_data.get('elapsed_time', run['elapsed_time']), app_run_data.get('completed_steps', completed_steps))
+
+                        # if not task_operation or (task_operation == 'assign_task' and not task_id):
+                        # Push workflow progress websocket message
+                        push_workflow_progress_message(app_user_id, run['user_id'], run['app_id'], app_name, icon, icon_background, run['workflow_id'], app_run_id, run['type'], run_name,
+                            run_status, run['created_time'], run['total_steps'], app_run_data.get('elapsed_time', run['elapsed_time']), app_run_data.get('completed_steps', completed_steps),app_run_data['need_human_confirm'])
 
                         # Push a workflow need human confirm message to the WebSocket message queue
                         if (task_operation != 'assign_task' or (task_operation == 'assign_task' and not task_id)) and app_run_data['need_human_confirm'] == 1:

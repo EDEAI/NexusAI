@@ -73,6 +73,10 @@ class AppRunsLog(BaseModel):
     finished_time: Optional[datetime] = None
     created_time: Optional[datetime] = None
 
+class HumanConfirmInfo(BaseModel):
+    user_id: Optional[int] = None
+    nickname: Optional[str] = None
+
 class WorkflowLogInfo(BaseModel):
     id: Optional[int] = None
     node_id: Optional[str] = None
@@ -92,6 +96,8 @@ class WorkflowLogInfo(BaseModel):
     updated_time: Optional[datetime] = None
     finished_time: Optional[datetime] = None
     child_executions: Optional[List['WorkflowLogInfo']] = None
+    need_human_confirm: Optional[int] = None
+    human_confirm_info: Optional[List[HumanConfirmInfo]] = None
 
 class WorkspaceWorkflowLogInfoResponseData(BaseModel):
     list: Optional[List[WorkflowLogInfo]] = None
