@@ -314,27 +314,17 @@ def task_callback_thread():
                                 result['data']['outputs']['id'] = return_agent['app_id']
                             else:
                                 logger.error(f"ERROR Batch generate agent returns:{return_agent}")
-                        # elif run_ai_tool_type == 4:
-                        #     value_str = result['data']['outputs']['value']
-                        #
-                        #     json_load_value = json.loads(value_str)
-                        #     if 'list' in json_load_value:
-                        #         json_load_value = json_load_value['list']
-                        #     else:
-                        #         json_load_value = [json_load_value]
-                        #
-                        #     test_var_obj = create_object_variable_from_list(
-                        #         data=json_load_value,
-                        #         name="inputs",
-                        #         display_name="Inptus"
-                        #     )
-                        #     test_var_obj = test_var_obj.to_dict()
-                        #     print(22222222222222222222222222)
-                        #     print(test_var_obj)
-                        #     result['data']['outputs']['value'] = json.dumps(test_var_obj)
-                        #     print(result['data']['outputs']['value'])
-                        #     exit()
-
+                        elif run_ai_tool_type == 4:
+                            value_str = result['data']['outputs']['value']
+                            json_load_value = json.loads(value_str)
+                            json_load_value = [json_load_value]
+                            test_var_obj = create_object_variable_from_list(
+                                data=json_load_value,
+                                name="inputs",
+                                display_name="Inptus"
+                            )
+                            test_var_obj = test_var_obj.to_dict()
+                            result['data']['outputs']['value'] = json.dumps(test_var_obj, ensure_ascii=False)
 
                         app_ai_run_data = {
                             'status': 3,
