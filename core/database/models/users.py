@@ -45,7 +45,7 @@ class Users(MySQL):
             # 返回结果
             filtered_list = [x for x in all_agents if x != uid]
             return filtered_list
-    
+
     # Get the role of the user
     def get_user_id_role(self, user_id: int) -> bool:
         role = self.select_one(columns="*", conditions=[{'column': 'id', 'value': user_id}])
@@ -66,10 +66,10 @@ class Users(MySQL):
             return user['language']
         else:
             raise ValueError(f"User with ID {user_id} not found")
-        
+
     def get_user_by_id(self, user_id: int) -> Optional[Dict[str, Any]]:
         user = self.select_one(
-            columns=['team_id'],
+            columns=['team_id', 'id', 'nickname'],
             conditions=[
                 {'column': 'id', 'value': user_id},
                 {'column': 'status', 'value': 1}

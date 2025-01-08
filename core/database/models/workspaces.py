@@ -2,6 +2,8 @@ from collections import defaultdict
 from typing import Any, Dict, List
 from core.database import MySQL
 from core.database.models.app_node_executions import AppNodeExecutions
+from core.database.models.users import Users
+from core.database.models.app_node_user_relation import AppNodeUserRelation
 from core.database.models.upload_files import UploadFiles
 from core.database.models.chatroom_messages import ChatroomMessages
 import math, json
@@ -160,7 +162,7 @@ class Workspaces(MySQL):
                      "app_node_executions.status",
                      "app_node_executions.error", "app_node_executions.outputs", "app_node_executions.elapsed_time",
                      "app_node_executions.created_time", "app_node_executions.updated_time",
-                     "app_node_executions.finished_time","apps.icon_background", "apps.icon"],
+                     "app_node_executions.finished_time","apps.icon_background", "apps.icon","app_node_executions.need_human_confirm","app_node_executions.user_id"],
             conditions=conditions
         )
 
@@ -171,6 +173,17 @@ class Workspaces(MySQL):
             recursive_task_executions = {}
 
             for app_node in app_node_list:
+                if app_node['need_human_confirm'] == 1:
+                    users = Users()
+                    app_node_user = AppNodeUserRelation()
+                    app_node_user_ids = app_node_user.get_node_user_ids(app_runs_id, app_node['node_id'])
+                    app_node['human_confirm_info'] = []
+                    for userId in app_node_user_ids:
+                        user_info = users.get_user_by_id(userId)
+                        app_node['human_confirm_info'].append({
+                            'user_id': user_info['id'],
+                            'nickname': user_info['nickname']
+                        })
                 if app_node['child_level'] > 0 and app_node['node_type'] == 'recursive_task_execution':
                     continue
 
@@ -254,7 +267,6 @@ class Workspaces(MySQL):
                 ],
                 conditions=[{'column': 'id', 'value': app_runs_id}]
             )
-
             if app_run_info:
                 for log_run in app_run_info:
                     if 'status' in log_run:

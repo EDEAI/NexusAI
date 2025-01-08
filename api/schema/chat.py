@@ -164,7 +164,6 @@ class ChatHistorySummary(BaseModel):
     app_id: Optional[int] = None
     app_run_id: Optional[int] = None
     status: Optional[int] = None
-    return_app_run_id: str = None
     corrected_parameter: str = None
 
 

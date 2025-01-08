@@ -2,10 +2,11 @@ import json
 import sys
 
 from collections import deque
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from datetime import datetime
+from time import monotonic
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from langchain_core.messages import AIMessage, AIMessageChunk
-from langchain_core.outputs import ChatGeneration
+from langchain_core.messages import AIMessageChunk
 
 from .websocket import WebSocketManager
 from core.database.models import (
@@ -16,8 +17,9 @@ from core.database.models import (
     Chatrooms,
     Models
 )
-from core.llm import Messages, Prompt
-from core.llm.models import LLMPipeline
+from core.llm import Prompt
+from core.workflow.nodes import AgentNode, LLMNode
+from core.workflow.variables import create_variable_from_dict, Variable
 from languages import get_language_content
 from log import Logger
 
@@ -32,23 +34,16 @@ chatroom_messages = ChatroomMessages()
 
 class Chatroom:
     @staticmethod
-    def _get_llm_pipeline(model_info: Dict, return_json: bool = False) -> LLMPipeline:
-        llm_config = {**model_info['supplier_config'], **model_info['model_config']}
-        if return_json:
-            llm_config['model_kwargs'] = {'response_format': {'type': 'json_object'}}
-        return LLMPipeline(supplier=model_info['supplier_name'], config=llm_config)
-    
-    @staticmethod
     def _console_log(content: str) -> None:
         sys.stdout.write(content)
         sys.stdout.flush()
 
-    def _init_llm_pipelines(self, all_agent_ids: Sequence[int], absent_agent_ids: Sequence[int]) -> None:
+    def _get_model_configs(self, all_agent_ids: Sequence[int], absent_agent_ids: Sequence[int]) -> None:
         model_info = Models().get_model_by_type(1, self._team_id, uid=self._user_id)
-        self._llm_pipelines[0] = self._get_llm_pipeline(model_info, return_json=True)
+        self._model_config_ids[0] = model_info['model_config_id']
         for agent_id in all_agent_ids:
             agent = Agents().select_one(
-                columns=['id', 'apps.name', 'obligations', 'model_config_id'],
+                columns=['id', 'app_id', 'apps.name', 'apps.description', 'obligations', 'model_config_id'],
                 joins=[('left', 'apps', 'agents.app_id = apps.id')],
                 conditions={'column': 'id', 'value': agent_id}  # Include deleted agents (with status=3)
             )
@@ -58,10 +53,7 @@ class Chatroom:
 
             self._all_agents[agent_id] = agent
             if agent_id not in absent_agent_ids:
-                model_config_id = agent['model_config_id']
-                model_info = Models().get_model_by_config_id(model_config_id)
-                assert model_info, f'Model configuration {model_config_id} not found.'
-                self._llm_pipelines[agent_id] = self._get_llm_pipeline(model_info)
+                self._model_config_ids[agent_id] = agent['model_config_id']
     
     def __init__(
         self,
@@ -82,11 +74,11 @@ class Chatroom:
         self._chatroom_id = chatroom_id
         self._app_run_id = app_run_id
         self._all_agents = {}
-        # self._llm_pipelines: dict
+        # self._model_config_ids: dict
         # keys are IDs of all active agents with the addition of 0 (which is the Speaker Selector)
-        # values are LLMPipeline instances
-        self._llm_pipelines: Dict[int, LLMPipeline] = {}
-        self._init_llm_pipelines(all_agent_ids, absent_agent_ids)
+        # values are corresponding LLM model_config_ids
+        self._model_config_ids: Dict[int, Dict[str, Any]] = {}
+        self._get_model_configs(all_agent_ids, absent_agent_ids)
         self._max_round = max_round
         self._smart_selection = smart_selection
         self._ws_manager = ws_manager
@@ -104,7 +96,7 @@ class Chatroom:
         Get information of all active agents as a JSON string in an AI prompt.
         '''
         info = []
-        for agent_id in self._llm_pipelines:
+        for agent_id in self._model_config_ids:
             if agent_id != 0:
                 agent = self._all_agents[agent_id]
                 abilities = agent['abilities']
@@ -184,10 +176,6 @@ class Chatroom:
         app_runs.increment_steps(self._app_run_id)
 
     async def _select_next_speaker(self) -> int:
-        prompt_tokens = 0
-        completion_tokens = 0
-        total_tokens = 0
-        llm_pipeline = self._llm_pipelines[0]  # Speaker Selector
         agent_id = None
         for i in range(5):  # Try 5 times
             last_speaker_id = self._history_messages[-1]['agent_id']
@@ -204,7 +192,7 @@ class Chatroom:
                 )
             else:
                 # If the last speaker is an agent,
-                if self._smart_selection or len(self._llm_pipelines) <= 2:
+                if self._smart_selection or len(self._model_config_ids) <= 2:
                     # and (smart selection is enabled or there is only one agent), the Speaker Selector must stop the chat
                     return 0
                 else:
@@ -220,7 +208,7 @@ class Chatroom:
                     )
             messages, messages_in_last_section = self._get_history_messages_list()
             user_prompt = user_prompt.format(
-                agent_count = len(self._llm_pipelines) - 1,
+                agent_count = len(self._model_config_ids) - 1,
                 agents = self._get_agents_info(),
                 user_message = messages_in_last_section[0]['message'],
                 topic = self._topic,
@@ -237,29 +225,34 @@ class Chatroom:
                     agent_id=agent_id
                 ) + user_prompt
 
-            # Prepare the input for the Speaker Selector
-            input_messages = Messages()
-            input_messages.add_prompt(Prompt(system_prompt, user_prompt))
-            input_ = [(role, message.value) for role, message in input_messages.messages]
-            logger.debug('Requesting LLM...')
             # Request LLM
-            result = await llm_pipeline.llm.agenerate([input_])
-            result: ChatGeneration = result.generations[0][0]
-            manager_message: AIMessage = result.message
-            logger.debug('Speaker selector output: %s', manager_message.content)
+            logger.debug('Requesting LLM...')
+            llm_node = LLMNode(
+                title='Speaker Selector',
+                desc='Speaker Selector',
+                model_config_id=self._model_config_ids[0],
+                prompt=Prompt(system_prompt, user_prompt)
+            )
+            result = llm_node.run(return_json=True)
+            assert result['status'] == 'success', result['message']
+            result_data = result['data']
+            manager_message_var = create_variable_from_dict(result_data['outputs'])
+            manager_message = manager_message_var.value
+            logger.debug('Speaker selector output: %s', manager_message)
+            llm_input_var = result_data['model_data']['messages']
+            llm_input = []
+            for role, message_var in llm_input_var:
+                llm_input.append((role, create_variable_from_dict(message_var).value))
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
-
-            # LLM output & token usage recording
-            if usage_metadata := manager_message.usage_metadata:
-                prompt_tokens = usage_metadata['input_tokens']
-                completion_tokens = usage_metadata['output_tokens']
-                total_tokens = usage_metadata['total_tokens']
+            prompt_tokens = result_data['prompt_tokens']
+            completion_tokens = result_data['completion_tokens']
+            total_tokens = result_data['total_tokens']
             chatroom_messages.insert(
                 {
                     'chatroom_id': self._chatroom_id,
                     'app_run_id': self._app_run_id,
-                    'llm_input': input_,
-                    'message': manager_message.content,
+                    'llm_input': llm_input,
+                    'message': manager_message,
                     'is_read': 1 if has_connections else 0,
                     'prompt_tokens': prompt_tokens,
                     'completion_tokens': completion_tokens,
@@ -271,7 +264,7 @@ class Chatroom:
                 prompt_tokens, completion_tokens, total_tokens
             )
 
-            llm_output = json.loads(manager_message.content)
+            llm_output = json.loads(manager_message)
             # Update the topic if the last speaker is the user
             if last_speaker_id == 0:
                 self._topic = llm_output['topic']
@@ -288,7 +281,7 @@ class Chatroom:
             except ValueError:
                 # The Speaker Selector returned an invalid agent ID, try again
                 continue
-            if agent_id in self._llm_pipelines:
+            if agent_id in self._model_config_ids:
                 return agent_id
             # else: the Speaker Selector returned an invalid agent ID, try again
 
@@ -299,7 +292,6 @@ class Chatroom:
         prompt_tokens = 0
         completion_tokens = 0
         total_tokens = 0
-        llm_pipeline = self._llm_pipelines[agent_id]
         agent = self._all_agents[agent_id]
         abilities = agent['abilities']
         messages, messages_in_last_section = self._get_history_messages_list()
@@ -336,39 +328,78 @@ class Chatroom:
                 name = agent['name'],
                 obligations = agent['obligations']
             )
-        input_messages = Messages()
-        input_messages.add_prompt(
-            Prompt(
-                system=get_language_content('chatroom_agent_system', self._user_id),
-                user=agent_user_prompt
-            )
+        prompt = Prompt(
+            system=get_language_content('chatroom_agent_system', self._user_id),
+            user=agent_user_prompt
         )
-        input_ = [(role, message.value) for role, message in input_messages.messages]
+        agent_node = AgentNode(
+            title=f'Agent {agent_id}',
+            desc=f'Agent {agent_id}',
+            agent_id=agent_id,
+            prompt=prompt
+        )
         logger.debug('Requesting LLM...')
-        self._console_log('Agent message: \033[36m')  # Print the agent message in green
-        chunk: AIMessageChunk
-        full_chunk: Optional[AIMessageChunk] = None
-        # Request LLM
-        async for chunk in llm_pipeline.llm.astream(
-            input_,
-            stream_usage=True
-        ):
-            if content := chunk.content:
-                self._console_log(content)
-                full_chunk = chunk if full_chunk is None else full_chunk + chunk
-                await self._ws_manager.send_agent_reply(
-                    self._chatroom_id,
-                    agent_id,
-                    content,
-                    full_chunk.content
-                )
-            # Get token usage
-            if usage_metadata := chunk.usage_metadata:
-                prompt_tokens = usage_metadata['input_tokens']
-                completion_tokens = usage_metadata['output_tokens']
-                total_tokens = usage_metadata['total_tokens']
-        self._console_log('\033[0m\n')  # Reset the color
-        agent_message = full_chunk.content if full_chunk else ''
+        start_time = monotonic()
+        now = datetime.now().replace(microsecond=0).isoformat(sep='_')
+        agent_run_id = AppRuns().insert(
+            {
+                # the local variable `app_id` is the APP ID of the workflow when `node_exec_id` is not 0
+                # and is the APP ID of the agent when `node_exec_id` is 0
+                'app_id': agent['app_id'],
+                'user_id': self._user_id,
+                'agent_id': agent_id,
+                'type': 2,
+                'name': f'Agent-{agent_id}-Roundtable-{self._chatroom_id}_{now}',
+                'status': 2
+            }
+        )
+        try:
+            self._console_log('Agent message: \033[36m')  # Print the agent message in green
+            full_chunk: Optional[AIMessageChunk] = None
+            # Request LLM
+            async for chunk in agent_node.run_in_chatroom(self._user_id):
+                if content := chunk.content:
+                    self._console_log(content)
+                    full_chunk = chunk if full_chunk is None else full_chunk + chunk
+                    await self._ws_manager.send_agent_reply(
+                        self._chatroom_id,
+                        agent_id,
+                        content,
+                        full_chunk.content
+                    )
+                # Get token usage
+                if usage_metadata := chunk.usage_metadata:
+                    prompt_tokens = usage_metadata['input_tokens']
+                    completion_tokens = usage_metadata['output_tokens']
+                    total_tokens = usage_metadata['total_tokens']
+            self._console_log('\033[0m\n')  # Reset the color
+            agent_message = full_chunk.content if full_chunk else ''
+            elapsed_time = monotonic() - start_time
+            AppRuns().update(
+                {'column': 'id', 'value': agent_run_id},
+                {
+                    'status': 3,
+                    'outputs': Variable(
+                        name='text',
+                        type='string',
+                        value=agent_message
+                    ).to_dict(),
+                    'elapsed_time': elapsed_time,
+                    'prompt_tokens': prompt_tokens,
+                    'completion_tokens': completion_tokens,
+                    'total_tokens': total_tokens,
+                    'finished_time': datetime.now()
+                }
+            )
+        except Exception as e:
+            AppRuns().update(
+                {'column': 'id', 'value': agent_run_id},
+                {
+                    'status': 4,
+                    'error': str(e)
+                }
+            )
+            raise
         await self._ws_manager.end_agent_reply(
             self._chatroom_id,
             agent_id,
@@ -383,7 +414,10 @@ class Chatroom:
                 'chatroom_id': self._chatroom_id,
                 'app_run_id': self._app_run_id,
                 'agent_id': agent_id,
-                'llm_input': input_,
+                'llm_input': [
+                    ['system', prompt.get_system()],
+                    ['user', prompt.get_user()]
+                ],
                 'message': agent_message,
                 'topic': self._topic,
                 'is_read': 1 if has_connections else 0,

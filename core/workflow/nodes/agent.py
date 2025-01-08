@@ -3,15 +3,18 @@ import json
 from copy import deepcopy
 from datetime import datetime
 from time import monotonic
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, AsyncIterator, Dict, List, Optional, Union
 from langchain_core.documents import Document
+from langchain_core.messages import AIMessageChunk
 
 from .base import CURRENT_NODE_ID, ImportToKBBaseNode, LLMBaseNode
 from ..context import Context, replace_variable_value_with_context
 from ..variables import ObjectVariable, Variable
 from ..recursive_task import RecursiveTaskCategory
-from core.database.models import Apps, AgentAbilities, AgentDatasetRelation, Agents, Workflows, AppRuns, AppNodeExecutions
+from core.database.models import Apps, AgentAbilities, AgentDatasetRelation, Agents, Workflows, AppRuns, AppNodeExecutions, Models
 from core.dataset import DatasetRetrieval
+from core.llm.messages import Messages
+from core.llm.models import LLMPipeline
 from core.llm.prompt import Prompt, replace_prompt_with_context
 from languages import get_language_content
 from log import Logger
@@ -431,4 +434,27 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 'status': 'failed',
                 'message': str(e)
             }
+    
+    async def run_in_chatroom(self, user_id: int = 0) -> AsyncIterator[AIMessageChunk]:
+        agent_id = self.data['agent_id']
+        agent = Agents().get_agent_by_id(agent_id)
+        model_config_id = agent['model_config_id']
+        model_info = Models().get_model_by_config_id(model_config_id)
+        llm_config = {**model_info['supplier_config'], **model_info['model_config']}
+        llm_pipeline = LLMPipeline(supplier=model_info['supplier_name'], config=llm_config)
+        
+        input_messages = Messages()
+        input_messages.add_prompt(
+            Prompt(
+                system=get_language_content('chatroom_agent_system', user_id),
+                user=self.data['prompt'].get_user()
+            )
+        )
+        input_ = [(role, message.value) for role, message in input_messages.messages]
+        
+        async for chunk in llm_pipeline.llm.astream(
+            input_,
+            stream_usage=True
+        ):
+            yield chunk
         
