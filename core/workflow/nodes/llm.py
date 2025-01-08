@@ -159,7 +159,10 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
                 correct_llm_output=correct_llm_output,
                 return_json=kwargs.get('return_json', False)
             )
-            outputs = Variable(name="text", type="string", value=content)
+            if isinstance(content, (dict, list)):
+                outputs = Variable(name="text", type="json", value=json.dumps(content, ensure_ascii=False))
+            else:
+                outputs = Variable(name="text", type="string", value=content)
             if (
                 not self.data['manual_confirmation']
                 # NOT running the app separately
