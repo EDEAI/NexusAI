@@ -648,7 +648,7 @@ class Agents(MySQL):
                 name (str): Agent name
                 description (str): Agent description
                 obligations (str): Agent obligations/responsibilities
-                agent_abilities (list): List of abilities with each containing:
+                abilities (list): List of abilities with each containing:
                     name (str): Ability name
                     content (str): Ability content/description
                     output_format (int): Output format (0: Default, 1: Text, 2: JSON, 3: Code)
@@ -728,7 +728,7 @@ class Agents(MySQL):
         # 7. Set agent abilities
         from api.schema.agent import AgentAbilitiesData
         agent_abilities = []
-        for ability in data["agent_abilities"]:
+        for ability in data["abilities"]:
             agent_abilities.append(AgentAbilitiesData(
                 agent_ability_id=0,  # New ability
                 name=ability["name"],
