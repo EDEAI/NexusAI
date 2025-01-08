@@ -539,3 +539,41 @@ export const agentSupplement = async (supplement_prompt: string, app_run_id: str
         data: { supplement_prompt, app_run_id },
     });
 };
+
+interface AgentCreateAbility {
+    name: string;
+    content: string;
+    status?: number;
+    output_format: number;
+}
+
+interface AgentCreateParams {
+    name: string;
+    description: string;
+    obligations: string;
+    abilities: AgentCreateAbility[];
+    tags: string[];
+}
+
+export const agentCreate = async (params: AgentCreateParams) => {
+    return await aniRequest<any>(`/v1/agent/agent_create`, {
+        method: 'POST',
+        data: params,
+    });
+};
+
+interface BatchAgentCreateParams {
+    app_run_id: number;
+    loop_count: number;
+    loop_limit: number;
+    supplement_prompt: string;
+    loop_id: number;
+}
+
+export const batchAgentCreate = async (params: BatchAgentCreateParams) => {
+    return await aniRequest<any>(`/v1/agent/agent_batch_generate`, {
+        method: 'POST',
+        data: params,
+    });
+};
+

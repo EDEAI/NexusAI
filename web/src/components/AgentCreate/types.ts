@@ -18,6 +18,7 @@ export interface AgentFormData {
         output_format: number;
     }>;
     skill_list?: AgentSkill[];
+    tags?: string[];
 }
 
 export interface BatchCreateFormData {

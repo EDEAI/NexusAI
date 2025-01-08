@@ -1,119 +1,153 @@
-import { Button, Input, Typography } from 'antd';
-import React, { memo, useState } from 'react';
+import { Button, Input, Spin, Typography } from 'antd';
+import React, { forwardRef, memo, useEffect, useImperativeHandle, useState } from 'react';
 import TagSearch from '../TagSearch';
 import { EditableCard } from './EditableCard';
 import { AgentFormData } from './types';
 const { Paragraph } = Typography;
+
+export interface ResultDisplayRef {
+    getValue: () => Partial<AgentFormData>;
+}
+
 interface ResultDisplayProps {
     initialValues?: Partial<AgentFormData>;
     onChange?: (values: AgentFormData) => void;
     loading?: boolean;
 }
 
-const ResultDisplay = memo(({ initialValues, onChange, loading }: ResultDisplayProps) => {
-    const [editableStrWithSuffix, setEditableStrWithSuffix] = useState(
-        initialValues?.description || '',
-    );
-    console.log(initialValues);
-    
-    return (
-        <div className="flex-1 h-full pb-4 overflow-auto rounded-lg border border-gray-200 px-4 bg-gray-50 overflow-y-auto">
-            <div className="h-full">
-                <div className="px-4 pt-6 flex items-center gap-2">
-                    <Paragraph
-                        editable={{
-                            onChange: setEditableStrWithSuffix,
-                            text: initialValues?.name,
-                            triggerType: ['text'],
-                            autoSize: true,
-                        }}
-                        className="hover:bg-blue-100 !mb-0 relative rounded-lg text-blue-600 text-[16px] flex items-center"
-                    >
-                        <img src="/icons/agent_create.svg" className="size-6 mr-1"></img>
-                        {initialValues?.name}
-                    </Paragraph>
-                </div>
-                <div className="px-4 py-1 mt-2">
-                    <Paragraph
-                        editable={{
-                            onChange: setEditableStrWithSuffix,
-                            text: initialValues?.description,
-                            triggerType: ['text'],
-                            autoSize: true,
-                        }}
-                        className=" hover:bg-blue-100 rounded-lg !mb-0 text-[#666666] text-[12px]"
-                        rootClassName=""
-                    >
-                        {initialValues?.description}
-                    </Paragraph>
-                    <div className="flex items-center hover:bg-blue-100 rounded-lg  mt-2">
-                        <img src="/icons/tag.svg" className="size-4"></img>
-                        <div className=" flex-1">
-                            <TagSearch
-                                showAddButton={false}
-                                className="w-full"
-                                variant="borderless"
-                            ></TagSearch>
-                        </div>
-                    </div>
-                </div>
-                <div className="px-4 py-1">
-                    <Paragraph
-                        editable={{
-                            onChange: setEditableStrWithSuffix,
-                            text: initialValues?.obligations,
-                            triggerType: ['text'],
-                            autoSize: true,
-                        }}
-                        className=" hover:bg-blue-100 rounded-lg !mb-0  text-[12px]"
-                    >
-                        {initialValues?.obligations}
-                    </Paragraph>
-                </div>
+const ResultDisplay = memo(
+    forwardRef<ResultDisplayRef, ResultDisplayProps>(
+        ({ initialValues, onChange, loading }, ref) => {
+            const [values, setValues] = useState<Partial<AgentFormData>>(initialValues || {});
 
-                <div className="flex flex-col gap-2 px-1 mt-2 pb-4">
-                    {initialValues?.abilities?.map((item, index) => (
-                        <EditableCard
-                            key={index}
-                            title={item.name}
-                            description={item.content}
-                            outputFormat={item.output_format}
-                            onDelete={() => {
-                                const newSkillList = [...initialValues.skill_list];
-                                newSkillList.splice(index, 1);
-                                onChange?.({
-                                    name: initialValues.name || '',
-                                    description: initialValues.description || '',
-                                    prompt: initialValues.prompt || '',
-                                    obligations: initialValues.obligations || '',
-                                    abilities: initialValues.abilities || [],
-                                    skill_list: newSkillList,
-                                });
-                            }}
-                            onChange={({ title, description, outputFormat }) => {
-                                const newSkillList = [...initialValues.skill_list];
-                                if (title !== undefined) newSkillList[index].skill = title;
-                                if (description !== undefined)
-                                    newSkillList[index].description = description;
-                                if (outputFormat !== undefined)
-                                    newSkillList[index].output_format =
-                                        outputFormat === 2 ? 'json' : 'text';
-                                onChange?.({
-                                    name: initialValues.name || '',
-                                    description: initialValues.description || '',
-                                    prompt: initialValues.prompt || '',
-                                    obligations: initialValues.obligations || '',
-                                    abilities: initialValues.abilities || [],
-                                    skill_list: newSkillList,
-                                });
-                            }}
-                        />
-                    ))}
+            useEffect(() => {
+                setValues(prev => ({
+                    ...initialValues,
+                    tags: prev.tags || [],
+                }));
+            }, [initialValues]);
+
+            useImperativeHandle(ref, () => ({
+                getValue: () => values,
+            }));
+
+            const handleChange = (updates: Partial<AgentFormData>) => {
+                const newValues = { ...values, ...updates };
+                setValues(newValues);
+                onChange?.(newValues as AgentFormData);
+            };
+
+            return (
+                <div className="flex-1 h-full pb-4 overflow-auto rounded-lg border border-gray-200 px-4 bg-gray-50 overflow-y-auto">
+                    <Spin
+                        spinning={loading}
+                        className="h-full"
+                        wrapperClassName="!h-full"
+                        tip="正在生成..."
+                    >
+                        <div className="h-full">
+                            <div className="px-4 pt-6 flex items-center gap-2">
+                                <Paragraph
+                                    editable={{
+                                        onChange: value => handleChange({ name: value }),
+                                        text: values.name,
+                                        triggerType: ['text'],
+                                        autoSize: true,
+                                    }}
+                                    className="hover:bg-blue-100 !mb-0 relative rounded-lg text-blue-600 text-[16px] flex items-center"
+                                >
+                                    <img
+                                        src="/icons/agent_create.svg"
+                                        className="size-6 mr-1"
+                                    ></img>
+                                    {values.name}
+                                </Paragraph>
+                            </div>
+                            <div className="px-4 py-1 mt-2">
+                                <Paragraph
+                                    editable={{
+                                        onChange: value => handleChange({ description: value }),
+                                        text: values.description,
+                                        triggerType: ['text'],
+                                        autoSize: true,
+                                    }}
+                                    className="hover:bg-blue-100 rounded-lg !mb-0 text-[#666666] text-[12px]"
+                                >
+                                    {values.description}
+                                </Paragraph>
+                                <div className="flex items-center hover:bg-blue-100 rounded-lg  mt-2">
+                                    <img src="/icons/tag.svg" className="size-4"></img>
+                                    <div className=" flex-1">
+                                        <TagSearch
+                                            showAddButton={false}
+                                            className="w-full"
+                                            variant="borderless"
+                                            onChange={(tags) => {
+                                                handleChange({ tags });
+                                            }}
+                                            value={values.tags}
+                                        ></TagSearch>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="px-4 py-1">
+                                <Paragraph
+                                    editable={{
+                                        onChange: value => handleChange({ obligations: value }),
+                                        text: values.obligations,
+                                        triggerType: ['text'],
+                                        autoSize: true,
+                                    }}
+                                    className="hover:bg-blue-100 rounded-lg !mb-0 text-[12px]"
+                                >
+                                    {values.obligations}
+                                </Paragraph>
+                            </div>
+
+                            <div className="flex flex-col gap-2 px-1 mt-2 pb-4">
+                                {values.abilities?.map((item, index) => (
+                                    <EditableCard
+                                        key={index}
+                                        title={item.name}
+                                        description={item.content}
+                                        outputFormat={item.output_format}
+                                        onDelete={() => {
+                                            const newAbilities = [...(values.abilities || [])];
+                                            newAbilities.splice(index, 1);
+                                            handleChange({
+                                                name: values.name || '',
+                                                description: values.description || '',
+
+                                                obligations: values.obligations || '',
+                                                abilities: newAbilities,
+                                            });
+                                        }}
+                                        onChange={({ title, description, outputFormat }) => {
+                                            const newAbilities = [...(values.abilities || [])];
+                                            if (title !== undefined)
+                                                newAbilities[index].name = title;
+                                            if (description !== undefined)
+                                                newAbilities[index].content = description;
+                                            if (outputFormat !== undefined)
+                                                newAbilities[index].output_format = outputFormat;
+                                            handleChange({
+                                                name: values.name || '',
+                                                description: values.description || '',
+
+                                                obligations: values.obligations || '',
+                                                abilities: newAbilities,
+                                            });
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </Spin>
                 </div>
-            </div>
-        </div>
-    );
-});
+            );
+        },
+    ),
+);
 
 interface PromptTextareaProps {
     /** Default textarea value */
