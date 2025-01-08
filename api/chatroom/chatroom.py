@@ -633,7 +633,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             {"column": "id", "value": app_run_id},
             {"column": "status", "value": 3}
         ]
-    )['status']
+    )
 
     if appStatus is None:
         return response_error(get_language_content("chatroom_app_run_id_not_found"))

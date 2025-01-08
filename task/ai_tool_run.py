@@ -67,7 +67,9 @@ def push_websocket_message(
         ai_elapsed_time: float,
         ai_prompt_tokens: int,
         ai_completion_tokens: int,
-        ai_total_tokens: int
+        ai_total_tokens: int,
+        run_ai_tool_type,
+        loop_id
 ):
     """
     Push messages to websocket.
@@ -91,33 +93,62 @@ def push_websocket_message(
     :param ai_prompt_tokens: Prompt tokens.
     :param ai_completion_tokens: Completion tokens.
     :param ai_total_tokens: Total tokens.
+    :param run_ai_tool_type: Run AI tool type, identify the type of AI tool being run this time.
+    :param loop_id: Loop ID, identifying the loop ID of this run.
     """
-
-    data = {
-        'user_id': user_id,
-        'type': ai_tool_type,
-        'data': {
-            'app_run_id': app_run_id,
-            'status': status,
-            'error': error,
-            'elapsed_time': elapsed_time,
-            'prompt_tokens': prompt_tokens,
-            'completion_tokens': completion_tokens,
-            'total_tokens': total_tokens,
-            'created_time': created_time,
-            'finished_time': finished_time,
-            'exec_data': {
-                'exec_id': exec_id,
-                'status': ai_status,
-                'error': ai_error,
-                'outputs': outputs,
-                'elapsed_time': ai_elapsed_time,
-                'prompt_tokens': ai_prompt_tokens,
-                'completion_tokens': ai_completion_tokens,
-                'total_tokens': ai_total_tokens,
+    if run_ai_tool_type == 1 and ai_tool_type == 'generate_agent_batch':
+        data = {
+            'user_id': user_id,
+            'type': ai_tool_type,
+            'data': {
+                'app_run_id': app_run_id,
+                'status': status,
+                'error': error,
+                'elapsed_time': elapsed_time,
+                'prompt_tokens': prompt_tokens,
+                'completion_tokens': completion_tokens,
+                'total_tokens': total_tokens,
+                'created_time': created_time,
+                'finished_time': finished_time,
+                'exec_data': {
+                    'exec_id': exec_id,
+                    'loop_id': loop_id,
+                    'status': ai_status,
+                    'error': ai_error,
+                    'outputs': outputs,
+                    'elapsed_time': ai_elapsed_time,
+                    'prompt_tokens': ai_prompt_tokens,
+                    'completion_tokens': ai_completion_tokens,
+                    'total_tokens': ai_total_tokens,
+                }
             }
         }
-    }
+    else:
+        data = {
+            'user_id': user_id,
+            'type': ai_tool_type,
+            'data': {
+                'app_run_id': app_run_id,
+                'status': status,
+                'error': error,
+                'elapsed_time': elapsed_time,
+                'prompt_tokens': prompt_tokens,
+                'completion_tokens': completion_tokens,
+                'total_tokens': total_tokens,
+                'created_time': created_time,
+                'finished_time': finished_time,
+                'exec_data': {
+                    'exec_id': exec_id,
+                    'status': ai_status,
+                    'error': ai_error,
+                    'outputs': outputs,
+                    'elapsed_time': ai_elapsed_time,
+                    'prompt_tokens': ai_prompt_tokens,
+                    'completion_tokens': ai_completion_tokens,
+                    'total_tokens': ai_total_tokens,
+                }
+            }
+        }
     push_to_websocket_queue(data)
     logger.info(
         f"Push results generated through AI:{user_id} run:{app_run_id} ai_tool_type:{ai_tool_type}:{status}:{error} exec_id:{exec_id} data:{data}")
@@ -290,16 +321,14 @@ def task_callback_thread():
                         #     if 'list' in json_load_value:
                         #         json_load_value = json_load_value['list']
                         #     else:
-                        #         json_load_value = [value for value in json_load_value.values()]
-                        #     print(11111111111111111111111111111111111111111111)
-                        #     print(json_load_value)
+                        #         json_load_value = [json_load_value]
                         #
-                        #     # json_load_value = json.load(result['data']['outputs']['value'])
                         #     test_var_obj = create_object_variable_from_list(
                         #         data=json_load_value,
                         #         name="inputs",
                         #         display_name="Inptus"
                         #     )
+                        #     test_var_obj = test_var_obj.to_dict()
                         #     print(22222222222222222222222222)
                         #     print(test_var_obj)
                         #     result['data']['outputs']['value'] = json.dumps(test_var_obj)
@@ -341,20 +370,20 @@ def task_callback_thread():
                             }
                         update_app_run(app_run_id, app_run_data)
 
-                        push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens)
+                        push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
                     else:
                         update_app_run(app_run_id, {'status': 4, 'error': result['message']})
                         update_ai_run(id, {'status': 4, 'error': result['message']})
                         end_time = time.time()
                         end_time = datetime.fromtimestamp(end_time)
-                        push_websocket_message(user_id, ai_tool_type, app_run_id, 4, result['message'], 0, 0, 0, 0, run['created_time'], end_time, id, 4, result['message'], {}, 0, 0, 0, 0)
+                        push_websocket_message(user_id, ai_tool_type, app_run_id, 4, result['message'], 0, 0, 0, 0, run['created_time'], end_time, id, 4, result['message'], {}, 0, 0, 0, 0, run_ai_tool_type, loop_id)
                 except Exception as e:
                     logger.error(f"Error processing run:{app_run_id} {traceback.format_exc()}")
                     # Update records with failure status and error message if an exception occurred
                     update_app_run(app_run_id, {'status': 4, 'error': str(e), 'need_human_confirm': 1})
                     end_time = time.time()
                     end_time = datetime.fromtimestamp(end_time)
-                    push_websocket_message(user_id, ai_tool_type, app_run_id, 4, str(e), 0, 0, 0, 0, end_time, end_time, id, 4, str(e), {}, 0, 0, 0, 0)
+                    push_websocket_message(user_id, ai_tool_type, app_run_id, 4, str(e), 0, 0, 0, 0, end_time, end_time, id, 4, str(e), {}, 0, 0, 0, 0, 0, 0)
 
                 remove_task_cache(item)
         time.sleep(1)

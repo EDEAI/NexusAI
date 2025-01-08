@@ -123,7 +123,33 @@ class ChatroomMessages(MySQL):
                     item['content'] = item['message']
 
         if offset == 0:
-            list = []
+            if total_count > 0:
+                list = self.select(
+                    columns=["apps.name", "apps.description", "apps.icon", "apps.icon_background",
+                             "chatroom_messages.id",
+                             "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id",
+                             "chatroom_messages.user_id",
+                             "chatroom_messages.agent_id", "chatroom_messages.message", "chatroom_messages.is_read",
+                             "chatroom_messages.created_time"],
+                    joins=[
+                        ["left", "chatrooms", "chatrooms.id = chatroom_messages.chatroom_id"],
+                        ["left", "agents", "agents.id = chatroom_messages.agent_id"],
+                        ["left", "apps", "apps.id = agents.app_id"],
+                    ],
+                    conditions=conditions,
+                    limit=page_size,
+                    offset=0,
+                    order_by="chatroom_messages.id ASC",
+                )
+                if list:
+                    for item in list:
+                        if item['agent_id'] > 0:
+                            item['is_agent'] = 1
+                        else:
+                            item['is_agent'] = 0
+                        item['content'] = item['message']
+            else:
+                list = []
 
         return {
             "list": list,
