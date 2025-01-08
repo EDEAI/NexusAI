@@ -10,6 +10,7 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 from typing import Dict, Optional, Any
 from log import Logger
 from core.database.models import AppRuns, AIToolLLMRecords, Agents
+from core.workfllow.variables import Variable
 from core.helper import push_to_websocket_queue
 from celery_app import run_llm_tool
 
@@ -23,6 +24,7 @@ running = True  # Global flag to control thread loops
 app_run = AppRuns()
 ai_tool_llm_records = AIToolLLMRecords()
 agents = Agents()
+variable = Variable()
 
 
 def update_app_run(app_run_id: int, data: dict) -> bool:
@@ -269,7 +271,7 @@ def task_callback_thread():
                         end_time = time.time()
                         end_time = datetime.fromtimestamp(end_time)
 
-                        if run_ai_tool_type == 1:
+                        if run_ai_tool_type == 1 and ai_tool_type == 'generate_agent_batch':
                             return_agent = agents.create_agent_with_configs(
                                 data=result['data']['outputs']['value'],
                                 user_id=user_id,
@@ -280,6 +282,13 @@ def task_callback_thread():
                                 result['data']['outputs']['id'] = return_agent['app_id']
                             else:
                                 logger.error(f"ERROR Batch generate agent returns:{return_agent}")
+                        # elif run_ai_tool_type == 4:
+                        #     test_var_obj = variable.create_object_variable_from_list(
+                        #         data=result['data']['outputs']['value'],
+                        #         name="inputs",
+                        #         display_name="Inptus"
+                        #     )
+                        #     result['data']['outputs']['value'] = test_var_obj.to_dict()
 
                         app_ai_run_data = {
                             'status': 3,
