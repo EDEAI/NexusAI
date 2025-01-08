@@ -1,3 +1,6 @@
+/*
+ * @LastEditors: biz
+ */
 import { useResizePanel } from '@/components/WorkFlow/hooks/use-resize-panel';
 import React, { memo, useCallback, useState } from 'react';
 
@@ -29,6 +32,7 @@ const ResizablePanel: React.FC<ResizablePanelProps> = ({
 
     const { triggerRef, containerRef } = useResizePanel({
         direction: 'horizontal',
+        triggerDirection:dragDirection,
         minWidth,
         maxWidth,
         onResize: handleResize,
