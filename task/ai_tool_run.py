@@ -9,7 +9,7 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 from typing import Dict, Optional, Any
 from log import Logger
-from core.database.models import AppRuns, AIToolLLMRecords
+from core.database.models import AppRuns, AIToolLLMRecords, Agents
 from core.helper import push_to_websocket_queue
 from celery_app import run_llm_tool
 
@@ -22,6 +22,7 @@ running = True  # Global flag to control thread loops
 # Database models
 app_run = AppRuns()
 ai_tool_llm_records = AIToolLLMRecords()
+agents = Agents()
 
 
 def update_app_run(app_run_id: int, data: dict) -> bool:
@@ -267,6 +268,18 @@ def task_callback_thread():
 
                         end_time = time.time()
                         end_time = datetime.fromtimestamp(end_time)
+
+                        if run_ai_tool_type == 1:
+                            return_agent = agents.create_agent_with_configs(
+                                data=result['data']['outputs']['value'],
+                                user_id=user_id,
+                                team_id=team_id
+                            )
+                            if return_agent['status'] == 1:
+                                logger.info(f"Batch generate agent returns:{return_agent}")
+                                result['data']['outputs']['id'] = return_agent['app_id']
+                            else:
+                                logger.error(f"ERROR Batch generate agent returns:{return_agent}")
 
                         app_ai_run_data = {
                             'status': 3,
