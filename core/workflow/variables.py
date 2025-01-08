@@ -448,3 +448,45 @@ def convert_to_fastapi_model(model_name: str, variable: VariableTypes) -> Type[B
         input_data=(InputDataModel, Field(..., title='Input Data', description='Input Data'))
     )
     return InputModel
+
+def create_object_variable_from_list(data: List[Dict[str, Any]], name: str = "root", display_name: Optional[str] = None) -> ObjectVariable:
+    """
+    Creates an ObjectVariable from a list of variable definitions.
+    Each item in the list should be a dictionary with 'name', 'type', and optionally 'display_name' and 'value'.
+
+    :param data: List[Dict[str, Any]], list of variable definitions
+    :param name: str, name of the root ObjectVariable
+    :param display_name: Optional[str], display name of the root ObjectVariable
+    :return: ObjectVariable containing all variables from the list as properties
+
+    Example input:
+    [
+        {
+            "name": "var1",
+            "display_name": "Variable 1",
+            "type": "string",
+            "value": "test"
+        },
+        {
+            "name": "var2",
+            "type": "number",
+            "value": 42
+        }
+    ]
+    """
+    obj_var = ObjectVariable(name=name)
+    if display_name:
+        obj_var.display_name = display_name
+    
+    for var_def in data:
+        variable = Variable(
+            name=var_def["name"],
+            type=var_def["type"],
+            display_name=var_def.get("display_name"),
+            value=var_def.get("value"),
+            required=var_def.get("required"),
+            max_length=var_def.get("max_length")
+        )
+        obj_var.add_property(var_def["name"], variable)
+    
+    return obj_var

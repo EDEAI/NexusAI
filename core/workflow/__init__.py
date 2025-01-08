@@ -96,6 +96,7 @@ __all__ = [
     "flatten_variable",
     "flatten_variable_with_values",
     "convert_to_fastapi_model",
+    "create_object_variable_from_list",
     
     "Edge",
     "Edges",
