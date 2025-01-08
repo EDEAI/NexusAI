@@ -813,28 +813,37 @@ language_packs = {
             '}}\n'
             '{append_prompt}\n\n'
         ),
+        'generate_agent_prompt':(
+            '我的要求：\n'
+            '{user_prompt}\n\n'
+        ),
+
         'regenerate_agent_prompt': (
-            '{history_user_prompt}\n\n'
-            '注意：生成的智能体不要与历史数据内容相同，要有不同的能力。\n'
+            '注意：生成的智能体不要与历史数据内容相同，需要拥有不同的能力。\n'
         ),
         'regenerate_agent_history_agent_list': (
             '历史数据如下：\n'
             '{history_agent_list}\n'
         ),
+
         'agent_supplement_prompt':(
-            '{history_user_prompt}\n'
-            '{agent_supplement}\n'
-            '请通过我的内容强化智能体数据。\n'
+            '{system_prompt} \n'
+            '补充说明：\n'
+            '{agent_supplement}\n\n'
+            '请参考提供的智能体数据，生成新的智能体。'
         ),
         'agent_supplement_user_prompt': (
-            '智能体数据如下。\n'
+            '智能体数据如下：\n'
             '{history_agent}'
         ),
+
         'agent_batch_generate_user_prompt':(
             '{history_agents} \n'
         ),
         'agent_reference_data':(
-            '生成的agent智能体参照如下内容：\n'
+            '补充说明：\n'
+            '{agent_supplement}\n\n'
+            '生成的agent智能体参照内容如下：\n'
             '{agent_data} \n'
             '注意：生成的智能体不要与历史智能体相同，要有不同的能力。\n'
             '历史智能体如下：\n'

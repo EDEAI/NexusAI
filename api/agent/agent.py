@@ -333,9 +333,17 @@ async def agent_generate(data: ReqAgentGenerateSchema, userinfo: TokenData = Dep
 
         # Prepare prompts for LLM
         system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
+
+        user_prompt = get_language_content('generate_agent_prompt', userinfo.uid)
+        user_prompt = user_prompt.format(
+            user_prompt=data.user_prompt
+        )
+
+        system_prompt = system_prompt.format(
+            append_prompt=user_prompt
+        )
         input_ = Prompt(
-            system=system_prompt,
-            user=data.user_prompt
+            system=system_prompt
         ).to_dict()
 
         # Initialize LLM execution record
@@ -400,20 +408,20 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
         ]
     )
 
-    # Extract original user prompt from first record
-    base_user_prompt = ""
+    # Extract original system prompt from first record
+    base_system_prompt = ""
     first_record = record_list[0]
     inputs = first_record.get('inputs', {})
 
-    # Get user prompt value from inputs
+    
+    # Get system prompt value from inputs
     try:
-        if isinstance(inputs, dict) and 'user' in inputs:
-            user_dict = inputs['user']
-            if isinstance(user_dict, dict) and 'value' in user_dict:
-                base_user_prompt = user_dict['value']
+        if isinstance(inputs, dict) and 'system' in inputs:
+            system_dict = inputs['system']
+            if isinstance(system_dict, dict) and 'value' in system_dict:
+                base_system_prompt = system_dict['value']
     except Exception as e:
-        # print(f"Error extracting user prompt: {str(e)}")
-        base_user_prompt = ""
+        base_system_prompt = ""
 
     # Collect history agent list from all records
     history_agent_list = []
@@ -423,7 +431,6 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
             if record.get('outputs'):
                 history_agent_list.append(record['outputs'])
         except Exception as e:
-            # print(f"Error processing record: {str(e)}")
             continue
 
     # Filter out None values
@@ -438,28 +445,16 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
         order_by='id DESC'
     )
 
-    # Prepare prompts for regeneration
-    system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
-    
-    # Format regenerate prompt with original user request
-    regenerate_prompt = get_language_content('regenerate_agent_prompt', userinfo.uid)
-    regenerate_prompt = regenerate_prompt.format(
-        history_user_prompt=base_user_prompt
-    )
     
     # Format user prompt with history agent list
     user_prompt = get_language_content('regenerate_agent_history_agent_list', userinfo.uid)
     user_prompt = user_prompt.format(
         history_agent_list=history_agent_list
     )
-    
-    # Combine system prompt with regenerate prompt
-    system_prompt = system_prompt.format(
-        append_prompt=regenerate_prompt
-    )
+    regenerate_agent_prompt = get_language_content('regenerate_agent_prompt', userinfo.uid)
 
     # Prepare input for LLM
-    input_ = Prompt(system=system_prompt, user=user_prompt).to_dict()
+    input_ = Prompt(system=base_system_prompt + regenerate_agent_prompt, user=user_prompt).to_dict()
 
     try:
         # Mark previous record as processed
@@ -531,24 +526,25 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
 
     # Get first record to extract original user prompt
     first_record = AIToolLLMRecords().select_one(
-        columns=['inputs'],
+        columns=['inputs', 'correct_prompt'],
         conditions=[
             {"column": "app_run_id", "value": data.app_run_id}
         ],
         order_by="id ASC"
     )
 
-    # Extract original user prompt from inputs
-    base_user_prompt = ""
+    # Extract original system prompt from inputs
+    base_system_prompt = ""
     inputs = first_record.get('inputs', {})
+    if inputs is None:
+        inputs = first_record.get('correct_prompt', {})
     try:
-        if isinstance(inputs, dict) and 'user' in inputs:
-            user_dict = inputs['user']
-            if isinstance(user_dict, dict) and 'value' in user_dict:
-                base_user_prompt = user_dict['value']
+        if isinstance(inputs, dict) and 'system' in inputs:
+            system_dict = inputs['system']
+            if isinstance(system_dict, dict) and 'value' in system_dict:
+                base_system_prompt = system_dict['value']
     except Exception:
-        base_user_prompt = ""
-
+        base_system_prompt = ""
     # Get latest record for agent history and status update
     last_record = AIToolLLMRecords().select_one(
         columns=['id', 'outputs'],
@@ -568,18 +564,15 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
     except Exception:
         pass
 
+
     # Prepare prompts for supplementation
     agent_supplement_prompt = get_language_content('agent_supplement_prompt', userinfo.uid)
     agent_supplement_prompt = agent_supplement_prompt.format(
-        history_user_prompt=base_user_prompt,
+        system_prompt=base_system_prompt,
         agent_supplement=data.supplement_prompt,
     )
 
     prompt_template = get_language_content('agent_supplement_user_prompt', userinfo.uid)
-    system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
-    system_prompt = system_prompt.format(
-        append_prompt=agent_supplement_prompt
-    )
 
     # Format user prompt with history and supplement
     user_prompt = prompt_template.format(
@@ -587,7 +580,7 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
     )
 
     # Prepare input for LLM
-    input_ = Prompt(system=system_prompt, user=user_prompt).to_dict()
+    input_ = Prompt(system=agent_supplement_prompt, user=user_prompt).to_dict()
 
     try:
         # Update app run status
@@ -635,11 +628,6 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             app_run_id (int): The ID of the app run
             record_id (int): The ID of the LLM record
     """
-
-    # result = AIToolLLMRecords().inputs_append_history_outputs(loop_id=data.loop_id, app_run_id=data.app_run_id)
-    # print('result1111111')
-    # print(result)
-    # return
     # Validate app run exists and belongs to user
     app_run_info = AppRuns().select_one(
         columns=["id"],
@@ -656,8 +644,30 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         # Get current timestamp as loop_id
         loop_id = int(time())
 
+        # Get first record to extract original user prompt
+        first_record = AIToolLLMRecords().select_one(
+            columns=['inputs', 'correct_prompt'],
+            conditions=[
+                {"column": "app_run_id", "value": data.app_run_id}
+            ],
+            order_by="id ASC"
+        )
+
+        # Extract original system prompt from inputs
+        base_system_prompt = ""
+        inputs = first_record.get('inputs', {})
+        if inputs is None:
+            inputs = first_record.get('correct_prompt', {})
+        try:
+            if isinstance(inputs, dict) and 'system' in inputs:
+                system_dict = inputs['system']
+                if isinstance(system_dict, dict) and 'value' in system_dict:
+                    base_system_prompt = system_dict['value']
+        except Exception:
+            base_system_prompt = ""
+        
+
         # Prepare prompts for batch generation
-        system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
         agent_batch_generate_user_prompt = get_language_content('agent_batch_generate_user_prompt', userinfo.uid)
         agent_batch_generate_user_prompt = agent_batch_generate_user_prompt.format(
             history_agents=''
@@ -681,13 +691,13 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
                     history_agent_info = outputs_dict['value']
         except Exception:
             pass
-
+            
         agent_reference_data = agent_reference_data.format(
-            agent_data=history_agent_info
+            agent_data=history_agent_info,
+            agent_supplement=data.supplement_prompt
         )
 
-        append_prompt = data.supplement_prompt + '\n' + agent_reference_data
-        system_prompt = system_prompt.format(append_prompt=append_prompt)
+        system_prompt = base_system_prompt + agent_reference_data
 
         # data.supplement_prompt
         # Prepare input for LLM
@@ -706,15 +716,9 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
                 ],
                 aggregates={"id": "count"}
             )
-            print('有loop_id')
-
-            print('record_total11111')
-            print(record_total)
-            print(record_total['count_id'])
 
             remaining_count = data.loop_limit - record_total['count_id']
         else:
-            print('没有loop_id')
             # New batch generation
             loop_id = int(time())
             remaining_count = data.loop_limit
@@ -723,9 +727,6 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             loop_count = data.loop_count
         else:
             loop_count = remaining_count
-
-        print('loop_count11111')
-        print(loop_count)
 
         # Update app run status
         AppRuns().update(
