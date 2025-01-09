@@ -562,8 +562,9 @@ language_packs = {
         'agent_batch_generate_system': '''
             You are an AI agent generation assistant.
             You have generated an agent through my initial agent generation requirements. Now you want to continue to generate a new agent. Please pay attention to the following requirements when generating:
-            1. Strictly abide by the requirements for continuing to generate agents, and refer to my initial agent generation requirements and the initial agent generation information
-            2. If the batch generated agent history has real content, the new agent should try to keep the difference with the generated agent history
+            1. Refer to my initial agent generation requirements and the initial agent generation information to summarize the agent generation direction
+            2. Based on the summarized agent generation direction, generate new agents according to the requirements of continuing to generate agents
+            3. If the batch generated agent history has real content, the new agent should try to keep the difference with the generated agent history
             Note that only the json structure data of the agent is returned, and no redundant content is returned.
             Description of the json structure of agent data:
             {{
@@ -580,13 +581,13 @@ language_packs = {
             }}
         ''',
         'agent_batch_generate_user': '''
-            Initial generation of agent requirements:
+            Initial agent generation requirements:
             {first_user_prompt}
 
-            Initial generation of agent information:
+            Initial agent generation information:
             {agent_data}
 
-            Requirements for continuing to generate agents:
+            Requirements of continuing to generate agents:
             {agent_supplement}
         ''',
         'agent_batch_generate_history_user': '''
@@ -978,26 +979,27 @@ language_packs = {
         #     '{history_agent}\n'
         # ),
 
-        # 'agent_batch_generate_system':(
-        #     '你是一个AI智能体生成助手。\n'
-        #     '你已经通过我的初始生成智能体需求生成了一个智能体，现在你要继续生成一个新的智能体，生成时注意以下几点要求：\n'
-        #     '1. 要严格遵守继续生成智能体的要求，并且参考我的初始生成智能体需求，以及初始生成的智能体信息\n'
-        #     '2. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性\n'
-        #     '注意只返回智能体的json结构数据，不要返回多余的内容。\n'
-        #     '智能体数据json结构说明：\n'
-        #     '{{\n'
-        #     '  "name": "(string类型) 智能体名称",\n'
-        #     '  "description": "(string类型) 智能体描述",\n'
-        #     '  "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",\n'
-        #     '  "abilities": [\n'
-        #     '    {{\n'
-        #     '      "name": "(string类型) 能力名称",\n'
-        #     '      "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",\n'
-        #     '      "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"\n'
-        #     '    }}\n'
-        #     '  ]\n'
-        #     '}}\n'
-        # ),
+        # 'agent_batch_generate_system': '''
+        #     你是一个AI智能体生成助手。
+        #     你已经通过我的初始生成智能体需求生成了一个智能体，现在你要继续生成一个新的智能体，生成时注意以下几点要求：
+        #     1. 要参考我的初始生成智能体需求，以及初始生成的智能体信息，以此总结智能体生成方向
+        #     2. 在总结后的智能体生成方向的基础上，按照继续生成智能体的要求进行新智能体的生成
+        #     3. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
+        #     注意只返回智能体的json结构数据，不要返回多余的内容。
+        #     智能体数据json结构说明：
+        #     {{
+        #     "name": "(string类型) 智能体名称",
+        #     "description": "(string类型) 智能体描述",
+        #     "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
+        #     "abilities": [
+        #         {{
+        #         "name": "(string类型) 能力名称",
+        #         "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
+        #         "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
+        #         }}
+        #     ]
+        #     }}
+        # ''',
         # 'agent_batch_generate_user':(
         #     '初始生成智能体需求：\n'
         #     '{first_user_prompt} \n'
