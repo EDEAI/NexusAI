@@ -545,9 +545,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
         )
     else:
         # system prompt
-        system_prompt = system_prompt.format(
-            chatroom_meeting_summary_system_correct=''
-        )
+        system_prompt = system_prompt.format(chatroom_meeting_summary_system_correct='')
 
         # user prompt
         user_prompt = get_language_content(
