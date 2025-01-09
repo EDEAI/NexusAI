@@ -737,7 +737,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             update_meeting=chat_data['corrected_parameter']
         )
     else:
-        # system prompt
+        # system prompt 
         system_prompt = system_prompt.format(chatroom_conference_orientation_system_correct='')
 
         # user prompt
