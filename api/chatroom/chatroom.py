@@ -1,4 +1,4 @@
-from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows)
+from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows, ChatroomDrivenRecords)
 from fastapi import APIRouter
 from api.utils.common import *
 from api.utils.jwt import *
@@ -519,30 +519,37 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
     )
 
     if chat_data['corrected_parameter'] != '':
-        # system prompt
-        system_prompt = system_prompt.format(
-            chatroom_meeting_summary_system_correct=get_language_content('chatroom_meeting_summary_system_correct', userinfo.uid)
-        )
-
-        # user prompt
-        user_prompt = get_language_content(
-            'chatroom_meeting_summary_user_correct',
-            userinfo.uid
-        )
         meeting_summary = AIToolLLMRecords().select_one(
-            columns=['outputs'],
+            columns=['outputs', 'inputs', 'correct_prompt'],
             conditions=[
                 {"column": "app_run_id", "value": chat_data['app_run_id']},
                 {"column": "ai_tool_type", "value": 3}
             ],
             order_by="created_time DESC",
         )
-        meeting_summary = meeting_summary['outputs']['value']
-        user_prompt = user_prompt.format(
-            messages=json.dumps(chatMessageList, ensure_ascii=False),
-            meeting_summary=meeting_summary,
-            update_meeting=chat_data['corrected_parameter']
-        )
+
+        if meeting_summary['inputs'] is None and meeting_summary['correct_prompt'] is None:
+            system_prompt = get_language_content('chatroom_generate_meeting_summary_from_a_single_message_system_correct', userinfo.uid)
+            user_prompt = get_language_content('chatroom_generate_meeting_summary_from_a_single_message_user_correct', userinfo.uid)
+            user_prompt = user_prompt.format(
+                meeting_summary=meeting_summary['outputs']['value'],
+                update_meeting=chat_data['corrected_parameter']
+            )
+        else:
+            # system prompt
+            system_prompt = system_prompt.format(chatroom_meeting_summary_system_correct=get_language_content('chatroom_meeting_summary_system_correct', userinfo.uid))
+
+            # user prompt
+            user_prompt = get_language_content(
+                'chatroom_meeting_summary_user_correct',
+                userinfo.uid
+            )
+            meeting_summary = meeting_summary['outputs']['value']
+            user_prompt = user_prompt.format(
+                messages=json.dumps(chatMessageList, ensure_ascii=False),
+                meeting_summary=meeting_summary,
+                update_meeting=chat_data['corrected_parameter']
+            )
     else:
         # system prompt
         system_prompt = system_prompt.format(chatroom_meeting_summary_system_correct='')
@@ -567,7 +574,6 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
             {"column": "id", "value": app_run_id},
             {'status': 1}
         )
-        # record_id = AIToolLLMRecords().initialize_correction_record(app_run_id, 3, 0, input_messages)
         record_id = AIToolLLMRecords().initialize_correction_record(
             app_run_id=app_run_id,
             ai_tool_type=3,
@@ -584,7 +590,12 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
                 'status': 1
             }
         )
-        # record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 3, 1, 0, 0, 0, input_messages)
+
+        ChatroomDrivenRecords().insert(
+            {
+                'data_source_run_id': app_run_id
+            }
+        )
         record_id = AIToolLLMRecords().initialize_execution_record(
             app_run_id=app_run_id,
             ai_tool_type=3,
@@ -703,9 +714,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
 
     if chat_data['status'] == 2:
         # system prompt
-        system_prompt = system_prompt.format(
-            chatroom_conference_orientation_system_correct=get_language_content('chatroom_conference_orientation_system_correct', userinfo.uid)
-        )
+        system_prompt = system_prompt.format(chatroom_conference_orientation_system_correct=get_language_content('chatroom_conference_orientation_system_correct', userinfo.uid))
 
         # user prompt
         user_prompt = get_language_content(
@@ -721,11 +730,6 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             order_by="created_time DESC",
         )
         meeting_summary_return = meeting_summary_return['outputs']['value']
-
-        # meeting_prompt = get_language_content(
-        #     'chatroom_round_table_app_target_data_generator_user_update',
-        #     userinfo.uid
-        # )
         user_prompt = user_prompt.format(
             meeting_summary=meeting_summary,
             prompt_variables=prompt_variables,
@@ -733,10 +737,8 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             update_meeting=chat_data['corrected_parameter']
         )
     else:
-        # system prompt
-        system_prompt = system_prompt.format(
-            chatroom_conference_orientation_system_correct=''
-        )
+        # system prompt 
+        system_prompt = system_prompt.format(chatroom_conference_orientation_system_correct='')
 
         # user prompt
         user_prompt = get_language_content(
@@ -749,34 +751,16 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             prompt_variables=prompt_variables
         )
 
-    # print(system_prompt)
-    # print(user_prompt)
-    # exit()
-
-    # start_time = time()
-    # start_datetime_str = datetime.fromtimestamp(start_time) \
-    #     .replace(microsecond=0).isoformat(sep='_')
-
     input_messages = Prompt(system_prompt, user_prompt).to_dict()
     if update_status == 1:
-        # app_run_id = AppRuns().insert(
-        #     {
-        #         'user_id': userinfo.uid,
-        #         'app_id': 0,
-        #         'type': 2,
-        #         'agent_id': agent_id,
-        #         'workflow_id': workflow_id,
-        #         # 'ai_tool_type': 4,
-        #         'chatroom_id': chatroom_id,
-        #         'name': f'APP_summary_variable_{start_datetime_str}',
-        #         'status': 1
-        #     }
-        # )
         AppRuns().update(
             {"column": "id", "value": app_run_id},
-            {'status': 1}
+            {
+                'agent_id': agent_id,
+                'workflow_id': workflow_id,
+                'status': 1
+            }
         )
-        # record_id = AIToolLLMRecords().initialize_execution_record(app_run_id, 4, 1, 0, 0, 0,  input_messages)
         record_id = AIToolLLMRecords().initialize_execution_record(
             app_run_id=app_run_id,
             ai_tool_type=4,
@@ -787,10 +771,88 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             {"column": "id", "value": app_run_id},
             {'status': 1}
         )
-        # record_id = AIToolLLMRecords().initialize_correction_record(app_run_id, 4, 0, input_messages)
         record_id = AIToolLLMRecords().initialize_correction_record(
             app_run_id=app_run_id,
             ai_tool_type=4,
             correct_prompt=input_messages
         )
     return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'message': 'Executing, please wait'})
+
+
+@router.post("/{chatroom_id}/chat_single_message_generation", response_model=ChatRoomResponseBase, summary="Generate meeting summary from a single message")
+async def chat_single_message_generation(chatroom_id: int, chatroom_message_id: int, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Generate a meeting summary from a single message in a specified chat room.
+
+    This endpoint processes a single message within a chat room to generate a meeting summary using a Language Model (LLM).
+    It distinguishes between agents and workflows based on the current application and uses the parameter passing rules
+    of agents and workflows to disassemble the parameters and summarize the chat history.
+
+    Parameters:
+    - chatroom_id (int): The unique identifier of the chat room to be updated. This is a required parameter.
+    - chatroom_message_id (int): The unique identifier of the chat message to be processed for summary generation. This is a required parameter.
+    - userinfo (TokenData): Information about the current user, provided through dependency injection. This is a required parameter.
+
+    Returns:
+    - A response object (ChatRoomResponseBase) representing a successful operation. The response contains the parameters returned by the LLM for front-end processing and manual verification.
+
+    Raises:
+    - HTTPException: If any required parameters are missing or invalid, or if the user has not been authenticated.
+    """
+    find_chatroom = Chatrooms().search_chatrooms_id(chatroom_id, userinfo.uid)
+    if not find_chatroom['status']:
+        return response_error(get_language_content("chatroom_does_not_exist"))
+
+    conditions = [
+        {"column": "chatroom_id", "value": chatroom_id},
+        {"column": "id", "value": chatroom_message_id},
+        {'column': 'id', 'op': '>', 'value': find_chatroom['initial_message_id']},
+        [
+            {'column': 'chatroom_messages.agent_id', 'op': '!=', 'value': 0, 'logic': 'or'},
+            {'column': 'chatroom_messages.user_id', 'op': '!=', 'value': 0}
+        ]
+    ]
+
+    chat_message = ChatroomMessages().select_one(
+        columns=['message'],
+        conditions=conditions
+    )
+
+    if chat_message is None:
+        return response_error(get_language_content("chatroom_message_is_not_find"))
+
+    start_time = time()
+    start_datetime_str = datetime.fromtimestamp(start_time) \
+        .replace(microsecond=0).isoformat(sep='_')
+
+    outputs = {
+        "name": "text",
+        "type": "string",
+        "value": chat_message['message'],
+        "max_length": 0
+    }
+
+    app_run_id = AppRuns().insert(
+        {
+            'user_id': userinfo.uid,
+            'app_id': 0,
+            'type': 2,
+            'chatroom_id': chatroom_id,
+            'name': f'Chat_single_message_generation_{start_datetime_str}',
+            'status': 3,
+            'outputs': outputs
+        }
+    )
+    record_id = AIToolLLMRecords().insert(
+        {
+            'app_run_id': app_run_id,
+            'ai_tool_type': 3,
+            'status': 3,
+            'run_type': 1,
+            'loop_id': 0,
+            'loop_limit': 0,
+            'loop_count': 0,
+            'outputs': outputs
+        }
+    )
+    return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'outputs': outputs, 'message': 'Processing successful'})

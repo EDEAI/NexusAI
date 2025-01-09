@@ -197,6 +197,7 @@ class WorkflowsRunSchema(BaseModel):
             ]
         }
     }
+    data_source_run_id: Optional[int] = 0
 
 
 class WorkflowsNodeRunSchema(BaseModel):

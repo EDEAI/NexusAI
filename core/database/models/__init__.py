@@ -39,6 +39,8 @@ from .upload_files import UploadFiles
 from .workspaces import Workspaces
 
 from .ai_tool_llm_records import AIToolLLMRecords
+from .chatroom_driven_records import ChatroomDrivenRecords
+
 
 
 __all__ = [
@@ -72,6 +74,7 @@ __all__ = [
     'Chatrooms',
     'ChatroomAgentRelation',
     'ChatroomMessages',
+    'ChatroomDrivenRecords',
     
     'UploadFiles',
     'Workspaces',
