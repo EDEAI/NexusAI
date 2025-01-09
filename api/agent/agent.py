@@ -334,7 +334,7 @@ async def agent_generate(data: ReqAgentGenerateSchema, userinfo: TokenData = Dep
 
         # Prepare prompts for LLM
         system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
-        user_prompt = get_language_content('generate_agent_user', userinfo.uid)
+        user_prompt = get_language_content('generate_agent_user', userinfo.uid, False)
         
         user_prompt = user_prompt.format(
             user_prompt=data.user_prompt
@@ -456,11 +456,11 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
 
     
     # Format user prompt with history agent list
-    user_prompt = get_language_content('regenerate_agent_user', userinfo.uid)
+    user_prompt = get_language_content('regenerate_agent_user', userinfo.uid, False)
     user_prompt = user_prompt.format(
         history_agent_list=history_agent_list
     )
-    regenerate_agent_system = get_language_content('regenerate_agent_system', userinfo.uid)
+    regenerate_agent_system = get_language_content('regenerate_agent_system', userinfo.uid, False)
 
     # Prepare input for LLM
     input_ = Prompt(system=base_system_prompt + regenerate_agent_system, user=base_user_prompt + user_prompt).to_dict()
@@ -542,25 +542,18 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
         order_by="id ASC"
     )
 
-    # Extract original system prompt from inputs
-    base_system_prompt = ""
+    # Extract original user prompt from inputs
     base_user_prompt = ""
     inputs = first_record.get('inputs', {})
     if inputs is None:
         inputs = first_record.get('correct_prompt', {})
 
     try:
-        if isinstance(inputs, dict) and 'system' in inputs:
-            system_dict = inputs['system']
-            if isinstance(system_dict, dict) and 'value' in system_dict:
-                base_system_prompt = system_dict['value']
-
         if isinstance(inputs, dict) and 'user' in inputs:
             user_dict = inputs['user']
             if isinstance(user_dict, dict) and 'value' in user_dict:
                 base_user_prompt = user_dict['value']
     except Exception:
-        base_system_prompt = ""
         base_user_prompt = ""
 
     # Get latest record for agent history and status update
@@ -583,12 +576,12 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
         pass
 
 
-    system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
-    system_prompt = system_prompt.format(
-        append_prompt=get_language_content('agent_supplement_system', userinfo.uid)
-    )
+    system_prompt = get_language_content('agent_supplement_system', userinfo.uid)
+    # system_prompt = system_prompt.format(
+    #     append_prompt=get_language_content('agent_supplement_system', userinfo.uid, False)
+    # )
 
-    user_prompt = get_language_content('agent_supplement_user', userinfo.uid)
+    user_prompt = get_language_content('agent_supplement_user', userinfo.uid, False)
     user_prompt = user_prompt.format(
         agent_supplement=data.supplement_prompt,
         history_agent=history_agent_info
@@ -657,30 +650,49 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
     if not app_run_info:
         return response_error(get_language_content('app_run_error'))
 
+    # Determine loop_id and remaining count
+    if data.loop_id > 0:
+        # Continue existing batch
+        loop_id = data.loop_id
+
+        # Query whether there are unfinished records
+        runing_record = AIToolLLMRecords().select_one(
+            columns=['id'],
+            conditions=[
+                {"column": "app_run_id", "value": data.app_run_id},
+                {"column": "loop_id", "value": data.loop_id},
+                {"column": "status", "op": "in", "value": [1, 2]}
+            ],
+            aggregates={"id": "count"}
+        )
+
+        if runing_record['count_id'] > 0:
+            # There are records that are being executed.
+            return response_error(get_language_content("agent_batch_exist_runing_rocord"))
+
+
+        record_total = AIToolLLMRecords().select_one(
+            columns=['id'],
+            conditions=[
+                {"column": "app_run_id", "value": data.app_run_id},
+                {"column": "loop_id", "value": data.loop_id}
+            ],
+            aggregates={"id": "count"}
+        )
+        remaining_count = data.loop_limit - record_total['count_id']
+    else:
+        # Start new batch
+        loop_id = int(time())
+        remaining_count = data.loop_limit
+
+    # Calculate batch size
+    loop_count = min(data.loop_count, remaining_count)
+
+    if loop_count <= 0:
+        return response_error(get_language_content("api_agent_batch_size_invalid"))
+ 
+
     try:
-        # Determine loop_id and remaining count
-        if data.loop_id > 0:
-            # Continue existing batch
-            loop_id = data.loop_id
-            record_total = AIToolLLMRecords().select_one(
-                columns=['id'],
-                conditions=[
-                    {"column": "app_run_id", "value": data.app_run_id},
-                    {"column": "loop_id", "value": data.loop_id}
-                ],
-                aggregates={"id": "count"}
-            )
-            remaining_count = data.loop_limit - record_total['count_id']
-        else:
-            # Start new batch
-            loop_id = int(time())
-            remaining_count = data.loop_limit
-
-        # Calculate batch size
-        loop_count = min(data.loop_count, remaining_count)
-        if loop_count <= 0:
-            return response_error(get_language_content("api_agent_batch_size_invalid"))
-
         # Prepare input with history outputs
         input_ = AIToolLLMRecords().inputs_append_history_outputs(
             app_run_id=data.app_run_id,

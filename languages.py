@@ -502,6 +502,7 @@ language_packs = {
         'api_agent_generate_failed': 'Agent generate failed',
         'api_agent_user_prompt_required': 'Agent user prompt required',
         'api_agent_batch_size_invalid': 'Agent batch size invalid',
+        'agent_batch_exist_runing_rocord': 'Agent generate exist runing rocord',
         
         'generate_agent_system_prompt': '''
             You are an AI agent generation assistant.
@@ -999,7 +1000,8 @@ language_packs = {
         'app_run_error': 'app运行记录不存在',
         'api_agent_generate_failed': 'agent生成记录失败',
         'api_agent_user_prompt_required': '提示词不能为空',
-        'api_agent_batch_size_invalid': '批量生成数量有误'
+        'api_agent_batch_size_invalid': '批量生成数量有误',
+        'agent_batch_exist_runing_rocord': '存在正在执行的记录'
     }
 }
 

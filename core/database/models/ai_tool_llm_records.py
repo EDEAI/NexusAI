@@ -166,78 +166,6 @@ class AIToolLLMRecords(MySQL):
             ]
         )
         return status
-    
-    def inputs_append_history_outputs_1(self, app_run_id: int, loop_id: int = 0) -> dict:
-        """
-        Append the value from outputs to inputs['user']['value'] in the latest record.
-        
-        This method retrieves the latest record for the given app_run_id and loop_id,
-        then appends the value from the outputs field to the value string in inputs['user'].
-        
-        Args:
-            app_run_id (int): The ID of the app run to process
-            loop_id (int, optional): The ID of the loop iteration. Defaults to 0
-            
-        Returns:
-            dict: Updated inputs dictionary with:
-                - system: Original system prompt
-                - user: Updated user field with appended value
-                - assistant: Assistant field (usually None)
-                
-        Example:
-            >>> record_dict = AIToolLLMRecords().inputs_append_history_outputs(app_run_id=123, loop_id=1)
-            >>> print(record_dict)  # Shows dictionary of the updated inputs
-        """
-        # Get the latest record
-        record = self.select_one(
-            columns=['id', 'inputs', 'outputs'],
-            conditions=[
-                {"column": "app_run_id", "value": app_run_id},
-                {"column": "loop_id", "value": loop_id},
-            ],
-            order_by='id DESC'
-        )
-
-        if not record or not isinstance(record, dict):
-            return {}
-
-        try:
-            # Extract inputs and outputs from record
-            inputs = record.get('inputs', {})
-            outputs = record.get('outputs', {})
-            
-            # Get value from outputs
-            outputs_value = outputs.get('value', '')  # Default to empty string if not found
-            
-            # Get current value from inputs['user']
-            current_value = inputs.get('user', {}).get('value', '')  # Default to empty string if not found
-            
-            # Ensure current_value is a string and append outputs_value
-            if isinstance(current_value, str):
-                # Append outputs_value to current_value with a separator (e.g., space or newline)
-                updated_value = f"{current_value} {outputs_value}".strip()
-            else:
-                # If current_value is not a string, convert it to a string and append
-                updated_value = f"{str(current_value)} {outputs_value}".strip()
-                
-            # Update the value in inputs['user']
-            if 'user' in inputs:
-                inputs['user']['value'] = updated_value
-            else:
-                inputs['user'] = {
-                    'name': 'user',
-                    'type': 'string',
-                    'value': updated_value,
-                    'max_length': 0
-                }
-            
-            # Return the updated inputs dictionary
-            return inputs
-        
-        except Exception as e:
-            print(f"Error in inputs_append_history_outputs: {str(e)}")
-            return {}
-        
 
     def inputs_append_history_outputs(self, app_run_id: int, loop_id: int = 0, agent_supplement: str = None) -> dict:
         """
@@ -297,7 +225,7 @@ class AIToolLLMRecords(MySQL):
                 pass
 
             # Format user prompt with history
-            user_prompt = get_language_content('agent_batch_generate_history_user', userinfo['user_id'])
+            user_prompt = get_language_content('agent_batch_generate_history_user', userinfo['user_id'], False)
             user_prompt = user_prompt.format(
                 history_prompt=base_user_prompt,
                 history_agents=outputs_list
@@ -331,7 +259,7 @@ class AIToolLLMRecords(MySQL):
             )
 
             # Format user prompt for new batch
-            user_prompt = get_language_content('agent_batch_generate_user', userinfo['user_id'])
+            user_prompt = get_language_content('agent_batch_generate_user', userinfo['user_id'], False)
             user_prompt = user_prompt.format(
                 first_user_prompt=base_user_prompt,
                 agent_supplement=agent_supplement,
@@ -340,10 +268,10 @@ class AIToolLLMRecords(MySQL):
             )
 
         # Prepare system prompt
-        system_prompt = get_language_content('generate_agent_system_prompt', userinfo['user_id'])
-        system_prompt = system_prompt.format(
-            append_prompt=get_language_content('agent_batch_generate_system', userinfo['user_id'])
-        )
+        system_prompt = get_language_content('agent_batch_generate_system', userinfo['user_id'])
+        # system_prompt = system_prompt.format(
+        #     append_prompt=get_language_content('agent_batch_generate_system', userinfo['user_id'])
+        # )
 
         # Return formatted prompts
         return Prompt(system=system_prompt, user=user_prompt).to_dict()
