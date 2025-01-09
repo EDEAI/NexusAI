@@ -657,16 +657,16 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
 
         # Query whether there are unfinished records
         runing_record = AIToolLLMRecords().select_one(
-            columns=['id'],
+            columns=['loop_id'],
             conditions=[
                 {"column": "app_run_id", "value": data.app_run_id},
                 {"column": "loop_id", "value": data.loop_id},
                 {"column": "status", "op": "in", "value": [1, 2]}
             ],
-            aggregates={"id": "count"}
+            limit=1
         )
 
-        if runing_record['count_id'] > 0:
+        if runing_record:
             # There are records that are being executed.
             return response_error(get_language_content("agent_batch_exist_runing_rocord"))
 
