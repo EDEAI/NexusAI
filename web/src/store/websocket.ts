@@ -176,13 +176,13 @@ type FlowMessage = WorkflowRunDebug | WorkflowRunProgress | WorkflowNeedHumanCon
 
 type MessageType = 'workflow_run_debug' | 'workflow_run_progress' | 'workflow_need_human_confirm' | 'generate_agent_batch';
 
-interface TypedMessageMap {
+type TypedMessageMap = {
     workflow_run_debug: WorkflowRunDebug[];
     workflow_run_progress: WorkflowRunProgress[];
     workflow_need_human_confirm: WorkflowNeedHumanConfirm[];
     generate_agent_batch: any[]; // 可以根据需要定义具体类型
     [key: string]: any[]; // 支持动态添加新类型
-}
+};
 
 interface FlowState {
     flowMessage: any[];
@@ -192,8 +192,9 @@ interface FlowState {
     addFlowMessage: (message: any) => void;
     setFlowMessage: (message: any[]) => void;
     getMessage: () => any[];
-    getTypedMessages: <T extends MessageType>(type: T) => TypedMessageMap[T];
+    getTypedMessages: <T extends MessageType>(type: T) => Partial<TypedMessageMap>[T] | [];
     filterMessages: (type: string, filterData?: any) => any[];
+    fuzzyFilterMessages: (typePattern: string) => any[];
 }
 
 const useSocketStore = create(
@@ -221,7 +222,7 @@ const useSocketStore = create(
             },
             setFlowMessage: message => {
                 set(state => {
-                    // 按类型重新组织消息
+                 
                     const typedMessages = message.reduce((acc, msg) => {
                         const type = msg.type as MessageType;
                         return {
@@ -253,6 +254,11 @@ const useSocketStore = create(
                 }
 
                 return messageList;
+            },
+            fuzzyFilterMessages: (typePattern) => {
+                return get().flowMessage.filter(item => 
+                    item.type?.toLowerCase().includes(typePattern.toLowerCase())
+                );
             },
         }),
         { name: 'useSocketStore' },
