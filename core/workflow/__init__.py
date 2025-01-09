@@ -8,6 +8,7 @@ from .edges import *
 from .graph import *
 from .context import *
 from .recursive_task import *
+from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
 from core.database.models import Apps, Workflows, AppRuns, AppNodeUserRelation
 
 def start_workflow(
@@ -18,7 +19,8 @@ def start_workflow(
     run_name: str, 
     inputs: dict,
     knowledge_base_mapping: Optional[Dict[str, Any]] = None,
-    node_confirm_users: Optional[Dict[str, List[int]]] = None
+    node_confirm_users: Optional[Dict[str, List[int]]] = None,
+    data_source_run_id: Optional[int] = 0
 ) -> None:
     """
     Start the workflow.
@@ -75,7 +77,10 @@ def start_workflow(
     if knowledge_base_mapping is not None:
         app_run_data['knowledge_base_mapping'] = knowledge_base_mapping
     app_run_id = app_runs.insert(app_run_data)
-    
+    if data_source_run_id > 0:
+        chatroomdriven_info = ChatroomDrivenRecords().get_data_by_data_source_run_id(data_source_run_id)
+        if chatroomdriven_info:
+            ChatroomDrivenRecords().update_data_driven_run_id(chatroomdriven_info['id'],data_source_run_id, app_run_id)
     if node_confirm_users:
         AppNodeUserRelation().create_data(app_run_id, node_confirm_users)
     

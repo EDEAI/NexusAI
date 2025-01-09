@@ -215,6 +215,7 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
     prompt = data.prompt
     uid = userinfo.uid
     team_id = userinfo.team_id
+    data_source_run_id = data.data_source_run_id
 
     if agent_id <= 0:
         return response_error(get_language_content("api_agent_run_agent_id_required"))
@@ -285,7 +286,7 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
             return response_error(get_language_content("api_agent_run_ability_status_not_normal"))
 
     task = run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id,
-                         prompt=prompt)
+                         prompt=prompt,data_source_run_id=data_source_run_id)
     while not task.ready():
         await asyncio.sleep(0.1)
     result = task.get()

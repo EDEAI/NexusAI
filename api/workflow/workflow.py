@@ -180,8 +180,9 @@ async def run(data: WorkflowsRunSchema,
         inputs = data.inputs
         knowledge_base_mapping = data.knowledge_base_mapping
         node_confirm_users = data.node_confirm_users
+        data_source_run_id = data.data_source_run_id
         return response_success(
-            start_workflow(userinfo.team_id, userinfo.uid, app_id, run_type, run_name, inputs, knowledge_base_mapping, node_confirm_users))
+            start_workflow(userinfo.team_id, userinfo.uid, app_id, run_type, run_name, inputs, knowledge_base_mapping, node_confirm_users,data_source_run_id))
     except Exception as e:
         return response_error(str(e))
 
