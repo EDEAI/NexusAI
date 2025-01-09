@@ -593,7 +593,8 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
 
         ChatroomDrivenRecords().insert(
             {
-                'data_source_run_id': app_run_id
+                'data_source_run_id': app_run_id,
+                'chatroom_id': chatroom_id
             }
         )
         record_id = AIToolLLMRecords().initialize_execution_record(
