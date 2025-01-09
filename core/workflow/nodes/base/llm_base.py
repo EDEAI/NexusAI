@@ -89,20 +89,29 @@ class LLMBaseNode(Node):
                 history = AIToolLLMRecords().get_history_record(app_run_id)
             if not history or len(history) != 2:
                 raise Exception("history not found.")
-            messages = create_messages_from_serialized_format(history[1]["model_data"]["messages"])
-            # Escape braces in the output text
-            ai_output_str = self.duplicate_braces(history[1]["model_data"]["raw_output"])
-            ai_output = Variable(name="text", type="string", value=ai_output_str)
-            messages.add_ai_message(ai_output)
-            correct_prompt = create_prompt_from_dict(history[0]["correct_prompt"])
-            # Escape braces in the corrected prompt
-            if system_prompt := correct_prompt.get_system():
-                correct_prompt.system.value = self.duplicate_braces(system_prompt)
-            if user_prompt := correct_prompt.get_user():
-                correct_prompt.user.value = self.duplicate_braces(user_prompt)
-            if assistant_prompt := correct_prompt.get_assistant():
-                correct_prompt.assistant.value = self.duplicate_braces(assistant_prompt)
-            messages.add_prompt(correct_prompt)
+            if history[1].get("model_data"):
+                messages = create_messages_from_serialized_format(history[1]["model_data"]["messages"])
+                # Escape braces in the output text
+                ai_output_str = self.duplicate_braces(history[1]["model_data"]["raw_output"])
+                ai_output = Variable(name="text", type="string", value=ai_output_str)
+                messages.add_ai_message(ai_output)
+                correct_prompt = create_prompt_from_dict(history[0]["correct_prompt"])
+                # Escape braces in the corrected prompt
+                if system_prompt := correct_prompt.get_system():
+                    correct_prompt.system.value = self.duplicate_braces(system_prompt)
+                if user_prompt := correct_prompt.get_user():
+                    correct_prompt.user.value = self.duplicate_braces(user_prompt)
+                if assistant_prompt := correct_prompt.get_assistant():
+                    correct_prompt.assistant.value = self.duplicate_braces(assistant_prompt)
+                messages.add_prompt(correct_prompt)
+            else:
+                if context:
+                    replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)
+                messages = Messages()
+                messages.add_prompt(self.data["prompt"])
+                if file_list:
+                    for file_var in file_list.values:
+                        messages.add_human_message(file_var)
         else:
             if context:
                 replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)
