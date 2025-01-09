@@ -670,16 +670,16 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             # There are records that are being executed.
             return response_error(get_language_content("agent_batch_exist_runing_rocord"))
 
-
-        record_total = AIToolLLMRecords().select_one(
+        record_total = AIToolLLMRecords().select(
             columns=['id'],
             conditions=[
                 {"column": "app_run_id", "value": data.app_run_id},
                 {"column": "loop_id", "value": data.loop_id}
-            ],
-            aggregates={"id": "count"}
+            ]
         )
-        remaining_count = data.loop_limit - record_total['count_id']
+
+        record_limit = len(record_total)
+        remaining_count = data.loop_limit - record_limit
     else:
         # Start new batch
         loop_id = int(time())
@@ -691,7 +691,6 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
     if loop_count <= 0:
         return response_error(get_language_content("api_agent_batch_size_invalid"))
  
-
     try:
         # Prepare input with history outputs
         input_ = AIToolLLMRecords().inputs_append_history_outputs(
