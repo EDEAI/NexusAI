@@ -262,7 +262,6 @@ def task_delay_thread():
                 #     loop_count = max(loop_count - 1, 0)
                 update_app_run(app_run_id, {'status': 2})
                 update_ai_run(id, {'status': 2})
-
                 create_celery_task(app_run_id, id, ai_tool_type, run['loop_id'], run['loop_limit'], run['loop_count'], run['ai_tool_type'], prompt_dict, return_json, correct_llm_output)
                 logger.debug(f"Task assigned completed and the App Run table ID is:{app_run_id}")
                 continue

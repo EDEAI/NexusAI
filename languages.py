@@ -872,6 +872,20 @@ language_packs = {
             '{update_meeting}\n'
         ),
 
+        'chatroom_generate_meeting_summary_from_a_single_message_system_correct': (
+            '你是一个会议内容总结助手，请根据我提供的历史会议总结和用户后续问题，生成新的会议总结。\n'
+            '用户后续问题：根据用户提出的问题和历史会议总结进行修正，确保返回的结果与历史会议总结不同。\n'
+            '注意最终只返回会议总结内容，不要返回多余的内容。\n'
+        ),
+
+        'chatroom_generate_meeting_summary_from_a_single_message_user_correct': (
+            '历史会议总结内容如下：\n'
+            '{meeting_summary}\n\n'
+
+            '用户后续问题：\n'
+            '{update_meeting}\n'
+        ),
+
         'chatroom_conference_orientation_system': (
             '你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据进行数据导向转化。 \n'
             '转化时注意以下几点要求：\n'
