@@ -167,7 +167,7 @@ class AIToolLLMRecords(MySQL):
         )
         return status
     
-    def inputs_append_history_outputs(self, app_run_id: int, loop_id: int = 0) -> dict:
+    def inputs_append_history_outputs_1(self, app_run_id: int, loop_id: int = 0) -> dict:
         """
         Append the value from outputs to inputs['user']['value'] in the latest record.
         
@@ -237,3 +237,113 @@ class AIToolLLMRecords(MySQL):
         except Exception as e:
             print(f"Error in inputs_append_history_outputs: {str(e)}")
             return {}
+        
+
+    def inputs_append_history_outputs(self, app_run_id: int, loop_id: int = 0, agent_supplement: str = None) -> dict:
+        """
+        Append outputs values from all records and prepare prompts for batch generation
+        
+        Args:
+            app_run_id (int): The ID of the app run
+            loop_id (int): The ID of the loop iteration (default: 0)
+            agent_supplement (str): Additional requirements for agent generation
+            
+        Returns:
+            dict: Input dictionary containing system and user prompts
+        """
+        from languages import get_language_content
+        from core.llm.prompt import Prompt
+
+        # Get user ID from app_runs
+        userinfo = self.select_one(
+            joins=[
+                ['left', 'app_runs', 'ai_tool_llm_records.app_run_id = app_runs.id']
+            ],
+            columns=['app_runs.user_id'],
+            conditions=[
+                {"column": "ai_tool_llm_records.app_run_id", "value": app_run_id},
+            ]
+        )
+
+        # Get all records for current batch
+        batch_records = self.select(
+            columns=['id', 'inputs', 'outputs'],
+            conditions=[
+                {"column": "app_run_id", "value": app_run_id},
+                {"column": "loop_id", "value": loop_id},
+            ],
+            order_by='id ASC'
+        )
+
+        # Extract outputs values into a list
+        outputs_list = []
+        for record in batch_records:
+            if record.get('outputs') and isinstance(record['outputs'], dict):
+                output_value = record['outputs'].get('value')
+                if output_value:
+                    outputs_list.append(output_value)
+
+        # Prepare prompts based on whether this is a continuation or new batch
+        if batch_records:
+            # Get base user prompt from first record of current batch
+            base_user_prompt = ""
+            try:
+                inputs = batch_records[0].get('inputs', {})
+                if isinstance(inputs, dict):
+                    user_dict = inputs.get('user', {})
+                    if isinstance(user_dict, dict):
+                        base_user_prompt = user_dict.get('value', '')
+            except Exception:
+                pass
+
+            # Format user prompt with history
+            user_prompt = get_language_content('agent_batch_generate_history_user', userinfo['user_id'])
+            user_prompt = user_prompt.format(
+                history_prompt=base_user_prompt,
+                history_agents=outputs_list
+            )
+        else:
+            # Get first record of original generation
+            first_record = self.select_one(
+                columns=['inputs'],
+                conditions=[
+                    {"column": "app_run_id", "value": app_run_id},
+                    {"column": "loop_id", "value": 0}
+                ],
+                order_by='id ASC'
+            )
+
+            # Get base user prompt
+            base_user_prompt = ""
+            if first_record and isinstance(first_record.get('inputs'), dict):
+                user_dict = first_record['inputs'].get('user', {})
+                if isinstance(user_dict, dict):
+                    base_user_prompt = user_dict.get('value', '')
+
+            # Get latest agent data
+            latest_record = self.select_one(
+                columns=['outputs'],
+                conditions=[
+                    {"column": "app_run_id", "value": app_run_id},
+                    {"column": "loop_id", "value": 0}
+                ],
+                order_by='id DESC'
+            )
+
+            # Format user prompt for new batch
+            user_prompt = get_language_content('agent_batch_generate_user', userinfo['user_id'])
+            user_prompt = user_prompt.format(
+                first_user_prompt=base_user_prompt,
+                agent_supplement=agent_supplement,
+                agent_data=latest_record['outputs'] if latest_record else {},
+                history_agents=outputs_list
+            )
+
+        # Prepare system prompt
+        system_prompt = get_language_content('generate_agent_system_prompt', userinfo['user_id'])
+        system_prompt = system_prompt.format(
+            append_prompt=get_language_content('agent_batch_generate_system', userinfo['user_id'])
+        )
+
+        # Return formatted prompts
+        return Prompt(system=system_prompt, user=user_prompt).to_dict()

@@ -831,40 +831,43 @@ language_packs = {
             '}}\n'
             '{append_prompt}\n\n'
         ),
-        'generate_agent_prompt':(
-            '我的要求：\n'
+        'generate_agent_user':(
+            '需求内容：\n'
             '{user_prompt}\n\n'
         ),
 
-        'regenerate_agent_prompt': (
-            '注意：生成的智能体不要与历史数据内容相同，需要拥有不同的能力。\n'
+        'regenerate_agent_system': (
+            '注意：生成的智能体不要与历史智能体内容相同，需要拥有不同的能力。\n'
         ),
-        'regenerate_agent_history_agent_list': (
-            '历史数据如下：\n'
+        'regenerate_agent_user': (
+            '历史智能体如下：\n'
             '{history_agent_list}\n'
         ),
 
-        'agent_supplement_prompt':(
-            '{system_prompt} \n'
+        'agent_supplement_system':(
+            '结合需求内容和补充说明，参考提供的智能体数据，生成新的智能体。\n'
+        ),
+        'agent_supplement_user':(
             '补充说明：\n'
             '{agent_supplement}\n\n'
-            '请参考提供的智能体数据，生成新的智能体。'
-        ),
-        'agent_supplement_user_prompt': (
             '智能体数据如下：\n'
-            '{history_agent}'
+            '{history_agent}\n'
         ),
 
-        'agent_batch_generate_user_prompt':(
-            '{history_agents} \n'
+        'agent_batch_generate_system':(
+            '结合需求内容、补充说明和智能体内容，生成新的智能体。但是不要和历史智能体相同，要有不同的能力。\n'
         ),
-        'agent_reference_data':(
+        'agent_batch_generate_user':(
+            '{first_user_prompt} \n'
             '补充说明：\n'
             '{agent_supplement}\n\n'
-            '生成的agent智能体参照内容如下：\n'
+            '智能体内容如下：\n'
             '{agent_data} \n'
-            '注意：生成的智能体不要与历史智能体相同，要有不同的能力。\n'
+        ),
+        'agent_batch_generate_history_user':(
+            '{history_prompt} \n'
             '历史智能体如下：\n'
+            '{history_agents} \n'
         ),
         'app_run_error': 'app运行记录不存在',
         'api_agent_generate_failed': 'agent生成记录失败',
