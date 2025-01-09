@@ -11,6 +11,7 @@ from .base import CURRENT_NODE_ID, ImportToKBBaseNode, LLMBaseNode
 from ..context import Context, replace_variable_value_with_context
 from ..variables import ObjectVariable, Variable
 from ..recursive_task import RecursiveTaskCategory
+from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
 from core.database.models import Apps, AgentAbilities, AgentDatasetRelation, Agents, Workflows, AppRuns, AppNodeExecutions, Models
 from core.dataset import DatasetRetrieval
 from core.llm.messages import Messages
@@ -43,7 +44,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         import_to_knowledge_base: Dict[str, bool] = {},
         knowledge_base_mapping: Dict[str, Dict[str, Union[int, Dict[str, int]]]] = {},
         flow_data: Dict[str, Any] = {},
-        original_node_id: Optional[str] = None
+        original_node_id: Optional[str] = None,
+        data_source_run_id : Optional[int] = 0
     ):
         """
         Initializes an AgentNode object with the ability to track the original node ID.
@@ -62,7 +64,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             "manual_confirmation": manual_confirmation,
             "import_to_knowledge_base": import_to_knowledge_base,
             "knowledge_base_mapping": knowledge_base_mapping,
-            "flow_data": flow_data
+            "flow_data": flow_data,
+            "data_source_run_id": data_source_run_id
         }
         if original_node_id is not None:
             init_kwargs["original_node_id"] = original_node_id
@@ -91,6 +94,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         level: int = 0,
         task: Optional[Dict[str, RecursiveTaskCategory]] = None,
         correct_llm_output: bool = False,
+        data_source_run_id : Optional[int] = 0,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -98,7 +102,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         """
         try:
             start_time = monotonic()
-            
             now = datetime.now().replace(microsecond=0).isoformat(sep='_')
             agent_id = self.data['agent_id']
             agent = Agents().get_agent_by_id(agent_id)
@@ -402,6 +405,10 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'finished_time': datetime.now()
                 }
             )
+            if data_source_run_id > 0:
+                chatroomdriven_info = ChatroomDrivenRecords().get_data_by_data_source_run_id(data_source_run_id)
+                if chatroomdriven_info:
+                    ChatroomDrivenRecords().update_data_driven_run_id(chatroomdriven_info['id'],data_source_run_id, agent_run_id)
             return {
                 'status': 'success',
                 'message': 'Agent node executed successfully.',

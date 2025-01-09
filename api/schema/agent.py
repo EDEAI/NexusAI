@@ -132,6 +132,7 @@ class ReqAgentRunSchema(BaseModel):
     ability_id: Optional[int] = None
     input_dict: Optional[Dict[str, Any]] = None
     prompt: Optional[Dict[str, Any]] = None
+    data_source_run_id: Optional[int] = 0
 
 class AgentRunResponseData(BaseModel):
     outputs: Optional[Dict[str, Any]] = None
