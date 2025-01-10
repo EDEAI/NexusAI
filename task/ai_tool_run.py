@@ -243,6 +243,9 @@ def task_delay_thread():
                 elif ai_tool_type == 4:
                     return_json = True
                     ai_tool_type = 'generate_meeting_action_items_'+run_type
+                elif ai_tool_type == 5:
+                    return_json = True
+                    ai_tool_type = 'agent_batch_sample_' + run_type
                 else:
                     return_json = True
 
@@ -252,14 +255,6 @@ def task_delay_thread():
                 else:
                     prompt_dict = inputs
                     correct_llm_output = False
-                # if run['loop_count'] > 0:
-                    # ai_tool_status = ai_tool_llm_records.get_search_record(app_run_id, run['ai_tool_type'], 4, run['loop_id'])
-                    # if ai_tool_status is None:
-                    #     inputs_new = ai_tool_llm_records.inputs_append_history_outputs(app_run_id, run['loop_id'])
-                    #     ai_tool_llm_records.initialize_execution_record(app_run_id, run['ai_tool_type'], 4, run['loop_id'], run['loop_count'], inputs_new, run['correct_prompt'])
-                # loop_count = run['loop_count']
-                # if loop_count > 0:
-                #     loop_count = max(loop_count - 1, 0)
                 update_app_run(app_run_id, {'status': 2})
                 update_ai_run(id, {'status': 2})
                 create_celery_task(app_run_id, id, ai_tool_type, run['loop_id'], run['loop_limit'], run['loop_count'], run['ai_tool_type'], prompt_dict, return_json, correct_llm_output)
@@ -341,22 +336,22 @@ def task_callback_thread():
                         app_run_prompt_tokens = run['prompt_tokens'] + prompt_tokens
                         app_run_completion_tokens = run['completion_tokens'] + completion_tokens
                         app_run_total_tokens = run['total_tokens'] + total_tokens
-                        if loop_count > 0:
-                            inputs_new = ai_tool_llm_records.inputs_append_history_outputs(app_run_id, loop_id)
-                            ai_tool_llm_records.initialize_execution_record(app_run_id, run_ai_tool_type, 4, loop_id, loop_limit, loop_count, inputs_new)
-                            app_run_data = {
-                                'status': 1
-                            }
-                        else:
-                            app_run_data = {
-                                'status': 3,
-                                'outputs': result['data']['outputs'],
-                                'elapsed_time': app_run_elapsed_time,
-                                'prompt_tokens': app_run_prompt_tokens,
-                                'completion_tokens': app_run_completion_tokens,
-                                'total_tokens': app_run_total_tokens,
-                                'finished_time': end_time
-                            }
+                        # if loop_count > 0:
+                        #     inputs_new = ai_tool_llm_records.inputs_append_history_outputs(app_run_id, loop_id)
+                        #     ai_tool_llm_records.initialize_execution_record(app_run_id, run_ai_tool_type, 4, loop_id, loop_limit, loop_count, inputs_new)
+                        #     app_run_data = {
+                        #         'status': 1
+                        #     }
+                        # else:
+                        app_run_data = {
+                            'status': 3,
+                            'outputs': result['data']['outputs'],
+                            'elapsed_time': app_run_elapsed_time,
+                            'prompt_tokens': app_run_prompt_tokens,
+                            'completion_tokens': app_run_completion_tokens,
+                            'total_tokens': app_run_total_tokens,
+                            'finished_time': end_time
+                        }
                         update_app_run(app_run_id, app_run_data)
 
                         push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)

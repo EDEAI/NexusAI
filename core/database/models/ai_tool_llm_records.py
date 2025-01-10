@@ -30,7 +30,7 @@ class AIToolLLMRecords(MySQL):
         Returns:
             int: The ID of the newly created record.
         """
-        loop_count = max(loop_count - 1, 0)
+        # loop_count = max(loop_count - 1, 0)
         record = {
             'app_run_id': app_run_id,
             'status': 1,
