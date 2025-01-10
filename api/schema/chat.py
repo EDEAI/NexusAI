@@ -167,6 +167,10 @@ class ChatHistorySummary(BaseModel):
     corrected_parameter: str = None
 
 
+class ChatSingleMessage(BaseModel):
+    message: str = None
+
+
 class ChatHistoryMessageSummary(BaseModel):
     app_run_id: str = None
     corrected_parameter: str = None
