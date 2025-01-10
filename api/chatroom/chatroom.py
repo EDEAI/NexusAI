@@ -1,4 +1,5 @@
-from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows, ChatroomDrivenRecords)
+from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages,
+                                  Agents, Workflows, ChatroomDrivenRecords)
 from fastapi import APIRouter
 from api.utils.common import *
 from api.utils.jwt import *
@@ -20,7 +21,8 @@ router = APIRouter()
 
 
 @router.get("/", response_model=ChatRoomListResponse, summary="Fetching the List of Chat Rooms")
-async def chatroom_list(page: int = 1, page_size: int = 10, name: str = "", userinfo: TokenData = Depends(get_current_user)):
+async def chatroom_list(page: int = 1, page_size: int = 10, name: str = "",
+                        userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of all chat rooms.
 
@@ -113,7 +115,8 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
     return response_success({'chatroom_id': chatroom_id})
 
 
-@router.get("/recent", response_model=RecentChatRoomListResponse, summary="Fetch a List of Recently Accessed Chat Rooms")
+@router.get("/recent", response_model=RecentChatRoomListResponse,
+            summary="Fetch a List of Recently Accessed Chat Rooms")
 async def recent_chatroom_list(chatroom_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of chat rooms that the user has recently accessed.
@@ -223,8 +226,10 @@ async def show_chatroom_details(chatroom_id: int, userinfo: TokenData = Depends(
     })
 
 
-@router.post("/{chatroom_id}/smart_selection", response_model=ChatRoomResponseBase, summary="Enables or Disables Smart Selection for a Chat Room")
-async def toggle_smart_selection_switch(chatroom_id: int, data: ToggleSmartSelectionSwitch, userinfo: TokenData = Depends(get_current_user)):
+@router.post("/{chatroom_id}/smart_selection", response_model=ChatRoomResponseBase,
+             summary="Enables or Disables Smart Selection for a Chat Room")
+async def toggle_smart_selection_switch(chatroom_id: int, data: ToggleSmartSelectionSwitch,
+                                        userinfo: TokenData = Depends(get_current_user)):
     """
     Enables or Disables Smart Selection for a Chat Room.
 
@@ -266,7 +271,8 @@ async def toggle_smart_selection_switch(chatroom_id: int, data: ToggleSmartSelec
 
 
 @router.post("/{chatroom_id}/update_chatroom", response_model=UpdateChatRoomResponse, summary="Update the Chat Room")
-async def update_chatroom(chatroom_id: int, chat_request: ReqChatroomUpdateSchema, userinfo: TokenData = Depends(get_current_user)):
+async def update_chatroom(chatroom_id: int, chat_request: ReqChatroomUpdateSchema,
+                          userinfo: TokenData = Depends(get_current_user)):
     """
     Updates an existing chat room with specified attributes.
 
@@ -368,12 +374,13 @@ async def update_chatroom(chatroom_id: int, chat_request: ReqChatroomUpdateSchem
             }
         )
 
-
     return response_success({'chatroom_id': chatroom_id})
 
 
-@router.put("/{chatroom_id}/agents/{agent_id}/setting", response_model=ChatRoomResponseBase, summary="Set the Chat Room Agent's Automatic Responses")
-async def toggle_auto_answer_switch(chatroom_id: int, agent_id: int, agent_setting: ReqAgentSettingSchema, userinfo: TokenData = Depends(get_current_user)):
+@router.put("/{chatroom_id}/agents/{agent_id}/setting", response_model=ChatRoomResponseBase,
+            summary="Set the Chat Room Agent's Automatic Responses")
+async def toggle_auto_answer_switch(chatroom_id: int, agent_id: int, agent_setting: ReqAgentSettingSchema,
+                                    userinfo: TokenData = Depends(get_current_user)):
     """
     Set the automatic response settings for an agent in a chat room.
 
@@ -417,7 +424,7 @@ async def toggle_auto_answer_switch(chatroom_id: int, agent_id: int, agent_setti
     find_chatroom_agent = ChatroomAgentRelation().search_chatroom_agent_relation_id(chatroom_id, agent_id)
     if not find_chatroom_agent['status']:
         return response_error(get_language_content("chatroom_agent_relation_does_not_exist"))
-    
+
     if active == 0:
         agents = ChatroomAgentRelation().get_active_agents_by_chatroom_id(chatroom_id)
         if len(agents) <= 1:
@@ -434,8 +441,10 @@ async def toggle_auto_answer_switch(chatroom_id: int, agent_id: int, agent_setti
     return response_success()
 
 
-@router.get("/{chatroom_id}/chatroom_message", response_model=ChatRoomResponseBase, summary="Get a list of historical messages")
-async def show_chatroom_details(chatroom_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
+@router.get("/{chatroom_id}/chatroom_message", response_model=ChatRoomResponseBase,
+            summary="Get a list of historical messages")
+async def show_chatroom_details(chatroom_id: int, page: int = 1, page_size: int = 10,
+                                userinfo: TokenData = Depends(get_current_user)):
     """
     Retrieve historical messages for a specific chat room.
 
@@ -469,8 +478,10 @@ async def show_chatroom_details(chatroom_id: int, page: int = 1, page_size: int 
     return response_success(chatroom_history_msg)
 
 
-@router.post("/{chatroom_id}/chat_history_message_summary", response_model=ChatRoomResponseBase, summary="Chat History Message Summary")
-async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessageSummary, userinfo: TokenData = Depends(get_current_user)):
+@router.post("/{chatroom_id}/chat_history_message_summary", response_model=ChatRoomResponseBase,
+             summary="Chat History Message Summary")
+async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessageSummary,
+                               userinfo: TokenData = Depends(get_current_user)):
     """
     Use specified properties to query existing applications.
     Distinguish between agents and workFlows based on the current application
@@ -529,15 +540,19 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
         )
 
         if meeting_summary['inputs'] is None and meeting_summary['correct_prompt'] is None:
-            system_prompt = get_language_content('chatroom_generate_meeting_summary_from_a_single_message_system_correct', userinfo.uid)
-            user_prompt = get_language_content('chatroom_generate_meeting_summary_from_a_single_message_user_correct', userinfo.uid)
+            system_prompt = get_language_content(
+                'chatroom_generate_meeting_summary_from_a_single_message_system_correct', userinfo.uid)
+            user_prompt = get_language_content('chatroom_generate_meeting_summary_from_a_single_message_user_correct',
+                                               userinfo.uid)
             user_prompt = user_prompt.format(
                 meeting_summary=meeting_summary['outputs']['value'],
                 update_meeting=chat_data['corrected_parameter']
             )
         else:
             # system prompt
-            system_prompt = system_prompt.format(chatroom_meeting_summary_system_correct=get_language_content('chatroom_meeting_summary_system_correct', userinfo.uid))
+            system_prompt = system_prompt.format(
+                chatroom_meeting_summary_system_correct=get_language_content('chatroom_meeting_summary_system_correct',
+                                                                             userinfo.uid))
 
             # user prompt
             user_prompt = get_language_content(
@@ -593,8 +608,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
 
         ChatroomDrivenRecords().insert(
             {
-                'data_source_run_id': app_run_id,
-                'chatroom_id': chatroom_id
+                'data_source_run_id': app_run_id
             }
         )
         record_id = AIToolLLMRecords().initialize_execution_record(
@@ -605,8 +619,9 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
     return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'message': 'Executing, please wait'})
 
 
-@router.post("/{chatroom_id}/chat_history_summary", response_model=ChatRoomResponseBase, summary="Chat History Summary")  
-async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummary, userinfo: TokenData = Depends(get_current_user)):
+@router.post("/{chatroom_id}/chat_history_summary", response_model=ChatRoomResponseBase, summary="Chat History Summary")
+async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummary,
+                               userinfo: TokenData = Depends(get_current_user)):
     """
     Use specified properties to query existing applications.
     Distinguish between agents and workFlows based on the current application
@@ -715,7 +730,8 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
 
     if chat_data['status'] == 2:
         # system prompt
-        system_prompt = system_prompt.format(chatroom_conference_orientation_system_correct=get_language_content('chatroom_conference_orientation_system_correct', userinfo.uid))
+        system_prompt = system_prompt.format(chatroom_conference_orientation_system_correct=get_language_content(
+            'chatroom_conference_orientation_system_correct', userinfo.uid))
 
         # user prompt
         user_prompt = get_language_content(
@@ -738,7 +754,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             update_meeting=chat_data['corrected_parameter']
         )
     else:
-        # system prompt 
+        # system prompt
         system_prompt = system_prompt.format(chatroom_conference_orientation_system_correct='')
 
         # user prompt
@@ -858,4 +874,26 @@ async def chat_single_message_generation(chatroom_id: int, chat_request: ChatSin
             'outputs': outputs
         }
     )
-    return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'outputs': outputs, 'message': 'Processing successful'})
+    return response_success(
+        {'app_run_id': app_run_id, 'record_id': record_id, 'outputs': outputs, 'message': 'Processing successful'})
+
+
+
+@router.get('/chat_room_history', response_model=ChatRoomHistory)
+async def get_chat_room_history(
+    chatroom_id: int,
+    page: int = 1,
+    page_size: int = 10,
+    userinfo: TokenData = Depends(get_current_user)
+):
+    """Get chat room history including meeting summaries, corrections, and directed actions."""
+    find_chatroom = Chatrooms().search_chatrooms_id(chatroom_id, userinfo.uid)
+    if not find_chatroom['status']:
+        return response_error(get_language_content("chatroom_does_not_exist"))
+
+    result = ChatroomDrivenRecords().get_history_by_chatroom_id(
+        chatroom_id=chatroom_id,
+        page=page,
+        page_size=page_size
+    )
+    return response_success(result)
