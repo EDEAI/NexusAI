@@ -159,12 +159,54 @@ class ResAgentGenerateSchema(BaseModel):
 class ReqAgentRegenerateSchema(BaseModel):
     app_run_id: Optional[int] = None
 
-
-
 class ReqAgentSupplementSchema(BaseModel):
     app_run_id: Optional[int] = None
     supplement_prompt: Optional[str] = None
 
+
+class ReqAgentBatchSample(BaseModel):
+    app_run_id: Optional[int] = None
+    supplement_prompt: Optional[str] = None
+
+class AgentBatchGenerateResonseData(BaseModel):
+    app_run_id: Optional[int] = None
+    record_id: Optional[int] = None
+
+class ResAgentBatchSample(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Optional[AgentBatchGenerateResonseData] = None
+
+class ReqAgentSaveSchema(BaseModel):
+    app_run_id: Optional[int] = None
+    record_id: Optional[int] = None
+    agent_info: Optional[Dict[str, Any]] = Field(
+        {
+            "name": "text",
+            "type": "json",
+            "value": {
+                "name":"Agent 1",
+                "description":"Agent 1 description",
+                "obligations":"Agent 1 obligations",
+                "abilities":[
+                    {
+                        "name":"ability1",
+                        "content":"ability content",
+                        "output_format":0
+                    }
+                ]
+            }
+        }
+    )
+
+class AgentSaveResponseData(BaseModel):
+    app_run_id: Optional[int] = None
+    record_id: Optional[int] = None
+
+class ResAgentSaveSchema(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Optional[AgentSaveResponseData] = None
 
 class ReqAgentBatchGenerateSchema(BaseModel):
     app_run_id: Optional[int] = None

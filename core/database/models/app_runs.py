@@ -243,3 +243,12 @@ class AppRuns(MySQL):
             ]
         )
         return result
+
+    def get_app_run_info(self, app_run_id: int, user_id: int) -> Dict[str, Any]:
+        return self.select_one(
+            columns=["id"],
+            conditions=[
+                {"column": "id", "value": app_run_id},
+                {"column": "user_id", "value": user_id}
+            ]
+        )

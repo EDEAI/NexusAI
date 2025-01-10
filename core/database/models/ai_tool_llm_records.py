@@ -275,3 +275,15 @@ class AIToolLLMRecords(MySQL):
 
         # Return formatted prompts
         return Prompt(system=system_prompt, user=user_prompt).to_dict()
+
+
+    def get_record_loop_count(self, app_run_id: int, loop_id: int) -> int:
+        result = self.select(
+            aggregates={"loop_count": "sum"},
+            conditions=[
+                {"column": "app_run_id", "value": app_run_id},
+                {"column": "loop_id", "value": loop_id}
+            ]
+        )
+        return result[0]["sum_loop_count"] if result else 0
+       
