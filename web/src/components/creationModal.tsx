@@ -84,6 +84,34 @@ const CreationModal: React.FC<ChildProps> = ({
             history.push(`/${CreationType.path}?type=false`);
         }
     };
+
+    const Footer = () => {
+        return (
+            <div className="flex justify-between">
+                <div className="flex items-center">
+                    {CreationType.apps_mode == 1 && (
+                        <Button
+                            onClick={() => {
+                                setAgentCreateOpen(true);
+                            }}
+                        >
+                            AI创建智能体
+                        </Button>
+                    )}
+                </div>
+                <div className="flex gap-2">
+                    <Button onClick={() => setIsModalOpen(false)}>取消</Button>
+                    <Button
+                        disabled={CreationName !== '' ? false : true}
+                        onClick={handleOk}
+                        type="primary"
+                    >
+                        {intl.formatMessage({ id: 'creation' })}
+                    </Button>
+                </div>
+            </div>
+        );
+    };
     return (
         <Modal
             title={intl.formatMessage({ id: 'creation.addnewapp' })}
@@ -93,6 +121,7 @@ const CreationModal: React.FC<ChildProps> = ({
             onCancel={() => setIsModalOpen(false)}
             okButtonProps={{ disabled: CreationName !== '' ? false : true }}
             width={820}
+            footer={<Footer />}
         >
             <div className="pb-1">
                 {ModalType ? (
@@ -143,13 +172,6 @@ const CreationModal: React.FC<ChildProps> = ({
                 ) : null}
 
                 <div className=" mt-5">
-                    {CreationType.apps_mode == 1 && (
-                        <div className="mb-2">
-                            <Button onClick={()=>{
-                                setAgentCreateOpen(true)
-                            }}>辅助生成智能体</Button>
-                        </div>
-                    )}
                     <div className="mb-5">
                         <p className="text-xs">
                             {CreationType.apps_mode == 1

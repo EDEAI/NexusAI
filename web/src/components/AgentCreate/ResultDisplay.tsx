@@ -3,6 +3,7 @@ import React, { forwardRef, memo, useEffect, useImperativeHandle, useState } fro
 import TagSearch from '../TagSearch';
 import { EditableCard } from './EditableCard';
 import { AgentFormData } from './types';
+import { PlusOutlined } from '@ant-design/icons';
 const { Paragraph } = Typography;
 
 export interface ResultDisplayRef {
@@ -13,11 +14,12 @@ interface ResultDisplayProps {
     initialValues?: Partial<AgentFormData>;
     onChange?: (values: AgentFormData) => void;
     loading?: boolean;
+    readOnly?: boolean;
 }
 
 const ResultDisplay = memo(
     forwardRef<ResultDisplayRef, ResultDisplayProps>(
-        ({ initialValues, onChange, loading }, ref) => {
+        ({ initialValues, onChange, loading, readOnly = false }, ref) => {
             const [values, setValues] = useState<Partial<AgentFormData>>(initialValues || {});
 
             useEffect(() => {
@@ -32,9 +34,26 @@ const ResultDisplay = memo(
             }));
 
             const handleChange = (updates: Partial<AgentFormData>) => {
+                if (readOnly) return;
                 const newValues = { ...values, ...updates };
                 setValues(newValues);
                 onChange?.(newValues as AgentFormData);
+            };
+
+            const handleAddAbility = () => {
+                if (readOnly) return;
+                const newAbilities = [...(values.abilities || [])];
+                newAbilities.push({
+                    name: '新技能',
+                    content: '技能描述',
+                    output_format: 1
+                });
+                handleChange({
+                    name: values.name || '',
+                    description: values.description || '',
+                    obligations: values.obligations || '',
+                    abilities: newAbilities,
+                });
             };
 
             return (
@@ -48,12 +67,12 @@ const ResultDisplay = memo(
                         <div className="h-full">
                             <div className="px-4 pt-6 flex items-center gap-2">
                                 <Paragraph
-                                    editable={{
+                                    editable={!readOnly ? {
                                         onChange: value => handleChange({ name: value }),
                                         text: values.name,
                                         triggerType: ['text'],
                                         autoSize: true,
-                                    }}
+                                    } : false}
                                     className="hover:bg-blue-100 !mb-0 relative rounded-lg text-blue-600 text-[16px] flex items-center"
                                 >
                                     <img
@@ -65,12 +84,12 @@ const ResultDisplay = memo(
                             </div>
                             <div className="px-4 py-1 mt-2">
                                 <Paragraph
-                                    editable={{
+                                    editable={!readOnly ? {
                                         onChange: value => handleChange({ description: value }),
                                         text: values.description,
                                         triggerType: ['text'],
                                         autoSize: true,
-                                    }}
+                                    } : false}
                                     className="hover:bg-blue-100 rounded-lg !mb-0 text-[#666666] text-[12px]"
                                 >
                                     {values.description}
@@ -82,7 +101,8 @@ const ResultDisplay = memo(
                                             showAddButton={false}
                                             className="w-full"
                                             variant="borderless"
-                                            onChange={(tags) => {
+                                            disabled={readOnly}
+                                            onChange={tags => {
                                                 handleChange({ tags });
                                             }}
                                             value={values.tags}
@@ -92,12 +112,12 @@ const ResultDisplay = memo(
                             </div>
                             <div className="px-4 py-1">
                                 <Paragraph
-                                    editable={{
+                                    editable={!readOnly ? {
                                         onChange: value => handleChange({ obligations: value }),
                                         text: values.obligations,
                                         triggerType: ['text'],
                                         autoSize: true,
-                                    }}
+                                    } : false}
                                     className="hover:bg-blue-100 rounded-lg !mb-0 text-[12px]"
                                 >
                                     {values.obligations}
@@ -111,13 +131,13 @@ const ResultDisplay = memo(
                                         title={item.name}
                                         description={item.content}
                                         outputFormat={item.output_format}
+                                        readOnly={readOnly}
                                         onDelete={() => {
                                             const newAbilities = [...(values.abilities || [])];
                                             newAbilities.splice(index, 1);
                                             handleChange({
                                                 name: values.name || '',
                                                 description: values.description || '',
-
                                                 obligations: values.obligations || '',
                                                 abilities: newAbilities,
                                             });
@@ -133,13 +153,21 @@ const ResultDisplay = memo(
                                             handleChange({
                                                 name: values.name || '',
                                                 description: values.description || '',
-
                                                 obligations: values.obligations || '',
                                                 abilities: newAbilities,
                                             });
                                         }}
                                     />
                                 ))}
+                                {!readOnly && (
+                                    <Button 
+                                        icon={<PlusOutlined />} 
+                                        onClick={handleAddAbility}
+                                        className="w-full"
+                                    >
+                                        增加技能
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </Spin>

@@ -135,7 +135,9 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                 if (res.code === 0) {
                     setKeyword('');
                     getTags();
+
                     props?.onTagChange?.();
+
                     message.success(
                         intl.formatMessage({
                             id: 'addTag.success',
@@ -374,7 +376,7 @@ const tagRender: TagRender = props => {
 // Add useTags hook back with improvements
 export const useTags = (initialModes = 0) => {
     const intl = useIntl();
-    const [modes, setModes] = useState(initialModes);
+    const [modes] = useState(initialModes);
     const [state, dispatch] = useReducer(tagReducer, {
         tagList: [
             {
@@ -420,9 +422,9 @@ export const useTags = (initialModes = 0) => {
         fetchTags(modes);
     }, [modes, fetchTags]);
 
-    const refreshTags = useCallback((newModes = 0) => {
-        setModes(newModes);
-    }, []);
+    const refreshTags = useCallback(() => {
+        fetchTags(modes);
+    }, [modes, fetchTags]);
 
     return {
         tagList: state.tagList,

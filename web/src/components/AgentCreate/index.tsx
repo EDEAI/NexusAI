@@ -1,13 +1,27 @@
-import { agentCreate, agentGenerate, agentReGenerate, agentSupplement, batchAgentCreate } from '@/api/workflow';
+import {
+    agentCreate,
+    agentGenerate,
+    agentReGenerate,
+    agentSupplement,
+    batchAgentCreate,
+} from '@/api/workflow';
 import useUserStore from '@/store/user';
 import useSocketStore from '@/store/websocket';
-import { PullRequestOutlined, ReloadOutlined, SendOutlined, ToolOutlined } from '@ant-design/icons';
+import {
+    ArrowLeftOutlined,
+    PullRequestOutlined,
+    ReloadOutlined,
+    SendOutlined,
+    ToolOutlined,
+} from '@ant-design/icons';
 import { ProFormDigit } from '@ant-design/pro-components';
 import { useRafState } from '@reactuses/core';
 import { useUpdateEffect } from 'ahooks';
-import { Button, Modal, Spin } from 'antd';
+import { App, Button, Modal, message } from 'antd';
 import { memo, useCallback, useRef, useState } from 'react';
-import ResultDisplay, { PromptTextarea, ResultDisplayRef } from './ResultDisplay';
+import BatchCreate, { BatchCreateRef } from './BatchCreate';
+import BeforeCreate from './BeforeCreate';
+import { PromptTextarea, ResultDisplayRef } from './ResultDisplay';
 import { AgentFormData, AgentResult, BatchCreateFormData } from './types';
 
 interface AgentResult {
@@ -31,13 +45,17 @@ const AgentCreate = memo(() => {
     const [promptVisible, setPromptVisible] = useState(false);
     const [formData, setFormData] = useState<AgentFormData | null>(null);
     const [batchVisible, setBatchVisible] = useState(false);
+    const [batchModelVisible, setBatchModelVisible] = useState(false);
+
     const [batchLoading, setBatchLoading] = useState(false);
     const [generateId, setGenerateId] = useState(null);
     const [hasProcessed, setHasProcessed] = useState(false);
     const flowMessage = useSocketStore(state => state.flowMessage);
     const resultDisplayRef = useRef<ResultDisplayRef>(null);
     const [batchCount, setBatchCount] = useState(10);
-
+    const { modal } = App.useApp();
+    const batchCreateRef = useRef<BatchCreateRef>(null);
+    const [createType, setCreateType] = useState<'single' | 'batch' | ''>('');
     useUpdateEffect(() => {
         if (agentCreateOpen) {
             setModelOpen(agentCreateOpen);
@@ -57,21 +75,33 @@ const AgentCreate = memo(() => {
             const res = await agentCreate(createParams);
             console.log(res);
             if (res.code == 0) {
-                setHasProcessed(false);
-                setGenerateId(res.data);
-                // setAgentCreateResult(res.data)
+                message.success('智能体创建成功');
             }
         } finally {
         }
     };
 
+    const closeModal = () => {
+        if (agentCreateResult) {
+            Modal.confirm({
+                title: '提示',
+                content: '是否确认离开？',
+                onOk: () => {
+                    handleCancel();
+                },
+            });
+            return;
+        }
+        handleCancel();
+    };
+
     const handleCancel = () => {
         setAgentCreateOpen(false);
         setModelOpen(false);
+        resetState();
     };
 
     const handleSubmit = async (prompt: string) => {
-        console.log(prompt);
         setLoading(true);
         try {
             const res = await agentGenerate(prompt);
@@ -115,20 +145,25 @@ const AgentCreate = memo(() => {
 
     const handleBatchGenerate = async (prompt: string) => {
         setBatchLoading(true);
-        try {
-            const params = {
-                app_run_id: generateId?.app_run_id,
-                loop_count: batchCount,
-                loop_limit: 10,
-                supplement_prompt: prompt,
-                loop_id: 0
-            };
-            const res = await batchAgentCreate(params);
-            console.log(res);
-            setBatchLoading(false);
-        } catch (error) {
-            console.error(error);
-            setBatchLoading(false);
+        const params = {
+            app_run_id: generateId?.app_run_id,
+            loop_count: 10,
+            loop_limit: batchCount,
+            supplement_prompt: prompt,
+            loop_id: 0,
+        };
+
+        const res = await batchAgentCreate(params);
+        if (res.code == 0) {
+            setBatchModelVisible({
+                ...params,
+                ...res.data,
+            });
+
+            setTimeout(() => {
+                batchCreateRef.current?.reset();
+                setBatchVisible(false);
+            }, 100);
         }
     };
     useUpdateEffect(() => {
@@ -183,26 +218,6 @@ const AgentCreate = memo(() => {
         }
     };
 
-    const BeforeCreate = useCallback(
-        () => (
-            <div className="rounded-lg flex-1 border border-gray-200 p-4 bg-gray-50 flex justify-center items-center flex-col gap-2 text-[#1b64f3]">
-                {/* {loading ? <div>生成中...</div> : <div>待生成智能体</div>} */}
-                {loading ? (
-                    <>
-                        <Spin />
-                        <div>生成中...</div>
-                    </>
-                ) : (
-                    <>
-                        <img src="/icons/agent_create.svg" className="size-16"></img>
-                        <div>待生成智能体</div>
-                    </>
-                )}
-            </div>
-        ),
-        [loading],
-    );
-
     const RenderFooter = () => {
         return (
             <div className="flex gap-2 justify-between">
@@ -216,27 +231,41 @@ const AgentCreate = memo(() => {
                             >
                                 生成新智能体
                             </Button>
-                            <Button
-                                type="primary"
-                                variant="filled"
-                                color="primary"
-                                onClick={() => setBatchVisible(true)}
-                            >
-                                批量生成智能体
-                            </Button>
+                            {batchVisible ? (
+                                <Button
+                                    type="primary"
+                                    variant="filled"
+                                    icon={<ArrowLeftOutlined />}
+                                    color="primary"
+                                    onClick={() => setBatchVisible(false)}
+                                >
+                                    继续编辑
+                                </Button>
+                            ) : (
+                                <Button
+                                    type="primary"
+                                    variant="filled"
+                                    color="primary"
+                                    onClick={() => setBatchVisible(true)}
+                                >
+                                    批量生成
+                                </Button>
+                            )}
                         </>
                     )}
                 </div>
                 <div className="flex gap-2">
-                    <Button onClick={handleCancel}>取消</Button>
-                    <Button
-                        type="primary"
-                        disabled={!agentCreateResult}
-                        icon={<PullRequestOutlined />}
-                        onClick={handleOk}
-                    >
-                        保存智能体
-                    </Button>
+                    {/* <Button onClick={handleCancel}>取消</Button> */}
+                    {false && (
+                        <Button
+                            type="primary"
+                            disabled={!agentCreateResult}
+                            icon={<PullRequestOutlined />}
+                            onClick={handleOk}
+                        >
+                            创建
+                        </Button>
+                    )}
                 </div>
             </div>
         );
@@ -248,18 +277,58 @@ const AgentCreate = memo(() => {
         setAgentCreateResult(null);
         setInputVisible(true);
         setPromptVisible(false);
+        setBatchVisible(false);
+        setBatchModelVisible(false);
+        setBatchCount(10);
+        setBatchLoading(false);
+        setPrompt('');
+        setLoading(false);
+        setCorrectLoading(false);
+        setRegenerateLoading(false);
+        setAgentCreateResultVisibleOutput(null);
+        setCreateType('');
     };
 
-    useUpdateEffect(() => {
-        if (!modelOpen) {
-            resetState();
+    const SelectedType = useCallback(() => {
+        if (createType === 'single') {
+            return (
+                <div className="flex gap-4 h-full relative flex-1">
+                    <BeforeCreate type={'single'} hasHover={false} loading={false} />
+                    <div className="w-1/2">
+                        <PromptTextarea
+                            placeholder="输入智能体生成提示词"
+                            submitText="生成智能体"
+                            submitIcon={<SendOutlined />}
+                            className="h-full"
+                            loading={loading}
+                            onSubmit={handleSubmit}
+                            key="single-prompt"
+                        ></PromptTextarea>
+                    </div>
+                </div>
+            );
         }
-    }, [modelOpen]);
+
+        return (
+            <div className="flex gap-4 h-full relative flex-1">
+                <BeforeCreate type={'batch'} hasHover={false} loading={false} />
+                <div className="w-1/2">
+                    <PromptTextarea
+                        placeholder="输入智能体批量生成提示词"
+                        submitText="生成智能体"
+                        submitIcon={<SendOutlined />}
+                        className="h-full"
+                        key="batch-prompt"
+                    ></PromptTextarea>
+                </div>
+            </div>
+        );
+    }, [createType]);
 
     return (
         <>
             <Modal
-                title="创建智能体"
+                title="AI创建智能体"
                 className="xl:min-w-[1200px] lg:min-w-[1000px]"
                 bodyProps={{
                     className: '!h-[600px] overflow-y-auto p-4',
@@ -267,10 +336,26 @@ const AgentCreate = memo(() => {
                 open={modelOpen}
                 footer={RenderFooter}
                 onOk={handleOk}
-                onCancel={handleCancel}
+                onCancel={closeModal}
             >
-                <div className="flex gap-4 h-full">
-                    {agentCreateResult ? (
+                <div className="flex gap-4 h-full relative">
+                    {createType == '' ? (
+                        <>
+                            <BeforeCreate
+                                type={'single'}
+                                onClick={() => setCreateType('single')}
+                                loading={false}
+                            />
+                            <BeforeCreate
+                                type={'batch'}
+                                onClick={() => setCreateType('batch')}
+                                loading={false}
+                            />
+                        </>
+                    ) : (
+                        <SelectedType />
+                    )}
+                    {/* {agentCreateResult ? (
                         <ResultDisplay
                             ref={resultDisplayRef}
                             initialValues={agentCreateResultOutput}
@@ -278,66 +363,72 @@ const AgentCreate = memo(() => {
                             loading={loading || correctLoading || regenerateLoading}
                         />
                     ) : (
-                        <BeforeCreate />
-                    )}
-                    {batchVisible ? (
-                        <div className="w-1/2 flex flex-col gap-4">
-                            <ProFormDigit
-                                label="生成数量"
-                                min={1}
-                                initialValue={10}
-                                layout="vertical"
-                                formItemProps={{
-                                    className: 'mb-0',
-                                }}
-                                fieldProps={{
-                                    precision: 0,
-                                    step: 1,
-                                    onChange: (value) => setBatchCount(Number(value)),
-                                    controls: true,
-                                    parser: value => Math.floor(Number(value || 0)),
-                                    formatter: value => `${value}`.replace(/[^\d]/g, ''),
-                                }}
-                            />
+                        <BeforeCreate type={batchVisible ? 'batch' : 'single'} loading={true} />
+                    )} */}
+
+                    <div className="flex flex-col gap-4 relative">
+                        {/* <PromptTextarea
+                            placeholder="输入智能体生成提示词"
+                            submitText="生成智能体"
+                            submitIcon={<SendOutlined />}
+                            loading={loading}
+                            onSubmit={handleSubmit}
+                            className="h-full"
+                            key="single-prompt"
+                        ></PromptTextarea> */}
+                        {agentCreateResult && (
                             <PromptTextarea
                                 placeholder="输入智能体生成提示词"
-                                submitText="开始批量生成"
-                                submitIcon={<SendOutlined />}
-                                loading={loading}
-                                onSubmit={handleBatchGenerate}
+                                submitText="修正智能体"
+                                submitIcon={<ToolOutlined />}
+                                onSubmit={handleCorrectAgent}
                                 className="h-full"
+                                loading={correctLoading}
+                                key="single-prompt"
                             ></PromptTextarea>
-                        </div>
-                    ) : (
-                        <div className="w-1/2 flex flex-col gap-4">
-                            <PromptTextarea
-                                placeholder="输入智能体生成提示词"
-                                submitText="生成智能体"
-                                submitIcon={<SendOutlined />}
-                                loading={loading}
-                                onSubmit={handleSubmit}
-                                className="h-full"
-                            ></PromptTextarea>
-                            {agentCreateResult && (
+                        )}
+                        {batchVisible && (
+                            <div className="absolute w-full h-full bg-white left-0 top-0 flex flex-col gap-4">
+                                <ProFormDigit
+                                    label="生成数量"
+                                    min={1}
+                                    initialValue={10}
+                                    layout="vertical"
+                                    formItemProps={{
+                                        className: 'mb-0',
+                                    }}
+                                    fieldProps={{
+                                        precision: 0,
+                                        step: 1,
+                                        onChange: value => setBatchCount(Number(value)),
+                                        controls: true,
+                                        parser: value => Math.floor(Number(value || 0)),
+                                        formatter: value => `${value}`.replace(/[^\d]/g, ''),
+                                    }}
+                                />
                                 <PromptTextarea
-                                    placeholder="输入智能体生成提示词"
-                                    submitText="修正智能体"
-                                    submitIcon={<ToolOutlined />}
-                                    onSubmit={handleCorrectAgent}
+                                    placeholder="输入批量生成提示词"
+                                    submitText="开始批量生成"
+                                    submitIcon={<SendOutlined />}
+                                    loading={loading}
+                                    onSubmit={handleBatchGenerate}
                                     className="h-full"
-                                    loading={correctLoading}
+                                    key="batch-prompt"
                                 ></PromptTextarea>
-                            )}
-                        </div>
-                    )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </Modal>
-            {/* <BatchCreate
-                open={batchVisible}
-                onCancel={() => setBatchVisible(false)}
+            <BatchCreate
+                ref={batchCreateRef}
+                open={!!batchModelVisible}
+                onCancel={() => setBatchModelVisible(false)}
                 onOk={handleBatchCreate}
                 loading={batchLoading}
-            /> */}
+                params={batchModelVisible}
+                onReset={resetState}
+            />
         </>
     );
 });

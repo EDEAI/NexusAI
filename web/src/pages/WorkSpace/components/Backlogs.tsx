@@ -93,7 +93,7 @@ export default () => {
     );
     return (
         <Spin spinning={loading}>
-            <div style={{ height: 'calc(100vh - 596px)' }}>
+            <div className='min-h-[300px]' style={{ height: 'calc(100vh - 596px)' }}>
                 <Title
                     iconSrc="/icons/back_log.svg"
                     titleText={intl.formatMessage({ id: 'app.workflow.backlogs.title' })}
