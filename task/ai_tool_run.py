@@ -295,20 +295,21 @@ def task_callback_thread():
                         end_time = time.time()
                         end_time = datetime.fromtimestamp(end_time)
 
-                        if run_ai_tool_type == 1 and ai_tool_type == 'generate_agent_batch':
-                            value_str = result['data']['outputs']['value']
-                            json_load_value = json.loads(value_str)
-                            return_agent = agents.create_agent_with_configs(
-                                data=json_load_value,
-                                user_id=user_id,
-                                team_id=team_id
-                            )
-                            if return_agent['status'] == 1:
-                                logger.info(f"Batch generate agent returns:{return_agent}")
-                                result['data']['outputs']['id'] = return_agent['app_id']
-                            else:
-                                logger.error(f"ERROR Batch generate agent returns:{return_agent}")
-                        elif run_ai_tool_type == 4:
+                        # if run_ai_tool_type == 1 and ai_tool_type == 'generate_agent_batch':
+                        #     value_str = result['data']['outputs']['value']
+                        #     json_load_value = json.loads(value_str)
+                        #     return_agent = agents.create_agent_with_configs(
+                        #         data=json_load_value,
+                        #         user_id=user_id,
+                        #         team_id=team_id
+                        #     )
+                        #     if return_agent['status'] == 1:
+                        #         logger.info(f"Batch generate agent returns:{return_agent}")
+                        #         result['data']['outputs']['id'] = return_agent['app_id']
+                        #     else:
+                        #         logger.error(f"ERROR Batch generate agent returns:{return_agent}")
+                        # elif run_ai_tool_type == 4:
+                        if run_ai_tool_type == 4:
                             value_str = result['data']['outputs']['value']
                             json_load_value = json.loads(value_str)
                             json_load_value = [json_load_value]
