@@ -184,17 +184,33 @@ class ResAgentBatchGenerateSchema(BaseModel):
     data: Optional[AgentBatchGenerateResonseData] = None
 
 
-class AgentAbilityCreateSchema(BaseModel):
-    """Schema for single agent ability creation"""
-    name: str
-    content: str
-    status: int = 1
-    output_format: int = 0
+class ReqAgentBatchCreateSchema(BaseModel):
+    """Schema for batch agent creation request"""
+    agents: List[Dict[str, Any]] = Field(
+        ...,
+        description="List of agent configurations to create in batch",
+        example=[{
+            "name": "Agent 1",
+            "description": "First agent description",
+            "obligations": "Agent 1 obligations",
+            "abilities": [
+                {
+                    "name": "ability1",
+                    "content": "ability content",
+                    "status": 1,
+                    "output_format": 0
+                }
+            ],
+            "tags": [1, 2]
+        }]
+    )
 
-class ReqAgentCreateSchema(BaseModel):
-    """Schema for agent creation request"""
-    name: str
-    description: str
-    obligations: str
-    abilities: List[AgentAbilityCreateSchema]
-    tags: Optional[List[int]] = []
+class ResBatchAgentCreateSchema(BaseModel):
+    """Response schema for batch agent creation"""
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Dict[str, List[int]] = Field(
+        ...,
+        description="Contains list of created app IDs",
+        example={"app_ids": [1, 2, 3]}
+    )
