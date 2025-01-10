@@ -184,20 +184,6 @@ class ResAgentBatchGenerateSchema(BaseModel):
     data: Optional[AgentBatchGenerateResonseData] = None
 
 
-class AgentAbilityCreateSchema(BaseModel):
-    """Schema for single agent ability creation"""
-    name: str
-    content: str
-    status: int = 1
-    output_format: int = 0
-
-class ReqAgentCreateSchema(BaseModel):
-    """Schema for agent creation request"""
-    name: str
-    description: str
-    obligations: str
-    abilities: List[AgentAbilityCreateSchema]
-    tags: Optional[List[int]] = []
 class ReqAgentBatchCreateSchema(BaseModel):
     """Schema for batch agent creation request"""
     agents: List[Dict[str, Any]] = Field(

@@ -728,32 +728,7 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         print(traceback.format_exc())
         return response_error(get_language_content("api_agent_generate_failed"))
 
-
-@router.post("/agent_create", response_model=ResAgentBaseCreateSchema)
-async def agent_create(data: ReqAgentCreateSchema, userinfo: TokenData = Depends(get_current_user)):
-    """
-    Create a new agent with complete configurations
-
-    Args:
-        data (ReqAgentCreateSchema): Request data containing agent configuration
-        userinfo (TokenData): Current user authentication info
-
-    Returns:
-        AgentBaseCreateResponseData: Contains created app_id
-    """
-    agents_model = Agents()
-    result = agents_model.create_agent_with_configs(
-        data=data.dict(),
-        user_id=userinfo.uid,
-        team_id=userinfo.team_id
-    )
-
-    if result["status"] != 1:
-        return response_error(result["message"])
-    return response_success(data={"app_id": result["app_id"]}, detail=get_language_content("api_agent_success"))
-
-
-@router.post("/agent_batch_create", response_model=ResBatchAgentCreateSchema)
+@router.post("/agent_create", response_model=ResBatchAgentCreateSchema)
 async def agent_batch_create(data: ReqAgentBatchCreateSchema, userinfo: TokenData = Depends(get_current_user)):
     """
     Create multiple agents in a single batch operation.
