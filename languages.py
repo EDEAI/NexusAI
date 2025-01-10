@@ -559,12 +559,10 @@ language_packs = {
             Generated agent data:
             {history_agent}
         ''',
-        'agent_batch_generate_system': '''
+        'agent_batch_sample_system': '''
             You are an AI agent generation assistant.
-            You have generated an agent through my initial agent generation requirements. Now you want to continue to generate a new agent. Please pay attention to the following requirements when generating:
-            1. Refer to my initial agent generation requirements and the initial agent generation information to summarize the agent generation direction
-            2. Based on the summarized agent generation direction, generate new agents according to the requirements of continuing to generate agents
-            3. If the batch generated agent history has real content, the new agent should try to keep the difference with the generated agent history
+            Please generate a complete sample agent information for me according to the agent data structure based on the requirements for batch generation of agents I provided. The agent name and description should be highly anthropomorphic.
+            Please note that only one agent sample should be generated, and batch generation should not be performed.
             Note that only the json structure data of the agent is returned, and no redundant content is returned.
             Description of the json structure of agent data:
             {{
@@ -580,22 +578,43 @@ language_packs = {
                 ]
             }}
         ''',
-        'agent_batch_generate_user': '''
-            Initial agent generation requirements:
-            {first_user_prompt}
-
-            Initial agent generation information:
-            {agent_data}
-
-            Requirements of continuing to generate agents:
-            {agent_supplement}
+        'agent_batch_sample_user': '''
+            Requirements for batch generation of agents:
+            {agent_batch_requirements}
         ''',
-        'agent_batch_generate_history_user': '''
-            {history_prompt}
+        'agent_batch_generate_system': '''
+            You are an AI agent generation assistant.
+            Please generate a batch of complete agent information for me according to the agent data structure based on the requirements and number of agents to be generated in batches provided by me. The agent names and descriptions should be highly anthropomorphic.
+            Please pay attention to the following requirements when generating:
+            1. Be sure to generate agents strictly according to the number of agents to be generated in batches provided by me, and do not generate more or less than this number
+            2. If the history of agents that have been generated in batches has real content, the new agent should try to keep the difference with the history of the generated agents
+            Note that only the json structure data of the agent is returned, and no redundant content is returned.
+            Description of the json structure of agent data:
+            [
+                {{
+                    "name": "(string type) Agent name",
+                    "description": "(string type) Agent description",
+                    "obligations": "(string type) Agent functional information (including but not limited to the identity, responsibilities, positions, skills, etc. of the agent)",
+                    "abilities": [
+                        {{
+                            "name": "(string type) Ability name",
+                            "content": "(string type) Specific content of the ability. When the agent is running, the selected ability content will be submitted to the LLM model as a prompt",
+                            "output_format": "(int type), the output format of the ability, 1: text format, 2: json format, 3: pure code format (excluding non-code content), when the agent is running, the content will be returned according to the output format corresponding to the selected ability"
+                        }}
+                    ]
+                }}
+            ]
+        ''',
+        'agent_batch_generate_user': '''
+            Requirements for batch generation of agents:
+            {agent_batch_requirements}
 
-            The batch generated agent history:
+            Number of batch generated agents:
+            {agent_batch_number}
+
+            Batch generated agent history:
             {history_agents}
-        '''
+        ''',
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -979,40 +998,62 @@ language_packs = {
         #     '{history_agent}\n'
         # ),
 
-        # 'agent_batch_generate_system': '''
+        # 'agent_batch_sample_system': '''
         #     你是一个AI智能体生成助手。
-        #     你已经通过我的初始生成智能体需求生成了一个智能体，现在你要继续生成一个新的智能体，生成时注意以下几点要求：
-        #     1. 要参考我的初始生成智能体需求，以及初始生成的智能体信息，以此总结智能体生成方向
-        #     2. 在总结后的智能体生成方向的基础上，按照继续生成智能体的要求进行新智能体的生成
-        #     3. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
+        #     请通过我提供的批量生成智能体的需求，按照智能体的数据结构为我生成一个完整的样例智能体信息，智能体名称、描述要高度拟人化。
+        #     注意只生成一个智能体样例，不要进行批量生成。
         #     注意只返回智能体的json结构数据，不要返回多余的内容。
         #     智能体数据json结构说明：
         #     {{
-        #     "name": "(string类型) 智能体名称",
-        #     "description": "(string类型) 智能体描述",
-        #     "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
-        #     "abilities": [
-        #         {{
-        #         "name": "(string类型) 能力名称",
-        #         "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
-        #         "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
-        #         }}
-        #     ]
+        #         "name": "(string类型) 智能体名称",
+        #         "description": "(string类型) 智能体描述",
+        #         "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
+        #         "abilities": [
+        #             {{
+        #                 "name": "(string类型) 能力名称",
+        #                 "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
+        #                 "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
+        #             }}
+        #         ]
         #     }}
         # ''',
-        # 'agent_batch_generate_user':(
-        #     '初始生成智能体需求：\n'
-        #     '{first_user_prompt} \n'
-        #     '初始生成的智能体信息：\n'
-        #     '{agent_data} \n'
-        #     '继续生成智能体的要求：\n'
-        #     '{agent_supplement}\n\n'
-        # ),
-        # 'agent_batch_generate_history_user':(
-        #     '{history_prompt} \n'
-        #     '已批量生成的智能体历史：\n'
-        #     '{history_agents} \n'
-        # ),
+        # 'agent_batch_sample_user': '''
+        #     批量生成智能体的需求：
+        #     {agent_batch_requirements}
+        # ''',
+        # 'agent_batch_generate_system': '''
+        #     你是一个AI智能体生成助手。
+        #     请通过我提供的批量生成智能体的需求、批量生成智能体的数量，按照智能体的数据结构为我生成一批完整的智能体信息，智能体名称、描述要高度拟人化。
+        #     生成时注意以下几点要求：
+        #     1. 一定要严格按照我提供的批量生成智能体的数量去生成智能体，不要多余或少于此数量
+        #     2. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
+        #     注意只返回智能体的json结构数据，不要返回多余的内容。
+        #     智能体数据json结构说明：
+        #     [
+        #         {{
+        #             "name": "(string类型) 智能体名称",
+        #             "description": "(string类型) 智能体描述",
+        #             "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
+        #             "abilities": [
+        #                 {{
+        #                     "name": "(string类型) 能力名称",
+        #                     "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
+        #                     "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
+        #                 }}
+        #             ]
+        #         }}
+        #     ]
+        # ''',
+        # 'agent_batch_generate_user': '''
+        #     批量生成智能体的需求：
+        #     {agent_batch_requirements}
+            
+        #     批量生成智能体的数量：
+        #     {agent_batch_number}
+            
+        #     已批量生成的智能体历史：
+        #     {history_agents}
+        # ''',
         'app_run_error': 'app运行记录不存在',
         'api_agent_generate_failed': 'agent生成记录失败',
         'api_agent_user_prompt_required': '提示词不能为空',
@@ -1059,9 +1100,10 @@ prompt_keys = {
     "regenerate_agent_user",
     "agent_supplement_system",
     "agent_supplement_user",
+    "agent_batch_sample_system",
+    "agent_batch_sample_user",
     "agent_batch_generate_system",
-    "agent_batch_generate_user",
-    "agent_batch_generate_history_user"
+    "agent_batch_generate_user"
 }
 
 
