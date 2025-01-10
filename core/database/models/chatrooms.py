@@ -1,286 +1,196 @@
 from core.database import MySQL
-from core.database.models.ai_tool_llm_records import AIToolLLMRecords
-from core.database.models.app_runs import AppRuns
-from core.database.models.apps import Apps
-from core.database.models.workflows import Workflows
-from core.workflow.variables import create_variable_from_dict
+from core.database.models.agents import Agents
+from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
 import math
 
 
-class ChatroomDrivenRecords(MySQL):
+class Chatrooms(MySQL):
     """
-    A database model class for managing chatroom driven records.
-    Inherits from MySQL base class to handle database operations.
-
-    This class provides an interface to interact with the chatroom_driven_records table,
-    which stores the relationships between data source runs and data driven runs.
+    A class that extends MySQL to manage operations on the {table_name} table.
     """
 
-    table_name = "chatroom_driven_records"
+    table_name = "chatrooms"
     """
-    The name of the database table this model interacts with.
+    Indicates whether the `chatrooms` table has an `update_time` column that tracks when a record was last updated.
     """
+    have_updated_time = True
 
-    have_updated_time = False
-    """
-    Configuration flag indicating that this table doesn't track update timestamps.
-    Set to False to disable automatic update_time management.
-    """
-
-    def get_data_by_data_source_run_id(self, data_source_run_id: int):
+    def search_agent_id(self, agent_id: int):
         """
-        Retrieve record information based on the data source run ID.
+        Searches for an agent by its ID.
 
-        Args:
-            data_source_run_id (int): The unique identifier of the data source run
+        This function queries the database to find an agent with the specified ID in the Agents table.
+        It uses the `select_one` method from the `Agents` model to perform the search based on
+        the provided agent ID. If an agent with the given ID exists, the function returns a dictionary
+        indicating success. Otherwise, it indicates failure.
 
-        Returns:
-            dict: A dictionary containing the record information with fields:
-                - id: The record's unique identifier
-                - data_source_run_id: The associated data source run ID
-                - data_driven_run_id: The associated data driven run ID
+        :param agent_id: The ID of the agent to search for in the database.
+        :type agent_id: int
 
-        Note:
-            Returns None if no matching record is found.
+        :return: A dictionary indicating the search result status.
+                 - {'status': 1}: If the agent is found in the database.
+                 - {'status': 0}: If the agent is not found in the database.
+        :rtype: dict
+        """
+        agent_model = Agents()
+        info = agent_model.select_one(
+            columns=[
+                'id',
+            ],
+            conditions=[
+                {"column": "id", "value": agent_id},
+            ]
+        )
+        if info is not None:
+            return {'status': 1}
+        else:
+            return {'status': 0}
+
+    def search_chatrooms_id(self, chatroom_id: int, user_id: int):
+        """
+        Retrieves information about a chat room by its ID.
+
+        This function queries the database for a chat room with the specified ID.
+        If the chat room exists, it returns a dictionary containing the chat room's
+        maximum round, app ID, and a status code indicating success.
+
+        :param chatroom_id: The ID of the chat room to search for.
+        :return: A dictionary containing the chat room's information and a status code.
+                 - If the chat room is found, the status code is 1.
+                 - If the chat room is not found, the status code is 0.
         """
         info = self.select_one(
             columns=[
-                'id', 'data_source_run_id', 'data_driven_run_id'
+                'id', 'max_round', 'app_id', 'status', 'smart_selection', 'initial_message_id'
             ],
             conditions=[
-                {"column": "data_source_run_id", "value": data_source_run_id},
+                {"column": "id", "value": chatroom_id},
+                {"column": "user_id", "value": user_id},
+                {"column": "status", "value": 1},
             ]
         )
-        return info
+        if info is not None:
+            return {'status': 1, 'max_round': info['max_round'], 'app_id': info['app_id'], 'chatroom_status': info['status'], 'smart_selection': info['smart_selection'], 'initial_message_id': info['initial_message_id']}
+        else:
+            return {'status': 0}
 
-    def update_data_driven_run_id(self, id: int, data_source_run_id: int, data_driven_run_id: int):
+    def all_chat_room_list(self, page: int = 1, page_size: int = 10, uid: int = 0, name: str = ""):
         """
-        Update the data_driven_run_id for a specific record identified by data_source_run_id.
+        Retrieves a list of chat rooms with pagination, filtering by user ID and chat room name.
 
-        Args:
-            data_source_run_id (int): The identifier of the data source run to update
-            data_driven_run_id (int): The new data driven run ID to set
-
-        Returns:
-            bool: True if the update was successful, False otherwise
-
-        Note:
-            This method updates a single record matching the data_source_run_id.
+        :param page: The page number for pagination.
+        :param page_size: The number of items per page.
+        :param uid: The ID of the user to filter chat rooms by.
+        :param name: The name of the chat room to filter by.
+        :return: A dictionary containing the list of chat rooms, total count, total pages, current page, and page size.
         """
-        update_data = {
-            "data_driven_run_id": data_driven_run_id
-        }
-        info = self.update(
-            [
-                {"column": "data_source_run_id", "value": data_source_run_id},
-                {"column": "id", "value": id}
-            ], update_data
-        )
-        return info
+        conditions = [
+            {"column": "chatrooms.status", "value": 1},
+            {"column": "apps.status", "value": 1},
+            {"column": "apps.mode", "value": 5},
+            {"column": "chatrooms.user_id", "value": uid},
+        ]
 
-    def get_history_by_chatroom_id(self, chatroom_id: int, page: int = 1, page_size: int = 10):
-        """Get chat room history with pagination"""
-        driven_records = self.select(
+        if name:
+            conditions.append({"column": "apps.name", "op": "like", "value": "%" + name + "%"})
+
+        total_count = self.select_one(
+            aggregates={"id": "count"},
+            joins=[
+                ["left", "apps", "chatrooms.app_id = apps.id"],
+            ],
+            conditions=conditions,
+        )["count_id"]
+
+        list = self.select(
             columns=[
-                'id', 'data_source_run_id', 'data_driven_run_id', 'chatroom_id'
+                "apps.name",
+                "apps.description",
+                "chatrooms.id as chatroom_id",
+                "chatrooms.chat_status",
+                "chatrooms.active",
+                "chatrooms.status as chatroom_status",
+                "chatrooms.smart_selection",
+                "apps.id as app_id"
             ],
-            conditions=[
-                {"column": "chatroom_id", "value": chatroom_id},
+            joins=[
+                ["left", "apps", "chatrooms.app_id = apps.id"]
             ],
-            order_by='id DESC',
+            conditions=conditions,
+            order_by="chatrooms.id DESC",
             limit=page_size,
             offset=(page - 1) * page_size
         )
 
-        # Get total count for pagination
-        total_count = self.select_one(
-            aggregates={"id": "count"},
-            conditions=[
-                {"column": "chatroom_id", "value": chatroom_id},
-            ]
-        )['count_id']
+        for chat_item in list:
+            chat_item['agent_list'] = []
+            agent_list = ChatroomAgentRelation().select(
+                columns=["agent_id", "chatroom_id"],
+                conditions=[
+                    {"column": "chatroom_id", "value": chat_item['chatroom_id']}
+                ],
+                order_by="id DESC"
+            )
 
-        history_list = []
-        if driven_records:
-            for record in driven_records:
-                record_data = {
-                    'source_run': None,
-                    'source_corrections': [],
-                    'target_run': None,
-                    'target_details': None
-                }
-
-                # Handle source run
-                if record['data_source_run_id']:
-                    source_run = AppRuns().select_one(
-                        columns=[
-                            'id', 'name', 'status', 'created_time', 'finished_time',
-                            'elapsed_time', 'total_tokens'
-                        ],
-                        conditions=[
-                            {"column": "id", "value": record['data_source_run_id']}
-                        ]
-                    )
-
-                    summary_records = AIToolLLMRecords().select(
-                        columns=[
-                            'id', 'run_type', 'inputs', 'outputs', 'correct_prompt',
-                            'created_time', 'status'
-                        ],
-                        conditions=[
-                            {"column": "app_run_id", "value": record['data_source_run_id']},
-                            {"column": "ai_tool_type", "value": 3}
-                        ],
-                        order_by='id ASC'
-                    )
-
-                    if summary_records:
-                        first_record = summary_records[0]
-                        # Parse original summary outputs using variables
-                        summary = None
-                        if first_record.get('outputs'):
-                            try:
-                                if isinstance(first_record['outputs'], dict):
-                                    variable = create_variable_from_dict(first_record['outputs'])
-                                    summary = variable.value
-                            except:
-                                pass
-
-                        record_data['source_run'] = {
-                            **source_run,
-                            'summary': summary
-                        }
-
-                        # Handle corrections
-                        for rec in summary_records[1:]:
-                            correction = {
-                                'created_time': rec['created_time'],
-                                'correct_prompt': None,
-                                'corrected_summary': None
-                            }
-
-                            # Parse correct_prompt
-                            if rec.get('correct_prompt'):
-                                try:
-                                    correction['correct_prompt'] = rec['correct_prompt']
-                                except:
-                                    pass
-
-                            # Parse corrected summary outputs
-                            if rec.get('outputs'):
-                                try:
-                                    variable = create_variable_from_dict(rec['outputs'])
-                                    correction['corrected_summary'] = variable.value
-                                except:
-                                    pass
-
-                            record_data['source_corrections'].append(correction)
-
-                # Handle target run
-                if record['data_driven_run_id']:
-                    # Get target run info
-                    target_run = AppRuns().select_one(
-                        columns=[
-                            'id', 'app_id', 'agent_id', 'workflow_id', 'name',
-                            'status', 'created_time', 'finished_time', 'elapsed_time',
-                            'completed_steps', 'total_steps', 'inputs', 'outputs',
-                            'total_tokens'
-                        ],
-                        conditions=[
-                            {"column": "id", "value": record['data_driven_run_id']}
-                        ]
-                    )
-
-                    if target_run:
-                        app = Apps().select_one(
-                            columns=['id', 'name', 'mode'],
-                            conditions=[{"column": "id", "value": target_run['app_id']}]
-                        )
-
-                        # Process status
-                        if target_run['status'] in (1, 2):
-                            target_run['status'] = 1
-                        elif target_run['status'] == 3:
-                            target_run['status'] = 2
-                        elif target_run['status'] == 4:
-                            target_run['status'] = 3
-
-                        # Calculate progress percentage
-                        completed = target_run.get('completed_steps', 0) or 0
-                        total = target_run.get('total_steps', 0) or 0
-                        target_run['percentage'] = int((completed / total * 100) if total > 0 else 0)
-
-                        # Parse inputs using variables
-                        if target_run.get('inputs'):
-                            try:
-                                print(target_run['inputs'])
-                                target_run['inputs'] = target_run['inputs']
-                            except:
-                                target_run['inputs'] = None
-
-                        # Parse outputs using variables
-                        if target_run.get('outputs'):
-                            try:
-                                target_run['outputs'] = target_run['outputs']
-                            except:
-                                target_run['outputs'] = None
-
-                        target_run['app'] = app
-                        record_data['target_run'] = target_run
-
-                        # Add type-specific details
-                        if app and app['mode'] == 1:  # Agent
-                            agent_details = AIToolLLMRecords().select_one(
-                                columns=['inputs', 'outputs'],
-                                conditions=[
-                                    {"column": "app_run_id", "value": record['data_driven_run_id']},
-                                    {"column": "ai_tool_type", "value": 0}
-                                ]
-                            )
-                            if agent_details:
-                                # Parse agent inputs
-                                if agent_details.get('inputs'):
-                                    try:
-                                        agent_details['inputs'] = agent_details['inputs']
-                                    except:
-                                        agent_details['inputs'] = None
-
-                                # Parse agent outputs
-                                if agent_details.get('outputs'):
-                                    try:
-                                        agent_details['outputs'] = agent_details['outputs']
-                                    except:
-                                        agent_details['outputs'] = None
-
-                                record_data['target_details'] = agent_details
-
-                        elif app and app['mode'] == 2:  # Workflow
-                            workflow = Workflows().select_one(
-                                columns=['id', 'graph'],
-                                conditions=[{"column": "id", "value": target_run['workflow_id']}]
-                            )
-                            if workflow:
-                                record_data['target_details'] = {
-                                    'workflow': workflow,
-                                    'run_details': {
-                                        'name': target_run['name'],
-                                        'apps_name': app['name'],
-                                        'status': target_run['status'],
-                                        'created_time': target_run['created_time'],
-                                        'finished_time': target_run['finished_time'],
-                                        'elapsed_time': target_run['elapsed_time'],
-                                        'completed_steps': target_run['completed_steps'],
-                                        'total_steps': target_run['total_steps'],
-                                        'percentage': target_run['percentage']
-                                    }
-                                }
-
-                history_list.append(record_data)
+            if agent_list:
+                for agent_item in agent_list:
+                    if agent_item['agent_id'] > 0:
+                        chat_item['agent_list'].append(Agents().select_one(
+                            columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id", "apps.icon", "apps.icon_background", "agents.obligations"],
+                            conditions=[
+                                {"column": "id", "value": agent_item['agent_id']}
+                            ],
+                            joins=[
+                                ["left", "apps", "apps.id = agents.app_id"],
+                            ]
+                        ))
 
         return {
-            "list": history_list,
+            "list": list,
             "total_count": total_count,
             "total_pages": math.ceil(total_count / page_size),
             "page": page,
             "page_size": page_size
         }
+
+    def recent_chatroom_list(self, chatroom_id: int, uid: int = 0):
+        """
+        Retrieves a list of the most recently active chat rooms for a given user, excluding a specific chat room.
+
+        This function queries the database to find the most recently active chat rooms for the specified user,
+        based on the 'last_run_time' from the 'app_runs' table. It excludes the chat room with the provided chatroom_id.
+        It then retrieves the associated agents for each chat room in the list.
+
+        Parameters:
+        - chatroom_id (int): The ID of the chat room to exclude from the list. Required.
+        - uid (int): The ID of the user to retrieve chat rooms for. Defaults to 0.
+
+        Returns:
+        - dict: A dictionary containing the list of recent chat rooms, with each chat room including its associated agents.
+        """
+        try:
+            query = f"""
+                SELECT apps.name, apps.description, chatrooms.id as chatroom_id, chatrooms.active, apps.id as app_id
+                FROM chatrooms
+                INNER JOIN apps ON chatrooms.app_id = apps.id
+                INNER JOIN (
+                    SELECT chatroom_id, MAX(created_time) as last_run_time
+                    FROM app_runs
+                    GROUP BY chatroom_id
+                ) AS last_runs ON chatrooms.id = last_runs.chatroom_id
+                WHERE chatrooms.status = 1 AND apps.status = 1 AND apps.mode = 5 AND chatrooms.user_id = {uid} AND chatrooms.id != {chatroom_id}
+                ORDER BY last_run_time DESC
+                LIMIT 5
+            """
+            list = self.execute_query(query)
+            rows = list.mappings().all()
+            chatrooms = [dict(row) for row in rows]
+            for chatroom in chatrooms:
+                chatroom_id = chatroom.get("chatroom_id")
+                if chatroom_id:
+                    agent_list = ChatroomAgentRelation().show_chatroom_agent(chatroom_id)
+                    chatroom["agent_list"] = agent_list
+            return {"list": chatrooms}
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return {"list": []}

@@ -186,7 +186,7 @@ class ChatRoomHistory(ResponseBase):
 
 class SourceRun(BaseModel):
     id: Optional[int] = None
-    name: Optional[str] = None
+    name: Optional[str] = None 
     status: Optional[int] = None
     created_time: Optional[datetime] = None
     finished_time: Optional[datetime] = None
@@ -209,8 +209,8 @@ class TargetRun(BaseModel):
     app: Optional[TargetApp] = None
     agent_id: Optional[int] = None
     workflow_id: Optional[int] = None
-    name: Optional[str] = None
-    apps_name: Optional[str] = None # 工作流名称
+    name: Optional[str] = None 
+    apps_name: Optional[str] = None
     status: Optional[int] = None
     created_time: Optional[datetime] = None
     finished_time: Optional[datetime] = None
@@ -220,7 +220,7 @@ class TargetRun(BaseModel):
     inputs: Optional[Dict[str, Any]] = None
     outputs: Optional[Dict[str, Any]] = None
     total_tokens: Optional[int] = None
-    percentage: Optional[int] = None # 进度百分比
+    percentage: Optional[int] = None
 
 class ChatHistoryItem(BaseModel):
     source_run: Optional[SourceRun] = None
