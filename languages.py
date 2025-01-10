@@ -588,7 +588,7 @@ language_packs = {
             Please pay attention to the following requirements when generating:
             1. Be sure to generate agents strictly according to the number of agents to be generated in batches provided by me, and do not generate more or less than this number
             2. If the history of agents that have been generated in batches has real content, the new agent should try to keep the difference with the history of the generated agents
-            Be sure to generate agents strictly according to the json structure of agent data. The multi-agent data is of list type as a whole. Each element in the list is an agent, and each agent is of dict type
+            3. Be sure to generate agents strictly according to the json structure of agent data. The multi-agent data is of list type as a whole. Each element in the list is an agent, and each agent is of dict type
             Note that only the json structure data of the agent is returned, and no redundant content is returned.
             Description of the json structure of agent data:
             [
