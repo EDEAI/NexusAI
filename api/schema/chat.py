@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, List, Any, Dict, Literal
+from datetime import datetime
 
 class ResponseBase(BaseModel):
     code: Optional[int] = None
@@ -171,3 +172,68 @@ class ChatHistoryMessageSummary(BaseModel):
     app_run_id: str = None
     corrected_parameter: str = None
 
+
+class ChatRoomHistoryList(BaseModel):
+    list: Optional[List[ChatRoomInfo]] = None
+    total_count: Optional[int] = None
+    total_pages: Optional[int] = None
+    page: Optional[int] = None
+    page_size: Optional[int] = None
+
+# chat_room_history
+class ChatRoomHistory(ResponseBase):
+    data: None
+
+class SourceRun(BaseModel):
+    id: Optional[int] = None
+    name: Optional[str] = None
+    status: Optional[int] = None
+    created_time: Optional[datetime] = None
+    finished_time: Optional[datetime] = None
+    elapsed_time: Optional[float] = None
+    total_tokens: Optional[int] = None
+    summary: Optional[str] = None
+
+class SummaryCorrection(BaseModel):
+    created_time: Optional[datetime] = None
+    correct_prompt: Optional[Dict[str, Any]] = None
+    corrected_summary: Optional[str] = None
+
+class TargetApp(BaseModel):
+    id: Optional[int] = None
+    name: Optional[str] = None
+    mode: Optional[int] = None
+
+class TargetRun(BaseModel):
+    id: Optional[int] = None
+    app: Optional[TargetApp] = None
+    agent_id: Optional[int] = None
+    workflow_id: Optional[int] = None
+    name: Optional[str] = None
+    apps_name: Optional[str] = None # 工作流名称
+    status: Optional[int] = None
+    created_time: Optional[datetime] = None
+    finished_time: Optional[datetime] = None
+    elapsed_time: Optional[float] = None
+    completed_steps: Optional[int] = None
+    total_steps: Optional[int] = None
+    inputs: Optional[Dict[str, Any]] = None
+    outputs: Optional[Dict[str, Any]] = None
+    total_tokens: Optional[int] = None
+    percentage: Optional[int] = None # 进度百分比
+
+class ChatHistoryItem(BaseModel):
+    source_run: Optional[SourceRun] = None
+    source_corrections: List[SummaryCorrection] = []
+    target_run: Optional[TargetRun] = None
+    target_details: Optional[Dict[str, Any]] = None
+
+class ChatHistoryList(BaseModel):
+    list: List[ChatHistoryItem] = []
+    total_count: int
+    total_pages: int
+    page: int
+    page_size: int
+
+class ChatRoomHistory(ResponseBase):
+    data: Optional[ChatHistoryList] = None
