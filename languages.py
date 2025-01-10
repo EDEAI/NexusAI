@@ -588,9 +588,9 @@ language_packs = {
             Please pay attention to the following requirements when generating:
             1. Be sure to generate agents strictly according to the number of agents to be generated in batches provided by me, and do not generate more or less than this number
             2. If the history of agents that have been generated in batches has real content, the new agent should try to keep the difference with the history of the generated agents
-            3. Be sure to generate agents strictly according to the json structure of the agent data, and do not change the data structure
+            Be sure to generate agents strictly according to the json structure of agent data. The multi-agent data is of list type as a whole. Each element in the list is an agent, and each agent is of dict type
             Note that only the json structure data of the agent is returned, and no redundant content is returned.
-            Description of the json structure of agent data: the data is of list type, each element in the list is an agent, and each agent is of dict type
+            Description of the json structure of agent data:
             [
                 {{
                     "name": "(string type) Agent name",
@@ -1022,30 +1022,30 @@ language_packs = {
         #     批量生成智能体的需求：
         #     {agent_batch_requirements}
         # ''',
-        # 'agent_batch_generate_system': '''
-        #     你是一个AI智能体生成助手。
-        #     请通过我提供的批量生成智能体的需求、批量生成智能体的数量，按照智能体的数据结构为我生成一批完整的智能体信息，智能体名称、描述要高度拟人化。
-        #     生成时注意以下几点要求：
-        #     1. 一定要严格按照我提供的批量生成智能体的数量去生成智能体，不要多余或少于此数量
-        #     2. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
-        #     3. 一定要严格按照智能体数据json结构去生成智能体，不要改变数据结构
-        #     注意只返回智能体的json结构数据，不要返回多余的内容。
-        #     智能体数据json结构说明：数据整体为list类型，list中每个元素为一个智能体，每个智能体为dict类型
-        #     [
-        #         {{
-        #             "name": "(string类型) 智能体名称",
-        #             "description": "(string类型) 智能体描述",
-        #             "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
-        #             "abilities": [
-        #                 {{
-        #                     "name": "(string类型) 能力名称",
-        #                     "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
-        #                     "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
-        #                 }}
-        #             ]
-        #         }}
-        #     ]
-        # ''',
+        'agent_batch_generate_system': '''
+            你是一个AI智能体生成助手。
+            请通过我提供的批量生成智能体的需求、批量生成智能体的数量，按照智能体的数据结构为我生成一批完整的智能体信息，智能体名称、描述要高度拟人化。
+            生成时注意以下几点要求：
+            1. 一定要严格按照我提供的批量生成智能体的数量去生成智能体，不要多余或少于此数量
+            2. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
+            3. 一定要严格按照智能体数据json结构去生成智能体，多智能体数据整体为list类型，list中每个元素为一个智能体，每个智能体为dict类型
+            注意只返回智能体的json结构数据，不要返回多余的内容。
+            智能体数据json结构说明：
+            [
+                {{
+                    "name": "(string类型) 智能体名称",
+                    "description": "(string类型) 智能体描述",
+                    "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
+                    "abilities": [
+                        {{
+                            "name": "(string类型) 能力名称",
+                            "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
+                            "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
+                        }}
+                    ]
+                }}
+            ]
+        ''',
         # 'agent_batch_generate_user': '''
         #     批量生成智能体的需求：
         #     {agent_batch_requirements}
