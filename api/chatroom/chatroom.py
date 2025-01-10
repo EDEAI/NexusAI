@@ -796,10 +796,8 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
     return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'message': 'Executing, please wait'})
 
 
-@router.post("/{chatroom_id}/chat_single_message_generation", response_model=ChatRoomResponseBase,
-             summary="Generate meeting summary from a single message")
-async def chat_single_message_generation(chatroom_id: int, chatroom_message_id: int,
-                                         userinfo: TokenData = Depends(get_current_user)):
+@router.post("/{chatroom_id}/chat_single_message_generation", response_model=ChatRoomResponseBase, summary="Generate meeting summary from a single message")
+async def chat_single_message_generation(chatroom_id: int, chat_request: ChatSingleMessage, userinfo: TokenData = Depends(get_current_user)):
     """
     Generate a meeting summary from a single message in a specified chat room.
 
@@ -809,7 +807,8 @@ async def chat_single_message_generation(chatroom_id: int, chatroom_message_id: 
 
     Parameters:
     - chatroom_id (int): The unique identifier of the chat room to be updated. This is a required parameter.
-    - chatroom_message_id (int): The unique identifier of the chat message to be processed for summary generation. This is a required parameter.
+    - chat_request (ChatSingleMessage): The request object containing the message to be processed. This is a required parameter.
+        - message (str): The content of the chat room message to be summarized.
     - userinfo (TokenData): Information about the current user, provided through dependency injection. This is a required parameter.
 
     Returns:
@@ -818,26 +817,27 @@ async def chat_single_message_generation(chatroom_id: int, chatroom_message_id: 
     Raises:
     - HTTPException: If any required parameters are missing or invalid, or if the user has not been authenticated.
     """
+    chat_data = chat_request.dict(exclude_unset=True)
     find_chatroom = Chatrooms().search_chatrooms_id(chatroom_id, userinfo.uid)
     if not find_chatroom['status']:
         return response_error(get_language_content("chatroom_does_not_exist"))
 
-    conditions = [
-        {"column": "chatroom_id", "value": chatroom_id},
-        {"column": "id", "value": chatroom_message_id},
-        {'column': 'id', 'op': '>', 'value': find_chatroom['initial_message_id']},
-        [
-            {'column': 'chatroom_messages.agent_id', 'op': '!=', 'value': 0, 'logic': 'or'},
-            {'column': 'chatroom_messages.user_id', 'op': '!=', 'value': 0}
-        ]
-    ]
-
-    chat_message = ChatroomMessages().select_one(
-        columns=['message'],
-        conditions=conditions
-    )
-
-    if chat_message is None:
+    # conditions = [
+    #     {"column": "chatroom_id", "value": chatroom_id},
+    #     {"column": "id", "value": chatroom_message_id},
+    #     {'column': 'id', 'op': '>', 'value': find_chatroom['initial_message_id']},
+    #     [
+    #         {'column': 'chatroom_messages.agent_id', 'op': '!=', 'value': 0, 'logic': 'or'},
+    #         {'column': 'chatroom_messages.user_id', 'op': '!=', 'value': 0}
+    #     ]
+    # ]
+    #
+    # chat_message = ChatroomMessages().select_one(
+    #     columns=['message'],
+    #     conditions=conditions
+    # )
+    #
+    if chat_data['message'] is None:
         return response_error(get_language_content("chatroom_message_is_not_find"))
 
     start_time = time()
@@ -847,7 +847,7 @@ async def chat_single_message_generation(chatroom_id: int, chatroom_message_id: 
     outputs = {
         "name": "text",
         "type": "string",
-        "value": chat_message['message'],
+        "value": chat_data['message'],
         "max_length": 0
     }
 
