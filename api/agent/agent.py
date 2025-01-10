@@ -286,7 +286,7 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
             return response_error(get_language_content("api_agent_run_ability_status_not_normal"))
 
     task = run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id,
-                         prompt=prompt,data_source_run_id=data_source_run_id)
+                         prompt=prompt, data_source_run_id=data_source_run_id)
     while not task.ready():
         await asyncio.sleep(0.1)
     result = task.get()
@@ -335,7 +335,7 @@ async def agent_generate(data: ReqAgentGenerateSchema, userinfo: TokenData = Dep
         # Prepare prompts for LLM
         system_prompt = get_language_content('generate_agent_system_prompt', userinfo.uid)
         user_prompt = get_language_content('generate_agent_user', userinfo.uid, False)
-        
+
         user_prompt = user_prompt.format(
             user_prompt=data.user_prompt
         )
@@ -416,7 +416,6 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
     first_record = record_list[0]
     inputs = first_record.get('inputs', {})
 
-    
     # Get system prompt value from inputs
     try:
         if isinstance(inputs, dict) and 'system' in inputs:
@@ -454,7 +453,6 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
         order_by='id DESC'
     )
 
-    
     # Format user prompt with history agent list
     user_prompt = get_language_content('regenerate_agent_user', userinfo.uid, False)
     user_prompt = user_prompt.format(
@@ -575,7 +573,6 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
     except Exception:
         pass
 
-
     system_prompt = get_language_content('agent_supplement_system', userinfo.uid)
     # system_prompt = system_prompt.format(
     #     append_prompt=get_language_content('agent_supplement_system', userinfo.uid, False)
@@ -586,7 +583,6 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
         agent_supplement=data.supplement_prompt,
         history_agent=history_agent_info
     )
-
 
     # Prepare input for LLM
     input_ = Prompt(system=system_prompt, user=base_user_prompt + user_prompt).to_dict()
@@ -690,7 +686,7 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
 
     if loop_count <= 0:
         return response_error(get_language_content("api_agent_batch_size_invalid"))
- 
+
     try:
         # Prepare input with history outputs
         input_ = AIToolLLMRecords().inputs_append_history_outputs(
@@ -710,7 +706,7 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             app_run_id=data.app_run_id,
             loop_limit=data.loop_limit,
             ai_tool_type=1,  # Agent generator type
-            run_type=4,      # Batch generation
+            run_type=4,  # Batch generation
             loop_id=loop_id,
             loop_count=loop_count,
             inputs=input_
@@ -755,3 +751,40 @@ async def agent_create(data: ReqAgentCreateSchema, userinfo: TokenData = Depends
     if result["status"] != 1:
         return response_error(result["message"])
     return response_success(data={"app_id": result["app_id"]}, detail=get_language_content("api_agent_success"))
+
+
+@router.post("/agent_batch_create", response_model=ResBatchAgentCreateSchema)
+async def agent_batch_create(data: ReqAgentBatchCreateSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Create multiple agents in a single batch operation.
+
+    Args:
+        data (ReqAgentBatchCreateSchema): List of agent configurations
+        userinfo (TokenData): Current user authentication info
+
+    Returns:
+        ResBatchAgentCreateSchema: Contains list of created app IDs
+    """
+    agents_model = Agents()
+    app_ids = []
+
+    for agent_config in data.agents:
+        result = agents_model.create_agent_with_configs(
+            data=agent_config,
+            user_id=userinfo.uid,
+            team_id=userinfo.team_id
+        )
+
+        if result["status"] == 1:
+            app_ids.append(result["app_id"])
+        else:
+            # Continue with remaining agents even if one fails
+            continue
+
+    if not app_ids:
+        return response_error(get_language_content("api_agent_batch_create_failed"))
+
+    return response_success(
+        data={"app_ids": app_ids},
+        detail=get_language_content("api_agent_success")
+    )
