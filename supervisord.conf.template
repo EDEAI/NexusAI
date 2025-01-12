@@ -89,6 +89,18 @@ stderr_logfile=logs/supervisor_workflow_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
 
+[program:ai_tool]
+command=python task/ai_tool_run.py
+autostart=true
+autorestart=true
+startretries=3
+stdout_logfile=logs/supervisor_ai_tool_run.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor_ai_tool_run_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+
 [program:celery]
 command=python celery_app.py
 autostart=true
