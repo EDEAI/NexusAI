@@ -97,6 +97,7 @@ def push_websocket_message(
     :param loop_id: Loop ID, identifying the loop ID of this run.
     """
     if run_ai_tool_type == 1 and ai_tool_type == 'generate_agent_batch':
+        outputs['value'] = json.dumps(json.loads(outputs['value'])['multi-agent'], ensure_ascii=False)
         data = {
             'user_id': user_id,
             'type': ai_tool_type,
