@@ -1,0 +1,11 @@
+ALTER TABLE `models` ADD `max_context_tokens` INT NOT NULL DEFAULT '0' COMMENT 'Max context tokens' AFTER `mode`, ADD `max_output_tokens` INT NOT NULL DEFAULT '0' COMMENT 'Max output tokens' AFTER `max_context_tokens`;
+UPDATE `models` SET `max_context_tokens` = '128000' WHERE `models`.`id` = 4;
+UPDATE `models` SET `max_output_tokens` = '16384' WHERE `models`.`id` = 4;
+UPDATE `models` SET `max_context_tokens` = '128000' WHERE `models`.`id` = 5;
+UPDATE `models` SET `max_output_tokens` = '16384' WHERE `models`.`id` = 5;
+UPDATE `models` SET `max_context_tokens` = '128000' WHERE `models`.`id` = 6;
+UPDATE `models` SET `max_output_tokens` = '4096' WHERE `models`.`id` = 6;
+UPDATE `models` SET `max_context_tokens` = '128000' WHERE `models`.`id` = 7;
+UPDATE `models` SET `max_output_tokens` = '4096' WHERE `models`.`id` = 7;
+UPDATE `models` SET `max_context_tokens` = '16385' WHERE `models`.`id` = 8;
+UPDATE `models` SET `max_output_tokens` = '4096' WHERE `models`.`id` = 8;
