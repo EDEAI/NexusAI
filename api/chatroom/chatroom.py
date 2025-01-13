@@ -550,9 +550,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
             )
         else:
             # system prompt
-            system_prompt = system_prompt.format(
-                chatroom_meeting_summary_system_correct=get_language_content('chatroom_meeting_summary_system_correct',
-                                                                             userinfo.uid))
+            system_prompt = system_prompt.format(chatroom_meeting_summary_system_correct=get_language_content('chatroom_meeting_summary_system_correct', userinfo.uid))
 
             # user prompt
             user_prompt = get_language_content(
@@ -567,8 +565,8 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
             )
     else:
         # system prompt
-        system_prompt = system_prompt.format(chatroom_meeting_summary_system_correct='')
-
+        system_correct = ''
+        system_prompt = system_prompt.format(chatroom_meeting_summary_system_correct=system_correct)
         # user prompt
         user_prompt = get_language_content(
             'chatroom_meeting_summary_user',
@@ -731,8 +729,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
 
     if chat_data['status'] == 2:
         # system prompt
-        system_prompt = system_prompt.format(chatroom_conference_orientation_system_correct=get_language_content(
-            'chatroom_conference_orientation_system_correct', userinfo.uid))
+        system_prompt = system_prompt.format(chatroom_conference_orientation_system_correct=get_language_content('chatroom_conference_orientation_system_correct', userinfo.uid))
 
         # user prompt
         user_prompt = get_language_content(
