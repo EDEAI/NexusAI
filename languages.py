@@ -310,7 +310,7 @@ language_packs = {
             '{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content, "topic": meeting topic}.\n\n'
             'You should determine whether to end the conversation according to the following rules:\n'
             '1. You should try to encourage all agents to actively participate in the dialogue regarding the current meeting topic;\n'
-            '2. You should also analyze the coherence of agent responses. If the last agent\'s response has no relevance to the current meeting topic, please end the conversation.\n\n'
+            '2. You should also analyze the coherence of agent responses. If the last agent\'s response is related to the current meeting topic, please do not end the conversation. If it is determined that there is no relevance, end the conversation.\n\n'
             'Then, respond according to the following requirements:\n'
             '1. If you think the conversation should end, please only return in JSON format: {"id": 0, "message": reason for ending the conversation}; otherwise, select an agent according to the following requirements.\n'
             '2. Please only select agents from the provided agent list. Do not select agents that exist in the chat history but not in the agent list;\n'
