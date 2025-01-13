@@ -953,9 +953,9 @@ async def agent_batch_sample(data: ReqAgentBatchSample, userinfo: TokenData = De
     # Initialize LLM execution record
     record_id = AIToolLLMRecords().initialize_execution_record(
         app_run_id=app_run_id,
-        ai_tool_type=1,  # Agent generator type
+        ai_tool_type=5,  # Agent generator type
         inputs=input_,
-        run_type=5
+        run_type=1
     )
 
     if not record_id:
