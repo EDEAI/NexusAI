@@ -565,7 +565,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
             )
     else:
         # system prompt
-        system_correct = ''
+        system_correct = ""
         system_prompt = system_prompt.format(chatroom_meeting_summary_system_correct=system_correct)
         # user prompt
         user_prompt = get_language_content(
@@ -575,7 +575,6 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
         user_prompt = user_prompt.format(
             messages=json.dumps(chatMessageList, ensure_ascii=False),
         )
-
     start_time = time()
     start_datetime_str = datetime.fromtimestamp(start_time) \
         .replace(microsecond=0).isoformat(sep='_')
