@@ -891,7 +891,7 @@ async def agent_save(data: ReqAgentSaveSchema, userinfo: TokenData = Depends(get
     )
 
     if not save_record:
-        return response_error(get_language_content('save_record_error'))
+        return response_error(get_language_content('api_agent_save_record_error'))
 
     return response_success(
         {
@@ -923,6 +923,10 @@ async def agent_batch_sample(data: ReqAgentBatchSample, userinfo: TokenData = De
             'status': 1  # Initial status
         })
     else:
+        AppRuns().update(
+            {'column': 'id', 'value': app_run_id},
+            {'status': 1}
+        )
         app_run_info = AppRuns().select_one(
             columns=["id"],
             conditions=[
