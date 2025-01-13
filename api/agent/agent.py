@@ -988,7 +988,7 @@ async def agent_batch_create(data: ReqAgentBatchCreateSchema, userinfo: TokenDat
 
     for agent_config in data.agents:
         result = agents_model.create_agent_with_configs(
-            data=agent_config,
+            data=agent_config.dict(),
             user_id=userinfo.uid,
             team_id=userinfo.team_id
         )

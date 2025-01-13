@@ -226,25 +226,23 @@ class ResAgentBatchGenerateSchema(BaseModel):
     data: Optional[AgentBatchGenerateResonseData] = None
 
 
+class AgentConfigData(BaseModel):
+    """Schema for individual agent configuration"""  
+    app_id: Optional[int] = Field(
+        None, 
+        description="App ID for updating existing agent. If not provided, creates new agent"
+    )
+    name: str
+    description: str
+    obligations: str 
+    abilities: List[Dict[str, Any]]
+    tags: Optional[List[int]] = []
+
 class ReqAgentBatchCreateSchema(BaseModel):
-    """Schema for batch agent creation request"""
-    agents: List[Dict[str, Any]] = Field(
+    """Schema for batch agent creation/update request"""
+    agents: List[AgentConfigData] = Field(
         ...,
-        description="List of agent configurations to create in batch",
-        example=[{
-            "name": "Agent 1",
-            "description": "First agent description",
-            "obligations": "Agent 1 obligations",
-            "abilities": [
-                {
-                    "name": "ability1",
-                    "content": "ability content",
-                    "status": 1,
-                    "output_format": 0
-                }
-            ],
-            "tags": [1, 2]
-        }]
+        description="List of agent configurations. Each can be create or update based on app_id"
     )
 
 class ResBatchAgentCreateSchema(BaseModel):
