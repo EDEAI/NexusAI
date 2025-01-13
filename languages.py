@@ -618,6 +618,9 @@ language_packs = {
             Batch generated agent history:
             {history_agents}
         ''',
+        'api_agent_supplement_prompt_required': 'supplement_prompt is requiredapi_agent_generate_failed',
+        'api_agent_save_record_error': 'save record errorapp_run_error',
+        'api_agent_record_error': 'record not found'
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -1064,7 +1067,10 @@ language_packs = {
         'api_agent_generate_failed': 'agent生成记录失败',
         'api_agent_user_prompt_required': '提示词不能为空',
         'api_agent_batch_size_invalid': '批量生成数量有误',
-        'agent_batch_exist_runing_rocord': '存在正在执行的记录'
+        'agent_batch_exist_runing_rocord': '存在正在执行的记录',
+        'api_agent_supplement_prompt_required': '补充提示词不能为空',
+        'api_agent_save_record_error': '保存记录失败',
+        'api_agent_record_error': '记录不存在'
     }
 }
 
