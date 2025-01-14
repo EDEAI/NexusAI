@@ -660,7 +660,6 @@ class Agents(MySQL):
                 message (str): Success/error message
                 app_id (int): Created/updated app ID if successful
         """
-        print(data)
         app_id = data.get("app_id",None)
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -691,7 +690,7 @@ class Agents(MySQL):
                 if not app_model.update({"column": "id", "value": app_id}, base_data):
                     return {"status": 2, "message": get_language_content("apps_update_error")}
 
-                # Get associated agent 
+                # Get associated agent
                 agent = self.select_one(
                     columns=["id"],
                     conditions=[
@@ -702,14 +701,14 @@ class Agents(MySQL):
                 )
                 if not agent:
                     return {"status": 2, "message": get_language_content("api_agent_info_agent_error")}
-
+                agent_id = agent["id"]
                 # Update agent base info
                 agent_config = {
                     "obligations": data["obligations"],
                     "team_id": team_id,
                     "updated_time": current_time
                 }
-                if not self.update({"column": "id", "value": agent["id"]}, agent_config):
+                if not self.update({"column": "id", "value": agent_id}, agent_config):
                     return {"status": 2, "message": get_language_content("agents_update_error")}
 
                 # Delete existing abilities (hard delete)
@@ -722,7 +721,7 @@ class Agents(MySQL):
                 for ability in data["abilities"]:
                     ability_data = {
                         "user_id": user_id,
-                        "agent_id": agent["id"],
+                        "agent_id": agent_id,
                         "name": ability["name"],
                         "content": ability["content"],
                         "output_format": ability.get("output_format", 0),
@@ -732,7 +731,6 @@ class Agents(MySQL):
                     }
                     if not agent_abilities_model.insert(ability_data):
                         return {"status": 2, "message": get_language_content("api_agent_abilities_set_abilities_insert_error")}
-
             else:
                 # Create new app
                 app_model = Apps()
@@ -769,7 +767,6 @@ class Agents(MySQL):
                 agent_id = self.insert(agent_data)
                 if not agent_id:
                     return {"status": 2, "message": get_language_content("agents_insert_error")}
-
                 # Create abilities for new agent
                 agent_abilities_model = AgentAbilities()
                 for ability in data["abilities"]:
@@ -785,8 +782,25 @@ class Agents(MySQL):
                     }
                     if not agent_abilities_model.insert(ability_data):
                         return {"status": 2, "message": get_language_content("api_agent_abilities_set_abilities_insert_error")}
-
+            # Validate the agent configuration before creating
+            from core.workflow.nodes import AgentNode
+            from core.workflow.variables import create_variable_from_dict
+            from core.llm.prompt import Prompt
+            try:
+                node = AgentNode(
+                    title=data["name"],
+                    desc=data["description"],
+                    input=create_variable_from_dict(data.get("input_variables", {})),
+                    agent_id=0,  # New agent
+                    ability_id=0,
+                    prompt=Prompt(),
+                )
+                node.validate()
+            except Exception as e:
+                return {"status": 2, "message": str(e)}
+            result = self.agent_publish(agent_id, user_id)
+            if result["status"] != 1:
+                return {"status": 2, "message": result["message"]}
             return {"status": 1, "message": get_language_content("api_agent_success"), "app_id": app_id}
-
         except Exception as e:
             return {"status": 2, "message": get_language_content("api_agent_create_error")}
