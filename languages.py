@@ -912,38 +912,51 @@ language_packs = {
             '{update_meeting}\n'
         ),
 
-        'chatroom_conference_orientation_system': (
-            '你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据进行数据导向转化。 \n'
-            '转化时注意以下几点要求：\n'
-            '1. 工作导向数据的拆分项，一定要符合我提供的工作导向数据中的目标范围，不要创建新的拆分项，也不要缺少拆分项\n'
-            '2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构\n'
-            '3. 一定要注意工作导向数据json格式说明中的字段说明和要求，以此为拆分参考规则\n'
-            '4. 最终只返回生成后的json格式内容，不要返回多余的内容。\n\n'
-            '工作导向数据json格式说明：\n'
-            '1. 结构类型说明：数据整体为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型\n'
-            '2. 字段说明和要求：[{{name: 拆分项对应的变量名，不要更改此字段，display_name: 拆分项对应的变量显示名，可以作为拆分项的功能和用途说明，可以作为拆分项的提取依据，不要更改此字段， type: 拆分项对应的变量类型，可为"number"或者"string"，注意拆分项内容一定要与变量类型对应，不要更改此字段，value: 最终的工作导向拆分项内容}}]\n'
-            '{chatroom_conference_orientation_system_correct}\n'
-        ),
-        'chatroom_conference_orientation_system_correct': '用户后续问题：请按照用户提出的问题和会议总结修正会议导向，返回结果不要相同。',
-        'chatroom_conference_orientation_user': (
-            '会议总结内容：\n'
-            '{meeting_summary}\n\n'
-            '工作导向数据：\n'
-            '{prompt_variables}\n\n'
-        ),
-        'chatroom_conference_orientation_user_correct': (
-            '会议总结内容：\n'
-            '{meeting_summary}\n\n'
-            
-            '工作导向数据：\n'
-            '{prompt_variables}\n\n'
+        'chatroom_conference_orientation_system': '''
+            你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据进行数据导向转化。 
+            转化时注意以下几点要求：
+            1. 工作导向数据的拆分项，一定要符合我提供的工作导向数据中的目标范围，不要创建新的拆分项，也不要缺少拆分项
+            2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构
+            3. 一定要注意工作导向数据json格式说明中的字段说明和要求，以此为拆分参考规则
+            4. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
+            5. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
 
-            '工作导向结果返回为：\n'
-            '{value_meeting_summary}\n\n'
+            工作导向数据json格式说明：
+            1. 结构类型说明：variables对应的数据整体为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型
+            2. 格式、字段说明和要求：
+            {{
+                'variables': [
+                    {{
+                        name: 拆分项对应的变量名，不要更改此字段，
+                        display_name: 拆分项对应的变量显示名，可以作为拆分项的功能和用途说明，可以作为拆分项的提取依据，不要更改此字段，
+                        type: 拆分项对应的变量类型，可为"number"或者"string"，注意拆分项内容一定要与变量类型对应，不要更改此字段，
+                        value: 最终的工作导向拆分项内容
+                    }}
+                ]
+            }}
+            {chatroom_conference_orientation_system_correct}
+        ''',
+        'chatroom_conference_orientation_system_correct': '用户后续问题：请按照用户提出的问题和会议总结修正会议导向，返回结果不要相同。',
+        'chatroom_conference_orientation_user': '''
+            会议总结内容：
+            {meeting_summary}
             
-            '用户后续问题：\n'
-            '{update_meeting}\n'
-        ),
+            工作导向数据：
+            {{'variables':{prompt_variables}}}
+        ''',
+        'chatroom_conference_orientation_user_correct': '''
+            会议总结内容：
+            {meeting_summary}
+            
+            工作导向数据：
+            {{'variables':{prompt_variables}}}
+
+            工作导向结果返回为：
+            {value_meeting_summary}
+            
+            用户后续问题：
+            {update_meeting}
+        ''',
 
         'chatroom_request_sent_successfully': '请求成功，请等待',
         
