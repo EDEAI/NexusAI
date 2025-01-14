@@ -1,3 +1,6 @@
+/*
+ * @LastEditors: biz
+ */
 import { ProFormDigit, ProFormTextArea } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Typography } from 'antd';
@@ -22,6 +25,7 @@ export const RenderInput = ({ data }) => {
                             key={val.name}
                             required={val.required}
                             name={val.name}
+                            initialValue={val.value}
                             label={val.name}
                         />
                     );
@@ -31,6 +35,7 @@ export const RenderInput = ({ data }) => {
                         key={val.name}
                         required={val.required}
                         name={val.name}
+                        initialValue={val.value}
                         label={val.name}
                     />
                 );
