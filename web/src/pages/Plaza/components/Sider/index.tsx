@@ -3,28 +3,34 @@ import { roomDetails, roomRecent, upAgentStatus, updataRoom, upRoomStatus } from
 import { headportrait } from '@/utils/useUser';
 import { ArrowLeftOutlined, EllipsisOutlined, QuestionCircleOutlined,ExclamationCircleFilled } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Empty, Spin, Switch, Tooltip,Modal } from 'antd';
+import { Button, Empty, Spin, Switch, Tooltip,Modal,message} from 'antd';
 import { throttle } from 'lodash';
 import { memo, useEffect, useRef, useState } from 'react';
 import { history, useParams } from 'umi';
-import Agent from '../CreationChatRoom/agent';
+import Agent from '../CreationChatRoom/selectApp';
+import useChatroomStore from '@/store/chatroomstate';
 interface siderPm {
-    setsendMessage: any;
-    truncatable?: any;
-    messageApi?: any;
     roomDetail?: any;
-    disableInput?: any;
     setAgent?:any
 }
 
 const Sider: React.FC<siderPm> = porpos => {
     const intl = useIntl();
 
-    let { setsendMessage, truncatable, messageApi, roomDetail, disableInput,setAgent } = porpos;
+    let {roomDetail,setAgent } = porpos;
+
+    // tips
+    const [messageApi, contextHolder] = message.useMessage();
 
     const { id } = useParams<{ id: string }>();
 
-    const [agentList, setAgentList] = useState([]);
+    const disableInput = useChatroomStore(state=>state.disableInput);
+
+    const truncatable = useChatroomStore(state=>state.truncatable)
+
+    const setClearMemory = useChatroomStore(state=>state.setClearMemory)
+
+    const [selectedAgent, setSelectedAgent] = useState([]);
     // Chat room details
     const [chatRoomdetial, setchatRoomdetial] = useState({ ...roomDetail });
     // RoomRecent - recently viewed room list
@@ -48,7 +54,7 @@ const Sider: React.FC<siderPm> = porpos => {
             okType: 'danger',
             cancelText: intl.formatMessage({ id: 'app.chatroom.clear.cancel' }),
             onOk() {
-                setsendMessage('TRUNCATE', '0');
+                setClearMemory(['TRUNCATE', '0']);
             },
         });
     };
@@ -65,7 +71,7 @@ const Sider: React.FC<siderPm> = porpos => {
                             smart_selection: res.data.smart_selection,
                         };
                     });
-                    setAgentList(res.data.agent_list);
+                    setSelectedAgent(res.data.agent_list);
                     agentLoading.current = true;
                 } catch (error) {}
             }
@@ -84,7 +90,7 @@ const Sider: React.FC<siderPm> = porpos => {
         if (id) {
             let active: number = item.active == 1 ? 0 : 1;
             if(active == 0){
-               let  agentLength =  agentList.filter(item=>item.active == 1)
+               let  agentLength =  selectedAgent.filter(item=>item.active == 1)
                if(agentLength.length - 1 == 0){
                     messageApi.open({
                         type: 'error',
@@ -97,7 +103,7 @@ const Sider: React.FC<siderPm> = porpos => {
             }
             let res = await upAgentStatus({ active: active }, id, item.agent_id);
             if (res.code == 0) {
-                setAgentList((pre: any) => {
+                setSelectedAgent((pre: any) => {
                     return pre.map((x: any) => {
                         return {
                             ...x,
@@ -136,22 +142,31 @@ const Sider: React.FC<siderPm> = porpos => {
     };
     // agent popup Save
     const popupSave = async (obj: any) => {
-        let agentList = [...obj.checkAgent].map(({ agent_id, active = 1 }) => ({
+        if(obj.checkItem && obj.checkItem.length==0){
+            messageApi.open({
+                type: 'error',
+                content: intl.formatMessage({ id: 'app.chatroom.content.addAgentTips_fail' }),
+                duration: 2,
+            });
+            return
+        }
+        let agentLists = [...obj.checkItem].map(({ agent_id, active = 1 }) => ({
             agent_id,
             active,
         }));
+        
         let updataObject = {
             description: chatRoomdetial.description,
             name: chatRoomdetial.name,
             max_round: chatRoomdetial.max_round,
         };
-        let res = await updataRoom({ ...updataObject, agent: agentList }, id);
+        let res = await updataRoom({ ...updataObject, agent: agentLists }, id);
         if (res.code == 0) {
-            obj.checkAgent.map((item: any) => {
+            obj.checkItem.map((item: any) => {
                 item.active = item.active == undefined ? 1 : item.active;
             });
-            setAgentList([...obj.checkAgent]);
-            setAgent.current = [...obj.checkAgent]
+            setSelectedAgent([...obj.checkItem]);
+            setAgent.current = [...obj.checkItem]
             messageApi.open({
                 type: 'success',
                 content: intl.formatMessage({ id: 'app.chatroom.content.addAgentTips' }),
@@ -179,9 +194,9 @@ const Sider: React.FC<siderPm> = porpos => {
         getRoomDetails();
         getRoomRecent();
     }, []);
-
     return (
         <>
+            {contextHolder}
             <div
                 className="h-full w-[320px] bg-[#fff] shrink-0"
                 style={{ boxShadow: '0px 2px 4px 0px rgba(0,0,0,0.1)' }}
@@ -210,7 +225,7 @@ const Sider: React.FC<siderPm> = porpos => {
                         </div>
                     </div>
                     {/* <div className='pb-[20px] text-[14px] text-[#213044] font-[500] px-[30px]'>{chatRoomdetial.name}</div> */}
-                    <div className="h-[327px]">
+                    <div className="h-[360px]">
                         <div className="pb-[20px] border-b-[1px] px-[10px]">
                             <div className="flex items-center cursor-pointer px-[20px]">
                                 <div className="flex gap-x-[5px] flex-1">
@@ -219,12 +234,12 @@ const Sider: React.FC<siderPm> = porpos => {
                                             id: 'app.chatroom.sidebar.agent_title',
                                         })}
                                     </span>
-                                    <div onClick={addAgent}>
+                                    {/* <div onClick={addAgent}>
                                         <img
                                             src="/icons/edit_icon_1.svg"
                                             className="w-[16px] h-[16px] shrink-0"
-                                        ></img>{' '}
-                                    </div>
+                                        ></img>
+                                    </div> */}
                                 </div>
                                 <div className="shrink-0 flex items-center">
                                     <Tooltip
@@ -259,8 +274,8 @@ const Sider: React.FC<siderPm> = porpos => {
                                 <div className="h-[220px] overflow-y-auto px-[10px]">
                                     {agentLoading.current ? (
                                         <div className="flex flex-col">
-                                            {agentList && agentList.length > 0 ? (
-                                                agentList.map(i => (
+                                            {selectedAgent && selectedAgent.length > 0 ? (
+                                                selectedAgent.map(i => (
                                                     <div
                                                         className="flex items-center gap-x-[5px] hover:bg-[#FAFAFA] transition p-[10px] slider_agent_box"
                                                         key={i.agent_id}
@@ -325,7 +340,20 @@ const Sider: React.FC<siderPm> = porpos => {
                                     )}
                                 </div>
                             </div>
-                            <div className="px-[20px]">
+                            <div className="px-[20px] ">
+                                <div
+                                    style={{ border: '1px solid #1B64F3' }}
+                                    onClick={addAgent}
+                                    className="w-full h-[30px] transition text-[#1B64F3] flex items-center justify-center cursor-pointer rounded-[6px] hover:text-[#fff] hover:bg-[#1B64F3]"
+                                >
+                                    <span className="text-[12px]">
+                                        {intl.formatMessage({
+                                            id: 'app.chatroom.add.agent',
+                                        })}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="px-[20px] pt-[15px]">
                                 <div
                                     style={
                                         truncatable && !disableInput
@@ -452,17 +480,13 @@ const Sider: React.FC<siderPm> = porpos => {
                         </div>
                     </div>
                 </div>
-                {agentShow ? (
-                    <Agent
-                        show={agentShow}
-                        popupClose={popupClose}
-                        popupSave={popupSave}
-                        checkList={agentList}
-                        zIndex={99}
-                    />
-                ) : (
-                    <></>
-                )}
+                <Agent
+                    show={agentShow}
+                    popupClose={popupClose}
+                    popupSave={popupSave}
+                    checkList={selectedAgent}
+                    zIndex={99}
+                />
             </div>
         </>
     );

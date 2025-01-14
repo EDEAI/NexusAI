@@ -1,3 +1,4 @@
+import { data } from 'autoprefixer';
 import aniRequest from './request';
 
 // Get homepage
@@ -80,3 +81,30 @@ export const getRoomMessage = async (id: any, data: any) => {
     });
     return res;
 };
+
+// meeting summary
+
+export const getMeetingsummary = async (id: any,data:any) => {
+    const res = await aniRequest<any>(`/v1/chatroom/${id}/chat_history_message_summary`, {
+        method: 'POST',
+        data: data,
+    });
+    return res;
+};
+
+export const getMeetingOrientation = async (id: any,data:any) => {
+    const res = await aniRequest<any>(`/v1/chatroom/${id}/chat_history_summary`, {
+        method: 'POST',
+        data: data,
+    });
+    return res;
+};
+
+export const getMeetingSummaryHistory = async(data:any)=>{
+    const res = await aniRequest<any>(`/v1/chatroom/chat_room_history`, {
+        method: 'GET',
+        data: data,
+    });
+    return res;
+    
+} 
