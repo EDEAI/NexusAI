@@ -524,11 +524,6 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
 
     chatMessageList = ChatroomMessages().get_history_list(chat_message)
 
-    system_prompt = get_language_content(
-        'chatroom_meeting_summary_system',
-        userinfo.uid
-    )
-
     if chat_data['corrected_parameter'] != '':
         meeting_summary = AIToolLLMRecords().select_one(
             columns=['outputs', 'inputs', 'correct_prompt'],
@@ -540,23 +535,21 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
         )
 
         if meeting_summary['inputs'] is None and meeting_summary['correct_prompt'] is None:
-            system_prompt = get_language_content(
-                'chatroom_generate_meeting_summary_from_a_single_message_system_correct', userinfo.uid)
-            user_prompt = get_language_content('chatroom_generate_meeting_summary_from_a_single_message_user_correct',
-                                               userinfo.uid)
+            # system prompt
+            system_prompt = get_language_content('chatroom_generate_meeting_summary_from_a_single_message_system_correct', userinfo.uid, True)
+
+            # user prompt
+            user_prompt = get_language_content('chatroom_generate_meeting_summary_from_a_single_message_user_correct', userinfo.uid, False)
             user_prompt = user_prompt.format(
                 meeting_summary=meeting_summary['outputs']['value'],
                 update_meeting=chat_data['corrected_parameter']
             )
         else:
             # system prompt
-            system_prompt = system_prompt.format(chatroom_meeting_summary_system_correct=get_language_content('chatroom_meeting_summary_system_correct', userinfo.uid))
+            system_prompt = get_language_content('chatroom_meeting_summary_system_correct', userinfo.uid, True)
 
             # user prompt
-            user_prompt = get_language_content(
-                'chatroom_meeting_summary_user_correct',
-                userinfo.uid
-            )
+            user_prompt = get_language_content('chatroom_meeting_summary_user_correct', userinfo.uid, False)
             meeting_summary = meeting_summary['outputs']['value']
             user_prompt = user_prompt.format(
                 messages=json.dumps(chatMessageList, ensure_ascii=False),
@@ -565,17 +558,13 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
             )
     else:
         # system prompt
-        system_correct = ''
-        system_prompt = system_prompt.format(chatroom_meeting_summary_system_correct=system_correct)
+        system_prompt = get_language_content('chatroom_meeting_summary_system', userinfo.uid, True)
+
         # user prompt
-        user_prompt = get_language_content(
-            'chatroom_meeting_summary_user',
-            userinfo.uid
-        )
+        user_prompt = get_language_content('chatroom_meeting_summary_user', userinfo.uid, False)
         user_prompt = user_prompt.format(
             messages=json.dumps(chatMessageList, ensure_ascii=False),
         )
-
     start_time = time()
     start_datetime_str = datetime.fromtimestamp(start_time) \
         .replace(microsecond=0).isoformat(sep='_')
@@ -721,21 +710,13 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
         agent_id = 0
         workflow_id = workflow['id']
 
-    # If the last speaker is the user, the Speaker Selector must choose an agent
-    system_prompt = get_language_content(
-        'chatroom_conference_orientation_system',
-        userinfo.uid
-    )
-
     if chat_data['status'] == 2:
         # system prompt
-        system_prompt = system_prompt.format(chatroom_conference_orientation_system_correct=get_language_content('chatroom_conference_orientation_system_correct', userinfo.uid))
+        system_prompt = get_language_content('chatroom_conference_orientation_system_correct', userinfo.uid, True)
 
         # user prompt
-        user_prompt = get_language_content(
-            'chatroom_conference_orientation_user_correct',
-            userinfo.uid
-        )
+        user_prompt = get_language_content('chatroom_conference_orientation_user_correct', userinfo.uid, False)
+
         meeting_summary_return = AIToolLLMRecords().select_one(
             columns=['outputs'],
             conditions=[
@@ -745,21 +726,23 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             order_by="created_time DESC",
         )
         meeting_summary_return = meeting_summary_return['outputs']['value']
+        # input_variable = create_variable_from_dict(meeting_summary_return)
+        meeting_summary_return = [
+            {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
+            for var in input_variable.properties.values()
+        ]
+
         user_prompt = user_prompt.format(
             meeting_summary=meeting_summary,
-            prompt_variables=prompt_variables,
             value_meeting_summary=meeting_summary_return,
             update_meeting=chat_data['corrected_parameter']
         )
     else:
         # system prompt
-        system_prompt = system_prompt.format(chatroom_conference_orientation_system_correct='')
+        system_prompt = get_language_content('chatroom_conference_orientation_system', userinfo.uid, True)
 
         # user prompt
-        user_prompt = get_language_content(
-            'chatroom_conference_orientation_user',
-            userinfo.uid
-        )
+        user_prompt = get_language_content('chatroom_conference_orientation_user', userinfo.uid, False)
 
         user_prompt = user_prompt.format(
             meeting_summary=meeting_summary,
