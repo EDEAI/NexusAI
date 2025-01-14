@@ -620,7 +620,108 @@ language_packs = {
         ''',
         'api_agent_supplement_prompt_required': 'supplement_prompt is requiredapi_agent_generate_failed',
         'api_agent_save_record_error': 'save record errorapp_run_error',
-        'api_agent_record_error': 'record not found'
+        'api_agent_record_error': 'record not found',
+        
+        'chatroom_meeting_summary_system': '''
+            You are a conference content summary assistant. Please summarize the conference through the conference chat history I provided.
+            Note that only the conference summary content will be returned in the end, and no redundant content will be returned.
+        ''',
+        'chatroom_meeting_summary_user': '''
+            Conference chat history:
+            {messages}
+        ''',
+        'chatroom_meeting_summary_system_correct': '''
+            You are a conference content summary assistant. You have made a conference summary through the conference chat history I provided. I provided you with the generated conference summary.
+            Please adjust the generated conference summary through the conference chat history I provided, the generated conference summary, and the conference summary corrections.
+            Note that only the corrected conference summary content will be returned in the end, and no redundant content will be returned.
+        ''',
+        'chatroom_meeting_summary_user_correct': '''
+            Conference chat history:
+            {messages}
+
+            Generated conference summary:
+            {meeting_summary}
+
+            Conference summary corrections:
+            {update_meeting}
+        ''',
+        'chatroom_generate_meeting_summary_from_a_single_message_system_correct': '''
+            You are a meeting summary assistant. You have generated a meeting summary for me. I have provided you with the generated meeting summary.
+            Please adjust the generated meeting summary based on the generated meeting summary and meeting summary corrections I provided.
+            Note that only the corrected meeting summary content will be returned in the end, and no redundant content will be returned.
+        ''',
+        'chatroom_generate_meeting_summary_from_a_single_message_user_correct': '''
+            Generated meeting summary:
+            {meeting_summary}
+
+            Meeting summary corrections:
+            {update_meeting}
+        ''',
+        'chatroom_conference_orientation_system': '''
+            You are a data conversion assistant. Please use the meeting summary content and work-oriented data I provided to perform data-oriented conversion.
+            Pay attention to the following requirements during conversion:
+            1. The split items of the work-oriented data must meet the target range in the work-oriented data I provided. Do not create new split items or lack split items.
+            2. The final generated work-oriented data must meet the requirements of the work-oriented data json format. Do not change the data structure.
+            3. Be sure to pay attention to the field description and requirements in the work-oriented data json format description, and use this as a reference rule for splitting.
+            4. Remember that the three fields of name, display_name, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
+            5. Be sure to strictly abide by the work-oriented data json format. Note that only the generated json format content is returned in the end, and no redundant content is returned.
+
+            Work-oriented data json format description:
+            1. Structural type description: The data corresponding to variables is of list type as a whole. Each element in the list is a data split item, and the data split item is of dict type
+            2. Format, field description and requirements:
+            {{
+                'variables': [
+                    {{
+                        name: The variable name corresponding to the split item. Do not change this field.
+                        display_name: The variable display name corresponding to the split item. It can be used as a description of the function and purpose of the split item and as a basis for extracting the split item. Do not change this field.
+                        type: The variable type corresponding to the split item. It can be "number" or "string". Note that the content of the split item must correspond to the variable type. Do not change this field.
+                        value: The final work-oriented split item content
+                    }}
+                ]
+            }}
+        ''',
+        'chatroom_conference_orientation_user': '''
+            Meeting summary content:
+            {meeting_summary}
+
+            Work-oriented data:
+            {{'variables':{prompt_variables}}}
+        ''',
+        'chatroom_conference_orientation_system_correct': '''
+            You are a data conversion assistant. You have already conducted a data-oriented conversion through the meeting summary content I provided. I provided the converted work-oriented data.
+            Please adjust the converted work-oriented data through the meeting summary content I provided, the converted work-oriented data, and the data correction suggestions.
+            Pay attention to the following requirements when adjusting:
+            1. The split items of the work-oriented data must meet the target range in the work-oriented data I provided. Do not create new split items or lack split items.
+            2. The final generated work-oriented data must meet the json format requirements of the work-oriented data. Do not change the data structure.
+            3. Be sure to pay attention to the field description and requirements in the json format description of the work-oriented data, and use this as a reference rule for splitting.
+            4. Remember that the three fields of name, display_name, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
+            5. Be sure to strictly abide by the data correction suggestions.
+            6. Be sure to strictly abide by the json format of the work-oriented data. Note that only the generated json format content is returned in the end, and do not return redundant content.
+
+            JSON format description of work-oriented data:
+            1. Structural type description: The data corresponding to variables is of list type as a whole. Each element in the list is a data split item, and the data split item is of dict type
+            2. Format, field description and requirements:
+            {{
+                'variables': [
+                    {{
+                        name: The variable name corresponding to the split item. Do not change this field.
+                        display_name: The variable display name corresponding to the split item. It can be used as a description of the function and purpose of the split item and as a basis for extracting the split item. Do not change this field.
+                        type: The variable type corresponding to the split item. It can be "number" or "string". Note that the content of the split item must correspond to the variable type. Do not change this field.
+                        value: The final content of the work-oriented split item
+                    }}
+                ]
+            }}
+        ''',
+        'chatroom_conference_orientation_user_correct': '''
+            Meeting summary content:
+            {meeting_summary}
+
+            Converted work-oriented data:
+            {{'variables':{value_meeting_summary}}}
+
+            Data correction suggestions:
+            {update_meeting}
+        '''
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -871,92 +972,109 @@ language_packs = {
         'team_id_not_found': '团队ID不存在',
         'chatroom_app_run_id_not_found': '当前appRunID未找到',
         'chatroom_status_is_incorrect': '当前状态不正确',
-        'chatroom_meeting_summary_system': (
-            '你是一个会议内容总结助手，请通过我提供的会议聊天历史进行会议总结。\n'
-            '注意最终只返回会议总结内容，不要返回多余的内容。\n'
-            '{chatroom_meeting_summary_system_correct}\n'
-        ),
-        'chatroom_meeting_summary_system_correct': '用户后续问题：请按照用户提出的问题和会议记录修正会议总结，返回结果不要相同。',
-        'chatroom_meeting_summary_user': (
-            '会议聊天历史：\n'
-            '{messages}\n\n'
-        ),
-        # 'chatroom_meeting_summary_user': (
-        #     '会议聊天历史：\n'
-        #     '{messages}\n\n'
-        #     '{summary}\n'
-        # ),
-
-        'chatroom_meeting_summary_user_correct': (
-            '会议聊天历史：\n'
-            '{messages}\n\n'
+        
+        # 'chatroom_meeting_summary_system': '''
+        #     你是一个会议内容总结助手，请通过我提供的会议聊天历史进行会议总结。
+        #     注意最终只返回会议总结内容，不要返回多余的内容。
+        # ''',
+        # 'chatroom_meeting_summary_user': '''
+        #     会议聊天历史：
+        #     {messages}
+        # ''',
+        # 'chatroom_meeting_summary_system_correct': '''
+        #     你是一个会议内容总结助手，你已经通过我提供的会议聊天历史进行了一次会议总结，我提供了你已生成的会议总结。
+        #     请通过我提供的会议聊天历史，已生成的会议总结，以及会议总结修正意见，对已生成的会议总结进行调整。
+        #     注意最终只返回修正后的会议总结内容，不要返回多余的内容。
+        # ''',
+        # 'chatroom_meeting_summary_user_correct': '''
+        #     会议聊天历史：
+        #     {messages}
             
-            '会议总结内容如下：\n'
-            '{meeting_summary}\n\n'
+        #     已生成的会议总结：
+        #     {meeting_summary}
 
-            '用户后续问题：\n'
-            '{update_meeting}\n'
-        ),
+        #     会议总结修正意见：
+        #     {update_meeting}
+        # ''',
 
-        'chatroom_generate_meeting_summary_from_a_single_message_system_correct': (
-            '你是一个会议内容总结助手，请根据我提供的历史会议总结和用户后续问题，生成新的会议总结。\n'
-            '用户后续问题：根据用户提出的问题和历史会议总结进行修正，确保返回的结果与历史会议总结不同。\n'
-            '注意最终只返回会议总结内容，不要返回多余的内容。\n'
-        ),
+        # 'chatroom_generate_meeting_summary_from_a_single_message_system_correct': '''
+        #     你是一个会议内容总结助手，你已经为我生成了一次会议总结，我提供了你已生成的会议总结。
+        #     请通过我提供的已生成的会议总结，以及会议总结修正意见，对已生成的会议总结进行调整。
+        #     注意最终只返回修正后的会议总结内容，不要返回多余的内容。
+        # ''',
+        # 'chatroom_generate_meeting_summary_from_a_single_message_user_correct': '''
+        #     已生成的会议总结：
+        #     {meeting_summary}
 
-        'chatroom_generate_meeting_summary_from_a_single_message_user_correct': (
-            '历史会议总结内容如下：\n'
-            '{meeting_summary}\n\n'
+        #     会议总结修正意见：
+        #     {update_meeting}
+        # ''',
 
-            '用户后续问题：\n'
-            '{update_meeting}\n'
-        ),
+        # 'chatroom_conference_orientation_system': '''
+        #     你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据进行数据导向转化。 
+        #     转化时注意以下几点要求：
+        #     1. 工作导向数据的拆分项，一定要符合我提供的工作导向数据中的目标范围，不要创建新的拆分项，也不要缺少拆分项
+        #     2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构
+        #     3. 一定要注意工作导向数据json格式说明中的字段说明和要求，以此为拆分参考规则
+        #     4. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
+        #     5. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
 
-        'chatroom_conference_orientation_system': '''
-            你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据进行数据导向转化。 
-            转化时注意以下几点要求：
-            1. 工作导向数据的拆分项，一定要符合我提供的工作导向数据中的目标范围，不要创建新的拆分项，也不要缺少拆分项
-            2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构
-            3. 一定要注意工作导向数据json格式说明中的字段说明和要求，以此为拆分参考规则
-            4. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
-            5. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
-
-            工作导向数据json格式说明：
-            1. 结构类型说明：variables对应的数据整体为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型
-            2. 格式、字段说明和要求：
-            {{
-                'variables': [
-                    {{
-                        name: 拆分项对应的变量名，不要更改此字段，
-                        display_name: 拆分项对应的变量显示名，可以作为拆分项的功能和用途说明，可以作为拆分项的提取依据，不要更改此字段，
-                        type: 拆分项对应的变量类型，可为"number"或者"string"，注意拆分项内容一定要与变量类型对应，不要更改此字段，
-                        value: 最终的工作导向拆分项内容
-                    }}
-                ]
-            }}
-            {chatroom_conference_orientation_system_correct}
-        ''',
-        'chatroom_conference_orientation_system_correct': '用户后续问题：请按照用户提出的问题和会议总结修正会议导向，返回结果不要相同。',
-        'chatroom_conference_orientation_user': '''
-            会议总结内容：
-            {meeting_summary}
+        #     工作导向数据json格式说明：
+        #     1. 结构类型说明：variables对应的数据整体为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型
+        #     2. 格式、字段说明和要求：
+        #     {{
+        #         'variables': [
+        #             {{
+        #                 name: 拆分项对应的变量名，不要更改此字段，
+        #                 display_name: 拆分项对应的变量显示名，可以作为拆分项的功能和用途说明，可以作为拆分项的提取依据，不要更改此字段，
+        #                 type: 拆分项对应的变量类型，可为"number"或者"string"，注意拆分项内容一定要与变量类型对应，不要更改此字段，
+        #                 value: 最终的工作导向拆分项内容
+        #             }}
+        #         ]
+        #     }}
+        # ''',
+        # 'chatroom_conference_orientation_user': '''
+        #     会议总结内容：
+        #     {meeting_summary}
             
-            工作导向数据：
-            {{'variables':{prompt_variables}}}
-        ''',
-        'chatroom_conference_orientation_user_correct': '''
-            会议总结内容：
-            {meeting_summary}
-            
-            工作导向数据：
-            {{'variables':{prompt_variables}}}
+        #     工作导向数据：
+        #     {{'variables':{prompt_variables}}}
+        # ''',
+        # 'chatroom_conference_orientation_system_correct': '''
+        #     你是一个数据转化助手，你已经通过我提供的会议总结内容进行了一次数据导向转化，我提供了已转化的工作导向数据。
+        #     请通过我提供的会议总结内容，已转化的工作导向数据，以及数据修正意见，对已转化的工作导向数据进行调整。
+        #     调整时注意以下几点要求：
+        #     1. 工作导向数据的拆分项，一定要符合我提供的工作导向数据中的目标范围，不要创建新的拆分项，也不要缺少拆分项
+        #     2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构
+        #     3. 一定要注意工作导向数据json格式说明中的字段说明和要求，以此为拆分参考规则
+        #     4. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
+        #     5. 一定要严格遵守数据修正意见
+        #     6. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
 
-            工作导向结果返回为：
-            {value_meeting_summary}
+        #     工作导向数据json格式说明：
+        #     1. 结构类型说明：variables对应的数据整体为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型
+        #     2. 格式、字段说明和要求：
+        #     {{
+        #         'variables': [
+        #             {{
+        #                 name: 拆分项对应的变量名，不要更改此字段，
+        #                 display_name: 拆分项对应的变量显示名，可以作为拆分项的功能和用途说明，可以作为拆分项的提取依据，不要更改此字段，
+        #                 type: 拆分项对应的变量类型，可为"number"或者"string"，注意拆分项内容一定要与变量类型对应，不要更改此字段，
+        #                 value: 最终的工作导向拆分项内容
+        #             }}
+        #         ]
+        #     }}
+        # ''',
+        # 'chatroom_conference_orientation_user_correct': '''
+        #     会议总结内容：
+        #     {meeting_summary}
+
+        #     已转化的工作导向数据：
+        #     {{'variables':{value_meeting_summary}}}
             
-            用户后续问题：
-            {update_meeting}
-        ''',
+        #     数据修正意见：
+        #     {update_meeting}
+        # ''',
 
         'chatroom_request_sent_successfully': '请求成功，请等待',
         
@@ -1128,7 +1246,17 @@ prompt_keys = {
     "agent_batch_sample_system",
     "agent_batch_sample_user",
     "agent_batch_generate_system",
-    "agent_batch_generate_user"
+    "agent_batch_generate_user",
+    "chatroom_meeting_summary_system",
+    "chatroom_meeting_summary_user",
+    "chatroom_meeting_summary_system_correct",
+    "chatroom_meeting_summary_user_correct",
+    "chatroom_generate_meeting_summary_from_a_single_message_system_correct",
+    "chatroom_generate_meeting_summary_from_a_single_message_user_correct",
+    "chatroom_conference_orientation_system",
+    "chatroom_conference_orientation_user",
+    "chatroom_conference_orientation_system_correct",
+    "chatroom_conference_orientation_user_correct"
 }
 
 
