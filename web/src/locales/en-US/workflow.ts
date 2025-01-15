@@ -290,5 +290,7 @@ export default {
 
     'agent.modal.leave.title': 'Tips',
     'agent.modal.leave.content': 'Are you sure you want to leave?',
-    'agent.save.failed': 'Save failed'
+    'agent.save.failed': 'Save failed',
+
+    'creation.placeholder.selectTags': 'Please select tags'
 };
