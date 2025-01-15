@@ -110,6 +110,9 @@ export default memo((props: any) => {
                     item?.type == 'workflow_need_human_confirm'
                 ){
                     item.need_human_confirm=0
+                    if(item?.data){
+                        item.data.need_human_confirm=0
+                    }
                 }
                 return item;
             }
