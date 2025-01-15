@@ -275,25 +275,30 @@ const BatchCreate = memo(
             };
 
             const MoreLoading = () => {
-                let moreNumber = batchParams?.loop_count;
-                if (batchParams?.loop_limit - agentList.length < batchParams?.loop_count) {
-                    moreNumber = batchParams?.loop_limit - agentList.length;
+                let moreNumber = batchParams?.loop_count || 0;
+                if (batchParams?.loop_limit && agentList.length) {
+                    const remaining = batchParams.loop_limit - agentList.length;
+                    if (remaining < moreNumber) {
+                        moreNumber = Math.max(0, remaining);
+                    }
                 }
-                return Array(moreNumber)
-                    .fill(0)
-                    .map((item, index) => {
-                        return (
-                            <div
-                                key={`l${index}`}
-                                className="rounded-lg relative border p-4 border-gray-300"
-                            >
-                                <Skeleton active paragraph={{ rows: 2 }} />
-                                <div className="absolute left-0 top-0 w-full h-full flex items-center justify-center">
-                                    <Spin size={`large`}></Spin>
-                                </div>
-                            </div>
-                        );
-                    });
+
+             
+                moreNumber = Math.floor(Math.max(0, moreNumber));
+
+                if (moreNumber <= 0) return null;
+
+                return Array.from({ length: moreNumber }).map((_, index) => (
+                    <div
+                        key={`l${index}`}
+                        className="rounded-lg relative border p-4 border-gray-300"
+                    >
+                        <Skeleton active paragraph={{ rows: 2 }} />
+                        <div className="absolute left-0 top-0 w-full h-full flex items-center justify-center">
+                            <Spin size="large"></Spin>
+                        </div>
+                    </div>
+                ));
             };
 
             const handleAgentChange = (values: any) => {
@@ -335,6 +340,7 @@ const BatchCreate = memo(
                                         onTagChange={() => {
                                             fetchTags();
                                         }}
+                                        showAddButton={false}
                                         listStyle='horizontal'
                                         className="w-full flex-1"
                                     />
