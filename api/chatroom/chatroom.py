@@ -660,7 +660,8 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
     meeting_summary = AIToolLLMRecords().select_one(
         columns=['outputs'],
         conditions=[
-            {"column": "app_run_id", "value": app_run_id}
+            {"column": "app_run_id", "value": app_run_id},
+            {"column": "ai_tool_type", "value": 3}
         ],
         order_by="created_time DESC",
     )
@@ -726,7 +727,8 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             order_by="created_time DESC",
         )
         meeting_summary_return = meeting_summary_return['outputs']['value']
-        # input_variable = create_variable_from_dict(meeting_summary_return)
+        meeting_summary_return = json.loads(meeting_summary_return)
+        input_variable = create_variable_from_dict(meeting_summary_return)
         meeting_summary_return = [
             {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
             for var in input_variable.properties.values()
