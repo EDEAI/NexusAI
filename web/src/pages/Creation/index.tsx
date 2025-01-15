@@ -408,6 +408,7 @@ const Creation: React.FC = () => {
                         <TagSearch
                             allowClear
                             modes={creationsearchdata('GET').optionsModalId}
+                            placeholder={intl.formatMessage({ id: 'creation.placeholder.selectTags' })}
                             onTagChange={() => {
                                 fetchTags();
                             }}

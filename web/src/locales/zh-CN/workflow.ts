@@ -283,5 +283,7 @@ export default {
 
     'agent.modal.leave.title': '提示',
     'agent.modal.leave.content': '是否确认离开？',
-    'agent.save.failed': '保存失败'
+    'agent.save.failed': '保存失败',
+
+    'creation.placeholder.selectTags': '请选择标签'
 };
