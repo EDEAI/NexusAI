@@ -1,4 +1,5 @@
 import sys, json, uuid, base64, random, string
+from collections import deque
 from hashlib import md5
 from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
@@ -10,6 +11,14 @@ from Crypto.Cipher import AES
 
 from config import settings
 from core.database import redis
+
+import tiktoken
+from typing import List, Dict, Any, Optional, Union
+try:
+    from anthropic import Anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
 
 def convert_json_to_basic_types(data):
     """
@@ -130,3 +139,79 @@ def encrypt_id(id_: int):
 
 def decrypt_id(encrypted_id: str):
     return int.from_bytes(_aes.decrypt(bytes.fromhex(encrypted_id)), 'big')
+
+def get_tokenizer(model_name: str) -> Union[tiktoken.Encoding, Anthropic]:
+    """
+    Get the appropriate tokenizer based on the model name
+    
+    Args:
+        model_name (str): Model name, e.g., 'gpt-3.5-turbo', 'gpt-4', 'claude-3-opus'
+        
+    Returns:
+        Union[tiktoken.Encoding, Anthropic]: Tokenizer object
+    """
+    if model_name.startswith('claude') and ANTHROPIC_AVAILABLE:
+        return Anthropic()
+    else:
+        # Use cl100k_base encoder as default
+        return tiktoken.encoding_for_model(model_name)
+
+def count_tokens(tokenizer: Union[tiktoken.Encoding, Anthropic], text: str) -> int:
+    """
+    Count tokens in text using the appropriate tokenizer
+    
+    Args:
+        tokenizer: Tokenizer object
+        text: Text to count tokens for
+        
+    Returns:
+        int: Number of tokens
+    """
+    if isinstance(tokenizer, tiktoken.Encoding):
+        return len(tokenizer.encode(text))
+    elif ANTHROPIC_AVAILABLE and isinstance(tokenizer, Anthropic):
+        return tokenizer.count_tokens(text)
+    return 0
+
+def truncate_messages_by_token_limit(messages: List[Dict[str, Any]], model_config: dict) -> List[Dict[str, Any]]:
+    """
+    Traverse messages from newest to oldest and ensure total token count doesn't exceed 90% of model's context window.
+    Uses official tokenizers for accurate token counting.
+    
+    Args:
+        messages (list): List of message history
+        model_config (dict): Model configuration containing model_name and context_length
+        
+    Returns:
+        list: Truncated message list
+    """
+    if not messages:
+        return messages
+        
+    # Get model information
+    model_name = model_config['model_name']
+    max_context_tokens = model_config['max_context_tokens']
+    max_output_tokens = model_config['max_output_tokens']
+    token_limit = int((max_context_tokens - max_output_tokens) * 0.9)  # Use 90% of context length as limit
+    
+    # Get appropriate tokenizer
+    tokenizer = get_tokenizer(model_name)
+    
+    truncated_messages = deque()
+    current_tokens = 0
+    
+    # Traverse messages from newest to oldest
+    for i, message in enumerate(reversed(messages)):
+        # Convert message to JSON string and count tokens
+        message_json = json.dumps(message, ensure_ascii=False)
+        message_tokens = count_tokens(tokenizer, message_json)
+        
+        # Ensure at least ONE message will be reserved
+        # Check if adding this message would exceed the token limit
+        if i > 0 and current_tokens + message_tokens > token_limit:
+            break
+            
+        current_tokens += message_tokens
+        truncated_messages.appendleft(message)  # Insert message at beginning to maintain order
+    
+    return list(truncated_messages)
