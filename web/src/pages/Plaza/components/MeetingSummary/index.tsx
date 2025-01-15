@@ -97,14 +97,13 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                                                 setBoxLoading={setBoxLoading}
                                                 setAppRunId={setAppRunId}
                                             />
-                                            <RunsMeetingSummary
+                                            {runboxShow?<RunsMeetingSummary
                                                 id={roomId} 
                                                 runid={appRunId}
-                                                runboxShow={runboxShow}
                                                 setBoxLoading={setBoxLoading}
                                                 scrollDom={scrollDom}
                                                 setinputShow={setinputShow}
-                                            />
+                                            />:<></>}
                                         </div>
                                     </div>
                                 </div>

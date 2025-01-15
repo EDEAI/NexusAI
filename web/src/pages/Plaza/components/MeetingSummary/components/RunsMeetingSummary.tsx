@@ -23,7 +23,6 @@ import rehypeHighlight from 'rehype-highlight';
 interface params {
     id:any;
     runid:any;
-    runboxShow:any;
     setBoxLoading:any;
     scrollDom:any;
     setinputShow:any;
@@ -73,7 +72,7 @@ const ProgressContainer :React.FC<{progressObj:any}> = memo((parmas) => {
 
 const RunsMeetingSummary:React.FC<params>=(params)=>{
     const intl = useIntl();
-    const {runboxShow,runid,id,setBoxLoading,scrollDom,setinputShow} = params
+    const {runid,id,setBoxLoading,scrollDom,setinputShow} = params
     const [currentVariate,setcurrentVariate] = useState(null)
     const [confirmNodes,setConfirmNodes] = useState(null)
     const [selectedType,setSelectedType] = useState('agent')
@@ -188,11 +187,14 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
         }
     };
     const backlogSetWebsocktdata = async () => {
-        let backlogs = flowMessage?.filter(item => item.type == 'workflow_need_human_confirm' && item.data.app_run_id == RunsId.current).map(({ data }) => data)?.filter(item => item.type !== 1);
+        let backDatas = flowMessage?.filter(item => item.type == 'workflow_need_human_confirm' && item.data.app_run_id == RunsId.current);     
+        
+        let backlogs = backDatas.map(({ data,need_human_confirm }) => ({data,need_human_confirm}))?.filter(item => item.data.type !== 1)
+            
         if(backlogs && backlogs.length){
-            let data = backlogs[backlogs.length-1]
+            let data = backlogs[backlogs.length-1].data
             data.exec_id = data?.node_exec_data?.node_exec_id
-            setbackData(data)
+            setbackData(backlogs[backlogs.length-1])
             setBoxLoading(false)
         }
     };
@@ -243,11 +245,12 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
         }
     }
 
-    useEffect(()=>{
-        if(runboxShow){
-            setSelectApp({type:'agent',checkItem:[],show:false})
-        }
-    },[runboxShow])
+    // useEffect(()=>{
+    //     if(runboxShow){
+    //         setSelectApp({type:'agent',checkItem:[],show:false})
+    //         setcurrentVariate(null);
+    //     }
+    // },[runboxShow])
 
     const flowMessage = useSocketStore(state=>state.flowMessage);
     useEffect(()=>{
@@ -277,139 +280,137 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
     return (
         <>
             {
-                runboxShow?
-                    <div className={`pt-[24px]  border-[#ddd]`} style={{minHeight:selectApp?.checkItem?.length?scrollDom?.current?.offsetHeight:'100%'}} >
-                        <div className='text-[14px] font-[500] flex item-center'>
-                            <div className='flex-1'>{intl.formatMessage({ id: `app.summary.Runapp` })}</div>
-                            <div className='px-[10px]'>
-                              {!runStart && !putsmd?<Dropdown menu={{items}}>
-                                    <AppstoreAddOutlined className='transition cursor-pointer text-[#999] text-[18px] hover:text-[#1B64F3]'/>
-                                </Dropdown> 
-                                :<></>}
-                            </div>
+                <div className={`pt-[24px]  border-[#ddd]`} style={{minHeight:selectApp?.checkItem?.length?scrollDom?.current?.offsetHeight:'100%'}} >
+                    <div className='text-[14px] font-[500] flex item-center'>
+                        <div className='flex-1'>{intl.formatMessage({ id: `app.summary.Runapp` })}</div>
+                        <div className='px-[10px]'>
+                            {!runStart && !putsmd?<Dropdown menu={{items}}>
+                                <AppstoreAddOutlined className='transition cursor-pointer text-[#999] text-[18px] hover:text-[#1B64F3]'/>
+                            </Dropdown> 
+                            :<></>}
                         </div>
-                        <div>
-                            {
-                                selectApp?.checkItem?.length?
-                                    <>
-                                        <div className='py-[6px]'>
-                                            <Graphic
-                                                icon={selectApp?.checkItem[0]?.icon}
-                                                title={selectApp?.checkItem[0]?.name}
-                                                textDetails={selectApp?.checkItem[0]?.description}
-                                                iconType={selectedType=='agent'?'robot_icon':'workflow_icon'}
-                                                handleClick={() => {}}
-                                            />
-                                        </div>
-                                        {
-                                            putsmd? 
-                                                <div className='max-h-[400px] overflow-y-auto'>
-                                                    <div className='p-[12px]  bg-[#F7F7F7] leading-[22px]'>
-                                                        <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
-                                                            {putsmd}
-                                                        </ReactMarkdown>
-                                                    </div>
-                                                </div>
-                                            :<></>
-
-                                        }
-
-                                        {!runStart && currentVariate!=null ? 
-                                        <ProForm
-                                            submitter={{
-                                                resetButtonProps: false,
-                                                submitButtonProps: {
-                                                    className: 'w-full',
-                                                },
-                                                searchConfig: {
-                                                    submitText: intl.formatMessage({
-                                                        id: 'workflow.button.run',
-                                                    }),
-                                                },
-                                            }}
-                                            onFinish={(e)=>{
-                                                selectedType=='workflow'?workflowRun(e):agentRun(e)
-                                            }}
-                                        >
-                                            <div className='py-[6px]'>
-                                                <RenderInput data={currentVariate}/>
-                                            </div>
-                                            
-                                            {selectedType=='workflow'?
-                                                <RenderConfirm data={confirmNodes} />
-                                                :
-                                                <div className='h-[150px] overflow-y-auto border border-color-[#eee] py-[4px] px-[11px] mb-[8px]'>
-                                                   <SlateEditor  
-                                                        onChange={value => {Editorrunchange(value)}}
-                                                        options={currentVariateArray} >
-                                                    </SlateEditor>
-                                                </div>
-                                            }
-                                        </ProForm>:<></>}
-                                       
-                                        {backData && runData &&  runData.need_human_confirm != 0?
-                                            <div className='pt-[12px]'>
-                                                <div className='flex gap-x-[6px] items-center h-[20px] cursor-pointer' onClick={()=>{setDealtWithData(backData)}}>
-                                                    <div><InfoCircleOutlined className='text-[#1B64F3] text-[16px]'/></div>
-                                                    <span>{intl.formatMessage({id:'app.summary.backlogTips'})}</span>
-                                                </div>
-                                            </div>:<></>
-                                        } 
-
-                                        {
-                                            runData?
-                                                <div className='pt-[10px]'>       
-                                                    <Graphic
-                                                        status={runData.status}
-                                                        icon={runData.icon}
-                                                        title={runData.run_name}
-                                                        textDetails={
-                                                            <ProgressContainer progressObj={runData}></ProgressContainer>
-                                                        }
-                                                        handleClick={() => {
-                                                            setRunPanelLogRecord(runData);
-                                                        }}
-                                                        progress={0 || setpercentage(runData)}
-                                                    ></Graphic>
-                                                </div>
-                                            :<></>
-                                            
-                                        }
-                                        
-                                    </>
-                                :
-                                <div className='flex gap-x-[20px] min-h-[70px] items-center px-[20px]'>
-                                    <Button className='flex-1 text-[14px]' onClick={
-                                        ()=>{
-                                            setSelectApp(pre=>{return {...pre,type:'agent',show:true}})
-                                        }
-                                    }
-                                    >
-                                        <img
-                                            src={`/icons/robot_icon.svg`}
-                                            alt=""
-                                            className="w-[14px] h-[14px]"
-                                        />
-                                        {intl.formatMessage({id:'app.summary.SelectAgent'})}
-                                    </Button>
-                                    <Button className='flex-1 text-[14px]'onClick={ 
-                                        ()=>{
-                                            setSelectApp(pre=>{return {...pre,type:'workflow',show:true}})
-                                        }
-                                    } >
-                                        <img
-                                            src={`/icons/workflow_icon.svg`}
-                                            alt=""
-                                            className="w-[14px] h-[14px]"
-                                        />
-                                        {intl.formatMessage({id:'app.summary.SelectWorkflow'})}
-                                    </Button>
-                                </div>
-                            }
-                        </div>
-                        
                     </div>
-                :<></>
+                    <div>
+                        {
+                            selectApp?.checkItem?.length?
+                                <>
+                                    <div className='py-[6px]'>
+                                        <Graphic
+                                            icon={selectApp?.checkItem[0]?.icon}
+                                            title={selectApp?.checkItem[0]?.name}
+                                            textDetails={selectApp?.checkItem[0]?.description}
+                                            iconType={selectedType=='agent'?'robot_icon':'workflow_icon'}
+                                            handleClick={() => {}}
+                                        />
+                                    </div>
+                                    {
+                                        putsmd? 
+                                            <div className='max-h-[400px] overflow-y-auto'>
+                                                <div className='p-[12px]  bg-[#F7F7F7] leading-[22px]'>
+                                                    <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
+                                                        {putsmd}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            </div>
+                                        :<></>
+
+                                    }
+
+                                    {!runStart && currentVariate!=null ? 
+                                    <ProForm
+                                        submitter={{
+                                            resetButtonProps: false,
+                                            submitButtonProps: {
+                                                className: 'w-full',
+                                            },
+                                            searchConfig: {
+                                                submitText: intl.formatMessage({
+                                                    id: 'workflow.button.run',
+                                                }),
+                                            },
+                                        }}
+                                        onFinish={(e)=>{
+                                            selectedType=='workflow'?workflowRun(e):agentRun(e)
+                                        }}
+                                    >
+                                        <div className='py-[6px]'>
+                                            <RenderInput data={currentVariate}/>
+                                        </div>
+                                        
+                                        {selectedType=='workflow'?
+                                            <RenderConfirm data={confirmNodes} />
+                                            :
+                                            <div className='h-[150px] overflow-y-auto border border-color-[#eee] py-[4px] px-[11px] mb-[8px]'>
+                                                <SlateEditor  
+                                                    onChange={value => {Editorrunchange(value)}}
+                                                    options={currentVariateArray} >
+                                                </SlateEditor>
+                                            </div>
+                                        }
+                                    </ProForm>:<></>}
+                                    
+                                    {backData &&  backData.need_human_confirm != 0?
+                                        <div className='pt-[12px]'>
+                                            <div className='flex gap-x-[6px] items-center h-[20px] cursor-pointer' onClick={()=>{setDealtWithData(backData.data)}}>
+                                                <div><InfoCircleOutlined className='text-[#1B64F3] text-[16px]'/></div>
+                                                <span>{intl.formatMessage({id:'app.summary.backlogTips'})}</span>
+                                            </div>
+                                        </div>:<></>
+                                    } 
+
+                                    {
+                                        runData?
+                                            <div className='pt-[10px]'>       
+                                                <Graphic
+                                                    status={runData.status}
+                                                    icon={runData.icon}
+                                                    title={runData.run_name}
+                                                    textDetails={
+                                                        <ProgressContainer progressObj={runData}></ProgressContainer>
+                                                    }
+                                                    handleClick={() => {
+                                                        setRunPanelLogRecord(runData);
+                                                    }}
+                                                    progress={0 || setpercentage(runData)}
+                                                ></Graphic>
+                                            </div>
+                                        :<></>
+                                        
+                                    }
+                                    
+                                </>
+                            :
+                            <div className='flex gap-x-[20px] min-h-[70px] items-center px-[20px]'>
+                                <Button className='flex-1 text-[14px]' onClick={
+                                    ()=>{
+                                        setSelectApp(pre=>{return {...pre,type:'agent',show:true}})
+                                    }
+                                }
+                                >
+                                    <img
+                                        src={`/icons/robot_icon.svg`}
+                                        alt=""
+                                        className="w-[14px] h-[14px]"
+                                    />
+                                    {intl.formatMessage({id:'app.summary.SelectAgent'})}
+                                </Button>
+                                <Button className='flex-1 text-[14px]'onClick={ 
+                                    ()=>{
+                                        setSelectApp(pre=>{return {...pre,type:'workflow',show:true}})
+                                    }
+                                } >
+                                    <img
+                                        src={`/icons/workflow_icon.svg`}
+                                        alt=""
+                                        className="w-[14px] h-[14px]"
+                                    />
+                                    {intl.formatMessage({id:'app.summary.SelectWorkflow'})}
+                                </Button>
+                            </div>
+                        }
+                    </div>
+                    
+                </div>
             }
             <SelectAppDom 
                 show={selectApp.show} 
