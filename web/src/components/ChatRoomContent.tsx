@@ -1,6 +1,6 @@
-import React, { FC, memo, useEffect, useRef, useState ,ReactNode,createContext } from 'react';
+import React, { FC, memo, useEffect, useRef, useState ,ReactNode, } from 'react';
 import useWebSocketManager from '@//hooks/useSocket';
-import { getRoomMessage, roomDetails } from '@/api/plaza';
+import { getRoomMessage } from '@/api/plaza';
 import { headportrait, userinfodata } from '@/utils/useUser';
 import { ArrowDownOutlined, PauseCircleOutlined,FileDoneOutlined,FundProjectionScreenOutlined} from '@ant-design/icons';
 import useChatroomStore from '@/store/chatroomstate';
@@ -250,13 +250,26 @@ const Chatcopy: FC<Chatcopyprops> = memo(props => {
         </div>
     );
 });
-const SummaryButton:FC<{}> = porpos =>{
+const SummaryButton:FC<{id:any,index?: number,idName: string,cidName: string;}> = porpos =>{
+    let { id, index, idName, cidName } = porpos;
     let intl = useIntl();
+    const setSummaryClick = useChatroomStore(state=>state.setSummaryClick);
+    const [disabled,setDisabled] = useState(true);
+    const summaryClick = useChatroomStore(state=>state.summaryClick);
+    useEffect(()=>{
+        setDisabled(summaryClick)
+    },[summaryClick])
     const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
     return (
-        <div className="flex gap-x-[4px] text-[#666] hover:text-[#1B64F3]">
-            <div className=" p-[2px] cursor-pointer rounded-md flex gap-x-[5px] items-center pt-[10px]" onClick={()=>{
-                setSummaryParams(true)
+        <div className={`flex gap-x-[4px] text-[#666] ${disabled?'cursor-pointer hover:text-[#1B64F3]':'cursor-no-drop'}`}>
+            <div className=" p-[2px]  rounded-md flex gap-x-[5px] items-center pt-[10px]" onClick={(e:any)=>{
+                if(disabled){
+                    const dom = e.target.closest(`#${idName}${index}`);
+                    const childElement = dom.querySelector(`#${cidName}${index}`);
+                    setSummaryParams({id:id,message:childElement.innerText})
+                    // setDisabled(false)
+                    setSummaryClick(false)
+                }
             }}>
                 <FileDoneOutlined className='text-[16px]'/>
                 <span className='text-[12px]'>
@@ -269,13 +282,24 @@ const SummaryButton:FC<{}> = porpos =>{
 const MeetingSummaryBtn:FC<{roomid:any}> = porpos =>{
     let {roomid} = porpos
     let intl = useIntl();
+    const setSummaryClick = useChatroomStore(state=>state.setSummaryClick);
+    const [disabled,setDisabled] = useState(true);
+    const summaryClick = useChatroomStore(state=>state.summaryClick);
+    useEffect(()=>{
+        setDisabled(summaryClick)
+    },[summaryClick])
     const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
     return (
-        <div className=" bg-[#fff]  items-center justify-center rounded-[8px] cursor-pointer" style={{boxShadow:'0px 0px 4px 0px rgba(0,0,0,0.1)'}}>
-            <div className='text-[#999999] hover:text-[#1B64F3] gap-x-[4px] flex items-center justify-center h-[40px] px-[20px]' onClick={()=>{
-                setSummaryParams({
-                    id:roomid
-                })
+        <div className={`bg-[#fff] text-[#999999]   items-center justify-center rounded-[8px] ${disabled?'cursor-pointer hover:text-[#1B64F3]':'cursor-no-drop'}`} style={{boxShadow:'0px 0px 4px 0px rgba(0,0,0,0.1)'}}>
+            <div className=' gap-x-[4px] flex items-center justify-center h-[40px] px-[20px]' onClick={()=>{
+                
+                if(disabled){
+                    setSummaryParams({
+                        id:roomid
+                    })
+                    // setDisabled(false)
+                    setSummaryClick(false)
+                }
             }}> 
                 <FundProjectionScreenOutlined className='text-[16px]'/>
                 <span className='text-[14px]'>
@@ -529,6 +553,7 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
     let intl = useIntl();
     const [currentMessageContent, setCurrentMessageContent]: any = useState([]);
     const [isEnd, setisEnd] = useState(false);
+    const { id } = useParams<{ id: string }>();
     useEffect(() => {
         if (isEnd) {
             setUserMessage((pre: any) => {
@@ -598,7 +623,12 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                                         idName="currentContent"
                                         cidName="currentChilContent"
                                     />
-                                    <SummaryButton/>
+                                    <SummaryButton
+                                        id={id}
+                                        index={index}
+                                        idName="currentContent"
+                                        cidName="currentChilContent"
+                                    />
                                 </div>
                             ) : (
                                 <></>
@@ -762,7 +792,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                 {/* <div className='loader_box'></div> */}
                 <Spin />
             </div>
-            <div className="max-w-[920px] mx-auto" ref={scrollchildDomRef}>
+            <div className="max-w-[920px] mx-auto" style={{minHeight:'calc(100% - 50px)'}} ref={scrollchildDomRef}>
                 {userMessage.map((item, index) => (
                     <div
                         key={index}
@@ -816,7 +846,12 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                         cidName="chilContent"
                                         index={index}
                                     />
-                                    <SummaryButton/>
+                                    <SummaryButton
+                                        id={id}
+                                        index={index}
+                                        idName="content"
+                                        cidName="chilContent"
+                                    />
                                 </div>
                             ) : (
                                 <></>
@@ -835,7 +870,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                     setSendValue={setSendValue}
                 ></ChatwindowCont>
             </div>
-            <div className='w-full flex justify-center pb-[10px]'>{!disableInput?<MeetingSummaryBtn roomid={id}/>:<></>}</div>
+            <div className='w-full flex justify-center pb-[10px]'>{!disableInput &&  userMessage.length?<MeetingSummaryBtn roomid={id}/>:<></>}</div>
         </div>
     );
 });

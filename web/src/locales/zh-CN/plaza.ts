@@ -73,8 +73,8 @@ export default {
     'app.chatroom.content.addAgentTips': '添加成功',
     'app.chatroom.content.addAgentTips_fail': '添加失败',
 
-    'app.chatroom.content.summary':'总结',
-    'app.chatroom.content.meetingSummary':'会议总结',
+    'app.chatroom.content.summary':'导向',
+    'app.chatroom.content.meetingSummary':'会议导向',
 
     'app.dashboard.None': '暂无数据',
 
@@ -102,4 +102,11 @@ export default {
     "app.summary.SelectWorkflow":"选择工作流",
     
     "app.summary.backlogTips":"你有一条待办项",
+
+    "app.summaryhistory.orientation":"修正导向",
+    "app.summaryhistory.time":"修正时间",
+    "app.summaryhistory.runapp":"运行应用",
+    "app.summaryhistory.input":"输入参数",
+    "app.summaryhistory.results":"运行结果",
+    "app.summaryhistory.prompt":"指令提示"
 };
