@@ -2,6 +2,7 @@
  * @LastEditors: biz
  */
 import { memo } from 'react';
+import { useIntl } from '@umijs/max';
 
 interface BeforeCreateProps {
     type?: 'single' | 'batch';
@@ -11,6 +12,8 @@ interface BeforeCreateProps {
 }
 
 const BeforeCreate = memo(({ type = 'single', loading = false, onClick, hasHover = true }: BeforeCreateProps) => {
+    const intl = useIntl();
+
     return (
         <div 
             onClick={onClick} 
@@ -25,9 +28,16 @@ const BeforeCreate = memo(({ type = 'single', loading = false, onClick, hasHover
                     className="size-16" 
                 />
                 <div className="mt-2">
-                    {type === 'single' ? '生成智能体' : '批量生成智能体'}
+                    {type === 'single' 
+                        ? intl.formatMessage({ id: 'agent.before.single.desc' })
+                        : intl.formatMessage({ id: 'agent.before.batch.desc' })
+                    }
                 </div>
-                {loading && <div className="mt-2 text-gray-400">生成中...</div>}
+                {loading && (
+                    <div className="mt-2 text-gray-400">
+                        {intl.formatMessage({ id: 'agent.before.loading' })}
+                    </div>
+                )}
             </div>
         </div>
     );

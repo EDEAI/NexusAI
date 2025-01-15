@@ -540,25 +540,29 @@ export const agentSupplement = async (supplement_prompt: string, app_run_id: str
     });
 };
 
-interface AgentCreateAbility {
-    name: string;
+interface AgentAbility {
     content: string;
-    status?: number;
-    output_format: number;
-}
-
-interface AgentCreateParams {
     name: string;
-    description: string;
-    obligations: string;
-    abilities: AgentCreateAbility[];
-    tags: string[];
+    output_format: number;
+    status: number;
 }
 
-export const agentCreate = async (params: AgentCreateParams) => {
+interface AgentData {
+    abilities: AgentAbility[];
+    description: string;
+    name: string;
+    obligations: string;
+    tags: number[];
+}
+
+interface AgentBatchCreateParams {
+    agents: AgentData[];
+}
+
+export const agentCreate = async (data: AgentBatchCreateParams) => {
     return await aniRequest<any>(`/v1/agent/agent_create`, {
         method: 'POST',
-        data: params,
+        data: data,
     });
 };
 
@@ -572,6 +576,41 @@ interface BatchAgentCreateParams {
 
 export const batchAgentCreate = async (params: BatchAgentCreateParams) => {
     return await aniRequest<any>(`/v1/agent/agent_batch_generate`, {
+        method: 'POST',
+        data: params,
+    });
+};
+
+export const previewBatchAgent = async (supplement_prompt: string, app_run_id: string) => {
+    return await aniRequest<any>(`/v1/agent/agent_batch_sample`, {
+        method: 'POST',
+        data: { supplement_prompt, app_run_id },
+    });
+};
+
+interface AgentInfo {
+    name: string;
+    type: string;
+    value: {
+        abilities: Array<{
+            content: string;
+            name: string;
+            output_format: number;
+        }>;
+        description: string;
+        name: string;
+        obligations: string;
+    };
+}
+
+interface SaveAgentParams {
+    app_run_id: number;
+    record_id: number;
+    agent_info: AgentInfo;
+}
+
+export const saveAgentTemporarily = async (params: SaveAgentParams) => {
+    return await aniRequest<any>(`/v1/agent/agent_save`, {
         method: 'POST',
         data: params,
     });

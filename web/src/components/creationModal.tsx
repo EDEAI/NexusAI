@@ -93,14 +93,17 @@ const CreationModal: React.FC<ChildProps> = ({
                         <Button
                             onClick={() => {
                                 setAgentCreateOpen(true);
+                                setIsModalOpen(false);
                             }}
                         >
-                            AI创建智能体
+                            {intl.formatMessage({ id: 'agent.creation.button.ai' })}
                         </Button>
                     )}
                 </div>
                 <div className="flex gap-2">
-                    <Button onClick={() => setIsModalOpen(false)}>取消</Button>
+                    <Button onClick={() => setIsModalOpen(false)}>
+                        {intl.formatMessage({ id: 'agent.modal.button.cancel' })}
+                    </Button>
                     <Button
                         disabled={CreationName !== '' ? false : true}
                         onClick={handleOk}

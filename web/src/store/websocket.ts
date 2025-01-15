@@ -180,8 +180,8 @@ type TypedMessageMap = {
     workflow_run_debug: WorkflowRunDebug[];
     workflow_run_progress: WorkflowRunProgress[];
     workflow_need_human_confirm: WorkflowNeedHumanConfirm[];
-    generate_agent_batch: any[]; // 可以根据需要定义具体类型
-    [key: string]: any[]; // 支持动态添加新类型
+    generate_agent_batch: any[]; 
+    [key: string]: any[];
 };
 
 interface FlowState {

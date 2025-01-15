@@ -1,14 +1,18 @@
 /*
  * @LastEditors: biz
  */
-import { batchAgentCreate, bindTag } from '@/api/workflow';
+import { agentCreate, batchAgentCreate } from '@/api/workflow';
 import useSocketStore from '@/store/websocket';
-import { CompressOutlined, ExpandOutlined } from '@ant-design/icons';
+import { CompressOutlined, DeleteOutlined, HistoryOutlined } from '@ant-design/icons';
 import { useSelections, useUpdateEffect } from 'ahooks';
-import { Button, Modal, Progress, Spin, message } from 'antd';
+import { Button, Modal, Progress, Skeleton, Spin, message } from 'antd';
+import { useIntl } from '@umijs/max';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import TagSearch, { TagSelect, useTags } from '../TagSearch';
+import TagSearch, { TagSelect } from '../TagSearch';
+import { useTagStore } from '@/store/tags';
 import ResultDisplay from './ResultDisplay';
+import useUserStore from '@/store/user';
+import { UPDATE_NOTIFICATIONS } from '@/store/user';
 
 interface BatchAgentParams {
     app_run_id: number;
@@ -25,6 +29,7 @@ interface BatchCreateProps {
     loading?: boolean;
     params?: BatchAgentParams;
     onReset?: () => void;
+    onPreview?: (text: string) => void;
 }
 
 interface ContinueGenerateButtonProps {
@@ -35,15 +40,13 @@ interface ContinueGenerateButtonProps {
 
 const ContinueGenerateButton = memo(
     ({ agentList, batchParams, onGenerate }: ContinueGenerateButtonProps) => {
+        const intl = useIntl();
         const [loading, setLoading] = useState(false);
         const [hidden, setHidden] = useState(false);
 
-        // 判断是否显示按钮
         const shouldShow = useMemo(() => {
             if (!agentList?.length || !batchParams) return false;
-            // 数量达到上限时不显示
             if (agentList.length >= batchParams.loop_limit) return false;
-            // 数量必须是 loop_count 的倍数
             return !hidden && agentList.length % batchParams.loop_count === 0;
         }, [agentList?.length, batchParams?.loop_count, batchParams?.loop_limit, hidden]);
 
@@ -59,7 +62,6 @@ const ContinueGenerateButton = memo(
             }
         };
 
-        // 当 agentList 长度变化时，重置 hidden 状态
         useEffect(() => {
             setHidden(false);
         }, [agentList.length]);
@@ -75,7 +77,7 @@ const ContinueGenerateButton = memo(
                 loading={loading}
                 onClick={handleClick}
             >
-                继续生成下一批
+                {intl.formatMessage({ id: 'agent.batch.continue' })}
             </Button>
         );
     },
@@ -83,29 +85,42 @@ const ContinueGenerateButton = memo(
 
 const BatchCreate = memo(
     forwardRef<BatchCreateRef, BatchCreateProps>(
-        ({ open, onCancel, onOk, loading, params, onReset }, ref) => {
+        ({ open, onCancel, onOk, loading, params, onReset, onPreview }, ref) => {
+            const intl = useIntl();
             const [batchParams, setBatchParams] = useState<BatchAgentParams | undefined>(params);
-            const { tagList,refreshTags } = useTags();
+            const { tags, fetchTags } = useTagStore();
             const [agentList, setAgentList] = useState<any[]>([]);
             const [selectedTags, setSelectedTags] = useState<string[]>([]);
             const [agentTagsMap, setAgentTagsMap] = useState<Record<number | string, string[]>>({});
             const [selectedAgent, setSelectedAgent] = useState<any | null>(null);
+            const [selectedAgentIndex, setSelectedAgentIndex] = useState<number>(-1);
             const batchMessages = useSocketStore(state =>
                 state.getTypedMessages('generate_agent_batch'),
             );
-            const setFlowMessage = useSocketStore(state => state.setFlowMessage);
+            const [moreLoading, setMoreLoading] = useState(false);
+            const [lastCheck, setLastCheck] = useState(Date.now());
+            const { 
+                shouldComponentUpdate,
+                clearUpdateNotification,
+                setUpdateNotification 
+            } = useUserStore(state => ({
+                shouldComponentUpdate: state.shouldComponentUpdate,
+                clearUpdateNotification: state.clearUpdateNotification,
+                setUpdateNotification: state.setUpdateNotification
+            }));
 
-            // 重置组件状态
             const resetState = () => {
                 setAgentList([]);
                 setSelectedTags([]);
                 setAgentTagsMap({});
                 setSelectedAgent(null);
-                unSelectAll()
+                setSelectedAgentIndex(-1);
+                unSelectAll();
             };
 
             const handleCloseAgentDetail = () => {
                 setSelectedAgent(null);
+                setSelectedAgentIndex(-1);
             };
 
             const { selected, allSelected, isSelected, toggle, unSelectAll, toggleAll } =
@@ -118,68 +133,32 @@ const BatchCreate = memo(
                 setSelectedTags(tags);
             };
 
+            useUpdateEffect(() => {
+                handleBindTag();
+            }, [selectedTags]);
+
             const handleBindTag = async () => {
-                try {
-                    const res = await bindTag(selectedTags, selected);
-                    if (res.code === 0) {
-                        message.success('标签设置成功');
-
-                        const newTagsMap = { ...agentTagsMap };
-                        selected.forEach(id => {
-                            newTagsMap[id] = selectedTags;
-                        });
-                        setAgentTagsMap(newTagsMap);
-
-                        setAgentList(prev =>
-                            prev.map(item =>
-                                selected.includes(item.id) ? { ...item, tags: selectedTags } : item,
-                            ),
-                        );
-                        unSelectAll();
-                    }
-                } catch (error) {
-                    message.error('标签设置失败');
-                }
-            };
-
-            const handleSingleAgentTagChange = async (id: number, tags: string[]) => {
-                try {
-                    const res = await bindTag(tags, [id]);
-                    if (res.code === 0) {
-                        setAgentTagsMap(prev => ({
-                            ...prev,
-                            [id]: tags,
-                        }));
-
-                        setAgentList(prev =>
-                            prev.map(item => (item.id === id ? { ...item, tags } : item)),
-                        );
-                    }
-                } catch (error) {
-                    message.error('标签设置失败');
-                }
+                const currentSelect = agentList.map(x => x.id);
+                const newTagsMap = { ...agentTagsMap };
+                currentSelect.forEach(id => {
+                    newTagsMap[id] = selectedTags;
+                });
+                setAgentTagsMap(newTagsMap);
+                setAgentList(prev => prev.map(item => ({ ...item, tags: selectedTags })));
             };
 
             const handleAgentClick = (agent: any) => {
                 setSelectedAgent(agent);
+                const index = agentList.findIndex(item => item.key === agent.key);
+                setSelectedAgentIndex(index);
             };
 
             useEffect(() => {
                 if (open) {
-                    // 如果是通过 handleBatchGenerate 打开（有新的 params）
-                    // if (params && (!batchParams || params.app_run_id !== batchParams.app_run_id)) {
-                    //     resetState();
-                    // }
                     setBatchParams(params);
+                    setMoreLoading(true);
                 }
             }, [params, open]);
-
-            // 当模态框关闭时重置状态
-            // useEffect(() => {
-            //     if (!open) {
-            //         resetState();
-            //     }
-            // }, [open]);
 
             useUpdateEffect(() => {
                 if (!open) return;
@@ -189,19 +168,31 @@ const BatchCreate = memo(
                             item?.data?.app_run_id === batchParams?.app_run_id &&
                             item?.data?.exec_data?.loop_id === batchParams.loop_id,
                     )
-                    .map((x, i) => ({
-                        ...JSON.parse(x.data.exec_data.outputs.value),
-                        key: i,
-                        loop_id: x.data?.exec_data?.loop_id,
-                        id: x.data?.exec_data?.outputs?.id || i,
-                        tags: agentTagsMap[x.data?.exec_data?.outputs?.id || i] || [],
-                    }))
+                    .map((x, i) => {
+                        const outputs = JSON.parse(x.data.exec_data.outputs.value);
+                        return (Array.isArray(outputs) ? outputs : [outputs]).map((output, j) => ({
+                            ...output,
+                            key: `${i}-${j}`,
+                            loop_id: x.data?.exec_data?.loop_id,
+                            id: x.data?.exec_data?.outputs?.id || `${i}-${j}`,
+                            tags: selectedTags.length ? selectedTags : (agentTagsMap[x.data?.exec_data?.outputs?.id || `${i}-${j}`] || []),
+                        }));
+                    })
+                    .flat()
                     .reverse();
 
                 if (currentMessage?.length) {
-                    setAgentList(currentMessage);
+                    setAgentList(prevList => {
+                        const existingAgents = new Map(prevList.map(agent => [agent.key, agent]));
+                        const mergedList = currentMessage.map(newAgent => {
+                            const existingAgent = existingAgents.get(newAgent.key);
+                            return existingAgent ? existingAgent : newAgent;
+                        });
+                        return mergedList;
+                    });
+                    setMoreLoading(false);
                 }
-            }, [batchMessages, agentTagsMap]);
+            }, [batchMessages, agentTagsMap, selectedTags]);
 
             const handleOk = async () => {
                 onOk?.();
@@ -221,6 +212,7 @@ const BatchCreate = memo(
                                 ...res.data,
                             };
                         });
+                        setMoreLoading(true);
                         return true;
                     }
                     return false;
@@ -230,22 +222,105 @@ const BatchCreate = memo(
                 }
             };
 
-            // 暴露重置方法给父组件
             useImperativeHandle(ref, () => ({
                 reset: resetState,
             }));
 
+            const createAgents = () => {
+                const reduxAgents = agentList.filter(item => !selected.includes(item.id));
+                Modal.confirm({
+                    title: intl.formatMessage({ id: 'agent.batch.confirm.title' }),
+                    content: intl.formatMessage(
+                        { id: 'agent.batch.confirm.content' },
+                        { count: reduxAgents.length }
+                    ),
+                    centered: true,
+                    mask: false,
+                    onOk: async () => {
+                        const formattedAgents = reduxAgents.map(agent => ({
+                            name: agent.name,
+                            description: agent.description,
+                            obligations: agent.obligations,
+                            abilities: agent.abilities.map(ability => ({
+                                ...ability,
+                                status: 1,
+                            })),
+                            tags: agent.tags.map(tag => Number(tag)),
+                        }));
+                        const res = await agentCreate({
+                            agents: formattedAgents,
+                        });
+                        if (res.code == 0) {
+                            message.success(intl.formatMessage({ id: 'agent.batch.create.success' }));
+                            handleOk();
+                            setUpdateNotification(UPDATE_NOTIFICATIONS.AGENT_LIST, {
+                                action: 'create',
+                                data: {}
+                            });
+                        }
+                    },
+                });
+            };
+            const Footer = () => {
+                return (
+                    <div className="flex justify-end gap-2">
+                        <div></div>
+                        <div>
+                            <Button onClick={createAgents} type="primary">
+                                {intl.formatMessage({ id: 'agent.batch.button.confirm' })}
+                            </Button>
+                        </div>
+                    </div>
+                );
+            };
+
+            const MoreLoading = () => {
+                let moreNumber = batchParams?.loop_count;
+                if (batchParams?.loop_limit - agentList.length < batchParams?.loop_count) {
+                    moreNumber = batchParams?.loop_limit - agentList.length;
+                }
+                return Array(moreNumber)
+                    .fill(0)
+                    .map((item, index) => {
+                        return (
+                            <div
+                                key={`l${index}`}
+                                className="rounded-lg relative border p-4 border-gray-300"
+                            >
+                                <Skeleton active paragraph={{ rows: 2 }} />
+                                <div className="absolute left-0 top-0 w-full h-full flex items-center justify-center">
+                                    <Spin size={`large`}></Spin>
+                                </div>
+                            </div>
+                        );
+                    });
+            };
+
+            const handleAgentChange = (values: any) => {
+                if (selectedAgentIndex === -1) return;
+
+                setAgentList(prev => {
+                    const newList = [...prev];
+                    newList[selectedAgentIndex] = {
+                        ...newList[selectedAgentIndex],
+                        ...values,
+                    };
+                    return newList;
+                });
+            };
+
             return (
                 <Modal
-                    title="批量生成智能体"
+                    title={intl.formatMessage({ id: 'agent.batch.title' })}
                     destroyOnClose
                     className="min-w-[1000px]"
                     bodyProps={{
                         className: '!h-[700px] overflow-y-auto p-4',
                     }}
-                    footer={null}
+                    footer={Footer}
                     open={open}
                     onCancel={onCancel}
+                    centered
                     onOk={handleOk}
                     confirmLoading={loading}
                 >
@@ -256,28 +331,20 @@ const BatchCreate = memo(
                                     <TagSearch
                                         allowClear
                                         onChange={handleTagChange}
+                                        placeholder={intl.formatMessage({ id: 'agent.batch.set.tags' })}
                                         onTagChange={() => {
-                                            
-                                            refreshTags();
-                                        
+                                            fetchTags();
                                         }}
+                                        listStyle='horizontal'
                                         className="w-full flex-1"
                                     />
                                 </div>
-                                <Button
-                                    disabled={!selected?.length}
-                                    type="primary"
-                                    onClick={handleBindTag}
-                                >
-                                    {selected?.length ? `为${selected?.length}个智能体` : ''}
-                                    设置标签
-                                </Button>
                             </div>
                             <div>
                                 <div className="flex justify-between items-center px-2 mt-4">
                                     <div className="flex items-center gap-2">
                                         <span>
-                                            已生成智能体 {agentList?.length}/
+                                            {intl.formatMessage({ id: 'agent.batch.generated' })} {agentList?.length}/
                                             {batchParams.loop_limit}
                                         </span>
                                         <ContinueGenerateButton
@@ -286,68 +353,81 @@ const BatchCreate = memo(
                                             onGenerate={handleBatchGenerate}
                                         />
                                     </div>
-                                    <a onClick={toggleAll}>{allSelected ? '取消全选' : '全选'}</a>
                                 </div>
-                                <div className="px-2">
-                                    <Progress
-                                        percent={(agentList?.length / batchParams.loop_limit) * 100}
-                                        size="small"
-                                        showInfo={false}
-                                    />
-                                </div>
+                                {agentList?.length != batchParams.loop_limit && (
+                                    <div className="px-2">
+                                        <Progress
+                                            percent={
+                                                (agentList?.length / batchParams.loop_limit) * 100
+                                            }
+                                            size="small"
+                                            showInfo={false}
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex-1 overflow-y-auto">
                                 <div className="grid grid-cols-2 gap-6">
+                                    {moreLoading && <MoreLoading />}
                                     {agentList.map(item => (
                                         <div
                                             key={item.key}
-                                            className={`rounded-lg relative border p-4 cursor-pointer transition-all hover:border-blue-500 ${
+                                            className={`rounded-lg relative border p-4 cursor-pointer transition-all ${
                                                 isSelected(item.id)
-                                                    ? 'border-blue-500 bg-blue-100'
-                                                    : 'border-gray-200'
+                                                    ? 'border-gray-100 text-gray-300'
+                                                    : 'border-gray-300 hover:border-blue-500 '
                                             }`}
-                                            onClick={() => toggle(item.id)}
+                                            onClick={() => handleAgentClick(item)}
                                         >
                                             <Button
                                                 type="text"
-                                                icon={<ExpandOutlined />}
-                                                className="absolute right-2 top-2"
+                                                icon={
+                                                    isSelected(item.id) ? (
+                                                        <HistoryOutlined />
+                                                    ) : (
+                                                        <DeleteOutlined />
+                                                    )
+                                                }
+                                                className={`absolute right-2 top-2`}
                                                 onClick={e => {
                                                     e.stopPropagation();
-                                                    handleAgentClick(item);
+                                                    toggle(item.id);
                                                 }}
                                             />
-                                            <div className="text-blue-600 font-medium">
+                                            <div
+                                                className={`font-medium ${
+                                                    isSelected(item.id)
+                                                        ? 'border-gray-100 text-gray-300'
+                                                        : 'text-blue-600'
+                                                }`}
+                                            >
                                                 {item.name}
                                             </div>
-                                            <div className="text-gray-500 mt-2">
+                                            <div
+                                                className={`mt-2 line-clamp-2 ${
+                                                    isSelected(item.id)
+                                                        ? 'border-gray-100 text-gray-300'
+                                                        : 'text-gray-500'
+                                                }`}
+                                            >
                                                 {item.description}
                                             </div>
-                                            <TagSelect
-                                                options={tagList}
+                                            {/* <TagSelect
+                                                options={tags}
                                                 value={item.tags}
                                                 className="w-full mt-2"
                                                 variant="borderless"
-                                                onChange={tags => {
-                                                    handleSingleAgentTagChange(item.id, tags);
-                                                }}
+                                                listStyle='horizontal'
+                                                tagColor={isSelected(item.id) ? 'default' : 'blue'}
+                                                aria-readonly
+                                                disabled={true}   
                                                 onClick={e => e.stopPropagation()}
-                                            />
+                                            /> */}
                                         </div>
                                     ))}
                                 </div>
-                                {agentList?.length ? null : (
-                                    <div className="flex justify-center items-center flex-col w-full h-full">
-                                        <Spin></Spin>
-                                        <div>生成中...</div>
-                                    </div>
-                                )}
                             </div>
-                            {/* <div className="-mb-4 py-1">
-                        已生成{agentList?.length || 0}个智能体，是否继续生成？
-                        <Button size="small">继续生成</Button>
-                    </div> */}
                         </div>
                     </div>
                     {selectedAgent && (
@@ -356,7 +436,7 @@ const BatchCreate = memo(
                                 <ResultDisplay
                                     initialValues={selectedAgent}
                                     loading={false}
-                                    readOnly={true}
+                                    onChange={handleAgentChange}
                                 />
                                 <Button
                                     type="text"

@@ -282,4 +282,13 @@ export default {
     'workflow.panel.dragTip': 'Drag node to canvas',
     'workflow.panel.noData': 'No data',
     'workflow.panel.searchPlaceholder': 'Search node name',
+
+    'agent.outputType': 'Output Type',
+    'agent.outputType.text': 'Text',
+    'agent.outputType.json': 'JSON',
+    'agent.outputType.code': 'Code',
+
+    'agent.modal.leave.title': 'Tips',
+    'agent.modal.leave.content': 'Are you sure you want to leave?',
+    'agent.save.failed': 'Save failed'
 };

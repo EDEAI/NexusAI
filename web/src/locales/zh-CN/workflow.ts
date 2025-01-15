@@ -275,4 +275,13 @@ export default {
     'workflow.panel.dragTip': '拖拽节点到画布中',
     'workflow.panel.noData': '暂无数据',
     'workflow.panel.searchPlaceholder': '搜索节点名称',
+
+    'agent.outputType': '输出类型',
+    'agent.outputType.text': '文本',
+    'agent.outputType.json': 'JSON',
+    'agent.outputType.code': '代码',
+
+    'agent.modal.leave.title': '提示',
+    'agent.modal.leave.content': '是否确认离开？',
+    'agent.save.failed': '保存失败'
 };

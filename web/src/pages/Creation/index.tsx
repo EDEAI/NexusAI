@@ -18,7 +18,7 @@ import { DeleteCreation, GetChatroom, PutappsUpdate } from '@/api/creation';
 import { bindTag, unBindTag } from '@/api/workflow';
 import Headportrait from '@/components/headportrait';
 import Scroll from '@/components/InfiniteScroll';
-import TagSearch, { TagSelect, useTags } from '@/components/TagSearch';
+import TagSearch, { TagSelect } from '@/components/TagSearch';
 import useUserStore from '@/store/user';
 import { createappdata, creationsearchdata, getlist, headportrait } from '@/utils/useUser';
 import { useIntl } from '@umijs/max';
@@ -28,6 +28,9 @@ import CreationModal from '../../components/creationModal';
 import AddCreation from './components/AddCreation';
 import Profilephoto from './components/profilephoto';
 import { use } from '@reactuses/core';
+import { useMount, useUpdateEffect } from 'ahooks';
+import { useTagStore } from '@/store/tags';
+import { UPDATE_NOTIFICATIONS } from '@/store/user';
 const { Text, Paragraph } = Typography;
 
 const { TextArea } = Input;
@@ -126,6 +129,9 @@ const Creation: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [opensetting, setOpensetting] = useState(-1);
     const [selectedTags, setSelectedTags]=useState<string[]>([]);
+    const [lastCheck, setLastCheck] = useState(Date.now());
+    const { shouldComponentUpdate, clearUpdateNotification } = useUserStore();
+
     const getChatRoomList = async (
         page?: any,
         searchTypedata?: any,
@@ -314,9 +320,35 @@ const Creation: React.FC = () => {
     //         value: 'All',
     //     },
     // ]);
-    const { tagList, refreshTags } = useTags();
+    const { tags, fetchTags } = useTagStore();
     
     useEffect(() => {}, [optionsModalId]);
+
+ 
+    useEffect(() => {
+        const checkUpdate = () => {
+            if (shouldComponentUpdate(UPDATE_NOTIFICATIONS.AGENT_LIST, lastCheck)) {
+          
+                const notification = useUserStore.getState().updateNotifications.get(UPDATE_NOTIFICATIONS.AGENT_LIST);
+                
+           
+                if (notification?.payload?.action === 'create') {
+             
+                    getChatRoomList(1, null);
+                } else {
+                  
+                    getChatRoomList(1, null);
+                }
+            
+                setLastCheck(Date.now());
+             
+                clearUpdateNotification(UPDATE_NOTIFICATIONS.AGENT_LIST);
+            }
+        };
+    
+        const timer = setInterval(checkUpdate, 1000);
+        return () => clearInterval(timer);
+    }, [shouldComponentUpdate, lastCheck]);
 
     return (
         <div
@@ -377,7 +409,7 @@ const Creation: React.FC = () => {
                             allowClear
                             modes={creationsearchdata('GET').optionsModalId}
                             onTagChange={() => {
-                                refreshTags();
+                                fetchTags();
                             }}
                             onChange={(e)=>{
                                 setSelectedTags(e)
@@ -653,6 +685,7 @@ const Creation: React.FC = () => {
                                                                                 //   }
                                                                                   
                                                                               }}
+                                                                              listStyle="horizontal"
                                                                               key={item.app_id}
                                                                               onChange={e => {
                                                                                 // const removeList=item.tags.filter(x=>!(e).some(y=>y==x.id)).map(x=>x.id||x)
@@ -677,7 +710,7 @@ const Creation: React.FC = () => {
                                                                                   item => item.id,
                                                                               )}
                                                                               maxTagCount={5}
-                                                                              options={tagList}
+                                                                              options={tags}
                                                                               className="!w-full"
                                                                               variant="borderless"
                                                                           ></TagSelect>

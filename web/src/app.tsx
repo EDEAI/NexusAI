@@ -12,6 +12,8 @@ import { useResetPanel } from './hooks/useResetPanel';
 import useWebSocketManager from './hooks/useSocket';
 import PageWrap from './layout';
 import { errorConfig } from './requestErrorConfig';
+import { useIntl } from '@umijs/max';
+import { useInitialTags } from '@/store/tags';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -41,6 +43,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     const [lastRouter, setLastRouter] = useState(location.pathname);
     const saveWorkFlow = useSaveWorkFlow();
     const resetPanel = useResetPanel();
+    useInitialTags();
     return {
         actionsRender: () => [<SelectLang key="SelectLang" />],
         avatarProps: {

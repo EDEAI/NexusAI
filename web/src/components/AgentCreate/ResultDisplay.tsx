@@ -1,9 +1,10 @@
+import { CloseOutlined, PlusOutlined, CheckOutlined } from '@ant-design/icons';
 import { Button, Input, Spin, Typography } from 'antd';
+import { useIntl } from '@umijs/max';
 import React, { forwardRef, memo, useEffect, useImperativeHandle, useState } from 'react';
 import TagSearch from '../TagSearch';
 import { EditableCard } from './EditableCard';
 import { AgentFormData } from './types';
-import { PlusOutlined } from '@ant-design/icons';
 const { Paragraph } = Typography;
 
 export interface ResultDisplayRef {
@@ -20,6 +21,7 @@ interface ResultDisplayProps {
 const ResultDisplay = memo(
     forwardRef<ResultDisplayRef, ResultDisplayProps>(
         ({ initialValues, onChange, loading, readOnly = false }, ref) => {
+            const intl = useIntl();
             const [values, setValues] = useState<Partial<AgentFormData>>(initialValues || {});
 
             useEffect(() => {
@@ -44,9 +46,9 @@ const ResultDisplay = memo(
                 if (readOnly) return;
                 const newAbilities = [...(values.abilities || [])];
                 newAbilities.push({
-                    name: '新技能',
-                    content: '技能描述',
-                    output_format: 1
+                    name: intl.formatMessage({ id: 'agent.result.new.ability' }),
+                    content: intl.formatMessage({ id: 'agent.result.ability.desc' }),
+                    output_format: 1,
                 });
                 handleChange({
                     name: values.name || '',
@@ -67,13 +69,17 @@ const ResultDisplay = memo(
                         <div className="h-full">
                             <div className="px-4 pt-6 flex items-center gap-2">
                                 <Paragraph
-                                    editable={!readOnly ? {
-                                        onChange: value => handleChange({ name: value }),
-                                        text: values.name,
-                                        triggerType: ['text'],
-                                        autoSize: true,
-                                    } : false}
-                                    className="hover:bg-blue-100 !mb-0 relative rounded-lg text-blue-600 text-[16px] flex items-center"
+                                    editable={
+                                        !readOnly
+                                            ? {
+                                                  onChange: value => handleChange({ name: value }),
+                                                  text: values.name,
+                                                  triggerType: ['text'],
+                                                  autoSize: true,
+                                              }
+                                            : false
+                                    }
+                                    className={`${!readOnly ? 'hover:bg-blue-100' : ''} !mb-0 relative rounded-lg text-blue-600 text-[16px] flex items-center`}
                                 >
                                     <img
                                         src="/icons/agent_create.svg"
@@ -84,41 +90,56 @@ const ResultDisplay = memo(
                             </div>
                             <div className="px-4 py-1 mt-2">
                                 <Paragraph
-                                    editable={!readOnly ? {
-                                        onChange: value => handleChange({ description: value }),
-                                        text: values.description,
-                                        triggerType: ['text'],
-                                        autoSize: true,
-                                    } : false}
-                                    className="hover:bg-blue-100 rounded-lg !mb-0 text-[#666666] text-[12px]"
+                                    editable={
+                                        !readOnly
+                                            ? {
+                                                  onChange: value =>
+                                                      handleChange({ description: value }),
+                                                  text: values.description,
+                                                  triggerType: ['text'],
+                                                  autoSize: true,
+                                              }
+                                            : false
+                                    }
+                                    className={`${!readOnly ? 'hover:bg-blue-100' : ''} rounded-lg !mb-0 text-[#666666] text-[12px]`}
                                 >
                                     {values.description}
                                 </Paragraph>
-                                <div className="flex items-center hover:bg-blue-100 rounded-lg  mt-2">
-                                    <img src="/icons/tag.svg" className="size-4"></img>
-                                    <div className=" flex-1">
-                                        <TagSearch
-                                            showAddButton={false}
-                                            className="w-full"
-                                            variant="borderless"
-                                            disabled={readOnly}
-                                            onChange={tags => {
-                                                handleChange({ tags });
-                                            }}
-                                            value={values.tags}
-                                        ></TagSearch>
+                                {!readOnly && (
+                                    <div className="flex items-center hover:bg-blue-100 rounded-lg  mt-2">
+                                        <img src="/icons/tag.svg" className="size-4"></img>
+                                        <div className=" flex-1">
+                                            <TagSearch
+                                                showAddButton={false}
+                                                className="w-full"
+                                                variant="borderless"
+                                                disabled={readOnly}
+                                                onChange={tags => {
+                                                    handleChange({ tags });
+                                                }}
+                                            
+                                                listStyle='horizontal'
+                                                maxTagCount={20}
+                                                value={values.tags}
+                                            ></TagSearch>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                             <div className="px-4 py-1">
                                 <Paragraph
-                                    editable={!readOnly ? {
-                                        onChange: value => handleChange({ obligations: value }),
-                                        text: values.obligations,
-                                        triggerType: ['text'],
-                                        autoSize: true,
-                                    } : false}
-                                    className="hover:bg-blue-100 rounded-lg !mb-0 text-[12px]"
+                                    editable={
+                                        !readOnly
+                                            ? {
+                                                  onChange: value =>
+                                                      handleChange({ obligations: value }),
+                                                  text: values.obligations,
+                                                  triggerType: ['text'],
+                                                  autoSize: true,
+                                              }
+                                            : false
+                                    }
+                                    className={`${!readOnly ? 'hover:bg-blue-100' : ''} rounded-lg !mb-0 text-[12px]`}
                                 >
                                     {values.obligations}
                                 </Paragraph>
@@ -160,12 +181,12 @@ const ResultDisplay = memo(
                                     />
                                 ))}
                                 {!readOnly && (
-                                    <Button 
-                                        icon={<PlusOutlined />} 
+                                    <Button
+                                        icon={<PlusOutlined />}
                                         onClick={handleAddAbility}
                                         className="w-full"
                                     >
-                                        增加技能
+                                        {intl.formatMessage({ id: 'agent.result.ability.add' })}
                                     </Button>
                                 )}
                             </div>
@@ -184,6 +205,8 @@ interface PromptTextareaProps {
     onChange?: (value: string) => void;
     /** Submit callback */
     onSubmit?: (value: string) => void;
+    /** Close callback */
+    onClose?: () => void;
     /** Placeholder text */
     placeholder?: string;
     /** Whether the component is disabled */
@@ -192,6 +215,10 @@ interface PromptTextareaProps {
     loading?: boolean;
     /** Submit button text */
     submitText?: string;
+    /** Show close button */
+    showCloseButton?: boolean;
+    /** Submit button props */
+    submitButtonProps?: React.ComponentProps<typeof Button>;
     /** Custom class name */
     className?: string;
     /** Custom style */
@@ -214,10 +241,13 @@ export const PromptTextarea = memo(
         defaultValue = '',
         onChange,
         onSubmit,
+        onClose,
         placeholder = 'Enter prompt',
         disabled = false,
         loading = false,
         submitText = 'Submit',
+        showCloseButton = false,
+        submitButtonProps = {},
         className = '',
         style = {},
         renderButton,
@@ -239,17 +269,20 @@ export const PromptTextarea = memo(
         const renderButtonContent = () => {
             if (!renderButton) {
                 return (
-                    <Button
-                        type="primary"
-                        variant="filled"
-                        color="primary"
-                        loading={loading}
-                        disabled={!value.trim() || disabled}
-                        onClick={handleSubmit}
-                        icon={submitIcon}
-                    >
-                        {submitText}
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button
+                            type="primary"
+                            variant="filled"
+                            color="primary"
+                            loading={loading}
+                            disabled={!value.trim() || disabled}
+                            onClick={handleSubmit}
+                            icon={submitIcon}
+                            {...submitButtonProps}
+                        >
+                            {submitText}
+                        </Button>
+                    </div>
                 );
             }
 
@@ -278,7 +311,17 @@ export const PromptTextarea = memo(
                     disabled={disabled}
                     className="w-full !h-full p-3 pr-9 rounded-lg border border-gray-200 resize-none outline-none focus:border-blue-500 transition-colors"
                 />
-                <div className="absolute right-2 bottom-2">{renderButtonContent()}</div>
+                <div className="absolute right-2 bottom-2 w-full flex justify-end">
+                    {renderButtonContent()}
+                </div>
+                {showCloseButton && (
+                    <Button
+                        type="text"
+                        icon={<CloseOutlined />}
+                        className="absolute right-1 top-1"
+                        onClick={onClose}
+                    ></Button>
+                )}
             </div>
         );
     },

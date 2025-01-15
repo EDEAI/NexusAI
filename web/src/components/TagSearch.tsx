@@ -1,10 +1,6 @@
-import {
-    createTag as apiCreateTag,
-    deleteTag as apiDeleteTag,
-    getTagList,
-    updateTag,
-} from '@/api/workflow';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { createTag, deleteTag, updateTag } from '@/api/workflow';
+import { useTagStore } from '@/store/tags';
+import { CheckOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { useDebounce, useMount } from 'ahooks';
 import {
@@ -18,7 +14,9 @@ import {
     Typography,
     message,
 } from 'antd';
-import { memo, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import Fuse from 'fuse.js';
+import type { CustomTagProps } from 'rc-select/lib/BaseSelect';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { EditableItem } from './DivEditable';
 
 const { Paragraph } = Typography;
@@ -28,34 +26,9 @@ interface TagSearchProps extends SelectProps {
     children?: React.ReactNode;
     modes?: number;
     showAddButton?: boolean;
+    listStyle?: 'vertical' | 'horizontal';
     [key: string]: any;
 }
-
-interface TagState {
-    tagList: SelectProps['options'];
-    loading: boolean;
-    error: string | null;
-}
-
-// Action types
-type TagAction =
-    | { type: 'SET_TAGS'; payload: SelectProps['options'] }
-    | { type: 'SET_LOADING'; payload: boolean }
-    | { type: 'SET_ERROR'; payload: string | null };
-
-// Reducer
-const tagReducer = (state: TagState, action: TagAction): TagState => {
-    switch (action.type) {
-        case 'SET_TAGS':
-            return { ...state, tagList: action.payload, error: null };
-        case 'SET_LOADING':
-            return { ...state, loading: action.payload };
-        case 'SET_ERROR':
-            return { ...state, error: action.payload, loading: false };
-        default:
-            return state;
-    }
-};
 
 const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = true, ...props }) => {
     const intl = useIntl();
@@ -63,61 +36,45 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
     const [openAddTag, setOpenAddTag] = useState(false);
     const [keyword, setKeyword] = useState('');
 
-    // Use reducer for complex state management
-    const [state, dispatch] = useReducer(tagReducer, {
-        tagList: [
-            {
-                label: intl.formatMessage({ id: 'addTag.all', defaultMessage: 'All' }),
-                value: 'All',
-            },
-        ],
-        loading: false,
-        error: null,
-    });
-
-    const debouncedKeyword = useDebounce(keyword, 300);
-
-    useEffect(() => {
-        const filteredTags = state.tagList.filter(tag => {
-            const stringValue = String(tag.label).toLowerCase();
-            return stringValue.includes(debouncedKeyword.toLowerCase());
-        });
-        if (debouncedKeyword) {
-            dispatch({ type: 'SET_TAGS', payload: filteredTags });
-        } else {
-            getTags();
-        }
-    }, [debouncedKeyword]);
+    const { tags, loading, fetchTags } = useTagStore();
 
     // Memoized API calls
     const getTags = useCallback(async () => {
         try {
-            dispatch({ type: 'SET_LOADING', payload: true });
-            const res = await getTagList(modes);
-            if (res.code === 0) {
-                const formattedTags = res.data?.map(x => ({
-                    ...x,
-                    label: x.name,
-                    value: x.id,
-                }));
-                dispatch({ type: 'SET_TAGS', payload: formattedTags });
-            } else {
-                throw new Error(res.message || 'Failed to fetch tags');
-            }
+            await fetchTags();
         } catch (error) {
-            dispatch({ type: 'SET_ERROR', payload: error.message });
             message.error(
                 intl.formatMessage({
                     id: 'error.fetchTags',
                     defaultMessage: 'Failed to fetch tags',
                 }),
             );
-        } finally {
-            dispatch({ type: 'SET_LOADING', payload: false });
         }
-    }, [modes, intl]);
+    }, [intl, fetchTags]);
 
-    const createTag = useCallback(
+    const debouncedKeyword = useDebounce(keyword, { wait: 300 });
+
+    const filteredOptions = useMemo(() => {
+        return tags
+            .filter(tag => {
+                if (!debouncedKeyword) return true;
+                const stringValue = String(tag.name).toLowerCase();
+                return stringValue.includes(debouncedKeyword.toLowerCase());
+            })
+            .map(tag => ({
+                label: tag.name,
+                value: tag.id,
+                data: tag,
+            }));
+    }, [tags, debouncedKeyword]);
+
+    useEffect(() => {
+        if (!debouncedKeyword) {
+            getTags();
+        }
+    }, [debouncedKeyword, getTags]);
+
+    const createTagHandler = useCallback(
         async (name: string) => {
             if (!name.trim()) {
                 message.warning(
@@ -130,14 +87,11 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
             }
 
             try {
-                dispatch({ type: 'SET_LOADING', payload: true });
-                const res = await apiCreateTag(name, modes);
+                const res = await createTag(name, modes);
                 if (res.code === 0) {
                     setKeyword('');
-                    getTags();
-
+                    await fetchTags();
                     props?.onTagChange?.();
-
                     message.success(
                         intl.formatMessage({
                             id: 'addTag.success',
@@ -154,20 +108,17 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                         defaultMessage: 'Failed to create tag',
                     }),
                 );
-            } finally {
-                dispatch({ type: 'SET_LOADING', payload: false });
             }
         },
-        [modes, intl, props?.onTagChange],
+        [modes, intl, props?.onTagChange, fetchTags],
     );
 
-    const deleteTag = useCallback(
-        async (tag_id: string) => {
+    const deleteTagHandler = useCallback(
+        async (tag_id: string | number) => {
             try {
-                dispatch({ type: 'SET_LOADING', payload: true });
-                const res = await apiDeleteTag(tag_id);
+                const res = await deleteTag(String(tag_id));
                 if (res.code === 0) {
-                    getTags();
+                    fetchTags();
                     message.success(
                         intl.formatMessage({
                             id: 'deleteTag.success',
@@ -184,11 +135,36 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                         defaultMessage: 'Failed to delete tag',
                     }),
                 );
-            } finally {
-                dispatch({ type: 'SET_LOADING', payload: false });
             }
         },
-        [intl],
+        [intl, fetchTags],
+    );
+
+    const updateTagHandler = useCallback(
+        async (id: string | number, name: string) => {
+            try {
+                const res = await updateTag(id, name);
+                if (res.code === 0) {
+                    fetchTags();
+                    message.success(
+                        intl.formatMessage({
+                            id: 'updateTag.success',
+                            defaultMessage: 'Tag updated successfully',
+                        }),
+                    );
+                } else {
+                    throw new Error(res.message || 'Failed to update tag');
+                }
+            } catch (error) {
+                message.error(
+                    intl.formatMessage({
+                        id: 'error.updateTag',
+                        defaultMessage: 'Failed to update tag',
+                    }),
+                );
+            }
+        },
+        [intl, fetchTags],
     );
 
     // Mount effect
@@ -203,7 +179,7 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                 <Input
                     suffix={
                         <PlusOutlined
-                            onClick={() => keyword.trim() && createTag(keyword)}
+                            onClick={() => keyword.trim() && createTagHandler(keyword)}
                             className={`cursor-pointer mx-1 ${
                                 !keyword.trim() ? 'text-gray-300' : ''
                             }`}
@@ -219,13 +195,13 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                     onPressEnter={e => {
                         e.preventDefault();
                         if (keyword.trim()) {
-                            createTag(keyword);
+                            createTagHandler(keyword);
                         }
                     }}
                 />
-                {state.tagList.map(item => (
+                {filteredOptions.map(item => (
                     <div
-                        key={item.id}
+                        key={item.value}
                         className="p-0.5 cursor-pointer border border-gray-300 text-gray-600 hover:border-[#1B64F3] rounded-md flex flex-wrap items-center transition-all duration-300"
                     >
                         <div className="pl-3 pr-1">
@@ -233,8 +209,8 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                                 maxLength={10}
                                 onUpdate={async newName => {
                                     try {
-                                        await updateTag(item.id, newName);
-                                        getTags();
+                                        await updateTagHandler(item.value, newName);
+                                        fetchTags();
                                         props?.onTagChange?.();
                                     } catch (error) {
                                         message.error(
@@ -246,12 +222,12 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                                     }
                                 }}
                             >
-                                {item.name}
+                                {item.label}
                             </EditableItem>
                         </div>
-                        {item.reference_count === 0 ? (
+                        {(item.data as any).reference_count === 0 ? (
                             <Button
-                                onClick={() => deleteTag(item.id)}
+                                onClick={() => deleteTagHandler(item.value)}
                                 type="text"
                                 icon={<DeleteOutlined />}
                             />
@@ -263,10 +239,10 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                                 })}
                                 description={`${intl.formatMessage({
                                     id: 'addTag.deleteConfirmation1',
-                                })} ${item.reference_count} ${intl.formatMessage({
+                                })} ${(item.data as any).reference_count} ${intl.formatMessage({
                                     id: 'addTag.deleteConfirmation2',
                                 })}`}
-                                onConfirm={() => deleteTag(item.id)}
+                                onConfirm={() => deleteTagHandler(item.value)}
                                 okText={intl.formatMessage({
                                     id: 'addTag.confirm',
                                     defaultMessage: 'Confirm',
@@ -283,7 +259,16 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                 ))}
             </div>
         ),
-        [state.tagList, keyword, intl, createTag, deleteTag],
+        [
+            filteredOptions,
+            keyword,
+            intl,
+            createTagHandler,
+            deleteTagHandler,
+            updateTagHandler,
+            fetchTags,
+            props?.onTagChange,
+        ],
     );
 
     return (
@@ -295,7 +280,7 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                 onCancel={() => setOpenAddTag(false)}
                 onOk={() => {
                     if (keyword.trim()) {
-                        createTag(keyword);
+                        createTagHandler(keyword);
                     }
                     setOpenAddTag(false);
                 }}
@@ -322,116 +307,217 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
 
             <TagSelect
                 className="!w-[160px]"
-                options={state.tagList}
-                loading={state.loading}
+                options={filteredOptions}
+                loading={loading}
+                onCreateTag={name => {
+                    createTagHandler(name);
+                }}
+              
                 {...props}
             />
         </div>
     );
 });
 
-interface TagSelectProps extends SelectProps {}
+interface TagSelectProps extends SelectProps {
+    tagColor?: string;
+    onCreateTag?: (name: string) => void;
+    listStyle?: 'vertical' | 'horizontal';
+}
+
+interface SelectOption {
+    label: string;
+    value: string | number;
+    data?: any;
+}
+
 export const TagSelect: React.FC<TagSelectProps> = memo(props => {
     const intl = useIntl();
+    const { tagColor, listStyle = 'vertical' } = props;
+    const { disabled, onCreateTag, ...restProps } = props;
+    const [inputValue, setInputValue] = useState('');
+    const [selectedTags, setSelectedTags] = useState<SelectOption[]>([]);
+
+    useEffect(() => {
+        if (restProps.options) {
+            if (restProps.value) {
+                const values = Array.isArray(restProps.value) ? restProps.value : [restProps.value];
+                const selected = (restProps.options as SelectOption[]).filter(option =>
+                    values.includes(option.value),
+                );
+                setSelectedTags(selected);
+            } else if (restProps.defaultValue && !selectedTags.length) {
+                const defaultValues = Array.isArray(restProps.defaultValue)
+                    ? restProps.defaultValue
+                    : [restProps.defaultValue];
+
+                const selected = (restProps.options as SelectOption[]).filter(option =>
+                    defaultValues.includes(option.value),
+                );
+                setSelectedTags(selected);
+            }
+        } else if (!restProps.value && !restProps.options) {
+            setSelectedTags([]);
+        }
+    }, [restProps.value, restProps.options, restProps.defaultValue]);
+
+    const handleChange = (values: (string | number)[] | null) => {
+        if (!values) {
+            setSelectedTags([]);
+            props.onChange?.([]);
+            return;
+        }
+
+        const newSelectedTags =
+            (restProps.options as SelectOption[])?.filter(option =>
+                values.includes(option.value),
+            ) || [];
+        setSelectedTags(newSelectedTags);
+        props.onChange?.(values);
+    };
+
+    const tagRender = (props: CustomTagProps) => {
+        const { label } = props;
+        const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
+            event.preventDefault();
+            event.stopPropagation();
+        };
+        return (
+            <Tag
+                color={tagColor || 'blue'}
+                onMouseDown={onPreventMouseDown}
+                style={{ marginInlineEnd: 4 }}
+            >
+                {label}
+            </Tag>
+        );
+    };
+
+    const fuse = useMemo(() => {
+        const options = {
+            keys: ['label'],
+            threshold: 0.3,
+            includeScore: true,
+        };
+        return new Fuse((restProps.options || []) as SelectOption[], options);
+    }, [restProps.options]);
+
+    const filteredOptions = useMemo(() => {
+        if (!inputValue) {
+            return restProps.options || [];
+        }
+
+        const searchResults = fuse.search(inputValue);
+        return searchResults.map(result => result.item);
+    }, [inputValue, fuse, restProps.options]);
+
+    const dropdownRender = (menu: React.ReactElement) => (
+        <div className="p-1">
+            <div
+                className={`max-h-[300px] overflow-auto ${
+                    listStyle === 'horizontal' ? 'flex flex-wrap gap-1' : ''
+                }`}
+            >
+                {filteredOptions.map(option => (
+                    <div
+                        key={option.value}
+                        className={`
+                            flex items-center justify-between cursor-pointer rounded hover:bg-gray-100
+                            ${
+                                selectedTags.some(tag => tag.value === option.value)
+                                    ? 'bg-blue-50'
+                                    : ''
+                            }
+                            ${
+                                listStyle === 'horizontal'
+                                    ? 'px-2 py-0.5 border border-gray-200'
+                                    : 'px-2 py-1.5'
+                            }
+                        `}
+                        onClick={() => {
+                            const isSelected = selectedTags.some(tag => tag.value === option.value);
+                            const newSelectedTags = isSelected
+                                ? selectedTags.filter(tag => tag.value !== option.value)
+                                : [...selectedTags, option];
+                            setSelectedTags(newSelectedTags);
+                            handleChange(newSelectedTags.map(tag => tag.value));
+                        }}
+                    >
+                        <span className="mr-2">{option.label}</span>
+                        {selectedTags.some(tag => tag.value === option.value) && (
+                            <CheckOutlined className="text-blue-500" />
+                        )}
+                    </div>
+                ))}
+            </div>
+            {onCreateTag &&
+                inputValue &&
+                !filteredOptions.some(option => option.label === inputValue) && (
+                    <div
+                        className="flex items-center gap-2 px-2 py-2 mt-1 cursor-pointer hover:bg-gray-100 border-t"
+                        onClick={() => {
+                            if (inputValue.trim()) {
+                                onCreateTag(inputValue.trim());
+                                setInputValue('');
+                            }
+                        }}
+                    >
+                        <PlusOutlined className="text-blue-500" />
+                        <span>
+                            {intl.formatMessage(
+                                { id: 'addTag.createTag', defaultMessage: 'Create tag: {tag}' },
+                                { tag: inputValue },
+                            )}
+                        </span>
+                    </div>
+                )}
+        </div>
+    );
 
     return (
-        <Select
+        <Select<SelectOption>
             mode="multiple"
             size="middle"
+            showSearch
+            tokenSeparators={[',']}
+            searchValue={inputValue}
+            onSearch={setInputValue}
+            value={selectedTags.map(tag => tag.value)}
+            onClear={() => {
+                setSelectedTags([]);
+                props.onChange?.([]);
+            }}
+            onKeyDown={e => {
+                if (e.key === 'Enter') {
+                    if (inputValue && inputValue.trim()) {
+                        const tags = inputValue
+                            .split(',')
+                            .map(tag => tag.trim())
+                            .filter(Boolean);
+                        tags.forEach(tag => {
+                            onCreateTag?.(tag);
+                        });
+                        setInputValue('');
+                    }
+                }
+            }}
             placeholder={intl.formatMessage({
                 id: 'addTag.pleaseSelect',
                 defaultMessage: 'Please select',
             })}
             maxTagCount="responsive"
-            onChange={e => {
-                props?.onChange?.(e);
-            }}
+            onChange={handleChange}
             tagRender={tagRender}
-            options={props?.options || []}
-            {...props}
+            dropdownRender={dropdownRender}
+            options={restProps.options || []}
+            disabled={disabled}
+            open={disabled ? false : restProps.open}
+            {...restProps}
+            
         />
     );
 });
 
 type TagRender = SelectProps['tagRender'];
-const tagRender: TagRender = props => {
-    const { label, value, closable, onClose } = props;
-    const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
-        event.preventDefault();
-        event.stopPropagation();
-    };
-    return (
-        <Tag
-            color={`blue`}
-            onMouseDown={onPreventMouseDown}
-            // closable={closable}
-            // onClose={onClose}
-            style={{ marginInlineEnd: 4 }}
-        >
-            {label}
-        </Tag>
-    );
-};
-
-// Add useTags hook back with improvements
-export const useTags = (initialModes = 0) => {
-    const intl = useIntl();
-    const [modes] = useState(initialModes);
-    const [state, dispatch] = useReducer(tagReducer, {
-        tagList: [
-            {
-                label: intl.formatMessage({ id: 'addTag.all', defaultMessage: 'All' }),
-                value: 'All',
-            },
-        ],
-        loading: false,
-        error: null,
-    });
-
-    const fetchTags = useCallback(
-        async (currentModes: number) => {
-            try {
-                dispatch({ type: 'SET_LOADING', payload: true });
-                const res = await getTagList(currentModes);
-                if (res.code === 0) {
-                    const formattedTags = res.data?.map(x => ({
-                        ...x,
-                        label: x.name,
-                        value: x.id,
-                    }));
-                    dispatch({ type: 'SET_TAGS', payload: formattedTags });
-                } else {
-                    throw new Error(res.message || 'Failed to fetch tags');
-                }
-            } catch (error) {
-                dispatch({ type: 'SET_ERROR', payload: error.message });
-                message.error(
-                    intl.formatMessage({
-                        id: 'error.fetchTags',
-                        defaultMessage: 'Failed to fetch tags',
-                    }),
-                );
-            } finally {
-                dispatch({ type: 'SET_LOADING', payload: false });
-            }
-        },
-        [intl],
-    );
-
-    useEffect(() => {
-        fetchTags(modes);
-    }, [modes, fetchTags]);
-
-    const refreshTags = useCallback(() => {
-        fetchTags(modes);
-    }, [modes, fetchTags]);
-
-    return {
-        tagList: state.tagList,
-        loading: state.loading,
-        error: state.error,
-        refreshTags,
-    };
-};
 
 export default memo(TagSearch);
