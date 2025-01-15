@@ -100,8 +100,9 @@ const AgentCreate = memo(() => {
     };
 
     const closeModal = () => {
-        if (singleAgentResult) {
+        if (singleAgentResult|| batchAgentResult) {
             Modal.confirm({
+                centered:true,
                 title: intl.formatMessage({ id: 'agent.modal.leave.title' }),
                 content: intl.formatMessage({ id: 'agent.modal.leave.content' }),
                 onOk: () => {
@@ -277,6 +278,7 @@ const AgentCreate = memo(() => {
         setBatchModelVisible(false);
         setBatchLoading(false);
         setPrompt('');
+        setBatchPrompt('')
         setLoading(false);
         setCorrectVisible(false);
         setCreateType('single');
@@ -392,7 +394,16 @@ const AgentCreate = memo(() => {
             <BatchCreateModal
                 ref={batchCreateRef}
                 open={batchModelVisible}
-                onCancel={() => setBatchModelVisible(false)}
+                onCancel={() =>{
+                    Modal.confirm({
+                        centered:true,
+                        title: intl.formatMessage({ id: 'agent.modal.leave.title' }),
+                        content: intl.formatMessage({ id: 'agent.modal.leave.content' }),
+                        onOk: () => {
+                            setBatchModelVisible(false)
+                        },
+                    });
+                }}
                 onOk={handleBatchCreate}
                 loading={batchLoading}
                 params={batchModelVisible}
