@@ -50,7 +50,7 @@ const Graphic: React.FC<GraphicProps> = (props: GraphicProps) => {
     // },[])
     return (
         <div
-            className={`flex  p-[10px] cursor-pointer overflow-hidden relative ${
+            className={`flex  p-[10px] cursor-pointer overflow-hidden relative bg-[#fff] ${
                 status !== undefined ? borderStatus(status) : 'graphicbox'
             }`}
             onClick={handleClick}

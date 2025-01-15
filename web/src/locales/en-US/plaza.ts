@@ -52,8 +52,8 @@ export default {
     'app.check_workflow_popup.save': 'Save',
     'app.check_workflow_popup.cancel': 'Cancel',
 
-    'app.chatroom.content.summary':'summary',
-    'app.chatroom.content.meetingSummary':'Meeting Summary',
+    'app.chatroom.content.summary':'Orientation',
+    'app.chatroom.content.meetingSummary':'Meeting Orientation',
 
     'app.chatroom.sidebar.return': 'Return',
     'app.chatroom.sidebar.agent_title': 'Agent',
@@ -93,7 +93,7 @@ export default {
     'app.workflow.needHumanConfirm': 'Need human confirmation',
     'app.workflow.noHumanConfirm': 'Human confirmation processed',
 
-    "app.summary.title":"Meeting Summary",
+    "app.summary.title":"Meeting Orientation",
     "app.summary.submitText":"Submit revisions",
     "app.summary.next":"Next step",
     "app.summary.placeholder":"Please enter your correction suggestion... .",
@@ -102,4 +102,12 @@ export default {
     "app.summary.SelectWorkflow":"Select Workflow",
 
     "app.summary.backlogTips":"You have a pending task",
+
+    "app.summaryhistory.orientation":"Correction orientation",
+    "app.summaryhistory.time":"Correction time",
+    "app.summaryhistory.runapp":"Run the application",
+    "app.summaryhistory.input":"Input parameters",
+    "app.summaryhistory.results":"Execution results",
+    "app.summaryhistory.prompt":"Instruction prompt"
+
 };

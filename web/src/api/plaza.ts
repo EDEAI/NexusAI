@@ -106,5 +106,12 @@ export const getMeetingSummaryHistory = async(data:any)=>{
         data: data,
     });
     return res;
-    
 } 
+
+export const getMeetingSinglesummary = async (id: any,data:any) => {
+    const res = await aniRequest<any>(`/v1/chatroom/${id}/chat_single_message_generation`, {
+        method: 'POST',
+        data: data,
+    });
+    return res;
+};
