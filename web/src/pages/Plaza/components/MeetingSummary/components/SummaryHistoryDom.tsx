@@ -50,7 +50,7 @@ const ProgressContainer :React.FC<{progressObj:any}> = memo((parmas) => {
 const SummaryHistoryDom:React.FC<{list:any,scrollDom:any}>=parmas=>{
     let {list,scrollDom}=parmas;
     let intl = useIntl();
-    const summaryHistory = list.reverse();
+    const [summaryHistory] = useState([...list.reverse()])
     const [domHeight,setDomHeight] = useState('100%')
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const timeConversion=time=>{
