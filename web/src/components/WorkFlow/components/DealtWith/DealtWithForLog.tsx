@@ -79,7 +79,7 @@ export default memo((props: any) => {
         const newHumanMessage = flowMessage.find(
             item => item?.data?.node_exec_data?.node_exec_id == execId,
         );
- 
+
 
         if (newHumanMessage) {
             getHumanMessage(execId);
@@ -110,10 +110,13 @@ export default memo((props: any) => {
                     item?.type == 'workflow_need_human_confirm'
                 ){
                     item.need_human_confirm=0
+                    if(item.data!=undefined){
+                        item.data.need_human_confirm=0
+                    }
                 }
                 return item;
             }
-                
+
         );
         setFlowMessage(newFlowMessage);
     };
