@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo,useEffect,useState} from 'react';
 import Graphic from '@/components/Graphic';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
@@ -47,10 +47,11 @@ const ProgressContainer :React.FC<{progressObj:any}> = memo((parmas) => {
     );
 });
 
-const SummaryHistoryDom:React.FC<{list:any}>=parmas=>{
-    let {list}=parmas;
+const SummaryHistoryDom:React.FC<{list:any,scrollDom:any}>=parmas=>{
+    let {list,scrollDom}=parmas;
     let intl = useIntl();
     const summaryHistory = list.reverse();
+    const [domHeight,setDomHeight] = useState('100%')
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const timeConversion=time=>{
         let newTime = new Date(time);
@@ -69,9 +70,16 @@ const SummaryHistoryDom:React.FC<{list:any}>=parmas=>{
         })
         return array
     }
+    useEffect(()=>{
+        if(scrollDom){
+            setDomHeight(scrollDom?.current?.offsetHeight)
+        }
+    },[scrollDom])
+    
     return(
         <>
-            <div className='px-4'>
+            <div className='px-4' style={{minHeight:domHeight}}>
+                
                 {
                     summaryHistory&&summaryHistory.length?summaryHistory.map(item=>(
                         item?.source_run && item?.source_run.summary?

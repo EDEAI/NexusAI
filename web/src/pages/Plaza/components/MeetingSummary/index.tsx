@@ -35,6 +35,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
             if(!isScroll){
                 setTimeout(()=>{
                     scrollDom?.current?.scrollTo({top: scrollDom.current.scrollHeight});
+
                 },200)
                 setRoomId(summaryParams.id)
                 setSummaryParams({})
@@ -64,6 +65,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
             setSummaryShow(true);
             
             getSummaryHistory(false);
+           
             
         }
     },[summaryParams])
@@ -78,7 +80,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                         minWidth={400}
                         className={`relative h-full right-0 border-0 returned-0 px-[0] ${packUp?'translate-x-full flex-[0]':''}`}
                     >
-                        {boxLoading?<div className='h-full w-full absolute top-0 left-0 flex justify-center items-center z-20 bg-[rgba(255,255,255,0.5)]'><Spin size="large" /></div>:<></>}
+                        {boxLoading?<div className='h-full w-full absolute top-0 left-0 flex justify-center items-center z-99 bg-[rgba(255,255,255,0.5)]'><Spin size="large" /></div>:<></>}
                         {
                             <>
                                 <div onClick={()=>{ setPackUp(pre=>!pre)}} className={`
@@ -87,10 +89,10 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                                     `}>
                                    {!packUp?<VerticalLeftOutlined className='text-[20px]'/>:<VerticalRightOutlined className='text-[20px]'/>}
                                 </div>
-                                <div className={`h-full overflow-y-auto flex flex-col-reverse scroll-smooth`}  ref={scrollDom}>
+                                <div className={`h-full min-h-full overflow-y-auto flex flex-col-reverse scroll-smooth`}  ref={scrollDom}>
                                     <div>
-                                        {summaryHistory.length?<SummaryHistoryDom list={summaryHistory}/>:<></>}
-                                        <div className={`w-full px-4 h-full`} style={{minHeight:summaryShow?scrollDom?.current?.offsetHeight:'100%'}}>
+                                        {summaryHistory.length?<SummaryHistoryDom scrollDom={scrollDom} list={summaryHistory}/>:<></>}
+                                        <div className={`w-full px-4 h-full`} style={{minHeight:summaryShow?scrollDom?.current?.offsetHeight:''}}>
                                             <RevisionsMeetingSummary 
                                                 setShow={setRunboxShow}
                                                 inputShow={inputShow}
