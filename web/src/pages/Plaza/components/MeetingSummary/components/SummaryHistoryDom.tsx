@@ -145,7 +145,7 @@ const SummaryHistoryDom:React.FC<{list:any}>=parmas=>{
                                                 </div>
                                                 <div>
                                                     <div className='text-[16px] font-[600] py-[8px]'>{intl.formatMessage({id:'app.summaryhistory.results'})}:</div>
-                                                    <div className='py-[12px]  bg-[#F7F7F7]'>    
+                                                    <div className='p-[12px]  bg-[#F7F7F7]'>    
                                                         {
                                                             item?.target_run?.agent_id!=0?
                                                             <div className='p-[12px]  bg-[#F7F7F7] leading-[22px]'>
