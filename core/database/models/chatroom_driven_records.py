@@ -184,7 +184,7 @@ class ChatroomDrivenRecords(MySQL):
                             'id', 'app_id', 'agent_id', 'workflow_id', 'name',
                             'status', 'created_time', 'finished_time', 'elapsed_time',
                             'completed_steps', 'total_steps', 'inputs', 'outputs',
-                            'total_tokens'
+                            'total_tokens','raw_user_prompt'
                         ],
                         conditions=[
                             {"column": "id", "value": record['data_driven_run_id']}
@@ -224,7 +224,11 @@ class ChatroomDrivenRecords(MySQL):
                                 target_run['outputs'] = target_run['outputs']
                             except:
                                 target_run['outputs'] = None
-
+                        if target_run.get('raw_user_prompt'):
+                            try:
+                                target_run['raw_user_prompt'] = target_run['raw_user_prompt']
+                            except:
+                                target_run['raw_user_prompt'] = None
                         target_run['app'] = app
                         record_data['target_run'] = target_run
 

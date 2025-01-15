@@ -149,6 +149,12 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             current_node.id = CURRENT_NODE_ID
             context.add_node(level, current_node)
             
+            replace_prompt_with_context(self.data['prompt'], context)
+            AppRuns().update(
+                {'column': 'id', 'value': agent_run_id},
+                {'raw_user_prompt': self.data['prompt'].get_user()}
+            )
+            
             input_ = {'obligations': agent['obligations']}
             
             # Generate the system prompt based on the agent's abilities and output format
@@ -254,7 +260,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         append_ret_lang_prompt=False
                     )
                 
-            replace_prompt_with_context(self.data['prompt'], context)
             user_prompt = self.data['prompt'].get_user()
             
             # RAG chain generation
@@ -343,6 +348,10 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 correct_llm_output=correct_llm_output,
                 requirements_and_goals=requirements_and_goals,
                 requirements_and_goals_kwargs=requirements_and_goals_kwargs
+            )
+            AppRuns().update(
+                {'column': 'id', 'value': agent_run_id},
+                {'messages': model_data['messages']}
             )
             print(model_data)
             # Process the AI message

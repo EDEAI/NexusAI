@@ -360,6 +360,11 @@ class Chatroom:
                 'agent_id': agent_id,
                 'type': 2,
                 'name': f'Agent-{agent_id}-Roundtable-{self._chatroom_id}_{now}',
+                'raw_user_prompt': agent_user_prompt,
+                'messages': [
+                    ['system', prompt.system.to_dict()],
+                    ['user', prompt.user.to_dict()]
+                ],
                 'status': 2
             }
         )
