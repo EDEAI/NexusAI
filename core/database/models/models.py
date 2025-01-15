@@ -52,6 +52,8 @@ class Models(MySQL):
                 'models.name AS model_name',
                 'models.type AS model_type',
                 'models.mode AS model_mode',
+                'models.max_context_tokens',
+                'models.max_output_tokens',
                 'suppliers.id AS supplier_id',
                 'suppliers.name AS supplier_name',
                 'supplier_configurations.config AS supplier_config',
