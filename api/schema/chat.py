@@ -225,6 +225,7 @@ class TargetRun(BaseModel):
     outputs: Optional[Dict[str, Any]] = None
     total_tokens: Optional[int] = None
     percentage: Optional[int] = None
+    raw_user_prompt: Optional[str] = None
 
 class ChatHistoryItem(BaseModel):
     source_run: Optional[SourceRun] = None
