@@ -519,7 +519,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
         order_by="id ASC",
     )
 
-    if chat_message is None:
+    if not chat_message:
         return response_error(get_language_content("chatroom_message_is_null"))
 
     chatMessageList = ChatroomMessages().get_history_list(chat_message)
