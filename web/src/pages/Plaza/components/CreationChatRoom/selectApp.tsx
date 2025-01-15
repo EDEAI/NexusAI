@@ -261,6 +261,7 @@ const Content: React.FC<params> = param => {
                                 showAddButton={false}
                                 size='large'
                                 className='w-[260px]'
+                                listStyle="horizontal"
                             ></TagSearch>
                         </div>
                         <div
