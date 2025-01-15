@@ -1,6 +1,6 @@
 import { getAppListByMode } from '@/api/workflow';
 import DraggablePanel from '@/components/Panel/DraggablePanel';
-import { TagSelect, useTags } from '@/components/TagSearch';
+import { TagSelect } from '@/components/TagSearch';
 import { SearchOutlined } from '@ant-design/icons';
 import { ProForm, ProFormItem, ProFormRadio, ProFormText } from '@ant-design/pro-components';
 import { getLocale, useIntl } from '@umijs/max';
@@ -13,6 +13,7 @@ import { getBaseNode } from '../../nodes/nodeDisperse';
 import useStore from '../../store';
 import { BlockEnum, TabConfig } from '../../types';
 import DraggableList from '../DraggableList';
+import { useTagStore } from '@/store/tags';
 
 interface SearchNodeList {
     [BlockEnum.Agent]?: any;
@@ -42,7 +43,7 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
     const [tabIndex, setTabIndex] = useState(defaultActiveTab || '1');
     const [searchNode, setSearchNode] = useState(baseNodes);
     const [searchTools, setSearchTools] = useState([]);
-    const { tagList } = useTags();
+    const { tags } = useTagStore();
     const [searchNodeList, setSearchNodeList] = useSetState<SearchNodeList>({
         [BlockEnum.Agent]: [],
         [BlockEnum.Skill]: [],
@@ -367,7 +368,7 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
                             <ProFormItem name={'tag'}>
                                 <TagSelect
                                     className="w-full"
-                                    options={tagList}
+                                    options={tags}
                                     allowClear
                                     onChange={e => {}}
                                 ></TagSelect>
