@@ -10,46 +10,7 @@ import useStore from '../../store';
 import { AppNode } from '../../types';
 import { resetFormNodes } from '../../utils/resetFormNodes';
 
-type PromptItem = {
-    serializedContent: string;
-    value: object;
-};
-interface Prompt {
-    system: PromptItem;
-    user: PromptItem;
-    assistant: PromptItem;
-}
-const originalOptions = [
-    {
-        label: '',
-        value: 'start',
-        options: [
-            { label: 'Jack', value: 'Jack', type: 'string' },
-            { label: 'Lucy', value: 'Lucy', type: 'string' },
-        ],
-    },
-    {
-        label: 'engineer',
-        value: 'engineer',
-        options: [
-            { label: 'Chloe', value: 'Chloe', type: 'string' },
-            { label: 'Lucas', value: 'Lucas', type: 'string' },
-        ],
-    },
-];
-const transformSelectOptions = options => {
-    return options.map(group => {
-        return {
-            label: <span>{group.label}</span>,
-            title: group.value,
-            options:
-                group.options?.map(item => ({
-                    label: <span>{item.label}</span>,
-                    value: item.value,
-                })) || [],
-        };
-    });
-};
+
 
 export default memo(({ node }: { node: AppNode }) => {
     const formRef = useRef(null);

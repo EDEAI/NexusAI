@@ -75,11 +75,11 @@ export default memo((props: any) => {
     };
 
     useUpdateEffect(() => {
-        console.log(flowMessage, execId);
+        if(!show) return;
         const newHumanMessage = flowMessage.find(
             item => item?.data?.node_exec_data?.node_exec_id == execId,
         );
-        console.log(newHumanMessage);
+ 
 
         if (newHumanMessage) {
             getHumanMessage(execId);

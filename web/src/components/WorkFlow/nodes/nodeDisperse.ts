@@ -78,7 +78,7 @@ export const NodeCustom = {
                 title: 'Agent',
                 entitle: 'Agent',
                 desc: '',
-                descTools: '这是一个初始化Agent节点描述',
+                descTools: '',
                 endescTools: 'This is an initial Agent node description',
                 outputInfo: {
                     key: 'text',
@@ -199,28 +199,6 @@ export const NodeCustom = {
             },
         },
     },
-    [BlockEnum.Retriever]: {
-        node: Retriever,
-        icon: BlockEnum.Retriever,
-        panel: RetrieverPanel,
-        title: '检索器',
-        entitle: 'Retriever',
-        base: {
-            type: BlockEnum.Retriever,
-            data: {
-                title: '检索器',
-                entitle: 'Retriever',
-                desc: '',
-                descTools: '从知识库中查询与用户的问题相关的文本内容',
-                endescTools: 'Query text content related to user questions from the knowledge base',
-                outputInfo: {
-                    key: 'output',
-                    type: 'object',
-                    base: true,
-                },
-            },
-        },
-    },
     [BlockEnum.VariableAggregation]: {
         node: VariableAggregation,
         icon: BlockEnum.VariableAggregation,
@@ -245,6 +223,29 @@ export const NodeCustom = {
             },
         },
     },
+    [BlockEnum.Retriever]: {
+        node: Retriever,
+        icon: BlockEnum.Retriever,
+        panel: RetrieverPanel,
+        title: '检索器',
+        entitle: 'Retriever',
+        base: {
+            type: BlockEnum.Retriever,
+            data: {
+                title: '检索器',
+                entitle: 'Retriever',
+                desc: '',
+                descTools: '从知识库中查询与用户的问题相关的文本内容',
+                endescTools: 'Query text content related to user questions from the knowledge base',
+                outputInfo: {
+                    key: 'output',
+                    type: 'object',
+                    base: true,
+                },
+            },
+        },
+    },
+
     [BlockEnum.ConditionBranch]: {
         node: ConditionBranch,
         icon: BlockEnum.ConditionBranch,

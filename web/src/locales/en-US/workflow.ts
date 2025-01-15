@@ -251,5 +251,44 @@ export default {
     'workflow.needHumanConfirm': 'Need human confirmation',
     'workflow.noHumanConfirm': 'Human confirmation processed',
     "workflow.label.selectAggregationVariables": "Select aggregation variables (multiple selection allowed)",
-    "workflow.message.setVariablesFirst": "Please set variables first"
+    "workflow.message.setVariablesFirst": "Please set variables first",
+
+    // Node list related
+    'workflow.nodeList': 'App List',
+    'workflow.team': 'Team',
+    'workflow.mine': 'Mine',
+    'workflow.search': 'Search App',
+    'workflow.list': 'Workflow',
+
+    // Node types
+    'workflow.node.start': 'Start',
+    'workflow.node.end': 'End', 
+    'workflow.node.agent': 'Agent',
+    'workflow.node.human': 'Human',
+    'workflow.node.retriever': 'Retriever',
+    'workflow.node.llm': 'LLM',
+    'workflow.node.variable_aggregation': 'Variable Aggregation',
+    'workflow.node.template_conversion': 'Template Conversion',
+    'workflow.node.condition_branch': 'Condition Branch',
+    'workflow.node.requirement_category': 'Requirement Category',
+    'workflow.node.custom_code': 'Custom Code',
+    'workflow.node.skill': 'Skill',
+    'workflow.node.http_request': 'HTTP Request',
+    'workflow.node.recursive_task_execution': 'Task Execution',
+    'workflow.node.recursive_task_generation': 'Task Generation',
+    'workflow.node.tool': 'Tool',
+
+    // Node panel
+    'workflow.panel.dragTip': 'Drag node to canvas',
+    'workflow.panel.noData': 'No data',
+    'workflow.panel.searchPlaceholder': 'Search node name',
+
+    'agent.outputType': 'Output Type',
+    'agent.outputType.text': 'Text',
+    'agent.outputType.json': 'JSON',
+    'agent.outputType.code': 'Code',
+
+    'agent.modal.leave.title': 'Tips',
+    'agent.modal.leave.content': 'Are you sure you want to leave?',
+    'agent.save.failed': 'Save failed'
 };

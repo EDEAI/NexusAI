@@ -44,6 +44,17 @@ export default {
     'app.check_agent_popup.save': 'Save',
     'app.check_agent_popup.cancel': 'Cancel',
 
+    'app.check_workflow_popup.title': 'Select Workflow',
+    'app.check_workflow_popup.chenck_text': 'Selected',
+    'app.check_workflow_popup.select_1': 'My Workflow',
+    'app.check_workflow_popup.select_2': 'Organization Workflow',
+    'app.check_workflow_popup.search': 'Please enter a keyword to search',
+    'app.check_workflow_popup.save': 'Save',
+    'app.check_workflow_popup.cancel': 'Cancel',
+
+    'app.chatroom.content.summary':'summary',
+    'app.chatroom.content.meetingSummary':'Meeting Summary',
+
     'app.chatroom.sidebar.return': 'Return',
     'app.chatroom.sidebar.agent_title': 'Agent',
     'app.chatroom.sidebar.agent_button': 'Clear Memory',
@@ -77,7 +88,18 @@ export default {
     'app.chatroom.clear.confirm': 'Clear',
     'app.chatroom.clear.tips': 'Do you want to clear the agent memory?',
     'app.chatroom.clear.cancel': 'Cancel',
+    'app.chatroom.add.agent':'Add Agent',
 
     'app.workflow.needHumanConfirm': 'Need human confirmation',
     'app.workflow.noHumanConfirm': 'Human confirmation processed',
+
+    "app.summary.title":"Meeting Summary",
+    "app.summary.submitText":"Submit revisions",
+    "app.summary.next":"Next step",
+    "app.summary.placeholder":"Please enter your correction suggestion... .",
+    "app.summary.Runapp":"Select Run App",
+    "app.summary.SelectAgent":"Select Agent",
+    "app.summary.SelectWorkflow":"Select Workflow",
+
+    "app.summary.backlogTips":"You have a pending task",
 };

@@ -18,3 +18,4 @@ docker/docker-compose.yml
 scripts/test*.py
 /supervisord.conf
 /docker-compose.yml
+.history
