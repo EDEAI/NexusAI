@@ -75,8 +75,6 @@ const Content: React.FC<params> = param => {
             const updateList = (list, setList) => {
                 setList(isInit ? [...newList] : [...list, ...newList]);
             };
-            console.log(data.search_type);
-            
             if (data.search_type == 3) {
                 updateList(myList, setMyList);
                 setIshasMore(res.data.total_pages > parameters.current.page);
@@ -95,7 +93,6 @@ const Content: React.FC<params> = param => {
     };
     const selectMobNumber = (key: any,type) => {
         let myCheckNumber = 0;
-        console.log(type,key);
         if(type == 3){
             if(checkMyItem.current.length){
                 myCheckNumber = checkMyItem.current.length;
@@ -160,7 +157,6 @@ const Content: React.FC<params> = param => {
     };
    // Save popup
     const Save = () => {
-        console.log(checkMyItem.current);
         popupSave({
             checkItem: [...checkMyItem.current,...checkMoreItem.current],
         });
@@ -380,7 +376,8 @@ const Content: React.FC<params> = param => {
                         className="p-[20px] flex gap-x-[20px] justify-end"
                         style={{ borderTop: '1px solid #e8e8e8' }}
                     >
-                        <div className='flex-1'>
+                       { 
+                        !radio?<div className='flex-1'>
                             <Button
                                 // type="text"
                                 // className="bg-[#1B64F3] rounded-[4px]"
@@ -390,7 +387,8 @@ const Content: React.FC<params> = param => {
                             >
                                 全选
                             </Button>
-                        </div>
+                        </div>:<></>
+                        }
                         <Button
                             className="text-[14px] text-[#213044] w-[88px] h-[40px]"
                             style={{ border: '1px solid #D8D8D8' }}
