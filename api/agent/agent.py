@@ -19,6 +19,9 @@ from time import time
 import json
 from core.database.models.ai_tool_llm_records import AIToolLLMRecords
 import traceback
+from core.database.models.models import Models
+from core.helper import truncate_messages_by_token_limit
+
 
 router = APIRouter()
 
@@ -403,6 +406,21 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
     if not app_run_info:
         return response_error(get_language_content('app_run_error'))
 
+    runing_record = AIToolLLMRecords().select_one(
+            columns=['loop_id'],
+            conditions=[
+                {"column": "app_run_id", "value": data.app_run_id},
+                {"column": "status", "op": "in", "value": [1, 2]}
+            ],
+            limit=1
+        )
+    if runing_record:
+        # There are records that are being executed.
+        return response_error(get_language_content("agent_batch_exist_runing_rocord"))
+
+
+
+
     # Get all LLM records for this app run
     record_list = AIToolLLMRecords().select(
         columns=['id', 'inputs', 'outputs'],
@@ -453,6 +471,11 @@ async def agent_regenerate(data: ReqAgentRegenerateSchema, userinfo: TokenData =
         ],
         order_by='id DESC'
     )
+
+    model_info = Models().get_model_by_type(1, userinfo.team_id, uid=userinfo.uid)
+    model_config_id = model_info['model_config_id']
+    model_info = Models().get_model_by_config_id(model_config_id)
+    history_agent_list = truncate_messages_by_token_limit(history_agent_list, model_info)
 
     # Format user prompt with history agent list
     user_prompt = get_language_content('regenerate_agent_user', userinfo.uid, False)
@@ -618,6 +641,16 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
 
 @router.post('/agent_batch_generate', response_model=ResAgentBatchGenerateSchema)
 async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Batch generate agents
+
+    Args:
+        app_run_id: int, App run ID
+        loop_count: int, Number of agents to generate per batch
+        loop_limit: int, Total number of agents to generate
+        supplement_prompt: str, Additional requirements for generation
+        loop_id: int, Loop iteration ID
+    """
     # Validate app run exists and belongs to user
     # app_run_info = AppRuns().get_app_run_info(data.app_run_id, userinfo.uid)
     # if not app_run_info:
@@ -693,15 +726,19 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             order_by='id ASC'
         )
 
-        # 合并所有outputs
         outputs_list = []
         for record in record_list:
             if record.get('outputs') and isinstance(record['outputs'], dict):
                 output_value = record['outputs'].get('value')
                 if isinstance(output_value, list):
-                    outputs_list.extend(output_value)  # 如果是列表就extend
+                    outputs_list.extend(output_value)
                 elif output_value:
-                    outputs_list.append(output_value)  # 如果是单个值就append
+                    outputs_list.append(output_value)
+
+        model_info = Models().get_model_by_type(1, userinfo.team_id, uid=userinfo.uid)
+        model_config_id = model_info['model_config_id']
+        model_info = Models().get_model_by_config_id(model_config_id)
+        outputs_list = truncate_messages_by_token_limit(outputs_list, model_info)
 
         system_prompt = get_language_content('agent_batch_generate_system', userinfo.uid)
         user_prompt = get_language_content('agent_batch_generate_user', userinfo.uid, False)
@@ -751,6 +788,14 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
 
 @router.post('/agent_save', response_model=ResAgentSaveSchema)
 async def agent_save(data: ReqAgentSaveSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Save agent information
+
+    Args:
+        app_run_id: int, App run ID
+        record_id: int, Record ID
+        agent_info: dict, Agent information to save
+    """
     app_run_info = AppRuns().select_one(
         columns=["id"],
         conditions=[
@@ -795,6 +840,10 @@ async def agent_save(data: ReqAgentSaveSchema, userinfo: TokenData = Depends(get
 async def agent_batch_sample(data: ReqAgentBatchSample, userinfo: TokenData = Depends(get_current_user)):
     """
     Generate a sample agent based on user prompt
+
+    Args:
+        app_run_id: int, App run ID
+        supplement_prompt: str, Additional requirements for sample generation
     """
     if not data.supplement_prompt:
         return response_error(get_language_content("api_agent_supplement_prompt_required"))
@@ -864,7 +913,7 @@ async def agent_batch_sample(data: ReqAgentBatchSample, userinfo: TokenData = De
 @router.post("/agent_create", response_model=ResBatchAgentCreateSchema)
 async def agent_batch_create(data: ReqAgentBatchCreateSchema, userinfo: TokenData = Depends(get_current_user)):
     """
-    Create multiple agents in a single batch operation.
+    Create multiple agents in a single batch operation
 
     Args:
         data (ReqAgentBatchCreateSchema): List of agent configurations
