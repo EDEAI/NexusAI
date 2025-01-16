@@ -692,7 +692,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
         input_variable = create_variable_from_dict(agent['input_variables'])
         prompt_variables = [
             # {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
-            {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
+            {k: v for k, v in var.to_dict().items() if k not in ['max_length']}
             for var in input_variable.properties.values()
         ]
         agent_id = agent['id']
