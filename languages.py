@@ -663,7 +663,7 @@ language_packs = {
             1. The split items of the work-oriented data must meet the target range in the work-oriented data I provided. Do not create new split items or lack split items.
             2. The final generated work-oriented data must meet the requirements of the work-oriented data json format. Do not change the data structure.
             3. Be sure to pay attention to the field description and requirements in the work-oriented data json format description, and use this as a reference rule for splitting.
-            4. Remember that the three fields of name, display_name, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
+            4. Remember that the four fields of name, display_name, required, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
             5. Be sure to strictly abide by the work-oriented data json format. Note that only the generated json format content is returned in the end, and no redundant content is returned.
 
             Work-oriented data json format description:
@@ -673,6 +673,7 @@ language_packs = {
                 'variables': [
                     {{
                         name: The variable name corresponding to the split item. Do not change this field.
+                        required: The variable required corresponding Is it mandatory. Do not change this field.
                         display_name: The variable display name corresponding to the split item. It can be used as a description of the function and purpose of the split item and as a basis for extracting the split item. Do not change this field.
                         type: The variable type corresponding to the split item. It can be "number" or "string". Note that the content of the split item must correspond to the variable type. Do not change this field.
                         value: The final work-oriented split item content
@@ -694,7 +695,7 @@ language_packs = {
             1. The split items of the work-oriented data must meet the target range in the work-oriented data I provided. Do not create new split items or lack split items.
             2. The final generated work-oriented data must meet the json format requirements of the work-oriented data. Do not change the data structure.
             3. Be sure to pay attention to the field description and requirements in the json format description of the work-oriented data, and use this as a reference rule for splitting.
-            4. Remember that the three fields of name, display_name, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
+            4. Remember that the four fields of name, display_name, required, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
             5. Be sure to strictly abide by the data correction suggestions.
             6. Be sure to strictly abide by the json format of the work-oriented data. Note that only the generated json format content is returned in the end, and do not return redundant content.
 
@@ -705,6 +706,7 @@ language_packs = {
                 'variables': [
                     {{
                         name: The variable name corresponding to the split item. Do not change this field.
+                        required: The variable required corresponding Is it mandatory. Do not change this field.
                         display_name: The variable display name corresponding to the split item. It can be used as a description of the function and purpose of the split item and as a basis for extracting the split item. Do not change this field.
                         type: The variable type corresponding to the split item. It can be "number" or "string". Note that the content of the split item must correspond to the variable type. Do not change this field.
                         value: The final content of the work-oriented split item
