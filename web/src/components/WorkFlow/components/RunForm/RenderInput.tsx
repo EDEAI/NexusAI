@@ -32,7 +32,7 @@ export const RenderInput = ({ data }) => {
                             ]}
                             name={val.name}
                             initialValue={val.value}
-                            label={val.name}
+                            label={val.display_name||val.name}
                         />
                     );
                 }
@@ -48,7 +48,7 @@ export const RenderInput = ({ data }) => {
                         ]}
                         name={val.name}
                         initialValue={val.value}
-                        label={val.name}
+                        label={val.display_name||val.name}
                     />
                 );
             })}

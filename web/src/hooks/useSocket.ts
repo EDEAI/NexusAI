@@ -4,10 +4,7 @@
 import useSocketStore from '@/store/websocket';
 import { useWebSocket } from 'ahooks';
 
-// const URL = {
-//     chat: 'ws://192.168.4.80:8765/',
-//     dealt: 'ws://192.168.4.80:9474/ws',
-// };
+
 const URL = {
     chat: CHAT_URL,
     dealt: WS_URL,
@@ -28,7 +25,6 @@ const useWebSocketManager = (type: ManagerType = 'dealt', listen?: Function) => 
                
             },
             onMessage: message => {
-                // console.log('Received message', message, listen);
                 listen && listen(message);
                 if (type == 'dealt') {
                     try {
@@ -45,6 +41,15 @@ const useWebSocketManager = (type: ManagerType = 'dealt', listen?: Function) => 
         },
     );
 
+    const checkAndConnect = () => {
+        if (readyState !== 1) {
+            console.debug('Socket not connected, attempting to connect...');
+            connect();
+            return false;
+        }
+        return true;
+    };
+
     const runSocket = () => {
         console.debug('Socket reconnected');
         connect();
@@ -55,6 +60,7 @@ const useWebSocketManager = (type: ManagerType = 'dealt', listen?: Function) => 
         disconnect,
         connect,
         runSocket,
+        checkAndConnect,
     };
 };
 
