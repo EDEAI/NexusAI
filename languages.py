@@ -262,6 +262,7 @@ language_packs = {
         'api_agent_delete_delete_app_error': 'delete app error',
         'api_agent_delete_delete_agent_error': 'delete agent error',
         'api_agent_delete_agent_delete_error': 'agent delete error',
+        'api_agent_batch_create_failed': 'Batch create failed',
         # meeting room
         'chatroom_name_is_required': 'meeting room name is required',
         'chatroom_max_round_is_required': 'max_round is required',
@@ -855,6 +856,7 @@ language_packs = {
         'api_agent_delete_delete_app_error': '删除应用失败',
         'api_agent_delete_delete_agent_error': '删除智能体失败',
         'api_agent_delete_agent_delete_error': '智能体删除失败',
+        'api_agent_batch_create_failed': '批量创建智能体失败',
 
         'chatroom_name_is_required': '会议室标题不能为空',
         'chatroom_max_round_is_required': '最大回合数不能为空',
