@@ -248,7 +248,7 @@ export default {
     'workflow.vars.displayName': 'Display Name',
     'workflow.vars.isRequired': 'Is Required',
 
-    'workflow.needHumanConfirm': 'Need human confirmation',
+    'workflow.needHumanConfirm': 'Pending',
     'workflow.noHumanConfirm': 'Human confirmation processed',
     "workflow.label.selectAggregationVariables": "Select aggregation variables (multiple selection allowed)",
     "workflow.message.setVariablesFirst": "Please set variables first",
@@ -292,5 +292,15 @@ export default {
     'agent.modal.leave.content': 'Are you sure you want to leave?',
     'agent.save.failed': 'Save failed',
 
-    'creation.placeholder.selectTags': 'Please select tags'
+    'creation.placeholder.selectTags': 'Please select tags',
+
+    'workflow.needHumanConfirm1': '待确认',
+    'workflow.tooltip.confirmer': 'Pending confirmation by: {users}',
+    'workflow.label.confirmer': 'Pending Confirmer',
+
+    'workflow.form.parameter.required': 'Please enter parameter',
+    'workflow.form.confirmer.required': 'Please select confirmer',
+
+    'agent.batch.count.tooltip': 'Select batch generation count',
+    'agent.batch.submit': 'Submit'
 };

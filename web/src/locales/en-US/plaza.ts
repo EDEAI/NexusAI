@@ -41,7 +41,7 @@ export default {
     'app.check_agent_popup.select_1': 'My Agent',
     'app.check_agent_popup.select_2': 'Organization Agents',
     'app.check_agent_popup.search': 'Please enter a keyword to search',
-    'app.check_agent_popup.save': 'Save',
+    'app.check_agent_popup.save': 'Confirm',
     'app.check_agent_popup.cancel': 'Cancel',
 
     'app.check_workflow_popup.title': 'Select Workflow',
@@ -49,7 +49,7 @@ export default {
     'app.check_workflow_popup.select_1': 'My Workflow',
     'app.check_workflow_popup.select_2': 'Organization Workflow',
     'app.check_workflow_popup.search': 'Please enter a keyword to search',
-    'app.check_workflow_popup.save': 'Save',
+    'app.check_workflow_popup.save': 'Confirm',
     'app.check_workflow_popup.cancel': 'Cancel',
 
     'app.chatroom.content.summary':'Orientation',
@@ -108,6 +108,8 @@ export default {
     "app.summaryhistory.runapp":"Run the application",
     "app.summaryhistory.input":"Input parameters",
     "app.summaryhistory.results":"Execution results",
-    "app.summaryhistory.prompt":"Instruction prompt"
+    "app.summaryhistory.prompt":"Instruction prompt",
+    "app.summaryhistory.userPrompt":"Correction prompt",
+    "app.summaryhistory.tag":"Pending"
 
 };

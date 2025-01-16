@@ -86,12 +86,12 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any}>=parmas=>{
                             <div className='pt-[16px] border-b-[1px] border-color-[#eee] ' key={item.source_run.id}>
                                <div className='pb-[60px]'>
                                     <div className='text-[16px] font-[600] pb-[8px] flex items-center'>
-                                        <span className='flex-1'>{item?.source_run?.name || intl.formatMessage({ id: 'app.summary.title' })}</span>
+                                        <span className='flex-1'>{intl.formatMessage({ id: 'app.summary.title' })}</span>
                                     </div>
                                     <p className='text-[12px] color-[#eee] mb-[8px]'>
                                         {timeConversion(item?.source_run?.created_time)}
                                     </p>
-                                    <div className='p-[12px]  bg-[#F7F7F7] leading-[22px]'>
+                                    <div className={`p-[12px]  leading-[22px] ${item?.source_corrections && item?.source_corrections.length>0?'bg-[#F7F7F7]':'bg-blue-100 rounded-[4px]'}`}>
                                         <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
                                             {item?.source_run?.summary}
                                         </ReactMarkdown>
@@ -102,8 +102,11 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any}>=parmas=>{
                                                 <div className='text-[16px] font-[600] py-[8px]'>{intl.formatMessage({id:'app.summaryhistory.orientation'})}:</div>
                                                 {
                                                     item?.source_corrections.map(item=>(
-                                                        <div key={item.created_time}>
-                                                            <div className='p-[12px]  bg-[#F7F7F7] leading-[22px]'>
+                                                        <div key={item.created_time} className='last-of-type:bg-blue-100 rounded-[4px] bg-[#F7F7F7] mb-[16px]'>
+                                                            <div className='p-[12px]   leading-[22px]'>
+                                                                <div className='tetx-[14px] font-[600] pb-[12px]'>
+                                                                   {intl.formatMessage({id:'app.summaryhistory.userPrompt'})}: {item.user_prompt}
+                                                                </div>
                                                                 <div className='tetx-[14px] font-[600] pb-[12px]'>
                                                                    {intl.formatMessage({id:'app.summaryhistory.time'})}: {timeConversion(item.created_time)}
                                                                 </div>
@@ -129,15 +132,19 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any}>=parmas=>{
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    {
-                                                        item?.target_run?.inputs?.properties ? getProperties(item?.target_run?.inputs?.properties).map(i=>(
-                                                            <div>
-                                                                <div className='text-[16px] color-[#000] font-[600] py-[12px]'>{intl.formatMessage({id:'app.summaryhistory.input'})}:</div>
-                                                                <div className='pb-[8px] font-[600]'>{i.name}</div>
-                                                                {/* <Input.TextArea variant='borderless' className='text-[14px]' value={item.value}  rows={6}/> */}
-                                                                <div className='py-[4px] px-[11px] text-[14px] leading-[1.5] h-[]'>{i.value}</div>
-                                                            </div>
-                                                        )):<></>
+                                                    {   
+                                                        item?.target_run?.inputs?.properties ?<div>
+                                                             <div className='text-[16px] color-[#000] font-[600] py-[12px]'>{intl.formatMessage({id:'app.summaryhistory.input'})}:</div>
+                                                            {
+                                                                 getProperties(item?.target_run?.inputs?.properties).map(i=>(
+                                                                    <div>
+                                                                        <div className='pb-[8px] font-[600]'>{i.display_name || i.name}</div>
+                                                                        {/* <Input.TextArea variant='borderless' className='text-[14px]' value={item.value}  rows={6}/> */}
+                                                                        <div className='py-[4px] px-[11px] text-[14px] leading-[1.5] h-[]'>{i.value}</div>
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                        </div>:<></>
                                                     }
                                                 </div>
                                                 <div>

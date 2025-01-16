@@ -1,10 +1,10 @@
 /*
  * @LastEditors: biz
  */
+import { getNodeConfirmUserList } from '@/api/workflow';
 import { ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Typography } from 'antd';
-import { getNodeConfirmUserList } from '@/api/workflow';
 
 export const RenderConfirm = ({ data }) => {
     const intl = useIntl();
@@ -25,6 +25,14 @@ export const RenderConfirm = ({ data }) => {
                     name={val.node_id}
                     mode="multiple"
                     required={true}
+                    rules={[
+                        {
+                            required: true,
+                            message: intl.formatMessage({
+                                id: 'workflow.form.confirmer.required',
+                            }),
+                        },
+                    ]}
                     request={async () => {
                         const res = await getNodeConfirmUserList();
                         return res.data.team_member_list
@@ -40,4 +48,4 @@ export const RenderConfirm = ({ data }) => {
     );
 };
 
-export default RenderConfirm; 
+export default RenderConfirm;
