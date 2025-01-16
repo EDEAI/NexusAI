@@ -10,7 +10,7 @@ export const RenderInput = ({ data }) => {
     const intl = useIntl();
     const inputs = data;
     if (!inputs || _.isEmpty(inputs)) return null;
-    
+
     return (
         <div>
             <Typography.Title level={5}>
@@ -24,6 +24,12 @@ export const RenderInput = ({ data }) => {
                         <ProFormDigit
                             key={val.name}
                             required={val.required}
+                            rules={[
+                                {
+                                    required: val.required,
+                                    message: intl.formatMessage({ id: 'workflow.form.parameter.required' }),
+                                },
+                            ]}
                             name={val.name}
                             initialValue={val.value}
                             label={val.name}
@@ -34,6 +40,12 @@ export const RenderInput = ({ data }) => {
                     <ProFormTextArea
                         key={val.name}
                         required={val.required}
+                        rules={[
+                            {
+                                required: val.required,
+                                message: intl.formatMessage({ id: 'workflow.form.parameter.required' }),
+                            },
+                        ]}
                         name={val.name}
                         initialValue={val.value}
                         label={val.name}
@@ -44,4 +56,4 @@ export const RenderInput = ({ data }) => {
     );
 };
 
-export default RenderInput; 
+export default RenderInput;

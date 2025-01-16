@@ -119,23 +119,24 @@ export default memo(() => {
                     const nodeInfo = item;
                     const NodeChildren = useCallback(() => {
                         if (!nodeInfo) return null;
-                        // if (nodeInfo.status == 2) {
-                        //     return <div>{intl.formatMessage({ id: 'workflow.nodeRuning' })}</div>;
-                        // } else
+
                         if (nodeInfo.status == 3 || (nodeInfo.status == 2 && item?.children)) {
                             return (
                                 <div className="flex flex-col gap-2">
                                     {nodeInfo?.need_human_confirm ? (
                                         <div>
-                                            <div>
-                                                {intl.formatMessage({
-                                                    id: 'workflow.needHumanConfirm',
-                                                })}
-                                                :
-                                                {item?.human_confirm_info
-                                                    ?.map(item => item.nickname)
-                                                    .join(',')}
-                                            </div>
+                                            <Alert
+                                                message={
+                                                    <div className="flex gap-2 flex-wrap ">
+                                                        {intl.formatMessage({ id: 'workflow.label.confirmer' })} :
+                                                        {item?.human_confirm_info
+                                                            ?.map(item => item.nickname)
+                                                            .join('、')}
+                                                    </div>
+                                                }
+                                                type="info"
+                                                className="break-all"
+                                            ></Alert>
                                         </div>
                                     ) : null}
                                     {nodeInfo?.prompt_data?.length > 0 && (
@@ -307,7 +308,7 @@ export default memo(() => {
                         } else if (nodeInfo?.status == 3) {
                             return (
                                 <div>
-                                    <div className='flex items-center gap-1'>
+                                    <div className="flex items-center gap-1">
                                         <span>
                                             {_.clamp(item?.elapsed_time, 0.00001, 9999999).toFixed(
                                                 5,
@@ -316,9 +317,27 @@ export default memo(() => {
                                         </span>
                                         <CheckCircleOutlined className="text-green-400"></CheckCircleOutlined>
                                     </div>
-                                    {
-                                        (item?.need_human_confirm)? <Tag className='w-full flex items-center justify-center' color="blue">待确认</Tag>:null
-                                    }
+                                    {item?.need_human_confirm ? (
+                                        <Tooltip
+                                            title={intl.formatMessage(
+                                                { id: 'workflow.tooltip.confirmer' },
+                                                {
+                                                    users: item?.human_confirm_info
+                                                        .map(x => x.nickname)
+                                                        .join(','),
+                                                },
+                                            )}
+                                        >
+                                            <Tag
+                                                className="w-full flex items-center justify-center"
+                                                color="blue"
+                                            >
+                                                {intl.formatMessage({
+                                                    id: 'workflow.needHumanConfirm1',
+                                                })}
+                                            </Tag>
+                                        </Tooltip>
+                                    ) : null}
                                 </div>
                             );
                         }
@@ -389,19 +408,6 @@ export default memo(() => {
                 activeKey: tabKey,
 
                 items: [
-                    // {
-                    //     label: ``,
-                    //     key: '1',
-                    //     children: (
-                    //         <InputContent loading={loading} onRunResult={runResult}></InputContent>
-                    //     ),
-                    // },
-                    // {
-                    //     label: intl.formatMessage({ id: 'workflow.result' }),
-                    //     key: '2',
-                    //     disabled: !endRun,
-                    //     children: <ResultContent></ResultContent>,
-                    // },
                     {
                         label: intl.formatMessage({ id: 'workflow.result' }),
                         key: '3',
@@ -452,8 +458,6 @@ const DetailContent = memo(({ endRun }: { endRun: any }) => {
     );
 
     useEffect(() => {
-        console.log('3131313311');
-
         if (endRun) {
             console.log(endRun);
 

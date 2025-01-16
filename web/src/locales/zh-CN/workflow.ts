@@ -285,5 +285,12 @@ export default {
     'agent.modal.leave.content': '是否确认离开？',
     'agent.save.failed': '保存失败',
 
-    'creation.placeholder.selectTags': '请选择标签'
+    'creation.placeholder.selectTags': '请选择标签',
+
+    'workflow.needHumanConfirm1': '待确认',
+    'workflow.tooltip.confirmer': '待确认人: {users}',
+    'workflow.label.confirmer': '待确认人',
+
+    'workflow.form.parameter.required': '请填写参数',
+    'workflow.form.confirmer.required': '请选择确认人',
 };
