@@ -1,0 +1,1 @@
+ALTER TABLE `ai_tool_llm_records` ADD `user_prompt` TEXT NULL DEFAULT NULL COMMENT 'Prompt word filled in by the user' AFTER `inputs`;
