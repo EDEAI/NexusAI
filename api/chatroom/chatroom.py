@@ -865,7 +865,7 @@ async def chat_single_message_generation(chatroom_id: int, chat_request: ChatSin
 
 
 
-@router.get('/chat_room_history', response_model=ChatRoomHistory)
+@router.get('/chat_room_history', response_model=ChatRoomHistoryList)
 async def get_chat_room_history(
     chatroom_id: int,
     page: int = 1,

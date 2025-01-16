@@ -200,6 +200,7 @@ class SourceRun(BaseModel):
 
 class SummaryCorrection(BaseModel):
     created_time: Optional[datetime] = None
+    user_prompt: Optional[str] = None
     correct_prompt: Optional[Dict[str, Any]] = None
     corrected_summary: Optional[str] = None
 
@@ -213,7 +214,7 @@ class TargetRun(BaseModel):
     app: Optional[TargetApp] = None
     agent_id: Optional[int] = None
     workflow_id: Optional[int] = None
-    name: Optional[str] = None 
+    name: Optional[str] = None
     apps_name: Optional[str] = None
     status: Optional[int] = None
     created_time: Optional[datetime] = None
@@ -225,7 +226,6 @@ class TargetRun(BaseModel):
     outputs: Optional[Dict[str, Any]] = None
     total_tokens: Optional[int] = None
     percentage: Optional[int] = None
-    raw_user_prompt: Optional[str] = None
 
 class ChatHistoryItem(BaseModel):
     source_run: Optional[SourceRun] = None
@@ -240,5 +240,5 @@ class ChatHistoryList(BaseModel):
     page: int
     page_size: int
 
-class ChatRoomHistory(ResponseBase):
+class ChatRoomHistoryList(ResponseBase):
     data: Optional[ChatHistoryList] = None
