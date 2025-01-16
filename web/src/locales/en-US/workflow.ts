@@ -229,7 +229,7 @@ export default {
     'workflow.import.description': 'Upload the exported workflow yml file',
 
     'app.itemHeader.agent': 'Agent',
-    'app.itemHeader.chatRoom': 'Chat Room',
+    'app.itemHeader.chatRoom': 'Round Table',
     'app.itemHeader.workFlow': 'Workflow',
 
     'workflow.vars.text': 'Text',
