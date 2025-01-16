@@ -314,7 +314,7 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
                                             resetButtonProps: false,
                                             submitButtonProps: {
                                                 className: 'w-full',
-                                                disabled:!slateEditorval.current
+                                                disabled: selectedType=='agent' && !slateEditorval.current
                                             },
                                             searchConfig: {
                                                 submitText: intl.formatMessage({
