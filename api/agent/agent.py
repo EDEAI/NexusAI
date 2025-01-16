@@ -353,7 +353,8 @@ async def agent_generate(data: ReqAgentGenerateSchema, userinfo: TokenData = Dep
             app_run_id=app_run_id,
             ai_tool_type=1,  # Agent generator type
             inputs=input_,
-            run_type=1
+            run_type=1,
+            user_prompt=data.user_prompt
         )
 
         if not record_id:
@@ -597,7 +598,8 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
         record_id = AIToolLLMRecords().initialize_correction_record(
             app_run_id=data.app_run_id,
             ai_tool_type=1,
-            correct_prompt=input_
+            correct_prompt=input_,
+            user_prompt=data.supplement_prompt
         )
 
         if not record_id:
@@ -726,7 +728,8 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             run_type=4,      # Batch generation
             loop_id=loop_id,
             loop_count=loop_count,
-            inputs=input_
+            inputs=input_,
+            user_prompt=data.supplement_prompt
         )
 
         if not record_id:
@@ -841,7 +844,8 @@ async def agent_batch_sample(data: ReqAgentBatchSample, userinfo: TokenData = De
         app_run_id=app_run_id,
         ai_tool_type=5,  # Agent generator type
         inputs=input_,
-        run_type=1
+        run_type=1,
+        user_prompt=data.supplement_prompt
     )
 
     if not record_id:
