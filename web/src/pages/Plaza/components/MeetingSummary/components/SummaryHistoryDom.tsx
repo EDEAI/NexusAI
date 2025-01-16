@@ -1,4 +1,5 @@
-import React, { memo,useEffect,useState} from 'react';
+import React, { memo,useEffect,useState,useRef} from 'react';
+import useChatroomStore from '@/store/chatroomstate';
 import Graphic from '@/components/Graphic';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
@@ -47,11 +48,11 @@ const ProgressContainer :React.FC<{progressObj:any}> = memo((parmas) => {
     );
 });
 
-const SummaryHistoryDom:React.FC<{list:any,scrollDom:any}>=parmas=>{
-    let {list,scrollDom}=parmas;
+const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any}>=parmas=>{
+    let {list,scrollDom,historyHeight}=parmas;
     let intl = useIntl();
     const [summaryHistory,setSummaryHistory] = useState([])
-    const [domHeight,setDomHeight] = useState('100%')
+    const domHeight = useRef('100%')
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const timeConversion=time=>{
         let newTime = new Date(time);
@@ -72,9 +73,15 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any}>=parmas=>{
     }
     useEffect(()=>{
         if(scrollDom){
-            setDomHeight(scrollDom?.current?.offsetHeight)
+            domHeight.current = scrollDom?.current?.offsetHeight
         }
     },[scrollDom])
+
+    useEffect(()=>{
+        if(historyHeight){
+            domHeight.current = 'auto'
+        }
+    },[historyHeight])
 
     useEffect(()=>{
         setSummaryHistory([...list.reverse()])
@@ -82,7 +89,7 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any}>=parmas=>{
     
     return(
         <>
-            <div className='px-4' style={{minHeight:domHeight}}>
+            <div className='px-4' style={{minHeight:domHeight.current}}>
                 
                 {
                     summaryHistory&&summaryHistory.length?summaryHistory.map(item=>(
