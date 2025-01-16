@@ -770,7 +770,7 @@ async def agent_save(data: ReqAgentSaveSchema, userinfo: TokenData = Depends(get
     )
 
     if not record_info:
-        return response_error(get_language_content('record_error'))
+        return response_error(get_language_content('api_agent_record_error'))
 
     agent_info = data.agent_info
 
