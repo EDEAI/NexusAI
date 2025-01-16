@@ -299,5 +299,8 @@ export default {
     'workflow.label.confirmer': 'Pending Confirmer',
 
     'workflow.form.parameter.required': 'Please enter parameter',
-    'workflow.form.confirmer.required': 'Please select confirmer'
+    'workflow.form.confirmer.required': 'Please select confirmer',
+
+    'agent.batch.count.tooltip': 'Select batch generation count',
+    'agent.batch.submit': 'Submit'
 };

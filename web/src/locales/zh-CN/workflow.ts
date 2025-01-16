@@ -293,4 +293,7 @@ export default {
 
     'workflow.form.parameter.required': '请填写参数',
     'workflow.form.confirmer.required': '请选择确认人',
+
+    'agent.batch.count.tooltip': '选择单批次生成数量',
+    'agent.batch.submit': '提交',
 };

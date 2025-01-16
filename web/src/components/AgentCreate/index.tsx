@@ -203,11 +203,11 @@ const AgentCreate = memo(() => {
         }
     };
 
-    const handleBatchGenerate = async (prompt: string, count: number) => {
+    const handleBatchGenerate = async (prompt: string, count: number,batchCount:number) => {
         setBatchLoading(true);
         const params = {
             app_run_id: batchGenerateId?.app_run_id || 0,
-            loop_count: 10,
+            loop_count: batchCount,
             loop_limit: count,
             supplement_prompt: prompt,
             loop_id: 0,
