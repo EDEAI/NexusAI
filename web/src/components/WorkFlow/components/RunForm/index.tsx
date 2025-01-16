@@ -24,10 +24,12 @@ const RunForm = memo(({ loading, onFinish, data }: RunFormProps) => {
                 submitButtonProps: {
                     className: 'w-full',
                 },
+                
                 searchConfig: {
                     submitText: intl.formatMessage({
                         id: 'workflow.button.run',
                     }),
+                    
                 },
             }}
             loading={loading}
