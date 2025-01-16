@@ -13,7 +13,7 @@ class AIToolLLMRecords(MySQL):
     """
     have_updated_time = True
 
-    def initialize_execution_record(self, app_run_id: int, ai_tool_type: int, run_type: int = 1, loop_id: int = 0, loop_limit: int = 0, loop_count: int = 0, inputs: Dict[str, Any] = None, correct_prompt: Dict[str, Any] = None) -> int:
+    def initialize_execution_record(self, app_run_id: int, ai_tool_type: int, run_type: int = 1, loop_id: int = 0, loop_limit: int = 0, loop_count: int = 0, inputs: Dict[str, Any] = None, correct_prompt: Dict[str, Any] = None, user_prompt: str = None) -> int:
         """
         Initializes an execution record with the given parameters.
         
@@ -26,6 +26,7 @@ class AIToolLLMRecords(MySQL):
             loop_count (int): The number of iterations required for looping.
             inputs (Dict[str, Any]): The inputs for the execution record.
             correct_prompt (Dict[str, Any]): The correct prompt for the execution record.
+            user_prompt (str, optional): The user-provided prompt. Defaults to None.
         
         Returns:
             int: The ID of the newly created record.
@@ -44,10 +45,12 @@ class AIToolLLMRecords(MySQL):
             record['inputs'] = inputs
         if correct_prompt is not None:
             record['correct_prompt'] = correct_prompt
+        if user_prompt is not None:
+            record['user_prompt'] = user_prompt
 
         return self.insert(record)
 
-    def initialize_correction_record(self, app_run_id: int, ai_tool_type: int, loop_count: int = 0, correct_prompt: Dict[str, Any] = None) -> int:
+    def initialize_correction_record(self, app_run_id: int, ai_tool_type: int, user_prompt: str = None, loop_count: int = 0, correct_prompt: Dict[str, Any] = None) -> int:
         """
         Initializes an AI correction record with the given parameters.
         
@@ -55,6 +58,7 @@ class AIToolLLMRecords(MySQL):
             app_run_id (int): The ID of the app run.
             ai_tool_type (int): AI tool type 0: Regular APP (not an AI tool) 1: Agent generator 2: Skill generator 3: Round Table meeting summary generator 4: Round Table app target data generator.
             loop_count (int): The number of iterations required for looping.
+            user_prompt (str, optional): The user-provided prompt. Defaults to None.
             correct_prompt (Dict[str, Any]): The correct prompt for the correction record.
         
         Returns:
@@ -81,7 +85,7 @@ class AIToolLLMRecords(MySQL):
         )
 
         # Initialize the next correction record
-        return self.initialize_execution_record(app_run_id, ai_tool_type, 3, loop_count, correct_prompt=correct_prompt)
+        return self.initialize_execution_record(app_run_id, ai_tool_type, 3, loop_count, correct_prompt=correct_prompt, user_prompt=user_prompt)
 
     def get_pending_ai_tool_tasks(self) -> List[Dict[str, Any]]:
         """

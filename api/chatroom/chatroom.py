@@ -478,10 +478,8 @@ async def show_chatroom_details(chatroom_id: int, page: int = 1, page_size: int 
     return response_success(chatroom_history_msg)
 
 
-@router.post("/{chatroom_id}/chat_history_message_summary", response_model=ChatRoomResponseBase,
-             summary="Chat History Message Summary")
-async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessageSummary,
-                               userinfo: TokenData = Depends(get_current_user)):
+@router.post("/{chatroom_id}/chat_history_message_summary", response_model=ChatRoomResponseBase, summary="Chat History Message Summary")
+async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessageSummary, userinfo: TokenData = Depends(get_current_user)):
     """
     Use specified properties to query existing applications.
     Distinguish between agents and workFlows based on the current application
@@ -579,6 +577,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
         record_id = AIToolLLMRecords().initialize_correction_record(
             app_run_id=app_run_id,
             ai_tool_type=3,
+            user_prompt=chat_data['corrected_parameter'],
             correct_prompt=input_messages
         )
     else:
@@ -685,6 +684,7 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
             return response_error(get_language_content("agent_does_not_exist"))
         input_variable = create_variable_from_dict(agent['input_variables'])
         prompt_variables = [
+            # {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
             {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
             for var in input_variable.properties.values()
         ]
@@ -705,7 +705,8 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
         input_var = workflow['graph']['nodes'][0]['data']['input']
         input_variable = create_variable_from_dict(input_var)
         prompt_variables = [
-            {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
+            # {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
+            {k: v for k, v in var.to_dict().items() if k not in ['max_length']}
             for var in input_variable.properties.values()
         ]
         agent_id = 0
@@ -730,7 +731,8 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
         meeting_summary_return = json.loads(meeting_summary_return)
         input_variable = create_variable_from_dict(meeting_summary_return)
         meeting_summary_return = [
-            {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
+            # {k: v for k, v in var.to_dict().items() if k not in ['required', 'max_length']}
+            {k: v for k, v in var.to_dict().items() if k not in ['max_length']}
             for var in input_variable.properties.values()
         ]
 
@@ -774,7 +776,8 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
         record_id = AIToolLLMRecords().initialize_correction_record(
             app_run_id=app_run_id,
             ai_tool_type=4,
-            correct_prompt=input_messages
+            correct_prompt=input_messages,
+            user_prompt=chat_data['corrected_parameter']
         )
     return response_success({'app_run_id': app_run_id, 'record_id': record_id, 'message': 'Executing, please wait'})
 
