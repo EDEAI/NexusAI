@@ -44,7 +44,7 @@ const BatchCreate = memo(
                 setCountError(true);
                 return;
             }
-            onSubmit(prompt, count,batchCount);
+            onSubmit(prompt, count, batchCount);
         };
 
         return (
@@ -87,7 +87,7 @@ const BatchCreate = memo(
                                             placeholder={intl.formatMessage({
                                                 id: 'agent.create.input.count',
                                             })}
-                                            className={`w-[200px] ${
+                                            className={`w-[130px] ${
                                                 countError
                                                     ? '!border-red-500 hover:!border-red-500 focus:!border-red-500'
                                                     : ''
@@ -100,16 +100,19 @@ const BatchCreate = memo(
                                             }}
                                             min={1}
                                         />
-                                        <Tooltip title={intl.formatMessage({ id: 'agent.batch.count.tooltip' })}>
-                                            <Segmented<string>
-                                                options={['3', '5', '10']}
-                                                value={batchCount}
-                                                onChange={value => {
-                                                    setBatchCount(value);
-                                                    console.log('Selected batch count:', value);
-                                                }}
-                                            />
-                                        </Tooltip>
+                                        {false && (
+                                            <Tooltip
+                                                title={intl.formatMessage({
+                                                    id: 'agent.batch.count.tooltip',
+                                                })}
+                                            >
+                                                <Segmented<string>
+                                                    options={['3', '5', '10']}
+                                                    value={batchCount}
+                                                    onChange={setBatchCount}
+                                                />
+                                            </Tooltip>
+                                        )}
                                         <Button
                                             type="primary"
                                             disabled={disabled}

@@ -2,17 +2,16 @@
  * @LastEditors: biz
  */
 import { agentCreate, batchAgentCreate } from '@/api/workflow';
+import { useTagStore } from '@/store/tags';
+import useUserStore, { UPDATE_NOTIFICATIONS } from '@/store/user';
 import useSocketStore from '@/store/websocket';
 import { CompressOutlined, DeleteOutlined, HistoryOutlined } from '@ant-design/icons';
+import { useIntl } from '@umijs/max';
 import { useSelections, useUpdateEffect } from 'ahooks';
 import { Button, Modal, Progress, Skeleton, Spin, message } from 'antd';
-import { useIntl } from '@umijs/max';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import TagSearch, { TagSelect } from '../TagSearch';
-import { useTagStore } from '@/store/tags';
+import TagSearch from '../TagSearch';
 import ResultDisplay from './ResultDisplay';
-import useUserStore from '@/store/user';
-import { UPDATE_NOTIFICATIONS } from '@/store/user';
 
 interface BatchAgentParams {
     app_run_id: number;
@@ -99,15 +98,12 @@ const BatchCreate = memo(
             );
             const [moreLoading, setMoreLoading] = useState(false);
             const [lastCheck, setLastCheck] = useState(Date.now());
-            const { 
-                shouldComponentUpdate,
-                clearUpdateNotification,
-                setUpdateNotification 
-            } = useUserStore(state => ({
-                shouldComponentUpdate: state.shouldComponentUpdate,
-                clearUpdateNotification: state.clearUpdateNotification,
-                setUpdateNotification: state.setUpdateNotification
-            }));
+            const { shouldComponentUpdate, clearUpdateNotification, setUpdateNotification } =
+                useUserStore(state => ({
+                    shouldComponentUpdate: state.shouldComponentUpdate,
+                    clearUpdateNotification: state.clearUpdateNotification,
+                    setUpdateNotification: state.setUpdateNotification,
+                }));
 
             const resetState = () => {
                 setAgentList([]);
@@ -175,7 +171,9 @@ const BatchCreate = memo(
                             key: `${i}-${j}`,
                             loop_id: x.data?.exec_data?.loop_id,
                             id: x.data?.exec_data?.outputs?.id || `${i}-${j}`,
-                            tags: selectedTags.length ? selectedTags : (agentTagsMap[x.data?.exec_data?.outputs?.id || `${i}-${j}`] || []),
+                            tags: selectedTags.length
+                                ? selectedTags
+                                : agentTagsMap[x.data?.exec_data?.outputs?.id || `${i}-${j}`] || [],
                         }));
                     })
                     .flat()
@@ -232,7 +230,7 @@ const BatchCreate = memo(
                     title: intl.formatMessage({ id: 'agent.batch.confirm.title' }),
                     content: intl.formatMessage(
                         { id: 'agent.batch.confirm.content' },
-                        { count: reduxAgents.length }
+                        { count: reduxAgents.length },
                     ),
                     centered: true,
                     mask: false,
@@ -251,11 +249,13 @@ const BatchCreate = memo(
                             agents: formattedAgents,
                         });
                         if (res.code == 0) {
-                            message.success(intl.formatMessage({ id: 'agent.batch.create.success' }));
+                            message.success(
+                                intl.formatMessage({ id: 'agent.batch.create.success' }),
+                            );
                             handleOk();
                             setUpdateNotification(UPDATE_NOTIFICATIONS.AGENT_LIST, {
                                 action: 'create',
-                                data: {}
+                                data: {},
                             });
                         }
                     },
@@ -275,7 +275,10 @@ const BatchCreate = memo(
             };
 
             const MoreLoading = () => {
-                let moreNumber = batchParams?.loop_count || 0;
+                let moreNumber =
+                    (batchParams?.loop_count > batchParams.loop_limit
+                        ? batchParams.loop_limit
+                        : batchParams?.loop_count) || 0;
                 if (batchParams?.loop_limit && agentList.length) {
                     const remaining = batchParams.loop_limit - agentList.length;
                     if (remaining < moreNumber) {
@@ -283,7 +286,6 @@ const BatchCreate = memo(
                     }
                 }
 
-             
                 moreNumber = Math.floor(Math.max(0, moreNumber));
 
                 if (moreNumber <= 0) return null;
@@ -336,12 +338,14 @@ const BatchCreate = memo(
                                     <TagSearch
                                         allowClear
                                         onChange={handleTagChange}
-                                        placeholder={intl.formatMessage({ id: 'agent.batch.set.tags' })}
+                                        placeholder={intl.formatMessage({
+                                            id: 'agent.batch.set.tags',
+                                        })}
                                         onTagChange={() => {
                                             fetchTags();
                                         }}
                                         showAddButton={false}
-                                        listStyle='horizontal'
+                                        listStyle="horizontal"
                                         className="w-full flex-1"
                                     />
                                 </div>
@@ -350,8 +354,8 @@ const BatchCreate = memo(
                                 <div className="flex justify-between items-center px-2 mt-4">
                                     <div className="flex items-center gap-2">
                                         <span>
-                                            {intl.formatMessage({ id: 'agent.batch.generated' })} {agentList?.length}/
-                                            {batchParams.loop_limit}
+                                            {intl.formatMessage({ id: 'agent.batch.generated' })}{' '}
+                                            {agentList?.length}/{batchParams.loop_limit}
                                         </span>
                                         <ContinueGenerateButton
                                             agentList={agentList}
