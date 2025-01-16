@@ -867,6 +867,13 @@ async def chat_single_message_generation(chatroom_id: int, chat_request: ChatSin
             'outputs': outputs
         }
     )
+
+    ChatroomDrivenRecords().insert(
+        {
+            'data_source_run_id': app_run_id,
+            'chatroom_id': chatroom_id
+        }
+    )
     return response_success(
         {'app_run_id': app_run_id, 'record_id': record_id, 'outputs': outputs, 'message': 'Processing successful'})
 
