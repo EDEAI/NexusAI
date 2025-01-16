@@ -125,7 +125,7 @@ class ChatroomDrivenRecords(MySQL):
                     summary_records = AIToolLLMRecords().select(
                         columns=[
                             'id', 'run_type', 'inputs', 'outputs', 'correct_prompt',
-                            'created_time', 'status'
+                            'created_time', 'status','user_prompt'
                         ],
                         conditions=[
                             {"column": "app_run_id", "value": record['data_source_run_id']},
@@ -155,6 +155,7 @@ class ChatroomDrivenRecords(MySQL):
                         for rec in summary_records[1:]:
                             correction = {
                                 'created_time': rec['created_time'],
+                                'user_prompt': rec['user_prompt'],
                                 'correct_prompt': None,
                                 'corrected_summary': None
                             }
@@ -184,7 +185,7 @@ class ChatroomDrivenRecords(MySQL):
                             'id', 'app_id', 'agent_id', 'workflow_id', 'name',
                             'status', 'created_time', 'finished_time', 'elapsed_time',
                             'completed_steps', 'total_steps', 'inputs', 'outputs',
-                            'total_tokens','raw_user_prompt'
+                            'total_tokens'
                         ],
                         conditions=[
                             {"column": "id", "value": record['data_driven_run_id']}
@@ -223,12 +224,7 @@ class ChatroomDrivenRecords(MySQL):
                             try:
                                 target_run['outputs'] = target_run['outputs']
                             except:
-                                target_run['outputs'] = None
-                        if target_run.get('raw_user_prompt'):
-                            try:
-                                target_run['raw_user_prompt'] = target_run['raw_user_prompt']
-                            except:
-                                target_run['raw_user_prompt'] = None
+                                target_run['outputs'] = ModuleNotFoundError
                         target_run['app'] = app
                         record_data['target_run'] = target_run
 

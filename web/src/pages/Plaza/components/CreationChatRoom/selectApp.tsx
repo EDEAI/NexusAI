@@ -20,10 +20,10 @@ const Content: React.FC<params> = param => {
     let { show, popupClose, popupSave, checkList, zIndex = '',nodetype='agent',radio} = param;
     const intl = useIntl();
     // Selected agent
-    const checkItem = useRef([]);
+    const checkMyItem = useRef([]);
+    const checkMoreItem = useRef([]);
     // Number of selected agents
     const [selectNumber, setSelectNumeber] = useState({ [`my_${nodetype}`]: 0,[`more_${nodetype}`]: 0,});
-
     const [selectType, setSelectType] = useState(3);
     // Whether more can be loaded
     const [ishasMore, setIshasMore] = useState(true);
@@ -40,7 +40,7 @@ const Content: React.FC<params> = param => {
     //  parameters
     const parameters = useRef({
         page: 1,
-        page_size: 40,
+        page_size: 999999,
         search_type: 3,
         apps_name:'',
         tag_ids:''
@@ -61,27 +61,28 @@ const Content: React.FC<params> = param => {
         // parameters.current.tag_ids='';
         getList(parameters.current,true)
     };
-    const getList = async (data: any, isInit = false) => {
-        if(isInit){
-            parameters.current.page=1;
+    const getList = async (data, isInit = false) => {
+        if (isInit) {
+            parameters.current.page = 1;
         }
         const res = await getAppListByMode(nodetype, data);
         if (res?.code == 0) {
-            res?.data?.list.forEach((item: any) => {
-                item.check = isCheckAagent(item);
-            });
+            const newList = res.data.list.map(item => ({
+                ...item,
+                check: isCheckAagent(item,data.search_type)
+            }));
+    
+            const updateList = (list, setList) => {
+                setList(isInit ? [...newList] : [...list, ...newList]);
+            };
             if (data.search_type == 3) {
-                isInit
-                    ? setMyList([...res?.data?.list])
-                    : setMyList([...myList, ...res?.data?.list]);
-                setIshasMore(res?.data?.total_pages > parameters?.current?.page);
-                selectMobNumber(`my_${nodetype}`);
+                updateList(myList, setMyList);
+                setIshasMore(res.data.total_pages > parameters.current.page);
+                selectMobNumber(`my_${nodetype}`, data.search_type);
             } else {
-                isInit
-                    ? setMoreList([...res?.data?.list])
-                    : setMoreList([...moreList, ...res?.data?.list]);
-                setMoreIshasMore(res?.data?.total_pages > parameters?.current?.page);
-                selectMobNumber(`more_${nodetype}`);
+                updateList(moreList, setMoreList);
+                setMoreIshasMore(res.data.total_pages > parameters.current.page);
+                selectMobNumber(`more_${nodetype}`, data.search_type);
             }
         }
     };
@@ -90,69 +91,63 @@ const Content: React.FC<params> = param => {
         parameters.current.page = 1;
         getList(parameters.current, true);
     };
-    const selectMobNumber = (key: any) => {
-        let myCheckNumber = 0
-        if(checkItem.current.length){
-            myCheckNumber = checkItem.current.filter(items => items.type == key).length;
+    const selectMobNumber = (key: any,type) => {
+        let myCheckNumber = 0;
+        if(type == 3){
+            if(checkMyItem.current.length){
+                myCheckNumber = checkMyItem.current.length;
+            }
+        }else{
+            if(checkMoreItem.current.length){
+                myCheckNumber = checkMoreItem.current.length;
+            }
         }
         setSelectNumeber(pre => {
             pre[key] = myCheckNumber;
             return pre;
         });
     };
-    const radioCheckItem=(type: any, item: any)=>{
-        item.type = type==3?`my_${nodetype}`:`more_${nodetype}`;
-        checkItem.current = [item];
-        if (type == 3) {
-            setMyList(pre =>  pre.map(i => ({...i,check: i.app_id === item.app_id})));
-            setMoreList(pre => pre.map(i=>({...i,check:false})))
-        } else {
-            setMoreList(pre => pre.map(i => ({...i,check: i.app_id === item.app_id})));
-            setMyList(pre => pre.map(i=>({...i,check:false})))
-        }
-        selectMobNumber(`my_${nodetype}`);
-        selectMobNumber(`more_${nodetype}`);
-    }
-    const addCheckItem = (type: any, item: any) => {
-        item.type = type==3?`my_${nodetype}`:`more_${nodetype}`;
-        let res = checkItem.current.filter(items => items.app_id == item.app_id);
-        checkItem.current.forEach((item, index) => {
-            if (item.app_id == res[0]?.app_id) {
-                checkItem.current.splice(index, 1);
-            }
-        });
-        checkItem.current = res.length ? [...checkItem.current] : [...checkItem.current, item];
-        if (type == 3) {
-            setMyList(pre=>{
-                return pre.map(i => {
-                    if (i.app_id === item.app_id) {
-                        return { ...i, check: !i.check };
-                    }
-                    return i;
-                });
-            });
-            selectMobNumber(`my_${nodetype}`);
-        } else {
-            setMoreList(pre=>{
-                return pre.map(i => {
-                    if (i.app_id === item.app_id) {
-                        return { ...i, check: !i.check };
-                    }
-                    return i;
-                });
-            });
-            selectMobNumber(`more_${nodetype}`);
-        }
+    const radiocheckMyItem = (type, item) => {
+        const isTypeThree = type == 3;
+        item.type = isTypeThree ? `my_${nodetype}` : `more_${nodetype}`;
+        checkMyItem.current = isTypeThree ? [item] : [];
+        checkMoreItem.current = isTypeThree ? [] : [item];
+    
+        const updateList = (list, shouldCheck) => 
+            list.map(i => ({ ...i, check: shouldCheck(i.app_id) }));
+    
+        setMyList(pre => updateList(pre, id => id == item.app_id && isTypeThree));
+        setMoreList(pre => updateList(pre, id => id == item.app_id && !isTypeThree));
+    
+        selectMobNumber(`my_${nodetype}`,3);
+        selectMobNumber(`more_${nodetype}`,2);
     };
-    const isCheckAagent = (item: any) => {
-        if(radio && checkItem.current.length>1){
+    const addcheckMyItem = (type, item) => {
+        item.type = type == 3 ? `my_${nodetype}` : `more_${nodetype}`;
+        const currentCheckList = type == 3 ? checkMyItem.current : checkMoreItem.current;
+        const res = currentCheckList.filter(currItem => currItem.app_id !== item.app_id);
+        if (res.length == currentCheckList.length) {
+            currentCheckList.push(item);
+        } else {
+            currentCheckList.splice(currentCheckList.indexOf(item), 1);
+        }
+    
+        const updateList = (list, id) => list.map(i => ({ ...i, check: i.app_id == id ? !i.check : i.check }));
+        type == 3 ? setMyList(pre => updateList(pre, item.app_id)) : setMoreList(pre => updateList(pre, item.app_id));
+    
+        selectMobNumber(type == 3 ? `my_${nodetype}` : `more_${nodetype}`,type);
+    };
+    const isCheckAagent = (item: any,type) => {
+        const currentCheckList = type == 3 ? checkMyItem.current : checkMoreItem.current;
+        if(radio && currentCheckList.length>1){
             return 0
         }
-        return checkItem.current.filter(i => i.app_id == item.app_id).length;
+        return currentCheckList.filter(i => i.app_id == item.app_id).length;
     };
     const Cancel = () => {
         popupClose();
-        checkItem.current = [];
+        checkMyItem.current = [];
+        checkMoreItem.current = [];
         setMoreList([]);
         setSelectType(3);
         setSelectNumeber({
@@ -163,15 +158,41 @@ const Content: React.FC<params> = param => {
    // Save popup
     const Save = () => {
         popupSave({
-            checkItem: checkItem.current,
+            checkItem: [...checkMyItem.current,...checkMoreItem.current],
         });
         Cancel();
     };
+    const checkAll=()=>{
+        const isTypeThree = parameters.current.search_type == 3;
+        const list = isTypeThree ? myList : moreList;
+        const typePrefix = isTypeThree ? 'my' : 'more';
+        const currentItem = isTypeThree ? checkMyItem : checkMoreItem
+        currentItem.current = list.map(item => ({
+            ...item,
+            type: `${typePrefix}_${nodetype}`
+        }));
+    
+        const updateList = list.map(item => ({
+            ...item,
+            check: 1
+        }));
+    
+        if (isTypeThree) {
+            setMyList(() => updateList);
+        } else {
+            setMoreList(() => updateList);
+        }
+        selectMobNumber(`${typePrefix}_${nodetype}`, parameters.current.search_type);
+    }
     useEffect(() => {
         if (show) {
             // showPopup()
+            parameters.current.search_type = 3
             if (checkList.length) {
-                checkItem.current = [...checkList];
+                let checkarr = checkList.filter(item=>item.type==`my_${nodetype}`);
+                let checMorekarr = checkList.filter(item=>item.type==`more_${nodetype}`);
+                checkMyItem.current = [...checkarr];
+                checkMoreItem.current = [...checMorekarr]
             }
             parameters.current.apps_name = '';
             getList({
@@ -296,10 +317,10 @@ const Content: React.FC<params> = param => {
                                                                 : 'border-[#1B64F3]'
                                                         }`}
                                                         onClick={() => {
-                                                            radio?radioCheckItem(
+                                                            radio?radiocheckMyItem(
                                                                     selectType,
                                                                     item,
-                                                                ): addCheckItem(
+                                                                ): addcheckMyItem(
                                                                 selectType,
                                                                 item,
                                                             );
@@ -355,6 +376,19 @@ const Content: React.FC<params> = param => {
                         className="p-[20px] flex gap-x-[20px] justify-end"
                         style={{ borderTop: '1px solid #e8e8e8' }}
                     >
+                       { 
+                        !radio?<div className='flex-1'>
+                            <Button
+                                // type="text"
+                                // className="bg-[#1B64F3] rounded-[4px]"
+                                htmlType="submit"
+                                onClick={checkAll}
+                                // size='small'
+                            >
+                                全选
+                            </Button>
+                        </div>:<></>
+                        }
                         <Button
                             className="text-[14px] text-[#213044] w-[88px] h-[40px]"
                             style={{ border: '1px solid #D8D8D8' }}

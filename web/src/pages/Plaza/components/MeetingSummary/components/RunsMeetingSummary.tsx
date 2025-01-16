@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import type { MenuProps } from 'antd';
-import { Button,Dropdown} from 'antd';
-import { getWorkFlowStartCondition } from '@/api/workflow';
+import { Button,Dropdown,Tag} from 'antd';
+import { getWorkFlowStartCondition , runWorkFlow } from '@/api/workflow';
 import {AppstoreAddOutlined,InfoCircleOutlined} from '@ant-design/icons'
 import { useIntl } from '@umijs/max';
 import SelectAppDom from '../../CreationChatRoom/selectApp'
@@ -10,7 +10,6 @@ import { getMeetingOrientation } from '@/api/plaza';
 import { ProForm } from '@ant-design/pro-components';
 import { RenderConfirm } from '@/components/WorkFlow/components/RunForm/RenderConfirm';
 import { RenderInput } from '@/components/WorkFlow/components/RunForm/RenderInput';
-import {runWorkFlow } from '@/api/workflow';
 import SlateEditor from '@/components/WorkFlow/components/Editor/SlateEditor';
 import { CURRENT_NODE_ID } from '@/components/WorkFlow/config';
 import { createPromptFromObject } from '@/py2js/prompt.js';
@@ -30,7 +29,6 @@ interface params {
 // Progress bar subtitle
 const ProgressContainer :React.FC<{progressObj:any}> = memo((parmas) => {
     let {progressObj} = parmas
-    console.log(progressObj);
     
     const setEntime = () => {
         return parseFloat(progressObj.elapsed_time).toFixed(6);
@@ -303,18 +301,7 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
                                             handleClick={() => {}}
                                         />
                                     </div>
-                                    {
-                                        putsmd? 
-                                            <div className='max-h-[400px] overflow-y-auto'>
-                                                <div className='p-[12px]  bg-[#F7F7F7] leading-[22px]'>
-                                                    <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
-                                                        {putsmd}
-                                                    </ReactMarkdown>
-                                                </div>
-                                            </div>
-                                        :<></>
-
-                                    }
+                                   
 
                                     {!runStart && currentVariate!=null ? 
                                     <ProForm
@@ -348,6 +335,19 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
                                             </div>
                                         }
                                     </ProForm>:<></>}
+
+                                    {
+                                        putsmd? 
+                                            <div className='max-h-[400px] overflow-y-auto mt-[16px]'>
+                                                <div className='p-[12px]  bg-[#F7F7F7] leading-[22px]'>
+                                                    <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
+                                                        {putsmd}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            </div>
+                                        :<></>
+
+                                    }
                                     
                                     {backData &&  backData.need_human_confirm != 0?
                                         <div className='pt-[12px]'>
@@ -364,7 +364,12 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
                                                 <Graphic
                                                     status={runData.status}
                                                     icon={runData.icon}
-                                                    title={runData.run_name}
+                                                    title={
+                                                        <div className='items-center gap-x-[8px] inline-flex justify-end w-full'>
+                                                            <span className='flex-1 truncate'>{runData.run_name}</span>
+                                                            {runData.need_human_confirm==1?<Tag className=' text-[12px] flex items-center justify-center margin-0' color="blue">{intl.formatMessage({id:'app.summaryhistory.tag'})}</Tag>:<></>}
+                                                        </div>
+                                                    }
                                                     textDetails={
                                                         <ProgressContainer progressObj={runData}></ProgressContainer>
                                                     }

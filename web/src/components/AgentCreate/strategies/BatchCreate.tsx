@@ -1,7 +1,7 @@
 import { BulbOutlined, SendOutlined } from '@ant-design/icons';
-import { Button, InputNumber } from 'antd';
-import { memo, useState } from 'react';
 import { useIntl } from '@umijs/max';
+import { Button, InputNumber, Segmented, Tooltip } from 'antd';
+import { memo, useState } from 'react';
 import BeforeCreate from '../BeforeCreate';
 import ResultDisplay, { PromptTextarea, ResultDisplayRef } from '../ResultDisplay';
 import { AgentFormData, AgentResult } from '../types';
@@ -14,7 +14,7 @@ interface BatchCreateProps {
     agentCreateResultOutput: AgentResult | null;
     resultDisplayRef: React.RefObject<ResultDisplayRef>;
     onFormChange: (values: AgentFormData) => void;
-    onSubmit: (prompt: string, count: number) => void;
+    onSubmit: (prompt: string, count: number, batchCount: string) => void;
     onPreview?: (value: string) => void;
     prompt: string;
     onPromptChange: (value: string) => void;
@@ -37,13 +37,14 @@ const BatchCreate = memo(
         const intl = useIntl();
         const [count, setCount] = useState<number | null>(null);
         const [countError, setCountError] = useState(false);
+        const [batchCount, setBatchCount] = useState('10');
 
         const handleSubmit = (prompt: string) => {
             if (!count || count < 1) {
                 setCountError(true);
                 return;
             }
-            onSubmit(prompt, count);
+            onSubmit(prompt, count, batchCount);
         };
 
         return (
@@ -56,7 +57,7 @@ const BatchCreate = memo(
                         initialValues={agentCreateResultOutput}
                         onChange={onFormChange}
                         readOnly={true}
-                        loading={loading }
+                        loading={loading}
                     />
                 )}
                 <div className="w-1/2">
@@ -83,8 +84,10 @@ const BatchCreate = memo(
                                     </Button>
                                     <div className="flex gap-2">
                                         <InputNumber
-                                            placeholder={intl.formatMessage({ id: 'agent.create.input.count' })}
-                                            className={`w-[200px] ${
+                                            placeholder={intl.formatMessage({
+                                                id: 'agent.create.input.count',
+                                            })}
+                                            className={`w-[130px] ${
                                                 countError
                                                     ? '!border-red-500 hover:!border-red-500 focus:!border-red-500'
                                                     : ''
@@ -97,13 +100,28 @@ const BatchCreate = memo(
                                             }}
                                             min={1}
                                         />
+                                        {false && (
+                                            <Tooltip
+                                                title={intl.formatMessage({
+                                                    id: 'agent.batch.count.tooltip',
+                                                })}
+                                            >
+                                                <Segmented<string>
+                                                    options={['3', '5', '10']}
+                                                    value={batchCount}
+                                                    onChange={setBatchCount}
+                                                />
+                                            </Tooltip>
+                                        )}
                                         <Button
                                             type="primary"
                                             disabled={disabled}
                                             onClick={onClick}
                                             icon={<SendOutlined />}
                                         >
-                                            {intl.formatMessage({ id: 'agent.create.batch.generate' })}
+                                            {intl.formatMessage({
+                                                id: 'agent.create.batch.generate',
+                                            })}
                                         </Button>
                                     </div>
                                 </div>

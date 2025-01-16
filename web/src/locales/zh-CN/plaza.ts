@@ -41,7 +41,7 @@ export default {
     'app.check_agent_popup.select_1': '我的 智能体',
     'app.check_agent_popup.select_2': '组织内 智能体',
     'app.check_agent_popup.search': '请输入关键词搜索',
-    'app.check_agent_popup.save': '保存',
+    'app.check_agent_popup.save': '确认',
     'app.check_agent_popup.cancel': '取消',
 
     'app.check_workflow_popup.title': '选择工作流',
@@ -49,7 +49,7 @@ export default {
     'app.check_workflow_popup.select_1': '我的 工作流',
     'app.check_workflow_popup.select_2': '组织内 工作流',
     'app.check_workflow_popup.search': '请输入关键词搜索',
-    'app.check_workflow_popup.save': '保存',
+    'app.check_workflow_popup.save': '确认',
     'app.check_workflow_popup.cancel': '取消',
 
     'app.chatroom.sidebar.return': '返回',
@@ -108,5 +108,7 @@ export default {
     "app.summaryhistory.runapp":"运行应用",
     "app.summaryhistory.input":"输入参数",
     "app.summaryhistory.results":"运行结果",
-    "app.summaryhistory.prompt":"指令提示"
+    "app.summaryhistory.prompt":"指令提示",
+    "app.summaryhistory.userPrompt":"修正提示词",
+    "app.summaryhistory.tag":"待确认"
 };

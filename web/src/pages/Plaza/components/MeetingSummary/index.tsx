@@ -70,7 +70,11 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
         }
     },[summaryParams])
 
-    
+    useEffect(()=>{
+        console.log(boxLoading);
+        
+    },[boxLoading])
+
     return (
         <>
             
@@ -80,7 +84,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                         minWidth={400}
                         className={`relative h-full right-0 border-0 returned-0 px-[0] ${packUp?'translate-x-full flex-[0]':''}`}
                     >
-                        {boxLoading?<div className='h-full w-full absolute top-0 left-0 flex justify-center items-center z-99 bg-[rgba(255,255,255,0.5)]'><Spin size="large" /></div>:<></>}
+                        {boxLoading?<div className='h-full w-full absolute top-0 left-0 flex justify-center items-center z-[100] bg-[rgba(255,255,255,0.5)]'><Spin size="large" /></div>:<></>}
                         {
                             <>
                                 <div onClick={()=>{ setPackUp(pre=>!pre)}} className={`

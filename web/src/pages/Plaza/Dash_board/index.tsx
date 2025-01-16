@@ -8,7 +8,7 @@ import useSocketStore from '@/store/websocket';
 import { creationsearchdata } from '@/utils/useUser';
 import { SwapRightOutlined,CheckCircleOutlined,ExclamationCircleOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Col, Empty, Row, Spin,Tooltip } from 'antd';
+import { Button, Col, Empty, Row, Spin,Tooltip,Tag } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 // import Menus from '../components/Menus/index';
@@ -187,14 +187,12 @@ const Backlogs :React.FC<BlockParmas> = parmas =>{
             seenExecIds.add(execId);
             return true;
         });
-        console.log(result);
         
         return result.reverse();
     };
     const setWebsocktdata = async () => {
         let backlogs = flowMessage?.filter(item => item.type == 'workflow_need_human_confirm').map(({ data }) => data)?.filter(item => item.type !== 1);
-        console.log(backlogs);
-        
+      
         if(backlogs && backlogs.length){
             setbackData(confirmConcat(backlogs,backData))
         }
@@ -283,8 +281,6 @@ const Agent :React.FC<BlockParmas> = parmas =>{
                             textDetails={item.description}
                             handleClick={() => {
                                 // jumpDetails(index);
-                                console.log(keyName);
-                                
                                 if(keyName == 'my_agent'){
                                     history.push(`/Agents?app_id=${item.app_id}&type=false`);
                                 }else{
@@ -340,7 +336,8 @@ const Workflow :React.FC<BlockParmas> = parmas =>{
 }
 // Run Logs
 const RunLogs :React.FC<BlockParmas> = parmas =>{
-    let  {data} = parmas
+    let  {data} = parmas;
+    const intl = useIntl();
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
     const setRunId = useUserStore(state => state.setRunId);
@@ -385,7 +382,13 @@ const RunLogs :React.FC<BlockParmas> = parmas =>{
                                     <Graphic
                                         status={item.status}
                                         icon={item.icon}
-                                        title={item.app_runs_name || item.run_name}
+                                        title={
+                                            <div className='items-center gap-x-[8px] inline-flex justify-end w-full'>
+                                                <span className='flex-1 truncate'>{item.app_runs_name || item.run_name}</span>
+                                                {item.status==2?1:0}
+                                                {item?.need_human_confirm==1 || item?.status==1?<Tag className=' text-[12px] flex items-center justify-center margin-0' color="blue">{intl.formatMessage({id:'app.summaryhistory.tag'})}</Tag>:<></>}
+                                            </div>
+                                        }
                                         textDetails={
                                             <ProgressContainer progressObj={item}></ProgressContainer>
                                         }
@@ -469,7 +472,6 @@ const MoreOrAdd :React.FC<MoreOrAddparmas> = parmas => {
     const intl = useIntl();
     let {item,setIsModalOpen,setCreationType} = parmas
     const Addel = () => {
-        // console.log(item);
         let addCreationTyp =
             item.key == 'my_agent'
                 ? { name: 'Agent', path: 'Agents', apps_mode: 1 }
