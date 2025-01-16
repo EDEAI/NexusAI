@@ -1,5 +1,5 @@
 from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages,
-                                  Agents, Workflows, ChatroomDrivenRecords)
+                                  Agents, Workflows, ChatroomDrivenRecords, Models)
 from fastapi import APIRouter
 from api.utils.common import *
 from api.utils.jwt import *
@@ -14,10 +14,12 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 from datetime import datetime
 # from api.utils.ai_tool import call_llm_for_ai_tool
+from core.helper import truncate_messages_by_token_limit
 
 from core.database.models import AppRuns
 
 router = APIRouter()
+models = Models()
 
 
 @router.get("/", response_model=ChatRoomListResponse, summary="Fetching the List of Chat Rooms")
@@ -521,6 +523,11 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessag
         return response_error(get_language_content("chatroom_message_is_null"))
 
     chatMessageList = ChatroomMessages().get_history_list(chat_message)
+
+    # Post added processing of chat history with long logic
+    model_info = models.get_model_by_type(1, userinfo.team_id, uid=userinfo.uid)
+    model_info = models.get_model_by_config_id(model_info['model_config_id'])
+    chatMessageList = truncate_messages_by_token_limit(chatMessageList, model_info)
 
     if chat_data['corrected_parameter'] != '':
         meeting_summary = AIToolLLMRecords().select_one(
