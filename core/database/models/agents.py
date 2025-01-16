@@ -660,13 +660,12 @@ class Agents(MySQL):
                 message (str): Success/error message
                 app_id (int): Created/updated app ID if successful
         """
-        app_id = data.get("app_id",None)
+        app_id = data.get("app_id", None)
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
         try:
+            app_model = Apps()
             if app_id:
                 # Update existing app
-                app_model = Apps()
                 base_data = {
                     "name": data["name"],
                     "description": data["description"],
@@ -701,8 +700,8 @@ class Agents(MySQL):
                 )
                 if not agent:
                     return {"status": 2, "message": get_language_content("api_agent_info_agent_error")}
+
                 agent_id = agent["id"]
-                # Update agent base info
                 agent_config = {
                     "obligations": data["obligations"],
                     "team_id": team_id,
@@ -713,32 +712,14 @@ class Agents(MySQL):
 
                 # Delete existing abilities (hard delete)
                 agent_abilities_model = AgentAbilities()
-                agent_abilities_model.delete([
-                    {"column": "agent_id", "value": agent["id"]}
-                ])
-
-                # Create new abilities
-                for ability in data["abilities"]:
-                    ability_data = {
-                        "user_id": user_id,
-                        "agent_id": agent_id,
-                        "name": ability["name"],
-                        "content": ability["content"],
-                        "output_format": ability.get("output_format", 0),
-                        "status": ability.get("status", 1),
-                        "created_time": current_time,
-                        "updated_time": current_time
-                    }
-                    if not agent_abilities_model.insert(ability_data):
-                        return {"status": 2, "message": get_language_content("api_agent_abilities_set_abilities_insert_error")}
+                agent_abilities_model.delete([{"column": "agent_id", "value": agent["id"]}])
             else:
                 # Create new app
-                app_model = Apps()
                 base_data = {
                     "name": data["name"],
                     "description": data["description"],
-                    "mode": 1,  # Fixed mode for agent
-                    "publish_status": 0,  # Initial draft status
+                    "mode": 1,
+                    "publish_status": 0,
                     "team_id": team_id,
                     "user_id": user_id,
                     "created_time": current_time,
@@ -749,10 +730,10 @@ class Agents(MySQL):
                 if not app_id:
                     return {"status": 2, "message": get_language_content("apps_insert_error")}
 
-                # Handle tags if provided
-                if data.get("tags"):
+                # Handle tags
+                if data.get("tags", []):
                     tag_bindings = TagBindings()
-                    if not tag_bindings.batch_update_bindings([app_id], data["tags"]):
+                    if not tag_bindings.batch_update_bindings([app_id], data.get("tags", [])):
                         return {"status": 2, "message": get_language_content("tag_binding_create_failed")}
 
                 # Create initial agent record
@@ -760,47 +741,61 @@ class Agents(MySQL):
                     "team_id": team_id,
                     "user_id": user_id,
                     "app_id": app_id,
-                    "obligations": data["obligations"],
                     "created_time": current_time,
                     "updated_time": current_time
                 }
                 agent_id = self.insert(agent_data)
                 if not agent_id:
                     return {"status": 2, "message": get_language_content("agents_insert_error")}
-                # Create abilities for new agent
-                agent_abilities_model = AgentAbilities()
-                for ability in data["abilities"]:
-                    ability_data = {
-                        "user_id": user_id,
-                        "agent_id": agent_id,
-                        "name": ability["name"],
-                        "content": ability["content"],
-                        "output_format": ability.get("output_format", 0),
-                        "status": ability.get("status", 1),
-                        "created_time": current_time,
-                        "updated_time": current_time
-                    }
-                    if not agent_abilities_model.insert(ability_data):
-                        return {"status": 2, "message": get_language_content("api_agent_abilities_set_abilities_insert_error")}
-            # Validate the agent configuration before creating
-            from core.workflow.nodes import AgentNode
-            from core.workflow.variables import create_variable_from_dict
-            from core.llm.prompt import Prompt
-            try:
-                node = AgentNode(
-                    title=data["name"],
-                    desc=data["description"],
-                    input=create_variable_from_dict(data.get("input_variables", {})),
-                    agent_id=0,  # New agent
-                    ability_id=0,
-                    prompt=Prompt(),
+
+                # Update agent configurations
+                model_id = ModelConfigurations().get_models_default_used_by_id(team_id=team_id, _type=1)
+                if not model_id:
+                    return {"status": 2,
+                            "message": get_language_content("api_agent_base_update_model_configuration_error")}
+
+                agent_config = {
+                    "input_variables": {"name": "input", "type": "object", "properties": {
+                        "default_var": {"name": "default_var", "type": "string", "value": "",
+                                        "display_name": "Default variable", "required": 0, "max_length": 0}},
+                                        "display_name": "", "to_string_keys": ""},
+                    "obligations": data["obligations"],
+                    'm_config_id': model_id
+                }
+
+                base_update_result = self.agent_base_update(
+                    agent_id=agent_id,
+                    uid=user_id,
+                    team_id=team_id,
+                    **agent_config
                 )
-                node.validate()
-            except Exception as e:
-                return {"status": 2, "message": str(e)}
+                if base_update_result["status"] != 1:
+                    return base_update_result
+
+            # Set agent abilities
+            from api.schema.agent import AgentAbilitiesData
+            agent_abilities = [
+                AgentAbilitiesData(
+                    agent_ability_id=0,
+                    name=ability["name"],
+                    content=ability["content"],
+                    status=1,
+                    output_format=ability.get("output_format", 0)
+                ) for ability in data["abilities"]
+            ]
+            ability_result = self.agent_abilities_set(
+                agent_id=agent_id,
+                uid=user_id,
+                auto_match_ability=1,
+                agent_abilities=agent_abilities
+            )
+            if ability_result["status"] != 1:
+                return ability_result
+
             result = self.agent_publish(agent_id, user_id)
             if result["status"] != 1:
                 return {"status": 2, "message": result["message"]}
+
             return {"status": 1, "message": get_language_content("api_agent_success"), "app_id": app_id}
         except Exception as e:
             return {"status": 2, "message": get_language_content("api_agent_create_error")}

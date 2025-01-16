@@ -18,6 +18,7 @@ import { Button, Typography, message } from 'antd';
 import _ from 'lodash';
 import { memo, useEffect, useRef, useState } from 'react';
 import { TextareaRunName } from './components/Form/Input';
+import RunForm from './components/RunForm';
 const { error } = message;
 export default memo(() => {
     const intl = useIntl();
@@ -219,27 +220,11 @@ export default memo(() => {
                     loading={loading}
                 >
                     {contextHolder}
-                    <ProForm
-                        submitter={{
-                            resetButtonProps: false,
-                            submitButtonProps: {
-                                className: 'w-full',
-                            },
-                            searchConfig: {
-                                submitText: intl.formatMessage({
-                                    id: 'workflow.button.run',
-                                    defaultMessage: '',
-                                }),
-                            },
-                        }}
+                    <RunForm 
                         loading={submitLoading}
                         onFinish={confirm}
-                    >
-                        <TextareaRunName name={'description'}></TextareaRunName>
-
-                        <RenderInput></RenderInput>
-                        <RenderConfirm></RenderConfirm>
-                    </ProForm>
+                        data={data}
+                    />
                 </ProCard>
             ) : null}
         </div>

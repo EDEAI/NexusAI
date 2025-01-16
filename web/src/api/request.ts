@@ -6,7 +6,7 @@
  */
 
 export namespace REQ_TYPE {
-    export interface ApiResponse<T> {
+    export interface ApiResponse<T = any> {
         detail: string;
         code: number;
         message: string;

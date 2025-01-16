@@ -44,6 +44,14 @@ export default {
     'app.check_agent_popup.save': '保存',
     'app.check_agent_popup.cancel': '取消',
 
+    'app.check_workflow_popup.title': '选择工作流',
+    'app.check_workflow_popup.chenck_text': '已选',
+    'app.check_workflow_popup.select_1': '我的 工作流',
+    'app.check_workflow_popup.select_2': '组织内 工作流',
+    'app.check_workflow_popup.search': '请输入关键词搜索',
+    'app.check_workflow_popup.save': '保存',
+    'app.check_workflow_popup.cancel': '取消',
+
     'app.chatroom.sidebar.return': '返回',
     'app.chatroom.sidebar.agent_title': '智能体',
     'app.chatroom.sidebar.agent_button': '清除记忆',
@@ -65,6 +73,9 @@ export default {
     'app.chatroom.content.addAgentTips': '添加成功',
     'app.chatroom.content.addAgentTips_fail': '添加失败',
 
+    'app.chatroom.content.summary':'导向',
+    'app.chatroom.content.meetingSummary':'会议导向',
+
     'app.dashboard.None': '暂无数据',
 
     'app.chatroom.del.title': '删除',
@@ -77,7 +88,25 @@ export default {
     'app.chatroom.clear.confirm': '清除',
     'app.chatroom.clear.tips':'是否清除智能体记忆？',
     'app.chatroom.clear.cancel':'取消',
+    'app.chatroom.add.agent':'添加智能体',
 
     "app.workflow.needHumanConfirm":"需要人工确认",
-    "app.workflow.noHumanConfirm":"已处理人工确认"
+    "app.workflow.noHumanConfirm":"已处理人工确认",
+
+    "app.summary.title":"会议总结",
+    "app.summary.submitText":"提交修正",
+    "app.summary.next":"下一步",
+    "app.summary.placeholder":"请输入你的修正建议….",
+    "app.summary.Runapp":"选择运行应用",
+    "app.summary.SelectAgent":"选择智能体",
+    "app.summary.SelectWorkflow":"选择工作流",
+    
+    "app.summary.backlogTips":"你有一条待办项",
+
+    "app.summaryhistory.orientation":"修正导向",
+    "app.summaryhistory.time":"修正时间",
+    "app.summaryhistory.runapp":"运行应用",
+    "app.summaryhistory.input":"输入参数",
+    "app.summaryhistory.results":"运行结果",
+    "app.summaryhistory.prompt":"指令提示"
 };

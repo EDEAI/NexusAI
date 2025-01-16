@@ -2,6 +2,7 @@
  * @LastEditors: biz
  */
 
+import AgentCreate from '@/components/AgentCreate';
 import DealtWithForLog from '@/components/WorkFlow/components/DealtWith/DealtWithForLog';
 import RunPanelLog from '@/components/WorkFlow/nodes/RunPanelLog';
 import RunWorkFlow from '@/components/WorkFlow/RunWorkFlow';
@@ -18,6 +19,7 @@ const PageWrap: React.FC<PlazaProps> = ({ children }) => {
             <DealtWithForLog></DealtWithForLog>
             <RunPanelLog></RunPanelLog>
             <RunWorkFlow></RunWorkFlow>
+            <AgentCreate></AgentCreate>
         </div>
     );
 };

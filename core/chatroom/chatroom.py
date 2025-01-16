@@ -17,6 +17,7 @@ from core.database.models import (
     Chatrooms,
     Models
 )
+from core.helper import truncate_messages_by_token_limit
 from core.llm import Prompt
 from core.workflow.nodes import AgentNode, LLMNode
 from core.workflow.variables import create_variable_from_dict, Variable
@@ -40,7 +41,11 @@ class Chatroom:
 
     def _get_model_configs(self, all_agent_ids: Sequence[int], absent_agent_ids: Sequence[int]) -> None:
         model_info = Models().get_model_by_type(1, self._team_id, uid=self._user_id)
-        self._model_config_ids[0] = model_info['model_config_id']
+        model_config_id = model_info['model_config_id']
+        self._model_config_ids[0] = model_config_id
+        model_info = Models().get_model_by_config_id(model_config_id)
+        assert model_info, f'Model configuration {model_config_id} not found.'
+        self._model_configs[model_config_id] = model_info
         for agent_id in all_agent_ids:
             agent = Agents().select_one(
                 columns=['id', 'app_id', 'apps.name', 'apps.description', 'obligations', 'model_config_id'],
@@ -53,7 +58,11 @@ class Chatroom:
 
             self._all_agents[agent_id] = agent
             if agent_id not in absent_agent_ids:
-                self._model_config_ids[agent_id] = agent['model_config_id']
+                model_config_id = agent['model_config_id']
+                self._model_config_ids[agent_id] = model_config_id
+                model_info = Models().get_model_by_config_id(model_config_id)
+                assert model_info, f'Model configuration {model_config_id} not found.'
+                self._model_configs[model_config_id] = model_info
     
     def __init__(
         self,
@@ -77,7 +86,8 @@ class Chatroom:
         # self._model_config_ids: dict
         # keys are IDs of all active agents with the addition of 0 (which is the Speaker Selector)
         # values are corresponding LLM model_config_ids
-        self._model_config_ids: Dict[int, Dict[str, Any]] = {}
+        self._model_config_ids: Dict[int, int] = {}
+        self._model_configs: Dict[int, Dict[str, Any]] = {}
         self._get_model_configs(all_agent_ids, absent_agent_ids)
         self._max_round = max_round
         self._smart_selection = smart_selection
@@ -127,7 +137,7 @@ class Chatroom:
                 )
         return json.dumps(info, ensure_ascii=False)
         
-    def _get_history_messages_list(self) -> Tuple[
+    def _get_history_messages_list(self, model_config_id: int) -> Tuple[
         List[Dict[str, Union[int, str]]],
         List[Dict[str, Union[int, str]]]
     ]:
@@ -154,7 +164,7 @@ class Chatroom:
             if message['id'] == 0:
                 break
         return (
-            messages,
+            truncate_messages_by_token_limit(messages, self._model_configs[model_config_id]),
             list(messages_in_last_section)
         )
     
@@ -206,7 +216,7 @@ class Chatroom:
                         self._user_id,
                         append_ret_lang_prompt=False
                     )
-            messages, messages_in_last_section = self._get_history_messages_list()
+            messages, messages_in_last_section = self._get_history_messages_list(self._model_config_ids[0])
             user_prompt = user_prompt.format(
                 agent_count = len(self._model_config_ids) - 1,
                 agents = self._get_agents_info(),
@@ -294,7 +304,7 @@ class Chatroom:
         total_tokens = 0
         agent = self._all_agents[agent_id]
         abilities = agent['abilities']
-        messages, messages_in_last_section = self._get_history_messages_list()
+        messages, messages_in_last_section = self._get_history_messages_list(self._model_config_ids[agent_id])
 
         # Prepare the input for the agent
         if abilities:
@@ -350,6 +360,11 @@ class Chatroom:
                 'agent_id': agent_id,
                 'type': 2,
                 'name': f'Agent-{agent_id}-Roundtable-{self._chatroom_id}_{now}',
+                'raw_user_prompt': agent_user_prompt,
+                'messages': [
+                    ['system', prompt.system.to_dict()],
+                    ['user', prompt.user.to_dict()]
+                ],
                 'status': 2
             }
         )

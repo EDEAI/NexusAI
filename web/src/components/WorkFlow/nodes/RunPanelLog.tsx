@@ -125,6 +125,19 @@ export default memo(() => {
                         if (nodeInfo.status == 3 || (nodeInfo.status == 2 && item?.children)) {
                             return (
                                 <div className="flex flex-col gap-2">
+                                    {nodeInfo?.need_human_confirm ? (
+                                        <div>
+                                            <div>
+                                                {intl.formatMessage({
+                                                    id: 'workflow.needHumanConfirm',
+                                                })}
+                                                :
+                                                {item?.human_confirm_info
+                                                    ?.map(item => item.nickname)
+                                                    .join(',')}
+                                            </div>
+                                        </div>
+                                    ) : null}
                                     {nodeInfo?.prompt_data?.length > 0 && (
                                         <div className="h-80">
                                             <CodeEditor
@@ -166,7 +179,6 @@ export default memo(() => {
                                                 <CodeEditor
                                                     language="python3"
                                                     value={nodeInfo?.inputs}
-
                                                     readOnly
                                                     isJSONStringifyBeauty
                                                     onChange={() => {}}
@@ -199,7 +211,7 @@ export default memo(() => {
                                         )}
                                 </div>
                             );
-                        }else if (nodeInfo.status == 4) {
+                        } else if (nodeInfo.status == 4) {
                             return (
                                 <Alert
                                     message={
@@ -294,12 +306,20 @@ export default memo(() => {
                             return <LoadingOutlined />;
                         } else if (nodeInfo?.status == 3) {
                             return (
-                                <>
-                                    <span>
-                                        {_.clamp(item?.elapsed_time, 0.00001, 9999999).toFixed(5)}S
-                                    </span>
-                                    <CheckCircleOutlined className="text-green-400"></CheckCircleOutlined>
-                                </>
+                                <div>
+                                    <div className='flex items-center gap-1'>
+                                        <span>
+                                            {_.clamp(item?.elapsed_time, 0.00001, 9999999).toFixed(
+                                                5,
+                                            )}
+                                            S
+                                        </span>
+                                        <CheckCircleOutlined className="text-green-400"></CheckCircleOutlined>
+                                    </div>
+                                    {
+                                        (item?.need_human_confirm)? <Tag className='w-full flex items-center justify-center' color="blue">待确认</Tag>:null
+                                    }
+                                </div>
                             );
                         }
 

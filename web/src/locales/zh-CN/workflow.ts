@@ -94,7 +94,7 @@ export default {
     'workflow.checkOutputMessageError': '输出值格式错误,请重新修改',
     'workflow.nodeRunOtherMessage': '您正在查看已发布版本数据，修改无效',
     'workflow.requires_uploadDes':
-        '开启后节点运行时可上传文件，配合“导入知识库”设置，以便下游节点检索知识库',
+        '开启后节点运行时可上传文件，配合"导入知识库"设置，以便下游节点检索知识库',
     'workflow.import_to_knowledge_baseDes':
         '开启后节点运行时可将变量信息或文件导入指定知识库，以便下游节点检索知识库',
     'workflow.manual_confirmationDes': '开启后节点运行完成可人工介入确认结果数据',
@@ -247,5 +247,43 @@ export default {
     'workflow.message.setVariablesFirst':'请先设置变量',
 
 
+    'workflow.nodeList': '列表',
+    'workflow.team': '团队',
+    'workflow.mine': '我的',
+    'workflow.search': '搜索App',
+    'workflow.list': '工作流',
 
+
+    'workflow.node.start': '开始',
+    'workflow.node.end': '结束',
+    'workflow.node.agent': '智能体',
+    'workflow.node.human': '人工',
+    'workflow.node.retriever': '检索',
+    'workflow.node.llm': 'LLM',
+    'workflow.node.variable_aggregation': '变量聚合',
+    'workflow.node.template_conversion': '模板转换',
+    'workflow.node.condition_branch': '条件分支',
+    'workflow.node.requirement_category': '需求分类',
+    'workflow.node.custom_code': '自定义代码',
+    'workflow.node.skill': '技能',
+    'workflow.node.http_request': 'HTTP请求',
+    'workflow.node.recursive_task_execution': '任务执行',
+    'workflow.node.recursive_task_generation': '任务生成',
+    'workflow.node.tool': '工具',
+
+
+    'workflow.panel.dragTip': '拖拽节点到画布中',
+    'workflow.panel.noData': '暂无数据',
+    'workflow.panel.searchPlaceholder': '搜索节点名称',
+
+    'agent.outputType': '输出类型',
+    'agent.outputType.text': '文本',
+    'agent.outputType.json': 'JSON',
+    'agent.outputType.code': '代码',
+
+    'agent.modal.leave.title': '提示',
+    'agent.modal.leave.content': '是否确认离开？',
+    'agent.save.failed': '保存失败',
+
+    'creation.placeholder.selectTags': '请选择标签'
 };

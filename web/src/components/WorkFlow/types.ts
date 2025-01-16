@@ -11,6 +11,7 @@ import {
     OnInit,
     OnNodesChange,
 } from '@xyflow/react';
+import { response } from 'express';
 
 type AppNodeData = {
     title: string;
@@ -203,3 +204,14 @@ export interface LLMNodeData {
     knowledge_base_mapping?: { [key: string]: number };
     originalNodeId?: string | null;
 }
+
+export interface TabConfig {
+    key?: string;
+    tabKey: 'node' | 'agent' | 'tool' | 'skill' | 'workflow';
+    label: string;
+    defaultMessage: string;
+    type: 'normal' | 'tools' | 'workflow';
+    getData: () => any;
+    show?: boolean;
+}
+

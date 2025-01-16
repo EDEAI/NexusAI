@@ -174,39 +174,71 @@ interface WorkflowNeedHumanConfirm {
 
 type FlowMessage = WorkflowRunDebug | WorkflowRunProgress | WorkflowNeedHumanConfirm;
 
-type FlowState = {
-    flowMessage: FlowMessage[];
+type MessageType = 'workflow_run_debug' | 'workflow_run_progress' | 'workflow_need_human_confirm' | 'generate_agent_batch';
+
+type TypedMessageMap = {
+    workflow_run_debug: WorkflowRunDebug[];
+    workflow_run_progress: WorkflowRunProgress[];
+    workflow_need_human_confirm: WorkflowNeedHumanConfirm[];
+    generate_agent_batch: any[]; 
+    [key: string]: any[];
+};
+
+interface FlowState {
+    flowMessage: any[];
+    typedMessages: Partial<TypedMessageMap>;
     dealtWithData: any;
     setDealtWithData: (value: any) => void;
-    addFlowMessage: (message: FlowMessage) => void;
-    setFlowMessage: (message: FlowMessage[]) => void;
-    getMessage: () => FlowMessage[];
-    getDebugMessage: (filterData?: Partial<WorkflowRunDebugData>) => WorkflowRunDebug[];
-    getProgressMessage: (filterData?: Partial<WorkflowRunProgressData>) => WorkflowRunProgress[];
-    getNeedHumanConfirmMessage: (
-        filterData?: Partial<WorkflowNeedHumanConfirmData>,
-    ) => WorkflowNeedHumanConfirm[];
-    filterMessages: (
-        type: FlowMessage['type'],
-        filterData?: Partial<
-            WorkflowRunDebugData | WorkflowRunProgressData | WorkflowNeedHumanConfirmData
-        >,
-    ) => FlowMessage[];
-};
+    addFlowMessage: (message: any) => void;
+    setFlowMessage: (message: any[]) => void;
+    getMessage: () => any[];
+    getTypedMessages: <T extends MessageType>(type: T) => Partial<TypedMessageMap>[T] | [];
+    filterMessages: (type: string, filterData?: any) => any[];
+    fuzzyFilterMessages: (typePattern: string) => any[];
+}
 
 const useSocketStore = create(
     devtools<FlowState>(
         (set, get) => ({
             flowMessage: [],
+            typedMessages: {},
             dealtWithData: null,
             setDealtWithData: (value: any) => {
                 set({ dealtWithData: value });
             },
             addFlowMessage: message => {
-                set({ flowMessage: [...get().flowMessage, message] });
+                set(state => {
+                    const newFlowMessage = [...state.flowMessage, message];
+                    const type = message.type as MessageType;
+                    
+                    return {
+                        flowMessage: newFlowMessage,
+                        typedMessages: {
+                            ...state.typedMessages,
+                            [type]: [...(state.typedMessages[type] || []), message]
+                        }
+                    };
+                });
             },
             setFlowMessage: message => {
-                set({ flowMessage: message });
+                set(state => {
+                 
+                    const typedMessages = message.reduce((acc, msg) => {
+                        const type = msg.type as MessageType;
+                        return {
+                            ...acc,
+                            [type]: [...(acc[type] || []), msg]
+                        };
+                    }, {} as TypedMessageMap);
+                    
+                    return {
+                        flowMessage: message,
+                        typedMessages
+                    };
+                });
+            },
+            getTypedMessages: type => {
+                return get().typedMessages[type] || [];
             },
             getMessage: () => {
                 return get().flowMessage;
@@ -223,20 +255,10 @@ const useSocketStore = create(
 
                 return messageList;
             },
-            getDebugMessage: filterData => {
-                return get().filterMessages('workflow_run_debug', filterData) as WorkflowRunDebug[];
-            },
-            getProgressMessage: filterData => {
-                return get().filterMessages(
-                    'workflow_run_progress',
-                    filterData,
-                ) as WorkflowRunProgress[];
-            },
-            getNeedHumanConfirmMessage: filterData => {
-                return get().filterMessages(
-                    'workflow_need_human_confirm',
-                    filterData,
-                ) as WorkflowNeedHumanConfirm[];
+            fuzzyFilterMessages: (typePattern) => {
+                return get().flowMessage.filter(item => 
+                    item.type?.toLowerCase().includes(typePattern.toLowerCase())
+                );
             },
         }),
         { name: 'useSocketStore' },

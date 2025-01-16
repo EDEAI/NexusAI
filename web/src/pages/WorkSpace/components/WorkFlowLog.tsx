@@ -138,7 +138,7 @@ export default memo(() => {
         );
     });
     return (
-        <div style={{ height: 'calc(100vh - 596px)' }}>
+        <div className='min-h-[300px]' style={{ height: 'calc(100vh - 596px)' }}>
             <Title
                 iconSrc="/icons/workflows.svg"
                 titleText={intl.formatMessage({ id: 'app.workflow.log.title' })}

@@ -6,7 +6,7 @@ import { Button, Col, Form, Input, InputNumber, message, Row } from 'antd';
 import { throttle } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'umi';
-import Agent from './agent';
+import Agent from './selectApp';
 const { TextArea } = Input;
 interface CreationChatRoom {
     show?: any;
@@ -124,7 +124,7 @@ const ChatroomDetial: React.FC<CreationChatRoom> = param => {
     };
     // agent popup Save
     const popupSave = (obj: any) => {
-        setcheckAgentList([...obj.checkAgent]);
+        setcheckAgentList([...obj.checkItem]);
     };
     // show agent popup
     const showPopup = () => {
@@ -417,16 +417,12 @@ const ChatroomDetial: React.FC<CreationChatRoom> = param => {
                         </div>
                     </div>
                 </div>
-                {agentShow ? (
-                    <Agent
-                        show={agentShow}
-                        popupClose={popupClose}
-                        popupSave={popupSave}
-                        checkList={checkAgentList}
-                    />
-                ) : (
-                    <></>
-                )}
+                <Agent
+                    show={agentShow}
+                    popupClose={popupClose}
+                    popupSave={popupSave}
+                    checkList={checkAgentList}
+                />
             </div>
         </>
     );

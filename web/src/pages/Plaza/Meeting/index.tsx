@@ -100,26 +100,26 @@ const Operation = ({ item, resetList, setCreateShow, isUpdataChatRoom, upDataId,
             ),
         },
     ];
-    const openRoomstatus = async () => {
-        await upRoomStatus(
-            { smart_selection: item.smart_selection == 1 ? 0 : 1 },
-            item.chatroom_id,
-        );
-        resetList(item.chatroom_id, item.smart_selection == 1 ? 0 : 1);
-    };
+    // const openRoomstatus = async () => {
+    //     await upRoomStatus(
+    //         { smart_selection: item.smart_selection == 1 ? 0 : 1 },
+    //         item.chatroom_id,
+    //     );
+    //     resetList(item.chatroom_id, item.smart_selection == 1 ? 0 : 1);
+    // };
     return (
         <>
             {contextHolder}
             <div className="flex  items-center">
                 <div className="flex gap-x-[6px] items-center flex-1">
-                    <span className="text-[12px] text-[#666] line">
+                    {/* <span className="text-[12px] text-[#666] line">
                         {intl.formatMessage({ id: 'app.chatroom_list.switch' })}
                     </span>
                     <Switch
                         size="small"
                         value={item.smart_selection == 1}
                         onChange={openRoomstatus}
-                    ></Switch>
+                    ></Switch> */}
                 </div>
                 <Dropdown menu={{ items }} placement="topRight" className="cursor-pointer">
                     <div className="w-[18px] h-[18px] bg-[#ebebeb] rounded-[4px] flex justify-center items-center">
@@ -309,11 +309,10 @@ const MeetingCont = () => {
                                                 <div className="px-[20px]">
                                                     <div style={{ borderBottom: '1px solid #eee' }}>
                                                         {
-                                                           item.description ? (
-                                                                <div className="text-[#666666] text-[12px] font-[400] w-full truncate min-h-[14px]">
-                                                                    {item.description}
-                                                                </div>
-                                                            ):<></>
+                                                            <div className="text-[#666666] text-[12px] font-[400] w-full truncate min-h-[14px]">
+                                                               { item.description ? item.description : <></>}
+                                                           </div>
+                                                          
                                                         }
                                                         <div className="py-[20px] h-[115px] overflow-hidden">
                                                             {item.agent_list &&
