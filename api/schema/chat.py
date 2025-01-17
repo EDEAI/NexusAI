@@ -83,6 +83,7 @@ class ChatRoomPageList(BaseModel):
     page: Optional[int] = None
     page_size: Optional[int] = None
 
+
 class ChatRoomListResponse(ResponseBase):
     data: Optional[ChatRoomPageList] = None
 
@@ -240,5 +241,14 @@ class ChatHistoryList(BaseModel):
     page: int
     page_size: int
 
+
 class ChatRoomHistoryList(ResponseBase):
     data: Optional[ChatHistoryList] = None
+
+
+class ChatHistoryListSingle(BaseModel):
+    list: List[ChatHistoryItem] = []
+
+
+class ChatRoomHistorySingle(BaseModel):
+    data: Optional[ChatHistoryListSingle] = None
