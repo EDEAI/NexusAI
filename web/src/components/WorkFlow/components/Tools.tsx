@@ -20,7 +20,8 @@ export default memo(() => {
     const publishStatus = searchParams.get('type') == 'true';
     const saveWorkFlow = useSaveWorkFlow();
     const [messageApi, contextHolder] = message.useMessage();
-    const publish = () => {
+    const publish = async () => {
+        await saveWorkFlow()
         const appId = searchParams.get('app_id');
         publishWorkFlow(appId).then(res => {
             console.log(res);
