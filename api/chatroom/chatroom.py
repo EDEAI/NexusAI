@@ -878,7 +878,6 @@ async def chat_single_message_generation(chatroom_id: int, chat_request: ChatSin
         {'app_run_id': app_run_id, 'record_id': record_id, 'outputs': outputs, 'message': 'Processing successful'})
 
 
-
 @router.get('/chat_room_history', response_model=ChatRoomHistoryList)
 async def get_chat_room_history(
     chatroom_id: int,
@@ -895,5 +894,23 @@ async def get_chat_room_history(
         chatroom_id=chatroom_id,
         page=page,
         page_size=page_size
+    )
+    return response_success(result)
+
+
+@router.get('/chat_room_history_single', summary='Get chat room History Single', response_model=ChatRoomHistorySingle)
+async def get_chat_room_history_single(
+    chatroom_id: int,
+    app_run_id: int,
+    userinfo: TokenData = Depends(get_current_user)
+):
+    """Get chat room history including meeting summaries, corrections, and directed actions."""
+    find_chatroom = Chatrooms().search_chatrooms_id(chatroom_id, userinfo.uid)
+    if not find_chatroom['status']:
+        return response_error(get_language_content("chatroom_does_not_exist"))
+
+    result = ChatroomDrivenRecords().get_history_by_chatroom_id_single(
+        chatroom_id=chatroom_id,
+        app_run_id=app_run_id
     )
     return response_success(result)
