@@ -250,7 +250,7 @@ const Backlogs :React.FC<BlockParmas> = parmas =>{
                                                     id: 'app.workflow.noHumanConfirm',
                                                 })}
                                             >
-                                                <CheckCircleOutlined className="text-[#808183]" />
+                                                <CheckCircleOutlined className="text-[#52C41C]" />
                                             </Tooltip>
                                         )}
                                     </div>}

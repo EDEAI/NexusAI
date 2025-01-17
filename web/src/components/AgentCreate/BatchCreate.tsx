@@ -266,7 +266,7 @@ const BatchCreate = memo(
                     <div className="flex justify-end gap-2">
                         <div></div>
                         <div>
-                            <Button onClick={createAgents} type="primary">
+                            <Button disabled={moreLoading} onClick={createAgents} type="primary">
                                 {intl.formatMessage({ id: 'agent.batch.button.confirm' })}
                             </Button>
                         </div>

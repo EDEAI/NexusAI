@@ -20,6 +20,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
     const [boxLoading,setBoxLoading] = useState(false);
     const [inputShow,setinputShow] = useState(true);
     const scrollDom = useRef(null)
+    const historyHeight = useRef(false)
 
     const getSummaryHistory=async(isScroll=true)=>{
         let resData=await getMeetingSummaryHistory({
@@ -66,6 +67,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
             
             getSummaryHistory(false);
            
+            historyHeight.current = true
             
         }
     },[summaryParams])
@@ -95,7 +97,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                                 </div>
                                 <div className={`h-full min-h-full overflow-y-auto flex flex-col-reverse scroll-smooth`}  ref={scrollDom}>
                                     <div>
-                                        {summaryHistory.length?<SummaryHistoryDom scrollDom={scrollDom} list={summaryHistory}/>:<></>}
+                                        {summaryHistory.length?<SummaryHistoryDom scrollDom={scrollDom} list={summaryHistory} historyHeight={historyHeight.current}/>:<></>}
                                         <div className={`w-full px-4 h-full`} style={{minHeight:summaryShow?scrollDom?.current?.offsetHeight:''}}>
                                             <RevisionsMeetingSummary 
                                                 setShow={setRunboxShow}

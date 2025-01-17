@@ -385,7 +385,7 @@ const Content: React.FC<params> = param => {
                                 onClick={checkAll}
                                 // size='small'
                             >
-                                全选
+                                {intl.formatMessage({id:'app.check_popup.check'})}
                             </Button>
                         </div>:<></>
                         }

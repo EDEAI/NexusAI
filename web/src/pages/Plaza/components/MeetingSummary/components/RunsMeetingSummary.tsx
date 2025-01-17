@@ -87,7 +87,8 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
     const [putsmd,setPutsMd]=useState('')
     const appId = useRef('');
     const originalVariate = useRef(null)
-    const RunsId= useRef('')
+    const RunsId= useRef('');
+    const slateEditorval = useRef('');
     
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
@@ -156,6 +157,7 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
         }
     };
     const Editorrunchange = (value: any) => {
+        slateEditorval.current = serialize(value)
         const promptObj = {
             user: {
                 value: serialize(value),
@@ -222,6 +224,7 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
         }
     };
     const agentRun=async(e)=>{
+        console.log(fourthly_prompt);
         setBoxLoading(true)
         let keys = Object.keys(e);
         keys.forEach(item=>{
@@ -229,6 +232,8 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
                 originalVariate.current.properties[item].value = e[item]
             }
         })
+
+        
         let res = await PutagentRun({
             agent_id: selectApp.checkItem[0].agent_id,
             ability_id: 0,
@@ -309,6 +314,7 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
                                             resetButtonProps: false,
                                             submitButtonProps: {
                                                 className: 'w-full',
+                                                disabled: selectedType=='agent' && !slateEditorval.current
                                             },
                                             searchConfig: {
                                                 submitText: intl.formatMessage({
@@ -330,7 +336,7 @@ const RunsMeetingSummary:React.FC<params>=(params)=>{
                                             <div className='h-[150px] overflow-y-auto border border-color-[#eee] py-[4px] px-[11px] mb-[8px]'>
                                                 <SlateEditor  
                                                     onChange={value => {Editorrunchange(value)}}
-                                                    options={currentVariateArray} >
+                                                    options={currentVariateArray} placeholder="请输入运行指令，输入@插入变量" >
                                                 </SlateEditor>
                                             </div>
                                         }

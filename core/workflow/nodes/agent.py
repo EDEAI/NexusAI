@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 from copy import deepcopy
@@ -467,10 +468,18 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             )
         )
         input_ = [(role, message.value) for role, message in input_messages.messages]
-        
-        async for chunk in llm_pipeline.llm.astream(
-            input_,
-            stream_usage=True
-        ):
-            yield chunk
+
+        for _ in range(5):
+            try:
+                llm_aiter = llm_pipeline.llm.astream(input_, stream_usage=True)
+                while True:
+                    try:
+                        yield await asyncio.wait_for(anext(llm_aiter), timeout=20)
+                    except StopAsyncIteration:
+                        break
+                break
+            except asyncio.TimeoutError:
+                pass
+        else:
+            raise Exception('Cannot connect to LLM after trying 5 times. Please check the network connection.')
         

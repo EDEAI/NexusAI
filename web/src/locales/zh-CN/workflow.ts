@@ -219,7 +219,7 @@ export default {
 
 
     'app.itemHeader.agent': '智能体',
-    'app.itemHeader.chatRoom': '聊天室',
+    'app.itemHeader.chatRoom': '圆桌',
     'app.itemHeader.workFlow': '工作流',
 
 
