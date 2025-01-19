@@ -507,7 +507,13 @@ language_packs = {
         
         'generate_agent_system_prompt': '''
             You are an AI agent generation assistant.
-            Please generate a complete agent information for me according to my requirements and the agent data structure. The agent name, description, and function information should be highly anthropomorphic.
+            Please generate a complete agent information for me according to my requirements and the agent data structure.
+            Please pay attention to the following requirements when generating:
+            1. The agent name should be highly anthropomorphic
+            2. The agent description should be as detailed as possible and cover all the information of the agent
+            3. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
+            4. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            5. Be sure to strictly abide by the json structure of the agent data
             Note that only the json structure data of the agent is returned, and no redundant content is returned.
             Description of the json structure of agent data:
             {{
@@ -562,8 +568,14 @@ language_packs = {
         ''',
         'agent_batch_sample_system': '''
             You are an AI agent generation assistant.
-            Please generate a complete sample agent information for me according to the agent data structure based on the requirements for batch generation of agents I provided. The agent name and description should be highly anthropomorphic.
-            Please note that only one agent sample should be generated, and batch generation should not be performed.
+            Please generate a complete sample agent information for me according to the agent data structure based on the requirements for batch generation of agents provided by me.
+            Please pay attention to the following requirements when generating:
+            1. The agent name should be highly anthropomorphic
+            2. The agent description should be as detailed as possible and cover all the information of the agent
+            3. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
+            4. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            5. Pay attention to only generate one agent sample, do not generate in batches.
+            6. Be sure to strictly abide by the json structure of the agent data
             Note that only the json structure data of the agent is returned, and no redundant content is returned.
             Description of the json structure of agent data:
             {{
@@ -585,11 +597,16 @@ language_packs = {
         ''',
         'agent_batch_generate_system': '''
             You are an AI agent generation assistant.
-            Please generate a batch of complete agent information for me according to the requirements for batch generation of agents, the number of batch generation of agents, and the data structure of multiple agents provided by me. The agent names and descriptions should be highly anthropomorphic.
-            Please pay attention to the following requirements when generating:
-            1. Be sure to generate agents strictly according to the number of batch generation of agents provided by me, and do not generate more or less than this number
-            2. If the history of agents generated in batches has real content, the new agent should try to keep the difference with the history of agents generated
-            3. Be sure to strictly abide by the json structure of multi-agent data
+            Please generate a batch of complete agent information for me based on the requirements for batch generation of agents, the number of batch generation of agents, and the data structure of multiple agents that I provide.
+            Pay attention to the following requirements when generating:
+            1. The name of the agent should be highly anthropomorphic
+            2. The agent description should be as detailed as possible and cover all the information of the agent
+            3. The function information of the agent should be as detailed as possible, not just limited to the literal "function" information, but also include other relevant feature information
+            4. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            5. Be sure to strictly generate agents according to the number of batch-generated agents I provide, and do not generate more or less than this number
+            6. The batch-generated agent data should be kept as different as possible, and do not generate duplicate agents
+            7. If the batch-generated agent history has real content, the new agent should be kept as different as possible from the generated agent history
+            8. Be sure to strictly abide by the multi-agent data json structure
             Note that only the generated multi-agent json structure data is returned, and no redundant content is returned.
             Description of the json structure of multi-agent data:
             {{
@@ -613,10 +630,10 @@ language_packs = {
             Requirements for batch generation of agents:
             {agent_batch_requirements}
 
-            Number of batch generated agents:
+            Number of batch generation of agents:
             {agent_batch_number}
 
-            Batch generated agent history:
+            Batch-generated agent history:
             {history_agents}
         ''',
         'api_agent_supplement_prompt_required': 'supplement_prompt is requiredapi_agent_generate_failed',
@@ -1082,25 +1099,31 @@ language_packs = {
 
         'chatroom_request_sent_successfully': '请求成功，请等待',
         
-        # 'generate_agent_system_prompt': (
-        #     '你是一个AI智能体生成助手，\n'
-        #     '请通过我的需求内容，按照智能体的数据结构为我生成一个完整的智能体信息，智能体名称、描述要高度拟人化。\n'
-        #     '注意只返回智能体的json结构数据，不要返回多余的内容。\n'
-        #     '智能体数据json结构说明：\n'
-        #     '{{\n'
-        #     '  "name": "(string类型) 智能体名称",\n'
-        #     '  "description": "(string类型) 智能体描述",\n'
-        #     '  "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",\n'
-        #     '  "abilities": [\n'
-        #     '    {{\n'
-        #     '      "name": "(string类型) 能力名称",\n'
-        #     '      "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",\n'
-        #     '      "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"\n'
-        #     '    }}\n'
-        #     '  ]\n'
-        #     '}}\n'
-        #     '{append_prompt}\n\n'
-        # ),
+        # 'generate_agent_system_prompt': '''
+        #     你是一个AI智能体生成助手。
+        #     请通过我的需求内容，按照智能体的数据结构为我生成一个完整的智能体信息。
+        #     生成时注意以下几点要求：
+        #     1. 智能体名称要高度拟人化
+        #     2. 智能体描述要尽量详细，要覆盖智能体的所有信息
+        #     3. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
+        #     4. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
+        #     5. 一定要严格遵守智能体数据json结构
+        #     注意只返回智能体的json结构数据，不要返回多余的内容。
+        #     智能体数据json结构说明：
+        #     {{
+        #         "name": "(string类型) 智能体名称",
+        #         "description": "(string类型) 智能体描述",
+        #         "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
+        #         "abilities": [
+        #             {{
+        #                 "name": "(string类型) 能力名称",
+        #                 "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
+        #                 "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
+        #             }}
+        #         ]
+        #     }}
+        #     {append_prompt}
+        # ''',
         # 'generate_agent_user':(
         #     '需求内容：\n'
         #     '{user_prompt}\n\n'
@@ -1141,8 +1164,14 @@ language_packs = {
 
         # 'agent_batch_sample_system': '''
         #     你是一个AI智能体生成助手。
-        #     请通过我提供的批量生成智能体的需求，按照智能体的数据结构为我生成一个完整的样例智能体信息，智能体名称、描述要高度拟人化。
-        #     注意只生成一个智能体样例，不要进行批量生成。
+        #     请通过我提供的批量生成智能体的需求，按照智能体的数据结构为我生成一个完整的样例智能体信息。
+        #     生成时注意以下几点要求：
+        #     1. 智能体名称要高度拟人化
+        #     2. 智能体描述要尽量详细，要覆盖智能体的所有信息
+        #     3. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
+        #     4. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
+        #     5. 注意只生成一个智能体样例，不要进行批量生成。
+        #     6. 一定要严格遵守智能体数据json结构
         #     注意只返回智能体的json结构数据，不要返回多余的内容。
         #     智能体数据json结构说明：
         #     {{
@@ -1164,11 +1193,16 @@ language_packs = {
         # ''',
         # 'agent_batch_generate_system': '''
         #     你是一个AI智能体生成助手。
-        #     请通过我提供的批量生成智能体的需求、批量生成智能体的数量、多智能体的数据结构为我生成一批完整的智能体信息，智能体名称、描述要高度拟人化。
+        #     请通过我提供的批量生成智能体的需求、批量生成智能体的数量、多智能体的数据结构为我生成一批完整的智能体信息。
         #     生成时注意以下几点要求：
-        #     1. 一定要严格按照我提供的批量生成智能体的数量去生成智能体，不要多余或少于此数量
-        #     2. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
-        #     3. 一定要严格遵守多智能体数据json结构
+        #     1. 智能体名称要高度拟人化
+        #     2. 智能体描述要尽量详细，要覆盖智能体的所有信息
+        #     3. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
+        #     4. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
+        #     5. 一定要严格按照我提供的批量生成智能体的数量去生成智能体，不要多余或少于此数量
+        #     6. 批量生成的智能体数据要尽量保持差异性，不要生成重复的智能体
+        #     7. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
+        #     8. 一定要严格遵守多智能体数据json结构
         #     注意只返回生成的多智能体json结构数据，不要返回多余的内容。
         #     多智能体数据json结构说明：
         #     {{
