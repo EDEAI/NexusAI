@@ -124,6 +124,34 @@ def push_websocket_message(
                 }
             }
         }
+
+    elif run_ai_tool_type == 2:
+        outputs['value'] = json.dumps(json.loads(outputs['value']), ensure_ascii=False)
+        data = {
+            'user_id': user_id,
+            'type': ai_tool_type,
+            'data': {
+                'app_run_id': app_run_id,
+                'status': status,
+                'error': error,
+                'elapsed_time': elapsed_time,
+                'prompt_tokens': prompt_tokens,
+                'completion_tokens': completion_tokens,
+                'total_tokens': total_tokens,
+                'created_time': created_time,
+                'finished_time': finished_time,
+                'exec_data': {
+                    'exec_id': exec_id,
+                    'status': ai_status,
+                    'error': ai_error,
+                    'outputs': outputs,
+                    'elapsed_time': ai_elapsed_time,
+                    'prompt_tokens': ai_prompt_tokens,
+                    'completion_tokens': ai_completion_tokens,
+                    'total_tokens': ai_total_tokens,
+                }
+            }
+        }
     elif run_ai_tool_type == 4:
         outputs['value'] = json.dumps(json.loads(outputs['value']), ensure_ascii=False)
         data = {
@@ -337,6 +365,17 @@ def task_callback_thread():
                         #     else:
                         #         logger.error(f"ERROR Batch generate agent returns:{return_agent}")
                         # elif run_ai_tool_type == 4:
+                        if run_ai_tool_type == 2:
+                            value_str = result['data']['outputs']['value']
+                            json_load_value = json.loads(value_str)['output variables']
+                            # json_load_value = [json_load_value]
+                            test_var_obj = create_object_variable_from_list(
+                                data=json_load_value,
+                                name="inputs",
+                                display_name="Inptus"
+                            )
+                            test_var_obj = test_var_obj.to_dict()
+                            result['data']['outputs']['value'] = json.dumps(test_var_obj, ensure_ascii=False)
                         if run_ai_tool_type == 4:
                             value_str = result['data']['outputs']['value']
                             json_load_value = json.loads(value_str)['variables']
