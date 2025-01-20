@@ -430,7 +430,7 @@ async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData =
         )
 
         if not record_id:
-            return response_error(get_language_content("api_agent_generate_failed"))
+            return response_error(get_language_content("api_skill_generate_failed"))
 
         return response_success(
             {
@@ -440,4 +440,4 @@ async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData =
             get_language_content("api_skill_success")
         )
     except Exception:
-        return response_error(get_language_content("api_skill_revise_failed"))
+        return response_error(get_language_content("api_skill_correction_failed"))
