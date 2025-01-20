@@ -641,11 +641,11 @@ language_packs = {
         'api_agent_record_error': 'record not found',
         
         'chatroom_meeting_summary_system': '''
-            You are a conference content summary assistant. Please summarize the conference through the conference chat history I provided.
-            Note that only the conference summary content will be returned in the end, and no redundant content will be returned.
+            You are a meeting summary assistant. Please summarize the meeting based on the meeting chat history I provided. The meeting summary should be as detailed as possible.
+            Note that only the meeting summary content will be returned in the end, and no redundant content will be returned.
         ''',
         'chatroom_meeting_summary_user': '''
-            Conference chat history:
+            Meeting chat history:
             {messages}
         ''',
         'chatroom_meeting_summary_system_correct': '''
@@ -680,7 +680,7 @@ language_packs = {
             Pay attention to the following requirements during conversion:
             1. Pay attention to the split items in the work-oriented data I provided. Be sure to keep the original split items, do not create new split items, and do not delete split items.
             2. The final generated work-oriented data must meet the requirements of the work-oriented data json format. Do not change the data structure.
-            3. Be sure to pay attention to the field description and requirements in the work-oriented data json format description, and use this as a reference rule for splitting.
+            3. Be sure to pay attention to the field description and requirements in the work-oriented data json format description, as well as the work-oriented data supplementary description I provided. The two are combined as split reference rules.
             4. Remember that the four fields of name, display_name, required, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
             5. Be sure to strictly abide by the work-oriented data json format. Note that only the generated json format content is returned in the end, and no redundant content is returned.
 
@@ -705,6 +705,9 @@ language_packs = {
 
             Work-oriented data:
             {{'variables':{prompt_variables}}}
+            
+            Supplementary description of work-oriented data:
+            {prompt_variables_supplement}
         ''',
         'chatroom_conference_orientation_system_correct': '''
             You are a data conversion assistant. You have already conducted a data-oriented conversion through the meeting summary content I provided. I provided the converted work-oriented data.
@@ -995,7 +998,7 @@ language_packs = {
         'chatroom_status_is_incorrect': '当前状态不正确',
         
         # 'chatroom_meeting_summary_system': '''
-        #     你是一个会议内容总结助手，请通过我提供的会议聊天历史进行会议总结。
+        #     你是一个会议内容总结助手，请通过我提供的会议聊天历史进行会议总结，会议总结内容要尽量详细。
         #     注意最终只返回会议总结内容，不要返回多余的内容。
         # ''',
         # 'chatroom_meeting_summary_user': '''
@@ -1036,7 +1039,7 @@ language_packs = {
         #     转化时注意以下几点要求：
         #     1. 注意我提供的工作导向数据中的拆分项，一定要保持原有拆分项，不要创建新的拆分项，也不要删除拆分项
         #     2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构
-        #     3. 一定要注意工作导向数据json格式说明中的字段说明和要求，以此为拆分参考规则
+        #     3. 一定要注意工作导向数据json格式说明中的字段说明和要求，还有我提供的工作导向数据补充说明，两项结合作为拆分参考规则
         #     4. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
         #     5. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
 
@@ -1060,6 +1063,9 @@ language_packs = {
             
         #     工作导向数据：
         #     {{'variables':{prompt_variables}}}
+            
+        #     工作导向数据补充说明：
+        #     {prompt_variables_supplement}
         # ''',
         # 'chatroom_conference_orientation_system_correct': '''
         #     你是一个数据转化助手，你已经通过我提供的会议总结内容进行了一次数据导向转化，我提供了已转化的工作导向数据。
