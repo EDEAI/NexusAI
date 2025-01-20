@@ -105,3 +105,27 @@ class ResSkillRunSchema(BaseModel):
     detail: Optional[str] = None
     data: Optional[ResSkillRunResponseData] = None
 
+class ReqSkillGenerateSchema(BaseModel):
+    user_prompt: Optional[str] = None
+
+class ResSkillGenerateData(BaseModel):
+    app_run_id: Optional[int] = None
+    record_id: Optional[int] = None
+
+class ResSkillGenerateSchema(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Optional[ResSkillGenerateData] = None
+
+class ReqSkillCorrectionSchema(BaseModel):
+    app_run_id: int
+    correction_prompt: str
+
+class ResSkillCorrectionData(BaseModel):
+    app_run_id: Optional[int] = None
+    record_id: Optional[int] = None
+
+class ResSkillCorrectionSchema(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Optional[ResSkillCorrectionData] = None
