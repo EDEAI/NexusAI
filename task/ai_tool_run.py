@@ -367,15 +367,25 @@ def task_callback_thread():
                         # elif run_ai_tool_type == 4:
                         if run_ai_tool_type == 2:
                             value_str = result['data']['outputs']['value']
-                            json_load_value = json.loads(value_str)['output variables']
-                            # json_load_value = [json_load_value]
+                            json_load_value = json.loads(value_str)['input_variables']
+                            output_variables_value = json.loads(value_str)['output_variables']
                             test_var_obj = create_object_variable_from_list(
                                 data=json_load_value,
                                 name="inputs",
                                 display_name="Inptus"
                             )
                             test_var_obj = test_var_obj.to_dict()
-                            result['data']['outputs']['value'] = json.dumps(test_var_obj, ensure_ascii=False)
+                            result['data']['outputs']['value']['input_variables'] = json.dumps(test_var_obj, ensure_ascii=False)
+
+
+                            output_variables_value_obj = create_object_variable_from_list(
+                                data=output_variables_value,
+                                name="inputs",
+                                display_name="Inptus"
+                            )
+                            output_variables_value_obj = output_variables_value_obj.to_dict()
+                            result['data']['outputs']['value']['output_variables'] = json.dumps(output_variables_value_obj, ensure_ascii=False)
+
                         if run_ai_tool_type == 4:
                             value_str = result['data']['outputs']['value']
                             json_load_value = json.loads(value_str)['variables']
