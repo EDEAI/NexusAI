@@ -242,7 +242,8 @@ class Apps(MySQL):
                 'team_id',
                 'mode',
                 'is_public',
-                'user_id'
+                'user_id',
+                'description'
             ],
             conditions=[
                 {'column': 'id', 'value': app_id},
