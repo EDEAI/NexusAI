@@ -1,0 +1,1 @@
+ALTER TABLE `tags` CHANGE `created_time` `created_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Tag created time';
