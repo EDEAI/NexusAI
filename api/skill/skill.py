@@ -1,6 +1,7 @@
 import asyncio
 
 from fastapi import APIRouter
+from core.database.models.tag_bindings import TagBindings
 from core.database.models import CustomTools, Apps
 from api.schema.skill import *
 from api.utils.common import *
@@ -9,16 +10,12 @@ from core.workflow.variables import *
 from core.workflow.nodes import *
 from celery_app import run_app
 from languages import get_language_content
-from core.database.models.app_runs import AppRuns
-from core.database.models.ai_tool_llm_records import AIToolLLMRecords
-from core.llm.prompt import create_prompt_from_dict, Prompt
-from time import time
-
 
 router = APIRouter()
 tools_db = CustomTools()
 apps_db = Apps()
 nodes = Nodes()
+tagbindings = TagBindings()
 
 
 # Create custom tool
@@ -47,7 +44,8 @@ async def skill_create(tool: ReqSkillCreateSchema, userinfo: TokenData = Depends
 
 # Read all custom tool
 @router.get("/skill_list", response_model=ResSkillListSchema)
-async def skill_list(page: int = 1, page_size: int = 10, skill_search_type: int = 1,  name: str = "",userinfo: TokenData = Depends(get_current_user)):
+async def skill_list(page: int = 1, page_size: int = 10, skill_search_type: int = 1, name: str = "",
+                     userinfo: TokenData = Depends(get_current_user)):
     """
         Read all custom tool
         :param page: The page of the skill.
@@ -65,7 +63,7 @@ async def skill_list(page: int = 1, page_size: int = 10, skill_search_type: int 
 
 # Read single custom tool
 @router.get("/skill_info/{app_id}", response_model=ResSkillBaseInfoSchema)
-async def skill_info( app_id: int, publish_status: int, userinfo: TokenData = Depends(get_current_user)):
+async def skill_info(app_id: int, publish_status: int, userinfo: TokenData = Depends(get_current_user)):
     """
     Read all custom tool
     :param app_id: The app_id of the skill.
@@ -77,7 +75,7 @@ async def skill_info( app_id: int, publish_status: int, userinfo: TokenData = De
         return response_error(get_language_content("Invalid app_id"))
     if publish_status not in [0, 1]:
         return response_error(get_language_content("publish_status can only input 0 or 1"))
-    result = tools_db.get_skill_info(userinfo.uid, app_id, publish_status,userinfo.team_id)
+    result = tools_db.get_skill_info(userinfo.uid, app_id, publish_status, userinfo.team_id)
     if result["status"] != 1:
         return response_error(get_language_content(result["message"]))
 
@@ -111,9 +109,11 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
         conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
                       {'column': 'publish_status', 'value': 0}]
         tools_db.update(conditions, update_data)
+        tagbindings.batch_update_bindings([app_id], update_data.get('tag_ids', []))
         return response_success()
     except:
         return response_error(get_language_content("update error"))
+
 
 @router.put("/skill_publish/{app_id}", response_model=ResSkillPublishSchema)
 async def skill_publish(app_id: int, userinfo: TokenData = Depends(get_current_user)):
@@ -131,16 +131,16 @@ async def skill_publish(app_id: int, userinfo: TokenData = Depends(get_current_u
     draft_info = draft_info['data']
     app = Apps().get_app_by_id(app_id)
     node = SkillNode(
-            title=app['name'],
-            desc=app['description'],
-            input=create_variable_from_dict(draft_info['input_variables']),
-            skill_id=draft_info['id']
-            )
+        title=app['name'],
+        desc=app['description'],
+        input=create_variable_from_dict(draft_info['input_variables']),
+        skill_id=draft_info['id']
+    )
     try:
         node.validate()
     except Exception as e:
         return response_error(str(e))
-    
+
     tool_data = {
         "team_id": draft_info['team_id'],
         "user_id": draft_info['user_id'],
@@ -161,7 +161,8 @@ async def skill_publish(app_id: int, userinfo: TokenData = Depends(get_current_u
         tool_id = tools_db.insert(tool_data)
         return response_success({'id': tool_id})
     else:
-        tools_db.update([{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id}, {'column': 'publish_status', 'value': 1}], tool_data)
+        tools_db.update([{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
+                         {'column': 'publish_status', 'value': 1}], tool_data)
         apps_data = {
             "publish_status": 1,
             "updated_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -189,6 +190,7 @@ async def delete_skill_by_app_id(app_id: int, userinfo: TokenData = Depends(get_
     if not deleted:
         return response_error(get_language_content("Tool not found"))
     return response_success()
+
 
 # Soft delete custom tool
 @router.put("/skill_delete/{id}/soft")
@@ -221,6 +223,7 @@ async def skill_delete(app_id: int, userinfo: TokenData = Depends(get_current_us
     if not deleted:
         return response_error(get_language_content("Tool not found"))
     return response_success()
+
 
 @router.post("/skill_run", response_model=ResSkillRunSchema)
 async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_current_user)):
@@ -287,154 +290,4 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
         return response_error(get_language_content(result["message"]))
     return response_success({"outputs": result["data"]["outputs"]})
 
-@router.post("/skill_generate", response_model=ResSkillGenerateSchema)
-async def skill_generate(data: ReqSkillGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
-    
-    # Validate user prompt
-    if not data.user_prompt:
-        return response_error(get_language_content("api_skill_user_prompt_required"))
 
-    # Create app run record
-    start_datetime_str = datetime.fromtimestamp(time()) \
-            .replace(microsecond=0).isoformat(sep='_')
-    app_run_id = AppRuns().insert({
-        'user_id': userinfo.uid,
-        'app_id': 0,
-        'type': 2,  # Skill generator type
-        'name': f'Skill_Generator_{start_datetime_str}',
-        'status': 1  # Initial status
-    })
-
-    # Prepare prompts for LLM
-    system_prompt = get_language_content('generate_skill_system_prompt', userinfo.uid)
-    user_prompt = get_language_content('generate_skill_user', userinfo.uid, False)
-
-    user_prompt = user_prompt.format(
-        user_prompt=data.user_prompt
-    )
-
-    system_prompt = system_prompt.format(
-        append_prompt=''
-    )
-    
-    input_ = Prompt(
-        system=system_prompt,
-        user=user_prompt
-    ).to_dict()
-
-    # Initialize LLM execution record
-    record_id = AIToolLLMRecords().initialize_execution_record(
-        app_run_id=app_run_id,
-        ai_tool_type=2,  # Skill generator type
-        inputs=input_,
-        run_type=1,
-        user_prompt=data.user_prompt
-    )
-
-    if not record_id:
-        return response_error(get_language_content("api_skill_generate_failed"))
-
-    # Return successful response
-    return response_success(
-        {
-            "app_run_id": app_run_id,
-            "record_id": record_id
-        },
-        get_language_content("api_skill_success")
-    )
-
-@router.post("/skill_correction", response_model=ResSkillCorrectionSchema)
-async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData = Depends(get_current_user)):
-    """
-    Correction skill based on user feedback
-    """
-    # Validate app run id
-    app_run_info = AppRuns().select_one(
-        columns=["id"],
-        conditions=[
-            {"column": "id", "value": data.app_run_id},
-            {"column": "user_id", "value": userinfo.uid}
-        ]
-    )
-
-    if not app_run_info:
-        return response_error(get_language_content('app_run_error'))
-    
-    first_record = AIToolLLMRecords().select_one(
-        columns=['id', 'outputs'],
-        conditions=[
-            {"column": "app_run_id", "value": data.app_run_id}
-        ],
-        order_by='id ASC'
-    )
-
-    # Extract original user prompt from inputs
-    base_user_prompt = ""
-    inputs = first_record.get('inputs', {})
-    if inputs is None:
-        inputs = first_record.get('correct_prompt', {})
-
-    try:
-        if isinstance(inputs, dict) and 'user' in inputs:
-            user_dict = inputs['user']
-            if isinstance(user_dict, dict) and 'value' in user_dict:
-                base_user_prompt = user_dict['value']
-    except Exception:
-        base_user_prompt = ""
-
-
-    # Get first record to extract original user prompt
-    last_record = AIToolLLMRecords().select_one(
-        columns=['id', 'outputs', 'correct_prompt'],
-        conditions=[
-            {"column": "app_run_id", "value": data.app_run_id}
-        ],
-        order_by='id DESC'
-    )
-    
-     # Extract agent info from outputs
-    history_skill_info = {}
-    try:
-        if isinstance(last_record, dict) and 'outputs' in last_record:
-            outputs_dict = last_record['outputs']
-            if isinstance(outputs_dict, dict) and 'value' in outputs_dict:
-                history_skill_info = outputs_dict['value']
-    except Exception:
-        pass
-
-    system_prompt = get_language_content('correction_skill_system_prompt', userinfo.uid)
-
-    user_prompt = get_language_content('correction_skill_user', userinfo.uid, False)
-    user_prompt = user_prompt.format(
-        correction_prompt=data.correction_prompt,
-        history_skill=history_skill_info
-    )
-
-    input_ = Prompt(system=system_prompt, user=base_user_prompt + user_prompt).to_dict()
-    try:    
-        # Update app run status
-        AppRuns().update(
-            {'column': 'id', 'value': data.app_run_id},
-            {'status': 1}
-        )
-
-        # Initialize new execution record
-        record_id = AIToolLLMRecords().initialize_correction_record(
-            app_run_id=data.app_run_id,
-            ai_tool_type=2,
-            correct_prompt=input_,
-            user_prompt=data.correction_prompt
-        )
-
-        if not record_id:
-            return response_error(get_language_content("api_agent_generate_failed"))
-
-        return response_success(
-            {
-                'app_run_id': data.app_run_id,
-                'record_id': record_id
-            },
-            get_language_content("api_skill_success")
-        )
-    except Exception:
-        return response_error(get_language_content("api_skill_revise_failed"))
