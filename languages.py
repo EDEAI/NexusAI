@@ -681,8 +681,9 @@ language_packs = {
             1. Pay attention to the split items in the work-oriented data I provided. Be sure to keep the original split items, do not create new split items, and do not delete split items.
             2. The final generated work-oriented data must meet the requirements of the work-oriented data json format. Do not change the data structure.
             3. Be sure to pay attention to the field description and requirements in the work-oriented data json format description, as well as the work-oriented data supplementary description I provided. The two are combined as split reference rules.
-            4. Remember that the four fields of name, display_name, required, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
-            5. Be sure to strictly abide by the work-oriented data json format. Note that only the generated json format content is returned in the end, and no redundant content is returned.
+            4. The content of the split item must comply with the definition and requirements of the corresponding split item in the split reference rule, and be as detailed as possible while complying with the definition and requirements
+            5. Remember that the four fields of name, display_name, required, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
+            6. Be sure to strictly abide by the work-oriented data json format. Note that only the generated json format content is returned in the end, and no redundant content is returned.
 
             Work-oriented data json format description:
             1. Structural type description: The data corresponding to variables is of list type as a whole. Each element in the list is a data split item, and the data split item is of dict type
@@ -1040,8 +1041,9 @@ language_packs = {
         #     1. 注意我提供的工作导向数据中的拆分项，一定要保持原有拆分项，不要创建新的拆分项，也不要删除拆分项
         #     2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构
         #     3. 一定要注意工作导向数据json格式说明中的字段说明和要求，还有我提供的工作导向数据补充说明，两项结合作为拆分参考规则
-        #     4. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
-        #     5. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
+        #     4. 拆分项的内容一定要符合拆分参考规则中的对应拆分项的定义和要求，在符合定义和要求的前提下要尽量详细
+        #     5. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
+        #     6. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
 
         #     工作导向数据json格式说明：
         #     1. 结构类型说明：variables对应的数据整体为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型
