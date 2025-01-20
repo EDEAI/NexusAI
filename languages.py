@@ -744,7 +744,11 @@ language_packs = {
 
             Data correction suggestions:
             {update_meeting}
-        '''
+        ''',
+        'api_skill_success': 'success',
+        'api_skill_generate_failed': 'Request failed, please try again later',
+        'api_skill_correction_failed': 'Request failed, please try again later',
+        'api_skill_user_prompt_required': 'Prompt is required',
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -1337,6 +1341,7 @@ language_packs = {
         'api_skill_success': '请求成功，请等待',
         'api_skill_generate_failed': '请求失败，请稍后再试',
         'api_skill_correction_failed': '请求失败，请稍后再试',
+        'api_skill_user_prompt_required': '提示词不能为空',
     }
 }
 
