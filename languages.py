@@ -1239,7 +1239,98 @@ language_packs = {
         'agent_batch_exist_runing_rocord': '存在正在执行的记录',
         'api_agent_supplement_prompt_required': '补充提示词不能为空',
         'api_agent_save_record_error': '保存记录失败',
-        'api_agent_record_error': '记录不存在'
+        'api_agent_record_error': '记录不存在',
+        'generate_skill_system_prompt':'''
+            你是一个AI工具生成助手，
+            请通过我的需求内容，按照工具的数据结构为我生成一个完整的工具信息。
+            注意只返回工具的结构数据，不要返回多余的内容。
+            工具数据json结构说明：
+            1.结构类型说明: 
+            input_variables为输入变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
+            output_variables为输出变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
+            2.格式、字段说明和要求
+            {{
+                "name":"(string类型)工具名称",
+                "description":"(string类型)工具描述",
+                "input_variables":[
+                    {{
+                        "name":"(string类型)输入变量名称",
+                        "type":"(string类型)输入变量类型['string','number']",
+                        "required":"(bool类型)输入变量是否必填,True必填,False不必填",
+                        "display_name":"(string类型),name的首字母大写格式"
+                    }}
+                ],
+                "dependencies":
+                {{
+                    "python3":[
+                        "python依赖名称，你要完全区分内部依赖和外部依赖，依赖名称要保证完全正确。"
+                    ]
+                }},
+                "code":
+                {{
+                    "python3":"(string类型)python3代码部分，你只需要提供方法即可。方法需要规定返回类型。方法形参是输入变量，变量要限制类型。return内容为dict类型，内容要和输出变量一致。"
+                }},
+                "output_type":"(int类型),输出类型包含以下四种类型： 1:文本  2: 数据库 3: 代码 4: 文档",
+                "output_variables":[
+                    {{
+                        "name": "(string类型)输出变量名称",
+                        "type": "(string类型)输出属性类型，包含以下六种类型：'string','number','object','Array[string]','Array[number]','Array[object]'",
+                        "display_name": "(string类型)，name的首字母大写格式。"
+                    }}
+                ]
+            }}
+            {append_prompt}
+        ''',
+        'generate_skill_user':'''
+            需求内容：
+            {user_prompt}
+        ''',
+        'correction_skill_system_prompt':'''
+            你是一个AI工具生成助手。
+            你已经生成了一个工具，请通过我提供的修正意见，对已生成的工具数据进行调整。
+            注意只返回技能的结构数据，不要返回多余的内容。
+            工具数据json结构说明：
+            1.结构类型说明: input_variables为输入变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
+            output_variables为输出变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
+            2.格式、字段说明和要求
+            {{
+                "name":"(string类型)工具名称",
+                "description":"(string类型)工具描述",
+                "input_variables":[
+                    {{
+                        "name":"(string类型)输入变量名称",
+                        "type":"(string类型)输入变量类型['string','number']",
+                        "required":"(bool类型)输入变量是否必填,True必填,False不必填",
+                        "display_name":"(string类型),name的首字母大写格式"
+                    }}
+                ]},
+                "dependencies":{{
+                    "python3":[
+                        "python依赖名称，你要完全区分内部依赖和外部依赖，依赖名称要保证完全正确。"
+                    ]
+                }},
+                "code":{{
+                    "python3":"(string类型)python3代码部分，你只需要提供方法即可。方法需要规定返回类型。方法形参是输入变量，变量要限制类型。return内容为dict类型，内容要和输出变量一致。"
+                }},
+                "output_type":"(int类型),输出类型包含以下四种类型： 1:文本  2: 数据库 3: 代码 4: 文档",
+                "output_variables":[
+                    {{
+                        "name": "(string类型)输出变量名称",
+                        "type": "(string类型)输出属性类型，包含以下六种类型：'string','number','object','Array[string]','Array[number]','Array[object]'",
+                        "display_name": "(string类型)，name的首字母大写格式。"
+                    }}
+                ]
+            }}
+        ''',
+        'correction_skill_user':'''
+            修正意见：
+            {correction_prompt}
+            已生成的工具信息：
+            {history_skill}
+        ''',
+        'api_skill_success': '请求成功，请等待',
+        'api_skill_generate_failed': '请求失败，请稍后再试',
+        'api_skill_correction_failed': '请求失败，请稍后再试',
     }
 }
 
