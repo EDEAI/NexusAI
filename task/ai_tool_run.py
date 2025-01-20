@@ -367,7 +367,7 @@ def task_callback_thread():
                         # elif run_ai_tool_type == 4:
                         if run_ai_tool_type == 2:
                             value_str = result['data']['outputs']['value']
-                            json_load_value = json.loads(value_str)['output variables']
+                            json_load_value = json.loads(value_str)['input_variables']
                             # json_load_value = [json_load_value]
                             test_var_obj = create_object_variable_from_list(
                                 data=json_load_value,
