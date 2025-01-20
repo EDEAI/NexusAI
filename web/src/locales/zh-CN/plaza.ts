@@ -36,6 +36,7 @@ export default {
     'app.edit_chatroom.title': '编辑圆桌',
     'app.edit_chatroom.succeed': '更新成功',
 
+    'app.check_agent_popup.name':'智能体',
     'app.check_agent_popup.title': '选择智能体',
     'app.check_agent_popup.chenck_text': '已选',
     'app.check_agent_popup.select_1': '我的 智能体',
@@ -44,6 +45,7 @@ export default {
     'app.check_agent_popup.save': '确认',
     'app.check_agent_popup.cancel': '取消',
 
+    'app.check_workflow_popup.name':'工作流',
     'app.check_workflow_popup.title': '选择工作流',
     'app.check_workflow_popup.chenck_text': '已选',
     'app.check_workflow_popup.select_1': '我的 工作流',
@@ -52,7 +54,8 @@ export default {
     'app.check_workflow_popup.save': '确认',
     'app.check_workflow_popup.cancel': '取消',
 
-    'app.check_popup.check': '全选',
+    'app.check_popup.add':'已添加',
+    'app.check_popup.check': '全部添加',
 
     'app.chatroom.sidebar.return': '返回',
     'app.chatroom.sidebar.agent_title': '智能体',

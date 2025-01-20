@@ -36,6 +36,7 @@ export default {
     'app.edit_chatroom.title': 'Edit Round Table',
     'app.edit_chatroom.succeed': 'Update Successful',
 
+    'app.check_agent_popup.name':'Agent',
     'app.check_agent_popup.title': 'Select Agent',
     'app.check_agent_popup.chenck_text': 'Selected',
     'app.check_agent_popup.select_1': 'My Agent',
@@ -44,6 +45,7 @@ export default {
     'app.check_agent_popup.save': 'Confirm',
     'app.check_agent_popup.cancel': 'Cancel',
 
+    'app.check_workflow_popup.name':'Workflow',
     'app.check_workflow_popup.title': 'Select Workflow',
     'app.check_workflow_popup.chenck_text': 'Selected',
     'app.check_workflow_popup.select_1': 'My Workflow',
@@ -51,8 +53,10 @@ export default {
     'app.check_workflow_popup.search': 'Please enter a keyword to search',
     'app.check_workflow_popup.save': 'Confirm',
     'app.check_workflow_popup.cancel': 'Cancel',
+    
+    'app.check_popup.add':'Added',
 
-    'app.check_popup.check': 'Select all',
+    'app.check_popup.check': 'Add all',
 
     'app.chatroom.content.summary':'Orientation',
     'app.chatroom.content.meetingSummary':'Meeting Orientation',
