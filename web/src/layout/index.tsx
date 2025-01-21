@@ -3,6 +3,7 @@
  */
 
 import AgentCreate from '@/components/AgentCreate';
+import SkillCreate from '@/components/SkillCreate';
 import DealtWithForLog from '@/components/WorkFlow/components/DealtWith/DealtWithForLog';
 import RunPanelLog from '@/components/WorkFlow/nodes/RunPanelLog';
 import RunWorkFlow from '@/components/WorkFlow/RunWorkFlow';
@@ -20,6 +21,7 @@ const PageWrap: React.FC<PlazaProps> = ({ children }) => {
             <RunPanelLog></RunPanelLog>
             <RunWorkFlow></RunWorkFlow>
             <AgentCreate></AgentCreate>
+            <SkillCreate></SkillCreate>
         </div>
     );
 };
