@@ -327,7 +327,7 @@ class ChatroomDrivenRecords(MySQL):
                         ],
                         conditions=[
                             {"column": "app_run_id", "value": record['data_source_run_id']},
-                            # {"column": "ai_tool_type", "value": 3}
+                            {"column": "ai_tool_type", "value": 3}
                         ],
                         order_by='id Asc'
                     )
