@@ -26,16 +26,24 @@ export default memo(() => {
     const runPanelLogRecord = useUserStore(state => state.runPanelLogRecord);
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const [runPanelShow, setRunPanelShow] = useState(false);
-    const setDealtWithData = useSocketStore(state => state.setDealtWithData);
+    const setDealtWithData = useUserStore(state => state.setDealtWithData);
     const setFlowMessage = useSocketStore(state => state.setFlowMessage);
     const flowMessage = useSocketStore(state => state.flowMessage);
     const [loading, setLoading] = useState(false);
     const [runList, setRunList] = useState([]);
     const [tabKey, setTabKey] = useState('4');
     const [endRun, setEndRun] = useState(null);
-
+    const prevConfirmDealtWith = useUserStore(state => state.prevConfirmDealtWith);
     const saveWorkFlow = useSaveWorkFlow();
-
+    useUpdateEffect(() => {
+        const newList = runList.map(item => {
+            if (item.id == prevConfirmDealtWith.exec_id) {
+                item.need_human_confirm = 0;
+            }
+            return item;
+        });
+        setRunList(newList);
+    }, [prevConfirmDealtWith]);
     const onClose = () => {
         setRunPanelLogRecord(null);
         setRunPanelShow(false);
@@ -128,7 +136,10 @@ export default memo(() => {
                                             <Alert
                                                 message={
                                                     <div className="flex gap-2 flex-wrap ">
-                                                        {intl.formatMessage({ id: 'workflow.label.confirmer' })} :
+                                                        {intl.formatMessage({
+                                                            id: 'workflow.label.confirmer',
+                                                        })}{' '}
+                                                        :
                                                         {item?.human_confirm_info
                                                             ?.map(item => item.nickname)
                                                             .join('、')}
@@ -331,6 +342,13 @@ export default memo(() => {
                                             <Tag
                                                 className="w-full flex items-center justify-center"
                                                 color="blue"
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    setDealtWithData({
+                                                        ...item,
+                                                        exec_id: item.id,
+                                                    });
+                                                }}
                                             >
                                                 {intl.formatMessage({
                                                     id: 'workflow.needHumanConfirm1',

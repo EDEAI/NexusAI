@@ -35,8 +35,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
             }
             if(!isScroll){
                 setTimeout(()=>{
-                    scrollDom?.current?.scrollTo({top: scrollDom.current.scrollHeight});
-
+                    scrollDom?.current?.scrollTo({top: 0});
                 },200)
                 setRoomId(summaryParams.id)
                 setSummaryParams({})
@@ -72,10 +71,6 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
         }
     },[summaryParams])
 
-    useEffect(()=>{
-        console.log(boxLoading);
-        
-    },[boxLoading])
 
     return (
         <>
@@ -97,13 +92,14 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                                 </div>
                                 <div className={`h-full min-h-full overflow-y-auto flex flex-col-reverse scroll-smooth`}  ref={scrollDom}>
                                     <div>
-                                        {summaryHistory.length?<SummaryHistoryDom scrollDom={scrollDom} list={summaryHistory} historyHeight={historyHeight.current}/>:<></>}
+                                        {summaryHistory.length?<SummaryHistoryDom id={id} scrollDom={scrollDom} list={summaryHistory} historyHeight={historyHeight.current}/>:<></>}
                                         <div className={`w-full px-4 h-full`} style={{minHeight:summaryShow?scrollDom?.current?.offsetHeight:''}}>
                                             <RevisionsMeetingSummary 
                                                 setShow={setRunboxShow}
                                                 inputShow={inputShow}
                                                 setBoxLoading={setBoxLoading}
                                                 setAppRunId={setAppRunId}
+                                                scrollDom={scrollDom}
                                             />
                                             {runboxShow?<RunsMeetingSummary
                                                 id={roomId} 

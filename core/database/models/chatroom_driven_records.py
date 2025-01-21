@@ -473,8 +473,6 @@ class ChatroomDrivenRecords(MySQL):
                                     }
                                 }
 
-                history_list.append(record_data)
+                # history_list.append(record_data)
 
-        return {
-            "list": history_list
-        }
+        return record_data

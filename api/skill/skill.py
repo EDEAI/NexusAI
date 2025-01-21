@@ -1,5 +1,4 @@
 import asyncio
-
 from fastapi import APIRouter
 from core.database.models.tag_bindings import TagBindings
 from core.database.models import CustomTools, Apps
@@ -14,7 +13,6 @@ from core.database.models.app_runs import AppRuns
 from core.database.models.ai_tool_llm_records import AIToolLLMRecords
 from core.llm.prompt import create_prompt_from_dict, Prompt
 from time import time
-
 
 router = APIRouter()
 tools_db = CustomTools()
@@ -112,7 +110,6 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
         conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
                       {'column': 'publish_status', 'value': 0}]
         tools_db.update(conditions, update_data)
-        tagbindings.batch_update_bindings([app_id], update_data.get('tag_ids', []))
 
         return response_success()
     except:
@@ -316,10 +313,6 @@ async def skill_generate(data: ReqSkillGenerateSchema, userinfo: TokenData = Dep
         user_prompt=data.user_prompt
     )
 
-    system_prompt = system_prompt.format(
-        append_prompt=''
-    )
-    
     input_ = Prompt(
         system=system_prompt,
         user=user_prompt
@@ -385,7 +378,6 @@ async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData =
     except Exception:
         base_user_prompt = ""
 
-
     # Get first record to extract original user prompt
     last_record = AIToolLLMRecords().select_one(
         columns=['id', 'outputs', 'correct_prompt'],
@@ -441,3 +433,82 @@ async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData =
         )
     except Exception:
         return response_error(get_language_content("api_skill_correction_failed"))
+
+
+@router.post("/skill_data_create", response_model=ResSkillCreateSchema)
+async def skill_data_create(data: ReqSkillDataCreateSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Create or update skill data with structured format
+    Args:
+        data: The skill data with standardized format including optional app_id
+        userinfo: The userinfo of the skill
+    Returns:
+        ID of created/updated skills
+    """
+    # No need to convert to dict here since we want to use Pydantic model properties
+    result = tools_db.skill_data_create(
+        data,
+        userinfo.uid,
+        userinfo.team_id
+    )
+
+    if result["status"] != 1:
+        return response_error(result["message"])
+
+    return response_success({
+        'id': result["skill_id"],
+        'app_id': result["app_id"]
+    })
+
+
+@router.post("/skill_debug", response_model=ResSkillRunSchema)
+async def skill_debug(data: ReqSkillDebugSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Debug skill by running it with test data without saving
+    Args:
+        data: The skill configuration and test data
+        userinfo: The user info object
+    Returns:
+        Execution results of the skill
+    """
+    try:
+        # Create node for validation
+        node = SkillNode(
+            title=data.name,
+            desc=data.description,
+            input=create_variable_from_dict(data.input_variables.dict()),
+            data={
+                'custom_code': data.code.dict(),
+                'code_dependencies': data.dependencies.dict(),
+                'output': create_variable_from_dict(data.output_variables.dict())
+            }
+        )
+
+        # Validate node configuration
+        node.validate()
+
+        # Validate input data format
+        input_dict = data.test_input
+        try:
+            create_variable_from_dict(input_dict)
+        except:
+            return response_error(get_language_content("input_dict_format_error"))
+        from core.workflow import Context
+        # Create a temporary context for running
+        context = Context()
+
+        # Run the node with test data
+        result = node.run(
+            context=context,
+            user_id=userinfo.uid,
+            app_id=0,  # Use 0 for testing
+            type=1  # Use draft type for testing
+        )
+
+        if result["status"] != "success":
+            return response_error(result["message"])
+
+        return response_success({"outputs": result["data"]["outputs"]})
+
+    except Exception as e:
+        return response_error(str(e))

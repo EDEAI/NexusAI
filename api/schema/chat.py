@@ -247,8 +247,8 @@ class ChatRoomHistoryList(ResponseBase):
 
 
 class ChatHistoryListSingle(BaseModel):
-    list: List[ChatHistoryItem] = []
-
+    # list: List[ChatHistoryItem] = []
+    data: Optional[ChatHistoryItem] = None
 
 class ChatRoomHistorySingle(BaseModel):
     data: Optional[ChatHistoryListSingle] = None

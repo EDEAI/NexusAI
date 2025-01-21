@@ -504,7 +504,7 @@ language_packs = {
         'api_agent_user_prompt_required': 'Agent user prompt required',
         'api_agent_batch_size_invalid': 'Agent batch size invalid',
         'agent_batch_exist_runing_rocord': 'Agent generate exist runing rocord',
-        
+
         'generate_agent_system_prompt': '''
             You are an AI agent generation assistant.
             Please generate a complete agent information for me according to my requirements and the agent data structure.
@@ -639,7 +639,7 @@ language_packs = {
         'api_agent_supplement_prompt_required': 'supplement_prompt is requiredapi_agent_generate_failed',
         'api_agent_save_record_error': 'save record errorapp_run_error',
         'api_agent_record_error': 'record not found',
-        
+
         'chatroom_meeting_summary_system': '''
             You are a meeting summary assistant. Please summarize the meeting based on the meeting chat history I provided. The meeting summary should be as detailed as possible.
             Note that only the meeting summary content will be returned in the end, and no redundant content will be returned.
@@ -681,9 +681,8 @@ language_packs = {
             1. Pay attention to the split items in the work-oriented data I provided. Be sure to keep the original split items, do not create new split items, and do not delete split items.
             2. The final generated work-oriented data must meet the requirements of the work-oriented data json format. Do not change the data structure.
             3. Be sure to pay attention to the field description and requirements in the work-oriented data json format description, as well as the work-oriented data supplementary description I provided. The two are combined as split reference rules.
-            4. The content of the split item must comply with the definition and requirements of the corresponding split item in the split reference rule, and be as detailed as possible while complying with the definition and requirements
-            5. Remember that the four fields of name, display_name, required, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
-            6. Be sure to strictly abide by the work-oriented data json format. Note that only the generated json format content is returned in the end, and no redundant content is returned.
+            4. Remember that the four fields of name, display_name, required, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
+            5. Be sure to strictly abide by the work-oriented data json format. Note that only the generated json format content is returned in the end, and no redundant content is returned.
 
             Work-oriented data json format description:
             1. Structural type description: The data corresponding to variables is of list type as a whole. Each element in the list is a data split item, and the data split item is of dict type
@@ -706,7 +705,7 @@ language_packs = {
 
             Work-oriented data:
             {{'variables':{prompt_variables}}}
-            
+
             Supplementary description of work-oriented data:
             {prompt_variables_supplement}
         ''',
@@ -852,7 +851,10 @@ language_packs = {
             
             Generated tool data:
             {history_skill}
-        '''
+        ''',
+        'skill_validation_failed': 'Skill validation failed',
+        'skill_create_success': 'Skill create success',
+        'skill_update_success': 'Skill update success',
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -1143,7 +1145,7 @@ language_packs = {
         # ''',
 
         # 'chatroom_conference_orientation_system': '''
-        #     你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据进行数据导向转化。 
+        #     你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据进行数据导向转化。
         #     转化时注意以下几点要求：
         #     1. 注意我提供的工作导向数据中的拆分项，一定要保持原有拆分项，不要创建新的拆分项，也不要删除拆分项
         #     2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构
@@ -1463,6 +1465,9 @@ language_packs = {
         'api_skill_generate_failed': '请求失败，请稍后再试',
         'api_skill_correction_failed': '请求失败，请稍后再试',
         'api_skill_user_prompt_required': '提示词不能为空',
+        'skill_validation_failed': '技能验证失败',
+        'skill_create_success': '技能创建成功',
+        'skill_update_success': '技能更新成功',
     }
 }
 

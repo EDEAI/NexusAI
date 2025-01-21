@@ -1,5 +1,3 @@
-
-
 from pydantic import BaseModel
 from typing import Optional, Dict, Any,List
 from datetime import datetime
@@ -32,7 +30,6 @@ class ReqSkillUpdateSchema(BaseModel):
     updated_time: Optional[datetime] = None
     status: Optional[int] = None
     is_public: Optional[int] = None
-    tag_ids: Optional[List[int]] = None
 
 class SkillBaseInfoResponseData(BaseModel):
     id: Optional[int] = None
@@ -82,7 +79,8 @@ class ResSkillListSchema(BaseModel):
     data: Optional[ResSkillListResponseData] = None
 
 class ResSkilCreateData(BaseModel):
-   id: Optional[int] = None
+    id: Optional[int] = None
+    app_id: Optional[int] = None
 
 class ResSkillCreateSchema(BaseModel):
     code: Optional[int] = None
@@ -129,3 +127,27 @@ class ResSkillCorrectionSchema(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
     data: Optional[ResSkillCorrectionData] = None
+
+class ReqSkillDataCreateSchema(BaseModel):
+    """Schema for creating or updating skill data"""
+    name: Optional[str] = None  # Optional for updates
+    description: Optional[str] = None  # Optional for updates
+    app_id: Optional[int] = None  # Required for updates
+    input_variables: Optional[Dict[str, Any]] = None
+    dependencies: Optional[Dict[str, Any]] = None
+    code: Optional[Dict[str, Any]] = None
+    output_type: Optional[int] = None
+    output_variables: Optional[Dict[str, Any]] = None
+    is_public: Optional[int] = None  # Added for app visibility control
+    tag_ids: Optional[List[int]] = None  # Added for tag management
+
+class ReqSkillDebugSchema(BaseModel):
+    """Schema for skill debugging without saving"""
+    name: str
+    description: str
+    input_variables: dict
+    dependencies: dict
+    code: dict
+    output_type: int  # 1:text 2:database 3:code 4:document
+    output_variables: dict
+    test_input: Dict[str, Any]  # Input data for testing
