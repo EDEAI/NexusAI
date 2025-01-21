@@ -294,7 +294,8 @@ export default {
 
     'creation.placeholder.selectTags': 'Please select tags',
 
-    'workflow.needHumanConfirm1': '待确认',
+    'workflow.needHumanConfirm1': 'To-do',
+    'workflow.needHumanConfirm2': 'Others To-do',
     'workflow.tooltip.confirmer': 'Pending confirmation by: {users}',
     'workflow.label.confirmer': 'Pending Confirmer',
 
