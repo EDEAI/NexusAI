@@ -3,7 +3,7 @@ import Scroll from '@/components/InfiniteScroll';
 import { headportrait } from '@/utils/useUser';
 import { CloseOutlined,DeleteOutlined  } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Col, Empty, Input, Row ,Radio } from 'antd';
+import { Button, Col, Empty, Input, Row ,Radio,Spin} from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import {getAppListByMode} from '@/api/workflow'
 import TagSearch from '@/components/TagSearch';
@@ -289,6 +289,9 @@ const Content: React.FC<params> = param => {
                                 id="agentScroll"
                                 style={{ height: 'calc(100% - 100px)' }}
                             >
+                                {myList.length || moreList.length?<></>:<div className='h-full w-full absolute top-0 left-0 flex justify-center items-center z-[100] bg-[rgba(255,255,255,0.5)]'>
+                                    <Spin size="large" />
+                                </div>}
                                 <Scroll
                                     dataLength={
                                         selectType == 3
@@ -374,7 +377,7 @@ const Content: React.FC<params> = param => {
                                 </Scroll>
                             </div>
                         </div>
-                        {checkCurrent&& checkCurrent.length ? 
+                        {(myList.length || moreList.length) && checkCurrent && checkCurrent.length ? 
                         <div className='h-full flex flex-col'  style={{boxShadow:'rgba(0, 0, 0, 0.1) 0px 0px 3px 0px'}}>
                             <div className='py-[10px] px-[10px] text-[14px]'>{intl.formatMessage({id:'app.check_popup.add'})}{intl.formatMessage({id:`app.check_${nodetype}_popup.name`})}</div>
                             <div className='w-[260px]  overflow-y-auto flex-1 min-w-0 min-h-0'>

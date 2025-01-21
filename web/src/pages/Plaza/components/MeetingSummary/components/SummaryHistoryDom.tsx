@@ -2,6 +2,7 @@ import React, { memo,useEffect,useState,useRef} from 'react';
 import useChatroomStore from '@/store/chatroomstate';
 import Graphic from '@/components/Graphic';
 import ReactMarkdown from 'react-markdown';
+import {RedoOutlined} from '@ant-design/icons'
 import rehypeHighlight from 'rehype-highlight';
 import useUserStore from '@/store/user';
 import { useIntl } from '@umijs/max';
@@ -139,10 +140,10 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any,id:an
                                             </div>
                                         :<></>
                                     }
-                                    <div className='w-full'>
+                                    <div className='flex flex-row-reverse'>
                                         <Button
                                             type="primary"
-                                            className="bg-[#1B64F3] rounded-[4px] my-3 h-[30px] w-full flex-1 tetx-[14px]"
+                                            className="bg-[#1B64F3] rounded-[4px] my-3 h-[30px] w-[110px] gap-[6px]"
                                             onClick={(e:any)=>{
                                                 if(disabled){
                                                     let source_corrections = item?.source_corrections && item?.source_corrections.length>0 && item?.source_corrections[item?.source_corrections.length-1]
@@ -151,8 +152,9 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any,id:an
                                                     setSummaryClick(false)
                                                 }
                                             }}
-                                        >
-                                            {intl.formatMessage({ id: `app.summaryhistory.submitText` })}
+                                        >   
+                                            <span className='text-[12px]'>{intl.formatMessage({ id: `app.summaryhistory.submitText` })}</span>
+                                            <RedoOutlined className='text-[14px]'/>
                                         </Button>
                                     </div>
                                     {
