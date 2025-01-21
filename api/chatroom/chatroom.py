@@ -898,7 +898,7 @@ async def get_chat_room_history(
     return response_success(result)
 
 
-@router.get('/chat_room_history_single', summary='Get chat room History Single', response_model=ChatRoomHistorySingle)
+@router.get('/chat_room_history_single', summary='Get chat room History Single', response_model=ChatHistoryListSingle)
 async def get_chat_room_history_single(
     chatroom_id: int,
     app_run_id: int,
@@ -913,4 +913,6 @@ async def get_chat_room_history_single(
         chatroom_id=chatroom_id,
         app_run_id=app_run_id
     )
+    print(111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111)
+    print(result)
     return response_success(result)
