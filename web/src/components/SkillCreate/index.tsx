@@ -37,9 +37,9 @@ const SkillCreate = memo(() => {
     const [params, setParams] = useState(null);
     const flowMessage = useSocketStore(state => state.flowMessage);
     const [hasProcessed, setHasProcessed] = useState(false);
-  
-    
- 
+
+
+
     const CodeEditorMemo = useMemo(() => (
         <CodeEditor
             language="python3"
@@ -98,28 +98,28 @@ const SkillCreate = memo(() => {
         } catch (error) {
             console.error(error);
         } finally {
-        
+
         }
     }, []);
 
     useUpdateEffect(() => {
         const currentMessage = flowMessage?.find(
             item =>
-                item?.data?.app_run_id == params.app_run_id &&
-                item?.data?.exec_data?.exec_id == params.record_id,
+                item?.data?.app_run_id == params?.app_run_id &&
+                item?.data?.exec_data?.exec_id == params?.record_id,
         );
         if (currentMessage && !hasProcessed) {
            try{
             const output = JSON.parse(currentMessage?.data?.exec_data?.outputs?.value);
             setSkillCreateResult(output);
-           
+
            }catch(e){
             console.log(e);
            }
            setLoading(false);
            setHasProcessed(true);
         }
-        
+
     }, [flowMessage]);
 
     const Create = useCallback(() => {
@@ -153,12 +153,12 @@ const SkillCreate = memo(() => {
         const onCorrectVisibleChange = useCallback((visible: boolean) => {
             setCorrectVisible(visible);
         }, []);
-    
+
         const onCorrect = useCallback(async (value: string) => {
             // 处理修正逻辑
             setCorrectVisible(false);
         }, []);
-    
+
         return (
             <div className="flex gap-4 h-full relative z-[10000]">
                 <div className="relative flex-1">

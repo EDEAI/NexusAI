@@ -17,8 +17,9 @@ const PageWrap: React.FC<PlazaProps> = ({ children }) => {
     return (
         <div className="layout">
             <div>{children}</div>
-            <DealtWithForLog></DealtWithForLog>
+
             <RunPanelLog></RunPanelLog>
+            <DealtWithForLog></DealtWithForLog>
             <RunWorkFlow></RunWorkFlow>
             <AgentCreate></AgentCreate>
             <SkillCreate></SkillCreate>

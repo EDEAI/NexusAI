@@ -99,7 +99,7 @@ const CreationModal: React.FC<ChildProps> = ({
                             {intl.formatMessage({ id: 'agent.creation.button.ai' })}
                         </Button>
                     )}
-                    {CreationType.apps_mode == 4 && (
+                    {/* {CreationType.apps_mode == 4 && (
                         <Button
                             onClick={() => {
                                 setSkillCreateOpen(true);
@@ -108,7 +108,7 @@ const CreationModal: React.FC<ChildProps> = ({
                         >
                             {intl.formatMessage({ id: 'agent.creation.button.skill.ai' })}
                         </Button>
-                    )}
+                    )} */}
                 </div>
                 <div className="flex gap-2">
                     <Button onClick={() => setIsModalOpen(false)}>

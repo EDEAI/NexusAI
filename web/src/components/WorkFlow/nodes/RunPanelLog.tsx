@@ -26,7 +26,7 @@ export default memo(() => {
     const runPanelLogRecord = useUserStore(state => state.runPanelLogRecord);
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const [runPanelShow, setRunPanelShow] = useState(false);
-    const setDealtWithData = useSocketStore(state => state.setDealtWithData);
+    const setDealtWithData = useUserStore(state => state.setDealtWithData);
     const setFlowMessage = useSocketStore(state => state.setFlowMessage);
     const flowMessage = useSocketStore(state => state.flowMessage);
     const [loading, setLoading] = useState(false);
@@ -128,7 +128,10 @@ export default memo(() => {
                                             <Alert
                                                 message={
                                                     <div className="flex gap-2 flex-wrap ">
-                                                        {intl.formatMessage({ id: 'workflow.label.confirmer' })} :
+                                                        {intl.formatMessage({
+                                                            id: 'workflow.label.confirmer',
+                                                        })}{' '}
+                                                        :
                                                         {item?.human_confirm_info
                                                             ?.map(item => item.nickname)
                                                             .join('、')}
@@ -331,6 +334,14 @@ export default memo(() => {
                                             <Tag
                                                 className="w-full flex items-center justify-center"
                                                 color="blue"
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    setDealtWithData({
+                                                        ...item,
+                                                        exec_id:item.id
+                                                    });
+
+                                                }}
                                             >
                                                 {intl.formatMessage({
                                                     id: 'workflow.needHumanConfirm1',
