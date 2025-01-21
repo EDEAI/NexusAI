@@ -913,6 +913,4 @@ async def get_chat_room_history_single(
         chatroom_id=chatroom_id,
         app_run_id=app_run_id
     )
-    print(111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111)
-    print(result)
     return response_success(result)
