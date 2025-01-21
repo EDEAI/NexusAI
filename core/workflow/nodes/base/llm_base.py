@@ -1,10 +1,12 @@
-import sys, json, re
+import asyncio, sys, json, re
 from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent.parent))
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from copy import deepcopy
+from typing import Any, AsyncIterator, Callable, Dict, List, Optional, Tuple, Union
 
 from langchain_core.documents import Document
+from langchain_core.messages import AIMessageChunk
 from langchain_core.runnables import Runnable, RunnableParallel, RunnablePassthrough
 from langchain_core.runnables.utils import Input, Output
 
@@ -42,46 +44,20 @@ class LLMBaseNode(Node):
             str: The text with duplicated braces.
         """
         return text.replace("{", "{{").replace("}", "}}")
-        
-    def invoke(
+    
+    def _prepare_messages_and_input(
         self, 
         app_run_id: int, 
         edge_id: str,
         context: Context,
         retrieval_chain: Optional[Runnable[Input, Output]] = None,
-        input: Union[str, Dict[str, Any]] = {},
+        input: Dict[str, Any] = {},
         file_list: Optional[ArrayVariable] = None,
-        return_json: bool = False,
         correct_llm_output: bool = False,
         requirements_and_goals: Optional[str] = None,
-        requirements_and_goals_kwargs: Optional[Dict[str, str]] = None
-    ) -> Dict[str, Any]:
-        """
-        Workflow node invokes the LLM model to generate text using the language model.
-        
-        Args:
-            app_run_id (int): The ID of the app run.
-            edge_id (str): The UUID of the edge.
-            context (Context): The context object containing all variables.
-            retrieval_chain (Optional[Runnable[Input, Output]]): The retrieval chain to be used for the LLM model.
-            input (Dict[str, Any]): The input data to be passed to the model.
-            return_json (bool): Indicates whether to return the output in JSON format.
-            correct_llm_output (bool): Indicates whether to correct the LLM output using the correct prompt.
-            requirements_and_goals (Optional[str]): The requirements and goals to be passed to the model.
-            requirements_and_goals_kwargs (Optional[Dict[str, str]]): The keyword arguments to be passed to the requirements and goals.
-            
-        Returns:
-            Dict[str, Any]: A dictionary containing the model data, content, prompt tokens, completion tokens, and total tokens.
-        """
-        model_info = Models().get_model_by_config_id(self.data["model_config_id"])
-        if not model_info:
-            raise Exception("Model configuration not found.")
-        
-        llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
-        if return_json:
-            llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
-        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config)
-        
+        requirements_and_goals_kwargs: Optional[Dict[str, str]] = None,
+        override_rag_input: Optional[str] = None
+    ) -> Tuple[Messages, Dict[str, Any]]:
         if correct_llm_output:
             if edge_id:
                 history = AppNodeExecutions().get_node_history(app_run_id, edge_id)
@@ -140,8 +116,8 @@ class LLMBaseNode(Node):
                     )
                 return json.dumps(formatted_docs_list, ensure_ascii=False)
             
-            user_prompt = input['user_prompt']
-            rag_result = retrieval_chain.invoke(user_prompt)
+            user_prompt = input['user_prompt'] if override_rag_input is None else override_rag_input
+            rag_result = retrieval_chain.invoke(user_prompt if override_rag_input is None else override_rag_input)
             formatted_docs = format_docs(rag_result)
             if requirements_and_goals_kwargs:
                 requirements_and_goals_kwargs['formatted_docs'] = formatted_docs
@@ -149,6 +125,64 @@ class LLMBaseNode(Node):
                 input['formatted_docs'] = formatted_docs
         if requirements_and_goals:
             input['requirements_and_goals'] = requirements_and_goals.format(**requirements_and_goals_kwargs)
+
+        return messages, input
+        
+    def invoke(
+        self,
+        app_run_id: int, 
+        edge_id: str,
+        context: Context,
+        retrieval_chain: Optional[Runnable[Input, Output]] = None,
+        input: Dict[str, Any] = {},
+        file_list: Optional[ArrayVariable] = None,
+        return_json: bool = False,
+        correct_llm_output: bool = False,
+        requirements_and_goals: Optional[str] = None,
+        requirements_and_goals_kwargs: Optional[Dict[str, str]] = None,
+        override_rag_input: Optional[str] = None
+    ) -> Tuple[Dict[str, Any], str, int, int, int]:
+        """
+        Workflow node invokes the LLM model to generate text using the language model.
+        
+        Args:
+            app_run_id (int): The ID of the app run.
+            edge_id (str): The UUID of the edge.
+            context (Context): The context object containing all variables.
+            retrieval_chain (Optional[Runnable[Input, Output]]): The retrieval chain to be used for the model.
+            input (Dict[str, Any]): The input data to be passed to the model.
+            file_list (Optional[ArrayVariable]): The list of files to be uploaded to the model.
+            return_json (bool): Indicates whether to return the output in JSON format.
+            correct_llm_output (bool): Indicates whether to correct the LLM output using the correct prompt.
+            requirements_and_goals (Optional[str]): The requirements and goals to be passed to the model.
+            requirements_and_goals_kwargs (Optional[Dict[str, str]]): The keyword arguments to be passed to the requirements and goals.
+            override_rag_input (Optional[str]): The input to be used for the retrieval chain.
+            
+        Returns:
+            Dict[str, Any]: A dictionary containing the model data, content, prompt tokens, completion tokens, and total tokens.
+        """
+        model_info = Models().get_model_by_config_id(self.data["model_config_id"])
+        if not model_info:
+            raise Exception("Model configuration not found.")
+        
+        llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
+        if return_json:
+            llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
+        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config)
+
+        messages, input = self._prepare_messages_and_input(
+            app_run_id=app_run_id, 
+            edge_id=edge_id,
+            context=context,
+            retrieval_chain=retrieval_chain,
+            input=input,
+            file_list=file_list,
+            correct_llm_output=correct_llm_output,
+            requirements_and_goals=requirements_and_goals,
+            requirements_and_goals_kwargs=requirements_and_goals_kwargs,
+            override_rag_input=override_rag_input
+        )
+
         ai_message = llm_pipeline.invoke(messages.to_langchain_format(), input)
         content = ai_message.content
         if return_json:
@@ -166,6 +200,85 @@ class LLMBaseNode(Node):
         }
         
         return model_data, content, prompt_tokens, completion_tokens, total_tokens
+    
+    def get_ainvoke_func(
+        self,
+        app_run_id: int, 
+        edge_id: str,
+        context: Context,
+        retrieval_chain: Optional[Runnable[Input, Output]] = None,
+        input: Union[str, Dict[str, Any]] = {},
+        file_list: Optional[ArrayVariable] = None,
+        return_json: bool = False,
+        correct_llm_output: bool = False,
+        requirements_and_goals: Optional[str] = None,
+        requirements_and_goals_kwargs: Optional[Dict[str, str]] = None,
+        override_rag_input: Optional[str] = None
+    ) -> Tuple[Dict[str, Any], Callable[[], AsyncIterator[AIMessageChunk]]]:
+        """
+        This function is used to get the model data and the async AI invoke function.
+        
+        Args:
+            app_run_id (int): The ID of the app run.
+            edge_id (str): The UUID of the edge.
+            context (Context): The context object containing all variables.
+            retrieval_chain (Optional[Runnable[Input, Output]]): The retrieval chain to be used for the model.
+            input (Dict[str, Any]): The input data to be passed to the model.
+            file_list (Optional[ArrayVariable]): The list of files to be uploaded to the model.
+            return_json (bool): Indicates whether to return the output in JSON format.
+            correct_llm_output (bool): Indicates whether to correct the LLM output using the correct prompt.
+            requirements_and_goals (Optional[str]): The requirements and goals to be passed to the model.
+            requirements_and_goals_kwargs (Optional[Dict[str, str]]): The keyword arguments to be passed to the requirements and goals.
+            override_rag_input (Optional[str]): The input to be used for the retrieval chain, if provided.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the model data, content, prompt tokens, completion tokens, and total tokens.
+        """
+        model_info = Models().get_model_by_config_id(self.data["model_config_id"])
+        if not model_info:
+            raise Exception("Model configuration not found.")
+        
+        llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
+        if return_json:
+            llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
+        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config)
+        messages, input = self._prepare_messages_and_input(
+            app_run_id=app_run_id, 
+            edge_id=edge_id,
+            context=context,
+            retrieval_chain=retrieval_chain,
+            input=input,
+            file_list=file_list,
+            correct_llm_output=correct_llm_output,
+            requirements_and_goals=requirements_and_goals,
+            requirements_and_goals_kwargs=requirements_and_goals_kwargs,
+            override_rag_input=override_rag_input
+        )
+
+        async def ainvoke():
+            llm_input = [(role, message.value.format(**input)) for role, message in messages.messages]
+
+            for _ in range(5):
+                try:
+                    llm_aiter = llm_pipeline.llm.astream(llm_input, stream_usage=True)
+                    while True:
+                        try:
+                            yield await asyncio.wait_for(anext(llm_aiter), timeout=20)
+                        except StopAsyncIteration:
+                            break
+                    break
+                except asyncio.TimeoutError:
+                    pass
+            else:
+                raise Exception('Cannot connect to LLM after trying 5 times. Please check the network connection.')
+        
+        messages_copy = deepcopy(messages)
+        messages_copy.replace_variables(input)
+        model_data = {
+            'model': llm_config,
+            'messages': messages_copy.serialize(),
+        }
+        return model_data, ainvoke
     
     def extract_json_from_string(self, text: str) -> dict:
         """

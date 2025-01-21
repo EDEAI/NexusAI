@@ -23,38 +23,78 @@ language_packs = {
             """,
         },
         "agent_system_prompt_with_auto_match_ability": (
+            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
+            'Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).'
+            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
+            'If your responsibilities and abilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.\n'
+            'Your ID: {id_}\n'
+            'Your name: {name}\n'
+            'Your description: {description}\n'
             'Your responsibilities (or identity) are as follows:\n'
             '{obligations}\n\n'
             'You have some abilities, each ability is in the form of a tuple (ability ID, specific information of the ability, output format of the ability) in the following Python list:\n'
             '{abilities_content_and_output_format}\n\n'
+            '{retrieved_docs_format}\n'
             '{reply_requirement}\n'
             'Finally, return a JSON formatted dictionary as follows:\n'
-            '{{"ability_id": ability ID (integer type), "output": content replied in the corresponding format of the ability}}'
+            '{{"ability_id": ability ID (integer type), "output": content replied in the corresponding format of the ability}}\n'
+            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
+        ),
+        "agent_system_prompt_with_auto_match_ability_direct_output": (
+            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
+            'Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).'
+            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
+            'If your responsibilities and abilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.\n'
+            'Your ID: {id_}\n'
+            'Your name: {name}\n'
+            'Your description: {description}\n'
+            'Your responsibilities (or identity) are as follows:\n'
+            '{obligations}\n\n'
+            'You have some abilities, each ability is in the form of a tuple (ability ID, specific information of the ability, output format of the ability) in the following Python list:\n'
+            '{abilities_content_and_output_format}\n\n'
+            '{retrieved_docs_format}\n'
+            '{reply_requirement}\n'
+            'Finally, reply in the corresponding format of the ability.\n'
+            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
         ),
         "agent_system_prompt_with_abilities": (
+            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
+            'Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).'
+            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
+            'If your responsibilities and abilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.\n'
+            'Your ID: {id_}\n'
+            'Your name: {name}\n'
+            'Your description: {description}\n'
             'Your responsibilities (or identity) are as follows:\n'
             '{obligations}\n\n'
             'You have the following abilities:\n'
             '{abilities_content}\n\n'
+            '{retrieved_docs_format}\n'
             '{reply_requirement}\n'
-            'Finally, return a JSON formatted dictionary as follows:\n'
-            '{{"output": content replied in {output_format} format}}'
+            'Finally, reply in {output_format} format.\n'
+            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
         ),
         "agent_system_prompt_with_no_ability": (
+            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
+            'Please note that you should respond based on your description, responsibilities and relevant content retrieved from the knowledge base (if provided).'
+            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
+            'If your responsibilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities.\n'
+            'Your ID: {id_}\n'
+            'Your name: {name}\n'
+            'Your description: {description}\n'
             'Your responsibilities (or identity) are as follows:\n'
             '{obligations}\n\n'
+            '{retrieved_docs_format}\n'
             '{reply_requirement}\n'
-            'Finally, return a JSON formatted dictionary as follows:\n'
-            '{{"output": content replied in {output_format} format}}'
+            'Finally, reply in {output_format} format.\n'
+            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
+        ),
+        "agent_retrieved_docs_format": (
+            'I will provide the information retrieved from the knowledge base based on the user input text '
+            'in the following JSON format: [{"content": content, "source": source document name}, ...])'
         ),
         "agent_reply_requirement_with_auto_match_ability": (
             'Please match one corresponding ability based on the user input information and reply in the format corresponding to the ability.'
-        ),
-        "agent_reply_requirement_with_abilities": (
-            'Please reply based on the user input information.'
-        ),
-        "agent_reply_requirement_with_no_ability": (
-            'Please reply based on the user input information.'
         ),
         "agent_reply_requirement_with_task_splitting_and_auto_match_ability": (
             'Please match one corresponding ability based on the user input information, and based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it, and reply in the format corresponding to the ability.'
@@ -68,14 +108,15 @@ language_packs = {
         "agent_output_format_1": "plain text",
         "agent_output_format_2": "JSON",
         "agent_output_format_3": "code",
+        "agent_user_prompt": (
+            'Below is the user\'s questions or needs:\n'
+            '{user_prompt}'
+        ),
         "agent_user_prompt_with_retrieved_docs": (
-            'Below is the text input by the user:\n'
+            'Below is the user\'s questions or needs:\n'
             '{user_prompt}\n\n'
-            'Below is the information retrieved from the knowledge base based on the user input text '
-            '(listed in the following JSON format: [{{"content": content, "source": source document name}}, ...])'
-            ':\n'
-            '{formatted_docs}\n\n'
-            'Please reply to the user based on the above information.'
+            'Below is the information retrieved from the knowledge base:\n'
+            '{formatted_docs}'
         ),
         "llm_reply_requirement_with_task_splitting": (
             'Please select the part of the overall task that you should be responsible for and process it.'
@@ -343,53 +384,39 @@ language_packs = {
             'Please select the next agent to speak from the agent list according to the requirements, or end the conversation.'
         ),
 
-        'chatroom_agent_system': (
-            'You are an AI agent in the meeting room, where there is one user and at least one AI agent.\n'
-            'Please respond based on the current meeting topic and your responsibilities and capabilities description.\n'
-            'I will provide the current meeting topic;\n'
-            'And the chat history list in the following JSON format:'
-            '[message, ...];\n'
-            'The JSON structure for each message is as follows:'
-            '{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content, "topic": meeting topic}.\n\n'
-            'I will also provide your ID, name, responsibilities, and capabilities description.\n'
-            'Your response must follow these requirements:\n'
-            '1. You must respond within your responsibilities and capabilities based on the current meeting topic.\n'
-            '2. If your responsibilities and capabilities are not directly related to the current meeting topic, please try to adapt to the topic and provide relevant responses, rather than being limited to your specific responsibilities and capabilities.\n'
-            '3. Note that historical messages are for reference only. Do not meaninglessly repeat content from historical messages in your response.\n'
-            '4. Make sure to respond with text content only, do not wrap your response in the JSON structure used in the message history.\n'
-            '5. The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.\n'
-            '6. Do not explicitly mention the current topic in your response unless the user specifically asks about it.'
-        ),
+        'chatroom_agent_user_subprompt': (
+            # 'You are in a meeting room, where there is one user and at least one AI agent.\n'
+            'Before now, other agents have already responded to the current user\'s questions or needs. I will provide records of the responses of other agents.'
+            'You need to answer questions or handle needs based on the user\'s questions or needs, as well as the response records of other agents.'
+            'The agents\' response records may contain questions or requirements initiated by the user.\n'
+            'The response records are in the following JSON format: [record, ...];\n'
+            'The JSON structure for each record is as follows:\n'
+            '{{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}}.\n\n'
 
-        'chatroom_agent_user_with_abilities': (
-            'Below is the chat history list:\n'
+            'Current user questions or needs:\n'
+            '{user_message}\n\n'
+
+            'Response records:\n'
             '{messages}\n\n'
-            'Current meeting topic: {topic}\n'
-            'Your ID: {id_}\n'
-            'Your name: {name}\n\n'
-            'Below are your responsibilities (or identity):'
-            '{obligations}\n\n'
-            'Below are your capabilities (listed in JSON format):\n'
-            '{abilities}\n\n'
-            'Please speak according to these contents and requirements.'
+            #'Now the meeting room needs you to speak. Please speak according to the current meeting topic and chat history.\n'
+            #'I will provide the current meeting topic;\n'
+            #'And the chat history list in the following JSON format: [message, ...];\n'
+            #'The JSON structure for each message is as follows:'
+            #'{{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content, "topic": meeting topic}}.\n\n'
+            #'Below is the chat history list:\n'
+            #'{messages}\n\n'
+            #'Current meeting topic: {topic}\n'
+            # 'Your response must follow these requirements:\n'
+            # '1. If your responsibilities and capabilities are not directly related to the current meeting topic, please try to adapt to the topic and provide relevant responses, rather than being limited to your specific responsibilities and capabilities.\n'
+            # '2. Note that historical messages are for reference only. Do not meaninglessly repeat content from historical messages in your response.\n'
+            # '3. Make sure to respond with text content only, do not wrap your response in the JSON structure used in the message history.\n'
+            # '4. Do not explicitly mention the current topic in your response unless the user specifically asks about it.'
         ),
-
-        'chatroom_agent_user_with_no_ability': (
-            'Below is the chat history list:\n'
-            '{messages}\n\n'
-            'Current meeting topic: {topic}\n'
-            'Your ID: {id_}\n'
-            'Your name: {name}\n\n'
-            'Below are your responsibilities (or identity):'
-            '{obligations}\n\n'
-            'Please speak according to these contents and requirements.'
-        ),
-
         'chatroom_agent_description_with_abilities': (
             'Agent responsibilities (or identity):\n'
             '{obligations}\n\n'
             'Agent capabilities (listed in JSON format):\n'
-            '{abilities}'
+            '{abilities_content}'
         ),
 
         'chatroom_agent_description_with_no_ability': (
@@ -1481,17 +1508,18 @@ language_packs = {
 prompt_keys = {
     "requirement_category",
     "agent_system_prompt_with_auto_match_ability",
+    "agent_system_prompt_with_auto_match_ability_direct_output",
     "agent_system_prompt_with_abilities",
     "agent_system_prompt_with_no_ability",
+    "agent_retrieved_docs_format",
     "agent_reply_requirement_with_auto_match_ability",
-    "agent_reply_requirement_with_abilities",
-    "agent_reply_requirement_with_no_ability",
     "agent_reply_requirement_with_task_splitting_and_auto_match_ability",
     "agent_reply_requirement_with_task_splitting_and_abilities",
     "agent_reply_requirement_with_task_splitting_and_no_ability",
     "agent_output_format_1",
     "agent_output_format_2",
     "agent_output_format_3",
+    "agent_user_prompt",
     "agent_user_prompt_with_retrieved_docs",
     "llm_reply_requirement_with_task_splitting",
     "recursive_task_generation",
@@ -1502,9 +1530,7 @@ prompt_keys = {
     "chatroom_manager_user_invalid_selection",
     "chatroom_manager_user",
     "chatroom_manager_user_with_optional_selection",
-    "chatroom_agent_system",
-    "chatroom_agent_user_with_abilities",
-    "chatroom_agent_user_with_no_ability",
+    "chatroom_agent_user_subprompt",
     "chatroom_agent_description_with_abilities",
     "chatroom_agent_description_with_no_ability",
     "chatroom_role_user",
