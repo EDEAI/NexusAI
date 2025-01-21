@@ -116,6 +116,7 @@ export default {
     "app.summaryhistory.results":"Execution results",
     "app.summaryhistory.prompt":"Instruction prompt",
     "app.summaryhistory.userPrompt":"Correction prompt",
-    "app.summaryhistory.tag":"Pending"
+    "app.summaryhistory.tag":"Pending",
 
+    "app.summaryhistory.submitText":"Reorientation"
 };

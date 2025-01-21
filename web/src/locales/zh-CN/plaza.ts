@@ -115,5 +115,7 @@ export default {
     "app.summaryhistory.results":"运行结果",
     "app.summaryhistory.prompt":"指令提示",
     "app.summaryhistory.userPrompt":"修正提示词",
-    "app.summaryhistory.tag":"待确认"
+    "app.summaryhistory.tag":"待确认",
+
+    "app.summaryhistory.submitText":"重新导向"
 };

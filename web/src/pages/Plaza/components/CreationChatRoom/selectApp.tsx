@@ -172,9 +172,7 @@ const Content: React.FC<params> = param => {
     }, [show]);
 
     useEffect(()=>{
-        if(checkItems.current.length !== checkCurrent.length){
-            setCheckCurrent([...checkItems.current])
-        }
+        setCheckCurrent([...checkItems.current])
     },[myList,moreList]) 
 
     const checkCurrentUpdata=useRef(false)
