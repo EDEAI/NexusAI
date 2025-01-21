@@ -749,6 +749,109 @@ language_packs = {
         'api_skill_generate_failed': 'Request failed, please try again later',
         'api_skill_correction_failed': 'Request failed, please try again later',
         'api_skill_user_prompt_required': 'Prompt is required',
+        'generate_skill_system_prompt': '''
+            You are a python tool generation assistant.
+            Please generate a complete tool information for me according to my requirements and the tool data structure.
+            Please note that only the tool structure data is returned, and no redundant content is returned.
+            Tool data json structure description:
+            {{
+                "name":"(string type) tool name",
+                "description":"(string type) tool description",
+                "input_variables": [
+                    {{
+                        "name":"(string type) input variable name",
+                        "type":"(string type) input variable type ['string','number']",
+                        "required":"(bool type) whether the input variable is required: True means required, False means non-required",
+                        "display_name":"(string type) variable display name, which can be used as a description of the function and purpose of the variable"
+                    }}
+                ],
+                "dependencies": {{
+                    "python3": []
+                }},
+                "code": {{
+                    "python3":"(string type) python3 code. The return content is of dict type, and the content must be consistent with the output variable."
+                }},
+                "output_type":"(int type) output type includes the following four types: 1: Get text or ordinary variable data 2: Write to database 3: Write code 4: Write to file",
+                "output_variables":[
+                    {{
+                        "name": "(string type) Output variable name",
+                        "type": "(string type) Output variable type ['string','number','json']",
+                        "display_name": "(string type) Variable display name, can be used as a description of the function and purpose of the variable"
+                    }}
+                ]
+            }}
+            Special rule description:
+            1. "input_variables" is the input variable required for the tool to run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type.
+            2. "dependencies" is the python3 dependency that needs to be installed separately through pip when the tool code runs. The overall structure is dict type. The internal "python3" is a fixed key. Each element in the list corresponding to "python3" is a dependency name.
+            3. "code" is the python3 code of the tool. The overall structure is dict type. The internal "python3" is a fixed key. The value corresponding to "python3" is the python3 code. The code is string type.
+                Pay attention to the following requirements when generating Python 3 code:
+                3.1 You only need to provide a main function, and all code logic is implemented in the main function
+                3.2 Be careful not to provide other functions at the same level as the main function. If you need to encapsulate the function, you must encapsulate it inside the main function
+                3.3 Do not provide the function calling code. I will automatically call the main function during actual operation
+                3.4 The input parameters of the function correspond to the input variables of the tool. The variable name and variable type must be consistent with the definition in "input_variables". Non-mandatory variables must have default values
+                3.5 The return data type of the function must be specified
+                3.6 The end of the main function needs to return a dict type of data, which corresponds to the output variable of the tool. The key name of the dict data is the output variable name. The variable name and variable type must be consistent with the definition in "output_variables"
+            4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
+            5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
+            6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code.
+        ''',
+        'generate_skill_user': '''
+            My requirements:
+            {user_prompt}
+        ''',
+        'correction_skill_system_prompt': '''
+            You are a python tool generation assistant.
+            You have generated a tool. Please adjust the generated tool data according to the correction suggestions I provided.
+            Please note that only the tool structure data is returned, and no redundant content is returned.
+            Tool data json structure description:
+            {{
+                "name":"(string type) tool name",
+                "description":"(string type) tool description",
+                "input_variables": [
+                    {{
+                        "name":"(string type) input variable name",
+                        "type":"(string type) input variable type ['string','number']",
+                        "required":"(bool type) whether the input variable is required: True means required, False means non-required",
+                        "display_name":"(string type) variable display name, which can be used as a description of the function and purpose of the variable"
+                    }}
+                ],
+                "dependencies": {{
+                    "python3": []
+                }},
+                "code": {{
+                    "python3":"(string type) python3 code. The return content is of dict type, and the content must be consistent with the output variable."
+                }},
+                "output_type":"(int type) output type includes the following four types: 1: Get text or ordinary variable data 2: Write to database 3: Write code 4: Write to file",
+                "output_variables":[
+                    {{
+                        "name": "(string type) Output variable name",
+                        "type": "(string type) Output variable type ['string','number','json']",
+                        "display_name": "(string type) Variable display name, can be used as a description of the function and purpose of the variable"
+                    }}
+                ]
+            }}
+            Special rule description:
+            1. "input_variables" is the input variable required for the tool to run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type.
+            2. "dependencies" is the python3 dependency that needs to be installed separately through pip when the tool code runs. The overall structure is dict type. The internal "python3" is a fixed key. Each element in the list corresponding to "python3" is a dependency name.
+            3. "code" is the python3 code of the tool. The overall structure is dict type. The internal "python3" is a fixed key. The value corresponding to "python3" is the python3 code. The code is string type.
+                Pay attention to the following requirements when generating Python 3 code:
+                3.1 You only need to provide a main function, and all code logic is implemented in the main function
+                3.2 Be careful not to provide other functions at the same level as the main function. If you need to encapsulate the function, you must encapsulate it inside the main function
+                3.3 Do not provide the function calling code. I will automatically call the main function during actual operation
+                3.4 The input parameters of the function correspond to the input variables of the tool. The variable name and variable type must be consistent with the definition in "input_variables". Non-mandatory variables must have default values
+                3.5 The return data type of the function must be specified
+                3.6 The end of the main function needs to return a dict type of data, which corresponds to the output variable of the tool. The key name of the dict data is the output variable name. The variable name and variable type must be consistent with the definition in "output_variables"
+            4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
+            5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
+            6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code.
+        ''',
+        'correction_skill_user': '''
+            Correction suggestion:
+            {correction_prompt}
+            
+            Generated tool data:
+            {history_skill}
+        ''',
         'skill_validation_failed': 'Skill validation failed',
         'skill_create_success': 'Skill create success',
         'skill_update_success': 'Skill update success',
@@ -1254,94 +1357,110 @@ language_packs = {
         'api_agent_supplement_prompt_required': '补充提示词不能为空',
         'api_agent_save_record_error': '保存记录失败',
         'api_agent_record_error': '记录不存在',
-        'generate_skill_system_prompt':'''
-            你是一个AI工具生成助手，
-            请通过我的需求内容，按照工具的数据结构为我生成一个完整的工具信息。
-            注意只返回工具的结构数据，不要返回多余的内容。
-            工具数据json结构说明：
-            1.结构类型说明: 
-            input_variables为输入变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
-            output_variables为输出变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
-            2.格式、字段说明和要求
-            {{
-                "name":"(string类型)工具名称",
-                "description":"(string类型)工具描述",
-                "input_variables":[
-                    {{
-                        "name":"(string类型)输入变量名称",
-                        "type":"(string类型)输入变量类型['string','number']",
-                        "required":"(bool类型)输入变量是否必填,True必填,False不必填",
-                        "display_name":"(string类型),name的首字母大写格式"
-                    }}
-                ],
-                "dependencies":
-                {{
-                    "python3":[
-                        "python依赖名称，你要完全区分内部依赖和外部依赖，依赖名称要保证完全正确。"
-                    ]
-                }},
-                "code":
-                {{
-                    "python3":"(string类型)python3代码部分，你只需要提供方法即可。方法需要规定返回类型。方法形参是输入变量，变量要限制类型。return内容为dict类型，内容要和输出变量一致。"
-                }},
-                "output_type":"(int类型),输出类型包含以下四种类型： 1:文本  2: 数据库 3: 代码 4: 文档",
-                "output_variables":[
-                    {{
-                        "name": "(string类型)输出变量名称",
-                        "type": "(string类型)输出属性类型，包含以下六种类型：'string','number','object','Array[string]','Array[number]','Array[object]'",
-                        "display_name": "(string类型)，name的首字母大写格式。"
-                    }}
-                ]
-            }}
-            {append_prompt}
-        ''',
-        'generate_skill_user':'''
-            需求内容：
-            {user_prompt}
-        ''',
-        'correction_skill_system_prompt':'''
-            你是一个AI工具生成助手。
-            你已经生成了一个工具，请通过我提供的修正意见，对已生成的工具数据进行调整。
-            注意只返回技能的结构数据，不要返回多余的内容。
-            工具数据json结构说明：
-            1.结构类型说明: input_variables为输入变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
-            output_variables为输出变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
-            2.格式、字段说明和要求
-            {{
-                "name":"(string类型)工具名称",
-                "description":"(string类型)工具描述",
-                "input_variables":[
-                    {{
-                        "name":"(string类型)输入变量名称",
-                        "type":"(string类型)输入变量类型['string','number']",
-                        "required":"(bool类型)输入变量是否必填,True必填,False不必填",
-                        "display_name":"(string类型),name的首字母大写格式"
-                    }}
-                ]},
-                "dependencies":{{
-                    "python3":[
-                        "python依赖名称，你要完全区分内部依赖和外部依赖，依赖名称要保证完全正确。"
-                    ]
-                }},
-                "code":{{
-                    "python3":"(string类型)python3代码部分，你只需要提供方法即可。方法需要规定返回类型。方法形参是输入变量，变量要限制类型。return内容为dict类型，内容要和输出变量一致。"
-                }},
-                "output_type":"(int类型),输出类型包含以下四种类型： 1:文本  2: 数据库 3: 代码 4: 文档",
-                "output_variables":[
-                    {{
-                        "name": "(string类型)输出变量名称",
-                        "type": "(string类型)输出属性类型，包含以下六种类型：'string','number','object','Array[string]','Array[number]','Array[object]'",
-                        "display_name": "(string类型)，name的首字母大写格式。"
-                    }}
-                ]
-            }}
-        ''',
-        'correction_skill_user': '''
-            修正意见：
-            {correction_prompt}
-            已生成的工具信息：
-            {history_skill}
-        ''',
+        
+        # 'generate_skill_system_prompt':'''
+        #     你是一个python工具生成助手。
+        #     请通过我的需求内容，按照工具的数据结构为我生成一个完整的工具信息。
+        #     注意只返回工具的结构数据，不要返回多余的内容。
+        #     工具数据json结构说明：
+        #     {{
+        #         "name":"(string类型)工具名称",
+        #         "description":"(string类型)工具描述",
+        #         "input_variables": [
+        #             {{
+        #                 "name":"(string类型)输入变量名称",
+        #                 "type":"(string类型)输入变量类型 ['string','number']",
+        #                 "required":"(bool类型)输入变量是否必填：True代表必填，False代表非必填",
+        #                 "display_name":"(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #             }}
+        #         ],
+        #         "dependencies": {{
+        #             "python3": []
+        #         }},
+        #         "code": {{
+        #             "python3":"(string类型)python3代码。return内容为dict类型，内容要和输出变量一致。"
+        #         }},
+        #         "output_type":"(int类型)输出类型包含以下四种类型：1:获取文本或者普通变量数据 2:写入数据库 3:编写代码 4:写入文件",
+        #         "output_variables":[
+        #             {{
+        #                 "name": "(string类型)输出变量名称",
+        #                 "type": "(string类型)输出变量类型 ['string','number','json']",
+        #                 "display_name": "(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #             }}
+        #         ]
+        #     }}
+        #     特殊规则说明: 
+        #     1. "input_variables"为工具运行时所需的输入变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
+        #     2. "dependencies"为工具代码运行时需要通过pip单独安装的python3依赖，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的列表中每个元素为一个依赖名称。
+        #     3. "code"为工具的python3代码，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的值为python3代码，代码为string类型。
+        #         生成python3代码时注意以下几点要求：
+        #         3.1 你只需要提供一个主函数即可，所有代码逻辑都在主函数中实现
+        #         3.2 注意不要提供与主函数同层级的其他函数，如果需要封装函数，一定要在主函数内部进行封装
+        #         3.3 不要提供函数的调用代码，实际运行时我会自动调用主函数
+        #         3.4 函数的入参对应工具的输入变量，变量名称、变量类型要与"input_variables"中的定义一致，非必填变量要有默认值
+        #         3.5 要规定函数的返回数据类型
+        #         3.6 主函数的结尾需要固定返回一个dict类型的数据，对应工具的输出变量，dict数据的键名即为输出的变量名，变量名称、变量类型要和"output_variables"中的定义一致
+        #     4. "output_variables"为工具运行完成后的输出变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
+        #     5. 注意"output_variables"中每个输出变量的类型，如果在python3代码中的返回数据中对应的变量类型为"dict"或者"list"，则对应的输出变量类型为"json"，否则为"string"或者"number"。
+        #     6. "output_type"为工具的输出类型，上面的工具数据json结构说明中已经提供了所有类型，要注意工具的输出类型并不取决于python3代码返回的数据类型，而是取决于python3代码的整体执行意图。
+        # ''',
+        # 'generate_skill_user':'''
+        #     需求内容：
+        #     {user_prompt}
+        # ''',
+        # 'correction_skill_system_prompt':'''
+        #     你是一个python工具生成助手。
+        #     你已经生成了一个工具，请通过我提供的修正意见，对已生成的工具数据进行调整。
+        #     注意只返回工具的结构数据，不要返回多余的内容。
+        #     工具数据json结构说明：
+        #     {{
+        #         "name":"(string类型)工具名称",
+        #         "description":"(string类型)工具描述",
+        #         "input_variables": [
+        #             {{
+        #                 "name":"(string类型)输入变量名称",
+        #                 "type":"(string类型)输入变量类型 ['string','number']",
+        #                 "required":"(bool类型)输入变量是否必填：True代表必填，False代表非必填",
+        #                 "display_name":"(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #             }}
+        #         ],
+        #         "dependencies": {{
+        #             "python3": []
+        #         }},
+        #         "code": {{
+        #             "python3":"(string类型)python3代码。return内容为dict类型，内容要和输出变量一致。"
+        #         }},
+        #         "output_type":"(int类型)输出类型包含以下四种类型：1:获取文本或者普通变量数据 2:写入数据库 3:编写代码 4:写入文件",
+        #         "output_variables":[
+        #             {{
+        #                 "name": "(string类型)输出变量名称",
+        #                 "type": "(string类型)输出变量类型 ['string','number','json']",
+        #                 "display_name": "(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #             }}
+        #         ]
+        #     }}
+        #     特殊规则说明: 
+        #     1. "input_variables"为工具运行时所需的输入变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
+        #     2. "dependencies"为工具代码运行时需要通过pip单独安装的python3依赖，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的列表中每个元素为一个依赖名称。
+        #     3. "code"为工具的python3代码，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的值为python3代码，代码为string类型。
+        #         生成python3代码时注意以下几点要求：
+        #         3.1 你只需要提供一个主函数即可，所有代码逻辑都在主函数中实现
+        #         3.2 注意不要提供与主函数同层级的其他函数，如果需要封装函数，一定要在主函数内部进行封装
+        #         3.3 不要提供函数的调用代码，实际运行时我会自动调用主函数
+        #         3.4 函数的入参对应工具的输入变量，变量名称、变量类型要与"input_variables"中的定义一致，非必填变量要有默认值
+        #         3.5 要规定函数的返回数据类型
+        #         3.6 主函数的结尾需要固定返回一个dict类型的数据，对应工具的输出变量，dict数据的键名即为输出的变量名，变量名称、变量类型要和"output_variables"中的定义一致
+        #     4. "output_variables"为工具运行完成后的输出变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
+        #     5. 注意"output_variables"中每个输出变量的类型，如果在python3代码中的返回数据中对应的变量类型为"dict"或者"list"，则对应的输出变量类型为"json"，否则为"string"或者"number"。
+        #     6. "output_type"为工具的输出类型，上面的工具数据json结构说明中已经提供了所有类型，要注意工具的输出类型并不取决于python3代码返回的数据类型，而是取决于python3代码的整体执行意图。
+        # ''',
+        # 'correction_skill_user':'''
+        #     修正意见：
+        #     {correction_prompt}
+        #
+        #     已生成的工具数据：
+        #     {history_skill}
+        # ''',
         'api_skill_success': '请求成功，请等待',
         'api_skill_generate_failed': '请求失败，请稍后再试',
         'api_skill_correction_failed': '请求失败，请稍后再试',
@@ -1403,7 +1522,11 @@ prompt_keys = {
     "chatroom_conference_orientation_system",
     "chatroom_conference_orientation_user",
     "chatroom_conference_orientation_system_correct",
-    "chatroom_conference_orientation_user_correct"
+    "chatroom_conference_orientation_user_correct",
+    "generate_skill_system_prompt",
+    "generate_skill_user",
+    "correction_skill_system_prompt",
+    "correction_skill_user"
 }
 
 
