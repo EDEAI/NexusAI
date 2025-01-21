@@ -36,7 +36,7 @@ const CreationModal: React.FC<ChildProps> = ({
         id: 1,
         icon: '/icons/headportrait/Android.svg',
     });
-    const { setAgentCreateOpen } = useUserStore();
+    const { setAgentCreateOpen,setSkillCreateOpen } = useUserStore();
     useEffect(() => {}, []);
 
     const IconName = (e: any) => {
@@ -99,6 +99,16 @@ const CreationModal: React.FC<ChildProps> = ({
                             {intl.formatMessage({ id: 'agent.creation.button.ai' })}
                         </Button>
                     )}
+                    {/* {CreationType.apps_mode == 4 && (
+                        <Button
+                            onClick={() => {
+                                setSkillCreateOpen(true);
+                                setIsModalOpen(false);
+                            }}
+                        >
+                            {intl.formatMessage({ id: 'agent.creation.button.skill.ai' })}
+                        </Button>
+                    )} */}
                 </div>
                 <div className="flex gap-2">
                     <Button onClick={() => setIsModalOpen(false)}>

@@ -9,6 +9,7 @@ import { useIntl } from '@umijs/max';
 import { useControllableValue, useHover, useMount, useResetState, useUpdateEffect } from 'ahooks';
 import { Button, Modal } from 'antd';
 import { memo, useRef, useState } from 'react';
+
 interface VariableItem {
     name: string;
     display_name: string;
@@ -16,10 +17,13 @@ interface VariableItem {
     required: boolean;
     type: string;
 }
+
 interface VariableList {
     variables?: VariableItem[];
     onChange?: (obj: { value: VariableItem[]; free: ObjectVariable }) => void;
+    title?: React.ReactNode;
 }
+
 type VariableProps = VariableItem & {
     onEdit: () => void;
     onDel: () => void;
@@ -31,22 +35,22 @@ const Variable = memo((props: VariableProps) => {
     const isHovering = useHover(ref);
     const intl = useIntl();
     const typeObject = {
-        string: intl.formatMessage({ id: 'workflow.vars.text', defaultMessage: '' }),
+        string: <img src="/icons/text.svg" className='size-4' />,
         long_string: intl.formatMessage({ id: 'workflow.vars.paragraph', defaultMessage: '' }),
-        number: intl.formatMessage({ id: 'workflow.vars.number', defaultMessage: '' }),
+        number:  <img src="/icons/number.svg" className='size-4' />,
     };
     return (
         <div
             ref={ref}
-            className="flex gap-2 justify-between truncate h-10 items-center p-2 border border-slate-300 rounded-md mt-2 cursor-pointer"
+            className="flex bg-white gap-2 justify-between truncate h-10 items-center p-2 border border-slate-300 hover:border-blue-400 rounded-md mt-2 cursor-pointer"
         >
             <div className="flex items-center gap-1 truncate">
                 <div>
                     <FunctionOutlined />
                 </div>
 
-                <div className="max-w-28 truncate">{props.name}</div>
-                <div className="max-w-20 truncate">{props.display_name}</div>
+                <div className="max-w-28 truncate font-bold">{props.name}</div>
+                <div className="max-w-20 truncate text-gray-500">{props.display_name}</div>
             </div>
             <div className="shrink-0">
                 {isHovering ? (
@@ -146,7 +150,7 @@ export default memo((props: VariableList) => {
         <>
             <div>
                 <div className="flex justify-between items-center pt-4">
-                    <div>{intl.formatMessage({ id: 'workflow.vars.inputFields' })}</div>
+                    {props.title || <div>{intl.formatMessage({ id: 'workflow.vars.inputFields' })}</div>}
                     <Button
                         onClick={() => {
                             formRef.current?.resetFields();

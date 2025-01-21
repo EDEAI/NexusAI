@@ -302,5 +302,23 @@ export default {
     'workflow.form.confirmer.required': 'Please select confirmer',
 
     'agent.batch.count.tooltip': 'Select batch generation count',
-    'agent.batch.submit': 'Submit'
+    'agent.batch.submit': 'Submit',
+
+    'agent.creation.button.skill.ai': 'AI Create Skill',
+
+    'skill.create.title': 'AI Create Skill',
+    'skill.before.title': 'Skill Creation',
+    'skill.before.desc': 'Quickly create skills with AI assistant',
+    'skill.before.loading': 'Loading...',
+    'skill.create.beforeTitle': 'Skill Creation',
+    'skill.create.beforeDesc': 'Quickly create skills with AI assistant',
+    'skill.create.loading': 'Generating...',
+    'skill.prompt.placeholder': 'Enter skill description, AI will help you create...',
+    'skill.prompt.submit': 'Generate',
+    'skill.create.tooltip.regenerate': 'Debug Skill',
+    'skill.create.tooltip.correct': 'Correct',
+    'skill.create.tooltip.save': 'Save',
+    'skill.create.prompt.modify': 'Please enter correction suggestions...',
+    'skill.create.button.modify': 'Correct',
+    'skill.debug.title': 'Debug Skill',
 };

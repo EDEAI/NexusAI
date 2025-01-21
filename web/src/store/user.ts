@@ -34,7 +34,9 @@ interface UserState {
     currentUpdateNodePanel:any;
     setCurrentUpdateNodePanel: (value: any) => void,
     agentCreateOpen: boolean;
+    skillCreateOpen: boolean;
     setAgentCreateOpen: (value: boolean) => void;
+    setSkillCreateOpen: (value: boolean) => void;
     updateNotifications: Map<string, UpdateNotification>;
     setUpdateNotification: (componentId: string, payload?: any) => void;
     clearUpdateNotification: (componentId: string) => void;
@@ -51,9 +53,13 @@ const useUserStore = create<UserState>()(
         currentUpdateNodePanel:null,
         prevConfirmDealtWith: null,
         agentCreateOpen: false,
+        skillCreateOpen: false,
         updateNotifications: new Map(),
         setAgentCreateOpen: (value: boolean) => {
             set({ agentCreateOpen: value });
+        },
+        setSkillCreateOpen: (value: boolean) => {
+            set({ skillCreateOpen: value });
         },
         setPrevConfirmDealtWith: (value: any) => {
             set({ prevConfirmDealtWith: value });
@@ -100,7 +106,7 @@ const useUserStore = create<UserState>()(
             if (!lastCheck) return true;
             return notification.timestamp > lastCheck;
         },
-    }))
+    }),{name:'userStore'})
 );
 
 export default useUserStore;

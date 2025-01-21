@@ -6,7 +6,7 @@ import Editor, { loader } from '@monaco-editor/react';
 import { useLocalStorageState } from 'ahooks';
 import { Button } from 'antd';
 import type { FC } from 'react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
@@ -31,6 +31,8 @@ export type Props = {
     noWrapper?: boolean;
     isExpand?: boolean;
     mdValue?: string;
+    onFullscreenChange?: (isFullscreen: boolean) => void;
+    showMaximize?: boolean;
 };
 
 const languageMap = {
@@ -48,12 +50,11 @@ const DEFAULT_THEME = {
     },
 };
 
-const CodeEditor: FC<Props> = ({
+const CodeEditor: FC<Props> = memo(({
     value = '',
     placeholder = '',
     onChange = () => {},
     title = '',
-
     language,
     readOnly,
     isJSONStringifyBeauty,
@@ -61,6 +62,8 @@ const CodeEditor: FC<Props> = ({
     mdValue,
     onMount,
     noWrapper,
+    onFullscreenChange,
+    showMaximize = true,
 }) => {
     const [isFocus, setIsFocus] = React.useState(false);
 
@@ -191,6 +194,25 @@ const CodeEditor: FC<Props> = ({
         );
     };
 
+    const renderMaximizeButton = () => {
+        if (!showMaximize) return null;
+        
+        return (
+            <Button
+                className="absolute top-1 right-1"
+                onClick={() => setShowBig(!showBig)}
+                type="text"
+                icon={
+                    !showBig ? (
+                        <ArrowsAltOutlined className="size-5 cursor-pointer text-lg" />
+                    ) : (
+                        <FullscreenExitOutlined className="size-5 cursor-pointer text-lg" />
+                    )
+                }
+            />
+        );
+    };
+
     const RenderFix = () => {
         return (
             <div
@@ -198,18 +220,7 @@ const CodeEditor: FC<Props> = ({
                 className={`relative h-full w-full top-0 flex flex-col p-2 border rounded-md  box-border border-slate-200`}
             >
                 <div className="h-8">{title && <div className="font-bold pb-2">{title}</div>}</div>
-                <Button
-                    className="absolute top-1 right-1"
-                    onClick={() => setShowBig(!showBig)}
-                    type="text"
-                    icon={
-                        !showBig ? (
-                            <ArrowsAltOutlined className=" size-5 cursor-pointer text-lg" />
-                        ) : (
-                            <FullscreenExitOutlined className=" size-5 cursor-pointer text-lg" />
-                        )
-                    }
-                ></Button>
+                {renderMaximizeButton()}
                 {mdValue && <ToggleMd></ToggleMd>}
                 {editorTypeJson ? (
                     <div className="flex-1">
@@ -252,7 +263,7 @@ const CodeEditor: FC<Props> = ({
                     style={{
                         height: 'calc(100vh - 84px)',
                         position: 'fixed',
-                        zIndex: '999',
+                        zIndex: '9999',
                         top: '65px',
                         right: '8px',
                         width: `${panelWidth}px`,
@@ -272,6 +283,13 @@ const CodeEditor: FC<Props> = ({
         return RenderFix();
     }, [showBig, value, editorTypeJson]);
 
+    const handleFullscreenChange = useCallback(() => {
+        const newShowBig = !showBig;
+        setShowBig(newShowBig);
+        onFullscreenChange?.(newShowBig);
+    }, [showBig, onFullscreenChange]);
+
     return <RenderWrap></RenderWrap>;
-};
-export default React.memo(CodeEditor);
+});
+
+export default CodeEditor;
