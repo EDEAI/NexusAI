@@ -33,9 +33,17 @@ export default memo(() => {
     const [runList, setRunList] = useState([]);
     const [tabKey, setTabKey] = useState('4');
     const [endRun, setEndRun] = useState(null);
-
+    const prevConfirmDealtWith = useUserStore(state => state.prevConfirmDealtWith);
     const saveWorkFlow = useSaveWorkFlow();
-
+    useUpdateEffect(() => {
+        const newList = runList.map(item => {
+            if (item.id == prevConfirmDealtWith.exec_id) {
+                item.need_human_confirm = 0;
+            }
+            return item;
+        });
+        setRunList(newList);
+    }, [prevConfirmDealtWith]);
     const onClose = () => {
         setRunPanelLogRecord(null);
         setRunPanelShow(false);
@@ -338,9 +346,8 @@ export default memo(() => {
                                                     e.stopPropagation();
                                                     setDealtWithData({
                                                         ...item,
-                                                        exec_id:item.id
+                                                        exec_id: item.id,
                                                     });
-
                                                 }}
                                             >
                                                 {intl.formatMessage({
