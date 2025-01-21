@@ -11,6 +11,7 @@ import { useIntl } from '@umijs/max';
 import { Button, Col, Empty, Row, Spin,Tooltip,Tag } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
+import {useBacklogList} from  '@/hooks/useBacklogList'
 // import Menus from '../components/Menus/index';
 
 // Subtitle
@@ -145,88 +146,90 @@ interface BlockParmas{
 }
 // Backlogs
 const Backlogs :React.FC<BlockParmas> = parmas =>{
-    const {data} = parmas;
+    // const {data} = parmas;
+    const {data,loading}=useBacklogList()
     const intl = useIntl();
-    const renamedData = data.map((item:any)=>({
-        'app_name':item.app_name,
-        'app_run_id':item.app_run_id,
-        'icon':item.icon,
-        'icon_background':item.icon_background,
-        'need_human_confirm':item.need_human_confirm,
-        'node_exec_data':{
-            'node_name':item.node_name,
-            'node_id':item.node_execution_id,
-            'node_exec_id':item.exec_id
-        },
-        'exec_id':item.exec_id,
-        'run_name':item.app_run_name,
-        'mode':item.mode
-    }))
-    const [backData,setbackData]  = useState(renamedData);
+    // const renamedData = data.map((item:any)=>({
+    //     'app_name':item.app_name,
+    //     'app_run_id':item.app_run_id,
+    //     'icon':item.icon,
+    //     'icon_background':item.icon_background,
+    //     'need_human_confirm':item.need_human_confirm,
+    //     'node_exec_data':{
+    //         'node_name':item.node_name,
+    //         'node_id':item.node_execution_id,
+    //         'node_exec_id':item.exec_id
+    //     },
+    //     'exec_id':item.exec_id,
+    //     'run_name':item.app_run_name,
+    //     'mode':item.mode
+    // }))
+    // const [backData,setbackData]  = useState(renamedData);
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
     const setRunId = useUserStore(state => state.setRunId);
-    const submitPromptId = useUserStore(state => state.submitPromptId);
+    // const submitPromptId = useUserStore(state => state.submitPromptId);
     
-    const confirmConcat = (backlogs: any, list: any) => {
-        const seenExecIds  = new Set();
-        const combined = [...list.reverse(), ...backlogs];
-        const result = combined.filter((item) => {
-            const execId = item.node_exec_data?.node_exec_id || item.exec_id;
-            if(!item.exec_id && item.node_exec_data?.node_exec_id){
-                item.exec_id = item.node_exec_data?.node_exec_id
-            }
-            if (!execId) {
-                return false;
-            }
+    // const confirmConcat = (backlogs: any, list: any) => {
+    //     const seenExecIds  = new Set();
+    //     const combined = [...list.reverse(), ...backlogs];
+    //     const result = combined.filter((item) => {
+    //         const execId = item.node_exec_data?.node_exec_id || item.exec_id;
+    //         if(!item.exec_id && item.node_exec_data?.node_exec_id){
+    //             item.exec_id = item.node_exec_data?.node_exec_id
+    //         }
+    //         if (!execId) {
+    //             return false;
+    //         }
 
-            if (seenExecIds.has(execId)) {
-                return false;
-            }
+    //         if (seenExecIds.has(execId)) {
+    //             return false;
+    //         }
 
-            seenExecIds.add(execId);
-            return true;
-        });
+    //         seenExecIds.add(execId);
+    //         return true;
+    //     });
         
-        return result.reverse();
-    };
-    const setWebsocktdata = async () => {
-        let backlogs = flowMessage?.filter(item => item.type == 'workflow_need_human_confirm').map(({ data }) => data)?.filter(item => item.type !== 1);
+    //     return result.reverse();
+    // };
+    
+    // // const setWebsocktdata = async () => {
+    // //     let backlogs = flowMessage?.filter(item => item.type == 'workflow_need_human_confirm').map(({ data }) => data)?.filter(item => item.type !== 1);
       
-        if(backlogs && backlogs.length){
-            setbackData(confirmConcat(backlogs,backData))
-        }
-    };
-    //websockt
-    const flowMessage = useSocketStore(state => state.flowMessage);
-    useEffect(() => {
-        setWebsocktdata();
-    }, [flowMessage]);
-    useEffect(()=>{
-        if(submitPromptId){
-            setbackData((pre:any)=>{
-                return pre.map((item:any)=>({
-                    ...item,
-                    'need_human_confirm':item.node_exec_data.node_exec_id == submitPromptId?0:item.need_human_confirm
-                }))
-            })
-        }
+    // //     if(backlogs && backlogs.length){
+    // //         setbackData(confirmConcat(backlogs,backData))
+    // //     }
+    // // };
+    // //websockt
+    // // const flowMessage = useSocketStore(state => state.flowMessage);
+    // // useEffect(() => {
+    // //     setWebsocktdata();
+    // // }, [flowMessage]);
+    // useEffect(()=>{
+    //     if(submitPromptId){
+    //         setbackData((pre:any)=>{
+    //             return pre.map((item:any)=>({
+    //                 ...item,
+    //                 'need_human_confirm':item.node_exec_data.node_exec_id == submitPromptId?0:item.need_human_confirm
+    //             }))
+    //         })
+    //     }
         
-    },[submitPromptId])
+    // },[submitPromptId])
     return (
         <>
-            {backData && backData.length ? 
+            {data && data.list.length ? 
                     <div
                     className={`cardbox`}
                     style={{ overflowY: 'auto', height: '100%', overflowX: 'hidden' }}
                 >
                     <Row gutter={[30,0]}>
-                        {backData.map((item: any, index: any) => (
+                        {data.list.map((item: any, index: any) => (
                             <Col key={index} className="graphicHoverbox" span="24">
                                 <Graphic
                                     icon={item.icon}
-                                    title={ item.node_exec_data?.node_name && <SubTitle subtitle={item} /> }
-                                    textDetails={item.run_name}
+                                    title={ item.node_name && <SubTitle subtitle={{app_name:item.app_name,node_name:item.node_name}} /> }
+                                    textDetails={item.app_run_name}
                                     handleClick={() => {
                                         if(item.need_human_confirm == 0){
                                             return

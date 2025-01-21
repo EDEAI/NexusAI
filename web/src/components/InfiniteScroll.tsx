@@ -15,12 +15,13 @@ interface scrollObject {
     upSlide?: any;
     isFooter?: any;
     pageNumber?: any;
+
 }
 
 const Scroll: React.FC<scrollObject> = (props: scrollObject) => {
     const { children, elid, dataLength, ishasMore, upSlide, isFooter, pageNumber = 2 } = props;
     return (
-        <div className="h-full flex flex-col">
+        <div className="w-full h-full flex flex-col">
             <InfiniteScroll
                 dataLength={dataLength}
                 scrollableTarget={elid}

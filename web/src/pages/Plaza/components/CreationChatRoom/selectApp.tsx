@@ -1,7 +1,7 @@
-import { getList } from '@/api/plaza';
+
 import Scroll from '@/components/InfiniteScroll';
 import { headportrait } from '@/utils/useUser';
-import { CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined,DeleteOutlined  } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Col, Empty, Input, Row ,Radio } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
@@ -20,10 +20,9 @@ const Content: React.FC<params> = param => {
     let { show, popupClose, popupSave, checkList, zIndex = '',nodetype='agent',radio} = param;
     const intl = useIntl();
     // Selected agent
-    const checkMyItem = useRef([]);
-    const checkMoreItem = useRef([]);
-    // Number of selected agents
-    const [selectNumber, setSelectNumeber] = useState({ [`my_${nodetype}`]: 0,[`more_${nodetype}`]: 0,});
+    const checkItems = useRef([]);
+    // check current
+    const [checkCurrent,setCheckCurrent] = useState([]) 
     const [selectType, setSelectType] = useState(3);
     // Whether more can be loaded
     const [ishasMore, setIshasMore] = useState(true);
@@ -45,7 +44,10 @@ const Content: React.FC<params> = param => {
         apps_name:'',
         tag_ids:''
     });
-
+    const getSelectNumber = (type)=>{return checkItems.current.filter(v=>v.type==type).length}
+    // Number of selected agents
+    const selectNumber = { [`my_${nodetype}`]:getSelectNumber(`my_${nodetype}`),[`more_${nodetype}`]:getSelectNumber(`more_${nodetype}`)};
+    
     const isMyList = () => {
         if (selectType == 3) {
             return myList && myList.length > 0 ? myList : [];
@@ -78,11 +80,9 @@ const Content: React.FC<params> = param => {
             if (data.search_type == 3) {
                 updateList(myList, setMyList);
                 setIshasMore(res.data.total_pages > parameters.current.page);
-                selectMobNumber(`my_${nodetype}`, data.search_type);
             } else {
                 updateList(moreList, setMoreList);
                 setMoreIshasMore(res.data.total_pages > parameters.current.page);
-                selectMobNumber(`more_${nodetype}`, data.search_type);
             }
         }
     };
@@ -91,74 +91,46 @@ const Content: React.FC<params> = param => {
         parameters.current.page = 1;
         getList(parameters.current, true);
     };
-    const selectMobNumber = (key: any,type) => {
-        let myCheckNumber = 0;
-        if(type == 3){
-            if(checkMyItem.current.length){
-                myCheckNumber = checkMyItem.current.length;
-            }
-        }else{
-            if(checkMoreItem.current.length){
-                myCheckNumber = checkMoreItem.current.length;
-            }
-        }
-        setSelectNumeber(pre => {
-            pre[key] = myCheckNumber;
-            return pre;
-        });
-    };
     const radiocheckMyItem = (type, item) => {
         const isTypeThree = type == 3;
         item.type = isTypeThree ? `my_${nodetype}` : `more_${nodetype}`;
-        checkMyItem.current = isTypeThree ? [item] : [];
-        checkMoreItem.current = isTypeThree ? [] : [item];
-    
+        checkItems.current = [item]
         const updateList = (list, shouldCheck) => 
             list.map(i => ({ ...i, check: shouldCheck(i.app_id) }));
     
         setMyList(pre => updateList(pre, id => id == item.app_id && isTypeThree));
         setMoreList(pre => updateList(pre, id => id == item.app_id && !isTypeThree));
-    
-        selectMobNumber(`my_${nodetype}`,3);
-        selectMobNumber(`more_${nodetype}`,2);
     };
     const addcheckMyItem = (type, item) => {
         item.type = type == 3 ? `my_${nodetype}` : `more_${nodetype}`;
-        const currentCheckList = type == 3 ? checkMyItem.current : checkMoreItem.current;
-        const res = currentCheckList.filter(currItem => currItem.app_id !== item.app_id);
-        if (res.length == currentCheckList.length) {
+        const currentCheckList = checkItems.current;
+        const res = currentCheckList.find(currItem => currItem.app_id == item.app_id);
+        if (!res) {
             currentCheckList.push(item);
         } else {
-            currentCheckList.splice(currentCheckList.indexOf(item), 1);
+            currentCheckList.splice(currentCheckList.findIndex(items=>items.app_id == item.app_id), 1);
         }
-    
         const updateList = (list, id) => list.map(i => ({ ...i, check: i.app_id == id ? !i.check : i.check }));
         type == 3 ? setMyList(pre => updateList(pre, item.app_id)) : setMoreList(pre => updateList(pre, item.app_id));
-    
-        selectMobNumber(type == 3 ? `my_${nodetype}` : `more_${nodetype}`,type);
     };
     const isCheckAagent = (item: any,type) => {
-        const currentCheckList = type == 3 ? checkMyItem.current : checkMoreItem.current;
+        const currentCheckList = checkItems.current;
         if(radio && currentCheckList.length>1){
             return 0
         }
-        return currentCheckList.filter(i => i.app_id == item.app_id).length;
+        return currentCheckList.some(i => i.app_id == item.app_id)?1:0;
     };
     const Cancel = () => {
         popupClose();
-        checkMyItem.current = [];
-        checkMoreItem.current = [];
+        checkItems.current = [];
+        setCheckCurrent([])
         setMoreList([]);
         setSelectType(3);
-        setSelectNumeber({
-            my_agent: 0,
-            more_agent: 0,
-        });
     };
    // Save popup
     const Save = () => {
         popupSave({
-            checkItem: [...checkMyItem.current,...checkMoreItem.current],
+            checkItem: [...checkItems.current],
         });
         Cancel();
     };
@@ -166,35 +138,28 @@ const Content: React.FC<params> = param => {
         const isTypeThree = parameters.current.search_type == 3;
         const list = isTypeThree ? myList : moreList;
         const typePrefix = isTypeThree ? 'my' : 'more';
-        const currentItem = isTypeThree ? checkMyItem : checkMoreItem
-        currentItem.current = list.map(item => ({
+        let addArray = list.map(item => ({
             ...item,
             type: `${typePrefix}_${nodetype}`
-        }));
-    
+        }))
+        let addCheck = checkItems.current.filter(v=>v.type != `${typePrefix}_${nodetype}`)
+        checkItems.current = [...addCheck,...addArray]
         const updateList = list.map(item => ({
             ...item,
             check: 1
         }));
-    
-        if (isTypeThree) {
-            setMyList(() => updateList);
-        } else {
-            setMoreList(() => updateList);
-        }
-        selectMobNumber(`${typePrefix}_${nodetype}`, parameters.current.search_type);
+        isTypeThree?setMyList(() => updateList):setMoreList(() => updateList);
     }
     useEffect(() => {
         if (show) {
             // showPopup()
             parameters.current.search_type = 3
-            if (checkList.length) {
-                let checkarr = checkList.filter(item=>item.type==`my_${nodetype}`);
-                let checMorekarr = checkList.filter(item=>item.type==`more_${nodetype}`);
-                checkMyItem.current = [...checkarr];
-                checkMoreItem.current = [...checMorekarr]
-            }
             parameters.current.apps_name = '';
+            // setCheckCurrent([])
+            if (checkList.length) {
+                checkItems.current = [...checkList];
+                setCheckCurrent([...checkList])
+            }
             getList({
                 ...parameters.current,
                 search_type:3
@@ -206,6 +171,39 @@ const Content: React.FC<params> = param => {
         }
     }, [show]);
 
+    useEffect(()=>{
+        setCheckCurrent([...checkItems.current])
+    },[myList,moreList]) 
+
+    const checkCurrentUpdata=useRef(false)
+    useEffect(()=>{
+        if(checkItems.current.length !== checkCurrent.length && checkCurrentUpdata.current){
+            const updateListChecks = (list, checkItems) => {
+                return list.map(item => ({
+                    ...item,
+                    check: checkItems.some(e => item.app_id === e.app_id) ? 1 : 0
+                }));
+            };
+            
+            checkItems.current = [...checkCurrent];
+            const mylist = checkCurrent.filter(item => item.type === "my_agent");
+            const morelist = checkCurrent.filter(item => item.type === "more_agent");
+            
+            setMyList(pre => updateListChecks(pre, mylist));
+            setMoreList(pre => updateListChecks(pre, morelist));
+
+            checkCurrentUpdata.current = false
+        }
+    },[checkCurrent])
+    
+
+   const delContrast = (delarr:any) =>{
+        checkCurrentUpdata.current = true
+        setCheckCurrent(pre=>{
+            return pre.filter(item => delarr.some(e=>item.app_id!=e.app_id));
+        })
+        
+   }
     return (
         show?<div
             ref={contentDom}
@@ -213,7 +211,7 @@ const Content: React.FC<params> = param => {
             className='transition  w-full h-full fixed top-[0] left-[0] bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-30"'
         >
             <div className="w-[980px] h-[646px] bg-[#fff] rounded-[6px] transition">
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col h-full w-full">
                     <div
                         className="text-[16px] flex items-center p-[20px]"
                         style={{ borderBottom: '1px solid #ebebeb' }}
@@ -226,151 +224,199 @@ const Content: React.FC<params> = param => {
                             onClick={Cancel}
                         />
                     </div>
-                    <div className="pt-[20px] flex-1 min-h-[0]">
-                        <div className="flex items-center pt-[0] p-[20px]">
-                            <span className="text-[#999]">
-                                {intl.formatMessage({ id: `app.check_${nodetype}_popup.chenck_text` })}：
-                            </span>
-                            <div className="flex items-center gap-x-[12px]">
-                                <span className="text-[#213044] text-[14px]">
-                                    {intl.formatMessage({ id: `app.check_${nodetype}_popup.select_1` })}:{' '}
-                                    {selectNumber[`my_${nodetype}`]}
+                    <div className='flex flex-1 overflow-x-hidden w-full min-w-0'>
+                        <div className="pt-[20px] h-full flex-1 min-w-0">
+                            <div className="flex items-center pt-[0] p-[20px]">
+                                <span className="text-[#999]">
+                                    {intl.formatMessage({ id: `app.check_${nodetype}_popup.chenck_text` })}：
                                 </span>
-                                <span className="text-[#213044] text-[14px]">
-                                    {intl.formatMessage({ id: `app.check_${nodetype}_popup.select_2` })}:{' '}
-                                    {selectNumber[`more_${nodetype}`]}
-                                </span>
+                                <div className="flex items-center gap-x-[12px]">
+                                    <span className="text-[#213044] text-[14px]">
+                                        {intl.formatMessage({ id: `app.check_${nodetype}_popup.select_1` })}:{' '}
+                                        {selectNumber[`my_${nodetype}`]}
+                                    </span>
+                                    <span className="text-[#213044] text-[14px]">
+                                        {intl.formatMessage({ id: `app.check_${nodetype}_popup.select_2` })}:{' '}
+                                        {selectNumber[`more_${nodetype}`]}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex gap-x-[20px] pt-[0] p-[20px]">
-                            <Radio.Group
-                                    onChange={ handleChange }
-                                    defaultValue={'3'}
+                            <div className="flex gap-x-[20px] pt-[0] p-[20px]">
+                                <Radio.Group
+                                        onChange={ handleChange }
+                                        defaultValue={'3'}
+                                        size='large'
+                                    >
+                                    <Radio.Button value="3" >
+                                        <span className='text-[14px]'>{intl.formatMessage({ id: `app.check_${nodetype}_popup.select_1` })}</span>
+                                    </Radio.Button>
+                                    <Radio.Button value="2" >
+                                        <span className='text-[14px]'>{intl.formatMessage({ id: `app.check_${nodetype}_popup.select_2` })}</span>
+                                    </Radio.Button>
+                                </Radio.Group>
+                                <Input
+                                    className="w-[320px] text-[14px] flex-1"
+                                    style={{fontSize:'14px !important'}}
+                                    onPressEnter={setSeachInput}
+                                    size="large"
+                                    placeholder={intl.formatMessage({
+                                        id: `app.check_${nodetype}_popup.search`,
+                                    })}
+                                    onChange={(e) => setInputVal(e.target.value)}
+                                    value={inputval}
+                                    prefix={
+                                        <img
+                                            src="/icons/search_icon.svg"
+                                            className="w-[16px] h-[16px] mr-[10px]"
+                                        />
+                                    }
+                                />
+                                <TagSearch
+                                    allowClear
+                                    onChange={(e)=>{
+                                        parameters.current.tag_ids = e?e.join(','):'';
+                                        parameters.current.page = 1;
+                                        getList(parameters.current,true)
+                                    }}
+                                    showAddButton={false}
                                     size='large'
-                                >
-                                <Radio.Button value="3" >
-                                    <span className='text-[14px]'>{intl.formatMessage({ id: `app.check_${nodetype}_popup.select_1` })}</span>
-                                </Radio.Button>
-                                <Radio.Button value="2" >
-                                    <span className='text-[14px]'>{intl.formatMessage({ id: `app.check_${nodetype}_popup.select_2` })}</span>
-                                </Radio.Button>
-                            </Radio.Group>
-                            <Input
-                                className="w-[320px] text-[14px]"
-                                style={{fontSize:'14px !important'}}
-                                onPressEnter={setSeachInput}
-                                size="large"
-                                placeholder={intl.formatMessage({
-                                    id: `app.check_${nodetype}_popup.search`,
-                                })}
-                                onChange={(e) => setInputVal(e.target.value)}
-                                value={inputval}
-                                prefix={
-                                    <img
-                                        src="/icons/search_icon.svg"
-                                        className="w-[16px] h-[16px] mr-[10px]"
-                                    />
-                                }
-                            />
-                            <TagSearch
-                                allowClear
-                                onChange={(e)=>{
-                                    parameters.current.tag_ids = e?e.join(','):'';
-                                    parameters.current.page = 1;
-                                    getList(parameters.current,true)
-                                }}
-                                showAddButton={false}
-                                size='large'
-                                className='w-[260px]'
-                                listStyle="horizontal"
-                            ></TagSearch>
-                        </div>
-                        <div
-                            className="overflow-y-auto  px-[20px]"
-                            id="agentScroll"
-                            style={{ height: 'calc(100% - 100px)' }}
-                        >
-                            <Scroll
-                                dataLength={
-                                    selectType == 3
-                                        ? myList.length
-                                        : moreList.length
-                                }
-                                elid={'agentScroll'}
-                                ishasMore={
-                                    selectType == 3 ? ishasMore : moreishasMore
-                                }
-                                upSlide={() => {
-                                    parameters.current.page+=1;
-                                    getList(parameters.current);
-                                }}
+                                    className='min-w-[240px] flex-1'
+                                    listStyle="horizontal"
+                                ></TagSearch>
+                            </div>
+                            <div
+                                className="overflow-y-auto  px-[20px]"
+                                id="agentScroll"
+                                style={{ height: 'calc(100% - 100px)' }}
                             >
-                                <div className="w-full overflow-x-hidden">
-                                    <Row gutter={[15, 15]}>
-                                        {isMyList() && isMyList().length ? (
-                                            isMyList().map((item: any, index: any) => (
-                                                <Col span={6} key={item.app_id}>
-                                                    <div
-                                                        className={`bg-[#fff] flex gap-x-[20px] p-[10px] cursor-pointer border-solid border-[1px] rounded-[4px] ${
-                                                            !item.check
-                                                                ? 'border-[#eee]'
-                                                                : 'border-[#1B64F3]'
-                                                        }`}
-                                                        onClick={() => {
-                                                            radio?radiocheckMyItem(
+                                <Scroll
+                                    dataLength={
+                                        selectType == 3
+                                            ? myList.length
+                                            : moreList.length
+                                    }
+                                    elid={'agentScroll'}
+                                    ishasMore={
+                                        selectType == 3 ? ishasMore : moreishasMore
+                                    }
+                                    upSlide={() => {
+                                        parameters.current.page+=1;
+                                        getList(parameters.current);
+                                    }}
+                                >
+                                    <div className="w-full overflow-x-hidden">
+                                        <Row gutter={[15, 15]}>
+                                            {isMyList() && isMyList().length ? (
+                                                isMyList().map((item: any, index: any) => (
+                                                    <Col span={checkCurrent.length?8:6} key={item.app_id}>
+                                                        <div
+                                                            className={`bg-[#fff] flex gap-x-[20px] p-[10px] cursor-pointer border-solid border-[1px] rounded-[4px] ${
+                                                                !item.check
+                                                                    ? 'border-[#eee]'
+                                                                    : 'border-gray-100'
+                                                            }`}
+                                                            onClick={() => {
+                                                                radio?radiocheckMyItem(
+                                                                        selectType,
+                                                                        item,
+                                                                    ): addcheckMyItem(
                                                                     selectType,
                                                                     item,
-                                                                ): addcheckMyItem(
-                                                                selectType,
-                                                                item,
-                                                            );
+                                                                );
+                                                            }}
+                                                        >
+                                                            <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] relative flex items-center justify-center shrink-0">
+                                                                <img
+                                                                    src={headportrait(
+                                                                        'single',
+                                                                        item.icon,
+                                                                    )}
+                                                                    alt=""
+                                                                    className="w-[20px]  h-[20px]"
+                                                                />
+                                                            </div>
+                                                            <div className="flex flex-col gap-y-[5px] justify-center flex-1 min-w-[0]">
+                                                                <div className={`text-[12px] font-[500] w-full truncate ${
+                                                                !item.check
+                                                                    ? 'text-[#213044]'
+                                                                    : 'text-gray-300'
+                                                            }`}>
+                                                                    {item.name}
+                                                                </div>
+                                                                <div className={`text-[12px] w-full truncate ${!item.check
+                                                                    ? 'text-[#999]'
+                                                                    : 'text-gray-300'}`}>
+                                                                    {item.description}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </Col>
+                                                ))
+                                            ) : (
+                                                <div className="w-full h-[380px] flex justify-center items-center">
+                                                    <Empty
+                                                        style={{ margin: '0px', fontSize: '16px' }}
+                                                        imageStyle={{
+                                                            width: '60px',
+                                                            margin: '0 auto',
+                                                            marginBottom: '2px',
                                                         }}
-                                                    >
-                                                        <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] relative flex items-center justify-center shrink-0">
-                                                            <img
-                                                                src={headportrait(
-                                                                    'single',
-                                                                    item.icon,
-                                                                )}
-                                                                alt=""
-                                                                className="w-[20px]  h-[20px]"
-                                                            />
-                                                            {/* <div className='w-[16px]  h-[16px] bg-[#fff] absolute bottom-[-2px] right-[-2px]'>
-                                                                    <img src="/icons/robot_icon.svg" alt="" className='w-[12px]  h-[12px]'/>
-                                                                </div> */}
-                                                        </div>
-                                                        <div className="flex flex-col gap-y-[5px] justify-center flex-1 min-w-[0]">
-                                                            <div className="text-[#213044] text-[12px] font-[500] w-full truncate">
-                                                                {item.name}
-                                                            </div>
-                                                            <div className="text-[#999] text-[12px] w-full truncate">
-                                                                {item.description}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Col>
-                                            ))
-                                        ) : (
-                                            <div className="w-full h-[380px] flex justify-center items-center">
-                                                <Empty
-                                                    style={{ margin: '0px', fontSize: '16px' }}
-                                                    imageStyle={{
-                                                        width: '60px',
-                                                        margin: '0 auto',
-                                                        marginBottom: '2px',
-                                                    }}
-                                                    description={intl.formatMessage({
-                                                        id: 'app.dashboard.None',
-                                                    })}
-                                                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                                                ></Empty>
-                                            </div>
-                                        )}
-                                    </Row>
-                                </div>
-                                {/* Empty */}
-                            </Scroll>
+                                                        description={intl.formatMessage({
+                                                            id: 'app.dashboard.None',
+                                                        })}
+                                                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                                    ></Empty>
+                                                </div>
+                                            )}
+                                        </Row>
+                                    </div>
+                                    {/* Empty */}
+                                </Scroll>
+                            </div>
                         </div>
+                        {checkCurrent&& checkCurrent.length ? 
+                        <div className='h-full flex flex-col'  style={{boxShadow:'rgba(0, 0, 0, 0.1) 0px 0px 3px 0px'}}>
+                            <div className='py-[10px] px-[10px] text-[14px]'>{intl.formatMessage({id:'app.check_popup.add'})}{intl.formatMessage({id:`app.check_${nodetype}_popup.name`})}</div>
+                            <div className='w-[260px]  overflow-y-auto flex-1 min-w-0 min-h-0'>
+                                <div className='flex gap-[6px] p-4 pt-[6px] flex-wrap w-full'>
+                                    { checkCurrent.map(item=>(
+                                        <div className='w-full cursor-pointer relative' key={item.app_id}>
+                                            <div
+                                                className="flex items-center gap-x-[5px] bg-[#FAFAFA] transition p-[10px] slider_agent_box"
+                                            >
+                                                <div className="flex gap-x-[15px] flex-1 min-w-[0]">
+                                                    <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
+                                                        <img
+                                                            src={headportrait(
+                                                                'single',
+                                                                item.icon,
+                                                            )}
+                                                            alt=""
+                                                            className="w-[18px]  h-[18px]"
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col gap-y-[5px] justify-center flex-1 min-w-[0]">
+                                                        <span className="text-[#213044] text-[12px] font-[500] truncate w-full">
+                                                            {item.name}
+                                                        </span>
+                                                        <span className="text-[#999999] text-[12px] truncate">
+                                                            {item.description}
+                                                        </span>
+                                                    </div>
+                                                </div> 
+                                            </div> 
+                                            <div className='text-[#f73131] transition text-[14px] absolute top-[6px] right-[6px]'><DeleteOutlined  /></div>
+                                            <div className='hover:opacity-100 opacity-0 transition absolute w-full h-full flex items-center justify-center top-0 left-0 bg-[rgba(255,255,255,0.8)]'onClick={()=>{
+                                                delContrast([item])
+                                            }}>
+                                                <div className='text-[#1b64f3] transition text-[24px]'><DeleteOutlined  /></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        :<></>}
                     </div>
                     <div
                         className="p-[20px] flex gap-x-[20px] justify-end"

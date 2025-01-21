@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import useUserStore from '@/store/user';
 import { useIntl } from '@umijs/max';
+import { Button } from 'antd';
 // Progress bar subtitle
 const ProgressContainer :React.FC<{progressObj:any}> = memo((parmas) => {
     let {progressObj} = parmas
@@ -48,8 +49,8 @@ const ProgressContainer :React.FC<{progressObj:any}> = memo((parmas) => {
     );
 });
 
-const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any}>=parmas=>{
-    let {list,scrollDom,historyHeight}=parmas;
+const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any,id:any}>=parmas=>{
+    let {list,scrollDom,historyHeight,id}=parmas;
     let intl = useIntl();
     const [summaryHistory,setSummaryHistory] = useState([])
     const domHeight = useRef('100%')
@@ -71,6 +72,13 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any}>=par
         })
         return array
     }
+    const setSummaryClick = useChatroomStore(state=>state.setSummaryClick);
+    const [disabled,setDisabled] = useState(true);
+    const summaryClick = useChatroomStore(state=>state.summaryClick);
+    const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
+    useEffect(()=>{
+        setDisabled(summaryClick)
+    },[summaryClick])
     useEffect(()=>{
         if(scrollDom){
             domHeight.current = scrollDom?.current?.offsetHeight
@@ -113,7 +121,7 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any}>=par
                                                 <div className='text-[16px] font-[600] py-[8px]'>{intl.formatMessage({id:'app.summaryhistory.orientation'})}:</div>
                                                 {
                                                     item?.source_corrections.map(item=>(
-                                                        <div key={item.created_time} className='last-of-type:bg-blue-100 rounded-[4px] bg-[#F7F7F7] mb-[16px]'>
+                                                        <div key={item.created_time} className='last-of-type:bg-blue-100 rounded-[4px] bg-[#F7F7F7] mb-[16px] last-of-type:mb-0'>
                                                             <div className='p-[12px]   leading-[22px]'>
                                                                 <div className='tetx-[14px] font-[600] pb-[12px]'>
                                                                    {intl.formatMessage({id:'app.summaryhistory.userPrompt'})}: {item.user_prompt}
@@ -131,6 +139,22 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any}>=par
                                             </div>
                                         :<></>
                                     }
+                                    <div className='w-full'>
+                                        <Button
+                                            type="primary"
+                                            className="bg-[#1B64F3] rounded-[4px] my-3 h-[30px] w-full flex-1 tetx-[14px]"
+                                            onClick={(e:any)=>{
+                                                if(disabled){
+                                                    let source_corrections = item?.source_corrections && item?.source_corrections.length>0 && item?.source_corrections[item?.source_corrections.length-1]
+                                                    let innertext = source_corrections ? source_corrections.corrected_summary : item?.source_run?.summary
+                                                    setSummaryParams({id:id,message:innertext})
+                                                    setSummaryClick(false)
+                                                }
+                                            }}
+                                        >
+                                            {intl.formatMessage({ id: `app.summaryhistory.submitText` })}
+                                        </Button>
+                                    </div>
                                     {
                                         item?.target_run?
                                             <div className='py-[12px]'>
