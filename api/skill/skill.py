@@ -289,7 +289,25 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
 
 @router.post("/skill_generate", response_model=ResSkillGenerateSchema)
 async def skill_generate(data: ReqSkillGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Generate skill based on user prompt using LLM
     
+    Args:
+        data: Request data containing user prompt for skill generation
+        userinfo: User authentication info
+        
+    Returns:
+        Dictionary containing:
+        - app_run_id: ID of the app run record
+        - record_id: ID of the LLM execution record
+        
+    Flow:
+        1. Validates user prompt
+        2. Creates app run record
+        3. Prepares system and user prompts for LLM
+        4. Initializes LLM execution record
+        5. Returns record IDs for tracking generation progress
+    """
     # Validate user prompt
     if not data.user_prompt:
         return response_error(get_language_content("api_skill_user_prompt_required"))
@@ -342,7 +360,25 @@ async def skill_generate(data: ReqSkillGenerateSchema, userinfo: TokenData = Dep
 @router.post("/skill_correction", response_model=ResSkillCorrectionSchema)
 async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData = Depends(get_current_user)):
     """
-    Correction skill based on user feedback
+    Correct/improve existing skill based on user feedback using LLM
+    
+    Args:
+        data: Request data containing:
+            - app_run_id: ID of original skill generation run
+            - correction_prompt: User feedback for improvement
+        userinfo: User authentication info
+        
+    Returns:
+        Dictionary containing:
+        - app_run_id: ID of the app run record
+        - record_id: ID of the new LLM correction record
+        
+    Flow:
+        1. Validates app run exists and belongs to user
+        2. Retrieves original generation context and results
+        3. Prepares correction prompts with original context
+        4. Creates new LLM execution record for correction
+        5. Returns record IDs for tracking correction progress
     """
     # Validate app run id
     app_run_info = AppRuns().select_one(
@@ -357,7 +393,7 @@ async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData =
         return response_error(get_language_content('app_run_error'))
     
     first_record = AIToolLLMRecords().select_one(
-        columns=['id', 'outputs'],
+        columns=['id', 'inputs', 'correct_prompt'],
         conditions=[
             {"column": "app_run_id", "value": data.app_run_id}
         ],
