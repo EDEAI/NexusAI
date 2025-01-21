@@ -316,10 +316,6 @@ async def skill_generate(data: ReqSkillGenerateSchema, userinfo: TokenData = Dep
         user_prompt=data.user_prompt
     )
 
-    system_prompt = system_prompt.format(
-        append_prompt=''
-    )
-    
     input_ = Prompt(
         system=system_prompt,
         user=user_prompt
