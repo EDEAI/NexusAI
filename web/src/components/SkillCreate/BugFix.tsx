@@ -5,6 +5,8 @@ import { memo, useEffect, useRef, useState } from 'react';
 import CodeEditor from '../WorkFlow/components/Editor/CodeEditor';
 import RenderInput from '../WorkFlow/components/RunForm/RenderInput';
 import BeforeCreate from './BeforeCreate';
+import { skillDebug, skillRun } from '@/api/workflow';
+import _ from 'lodash';
 
 interface BugFixProps {
     open: boolean;
@@ -31,8 +33,24 @@ const BugFix = memo(({ open, onCancel, skillData }: BugFixProps) => {
         onCancel();
     };
 
-    const onSubmit = () => {
-        setSkillRunResult('运行结果');
+    const onSubmit =async (val) => {
+        console.log(val,skillData);
+        const variable= _.cloneDeep(skillData?.input_variables||{});
+        Object.entries(val).forEach(([key, val]) => {
+            if(variable?.properties?.hasOwnProperty?.(key)){
+                variable.properties[key].value=val;
+            }
+        });
+        console.log(variable);
+        const debugData={
+            ...skillData,
+            test_input: variable,
+        }
+        const res=await skillDebug(debugData);
+        if(res.code==0){
+            setSkillRunResult('运行结果');
+        }
+        
     };
 
     return (

@@ -649,7 +649,12 @@ export const skillRun = async (skill_id:string,input_dict) => {
     });
 };
 
-
+export const skillDebug = async (debugData:any) => {
+    return await aniRequest<any>(`/v1/skill/skill_debug`, {
+        method: 'POST',
+        data:debugData,
+    });
+};
 export const skillCorrection = async (app_run_id:string,correction_prompt) => {
     return await aniRequest<any>(`/v1/skill/skill_correction`, {
         method: 'POST',
