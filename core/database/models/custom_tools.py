@@ -171,7 +171,7 @@ class CustomTools(MySQL):
                       {'column': 'publish_status', 'value': 0}]
             self.update(conditions, update_data)
             # Handle tags
-            tag_ids = data.get('tag_ids',[])
+            tag_ids = data.get('tags',[])
             if tag_ids:
                 tag_bindings = TagBindings()
                 if not tag_bindings.batch_update_bindings([app_id], tag_ids):
@@ -200,7 +200,7 @@ class CustomTools(MySQL):
             return {"status": 2, "message": get_language_content("apps_insert_error")}
 
         # Handle tags
-        tag_ids = data.get('tag_ids',[])
+        tag_ids = data.get('tags',[])
         if tag_ids:
             tag_bindings = TagBindings()
             if not tag_bindings.batch_update_bindings([app_id], tag_ids):
