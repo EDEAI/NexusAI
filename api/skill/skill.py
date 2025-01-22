@@ -36,7 +36,7 @@ async def skill_create(tool: ReqSkillCreateSchema, userinfo: TokenData = Depends
     tool_data['updated_time'] = datetime.now()
     tool_data['status'] = 1
     if 'publish_status' not in tool_data or tool_data['publish_status'] not in [0, 1]:
-        return response_error(get_language_content("publish_status can only input 0 or 1"))
+        return response_error(get_language_content("publish_status_invalid"))
 
     if tool_data['publish_status'] == 1:
         tool_data['published_time'] = datetime.now()
@@ -73,9 +73,9 @@ async def skill_info( app_id: int, publish_status: int, userinfo: TokenData = De
     :return: ID of created skills
     """
     if app_id <= 0:
-        return response_error(get_language_content("Invalid app_id"))
+        return response_error(get_language_content("invalid_app_id"))
     if publish_status not in [0, 1]:
-        return response_error(get_language_content("publish_status can only input 0 or 1"))
+        return response_error(get_language_content("publish_status_invalid"))
     result = tools_db.get_skill_info(userinfo.uid, app_id, publish_status,userinfo.team_id)
     if result["status"] != 1:
         return response_error(get_language_content(result["message"]))
@@ -98,7 +98,7 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
     update_data = tool.dict(exclude_unset=True)
     update_data['updated_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if 'is_public' in update_data and update_data['is_public'] not in [0, 1]:
-        return response_error(get_language_content("is_public can only input 0 or 1"))
+        return response_error(get_language_content("is_public_invalid"))
     try:
         if 'is_public' in update_data:
             apps_data = {
@@ -113,7 +113,7 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
 
         return response_success()
     except:
-        return response_error(get_language_content("update error"))
+        return response_error(get_language_content("update_error"))
 
 @router.put("/skill_publish/{app_id}", response_model=ResSkillPublishSchema)
 async def skill_publish(app_id: int, userinfo: TokenData = Depends(get_current_user)):
@@ -180,14 +180,14 @@ async def delete_skill_by_app_id(app_id: int, userinfo: TokenData = Depends(get_
     """
     user_id = userinfo.uid
     if app_id <= 0:
-        return response_error(get_language_content("app_id is required"))
+        return response_error(get_language_content("app_id_required"))
 
     conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id}]
     app_conditions = [{'column': 'id', 'value': app_id}]
     deleted = tools_db.soft_delete(conditions)
     apps_db.soft_delete(app_conditions)
     if not deleted:
-        return response_error(get_language_content("Tool not found"))
+        return response_error(get_language_content("skill_not_found"))
     return response_success()
 
 # Soft delete custom tool
@@ -203,7 +203,7 @@ async def skill_soft_delete(id: int, userinfo: TokenData = Depends(get_current_u
     conditions = [{'column': 'id', 'value': id}, {'column': 'user_id', 'value': user_id}]
     deleted = tools_db.soft_delete(conditions)
     if not deleted:
-        return response_error(get_language_content("Tool not found"))
+        return response_error(get_language_content("skill_not_found"))
     return response_success()
 
 
@@ -219,7 +219,7 @@ async def skill_delete(app_id: int, userinfo: TokenData = Depends(get_current_us
     conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id}]
     deleted = tools_db.delete(conditions)
     if not deleted:
-        return response_error(get_language_content("Tool not found"))
+        return response_error(get_language_content("skill_not_found"))
     return response_success()
 
 @router.post("/skill_run", response_model=ResSkillRunSchema)
@@ -235,15 +235,15 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
     team_id = userinfo.team_id
 
     if skill_id <= 0:
-        return response_error(get_language_content("skill_id is required"))
+        return response_error(get_language_content("skill_id_required"))
 
     if not input_dict:
-        return response_error(get_language_content("input_dict is required"))
+        return response_error(get_language_content("input_dict_required"))
 
     try:
         create_variable_from_dict(input_dict)
     except:
-        return response_error(get_language_content("input_dict data in wrong format"))
+        return response_error(get_language_content("input_dict_format_error"))
 
     skill = tools_db.select_one(
         columns="*",
@@ -253,13 +253,13 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
             {"column": "status", "op": "in", "value": [1, 2]}
         ])
     if not skill:
-        return response_error(get_language_content("skill error"))
+        return response_error(get_language_content("skill_error"))
 
     if skill["user_id"] != uid:
         if skill["status"] != 1:
-            return response_error(get_language_content("The agent  skill is not normal"))
+            return response_error(get_language_content("skill_status_not_normal"))
         if skill["publish_status"] != 1:
-            return response_error(get_language_content("Only creators can run drafts skill"))
+            return response_error(get_language_content("skill_draft_creators_only"))
 
     apps_model = Apps()
     app = apps_model.select_one(
@@ -273,12 +273,12 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
     )
 
     if not app:
-        return response_error(get_language_content("app error"))
+        return response_error(get_language_content("app_error"))
     if app["user_id"] != uid:
         if app["is_public"] == 0:
-            return response_error(get_language_content("Team members are not open"))
+            return response_error(get_language_content("team_members_not_open"))
         if app["status"] != 1:
-            return response_error(get_language_content("The app status is not normal"))
+            return response_error(get_language_content("app_status_not_normal"))
     task = run_app.delay(app_type="skill", id_=skill_id, user_id=uid, input_dict=input_dict)
     while not task.ready():
         await asyncio.sleep(0.1)
@@ -483,7 +483,7 @@ async def skill_data_create(data: ReqSkillDataCreateSchema, userinfo: TokenData 
     """
     # No need to convert to dict here since we want to use Pydantic model properties
     result = tools_db.skill_data_create(
-        data,
+        data.dict(exclude_unset=True),
         userinfo.uid,
         userinfo.team_id
     )
@@ -512,11 +512,12 @@ async def skill_debug(data: ReqSkillDebugSchema, userinfo: TokenData = Depends(g
         node = SkillNode(
             title=data.name,
             desc=data.description,
-            input=create_variable_from_dict(data.input_variables.dict()),
+            input=create_variable_from_dict(data.input_variables),
+            output=create_variable_from_dict(data.output_variables),
             data={
-                'custom_code': data.code.dict(),
-                'code_dependencies': data.dependencies.dict(),
-                'output': create_variable_from_dict(data.output_variables.dict())
+                'custom_code': data.code,
+                'code_dependencies': data.dependencies,
+                'output': create_variable_from_dict(data.output_variables)
             }
         )
 
