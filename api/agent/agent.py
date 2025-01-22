@@ -737,7 +737,8 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             input_ = AIToolLLMRecords().inputs_append_history_outputs(
                 app_run_id=data.app_run_id,
                 loop_id=loop_id,
-                agent_supplement=data.supplement_prompt
+                agent_supplement=data.supplement_prompt,
+                user_id=userinfo.uid
             )
 
 
