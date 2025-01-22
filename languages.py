@@ -635,6 +635,8 @@ language_packs = {
             7. The batch-generated agent data should be kept as different as possible, and do not generate duplicate agents
             8. If the batch-generated agent history has real content, the new agent should be kept as different as possible from the generated agent history
             9. Be sure to strictly abide by the multi-agent data json structure
+            10. No need to consider model context length limit, do not simplify agent information
+            After all agents are generated, it is necessary to enrich and improve the information of each agent based on the above requirements to ensure that the information of each agent is sufficient and detailed.
             Note that only the generated multi-agent json structure data is returned, and no redundant content is returned.
             Description of the json structure of multi-agent data:
             {{
@@ -1351,6 +1353,8 @@ language_packs = {
         #     7. 批量生成的智能体数据要尽量保持差异性，不要生成重复的智能体
         #     8. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
         #     9. 一定要严格遵守多智能体数据json结构
+        #     10. 不需要考虑模型上下文长度限制，不要精简智能体信息
+        #     在所有智能体生成完成后，一定要基于上述要求对每个智能体的信息进行丰富和完善，确保每个智能体的信息足够充分和详细。
         #     注意只返回生成的多智能体json结构数据，不要返回多余的内容。
         #     多智能体数据json结构说明：
         #     {{
