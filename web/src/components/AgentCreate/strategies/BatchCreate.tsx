@@ -1,5 +1,6 @@
 import { BulbOutlined, SendOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
+import { useSessionStorageState } from 'ahooks';
 import { Button, InputNumber, Segmented, Tooltip } from 'antd';
 import { memo, useState } from 'react';
 import BeforeCreate from '../BeforeCreate';
@@ -35,7 +36,13 @@ const BatchCreate = memo(
         onPromptChange,
     }: BatchCreateProps) => {
         const intl = useIntl();
-        const [count, setCount] = useState<number | null>(null);
+        // const [count, setCount] = useState<number | null>(null);
+        const [count, setCount] = useSessionStorageState<string | undefined>(
+            'use-local-storage-state-count',
+            {
+                defaultValue: '',
+            },
+        );
         const [countError, setCountError] = useState(false);
         const [batchCount, setBatchCount] = useState('10');
 

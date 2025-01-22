@@ -1,0 +1,251 @@
+import { ProForm, ProFormRadio, ProFormSelect } from '@ant-design/pro-components';
+import { useIntl } from '@umijs/max';
+import { Spin, Typography } from 'antd';
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import TagSearch from '../TagSearch';
+import Variable from '../WorkFlow/components/Variable';
+import { SkillFormData } from './types';
+
+const { Paragraph } = Typography;
+
+export interface ResultDisplayRef {
+    getValue: () => Partial<SkillFormData>;
+}
+
+interface ResultDisplayProps {
+    initialValues?: Partial<SkillFormData>;
+    onChange?: (values: SkillFormData) => void;
+    loading?: boolean;
+    readOnly?: boolean;
+}
+
+const ResultDisplay = memo(
+    forwardRef<ResultDisplayRef, ResultDisplayProps>(
+        ({ initialValues, onChange, loading, readOnly = false }, ref) => {
+            const intl = useIntl();
+            const [values, setValues] = useState<Partial<SkillFormData>>(initialValues || {});
+
+            useEffect(() => {
+                setValues(prev => ({
+                    ...initialValues,
+                    tags: prev.tags || [],
+                }));
+            }, [initialValues]);
+
+            useImperativeHandle(ref, () => ({
+                getValue: () => values,
+            }));
+
+            const handleChange = (updates: Partial<SkillFormData>) => {
+                if (readOnly) return;
+                const newValues = { ...values, ...updates };
+                setValues(newValues);
+                onChange?.(newValues as SkillFormData);
+            };
+
+            const variableChange = useCallback(
+                (variables: any[]) => {
+                    // handleChange({
+                    //     input_variables: {
+                    //         ...values.input_variables,
+                    //         properties: variables.reduce((acc, cur) => ({
+                    //             ...acc,
+                    //             [cur.name]: cur
+                    //         }), {})
+                    //     }
+                    // });
+                },
+                [values.input_variables, handleChange],
+            );
+
+    return (
+        <div className="flex-1 h-full pb-4 overflow-auto rounded-lg border border-gray-200 px-4 bg-gray-50 overflow-y-auto">
+            <Spin
+                spinning={loading}
+                className="h-full"
+                wrapperClassName="!h-full"
+                tip="正在生成..."
+                    >
+                        <div className="h-full pb-10">
+                            <div className="px-4 pt-6 flex items-center gap-2">
+                                <Paragraph
+                                    editable={
+                                        !readOnly
+                                            ? {
+                                                  onChange: value => handleChange({ name: value }),
+                                                  text: values.name,
+                                                  triggerType: ['text'],
+                                                  autoSize: true,
+                                              }
+                                            : false
+                                    }
+                                    className={`${
+                                        !readOnly ? 'hover:bg-blue-100' : ''
+                                    } !mb-0 relative rounded-lg text-blue-600 text-[16px] flex items-center`}
+                                >
+                                    <img
+                                        src="/icons/agent_create.svg"
+                                        className="size-6 mr-1"
+                                    ></img>
+                                    {values.name}
+                                </Paragraph>
+                            </div>
+                            <div className="px-4 py-1 mt-2">
+                                <Paragraph
+                                    editable={
+                                        !readOnly
+                                            ? {
+                                                  onChange: value =>
+                                                      handleChange({ description: value }),
+                                                  text: values.description,
+                                                  triggerType: ['text'],
+                                                  autoSize: true,
+                                              }
+                                            : false
+                                    }
+                                    className={`${
+                                        !readOnly ? 'hover:bg-blue-100' : ''
+                                    } rounded-lg !mb-0 text-[#666666] text-[12px]`}
+                                >
+                                    {values.description}
+                                </Paragraph>
+                                {!readOnly && (
+                                    <div className="flex items-center hover:bg-blue-100 rounded-lg  mt-2">
+                                        <img src="/icons/tag.svg" className="size-4"></img>
+                                        <div className=" flex-1">
+                                            <TagSearch
+                                                showAddButton={false}
+                                                className="w-full"
+                                                variant="borderless"
+                                                disabled={readOnly}
+                                                onChange={tags => {
+                                                    handleChange({ tags });
+                                                }}
+                                                listStyle="horizontal"
+                                                maxTagCount={20}
+                                                value={values.tags}
+                                            ></TagSearch>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div>
+                                    <Variable
+                                        variables={
+                                            Object.values(
+                                                values.input_variables?.properties || {},
+                                            ) || []
+                                        }
+                                        title={`输入变量`}
+                                        onChange={variableChange}
+                                    ></Variable>
+                                </div>
+                                {/* <div className="h-80 mt-4">
+                                    <CodeEditor
+                                        language="python3"
+                                        value={values?.code?.['python3']}
+                                        // mdValue={nodeInfo?.outputs_md}
+
+                                        isJSONStringifyBeauty
+                                        onChange={() => {}}
+                                        title={`python`}
+                                    ></CodeEditor>
+                                </div> */}
+
+                                <ProForm
+                                    initialValues={{
+                                        dependencies: values.dependencies['python3'],
+                                        output_type: values.output_type,
+                                    }}
+                                    submitter={false}
+                                    className="mt-4"
+                                >
+                                    <ProFormSelect
+                                        label={intl.formatMessage({
+                                            id: 'workflow.label.dependencies',
+                                            defaultMessage: '',
+                                        })}
+                                        mode="tags"
+                                        name="dependencies"
+                                        placeholder={intl.formatMessage({
+                                            id: 'workflow.placeholder.enterDependencies',
+                                            defaultMessage: '，,',
+                                        })}
+                                        allowClear
+                                        tooltip={intl.formatMessage({
+                                            id: 'workflow.tooltip.dependencies',
+                                            defaultMessage: 'python，pip',
+                                        })}
+                                        fieldProps={{
+                                            open: false,
+                                            tokenSeparators: [',', ' '],
+                                        }}
+                                    ></ProFormSelect>
+                                    <ProFormRadio.Group
+                                        label="输出类型"
+                                        name="output_type"
+                                        formItemProps={{
+                                            className: 'mb-0',
+                                        }}
+                                        fieldProps={{
+                                            options: [
+                                                {
+                                                    label: '文本',
+                                                    value: 1,
+                                                },
+                                                {
+                                                    label: '数据库',
+                                                    value: 2,
+                                                },
+                                                {
+                                                    label: '代码',
+                                                    value: 3,
+                                                },
+                                                {
+                                                    label: '文档',
+                                                    value: 4,
+                                                },
+                                            ],
+                                            // optionType:'button'
+                                        }}
+                                    ></ProFormRadio.Group>
+                                </ProForm>
+                                <Variable
+                                    variables={
+                                        Object.values(values.output_variables?.properties || {}) ||
+                                        []
+                                    }
+                                    title={`输出变量`}
+                                    onChange={variableChange}
+                                ></Variable>
+                            </div>
+
+                            <div className="px-4 py-1">
+                                <Paragraph
+                                    editable={
+                                        !readOnly
+                                            ? {
+                                                  onChange: value =>
+                                                      handleChange({ obligations: value }),
+                                                  text: values.obligations,
+                                                  triggerType: ['text'],
+                                                  autoSize: true,
+                                              }
+                                            : false
+                                    }
+                                    className={`${
+                                        !readOnly ? 'hover:bg-blue-100' : ''
+                                    } rounded-lg !mb-0 text-[12px]`}
+                                >
+                                    {values.obligations}
+                                </Paragraph>
+                            </div>
+                        </div>
+                    </Spin>
+        </div>
+    );
+        },
+    ),
+);
+
+export default ResultDisplay;

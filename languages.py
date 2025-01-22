@@ -504,10 +504,16 @@ language_packs = {
         'api_agent_user_prompt_required': 'Agent user prompt required',
         'api_agent_batch_size_invalid': 'Agent batch size invalid',
         'agent_batch_exist_runing_rocord': 'Agent generate exist runing rocord',
-        
+
         'generate_agent_system_prompt': '''
             You are an AI agent generation assistant.
-            Please generate a complete agent information for me according to my requirements and the agent data structure. The agent name, description, and function information should be highly anthropomorphic.
+            Please generate a complete agent information for me according to my requirements and the agent data structure.
+            Please pay attention to the following requirements when generating:
+            1. The agent name should be highly anthropomorphic
+            2. The agent description should be as detailed as possible and cover all the information of the agent
+            3. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
+            4. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            5. Be sure to strictly abide by the json structure of the agent data
             Note that only the json structure data of the agent is returned, and no redundant content is returned.
             Description of the json structure of agent data:
             {{
@@ -562,8 +568,14 @@ language_packs = {
         ''',
         'agent_batch_sample_system': '''
             You are an AI agent generation assistant.
-            Please generate a complete sample agent information for me according to the agent data structure based on the requirements for batch generation of agents I provided. The agent name and description should be highly anthropomorphic.
-            Please note that only one agent sample should be generated, and batch generation should not be performed.
+            Please generate a complete sample agent information for me according to the agent data structure based on the requirements for batch generation of agents provided by me.
+            Please pay attention to the following requirements when generating:
+            1. The agent name should be highly anthropomorphic
+            2. The agent description should be as detailed as possible and cover all the information of the agent
+            3. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
+            4. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            5. Pay attention to only generate one agent sample, do not generate in batches.
+            6. Be sure to strictly abide by the json structure of the agent data
             Note that only the json structure data of the agent is returned, and no redundant content is returned.
             Description of the json structure of agent data:
             {{
@@ -585,11 +597,16 @@ language_packs = {
         ''',
         'agent_batch_generate_system': '''
             You are an AI agent generation assistant.
-            Please generate a batch of complete agent information for me according to the requirements for batch generation of agents, the number of batch generation of agents, and the data structure of multiple agents provided by me. The agent names and descriptions should be highly anthropomorphic.
-            Please pay attention to the following requirements when generating:
-            1. Be sure to generate agents strictly according to the number of batch generation of agents provided by me, and do not generate more or less than this number
-            2. If the history of agents generated in batches has real content, the new agent should try to keep the difference with the history of agents generated
-            3. Be sure to strictly abide by the json structure of multi-agent data
+            Please generate a batch of complete agent information for me based on the requirements for batch generation of agents, the number of batch generation of agents, and the data structure of multiple agents that I provide.
+            Pay attention to the following requirements when generating:
+            1. The name of the agent should be highly anthropomorphic
+            2. The agent description should be as detailed as possible and cover all the information of the agent
+            3. The function information of the agent should be as detailed as possible, not just limited to the literal "function" information, but also include other relevant feature information
+            4. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            5. Be sure to strictly generate agents according to the number of batch-generated agents I provide, and do not generate more or less than this number
+            6. The batch-generated agent data should be kept as different as possible, and do not generate duplicate agents
+            7. If the batch-generated agent history has real content, the new agent should be kept as different as possible from the generated agent history
+            8. Be sure to strictly abide by the multi-agent data json structure
             Note that only the generated multi-agent json structure data is returned, and no redundant content is returned.
             Description of the json structure of multi-agent data:
             {{
@@ -613,22 +630,22 @@ language_packs = {
             Requirements for batch generation of agents:
             {agent_batch_requirements}
 
-            Number of batch generated agents:
+            Number of batch generation of agents:
             {agent_batch_number}
 
-            Batch generated agent history:
+            Batch-generated agent history:
             {history_agents}
         ''',
         'api_agent_supplement_prompt_required': 'supplement_prompt is requiredapi_agent_generate_failed',
         'api_agent_save_record_error': 'save record errorapp_run_error',
         'api_agent_record_error': 'record not found',
-        
+
         'chatroom_meeting_summary_system': '''
-            You are a conference content summary assistant. Please summarize the conference through the conference chat history I provided.
-            Note that only the conference summary content will be returned in the end, and no redundant content will be returned.
+            You are a meeting summary assistant. Please summarize the meeting based on the meeting chat history I provided. The meeting summary should be as detailed as possible.
+            Note that only the meeting summary content will be returned in the end, and no redundant content will be returned.
         ''',
         'chatroom_meeting_summary_user': '''
-            Conference chat history:
+            Meeting chat history:
             {messages}
         ''',
         'chatroom_meeting_summary_system_correct': '''
@@ -663,7 +680,7 @@ language_packs = {
             Pay attention to the following requirements during conversion:
             1. Pay attention to the split items in the work-oriented data I provided. Be sure to keep the original split items, do not create new split items, and do not delete split items.
             2. The final generated work-oriented data must meet the requirements of the work-oriented data json format. Do not change the data structure.
-            3. Be sure to pay attention to the field description and requirements in the work-oriented data json format description, and use this as a reference rule for splitting.
+            3. Be sure to pay attention to the field description and requirements in the work-oriented data json format description, as well as the work-oriented data supplementary description I provided. The two are combined as split reference rules.
             4. Remember that the four fields of name, display_name, required, and type in the work-oriented data I provided must not be changed. You only need to fill in the value field with the split item content.
             5. Be sure to strictly abide by the work-oriented data json format. Note that only the generated json format content is returned in the end, and no redundant content is returned.
 
@@ -688,6 +705,9 @@ language_packs = {
 
             Work-oriented data:
             {{'variables':{prompt_variables}}}
+
+            Supplementary description of work-oriented data:
+            {prompt_variables_supplement}
         ''',
         'chatroom_conference_orientation_system_correct': '''
             You are a data conversion assistant. You have already conducted a data-oriented conversion through the meeting summary content I provided. I provided the converted work-oriented data.
@@ -724,7 +744,14 @@ language_packs = {
 
             Data correction suggestions:
             {update_meeting}
-        '''
+        ''',
+        'api_skill_success': 'success',
+        'api_skill_generate_failed': 'Request failed, please try again later',
+        'api_skill_correction_failed': 'Request failed, please try again later',
+        'api_skill_user_prompt_required': 'Prompt is required',
+        'skill_validation_failed': 'Skill validation failed',
+        'skill_create_success': 'Skill create success',
+        'skill_update_success': 'Skill update success',
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -978,7 +1005,7 @@ language_packs = {
         'chatroom_status_is_incorrect': '当前状态不正确',
         
         # 'chatroom_meeting_summary_system': '''
-        #     你是一个会议内容总结助手，请通过我提供的会议聊天历史进行会议总结。
+        #     你是一个会议内容总结助手，请通过我提供的会议聊天历史进行会议总结，会议总结内容要尽量详细。
         #     注意最终只返回会议总结内容，不要返回多余的内容。
         # ''',
         # 'chatroom_meeting_summary_user': '''
@@ -1015,13 +1042,14 @@ language_packs = {
         # ''',
 
         # 'chatroom_conference_orientation_system': '''
-        #     你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据进行数据导向转化。 
+        #     你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据进行数据导向转化。
         #     转化时注意以下几点要求：
         #     1. 注意我提供的工作导向数据中的拆分项，一定要保持原有拆分项，不要创建新的拆分项，也不要删除拆分项
         #     2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构
-        #     3. 一定要注意工作导向数据json格式说明中的字段说明和要求，以此为拆分参考规则
-        #     4. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
-        #     5. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
+        #     3. 一定要注意工作导向数据json格式说明中的字段说明和要求，还有我提供的工作导向数据补充说明，两项结合作为拆分参考规则
+        #     4. 拆分项的内容一定要符合拆分参考规则中的对应拆分项的定义和要求，在符合定义和要求的前提下要尽量详细
+        #     5. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
+        #     6. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
 
         #     工作导向数据json格式说明：
         #     1. 结构类型说明：variables对应的数据整体为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型
@@ -1043,6 +1071,9 @@ language_packs = {
             
         #     工作导向数据：
         #     {{'variables':{prompt_variables}}}
+            
+        #     工作导向数据补充说明：
+        #     {prompt_variables_supplement}
         # ''',
         # 'chatroom_conference_orientation_system_correct': '''
         #     你是一个数据转化助手，你已经通过我提供的会议总结内容进行了一次数据导向转化，我提供了已转化的工作导向数据。
@@ -1082,25 +1113,31 @@ language_packs = {
 
         'chatroom_request_sent_successfully': '请求成功，请等待',
         
-        # 'generate_agent_system_prompt': (
-        #     '你是一个AI智能体生成助手，\n'
-        #     '请通过我的需求内容，按照智能体的数据结构为我生成一个完整的智能体信息，智能体名称、描述要高度拟人化。\n'
-        #     '注意只返回智能体的json结构数据，不要返回多余的内容。\n'
-        #     '智能体数据json结构说明：\n'
-        #     '{{\n'
-        #     '  "name": "(string类型) 智能体名称",\n'
-        #     '  "description": "(string类型) 智能体描述",\n'
-        #     '  "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",\n'
-        #     '  "abilities": [\n'
-        #     '    {{\n'
-        #     '      "name": "(string类型) 能力名称",\n'
-        #     '      "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",\n'
-        #     '      "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"\n'
-        #     '    }}\n'
-        #     '  ]\n'
-        #     '}}\n'
-        #     '{append_prompt}\n\n'
-        # ),
+        # 'generate_agent_system_prompt': '''
+        #     你是一个AI智能体生成助手。
+        #     请通过我的需求内容，按照智能体的数据结构为我生成一个完整的智能体信息。
+        #     生成时注意以下几点要求：
+        #     1. 智能体名称要高度拟人化
+        #     2. 智能体描述要尽量详细，要覆盖智能体的所有信息
+        #     3. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
+        #     4. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
+        #     5. 一定要严格遵守智能体数据json结构
+        #     注意只返回智能体的json结构数据，不要返回多余的内容。
+        #     智能体数据json结构说明：
+        #     {{
+        #         "name": "(string类型) 智能体名称",
+        #         "description": "(string类型) 智能体描述",
+        #         "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
+        #         "abilities": [
+        #             {{
+        #                 "name": "(string类型) 能力名称",
+        #                 "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
+        #                 "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
+        #             }}
+        #         ]
+        #     }}
+        #     {append_prompt}
+        # ''',
         # 'generate_agent_user':(
         #     '需求内容：\n'
         #     '{user_prompt}\n\n'
@@ -1141,8 +1178,14 @@ language_packs = {
 
         # 'agent_batch_sample_system': '''
         #     你是一个AI智能体生成助手。
-        #     请通过我提供的批量生成智能体的需求，按照智能体的数据结构为我生成一个完整的样例智能体信息，智能体名称、描述要高度拟人化。
-        #     注意只生成一个智能体样例，不要进行批量生成。
+        #     请通过我提供的批量生成智能体的需求，按照智能体的数据结构为我生成一个完整的样例智能体信息。
+        #     生成时注意以下几点要求：
+        #     1. 智能体名称要高度拟人化
+        #     2. 智能体描述要尽量详细，要覆盖智能体的所有信息
+        #     3. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
+        #     4. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
+        #     5. 注意只生成一个智能体样例，不要进行批量生成。
+        #     6. 一定要严格遵守智能体数据json结构
         #     注意只返回智能体的json结构数据，不要返回多余的内容。
         #     智能体数据json结构说明：
         #     {{
@@ -1164,11 +1207,16 @@ language_packs = {
         # ''',
         # 'agent_batch_generate_system': '''
         #     你是一个AI智能体生成助手。
-        #     请通过我提供的批量生成智能体的需求、批量生成智能体的数量、多智能体的数据结构为我生成一批完整的智能体信息，智能体名称、描述要高度拟人化。
+        #     请通过我提供的批量生成智能体的需求、批量生成智能体的数量、多智能体的数据结构为我生成一批完整的智能体信息。
         #     生成时注意以下几点要求：
-        #     1. 一定要严格按照我提供的批量生成智能体的数量去生成智能体，不要多余或少于此数量
-        #     2. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
-        #     3. 一定要严格遵守多智能体数据json结构
+        #     1. 智能体名称要高度拟人化
+        #     2. 智能体描述要尽量详细，要覆盖智能体的所有信息
+        #     3. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
+        #     4. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
+        #     5. 一定要严格按照我提供的批量生成智能体的数量去生成智能体，不要多余或少于此数量
+        #     6. 批量生成的智能体数据要尽量保持差异性，不要生成重复的智能体
+        #     7. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
+        #     8. 一定要严格遵守多智能体数据json结构
         #     注意只返回生成的多智能体json结构数据，不要返回多余的内容。
         #     多智能体数据json结构说明：
         #     {{
@@ -1205,7 +1253,102 @@ language_packs = {
         'agent_batch_exist_runing_rocord': '存在正在执行的记录',
         'api_agent_supplement_prompt_required': '补充提示词不能为空',
         'api_agent_save_record_error': '保存记录失败',
-        'api_agent_record_error': '记录不存在'
+        'api_agent_record_error': '记录不存在',
+        'generate_skill_system_prompt':'''
+            你是一个AI工具生成助手，
+            请通过我的需求内容，按照工具的数据结构为我生成一个完整的工具信息。
+            注意只返回工具的结构数据，不要返回多余的内容。
+            工具数据json结构说明：
+            1.结构类型说明: 
+            input_variables为输入变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
+            output_variables为输出变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
+            2.格式、字段说明和要求
+            {{
+                "name":"(string类型)工具名称",
+                "description":"(string类型)工具描述",
+                "input_variables":[
+                    {{
+                        "name":"(string类型)输入变量名称",
+                        "type":"(string类型)输入变量类型['string','number']",
+                        "required":"(bool类型)输入变量是否必填,True必填,False不必填",
+                        "display_name":"(string类型),name的首字母大写格式"
+                    }}
+                ],
+                "dependencies":
+                {{
+                    "python3":[
+                        "python依赖名称，你要完全区分内部依赖和外部依赖，依赖名称要保证完全正确。"
+                    ]
+                }},
+                "code":
+                {{
+                    "python3":"(string类型)python3代码部分，你只需要提供方法即可。方法需要规定返回类型。方法形参是输入变量，变量要限制类型。return内容为dict类型，内容要和输出变量一致。"
+                }},
+                "output_type":"(int类型),输出类型包含以下四种类型： 1:文本  2: 数据库 3: 代码 4: 文档",
+                "output_variables":[
+                    {{
+                        "name": "(string类型)输出变量名称",
+                        "type": "(string类型)输出属性类型，包含以下六种类型：'string','number','object','Array[string]','Array[number]','Array[object]'",
+                        "display_name": "(string类型)，name的首字母大写格式。"
+                    }}
+                ]
+            }}
+            {append_prompt}
+        ''',
+        'generate_skill_user':'''
+            需求内容：
+            {user_prompt}
+        ''',
+        'correction_skill_system_prompt':'''
+            你是一个AI工具生成助手。
+            你已经生成了一个工具，请通过我提供的修正意见，对已生成的工具数据进行调整。
+            注意只返回技能的结构数据，不要返回多余的内容。
+            工具数据json结构说明：
+            1.结构类型说明: input_variables为输入变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
+            output_variables为输出变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
+            2.格式、字段说明和要求
+            {{
+                "name":"(string类型)工具名称",
+                "description":"(string类型)工具描述",
+                "input_variables":[
+                    {{
+                        "name":"(string类型)输入变量名称",
+                        "type":"(string类型)输入变量类型['string','number']",
+                        "required":"(bool类型)输入变量是否必填,True必填,False不必填",
+                        "display_name":"(string类型),name的首字母大写格式"
+                    }}
+                ]},
+                "dependencies":{{
+                    "python3":[
+                        "python依赖名称，你要完全区分内部依赖和外部依赖，依赖名称要保证完全正确。"
+                    ]
+                }},
+                "code":{{
+                    "python3":"(string类型)python3代码部分，你只需要提供方法即可。方法需要规定返回类型。方法形参是输入变量，变量要限制类型。return内容为dict类型，内容要和输出变量一致。"
+                }},
+                "output_type":"(int类型),输出类型包含以下四种类型： 1:文本  2: 数据库 3: 代码 4: 文档",
+                "output_variables":[
+                    {{
+                        "name": "(string类型)输出变量名称",
+                        "type": "(string类型)输出属性类型，包含以下六种类型：'string','number','object','Array[string]','Array[number]','Array[object]'",
+                        "display_name": "(string类型)，name的首字母大写格式。"
+                    }}
+                ]
+            }}
+        ''',
+        'correction_skill_user': '''
+            修正意见：
+            {correction_prompt}
+            已生成的工具信息：
+            {history_skill}
+        ''',
+        'api_skill_success': '请求成功，请等待',
+        'api_skill_generate_failed': '请求失败，请稍后再试',
+        'api_skill_correction_failed': '请求失败，请稍后再试',
+        'api_skill_user_prompt_required': '提示词不能为空',
+        'skill_validation_failed': '技能验证失败',
+        'skill_create_success': '技能创建成功',
+        'skill_update_success': '技能更新成功',
     }
 }
 

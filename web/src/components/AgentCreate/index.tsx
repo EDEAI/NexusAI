@@ -282,6 +282,7 @@ const AgentCreate = memo(() => {
         setLoading(false);
         setCorrectVisible(false);
         setCreateType('single');
+        sessionStorage.removeItem('use-local-storage-state-count');
     };
 
     const SelectedType = useCallback(() => {

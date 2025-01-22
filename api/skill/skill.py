@@ -1,6 +1,6 @@
 import asyncio
-
 from fastapi import APIRouter
+from core.database.models.tag_bindings import TagBindings
 from core.database.models import CustomTools, Apps
 from api.schema.skill import *
 from api.utils.common import *
@@ -9,13 +9,16 @@ from core.workflow.variables import *
 from core.workflow.nodes import *
 from celery_app import run_app
 from languages import get_language_content
-
+from core.database.models.app_runs import AppRuns
+from core.database.models.ai_tool_llm_records import AIToolLLMRecords
+from core.llm.prompt import create_prompt_from_dict, Prompt
+from time import time
 
 router = APIRouter()
 tools_db = CustomTools()
 apps_db = Apps()
 nodes = Nodes()
-
+tagbindings = TagBindings()
 
 # Create custom tool
 @router.post("/skill_create", response_model=ResSkillCreateSchema)
@@ -107,6 +110,7 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
         conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
                       {'column': 'publish_status', 'value': 0}]
         tools_db.update(conditions, update_data)
+
         return response_success()
     except:
         return response_error(get_language_content("update error"))
@@ -283,4 +287,228 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
         return response_error(get_language_content(result["message"]))
     return response_success({"outputs": result["data"]["outputs"]})
 
+@router.post("/skill_generate", response_model=ResSkillGenerateSchema)
+async def skill_generate(data: ReqSkillGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
+    
+    # Validate user prompt
+    if not data.user_prompt:
+        return response_error(get_language_content("api_skill_user_prompt_required"))
 
+    # Create app run record
+    start_datetime_str = datetime.fromtimestamp(time()) \
+            .replace(microsecond=0).isoformat(sep='_')
+    app_run_id = AppRuns().insert({
+        'user_id': userinfo.uid,
+        'app_id': 0,
+        'type': 2,  # Skill generator type
+        'name': f'Skill_Generator_{start_datetime_str}',
+        'status': 1  # Initial status
+    })
+
+    # Prepare prompts for LLM
+    system_prompt = get_language_content('generate_skill_system_prompt', userinfo.uid)
+    user_prompt = get_language_content('generate_skill_user', userinfo.uid, False)
+
+    user_prompt = user_prompt.format(
+        user_prompt=data.user_prompt
+    )
+
+    input_ = Prompt(
+        system=system_prompt,
+        user=user_prompt
+    ).to_dict()
+
+    # Initialize LLM execution record
+    record_id = AIToolLLMRecords().initialize_execution_record(
+        app_run_id=app_run_id,
+        ai_tool_type=2,  # Skill generator type
+        inputs=input_,
+        run_type=1,
+        user_prompt=data.user_prompt
+    )
+
+    if not record_id:
+        return response_error(get_language_content("api_skill_generate_failed"))
+
+    # Return successful response
+    return response_success(
+        {
+            "app_run_id": app_run_id,
+            "record_id": record_id
+        },
+        get_language_content("api_skill_success")
+    )
+
+@router.post("/skill_correction", response_model=ResSkillCorrectionSchema)
+async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Correction skill based on user feedback
+    """
+    # Validate app run id
+    app_run_info = AppRuns().select_one(
+        columns=["id"],
+        conditions=[
+            {"column": "id", "value": data.app_run_id},
+            {"column": "user_id", "value": userinfo.uid}
+        ]
+    )
+
+    if not app_run_info:
+        return response_error(get_language_content('app_run_error'))
+    
+    first_record = AIToolLLMRecords().select_one(
+        columns=['id', 'outputs'],
+        conditions=[
+            {"column": "app_run_id", "value": data.app_run_id}
+        ],
+        order_by='id ASC'
+    )
+
+    # Extract original user prompt from inputs
+    base_user_prompt = ""
+    inputs = first_record.get('inputs', {})
+    if inputs is None:
+        inputs = first_record.get('correct_prompt', {})
+
+    try:
+        if isinstance(inputs, dict) and 'user' in inputs:
+            user_dict = inputs['user']
+            if isinstance(user_dict, dict) and 'value' in user_dict:
+                base_user_prompt = user_dict['value']
+    except Exception:
+        base_user_prompt = ""
+
+    # Get first record to extract original user prompt
+    last_record = AIToolLLMRecords().select_one(
+        columns=['id', 'outputs', 'correct_prompt'],
+        conditions=[
+            {"column": "app_run_id", "value": data.app_run_id}
+        ],
+        order_by='id DESC'
+    )
+    
+     # Extract agent info from outputs
+    history_skill_info = {}
+    try:
+        if isinstance(last_record, dict) and 'outputs' in last_record:
+            outputs_dict = last_record['outputs']
+            if isinstance(outputs_dict, dict) and 'value' in outputs_dict:
+                history_skill_info = outputs_dict['value']
+    except Exception:
+        pass
+
+    system_prompt = get_language_content('correction_skill_system_prompt', userinfo.uid)
+
+    user_prompt = get_language_content('correction_skill_user', userinfo.uid, False)
+    user_prompt = user_prompt.format(
+        correction_prompt=data.correction_prompt,
+        history_skill=history_skill_info
+    )
+
+    input_ = Prompt(system=system_prompt, user=base_user_prompt + user_prompt).to_dict()
+    try:    
+        # Update app run status
+        AppRuns().update(
+            {'column': 'id', 'value': data.app_run_id},
+            {'status': 1}
+        )
+
+        # Initialize new execution record
+        record_id = AIToolLLMRecords().initialize_correction_record(
+            app_run_id=data.app_run_id,
+            ai_tool_type=2,
+            correct_prompt=input_,
+            user_prompt=data.correction_prompt
+        )
+
+        if not record_id:
+            return response_error(get_language_content("api_skill_generate_failed"))
+
+        return response_success(
+            {
+                'app_run_id': data.app_run_id,
+                'record_id': record_id
+            },
+            get_language_content("api_skill_success")
+        )
+    except Exception:
+        return response_error(get_language_content("api_skill_correction_failed"))
+
+
+@router.post("/skill_data_create", response_model=ResSkillCreateSchema)
+async def skill_data_create(data: ReqSkillDataCreateSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Create or update skill data with structured format
+    Args:
+        data: The skill data with standardized format including optional app_id
+        userinfo: The userinfo of the skill
+    Returns:
+        ID of created/updated skills
+    """
+    # No need to convert to dict here since we want to use Pydantic model properties
+    result = tools_db.skill_data_create(
+        data,
+        userinfo.uid,
+        userinfo.team_id
+    )
+
+    if result["status"] != 1:
+        return response_error(result["message"])
+
+    return response_success({
+        'id': result["skill_id"],
+        'app_id': result["app_id"]
+    })
+
+
+@router.post("/skill_debug", response_model=ResSkillRunSchema)
+async def skill_debug(data: ReqSkillDebugSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Debug skill by running it with test data without saving
+    Args:
+        data: The skill configuration and test data
+        userinfo: The user info object
+    Returns:
+        Execution results of the skill
+    """
+    try:
+        # Create node for validation
+        node = SkillNode(
+            title=data.name,
+            desc=data.description,
+            input=create_variable_from_dict(data.input_variables.dict()),
+            data={
+                'custom_code': data.code.dict(),
+                'code_dependencies': data.dependencies.dict(),
+                'output': create_variable_from_dict(data.output_variables.dict())
+            }
+        )
+
+        # Validate node configuration
+        node.validate()
+
+        # Validate input data format
+        input_dict = data.test_input
+        try:
+            create_variable_from_dict(input_dict)
+        except:
+            return response_error(get_language_content("input_dict_format_error"))
+        from core.workflow import Context
+        # Create a temporary context for running
+        context = Context()
+
+        # Run the node with test data
+        result = node.run(
+            context=context,
+            user_id=userinfo.uid,
+            app_id=0,  # Use 0 for testing
+            type=1  # Use draft type for testing
+        )
+
+        if result["status"] != "success":
+            return response_error(result["message"])
+
+        return response_success({"outputs": result["data"]["outputs"]})
+
+    except Exception as e:
+        return response_error(str(e))

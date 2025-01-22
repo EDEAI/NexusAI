@@ -616,3 +616,45 @@ export const saveAgentTemporarily = async (params: SaveAgentParams) => {
     });
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const skillCreate = async (user_prompt:string ) => {
+    return await aniRequest<any>(`/v1/skill/skill_generate`, {
+        method: 'POST',
+        data: {
+            user_prompt
+        },
+    });
+};
+
+
+
+export const skillRun = async (skill_id:string,input_dict) => {
+    return await aniRequest<any>(`/v1/skill/skill_run`, {
+        method: 'POST',
+        data: {
+            skill_id,input_dict
+        },
+    });
+};
+
+
+export const skillCorrection = async (app_run_id:string,correction_prompt) => {
+    return await aniRequest<any>(`/v1/skill/skill_correction`, {
+        method: 'POST',
+        data: {
+            app_run_id,correction_prompt
+        },
+    });
+};

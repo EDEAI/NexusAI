@@ -20,22 +20,67 @@ import CodeEditor from '../components/Editor/CodeEditor';
 import { NOT_SHOW_INPUT_RESULT_NODE, NOT_SHOW_OUTPUT_RESULT_NODE } from '../config';
 import useSaveWorkFlow from '../saveWorkFlow';
 import { BlockEnum } from '../types';
-
+interface TodoTagProps {
+    humanConfirmInfo: Array<{
+        user_id: string | number;
+        nickname: string;
+    }>;
+    userId: string | number;
+    onClick?: (e: React.MouseEvent) => void;
+}
 export default memo(() => {
     const intl = useIntl();
     const runPanelLogRecord = useUserStore(state => state.runPanelLogRecord);
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const [runPanelShow, setRunPanelShow] = useState(false);
-    const setDealtWithData = useSocketStore(state => state.setDealtWithData);
+    const setDealtWithData = useUserStore(state => state.setDealtWithData);
     const setFlowMessage = useSocketStore(state => state.setFlowMessage);
     const flowMessage = useSocketStore(state => state.flowMessage);
     const [loading, setLoading] = useState(false);
     const [runList, setRunList] = useState([]);
     const [tabKey, setTabKey] = useState('4');
     const [endRun, setEndRun] = useState(null);
-
+    const prevConfirmDealtWith = useUserStore(state => state.prevConfirmDealtWith);
     const saveWorkFlow = useSaveWorkFlow();
+    const userId = JSON.parse(localStorage.getItem('userInfo') || '{}')?.uid;
+    useUpdateEffect(() => {
+        const newList = runList.map(item => {
+            if (item.id == prevConfirmDealtWith.exec_id) {
+                item.need_human_confirm = 0;
+            }
+            return item;
+        });
+        setRunList(newList);
+    }, [prevConfirmDealtWith]);
 
+    const TodoTag = memo(({ humanConfirmInfo, userId, onClick }: TodoTagProps) => {
+        const intl = useIntl();
+
+        const isSelfTodo = humanConfirmInfo?.some(x => x.user_id == userId);
+
+        return (
+            <Tooltip
+                title={intl.formatMessage(
+                    { id: 'workflow.tooltip.confirmer' },
+                    {
+                        users: humanConfirmInfo?.map(x => x.nickname).join(','),
+                    },
+                )}
+            >
+                <Tag
+                    className="flex items-center justify-center"
+                    color="blue"
+                    onClick={isSelfTodo ? onClick : undefined}
+                >
+                    {intl.formatMessage({
+                        id: isSelfTodo
+                            ? 'workflow.needHumanConfirm1'
+                            : 'workflow.needHumanConfirm2',
+                    })}
+                </Tag>
+            </Tooltip>
+        );
+    });
     const onClose = () => {
         setRunPanelLogRecord(null);
         setRunPanelShow(false);
@@ -128,7 +173,10 @@ export default memo(() => {
                                             <Alert
                                                 message={
                                                     <div className="flex gap-2 flex-wrap ">
-                                                        {intl.formatMessage({ id: 'workflow.label.confirmer' })} :
+                                                        {intl.formatMessage({
+                                                            id: 'workflow.label.confirmer',
+                                                        })}{' '}
+                                                        :
                                                         {item?.human_confirm_info
                                                             ?.map(item => item.nickname)
                                                             .join('、')}
@@ -154,24 +202,7 @@ export default memo(() => {
                                             ></CodeEditor>
                                         </div>
                                     )}
-                                    {/* <List
-                                            header={
-                                                <Typography.Title level={5}>
-                                                    {intl.formatMessage({
-                                                        id: 'workflow.historyPrompt',
-                                                    })}
-                                                </Typography.Title>
-                                            }
-                                            dataSource={nodeInfo?.prompt_data}
-                                            renderItem={item => (
-                                                <List.Item>
-                                                    <List.Item.Meta
-                                                        title={Object.keys(item)[0]}
-                                                        description={Object.values(item)[0]}
-                                                    ></List.Item.Meta>
-                                                </List.Item>
-                                            )}
-                                        ></List> */}
+                           
                                     {nodeInfo.inputs &&
                                         !NOT_SHOW_INPUT_RESULT_NODE.includes(
                                             nodeInfo.node_type,
@@ -292,6 +323,21 @@ export default memo(() => {
                         }
 
                         if (nodeInfo.node_type == BlockEnum.Human) {
+                            if (nodeInfo.need_human_confirm == 1) {
+                                return (
+                                    <TodoTag
+                                        humanConfirmInfo={item.human_confirm_info}
+                                        userId={userId}
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            setDealtWithData({
+                                                ...item,
+                                                exec_id: item.id,
+                                            });
+                                        }}
+                                    />
+                                );
+                            }
                             return (
                                 <Tag
                                     icon={<CheckCircleOutlined></CheckCircleOutlined>}
@@ -318,32 +364,24 @@ export default memo(() => {
                                         <CheckCircleOutlined className="text-green-400"></CheckCircleOutlined>
                                     </div>
                                     {item?.need_human_confirm ? (
-                                        <Tooltip
-                                            title={intl.formatMessage(
-                                                { id: 'workflow.tooltip.confirmer' },
-                                                {
-                                                    users: item?.human_confirm_info
-                                                        .map(x => x.nickname)
-                                                        .join(','),
-                                                },
-                                            )}
-                                        >
-                                            <Tag
-                                                className="w-full flex items-center justify-center"
-                                                color="blue"
-                                            >
-                                                {intl.formatMessage({
-                                                    id: 'workflow.needHumanConfirm1',
-                                                })}
-                                            </Tag>
-                                        </Tooltip>
+                                        <TodoTag
+                                            humanConfirmInfo={item.human_confirm_info}
+                                            userId={userId}
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                setDealtWithData({
+                                                    ...item,
+                                                    exec_id: item.id,
+                                                });
+                                            }}
+                                        />
                                     ) : null}
                                 </div>
                             );
                         }
 
                         return <span className="text-red-500">ERROR</span>;
-                    }, [item]);
+                    }, [item, userId]);
                     return (
                         <div className="user-collapse">
                             <Collapse

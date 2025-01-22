@@ -287,7 +287,8 @@ export default {
 
     'creation.placeholder.selectTags': '请选择标签',
 
-    'workflow.needHumanConfirm1': '待确认',
+    'workflow.needHumanConfirm1': '待办',
+    'workflow.needHumanConfirm2': '有他人待办',
     'workflow.tooltip.confirmer': '待确认人: {users}',
     'workflow.label.confirmer': '待确认人',
 
@@ -296,4 +297,21 @@ export default {
 
     'agent.batch.count.tooltip': '选择单批次生成数量',
     'agent.batch.submit': '提交',
+
+    'agent.creation.button.skill.ai': 'AI创建技能',
+    'skill.create.title': 'AI创建技能',
+    'skill.before.title': '技能创建',
+    'skill.before.desc': '使用AI助手快速创建技能',
+    'skill.before.loading': '正在加载...',
+    'skill.create.beforeTitle': '技能创建',
+    'skill.create.beforeDesc': '使用AI助手快速创建技能',
+    'skill.create.loading': '正在生成...',
+    'skill.prompt.placeholder': '请输入技能描述，AI将帮助你创建技能...',
+    'skill.prompt.submit': '生成',
+    'skill.create.tooltip.regenerate': '调试技能',
+    'skill.create.tooltip.correct': '修正',
+    'skill.create.tooltip.save': '保存',
+    'skill.create.prompt.modify': '请输入修正建议...',
+    'skill.create.button.modify': '修正',
+    'skill.debug.title': '调试技能',
 };

@@ -481,7 +481,7 @@ async def show_chatroom_details(chatroom_id: int, page: int = 1, page_size: int 
 
 
 @router.post("/{chatroom_id}/chat_history_message_summary", response_model=ChatRoomResponseBase, summary="Chat History Message Summary")
-async def chat_history_summary(chatroom_id: int, chat_request: ChatHistoryMessageSummary, userinfo: TokenData = Depends(get_current_user)):
+async def chat_history_message_summary(chatroom_id: int, chat_request: ChatHistoryMessageSummary, userinfo: TokenData = Depends(get_current_user)):
     """
     Use specified properties to query existing applications.
     Distinguish between agents and workFlows based on the current application
@@ -754,10 +754,10 @@ async def chat_history_summary(chatroom_id: int, chat_request: ChatHistorySummar
 
         # user prompt
         user_prompt = get_language_content('chatroom_conference_orientation_user', userinfo.uid, False)
-
         user_prompt = user_prompt.format(
             meeting_summary=meeting_summary,
-            prompt_variables=prompt_variables
+            prompt_variables=prompt_variables,
+            prompt_variables_supplement=app_info['description']
         )
 
     input_messages = Prompt(system_prompt, user_prompt).to_dict()
@@ -898,7 +898,7 @@ async def get_chat_room_history(
     return response_success(result)
 
 
-@router.get('/chat_room_history_single', summary='Get chat room History Single', response_model=ChatRoomHistorySingle)
+@router.get('/chat_room_history_single', summary='Get chat room History Single', response_model=ChatHistoryListSingle)
 async def get_chat_room_history_single(
     chatroom_id: int,
     app_run_id: int,
@@ -913,4 +913,6 @@ async def get_chat_room_history_single(
         chatroom_id=chatroom_id,
         app_run_id=app_run_id
     )
+    print(111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111)
+    print(result)
     return response_success(result)

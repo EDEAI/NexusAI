@@ -1,5 +1,3 @@
-
-
 from pydantic import BaseModel
 from typing import Optional, Dict, Any,List
 from datetime import datetime
@@ -81,7 +79,8 @@ class ResSkillListSchema(BaseModel):
     data: Optional[ResSkillListResponseData] = None
 
 class ResSkilCreateData(BaseModel):
-   id: Optional[int] = None
+    id: Optional[int] = None
+    app_id: Optional[int] = None
 
 class ResSkillCreateSchema(BaseModel):
     code: Optional[int] = None
@@ -104,3 +103,51 @@ class ResSkillRunSchema(BaseModel):
     detail: Optional[str] = None
     data: Optional[ResSkillRunResponseData] = None
 
+class ReqSkillGenerateSchema(BaseModel):
+    user_prompt: Optional[str] = None
+
+class ResSkillGenerateData(BaseModel):
+    app_run_id: Optional[int] = None
+    record_id: Optional[int] = None
+
+class ResSkillGenerateSchema(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Optional[ResSkillGenerateData] = None
+
+class ReqSkillCorrectionSchema(BaseModel):
+    app_run_id: int
+    correction_prompt: str
+
+class ResSkillCorrectionData(BaseModel):
+    app_run_id: Optional[int] = None
+    record_id: Optional[int] = None
+
+class ResSkillCorrectionSchema(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Optional[ResSkillCorrectionData] = None
+
+class ReqSkillDataCreateSchema(BaseModel):
+    """Schema for creating or updating skill data"""
+    name: Optional[str] = None  # Optional for updates
+    description: Optional[str] = None  # Optional for updates
+    app_id: Optional[int] = None  # Required for updates
+    input_variables: Optional[Dict[str, Any]] = None
+    dependencies: Optional[Dict[str, Any]] = None
+    code: Optional[Dict[str, Any]] = None
+    output_type: Optional[int] = None
+    output_variables: Optional[Dict[str, Any]] = None
+    is_public: Optional[int] = None  # Added for app visibility control
+    tag_ids: Optional[List[int]] = None  # Added for tag management
+
+class ReqSkillDebugSchema(BaseModel):
+    """Schema for skill debugging without saving"""
+    name: str
+    description: str
+    input_variables: dict
+    dependencies: dict
+    code: dict
+    output_type: int  # 1:text 2:database 3:code 4:document
+    output_variables: dict
+    test_input: Dict[str, Any]  # Input data for testing

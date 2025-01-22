@@ -3,14 +3,7 @@ import { Footer } from '@/components';
 import { login, userinfo } from '@/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 import { creationsearchdata, userinfodata } from '@/utils/useUser';
-import {
-    AlipayCircleOutlined,
-    LockOutlined,
-    MobileOutlined,
-    TaobaoCircleOutlined,
-    UserOutlined,
-    WeiboCircleOutlined,
-} from '@ant-design/icons';
+import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormCaptcha, ProFormText } from '@ant-design/pro-components';
 import {
     FormattedMessage,
@@ -25,7 +18,6 @@ import { Alert, message, Tabs } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
 import Settings from '../../../../config/defaultSettings';
-import { useMount } from 'ahooks';
 
 const useStyles = createStyles(({ token }) => {
     return {
@@ -65,10 +57,10 @@ const useStyles = createStyles(({ token }) => {
 
 const Lang = () => {
     const { styles } = useStyles();
-
+    const LangIconLoaded = () => <img src="/icons/lang.svg" />;
     return (
         <div className={styles.lang} data-lang>
-            {SelectLang && <SelectLang />}
+            {SelectLang && <SelectLang icon={<LangIconLoaded />} />}
         </div>
     );
 };
@@ -172,23 +164,12 @@ const Login: React.FC = () => {
                     subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
                     initialValues={{
                         autoLogin: true,
-
                     }}
-
                     onFinish={async values => {
                         await handleSubmit(values as API.LoginParams);
                     }}
                 >
-                    <Tabs
-                        activeKey={type}
-                        onChange={setType}
-                        centered
-                        items={
-                            [
-
-                            ]
-                        }
-                    />
+                    <Tabs activeKey={type} onChange={setType} centered items={[]} />
 
                     {status === 'error' && loginType === 'account' && (
                         <LoginMessage
@@ -214,10 +195,7 @@ const Login: React.FC = () => {
                                     {
                                         required: true,
                                         message: (
-                                            <FormattedMessage
-                                                id="pages.login.username.required"
-
-                                            />
+                                            <FormattedMessage id="pages.login.username.required" />
                                         ),
                                     },
                                 ]}
@@ -230,16 +208,12 @@ const Login: React.FC = () => {
                                 }}
                                 placeholder={intl.formatMessage({
                                     id: 'pages.login.password.placeholder',
-
                                 })}
                                 rules={[
                                     {
                                         required: true,
                                         message: (
-                                            <FormattedMessage
-                                                id="pages.login.password.required"
-
-                                            />
+                                            <FormattedMessage id="pages.login.password.required" />
                                         ),
                                     },
                                 ]}
@@ -247,9 +221,7 @@ const Login: React.FC = () => {
                         </>
                     )}
 
-                    {status === 'error' && loginType === 'mobile' && (
-                        <LoginMessage content="" />
-                    )}
+                    {status === 'error' && loginType === 'mobile' && <LoginMessage content="" />}
                     {type === 'mobile' && (
                         <>
                             <ProFormText
@@ -260,25 +232,18 @@ const Login: React.FC = () => {
                                 name="mobile"
                                 placeholder={intl.formatMessage({
                                     id: 'pages.login.phoneNumber.placeholder',
-
                                 })}
                                 rules={[
                                     {
                                         required: true,
                                         message: (
-                                            <FormattedMessage
-                                                id="pages.login.phoneNumber.required"
-
-                                            />
+                                            <FormattedMessage id="pages.login.phoneNumber.required" />
                                         ),
                                     },
                                     {
                                         pattern: /^1\d{10}$/,
                                         message: (
-                                            <FormattedMessage
-                                                id="pages.login.phoneNumber.invalid"
-
-                                            />
+                                            <FormattedMessage id="pages.login.phoneNumber.invalid" />
                                         ),
                                     },
                                 ]}
@@ -293,18 +258,15 @@ const Login: React.FC = () => {
                                 }}
                                 placeholder={intl.formatMessage({
                                     id: 'pages.login.captcha.placeholder',
-
                                 })}
                                 captchaTextRender={(timing, count) => {
                                     if (timing) {
                                         return `${count} ${intl.formatMessage({
                                             id: 'pages.getCaptchaSecondText',
-
                                         })}`;
                                     }
                                     return intl.formatMessage({
                                         id: 'pages.login.phoneLogin.getVerificationCode',
-
                                     });
                                 }}
                                 name="captcha"
@@ -312,10 +274,7 @@ const Login: React.FC = () => {
                                     {
                                         required: true,
                                         message: (
-                                            <FormattedMessage
-                                                id="pages.login.captcha.required"
-
-                                            />
+                                            <FormattedMessage id="pages.login.captcha.required" />
                                         ),
                                     },
                                 ]}
@@ -326,7 +285,6 @@ const Login: React.FC = () => {
                                     if (!result) {
                                         return;
                                     }
-
                                 }}
                             />
                         </>
@@ -335,9 +293,7 @@ const Login: React.FC = () => {
                         style={{
                             marginBottom: 24,
                         }}
-                    >
-
-                    </div>
+                    ></div>
                 </LoginForm>
             </div>
             <Footer />
