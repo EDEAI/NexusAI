@@ -1,7 +1,7 @@
 import { ProForm, ProFormRadio, ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Spin, Typography } from 'antd';
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, memo, useEffect, useImperativeHandle, useState } from 'react';
 import TagSearch from '../TagSearch';
 import Variable from '../WorkFlow/components/Variable';
 
@@ -50,39 +50,43 @@ const ResultDisplay = memo(
             if (readOnly) return;
             const newValues = { ...values, ...updates };
             console.log('values', newValues);
-            
+
             setValues(newValues);
             onChange?.(newValues);
         };
 
-        const handleVariableChange = (type: 'input' | 'output') => (data: { value: any[]; free: any }) => {
-            const properties = data.value.reduce((acc, cur) => ({
-                ...acc,
-                [cur.name]: cur
-            }), {});
+        const handleVariableChange =
+            (type: 'input' | 'output') => (data: { value: any[]; free: any }) => {
+                const properties = data.value.reduce(
+                    (acc, cur) => ({
+                        ...acc,
+                        [cur.name]: cur,
+                    }),
+                    {},
+                );
 
-            if (type === 'input') {
-                handleChange({
-                    input_variables: {
-                        ...values.input_variables,
-                        properties
-                    }
-                });
-            } else {
-                handleChange({
-                    output_variables: {
-                        ...values.output_variables,
-                        properties
-                    }
-                });
-            }
-        };
+                if (type === 'input') {
+                    handleChange({
+                        input_variables: {
+                            ...values.input_variables,
+                            properties,
+                        },
+                    });
+                } else {
+                    handleChange({
+                        output_variables: {
+                            ...values.output_variables,
+                            properties,
+                        },
+                    });
+                }
+            };
 
         const handleDependenciesChange = (deps: string[]) => {
             handleChange({
                 dependencies: {
-                    python3: deps
-                }
+                    python3: deps,
+                },
             });
         };
 
@@ -92,7 +96,7 @@ const ResultDisplay = memo(
                     spinning={loading}
                     className="h-full"
                     wrapperClassName="!h-full"
-                    tip="正在生成..."
+                    tip="loading..."
                 >
                     <div className="h-full pb-10">
                         <div className="px-4 pt-6 flex items-center gap-2">
@@ -111,10 +115,7 @@ const ResultDisplay = memo(
                                     !readOnly ? 'hover:bg-blue-100' : ''
                                 } !mb-0 relative rounded-lg text-blue-600 text-[16px] flex items-center`}
                             >
-                                <img
-                                    src="/icons/agent_create.svg"
-                                    className="size-6 mr-1"
-                                ></img>
+                                <img src="/icons/agent_create.svg" className="size-6 mr-1"></img>
                                 {values.name}
                             </Paragraph>
                         </div>
@@ -159,8 +160,12 @@ const ResultDisplay = memo(
 
                             <div>
                                 <Variable
-                                    variables={Object.values(values.input_variables?.properties || {})}
-                                    title="输入变量"
+                                    variables={Object.values(
+                                        values.input_variables?.properties || {},
+                                    )}
+                                    title={intl.formatMessage({
+                                        id: 'skill.result.input.variables',
+                                    })}
                                     onChange={handleVariableChange('input')}
                                     variableTypes={['string', 'number', 'json']}
                                 />
@@ -187,9 +192,9 @@ const ResultDisplay = memo(
                                 onValuesChange={(_, allValues) => {
                                     handleChange({
                                         dependencies: {
-                                            python3: allValues.dependencies
+                                            python3: allValues.dependencies,
                                         },
-                                        output_type: allValues.output_type
+                                        output_type: allValues.output_type,
                                     });
                                 }}
                             >
@@ -212,24 +217,44 @@ const ResultDisplay = memo(
                                     }}
                                 />
                                 <ProFormRadio.Group
-                                    label="输出类型"
+                                    label={intl.formatMessage({ id: 'skill.result.output.type' })}
                                     name="output_type"
                                     formItemProps={{
                                         className: 'mb-0',
                                     }}
                                     fieldProps={{
                                         options: [
-                                            { label: '文本', value: 1 },
-                                            { label: '数据库', value: 2 },
-                                            { label: '代码', value: 3 },
-                                            { label: '文档', value: 4 },
+                                            {
+                                                label: intl.formatMessage({
+                                                    id: 'skill.result.output.type.text',
+                                                }),
+                                                value: 1,
+                                            },
+                                            {
+                                                label: intl.formatMessage({
+                                                    id: 'skill.result.output.type.database',
+                                                }),
+                                                value: 2,
+                                            },
+                                            {
+                                                label: intl.formatMessage({
+                                                    id: 'skill.result.output.type.code',
+                                                }),
+                                                value: 3,
+                                            },
+                                            {
+                                                label: intl.formatMessage({
+                                                    id: 'skill.result.output.type.document',
+                                                }),
+                                                value: 4,
+                                            },
                                         ],
                                     }}
                                 />
                             </ProForm>
                             <Variable
                                 variables={Object.values(values.output_variables?.properties || {})}
-                                title="输出变量"
+                                title={intl.formatMessage({ id: 'skill.result.output.variables' })}
                                 onChange={handleVariableChange('output')}
                                 variableTypes={['string', 'number', 'json']}
                             />
