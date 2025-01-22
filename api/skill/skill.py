@@ -290,7 +290,9 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
         await asyncio.sleep(0.1)
     result = task.get()
     if result["status"] != "success":
-        return response_error(result["message"])
+        return response_success({"outputs":{
+                'error': result["message"]
+            }})
     return response_success({"outputs": result["data"]["outputs"]})
 
 
@@ -522,7 +524,9 @@ async def skill_debug(data: ReqSkillDebugSchema, userinfo: TokenData = Depends(g
     try:
         result = task.get()
         if result["status"] != "success":
-            return response_error(result["message"])
+            return response_success({"outputs":{
+                'error': result["message"]
+            }})
         return response_success({"outputs": result["data"]["outputs"]})
     except Exception as e:
         return response_error(str(e))
