@@ -181,36 +181,36 @@ const SummaryHistoryDom: React.FC<{
                                                 })}
                                                 :
                                             </div>
-                                            {item?.source_corrections.map(item => (
+                                            {item?.source_corrections.map((citem,index) => (
                                                 <div
-                                                    key={item.created_time}
+                                                    key={citem.created_time}
                                                     className="mb-[16px] last-of-type:mb-0"
                                                 >
-                                                    <div className="last-of-type:bg-blue-100 rounded-[4px] bg-[#F7F7F7]">
+                                                    <div className={`rounded-[4px]  ${(item?.source_corrections.length-1)!=index? 'bg-[#F7F7F7]':'bg-blue-100'}`}>
                                                         <div className="p-[12px]   leading-[22px]">
                                                             <div className="tetx-[14px] font-[600] pb-[12px]">
                                                                 {intl.formatMessage({
                                                                     id: 'app.summaryhistory.userPrompt',
                                                                 })}
-                                                                : {item.user_prompt}
+                                                                : {citem.user_prompt}
                                                             </div>
                                                             <div className="tetx-[14px] font-[600] pb-[12px]">
                                                                 {intl.formatMessage({
                                                                     id: 'app.summaryhistory.time',
                                                                 })}
                                                                 :{' '}
-                                                                {timeConversion(item.created_time)}
+                                                                {timeConversion(citem.created_time)}
                                                             </div>
                                                             <ReactMarkdown
                                                                 rehypePlugins={[rehypeHighlight]}
                                                             >
-                                                                {item?.corrected_summary}
+                                                                {citem?.corrected_summary}
                                                             </ReactMarkdown>
                                                         </div>
                                                     </div>
                                                     <Redirect
                                                         id={id}
-                                                        message={item?.corrected_summary}
+                                                        message={citem?.corrected_summary}
                                                     />
                                                 </div>
                                             ))}
