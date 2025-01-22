@@ -1,12 +1,12 @@
+import { skillDebug } from '@/api/workflow';
 import { ProForm, ProFormInstance } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Modal } from 'antd';
+import { Modal, message } from 'antd';
+import _ from 'lodash';
 import { memo, useEffect, useRef, useState } from 'react';
 import CodeEditor from '../WorkFlow/components/Editor/CodeEditor';
 import RenderInput from '../WorkFlow/components/RunForm/RenderInput';
 import BeforeCreate from './BeforeCreate';
-import { skillDebug, skillRun } from '@/api/workflow';
-import _ from 'lodash';
 
 interface BugFixProps {
     open: boolean;
@@ -23,34 +23,40 @@ const BugFix = memo(({ open, onCancel, skillData }: BugFixProps) => {
     useEffect(() => {
         if (!open) {
             setSkillRunResult('');
-            formRef.current?.resetFields();
+            // formRef.current?.resetFields();
         }
     }, [open]);
 
     const handleCancel = () => {
         setSkillRunResult('');
-        formRef.current?.resetFields();
+        // formRef.current?.resetFields();
         onCancel();
     };
 
-    const onSubmit =async (val) => {
-        console.log(val,skillData);
-        const variable= _.cloneDeep(skillData?.input_variables||{});
+    const onSubmit = async val => {
+        console.log(val, skillData);
+        const variable = _.cloneDeep(skillData?.input_variables || {});
         Object.entries(val).forEach(([key, val]) => {
-            if(variable?.properties?.hasOwnProperty?.(key)){
-                variable.properties[key].value=val;
+            if (variable?.properties?.hasOwnProperty?.(key)) {
+                variable.properties[key].value = val;
             }
         });
         console.log(variable);
-        const debugData={
+
+        const debugData = {
             ...skillData,
+            code: JSON.stringify(skillData?.code || {}),
             test_input: variable,
+        };
+        const res = await skillDebug(debugData);
+        if (res.code == 0) {
+            setSkillRunResult(res.data?.outputs);
+            if(res.data?.error) {
+                message.error(intl.formatMessage({ id: 'skill.debug.run.error' }, { error: res.data.error }));
+            }
+        } else {
+            message.error(intl.formatMessage({ id: 'skill.debug.run.failed' }));
         }
-        const res=await skillDebug(debugData);
-        if(res.code==0){
-            setSkillRunResult('运行结果');
-        }
-        
     };
 
     return (
@@ -67,7 +73,7 @@ const BugFix = memo(({ open, onCancel, skillData }: BugFixProps) => {
             centered
         >
             <div className="flex gap-4 h-full relative">
-                <div className='w-3/4'>
+                <div className="w-3/4">
                     {skillRunResult ? (
                         <CodeEditor
                             language="python3"
@@ -83,13 +89,13 @@ const BugFix = memo(({ open, onCancel, skillData }: BugFixProps) => {
                         <BeforeCreate
                             hasHover={false}
                             icon="/icons/agent_skill.svg"
-                            title={`技能调试`}
-                            loadingText={`运行中`}
+                            title={intl.formatMessage({ id: 'skill.debug.title' })}
+                            loadingText={intl.formatMessage({ id: 'skill.debug.loading' })}
                         />
                     )}
                 </div>
 
-                <div className="w-1/2">
+                <div className="w-1/2 h-full overflow-y-auto">
                     <ProForm
                         formRef={formRef}
                         submitter={{
@@ -99,7 +105,7 @@ const BugFix = memo(({ open, onCancel, skillData }: BugFixProps) => {
                             },
                             searchConfig: {
                                 submitText: intl.formatMessage({
-                                    id: 'workflow.button.run',
+                                    id: 'skill.debug.button.run',
                                 }),
                             },
                         }}

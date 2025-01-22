@@ -663,3 +663,10 @@ export const skillCorrection = async (app_run_id:string,correction_prompt) => {
         },
     });
 };
+export const skillDataCreate= async (createData) => {
+    return await aniRequest<any>(`/v1/skill/skill_data_create`, {
+        method: 'POST',
+        data:createData,
+    });
+};
+
