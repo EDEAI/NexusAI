@@ -24,7 +24,7 @@ running = True  # Global flag to control thread loops
 app_run = AppRuns()
 ai_tool_llm_records = AIToolLLMRecords()
 agents = Agents()
-single_or_multiple = True  # Batch generation switch   True: Multiple agent generation, False: Single agent generation
+single_or_multiple = False  # Batch generation switch   True: Multiple agent generation, False: Single agent generation
 
 
 def update_app_run(app_run_id: int, data: dict) -> bool:
@@ -432,7 +432,18 @@ def task_callback_thread():
                                 # Single agent generation
                                 if loop_count > 0:
                                     inputs_new = ai_tool_llm_records.inputs_append_history_outputs(app_run_id, loop_id)
-                                    ai_tool_llm_records.initialize_execution_record(app_run_id, run_ai_tool_type, 4, loop_id, loop_limit, loop_count, inputs_new)
+                                    # ai_tool_llm_records.initialize_execution_record(app_run_id, run_ai_tool_type, 4, loop_id, loop_limit, loop_count, inputs_new, single_or_multiple)
+
+                                    ai_tool_llm_records.initialize_execution_record(
+                                        app_run_id=app_run_id,
+                                        ai_tool_type=run_ai_tool_type,
+                                        run_type=4,
+                                        loop_id=loop_id,
+                                        loop_limit=loop_limit,
+                                        loop_count=loop_count,
+                                        inputs=inputs_new,
+                                        single_or_multiple=single_or_multiple
+                                    )
                                     app_run_data = {
                                         'status': 1
                                     }
@@ -466,6 +477,10 @@ def task_callback_thread():
                                 if loop_count == 0:
                                     # 拼接所有agent的输出结果并返回给前端（需要调用郑帅的接口）
                                     outPuts = ai_tool_llm_records.append_record_outputs(app_run_id, loop_id)
+                                    outPuts['value'] = json.dumps(outPuts['value'], ensure_ascii=False)
+                                    # logger.info("---------------------------------------------------------------------------------------------------")
+                                    # logger.info(f"outPuts:{outPuts}")
+                                    # logger.info("---------------------------------------------------------------------------------------------------")
                                     push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', outPuts, elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
                         else:
                             push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
