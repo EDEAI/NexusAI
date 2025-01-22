@@ -22,6 +22,7 @@ interface VariableList {
     variables?: VariableItem[];
     onChange?: (obj: { value: VariableItem[]; free: ObjectVariable }) => void;
     title?: React.ReactNode;
+    variableTypes?: string[];
 }
 
 type VariableProps = VariableItem & {
@@ -38,6 +39,7 @@ const Variable = memo((props: VariableProps) => {
         string: <img src="/icons/text.svg" className='size-4' />,
         long_string: intl.formatMessage({ id: 'workflow.vars.paragraph', defaultMessage: '' }),
         number:  <img src="/icons/number.svg" className='size-4' />,
+        json: <img src="/icons/json.svg" className='size-4' />
     };
     return (
         <div
@@ -201,18 +203,20 @@ export default memo((props: VariableList) => {
                             buttonStyle: 'solid',
                             onChange: e => setType(e.target.value),
                         }}
-                        options={[
+                        options={props.variableTypes?.map(type => ({
+                            label: intl.formatMessage({ id: `workflow.vars.${type}` }),
+                            value: type,
+                        })) || [
                             {
                                 label: intl.formatMessage({ id: 'workflow.vars.text' }),
                                 value: 'string',
                             },
-
                             {
                                 label: intl.formatMessage({ id: 'workflow.vars.number' }),
                                 value: 'number',
                             },
                         ]}
-                    ></ProFormRadio.Group>
+                    />
                     <ProFormText
                         name={'name'}
                         label={intl.formatMessage({ id: 'workflow.vars.variableName' })}

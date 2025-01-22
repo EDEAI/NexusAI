@@ -81,16 +81,29 @@ def run_app(
                 data_source_run_id = kwargs['data_source_run_id'],
             )
         case 'skill':
-            skill = CustomTools().get_skill_by_id(id_)
-            app_id = skill['app_id']
-            run_type = 1 if skill['publish_status'] == 0 else 2
-            app = Apps().get_app_by_id(app_id)
-            node = SkillNode(
-                title=app['name'],
-                desc=app['description'],
-                input=input_,
-                skill_id=id_
-            )
+            if 'custom_data' in kwargs:
+                app_id = 0
+                run_type = 2
+                custom_data = kwargs['custom_data'] 
+                node = SkillNode(
+                    title=custom_data['name'],
+                    desc=custom_data['description'],
+                    input=input_,
+                    skill_id=id_,
+                    custom_data=custom_data
+                )
+                kwargs['custom_data'] = kwargs['custom_data'] 
+            else:
+                skill = CustomTools().get_skill_by_id(id_)
+                app_id = skill['app_id']
+                run_type = 1 if skill['publish_status'] == 0 else 2
+                app = Apps().get_app_by_id(app_id)
+                node = SkillNode(
+                    title=app['name'],
+                    desc=app['description'],
+                    input=input_,
+                    skill_id=id_
+                )
         case _:
             raise ValueError(f'Invalid app type: {app_type}')
         

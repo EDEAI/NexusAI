@@ -166,6 +166,8 @@ const RunsWorkFlow:FC<params>=(params) =>{
                 originalVariate.current = object
                 let prokeys = Object.keys(object.properties);
                 if(prokeys.length){
+                    console.log(object.properties);
+                    
                     setcurrentVariate(object.properties);
                 }
                 setinputShow(false)
@@ -203,7 +205,22 @@ const RunsWorkFlow:FC<params>=(params) =>{
                         <RenderInput data={currentVariate}/>
                     </div>
                     <RenderConfirm data={confirmNodes} />
-                </ProForm>:<></>}
+                </ProForm>
+                :<>
+                  {currentVariate!=null?Object.values(currentVariate).map((item:any)=>(
+                        <div>
+                            <div className='text-[16px] color-[#000] font-[600] py-[12px]'>{intl.formatMessage({id:'app.summaryhistory.input'})}:</div>
+                            
+                            <div>
+                                    <div className='pb-[8px] font-[600]'>{item.display_name || item.name}</div>
+                                    
+                                <div className='py-[4px] px-[11px] text-[14px] leading-[1.5] '>{item.value}</div>
+                            </div>
+                            
+                        </div>
+                  )):<></>}
+                </>
+            }
             
             {backData &&  backData.need_human_confirm != 0?
                 <div className='pt-[12px]'>

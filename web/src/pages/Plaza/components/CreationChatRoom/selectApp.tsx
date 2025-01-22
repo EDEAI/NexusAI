@@ -311,12 +311,12 @@ const Content: React.FC<params> = param => {
                                         <Row gutter={[15, 15]}>
                                             {isMyList() && isMyList().length ? (
                                                 isMyList().map((item: any, index: any) => (
-                                                    <Col span={checkCurrent.length?8:6} key={item.app_id}>
+                                                    <Col span={checkCurrent.length && !radio?8:6} key={item.app_id}>
                                                         <div
                                                             className={`bg-[#fff] flex gap-x-[20px] p-[10px] cursor-pointer border-solid border-[1px] rounded-[4px] ${
                                                                 !item.check
                                                                     ? 'border-[#eee]'
-                                                                    : 'border-gray-100'
+                                                                    : radio?'border-[#1b64f3]':'border-gray-100'
                                                             }`}
                                                             onClick={() => {
                                                                 radio?radiocheckMyItem(
@@ -342,13 +342,13 @@ const Content: React.FC<params> = param => {
                                                                 <div className={`text-[12px] font-[500] w-full truncate ${
                                                                 !item.check
                                                                     ? 'text-[#213044]'
-                                                                    : 'text-gray-300'
+                                                                    : radio?'text-[#213044]':'text-gray-300'
                                                             }`}>
                                                                     {item.name}
                                                                 </div>
                                                                 <div className={`text-[12px] w-full truncate ${!item.check
                                                                     ? 'text-[#999]'
-                                                                    : 'text-gray-300'}`}>
+                                                                    : radio?'text-[#999]':'text-gray-300'}`}>
                                                                     {item.description}
                                                                 </div>
                                                             </div>
@@ -377,7 +377,7 @@ const Content: React.FC<params> = param => {
                                 </Scroll>
                             </div>
                         </div>
-                        {(myList.length || moreList.length) && checkCurrent && checkCurrent.length ? 
+                        {!radio && (myList.length || moreList.length) && checkCurrent && checkCurrent.length ? 
                         <div className='h-full flex flex-col'  style={{boxShadow:'rgba(0, 0, 0, 0.1) 0px 0px 3px 0px'}}>
                             <div className='py-[10px] px-[10px] text-[14px]'>{intl.formatMessage({id:'app.check_popup.add'})}{intl.formatMessage({id:`app.check_${nodetype}_popup.name`})}</div>
                             <div className='w-[260px]  overflow-y-auto flex-1 min-w-0 min-h-0'>
