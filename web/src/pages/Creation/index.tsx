@@ -344,6 +344,23 @@ const Creation: React.FC = () => {
              
                 clearUpdateNotification(UPDATE_NOTIFICATIONS.AGENT_LIST);
             }
+            if (shouldComponentUpdate(UPDATE_NOTIFICATIONS.SKILL_LIST, lastCheck)) {
+          
+                const notification = useUserStore.getState().updateNotifications.get(UPDATE_NOTIFICATIONS.SKILL_LIST);
+                
+           
+                if (notification?.payload?.action === 'create') {
+             
+                    getChatRoomList(4, null);
+                } else {
+                  
+                    getChatRoomList(4, null);
+                }
+            
+                setLastCheck(Date.now());
+             
+                clearUpdateNotification(UPDATE_NOTIFICATIONS.SKILL_LIST);
+            }
         };
     
         const timer = setInterval(checkUpdate, 1000);
@@ -878,6 +895,7 @@ const Creation: React.FC = () => {
                                                                       onOpenChange={newopen => {
                                                                           setOpensetting(-1);
                                                                       }}
+                                                                      mouseLeaveDelay={1}
                                                                       content={
                                                                           <div>
                                                                               <div>
