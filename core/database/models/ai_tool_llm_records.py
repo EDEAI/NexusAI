@@ -175,7 +175,7 @@ class AIToolLLMRecords(MySQL):
         )
         return status
 
-    def inputs_append_history_outputs(self, app_run_id: int, loop_id: int = 0, agent_supplement: str = None) -> dict:
+    def inputs_append_history_outputs(self, app_run_id: int, loop_id: int = 0, agent_supplement: str = None, user_id: int = 0) -> dict:
         """
         Append outputs values from all records and prepare prompts for batch generation
         
@@ -190,16 +190,7 @@ class AIToolLLMRecords(MySQL):
         from languages import get_language_content
         from core.llm.prompt import Prompt
 
-        # Get user ID from app_runs
-        userinfo = self.select_one(
-            joins=[
-                ['left', 'app_runs', 'ai_tool_llm_records.app_run_id = app_runs.id']
-            ],
-            columns=['app_runs.user_id'],
-            conditions=[
-                {"column": "ai_tool_llm_records.app_run_id", "value": app_run_id},
-            ]
-        )
+        
 
         # Get all records for current batch
         batch_records = self.select(
@@ -222,12 +213,23 @@ class AIToolLLMRecords(MySQL):
 
         # Prepare prompts based on whether this is a continuation or new batch
         if batch_records:
+            # Get user ID from app_runs
+            userinfo = self.select_one(
+                joins=[
+                    ['left', 'app_runs', 'ai_tool_llm_records.app_run_id = app_runs.id']
+                ],
+                columns=['app_runs.user_id'],
+                conditions=[
+                    {"column": "ai_tool_llm_records.app_run_id", "value": app_run_id},
+                ]
+            )
+            user_id = userinfo['user_id']
             # Get base user prompt from first record of current batch
             agent_supplement = batch_records[0].get('user_prompt', '')
             
         # Prepare system prompt
-        system_prompt = get_language_content('agent_batch_one_system', userinfo['user_id'])
-        user_prompt = get_language_content('agent_batch_one_user', userinfo['user_id'], False)
+        system_prompt = get_language_content('agent_batch_one_system', user_id)
+        user_prompt = get_language_content('agent_batch_one_user', user_id, False)
         user_prompt = user_prompt.format(
             agent_batch_requirements=agent_supplement,
             history_agents=outputs_list
