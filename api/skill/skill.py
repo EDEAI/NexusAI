@@ -507,45 +507,11 @@ async def skill_debug(data: ReqSkillDebugSchema, userinfo: TokenData = Depends(g
     Returns:
         Execution results of the skill
     """
-    try:
-        # Create node for validation
-        node = SkillNode(
-            title=data.name,
-            desc=data.description,
-            input=create_variable_from_dict(data.input_variables),
-            output=create_variable_from_dict(data.output_variables),
-            data={
-                'custom_code': data.code,
-                'code_dependencies': data.dependencies,
-                'output': create_variable_from_dict(data.output_variables)
-            }
-        )
-
-        # Validate node configuration
-        node.validate()
-
-        # Validate input data format
-        input_dict = data.test_input
-        try:
-            create_variable_from_dict(input_dict)
-        except:
-            return response_error(get_language_content("input_dict_format_error"))
-        from core.workflow import Context
-        # Create a temporary context for running
-        context = Context()
-
-        # Run the node with test data
-        result = node.run(
-            context=context,
-            user_id=userinfo.uid,
-            app_id=0,  # Use 0 for testing
-            type=1  # Use draft type for testing
-        )
-
-        if result["status"] != "success":
-            return response_error(result["message"])
-
-        return response_success({"outputs": result["data"]["outputs"]})
-
-    except Exception as e:
-        return response_error(str(e))
+    task = run_app.delay(app_type="skill",id_ = 0 ,user_id=userinfo.uid, input_dict=data.test_input,custom_data = data.dict(exclude_unset=True))
+    while not task.ready():
+        await asyncio.sleep(0.1)
+    print(task)
+    result = task.get()
+    if result["status"] != "success":
+        return response_error(get_language_content(result["message"]))
+    return response_success({"outputs": result["data"]["outputs"]})

@@ -147,7 +147,7 @@ class ReqSkillDebugSchema(BaseModel):
     description: str
     input_variables: dict
     dependencies: dict
-    code: Optional[dict] = None
+    code: Optional[str] = None
     output_type: int  # 1:text 2:database 3:code 4:document
     output_variables: dict
     test_input: Dict[str, Any]  # Input data for testing
