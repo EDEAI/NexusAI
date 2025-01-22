@@ -222,7 +222,7 @@ class AppRuns(MySQL):
         result = self.execute_query(sql)
         return result.rowcount > 0
 
-    def get_search_app_run_team_id(self, app_run_id) -> [Dict[str, Any]]:
+    def get_search_app_run_team_id(self, app_run_id) -> Dict[str, Any]:
         """
         Gets the count of running app runs for a specific workflow.
 
