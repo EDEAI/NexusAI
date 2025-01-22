@@ -13,7 +13,7 @@ class AIToolLLMRecords(MySQL):
     """
     have_updated_time = True
 
-    def initialize_execution_record(self, app_run_id: int, ai_tool_type: int, run_type: int = 1, loop_id: int = 0, loop_limit: int = 0, loop_count: int = 0, inputs: Dict[str, Any] = None, correct_prompt: Dict[str, Any] = None, user_prompt: str = None) -> int:
+    def initialize_execution_record(self, app_run_id: int, ai_tool_type: int, run_type: int = 1, loop_id: int = 0, loop_limit: int = 0, loop_count: int = 0, inputs: Dict[str, Any] = None, correct_prompt: Dict[str, Any] = None, user_prompt: str = None, single_or_multiple: bool = True) -> int:
         """
         Initializes an execution record with the given parameters.
         
@@ -27,11 +27,14 @@ class AIToolLLMRecords(MySQL):
             inputs (Dict[str, Any]): The inputs for the execution record.
             correct_prompt (Dict[str, Any]): The correct prompt for the execution record.
             user_prompt (str, optional): The user-provided prompt. Defaults to None.
+            single_or_multiple(bool)  # Batch generation switch   True: Multiple agent generation, False: Single agent generation
         
         Returns:
             int: The ID of the newly created record.
         """
-        # loop_count = max(loop_count - 1, 0)
+        if single_or_multiple is False:
+            loop_count = max(loop_count - 1, 0)
+
         record = {
             'app_run_id': app_run_id,
             'status': 1,
@@ -50,7 +53,7 @@ class AIToolLLMRecords(MySQL):
 
         return self.insert(record)
 
-    def initialize_correction_record(self, app_run_id: int, ai_tool_type: int, user_prompt: str = None, loop_count: int = 0, correct_prompt: Dict[str, Any] = None) -> int:
+    def initialize_correction_record(self, app_run_id: int, ai_tool_type: int, user_prompt: str = None, loop_count: int = 0, correct_prompt: Dict[str, Any] = None, single_or_multiple: bool = True) -> int:
         """
         Initializes an AI correction record with the given parameters.
         
@@ -60,6 +63,7 @@ class AIToolLLMRecords(MySQL):
             loop_count (int): The number of iterations required for looping.
             user_prompt (str, optional): The user-provided prompt. Defaults to None.
             correct_prompt (Dict[str, Any]): The correct prompt for the correction record.
+            single_or_multiple(bool)  # Batch generation switch   True: Multiple agent generation, False: Single agent generation
         
         Returns:
             int: The ID of the newly created correction record.
@@ -85,7 +89,7 @@ class AIToolLLMRecords(MySQL):
         )
 
         # Initialize the next correction record
-        return self.initialize_execution_record(app_run_id, ai_tool_type, 3, loop_count, correct_prompt=correct_prompt, user_prompt=user_prompt)
+        return self.initialize_execution_record(app_run_id, ai_tool_type, 3, loop_count, correct_prompt=correct_prompt, user_prompt=user_prompt, single_or_multiple=single_or_multiple)
 
     def get_pending_ai_tool_tasks(self) -> List[Dict[str, Any]]:
         """
@@ -280,7 +284,6 @@ class AIToolLLMRecords(MySQL):
         # Return formatted prompts
         return Prompt(system=system_prompt, user=user_prompt).to_dict()
 
-
     def get_record_loop_count(self, app_run_id: int, loop_id: int) -> int:
         result = self.select(
             aggregates={"loop_count": "sum"},
@@ -291,3 +294,65 @@ class AIToolLLMRecords(MySQL):
         )
         return result[0]["sum_loop_count"] if result else 0
        
+    def append_record_outputs(self, app_run_id: int, loop_id: int) -> List[Dict[str, Any]]:
+        """
+        Retrieve and process outputs from records for a specific app run and loop iteration
+        
+        Args:
+            app_run_id (int): The ID of the application run
+            loop_id (int): The ID of the loop iteration
+            
+        Returns:
+            List[Dict[str, Any]]: List of processed output values from the records
+            
+        Note:
+            - Gets the current generation count from the latest record
+            - Retrieves records up to the current generation count
+            - Extracts and validates output values from each record
+            - Filters out invalid/empty outputs
+        """
+        try:
+            # Get current generation count from latest record
+            latest_record = self.select_one(
+                columns=['current_gen_count'],
+                conditions=[
+                    {"column": "app_run_id", "value": app_run_id},
+                    {"column": "loop_id", "value": loop_id}
+                ],
+                order_by='id DESC',
+                limit=1
+            )
+            
+            if not latest_record or 'current_gen_count' not in latest_record:
+                return []
+                
+            gen_count = latest_record['current_gen_count']
+            
+            # Get records up to current generation count
+            records = self.select(
+                columns=['outputs'],
+                conditions=[
+                    {"column": "app_run_id", "value": app_run_id},
+                    {"column": "loop_id", "value": loop_id}
+                ],
+                limit=gen_count
+            )
+
+            # Process and validate outputs
+            outputs_list = []
+            for record in records:
+                outputs = record.get('outputs')
+                if not outputs or not isinstance(outputs, dict):
+                    continue
+                    
+                output_value = outputs.get('value')
+                if output_value:
+                    outputs_list.append(output_value)
+
+            return outputs_list
+            
+        except Exception as e:
+            # Log error if needed
+            return []
+
+

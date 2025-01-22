@@ -24,6 +24,7 @@ running = True  # Global flag to control thread loops
 app_run = AppRuns()
 ai_tool_llm_records = AIToolLLMRecords()
 agents = Agents()
+single_or_multiple = True  # Batch generation switch   True: Multiple agent generation, False: Single agent generation
 
 
 def update_app_run(app_run_id: int, data: dict) -> bool:
@@ -413,25 +414,61 @@ def task_callback_thread():
                         app_run_prompt_tokens = run['prompt_tokens'] + prompt_tokens
                         app_run_completion_tokens = run['completion_tokens'] + completion_tokens
                         app_run_total_tokens = run['total_tokens'] + total_tokens
-                        # if loop_count > 0:
-                        #     inputs_new = ai_tool_llm_records.inputs_append_history_outputs(app_run_id, loop_id)
-                        #     ai_tool_llm_records.initialize_execution_record(app_run_id, run_ai_tool_type, 4, loop_id, loop_limit, loop_count, inputs_new)
-                        #     app_run_data = {
-                        #         'status': 1
-                        #     }
-                        # else:
-                        app_run_data = {
-                            'status': 3,
-                            'outputs': result['data']['outputs'],
-                            'elapsed_time': app_run_elapsed_time,
-                            'prompt_tokens': app_run_prompt_tokens,
-                            'completion_tokens': app_run_completion_tokens,
-                            'total_tokens': app_run_total_tokens,
-                            'finished_time': end_time
-                        }
+                        # single_or_multiple
+                        if run_ai_tool_type == 1 and ai_tool_type == 'generate_agent_batch':
+                            # Batch generation switch   True: Multiple agent generation, False: Single agent generation
+                            if single_or_multiple:
+                                # Multiple agent generation
+                                app_run_data = {
+                                    'status': 3,
+                                    'outputs': result['data']['outputs'],
+                                    'elapsed_time': app_run_elapsed_time,
+                                    'prompt_tokens': app_run_prompt_tokens,
+                                    'completion_tokens': app_run_completion_tokens,
+                                    'total_tokens': app_run_total_tokens,
+                                    'finished_time': end_time
+                                }
+                            else:
+                                # Single agent generation
+                                if loop_count > 0:
+                                    inputs_new = ai_tool_llm_records.inputs_append_history_outputs(app_run_id, loop_id)
+                                    ai_tool_llm_records.initialize_execution_record(app_run_id, run_ai_tool_type, 4, loop_id, loop_limit, loop_count, inputs_new)
+                                    app_run_data = {
+                                        'status': 1
+                                    }
+                                else:
+                                    app_run_data = {
+                                        'status': 3,
+                                        'outputs': result['data']['outputs'],
+                                        'elapsed_time': app_run_elapsed_time,
+                                        'prompt_tokens': app_run_prompt_tokens,
+                                        'completion_tokens': app_run_completion_tokens,
+                                        'total_tokens': app_run_total_tokens,
+                                        'finished_time': end_time
+                                    }
+                        else:
+                            app_run_data = {
+                                'status': 3,
+                                'outputs': result['data']['outputs'],
+                                'elapsed_time': app_run_elapsed_time,
+                                'prompt_tokens': app_run_prompt_tokens,
+                                'completion_tokens': app_run_completion_tokens,
+                                'total_tokens': app_run_total_tokens,
+                                'finished_time': end_time
+                            }
                         update_app_run(app_run_id, app_run_data)
-
-                        push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
+                        if run_ai_tool_type == 1 and ai_tool_type == 'generate_agent_batch':
+                            if single_or_multiple:
+                                # Multiple agent generation
+                                push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
+                            else:
+                                # Single agent generation
+                                if loop_count == 0:
+                                    # 拼接所有agent的输出结果并返回给前端（需要调用郑帅的接口）
+                                    outPuts = ai_tool_llm_records.append_record_outputs(app_run_id, loop_id)
+                                    push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', outPuts, elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
+                        else:
+                            push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
                     else:
                         update_app_run(app_run_id, {'status': 4, 'error': result['message']})
                         update_ai_run(id, {'status': 4, 'error': result['message']})
