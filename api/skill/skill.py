@@ -20,6 +20,7 @@ apps_db = Apps()
 nodes = Nodes()
 tagbindings = TagBindings()
 
+
 # Create custom tool
 @router.post("/skill_create", response_model=ResSkillCreateSchema)
 async def skill_create(tool: ReqSkillCreateSchema, userinfo: TokenData = Depends(get_current_user)):
@@ -46,7 +47,8 @@ async def skill_create(tool: ReqSkillCreateSchema, userinfo: TokenData = Depends
 
 # Read all custom tool
 @router.get("/skill_list", response_model=ResSkillListSchema)
-async def skill_list(page: int = 1, page_size: int = 10, skill_search_type: int = 1,  name: str = "",userinfo: TokenData = Depends(get_current_user)):
+async def skill_list(page: int = 1, page_size: int = 10, skill_search_type: int = 1, name: str = "",
+                     userinfo: TokenData = Depends(get_current_user)):
     """
         Read all custom tool
         :param page: The page of the skill.
@@ -64,7 +66,7 @@ async def skill_list(page: int = 1, page_size: int = 10, skill_search_type: int 
 
 # Read single custom tool
 @router.get("/skill_info/{app_id}", response_model=ResSkillBaseInfoSchema)
-async def skill_info( app_id: int, publish_status: int, userinfo: TokenData = Depends(get_current_user)):
+async def skill_info(app_id: int, publish_status: int, userinfo: TokenData = Depends(get_current_user)):
     """
     Read all custom tool
     :param app_id: The app_id of the skill.
@@ -76,7 +78,7 @@ async def skill_info( app_id: int, publish_status: int, userinfo: TokenData = De
         return response_error(get_language_content("invalid_app_id"))
     if publish_status not in [0, 1]:
         return response_error(get_language_content("publish_status_invalid"))
-    result = tools_db.get_skill_info(userinfo.uid, app_id, publish_status,userinfo.team_id)
+    result = tools_db.get_skill_info(userinfo.uid, app_id, publish_status, userinfo.team_id)
     if result["status"] != 1:
         return response_error(get_language_content(result["message"]))
 
@@ -115,6 +117,7 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
     except:
         return response_error(get_language_content("update_error"))
 
+
 @router.put("/skill_publish/{app_id}", response_model=ResSkillPublishSchema)
 async def skill_publish(app_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
@@ -131,16 +134,16 @@ async def skill_publish(app_id: int, userinfo: TokenData = Depends(get_current_u
     draft_info = draft_info['data']
     app = Apps().get_app_by_id(app_id)
     node = SkillNode(
-            title=app['name'],
-            desc=app['description'],
-            input=create_variable_from_dict(draft_info['input_variables']),
-            skill_id=draft_info['id']
-            )
+        title=app['name'],
+        desc=app['description'],
+        input=create_variable_from_dict(draft_info['input_variables']),
+        skill_id=draft_info['id']
+    )
     try:
         node.validate()
     except Exception as e:
         return response_error(str(e))
-    
+
     tool_data = {
         "team_id": draft_info['team_id'],
         "user_id": draft_info['user_id'],
@@ -161,7 +164,8 @@ async def skill_publish(app_id: int, userinfo: TokenData = Depends(get_current_u
         tool_id = tools_db.insert(tool_data)
         return response_success({'id': tool_id})
     else:
-        tools_db.update([{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id}, {'column': 'publish_status', 'value': 1}], tool_data)
+        tools_db.update([{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
+                         {'column': 'publish_status', 'value': 1}], tool_data)
         apps_data = {
             "publish_status": 1,
             "updated_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -189,6 +193,7 @@ async def delete_skill_by_app_id(app_id: int, userinfo: TokenData = Depends(get_
     if not deleted:
         return response_error(get_language_content("skill_not_found"))
     return response_success()
+
 
 # Soft delete custom tool
 @router.put("/skill_delete/{id}/soft")
@@ -221,6 +226,7 @@ async def skill_delete(app_id: int, userinfo: TokenData = Depends(get_current_us
     if not deleted:
         return response_error(get_language_content("skill_not_found"))
     return response_success()
+
 
 @router.post("/skill_run", response_model=ResSkillRunSchema)
 async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_current_user)):
@@ -284,23 +290,24 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
         await asyncio.sleep(0.1)
     result = task.get()
     if result["status"] != "success":
-        return response_error(get_language_content(result["message"]))
+        return response_error(result["message"])
     return response_success({"outputs": result["data"]["outputs"]})
+
 
 @router.post("/skill_generate", response_model=ResSkillGenerateSchema)
 async def skill_generate(data: ReqSkillGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
     """
     Generate skill based on user prompt using LLM
-    
+
     Args:
         data: Request data containing user prompt for skill generation
         userinfo: User authentication info
-        
+
     Returns:
         Dictionary containing:
         - app_run_id: ID of the app run record
         - record_id: ID of the LLM execution record
-        
+
     Flow:
         1. Validates user prompt
         2. Creates app run record
@@ -314,7 +321,7 @@ async def skill_generate(data: ReqSkillGenerateSchema, userinfo: TokenData = Dep
 
     # Create app run record
     start_datetime_str = datetime.fromtimestamp(time()) \
-            .replace(microsecond=0).isoformat(sep='_')
+        .replace(microsecond=0).isoformat(sep='_')
     app_run_id = AppRuns().insert({
         'user_id': userinfo.uid,
         'app_id': 0,
@@ -357,22 +364,23 @@ async def skill_generate(data: ReqSkillGenerateSchema, userinfo: TokenData = Dep
         get_language_content("api_skill_success")
     )
 
+
 @router.post("/skill_correction", response_model=ResSkillCorrectionSchema)
 async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData = Depends(get_current_user)):
     """
     Correct/improve existing skill based on user feedback using LLM
-    
+
     Args:
         data: Request data containing:
             - app_run_id: ID of original skill generation run
             - correction_prompt: User feedback for improvement
         userinfo: User authentication info
-        
+
     Returns:
         Dictionary containing:
         - app_run_id: ID of the app run record
         - record_id: ID of the new LLM correction record
-        
+
     Flow:
         1. Validates app run exists and belongs to user
         2. Retrieves original generation context and results
@@ -391,7 +399,7 @@ async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData =
 
     if not app_run_info:
         return response_error(get_language_content('app_run_error'))
-    
+
     first_record = AIToolLLMRecords().select_one(
         columns=['id', 'inputs', 'correct_prompt'],
         conditions=[
@@ -422,8 +430,8 @@ async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData =
         ],
         order_by='id DESC'
     )
-    
-     # Extract agent info from outputs
+
+    # Extract agent info from outputs
     history_skill_info = {}
     try:
         if isinstance(last_record, dict) and 'outputs' in last_record:
@@ -442,7 +450,7 @@ async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData =
     )
 
     input_ = Prompt(system=system_prompt, user=base_user_prompt + user_prompt).to_dict()
-    try:    
+    try:
         # Update app run status
         AppRuns().update(
             {'column': 'id', 'value': data.app_run_id},
@@ -507,11 +515,14 @@ async def skill_debug(data: ReqSkillDebugSchema, userinfo: TokenData = Depends(g
     Returns:
         Execution results of the skill
     """
-    task = run_app.delay(app_type="skill",id_ = 0 ,user_id=userinfo.uid, input_dict=data.test_input,custom_data = data.dict(exclude_unset=True))
+    task = run_app.delay(app_type="skill", id_=0, user_id=userinfo.uid, input_dict=data.test_input,
+                         custom_data=data.dict(exclude_unset=True))
     while not task.ready():
         await asyncio.sleep(0.1)
-    print(task)
-    result = task.get()
-    if result["status"] != "success":
-        return response_error(get_language_content(result["message"]))
-    return response_success({"outputs": result["data"]["outputs"]})
+    try:
+        result = task.get()
+        if result["status"] != "success":
+            return response_error(result["message"])
+        return response_success({"outputs": result["data"]["outputs"]})
+    except Exception as e:
+        return response_error(str(e))
