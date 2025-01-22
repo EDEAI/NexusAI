@@ -225,9 +225,10 @@ export default {
 
 
 
-    "workflow.vars.text": "文字",
+    "workflow.vars.string": "文字",
     "workflow.vars.paragraph": "段落",
     "workflow.vars.number": "数字",
+    "workflow.vars.json": "JSON",
     "workflow.vars.required": "必填",
     "workflow.vars.inputFields": "输入字段",
     "workflow.vars.createVariable": "创建变量",

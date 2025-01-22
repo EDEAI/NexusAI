@@ -26,7 +26,8 @@ class SkillNode(SandboxBaseNode):
         wait_for_all_predecessors: bool = False,
         manual_confirmation: bool = False,
         flow_data: Dict[str, Any] = {},
-        original_node_id: Optional[str] = None
+        original_node_id: Optional[str] = None,
+        custom_data: Optional[Dict[str, Any]] = None
     ):
         """
         Initializes a SkillNode object.
@@ -40,20 +41,23 @@ class SkillNode(SandboxBaseNode):
             "output": output,
             "wait_for_all_predecessors": wait_for_all_predecessors,
             "manual_confirmation": manual_confirmation,
-            "flow_data": flow_data
+            "flow_data": flow_data,
+            "custom_data": custom_data
         }
         if original_node_id is not None:
             init_kwargs["original_node_id"] = original_node_id
 
         super().__init__(**init_kwargs)
     def validate(self):
-        skill_id = self.data['skill_id']
-        custom_tools = CustomTools()
-        custom_data = custom_tools.get_skill_by_id(skill_id)
+        if self.data['skill_id'] > 0:
+            skill_id = self.data['skill_id']
+            custom_tools = CustomTools()
+            custom_data = custom_tools.get_skill_by_id(skill_id)
         assert custom_data, get_language_content('skill_does_not_exist')
         assert custom_data['input_variables'], get_language_content('skill_input_variables_error')
         assert custom_data['output_variables'], get_language_content('skill_output_variables_error')
         assert custom_data['code'], get_language_content('skill_code_error')
+        
 
     def run(
             self,
@@ -69,12 +73,17 @@ class SkillNode(SandboxBaseNode):
         """
         try:
             start_time = datetime.now()
-            
-            skill_id = self.data['skill_id']
-            custom_tools = CustomTools()
-            custom_data = custom_tools.get_skill_by_id(skill_id)
-            if not custom_data:
-                raise ValueError('Skill not found')
+            if self.data['skill_id'] > 0:
+                skill_id = self.data['skill_id']
+                custom_tools = CustomTools()
+                custom_data = custom_tools.get_skill_by_id(skill_id)
+                if not custom_data:
+                    raise ValueError('Skill not found')
+            else:
+                custom_data = self.data['custom_data']
+                custom_data['app_id'] = 0
+                skill_id = 0
+                # self.data['custom_code'] = custom_data['code']
             start_time_str = start_time.replace(microsecond=0).isoformat(sep='_')
             skill_run_id = AppRuns().insert(
                 {
@@ -95,8 +104,8 @@ class SkillNode(SandboxBaseNode):
             input = self.data['input']
             replace_variable_value_with_context(input, context)
             validate_required_variable(input)
-            
-            Apps().increment_execution_times(custom_data['app_id'])
+            if custom_data['app_id'] > 0:
+                Apps().increment_execution_times(custom_data['app_id'])
             
             response = self.run_custom_code()
 

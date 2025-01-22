@@ -232,9 +232,10 @@ export default {
     'app.itemHeader.chatRoom': 'Round Table',
     'app.itemHeader.workFlow': 'Workflow',
 
-    'workflow.vars.text': 'Text',
+    'workflow.vars.string': 'Text',
     'workflow.vars.paragraph': 'Paragraph',
     'workflow.vars.number': 'Number',
+    'workflow.vars.json': 'JSON',
     'workflow.vars.required': 'Required',
     'workflow.vars.inputFields': 'Input Fields',
     'workflow.vars.createVariable': 'Create Variable',

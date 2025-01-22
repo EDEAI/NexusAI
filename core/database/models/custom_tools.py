@@ -151,60 +151,42 @@ class CustomTools(MySQL):
         """
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         app_model = Apps()
-
-        # Check if this is an update operation (app_id provided)
-        if app_id := data.app_id:
-            # Verify app exists and user has permission
-            app = app_model.get_app_by_id(app_id)
-            if not app:
-                return {"status": 2, "message": get_language_content("app_not_found")}
-
-            if app["user_id"] != user_id:
-                return {"status": 2, "message": get_language_content("unauthorized_app_access")}
-
-            # Update app public status if provided
-            if hasattr(data, 'is_public') and data.is_public is not None:
-                app_model.update(
-                    [{'column': 'id', 'value': app_id}],
-                    {
-                        "is_public": data.is_public,
-                        "updated_time": current_time
-                    }
-                )
-
-            # Update skill data - serialize dictionaries to JSON strings
-            skill_data = {
-                # "config": "{}",
-                "input_variables": data.input_variables,
-                "dependencies": data.dependencies,
-                "code": data.code,
-                "output_type": data.output_type,
-                "output_variables": data.output_variables,
+        app_id = data.get('app_id',None)
+        if app_id:
+            app_update_data = {
+                "name": data.get('name'),
+                "description": data.get('description'),
                 "updated_time": current_time
             }
-
-            # Update draft version
-            conditions = [
-                {'column': 'app_id', 'value': app_id},
-                {'column': 'user_id', 'value': user_id},
-                {'column': 'publish_status', 'value': 0}
-            ]
-            self.update(conditions, skill_data)
-
-            # Get updated skill info
-            draft_info = self.get_publish_skill_info(user_id, app_id, 0)
+            update_data = {
+                "updated_time": current_time,
+                "input_variables": data['input_variables'],
+                "dependencies": data['dependencies'],
+                "code": data['code'],
+                "output_type": data['output_type'],
+                "output_variables": data['output_variables']
+            }
+            app_model.update([{'column': 'id', 'value': app_id}], app_update_data)
+            conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
+                      {'column': 'publish_status', 'value': 0}]
+            self.update(conditions, update_data)
+            # Handle tags
+            tag_ids = data.get('tag_ids',[])
+            if tag_ids:
+                tag_bindings = TagBindings()
+                if not tag_bindings.batch_update_bindings([app_id], tag_ids):
+                    return {"status": 2, "message": get_language_content("tag_binding_create_failed")}
 
             return {
                 "status": 1,
-                "message": get_language_content("skill_update_success"),
-                "skill_id": draft_info['data']['id'],
+                "message": get_language_content("skill_create_success"),
+                "skill_id": 0,
                 "app_id": app_id
             }
-
         # Create new app
         base_data = {
-            "name": data.name,
-            "description": data.description,
+            "name": data.get('name'),
+            "description": data.get('description'),
             "mode": 4,  # For skills
             "publish_status": 0,
             "team_id": team_id,
@@ -218,36 +200,57 @@ class CustomTools(MySQL):
             return {"status": 2, "message": get_language_content("apps_insert_error")}
 
         # Handle tags
-        if hasattr(data, 'tag_ids') and data.tag_ids:
+        tag_ids = data.get('tag_ids',[])
+        if tag_ids:
             tag_bindings = TagBindings()
-            if not tag_bindings.batch_update_bindings([app_id], data.tag_ids):
+            if not tag_bindings.batch_update_bindings([app_id], tag_ids):
                 return {"status": 2, "message": get_language_content("tag_binding_create_failed")}
 
-        # Create skill initial record
+        # create skill
         skill_data = {
             "team_id": team_id,
             "user_id": user_id,
             "app_id": app_id,
             "created_time": current_time,
             "updated_time": current_time,
-            "publish_status": 0,  # Draft status
-            "status": 1,  # Active status
-            # "config": "{}",
-            "input_variables": data.input_variables,
-            "dependencies": data.dependencies,
-            "code": data.code,
-            "output_type": data.output_type,
-            "output_variables": data.output_variables
+            "input_variables": data['input_variables'],
+            "dependencies": data['dependencies'],
+            "code": data['code'],
+            "output_type": data['output_type'],
+            "output_variables": data['output_variables'],
         }
-
         skill_id = self.insert(skill_data)
-        if not skill_id:
-            return {"status": 2, "message": get_language_content("skill_insert_error")}
 
-        return {
-            "status": 1,
-            "message": get_language_content("skill_create_success"),
-            "skill_id": skill_id,
-            "app_id": app_id
+        draft_info = self.get_publish_skill_info(user_id, app_id, 0)
+
+        draft_info = draft_info['data']
+        
+        tool_data = {
+            "team_id": draft_info['team_id'],
+            "user_id": draft_info['user_id'],
+            "app_id": draft_info['app_id'],
+            "config": draft_info['config'],
+            "input_variables": draft_info['input_variables'],
+            "dependencies": draft_info['dependencies'],
+            "code": draft_info['code'],
+            "output_type": draft_info['output_type'],
+            "output_variables": draft_info['output_variables'],
+            "publish_status": 1,
+            "published_time": datetime.now(),
+            "status": 1
         }
+        skill_id = self.insert(tool_data)
+        apps_data = {
+                    "publish_status": 1,
+                    "updated_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+        app_model.update([{'column': 'id', 'value': app_id}], apps_data)
+        return {
+        "status": 1,
+        "message": get_language_content("skill_create_success"),
+        "skill_id": skill_id,
+        "app_id": app_id
+    }
+
+        
 

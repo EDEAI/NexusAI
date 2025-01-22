@@ -4,7 +4,7 @@
 /*
  * @LastEditors: biz
  */
-import { skillCreate } from '@/api/workflow';
+import { skillCorrection, skillCreate } from '@/api/workflow';
 import useUserStore from '@/store/user';
 import useSocketStore from '@/store/websocket';
 import {
@@ -37,7 +37,7 @@ const SkillCreate = memo(() => {
     const [params, setParams] = useState(null);
     const flowMessage = useSocketStore(state => state.flowMessage);
     const [hasProcessed, setHasProcessed] = useState(false);
-
+    const [changeSkill,setChangeSkill]=useState(null)
 
 
     const CodeEditorMemo = useMemo(() => (
@@ -102,6 +102,21 @@ const SkillCreate = memo(() => {
         }
     }, []);
 
+    const handleCorrection= useCallback(async (value: string,app_run_id) => {
+        setLoading(true);
+        try {
+            const res = await skillCorrection(app_run_id,value );
+            if (res.code == 0) {
+                // setSkillCreateResult(res.data);
+                setHasProcessed(false)
+                setPrompt(value)
+            }
+
+        }catch(e){
+            console.log(e);
+        }
+    }, [params]);
+
     useUpdateEffect(() => {
         const currentMessage = flowMessage?.find(
             item =>
@@ -164,6 +179,7 @@ const SkillCreate = memo(() => {
                 <div className="relative flex-1">
                     <ResultDisplay
                         loading={loading}
+                        onChange={setChangeSkill}
                         initialValues={skillCreateResult}
                     ></ResultDisplay>
                     <div className="absolute bottom-2 right-2 flex gap-2 p-1  bg-opacity-50 rounded-md">
@@ -213,7 +229,7 @@ const SkillCreate = memo(() => {
                                 className="h-[100px]"
                                 loading={loading}
                                 onClose={() => onCorrectVisibleChange(false)}
-                                onSubmit={onCorrect}
+                                onSubmit={(e)=>handleCorrection(e,params?.app_run_id||'')}
                                 submitButtonProps={{
                                     size: 'small',
                                     loading: loading,
@@ -269,7 +285,7 @@ const SkillCreate = memo(() => {
             <BugFix
                 open={bugFixshow}
                 onCancel={() => setBugFixshow(false)}
-                skillData={skillCreateResult}
+                skillData={{...changeSkill,app_run_id:params?.app_run_id}}
                 onSubmit={handleBugFixSubmit}
             />
         </Modal>

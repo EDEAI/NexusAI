@@ -23,38 +23,78 @@ language_packs = {
             """,
         },
         "agent_system_prompt_with_auto_match_ability": (
+            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
+            'Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).'
+            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
+            'If your responsibilities and abilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.\n'
+            'Your ID: {id_}\n'
+            'Your name: {name}\n'
+            'Your description: {description}\n'
             'Your responsibilities (or identity) are as follows:\n'
             '{obligations}\n\n'
             'You have some abilities, each ability is in the form of a tuple (ability ID, specific information of the ability, output format of the ability) in the following Python list:\n'
             '{abilities_content_and_output_format}\n\n'
+            '{retrieved_docs_format}\n'
             '{reply_requirement}\n'
             'Finally, return a JSON formatted dictionary as follows:\n'
-            '{{"ability_id": ability ID (integer type), "output": content replied in the corresponding format of the ability}}'
+            '{{"ability_id": ability ID (integer type), "output": content replied in the corresponding format of the ability}}\n'
+            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
+        ),
+        "agent_system_prompt_with_auto_match_ability_direct_output": (
+            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
+            'Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).'
+            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
+            'If your responsibilities and abilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.\n'
+            'Your ID: {id_}\n'
+            'Your name: {name}\n'
+            'Your description: {description}\n'
+            'Your responsibilities (or identity) are as follows:\n'
+            '{obligations}\n\n'
+            'You have some abilities, each ability is in the form of a tuple (ability ID, specific information of the ability, output format of the ability) in the following Python list:\n'
+            '{abilities_content_and_output_format}\n\n'
+            '{retrieved_docs_format}\n'
+            '{reply_requirement}\n'
+            'Finally, reply in the corresponding format of the ability.\n'
+            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
         ),
         "agent_system_prompt_with_abilities": (
+            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
+            'Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).'
+            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
+            'If your responsibilities and abilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.\n'
+            'Your ID: {id_}\n'
+            'Your name: {name}\n'
+            'Your description: {description}\n'
             'Your responsibilities (or identity) are as follows:\n'
             '{obligations}\n\n'
             'You have the following abilities:\n'
             '{abilities_content}\n\n'
+            '{retrieved_docs_format}\n'
             '{reply_requirement}\n'
-            'Finally, return a JSON formatted dictionary as follows:\n'
-            '{{"output": content replied in {output_format} format}}'
+            'Finally, reply in {output_format} format.\n'
+            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
         ),
         "agent_system_prompt_with_no_ability": (
+            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
+            'Please note that you should respond based on your description, responsibilities and relevant content retrieved from the knowledge base (if provided).'
+            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
+            'If your responsibilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities.\n'
+            'Your ID: {id_}\n'
+            'Your name: {name}\n'
+            'Your description: {description}\n'
             'Your responsibilities (or identity) are as follows:\n'
             '{obligations}\n\n'
+            '{retrieved_docs_format}\n'
             '{reply_requirement}\n'
-            'Finally, return a JSON formatted dictionary as follows:\n'
-            '{{"output": content replied in {output_format} format}}'
+            'Finally, reply in {output_format} format.\n'
+            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
+        ),
+        "agent_retrieved_docs_format": (
+            'I will provide the information retrieved from the knowledge base based on the user input text '
+            'in the following JSON format: [{"content": content, "source": source document name}, ...])'
         ),
         "agent_reply_requirement_with_auto_match_ability": (
             'Please match one corresponding ability based on the user input information and reply in the format corresponding to the ability.'
-        ),
-        "agent_reply_requirement_with_abilities": (
-            'Please reply based on the user input information.'
-        ),
-        "agent_reply_requirement_with_no_ability": (
-            'Please reply based on the user input information.'
         ),
         "agent_reply_requirement_with_task_splitting_and_auto_match_ability": (
             'Please match one corresponding ability based on the user input information, and based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it, and reply in the format corresponding to the ability.'
@@ -68,14 +108,15 @@ language_packs = {
         "agent_output_format_1": "plain text",
         "agent_output_format_2": "JSON",
         "agent_output_format_3": "code",
+        "agent_user_prompt": (
+            'Below is the user\'s questions or needs:\n'
+            '{user_prompt}'
+        ),
         "agent_user_prompt_with_retrieved_docs": (
-            'Below is the text input by the user:\n'
+            'Below is the user\'s questions or needs:\n'
             '{user_prompt}\n\n'
-            'Below is the information retrieved from the knowledge base based on the user input text '
-            '(listed in the following JSON format: [{{"content": content, "source": source document name}}, ...])'
-            ':\n'
-            '{formatted_docs}\n\n'
-            'Please reply to the user based on the above information.'
+            'Below is the information retrieved from the knowledge base:\n'
+            '{formatted_docs}'
         ),
         "llm_reply_requirement_with_task_splitting": (
             'Please select the part of the overall task that you should be responsible for and process it.'
@@ -343,53 +384,39 @@ language_packs = {
             'Please select the next agent to speak from the agent list according to the requirements, or end the conversation.'
         ),
 
-        'chatroom_agent_system': (
-            'You are an AI agent in the meeting room, where there is one user and at least one AI agent.\n'
-            'Please respond based on the current meeting topic and your responsibilities and capabilities description.\n'
-            'I will provide the current meeting topic;\n'
-            'And the chat history list in the following JSON format:'
-            '[message, ...];\n'
-            'The JSON structure for each message is as follows:'
-            '{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content, "topic": meeting topic}.\n\n'
-            'I will also provide your ID, name, responsibilities, and capabilities description.\n'
-            'Your response must follow these requirements:\n'
-            '1. You must respond within your responsibilities and capabilities based on the current meeting topic.\n'
-            '2. If your responsibilities and capabilities are not directly related to the current meeting topic, please try to adapt to the topic and provide relevant responses, rather than being limited to your specific responsibilities and capabilities.\n'
-            '3. Note that historical messages are for reference only. Do not meaninglessly repeat content from historical messages in your response.\n'
-            '4. Make sure to respond with text content only, do not wrap your response in the JSON structure used in the message history.\n'
-            '5. The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.\n'
-            '6. Do not explicitly mention the current topic in your response unless the user specifically asks about it.'
-        ),
+        'chatroom_agent_user_subprompt': (
+            # 'You are in a meeting room, where there is one user and at least one AI agent.\n'
+            'Before now, other agents have already responded to the current user\'s questions or needs. I will provide records of the responses of other agents.'
+            'You need to answer questions or handle needs based on the user\'s questions or needs, as well as the response records of other agents.'
+            'The agents\' response records may contain questions or requirements initiated by the user.\n'
+            'The response records are in the following JSON format: [record, ...];\n'
+            'The JSON structure for each record is as follows:\n'
+            '{{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}}.\n\n'
 
-        'chatroom_agent_user_with_abilities': (
-            'Below is the chat history list:\n'
+            'Current user questions or needs:\n'
+            '{user_message}\n\n'
+
+            'Response records:\n'
             '{messages}\n\n'
-            'Current meeting topic: {topic}\n'
-            'Your ID: {id_}\n'
-            'Your name: {name}\n\n'
-            'Below are your responsibilities (or identity):'
-            '{obligations}\n\n'
-            'Below are your capabilities (listed in JSON format):\n'
-            '{abilities}\n\n'
-            'Please speak according to these contents and requirements.'
+            #'Now the meeting room needs you to speak. Please speak according to the current meeting topic and chat history.\n'
+            #'I will provide the current meeting topic;\n'
+            #'And the chat history list in the following JSON format: [message, ...];\n'
+            #'The JSON structure for each message is as follows:'
+            #'{{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content, "topic": meeting topic}}.\n\n'
+            #'Below is the chat history list:\n'
+            #'{messages}\n\n'
+            #'Current meeting topic: {topic}\n'
+            # 'Your response must follow these requirements:\n'
+            # '1. If your responsibilities and capabilities are not directly related to the current meeting topic, please try to adapt to the topic and provide relevant responses, rather than being limited to your specific responsibilities and capabilities.\n'
+            # '2. Note that historical messages are for reference only. Do not meaninglessly repeat content from historical messages in your response.\n'
+            # '3. Make sure to respond with text content only, do not wrap your response in the JSON structure used in the message history.\n'
+            # '4. Do not explicitly mention the current topic in your response unless the user specifically asks about it.'
         ),
-
-        'chatroom_agent_user_with_no_ability': (
-            'Below is the chat history list:\n'
-            '{messages}\n\n'
-            'Current meeting topic: {topic}\n'
-            'Your ID: {id_}\n'
-            'Your name: {name}\n\n'
-            'Below are your responsibilities (or identity):'
-            '{obligations}\n\n'
-            'Please speak according to these contents and requirements.'
-        ),
-
         'chatroom_agent_description_with_abilities': (
             'Agent responsibilities (or identity):\n'
             '{obligations}\n\n'
             'Agent capabilities (listed in JSON format):\n'
-            '{abilities}'
+            '{abilities_content}'
         ),
 
         'chatroom_agent_description_with_no_ability': (
@@ -509,7 +536,7 @@ language_packs = {
             You are an AI agent generation assistant.
             Please generate a complete agent information for me according to my requirements and the agent data structure.
             Please pay attention to the following requirements when generating:
-            1. The agent name should be highly anthropomorphic
+            1. The name of the agent should simply and directly reflect the key information of the agent and be as humanized as possible
             2. The agent description should be as detailed as possible and cover all the information of the agent
             3. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
             4. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
@@ -570,7 +597,7 @@ language_packs = {
             You are an AI agent generation assistant.
             Please generate a complete sample agent information for me according to the agent data structure based on the requirements for batch generation of agents provided by me.
             Please pay attention to the following requirements when generating:
-            1. The agent name should be highly anthropomorphic
+            1. The name of the agent should simply and directly reflect the key information of the agent and be as humanized as possible
             2. The agent description should be as detailed as possible and cover all the information of the agent
             3. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
             4. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
@@ -599,14 +626,15 @@ language_packs = {
             You are an AI agent generation assistant.
             Please generate a batch of complete agent information for me based on the requirements for batch generation of agents, the number of batch generation of agents, and the data structure of multiple agents that I provide.
             Pay attention to the following requirements when generating:
-            1. The name of the agent should be highly anthropomorphic
-            2. The agent description should be as detailed as possible and cover all the information of the agent
-            3. The function information of the agent should be as detailed as possible, not just limited to the literal "function" information, but also include other relevant feature information
-            4. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
-            5. Be sure to strictly generate agents according to the number of batch-generated agents I provide, and do not generate more or less than this number
-            6. The batch-generated agent data should be kept as different as possible, and do not generate duplicate agents
-            7. If the batch-generated agent history has real content, the new agent should be kept as different as possible from the generated agent history
-            8. Be sure to strictly abide by the multi-agent data json structure
+            1. Do not reduce the quality of each agent generated by batch generation. The information of each agent should be sufficient and detailed
+            2. The name of the agent should simply and directly reflect the key information of the agent and be as humanized as possible
+            3. The agent description should be as detailed as possible and cover all the information of the agent
+            4. The function information of the agent should be as detailed as possible, not just limited to the literal "function" information, but also include other relevant feature information
+            5. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            6. Be sure to strictly generate agents according to the number of batch-generated agents I provide, and do not generate more or less than this number
+            7. The batch-generated agent data should be kept as different as possible, and do not generate duplicate agents
+            8. If the batch-generated agent history has real content, the new agent should be kept as different as possible from the generated agent history
+            9. Be sure to strictly abide by the multi-agent data json structure
             Note that only the generated multi-agent json structure data is returned, and no redundant content is returned.
             Description of the json structure of multi-agent data:
             {{
@@ -749,9 +777,131 @@ language_packs = {
         'api_skill_generate_failed': 'Request failed, please try again later',
         'api_skill_correction_failed': 'Request failed, please try again later',
         'api_skill_user_prompt_required': 'Prompt is required',
+        'generate_skill_system_prompt': '''
+            You are a python tool generation assistant.
+            Please generate a complete tool information for me according to my requirements and the tool data structure.
+            Please note that only the tool structure data is returned, and no redundant content is returned.
+            Tool data json structure description:
+            {{
+                "name":"(string type) tool name",
+                "description":"(string type) tool description",
+                "input_variables": [
+                    {{
+                        "name":"(string type) input variable name",
+                        "type":"(string type) input variable type ['string','number']",
+                        "required":"(bool type) whether the input variable is required: True means required, False means non-required",
+                        "display_name":"(string type) variable display name, which can be used as a description of the function and purpose of the variable"
+                    }}
+                ],
+                "dependencies": {{
+                    "python3": []
+                }},
+                "code": {{
+                    "python3":"(string type) python3 code. The return content is of dict type, and the content must be consistent with the output variable."
+                }},
+                "output_type":"(int type) output type includes the following four types: 1: Get text or ordinary variable data 2: Write to database 3: Write code 4: Write to file",
+                "output_variables":[
+                    {{
+                        "name": "(string type) Output variable name",
+                        "type": "(string type) Output variable type ['string','number','json']",
+                        "display_name": "(string type) Variable display name, can be used as a description of the function and purpose of the variable"
+                    }}
+                ]
+            }}
+            Special rule description:
+            1. "input_variables" is the input variable required for the tool to run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type.
+            2. "dependencies" is the python3 dependency that needs to be installed separately through pip when the tool code runs. The overall structure is dict type. The internal "python3" is a fixed key. Each element in the list corresponding to "python3" is a dependency name.
+            3. "code" is the python3 code of the tool. The overall structure is dict type. The internal "python3" is a fixed key. The value corresponding to "python3" is the python3 code. The code is string type.
+                Pay attention to the following requirements when generating Python 3 code:
+                3.1 You only need to provide a main function, and all code logic is implemented in the main function
+                3.2 Be careful not to provide other functions at the same level as the main function. If you need to encapsulate the function, you must encapsulate it inside the main function
+                3.3 Do not provide the function calling code. I will automatically call the main function during actual operation
+                3.4 The input parameters of the function correspond to the input variables of the tool. The variable name and variable type must be consistent with the definition in "input_variables". Non-mandatory variables must have default values
+                3.5 The return data type of the function must be specified
+                3.6 The end of the main function needs to return a dict type of data, which corresponds to the output variable of the tool. The key name of the dict data is the output variable name. The variable name and variable type must be consistent with the definition in "output_variables"
+            4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
+            5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
+            6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
+            7. The variable names in "input_variables" and "output_variables", as well as the corresponding variable names in the Python 3 code, must conform to the code variable naming conventions
+        ''',
+        'generate_skill_user': '''
+            My requirements:
+            {user_prompt}
+        ''',
+        'correction_skill_system_prompt': '''
+            You are a python tool generation assistant.
+            You have generated a tool. Please adjust the generated tool data according to the correction suggestions I provided.
+            Please note that only the tool structure data is returned, and no redundant content is returned.
+            Tool data json structure description:
+            {{
+                "name":"(string type) tool name",
+                "description":"(string type) tool description",
+                "input_variables": [
+                    {{
+                        "name":"(string type) input variable name",
+                        "type":"(string type) input variable type ['string','number']",
+                        "required":"(bool type) whether the input variable is required: True means required, False means non-required",
+                        "display_name":"(string type) variable display name, which can be used as a description of the function and purpose of the variable"
+                    }}
+                ],
+                "dependencies": {{
+                    "python3": []
+                }},
+                "code": {{
+                    "python3":"(string type) python3 code. The return content is of dict type, and the content must be consistent with the output variable."
+                }},
+                "output_type":"(int type) output type includes the following four types: 1: Get text or ordinary variable data 2: Write to database 3: Write code 4: Write to file",
+                "output_variables":[
+                    {{
+                        "name": "(string type) Output variable name",
+                        "type": "(string type) Output variable type ['string','number','json']",
+                        "display_name": "(string type) Variable display name, can be used as a description of the function and purpose of the variable"
+                    }}
+                ]
+            }}
+            Special rule description:
+            1. "input_variables" is the input variable required for the tool to run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type.
+            2. "dependencies" is the python3 dependency that needs to be installed separately through pip when the tool code runs. The overall structure is dict type. The internal "python3" is a fixed key. Each element in the list corresponding to "python3" is a dependency name.
+            3. "code" is the python3 code of the tool. The overall structure is dict type. The internal "python3" is a fixed key. The value corresponding to "python3" is the python3 code. The code is string type.
+                Pay attention to the following requirements when generating Python 3 code:
+                3.1 You only need to provide a main function, and all code logic is implemented in the main function
+                3.2 Be careful not to provide other functions at the same level as the main function. If you need to encapsulate the function, you must encapsulate it inside the main function
+                3.3 Do not provide the function calling code. I will automatically call the main function during actual operation
+                3.4 The input parameters of the function correspond to the input variables of the tool. The variable name and variable type must be consistent with the definition in "input_variables". Non-mandatory variables must have default values
+                3.5 The return data type of the function must be specified
+                3.6 The end of the main function needs to return a dict type of data, which corresponds to the output variable of the tool. The key name of the dict data is the output variable name. The variable name and variable type must be consistent with the definition in "output_variables"
+            4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
+            5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
+            6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
+            7. The variable names in "input_variables" and "output_variables", as well as the corresponding variable names in the Python 3 code, must conform to the code variable naming conventions
+        ''',
+        'correction_skill_user': '''
+            Correction suggestion:
+            {correction_prompt}
+            
+            Generated tool data:
+            {history_skill}
+        ''',
         'skill_validation_failed': 'Skill validation failed',
         'skill_create_success': 'Skill create success',
         'skill_update_success': 'Skill update success',
+        # Skill related messages
+        "publish_status_invalid": "publish status can only input 0 or 1",
+        "invalid_app_id": "Invalid app ID",
+        "update_error": "Update failed",
+        "skill_not_exist": "Skill does not exist",
+        "app_id_required": "App ID is required",
+        "tool_not_found": "Tool not found",
+        "skill_id_required": "Skill ID is required",
+        "input_dict_required": "Input data is required",
+        "input_dict_format_error": "Input data format is invalid",
+        "skill_error": "Skill error occurred",
+        "skill_status_not_normal": "The skill status is not normal",
+        "skill_draft_creators_only": "Only creators can run draft skills",
+        "app_error": "Application error occurred",
+        "team_members_not_open": "Not open to team members",
+        "app_status_not_normal": "The application status is not normal",
+        "skill_not_found": "Skill not found",
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -1117,7 +1267,7 @@ language_packs = {
         #     你是一个AI智能体生成助手。
         #     请通过我的需求内容，按照智能体的数据结构为我生成一个完整的智能体信息。
         #     生成时注意以下几点要求：
-        #     1. 智能体名称要高度拟人化
+        #     1. 智能体名称要可简单直接的体现智能体的关键信息，并且要尽量拟人化
         #     2. 智能体描述要尽量详细，要覆盖智能体的所有信息
         #     3. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
         #     4. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
@@ -1180,7 +1330,7 @@ language_packs = {
         #     你是一个AI智能体生成助手。
         #     请通过我提供的批量生成智能体的需求，按照智能体的数据结构为我生成一个完整的样例智能体信息。
         #     生成时注意以下几点要求：
-        #     1. 智能体名称要高度拟人化
+        #     1. 智能体名称要可简单直接的体现智能体的关键信息，并且要尽量拟人化
         #     2. 智能体描述要尽量详细，要覆盖智能体的所有信息
         #     3. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
         #     4. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
@@ -1209,14 +1359,15 @@ language_packs = {
         #     你是一个AI智能体生成助手。
         #     请通过我提供的批量生成智能体的需求、批量生成智能体的数量、多智能体的数据结构为我生成一批完整的智能体信息。
         #     生成时注意以下几点要求：
-        #     1. 智能体名称要高度拟人化
-        #     2. 智能体描述要尽量详细，要覆盖智能体的所有信息
-        #     3. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
-        #     4. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
-        #     5. 一定要严格按照我提供的批量生成智能体的数量去生成智能体，不要多余或少于此数量
-        #     6. 批量生成的智能体数据要尽量保持差异性，不要生成重复的智能体
-        #     7. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
-        #     8. 一定要严格遵守多智能体数据json结构
+        #     1. 不要因为批量生成智能体而降低每个智能体的生成质量，每个智能体的信息要足够充分和详细
+        #     2. 智能体名称要可简单直接的体现智能体的关键信息，并且要尽量拟人化
+        #     3. 智能体描述要尽量详细，要覆盖智能体的所有信息
+        #     4. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
+        #     5. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
+        #     6. 一定要严格按照我提供的批量生成智能体的数量去生成智能体，不要多余或少于此数量
+        #     7. 批量生成的智能体数据要尽量保持差异性，不要生成重复的智能体
+        #     8. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
+        #     9. 一定要严格遵守多智能体数据json结构
         #     注意只返回生成的多智能体json结构数据，不要返回多余的内容。
         #     多智能体数据json结构说明：
         #     {{
@@ -1254,94 +1405,112 @@ language_packs = {
         'api_agent_supplement_prompt_required': '补充提示词不能为空',
         'api_agent_save_record_error': '保存记录失败',
         'api_agent_record_error': '记录不存在',
-        'generate_skill_system_prompt':'''
-            你是一个AI工具生成助手，
-            请通过我的需求内容，按照工具的数据结构为我生成一个完整的工具信息。
-            注意只返回工具的结构数据，不要返回多余的内容。
-            工具数据json结构说明：
-            1.结构类型说明: 
-            input_variables为输入变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
-            output_variables为输出变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
-            2.格式、字段说明和要求
-            {{
-                "name":"(string类型)工具名称",
-                "description":"(string类型)工具描述",
-                "input_variables":[
-                    {{
-                        "name":"(string类型)输入变量名称",
-                        "type":"(string类型)输入变量类型['string','number']",
-                        "required":"(bool类型)输入变量是否必填,True必填,False不必填",
-                        "display_name":"(string类型),name的首字母大写格式"
-                    }}
-                ],
-                "dependencies":
-                {{
-                    "python3":[
-                        "python依赖名称，你要完全区分内部依赖和外部依赖，依赖名称要保证完全正确。"
-                    ]
-                }},
-                "code":
-                {{
-                    "python3":"(string类型)python3代码部分，你只需要提供方法即可。方法需要规定返回类型。方法形参是输入变量，变量要限制类型。return内容为dict类型，内容要和输出变量一致。"
-                }},
-                "output_type":"(int类型),输出类型包含以下四种类型： 1:文本  2: 数据库 3: 代码 4: 文档",
-                "output_variables":[
-                    {{
-                        "name": "(string类型)输出变量名称",
-                        "type": "(string类型)输出属性类型，包含以下六种类型：'string','number','object','Array[string]','Array[number]','Array[object]'",
-                        "display_name": "(string类型)，name的首字母大写格式。"
-                    }}
-                ]
-            }}
-            {append_prompt}
-        ''',
-        'generate_skill_user':'''
-            需求内容：
-            {user_prompt}
-        ''',
-        'correction_skill_system_prompt':'''
-            你是一个AI工具生成助手。
-            你已经生成了一个工具，请通过我提供的修正意见，对已生成的工具数据进行调整。
-            注意只返回技能的结构数据，不要返回多余的内容。
-            工具数据json结构说明：
-            1.结构类型说明: input_variables为输入变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
-            output_variables为输出变量，整体结构为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型，properties为变量数据，properties_name是每个变量的名称。
-            2.格式、字段说明和要求
-            {{
-                "name":"(string类型)工具名称",
-                "description":"(string类型)工具描述",
-                "input_variables":[
-                    {{
-                        "name":"(string类型)输入变量名称",
-                        "type":"(string类型)输入变量类型['string','number']",
-                        "required":"(bool类型)输入变量是否必填,True必填,False不必填",
-                        "display_name":"(string类型),name的首字母大写格式"
-                    }}
-                ]},
-                "dependencies":{{
-                    "python3":[
-                        "python依赖名称，你要完全区分内部依赖和外部依赖，依赖名称要保证完全正确。"
-                    ]
-                }},
-                "code":{{
-                    "python3":"(string类型)python3代码部分，你只需要提供方法即可。方法需要规定返回类型。方法形参是输入变量，变量要限制类型。return内容为dict类型，内容要和输出变量一致。"
-                }},
-                "output_type":"(int类型),输出类型包含以下四种类型： 1:文本  2: 数据库 3: 代码 4: 文档",
-                "output_variables":[
-                    {{
-                        "name": "(string类型)输出变量名称",
-                        "type": "(string类型)输出属性类型，包含以下六种类型：'string','number','object','Array[string]','Array[number]','Array[object]'",
-                        "display_name": "(string类型)，name的首字母大写格式。"
-                    }}
-                ]
-            }}
-        ''',
-        'correction_skill_user': '''
-            修正意见：
-            {correction_prompt}
-            已生成的工具信息：
-            {history_skill}
-        ''',
+        
+        # 'generate_skill_system_prompt':'''
+        #     你是一个python工具生成助手。
+        #     请通过我的需求内容，按照工具的数据结构为我生成一个完整的工具信息。
+        #     注意只返回工具的结构数据，不要返回多余的内容。
+        #     工具数据json结构说明：
+        #     {{
+        #         "name":"(string类型)工具名称",
+        #         "description":"(string类型)工具描述",
+        #         "input_variables": [
+        #             {{
+        #                 "name":"(string类型)输入变量名称",
+        #                 "type":"(string类型)输入变量类型 ['string','number']",
+        #                 "required":"(bool类型)输入变量是否必填：True代表必填，False代表非必填",
+        #                 "display_name":"(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #             }}
+        #         ],
+        #         "dependencies": {{
+        #             "python3": []
+        #         }},
+        #         "code": {{
+        #             "python3":"(string类型)python3代码。return内容为dict类型，内容要和输出变量一致。"
+        #         }},
+        #         "output_type":"(int类型)输出类型包含以下四种类型：1:获取文本或者普通变量数据 2:写入数据库 3:编写代码 4:写入文件",
+        #         "output_variables":[
+        #             {{
+        #                 "name": "(string类型)输出变量名称",
+        #                 "type": "(string类型)输出变量类型 ['string','number','json']",
+        #                 "display_name": "(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #             }}
+        #         ]
+        #     }}
+        #     特殊规则说明: 
+        #     1. "input_variables"为工具运行时所需的输入变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
+        #     2. "dependencies"为工具代码运行时需要通过pip单独安装的python3依赖，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的列表中每个元素为一个依赖名称。
+        #     3. "code"为工具的python3代码，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的值为python3代码，代码为string类型。
+        #         生成python3代码时注意以下几点要求：
+        #         3.1 你只需要提供一个主函数即可，所有代码逻辑都在主函数中实现
+        #         3.2 注意不要提供与主函数同层级的其他函数，如果需要封装函数，一定要在主函数内部进行封装
+        #         3.3 不要提供函数的调用代码，实际运行时我会自动调用主函数
+        #         3.4 函数的入参对应工具的输入变量，变量名称、变量类型要与"input_variables"中的定义一致，非必填变量要有默认值
+        #         3.5 要规定函数的返回数据类型
+        #         3.6 主函数的结尾需要固定返回一个dict类型的数据，对应工具的输出变量，dict数据的键名即为输出的变量名，变量名称、变量类型要和"output_variables"中的定义一致
+        #     4. "output_variables"为工具运行完成后的输出变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
+        #     5. 注意"output_variables"中每个输出变量的类型，如果在python3代码中的返回数据中对应的变量类型为"dict"或者"list"，则对应的输出变量类型为"json"，否则为"string"或者"number"。
+        #     6. "output_type"为工具的输出类型，上面的工具数据json结构说明中已经提供了所有类型，要注意工具的输出类型并不取决于python3代码返回的数据类型，而是取决于python3代码的整体执行意图。
+        #     7. "input_variables"和"output_variables"中的变量名称，以及python3代码中对应的变量名称，一定要符合代码变量命名规范
+        # ''',
+        # 'generate_skill_user':'''
+        #     需求内容：
+        #     {user_prompt}
+        # ''',
+        # 'correction_skill_system_prompt':'''
+        #     你是一个python工具生成助手。
+        #     你已经生成了一个工具，请通过我提供的修正意见，对已生成的工具数据进行调整。
+        #     注意只返回工具的结构数据，不要返回多余的内容。
+        #     工具数据json结构说明：
+        #     {{
+        #         "name":"(string类型)工具名称",
+        #         "description":"(string类型)工具描述",
+        #         "input_variables": [
+        #             {{
+        #                 "name":"(string类型)输入变量名称",
+        #                 "type":"(string类型)输入变量类型 ['string','number']",
+        #                 "required":"(bool类型)输入变量是否必填：True代表必填，False代表非必填",
+        #                 "display_name":"(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #             }}
+        #         ],
+        #         "dependencies": {{
+        #             "python3": []
+        #         }},
+        #         "code": {{
+        #             "python3":"(string类型)python3代码。return内容为dict类型，内容要和输出变量一致。"
+        #         }},
+        #         "output_type":"(int类型)输出类型包含以下四种类型：1:获取文本或者普通变量数据 2:写入数据库 3:编写代码 4:写入文件",
+        #         "output_variables":[
+        #             {{
+        #                 "name": "(string类型)输出变量名称",
+        #                 "type": "(string类型)输出变量类型 ['string','number','json']",
+        #                 "display_name": "(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #             }}
+        #         ]
+        #     }}
+        #     特殊规则说明: 
+        #     1. "input_variables"为工具运行时所需的输入变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
+        #     2. "dependencies"为工具代码运行时需要通过pip单独安装的python3依赖，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的列表中每个元素为一个依赖名称。
+        #     3. "code"为工具的python3代码，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的值为python3代码，代码为string类型。
+        #         生成python3代码时注意以下几点要求：
+        #         3.1 你只需要提供一个主函数即可，所有代码逻辑都在主函数中实现
+        #         3.2 注意不要提供与主函数同层级的其他函数，如果需要封装函数，一定要在主函数内部进行封装
+        #         3.3 不要提供函数的调用代码，实际运行时我会自动调用主函数
+        #         3.4 函数的入参对应工具的输入变量，变量名称、变量类型要与"input_variables"中的定义一致，非必填变量要有默认值
+        #         3.5 要规定函数的返回数据类型
+        #         3.6 主函数的结尾需要固定返回一个dict类型的数据，对应工具的输出变量，dict数据的键名即为输出的变量名，变量名称、变量类型要和"output_variables"中的定义一致
+        #     4. "output_variables"为工具运行完成后的输出变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
+        #     5. 注意"output_variables"中每个输出变量的类型，如果在python3代码中的返回数据中对应的变量类型为"dict"或者"list"，则对应的输出变量类型为"json"，否则为"string"或者"number"。
+        #     6. "output_type"为工具的输出类型，上面的工具数据json结构说明中已经提供了所有类型，要注意工具的输出类型并不取决于python3代码返回的数据类型，而是取决于python3代码的整体执行意图。
+        #     7. "input_variables"和"output_variables"中的变量名称，以及python3代码中对应的变量名称，一定要符合代码变量命名规范
+        # ''',
+        # 'correction_skill_user':'''
+        #     修正意见：
+        #     {correction_prompt}
+        #
+        #     已生成的工具数据：
+        #     {history_skill}
+        # ''',
         'api_skill_success': '请求成功，请等待',
         'api_skill_generate_failed': '请求失败，请稍后再试',
         'api_skill_correction_failed': '请求失败，请稍后再试',
@@ -1349,6 +1518,23 @@ language_packs = {
         'skill_validation_failed': '技能验证失败',
         'skill_create_success': '技能创建成功',
         'skill_update_success': '技能更新成功',
+        # Skill related messages 
+        "publish_status_invalid": "发布状态只能输入0或1",
+        "invalid_app_id": "无效的应用ID",
+        "update_error": "更新失败",
+        "skill_not_exist": "技能不存在",
+        "app_id_required": "应用ID不能为空",
+        "tool_not_found": "未找到工具",
+        "skill_id_required": "技能ID不能为空",
+        "input_dict_required": "输入数据不能为空",
+        "input_dict_format_error": "输入数据格式无效",
+        "skill_error": "技能错误",
+        "skill_status_not_normal": "技能状态不正常",
+        "skill_draft_creators_only": "只有创建者可以运行草稿技能",
+        "app_error": "应用程序错误",
+        "team_members_not_open": "未向团队成员开放",
+        "app_status_not_normal": "应用状态不正常",
+        "skill_not_found": "未找到技能",
     }
 }
 
@@ -1356,17 +1542,18 @@ language_packs = {
 prompt_keys = {
     "requirement_category",
     "agent_system_prompt_with_auto_match_ability",
+    "agent_system_prompt_with_auto_match_ability_direct_output",
     "agent_system_prompt_with_abilities",
     "agent_system_prompt_with_no_ability",
+    "agent_retrieved_docs_format",
     "agent_reply_requirement_with_auto_match_ability",
-    "agent_reply_requirement_with_abilities",
-    "agent_reply_requirement_with_no_ability",
     "agent_reply_requirement_with_task_splitting_and_auto_match_ability",
     "agent_reply_requirement_with_task_splitting_and_abilities",
     "agent_reply_requirement_with_task_splitting_and_no_ability",
     "agent_output_format_1",
     "agent_output_format_2",
     "agent_output_format_3",
+    "agent_user_prompt",
     "agent_user_prompt_with_retrieved_docs",
     "llm_reply_requirement_with_task_splitting",
     "recursive_task_generation",
@@ -1377,9 +1564,7 @@ prompt_keys = {
     "chatroom_manager_user_invalid_selection",
     "chatroom_manager_user",
     "chatroom_manager_user_with_optional_selection",
-    "chatroom_agent_system",
-    "chatroom_agent_user_with_abilities",
-    "chatroom_agent_user_with_no_ability",
+    "chatroom_agent_user_subprompt",
     "chatroom_agent_description_with_abilities",
     "chatroom_agent_description_with_no_ability",
     "chatroom_role_user",
@@ -1403,7 +1588,11 @@ prompt_keys = {
     "chatroom_conference_orientation_system",
     "chatroom_conference_orientation_user",
     "chatroom_conference_orientation_system_correct",
-    "chatroom_conference_orientation_user_correct"
+    "chatroom_conference_orientation_user_correct",
+    "generate_skill_system_prompt",
+    "generate_skill_user",
+    "correction_skill_system_prompt",
+    "correction_skill_user"
 }
 
 

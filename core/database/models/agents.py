@@ -34,16 +34,19 @@ class Agents(MySQL):
         """
         agent = self.select_one(
             columns=[
-                "id",
-                "app_id",
-                "obligations",
-                "input_variables",
-                "auto_match_ability",
-                "default_output_format",
-                "model_config_id",
-                "allow_upload_file",
-                "publish_status"
+                "agents.id",
+                "apps.name",
+                "apps.description",
+                "agents.app_id",
+                "agents.obligations",
+                "agents.input_variables",
+                "agents.auto_match_ability",
+                "agents.default_output_format",
+                "agents.model_config_id",
+                "agents.allow_upload_file",
+                "agents.publish_status"
             ],
+            joins=[["inner", "apps", "agents.app_id = apps.id"]],
             conditions=[
                 {"column": "id", "value": agent_id},
                 {"column": "status", "value": 1}
