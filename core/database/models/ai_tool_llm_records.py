@@ -203,10 +203,11 @@ class AIToolLLMRecords(MySQL):
 
         # Get all records for current batch
         batch_records = self.select(
-            columns=['id', 'inputs', 'outputs'],
+            columns=['id', 'inputs', 'outputs', 'user_prompt'],
             conditions=[
                 {"column": "app_run_id", "value": app_run_id},
                 {"column": "loop_id", "value": loop_id},
+                {"column": "run_type", "value": 4}
             ],
             order_by='id ASC'
         )
@@ -222,65 +223,15 @@ class AIToolLLMRecords(MySQL):
         # Prepare prompts based on whether this is a continuation or new batch
         if batch_records:
             # Get base user prompt from first record of current batch
-            base_user_prompt = ""
-            try:
-                inputs = batch_records[0].get('inputs', {})
-                if isinstance(inputs, dict):
-                    user_dict = inputs.get('user', {})
-                    if isinstance(user_dict, dict):
-                        base_user_prompt = user_dict.get('value', '')
-            except Exception:
-                pass
-
-            # Format user prompt with history
-            user_prompt = get_language_content('agent_batch_generate_history_user', userinfo['user_id'], False)
-            user_prompt = user_prompt.format(
-                history_prompt=base_user_prompt,
-                history_agents=outputs_list
-            )
-        else:
-            # Get first record of original generation
-            first_record = self.select_one(
-                columns=['inputs'],
-                conditions=[
-                    {"column": "app_run_id", "value": app_run_id},
-                    {"column": "loop_id", "value": 0}
-                ],
-                order_by='id ASC'
-            )
-
-            # Get base user prompt
-            base_user_prompt = ""
-            if first_record and isinstance(first_record.get('inputs'), dict):
-                user_dict = first_record['inputs'].get('user', {})
-                if isinstance(user_dict, dict):
-                    base_user_prompt = user_dict.get('value', '')
-
-            # Get latest agent data
-            latest_record = self.select_one(
-                columns=['outputs'],
-                conditions=[
-                    {"column": "app_run_id", "value": app_run_id},
-                    {"column": "loop_id", "value": 0}
-                ],
-                order_by='id DESC'
-            )
-
-            # Format user prompt for new batch
-            user_prompt = get_language_content('agent_batch_generate_user', userinfo['user_id'], False)
-            user_prompt = user_prompt.format(
-                first_user_prompt=base_user_prompt,
-                agent_supplement=agent_supplement,
-                agent_data=latest_record['outputs'] if latest_record else {},
-                history_agents=outputs_list
-            )
-
+            agent_supplement = batch_records[0].get('user_prompt', '')
+            
         # Prepare system prompt
-        system_prompt = get_language_content('agent_batch_generate_system', userinfo['user_id'])
-        # system_prompt = system_prompt.format(
-        #     append_prompt=get_language_content('agent_batch_generate_system', userinfo['user_id'])
-        # )
-
+        system_prompt = get_language_content('agent_batch_one_system', userinfo['user_id'])
+        user_prompt = get_language_content('agent_batch_one_user', userinfo['user_id'], False)
+        user_prompt = user_prompt.format(
+            agent_batch_requirements=agent_supplement,
+            history_agents=outputs_list
+        )
         # Return formatted prompts
         return Prompt(system=system_prompt, user=user_prompt).to_dict()
 
@@ -289,7 +240,8 @@ class AIToolLLMRecords(MySQL):
             aggregates={"loop_count": "sum"},
             conditions=[
                 {"column": "app_run_id", "value": app_run_id},
-                {"column": "loop_id", "value": loop_id}
+                {"column": "loop_id", "value": loop_id},
+                {"column": "run_type", "value": 4}
             ]
         )
         return result[0]["sum_loop_count"] if result else 0
