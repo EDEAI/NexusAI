@@ -280,7 +280,6 @@ class AIToolLLMRecords(MySQL):
         # Return formatted prompts
         return Prompt(system=system_prompt, user=user_prompt).to_dict()
 
-
     def get_record_loop_count(self, app_run_id: int, loop_id: int) -> int:
         result = self.select(
             aggregates={"loop_count": "sum"},
@@ -291,3 +290,65 @@ class AIToolLLMRecords(MySQL):
         )
         return result[0]["sum_loop_count"] if result else 0
        
+    def append_record_outputs(self, app_run_id: int, loop_id: int) -> List[Dict[str, Any]]:
+        """
+        Retrieve and process outputs from records for a specific app run and loop iteration
+        
+        Args:
+            app_run_id (int): The ID of the application run
+            loop_id (int): The ID of the loop iteration
+            
+        Returns:
+            List[Dict[str, Any]]: List of processed output values from the records
+            
+        Note:
+            - Gets the current generation count from the latest record
+            - Retrieves records up to the current generation count
+            - Extracts and validates output values from each record
+            - Filters out invalid/empty outputs
+        """
+        try:
+            # Get current generation count from latest record
+            latest_record = self.select_one(
+                columns=['current_gen_count'],
+                conditions=[
+                    {"column": "app_run_id", "value": app_run_id},
+                    {"column": "loop_id", "value": loop_id}
+                ],
+                order_by='id DESC',
+                limit=1
+            )
+            
+            if not latest_record or 'current_gen_count' not in latest_record:
+                return []
+                
+            gen_count = latest_record['current_gen_count']
+            
+            # Get records up to current generation count
+            records = self.select(
+                columns=['outputs'],
+                conditions=[
+                    {"column": "app_run_id", "value": app_run_id},
+                    {"column": "loop_id", "value": loop_id}
+                ],
+                limit=gen_count
+            )
+
+            # Process and validate outputs
+            outputs_list = []
+            for record in records:
+                outputs = record.get('outputs')
+                if not outputs or not isinstance(outputs, dict):
+                    continue
+                    
+                output_value = outputs.get('value')
+                if output_value:
+                    outputs_list.append(output_value)
+
+            return outputs_list
+            
+        except Exception as e:
+            # Log error if needed
+            return []
+
+
