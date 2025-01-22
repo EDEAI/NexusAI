@@ -248,7 +248,7 @@ class AIToolLLMRecords(MySQL):
         )
         return result[0]["sum_loop_count"] if result else 0
        
-    def append_record_outputs(self, app_run_id: int, loop_id: int) -> List[Dict[str, Any]]:
+    def append_record_outputs(self, app_run_id: int, loop_id: int) -> Dict[str, Any]:
         """
         Retrieve and process outputs from records for a specific app run and loop iteration
         
@@ -257,7 +257,7 @@ class AIToolLLMRecords(MySQL):
             loop_id (int): The ID of the loop iteration
             
         Returns:
-            List[Dict[str, Any]]: List of processed output values from the records
+            Dict[str, Any]: List of processed output values from the records
             
         Note:
             - Gets the current generation count from the latest record
@@ -303,10 +303,16 @@ class AIToolLLMRecords(MySQL):
                 if output_value:
                     outputs_list.append(output_value)
 
-            return outputs_list
+            return {
+                "name": "text",
+                "type": "json",
+                "value":{
+                    "multi-agent": outputs_list
+                }
+            }
             
         except Exception as e:
             # Log error if needed
-            return []
+            return {}
 
 
