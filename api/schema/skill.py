@@ -139,7 +139,7 @@ class ReqSkillDataCreateSchema(BaseModel):
     output_type: Optional[int] = None
     output_variables: Optional[Dict[str, Any]] = None
     is_public: Optional[int] = None  # Added for app visibility control
-    tag_ids: Optional[List[int]] = None  # Added for tag management
+    tags: Optional[List[int]] = None  # Added for tag management
 
 class ReqSkillDebugSchema(BaseModel):
     """Schema for skill debugging without saving"""
