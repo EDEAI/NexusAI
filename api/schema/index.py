@@ -74,6 +74,7 @@ class WorkflowLogData(BaseModel):
     status: Optional[int] = None
     completed_steps: Optional[int] = None
     total_steps: Optional[int] = None
+    need_human_confirm: Optional[int] = None
     percentage: Optional[int] = None
     icon_background: Optional[str] = None
     icon: Optional[str] = None

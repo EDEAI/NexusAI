@@ -169,7 +169,7 @@ class AppRuns(MySQL):
         return self.select(
             columns=['app_runs.id AS app_run_id', 'apps.name AS apps_name', 'app_runs.name AS app_runs_name',
                      'app_runs.workflow_id', 'app_runs.created_time', 'app_runs.elapsed_time', 'app_runs.status',
-                     'app_runs.completed_steps', 'app_runs.total_steps', 'apps.icon', 'apps.icon_background'],
+                     'app_runs.completed_steps', 'app_runs.total_steps', 'app_runs.need_human_confirm', 'apps.icon', 'apps.icon_background'],
             joins=[('inner', 'apps', 'app_runs.app_id = apps.id')],
             conditions=conditions,
             order_by = "app_runs.id DESC",
