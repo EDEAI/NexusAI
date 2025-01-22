@@ -517,6 +517,8 @@ async def skill_debug(data: ReqSkillDebugSchema, userinfo: TokenData = Depends(g
     Returns:
         Execution results of the skill
     """
+    data = data.dict(exclude_unset=True)
+    data['code'] = json.dumps(data['code'])
     task = run_app.delay(app_type="skill", id_=0, user_id=userinfo.uid, input_dict=data.test_input,
                          custom_data=data.dict(exclude_unset=True))
     while not task.ready():

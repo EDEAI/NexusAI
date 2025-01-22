@@ -4,6 +4,7 @@ from core.database.models.tag_bindings import TagBindings
 from core.database.models.apps import Apps
 from core.database.models import Users
 import math
+import json
 from datetime import datetime
 from languages import get_language_content
 
@@ -152,6 +153,7 @@ class CustomTools(MySQL):
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         app_model = Apps()
         app_id = data.get('app_id',None)
+        data['code'] = json.dumps(data['code'])
         if app_id:
             app_update_data = {
                 "name": data.get('name'),
