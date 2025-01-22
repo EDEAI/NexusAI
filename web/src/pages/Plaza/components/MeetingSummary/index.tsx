@@ -49,9 +49,11 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                 setisLoad(true)
                 setTimeout(()=>{isUpload.current = true},300)
             }
-            setTimeout(()=>{
-                scrollDom?.current?.scrollTo({top: 0});
-            },200)
+            if(init){
+                setTimeout(()=>{
+                    scrollDom?.current?.scrollTo({top: 0});
+                },200)
+            }
             if(!isScroll){
                 setRoomId(summaryParams.id)
                 setSummaryParams({})
