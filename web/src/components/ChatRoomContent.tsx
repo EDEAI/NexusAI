@@ -499,25 +499,27 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                                 ? currentMessage.name
                                 : userinfodata('GET').nickname}
                         </div>
-                        <div
-                            className={`text-left inline-block markdown-container text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
-                            style={
-                                currentMessage.is_agent == 1
-                                    ? { borderRadius: ' 0px 8px 8px 8px' }
-                                    : {
-                                          borderRadius: '8px 0px 8px 8px',
-                                          background: 'rgba(27,100,243,0.1)',
-                                          whiteSpace:'pre-wrap'
-                                      }
-                            }
-                            id={`addchilContent`}
-                        >
-                            <ReactMarkdown
-                                rehypePlugins={[rehypeHighlight]}
-                                components={renderers('add', intl)}
+                        <div className={`flex ${currentMessage.is_agent == 1 ?'flex-row':'flex-row-reverse'}`}>
+                            <div
+                                className={`text-left inline-block markdown-container text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
+                                style={
+                                    currentMessage.is_agent == 1
+                                        ? { borderRadius: ' 0px 8px 8px 8px' }
+                                        : {
+                                            borderRadius: '8px 0px 8px 8px',
+                                            background: 'rgba(27,100,243,0.1)',
+                                            whiteSpace:'pre-wrap'
+                                        }
+                                }
+                                id={`addchilContent`}
                             >
-                                {currentMessage.content}
-                            </ReactMarkdown>
+                                <ReactMarkdown
+                                    rehypePlugins={[rehypeHighlight]}
+                                    components={renderers('add', intl)}
+                                >
+                                    {currentMessage.content}
+                                </ReactMarkdown>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -594,26 +596,28 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                             >
                                 {item.name ? item.name : userinfodata('GET').nickname}
                             </div>
-                            <div
-                                className={`text-left inline-block markdown-container text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
-                                style={
-                                    item.is_agent == 1
-                                        ? { borderRadius: ' 0px 8px 8px 8px' }
-                                        : {
-                                              borderRadius: '8px 0px 8px 8px',
-                                              background: 'rgba(27,100,243,0.1)',
-                                              whiteSpace:'pre-wrap'
-                                              
-                                          }
-                                }
-                                id={`currentChilContent${index}`}
-                            >
-                                <ReactMarkdown
-                                    rehypePlugins={[rehypeHighlight]}
-                                    components={renderers(index, intl)}
+                            <div className={`flex ${item.is_agent == 1 ?'flex-row':'flex-row-reverse'}`}>
+                                <div
+                                    className={`text-left inline-block markdown-container text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
+                                    style={
+                                        item.is_agent == 1
+                                            ? { borderRadius: ' 0px 8px 8px 8px' }
+                                            : {
+                                                borderRadius: '8px 0px 8px 8px',
+                                                background: 'rgba(27,100,243,0.1)',
+                                                whiteSpace:'pre-wrap'
+                                                
+                                            }
+                                    }
+                                    id={`currentChilContent${index}`}
                                 >
-                                    {item.content}
-                                </ReactMarkdown>
+                                    <ReactMarkdown
+                                        rehypePlugins={[rehypeHighlight]}
+                                        components={renderers(index, intl)}
+                                    >
+                                        {item.content}
+                                    </ReactMarkdown>
+                                </div>
                             </div>
                             {item.is_agent == 1 ? (
                                 <div className='flex gap-x-[20px]'>
@@ -818,25 +822,27 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                             >
                                 {item.name ? item.name : userinfodata('GET').nickname}
                             </div>
-                            <div
-                                className={`text-left markdown-container inline-block text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
-                                style={
-                                    item.is_agent == 1
-                                        ? { borderRadius: ' 0px 8px 8px 8px' }
-                                        : {
-                                              borderRadius: '8px 0px 8px 8px',
-                                              background: 'rgba(27,100,243,0.1)',
-                                              whiteSpace:'pre-wrap'
-                                          }
-                                }
-                                id={`chilContent${index}`}
-                            >
-                                <ReactMarkdown
-                                    rehypePlugins={[rehypeHighlight]}
-                                    components={renderers(index, intl)}
+                            <div className={`flex ${item.is_agent == 1 ?'flex-row':'flex-row-reverse'}`}>
+                                <div
+                                    className={`text-left markdown-container inline-block text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
+                                    style={
+                                        item.is_agent == 1
+                                            ? { borderRadius: ' 0px 8px 8px 8px' }
+                                            : {
+                                                borderRadius: '8px 0px 8px 8px',
+                                                background: 'rgba(27,100,243,0.1)',
+                                                whiteSpace:'pre-wrap'
+                                            }
+                                    }
+                                    id={`chilContent${index}`}
                                 >
-                                    {item.content}
-                                </ReactMarkdown>
+                                    <ReactMarkdown
+                                        rehypePlugins={[rehypeHighlight]}
+                                        components={renderers(index, intl)}
+                                    >
+                                        {item.content}
+                                    </ReactMarkdown>
+                                </div>
                             </div>
                             {item.is_agent == 1 ? (
                                 <div className='flex gap-x-[20px]'>

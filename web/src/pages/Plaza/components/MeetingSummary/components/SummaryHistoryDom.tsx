@@ -50,6 +50,35 @@ const ProgressContainer :React.FC<{progressObj:any}> = memo((parmas) => {
     );
 });
 
+const Redirect:React.FC<{id:any,message:any}> = memo((parmas)=>{
+    let {id,message} =  parmas
+    let intl = useIntl();
+    const setSummaryClick = useChatroomStore(state=>state.setSummaryClick);
+    const [disabled,setDisabled] = useState(true);
+    const summaryClick = useChatroomStore(state=>state.summaryClick);
+    const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
+    useEffect(()=>{
+        setDisabled(summaryClick)
+    },[summaryClick])
+    return (
+        <div className='flex flex-row-reverse'>
+            <Button
+                type="primary"
+                className="bg-[#1B64F3] rounded-[4px] my-3 h-[30px] w-[110px] gap-[6px]"
+                onClick={(e:any)=>{
+                    if(disabled){
+                        setSummaryParams({id:id,message:message})
+                        setSummaryClick(false)
+                    }
+                }}
+            >   
+                <span className='text-[12px]'>{intl.formatMessage({ id: `app.summaryhistory.submitText` })}</span>
+                <RedoOutlined className='text-[14px]'/>
+            </Button>
+        </div>
+    )
+})
+
 const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any,id:any}>=parmas=>{
     let {list,scrollDom,historyHeight,id}=parmas;
     let intl = useIntl();
@@ -73,13 +102,7 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any,id:an
         })
         return array
     }
-    const setSummaryClick = useChatroomStore(state=>state.setSummaryClick);
-    const [disabled,setDisabled] = useState(true);
-    const summaryClick = useChatroomStore(state=>state.summaryClick);
-    const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
-    useEffect(()=>{
-        setDisabled(summaryClick)
-    },[summaryClick])
+
     useEffect(()=>{
         if(scrollDom){
             domHeight.current = scrollDom?.current?.offsetHeight
@@ -93,7 +116,7 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any,id:an
     },[historyHeight])
 
     useEffect(()=>{
-        setSummaryHistory([...list.reverse()])
+        setSummaryHistory([...list])
     },[list])
     
     return(
@@ -111,10 +134,13 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any,id:an
                                     <p className='text-[12px] color-[#eee] mb-[8px]'>
                                         {timeConversion(item?.source_run?.created_time)}
                                     </p>
-                                    <div className={`p-[12px]  leading-[22px] ${item?.source_corrections && item?.source_corrections.length>0?'bg-[#F7F7F7]':'bg-blue-100 rounded-[4px]'}`}>
-                                        <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
-                                            {item?.source_run?.summary}
-                                        </ReactMarkdown>
+                                    <div>
+                                        <div className={`p-[12px]  leading-[22px] ${item?.source_corrections && item?.source_corrections.length>0?'bg-[#F7F7F7]':'bg-blue-100 rounded-[4px]'}`}>
+                                            <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
+                                                {item?.source_run?.summary}
+                                            </ReactMarkdown>
+                                        </div>
+                                        <Redirect id={id} message={item?.source_run?.summary}/>
                                     </div>
                                     {
                                         item?.source_corrections && item?.source_corrections.length>0 ? 
@@ -122,41 +148,28 @@ const SummaryHistoryDom:React.FC<{list:any,scrollDom:any,historyHeight:any,id:an
                                                 <div className='text-[16px] font-[600] py-[8px]'>{intl.formatMessage({id:'app.summaryhistory.orientation'})}:</div>
                                                 {
                                                     item?.source_corrections.map(item=>(
-                                                        <div key={item.created_time} className='last-of-type:bg-blue-100 rounded-[4px] bg-[#F7F7F7] mb-[16px] last-of-type:mb-0'>
-                                                            <div className='p-[12px]   leading-[22px]'>
-                                                                <div className='tetx-[14px] font-[600] pb-[12px]'>
-                                                                   {intl.formatMessage({id:'app.summaryhistory.userPrompt'})}: {item.user_prompt}
+                                                        <div key={item.created_time} className='mb-[16px] last-of-type:mb-0'>
+                                                            <div  className='last-of-type:bg-blue-100 rounded-[4px] bg-[#F7F7F7]'>
+                                                                <div className='p-[12px]   leading-[22px]'>
+                                                                    <div className='tetx-[14px] font-[600] pb-[12px]'>
+                                                                    {intl.formatMessage({id:'app.summaryhistory.userPrompt'})}: {item.user_prompt}
+                                                                    </div>
+                                                                    <div className='tetx-[14px] font-[600] pb-[12px]'>
+                                                                    {intl.formatMessage({id:'app.summaryhistory.time'})}: {timeConversion(item.created_time)}
+                                                                    </div>
+                                                                    <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
+                                                                        {item?.corrected_summary}
+                                                                    </ReactMarkdown>
                                                                 </div>
-                                                                <div className='tetx-[14px] font-[600] pb-[12px]'>
-                                                                   {intl.formatMessage({id:'app.summaryhistory.time'})}: {timeConversion(item.created_time)}
-                                                                </div>
-                                                                <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
-                                                                    {item?.corrected_summary}
-                                                                </ReactMarkdown>
                                                             </div>
+                                                            <Redirect id={id} message={item?.corrected_summary}/>
                                                         </div>
                                                     ))
                                                 }
                                             </div>
                                         :<></>
                                     }
-                                    <div className='flex flex-row-reverse'>
-                                        <Button
-                                            type="primary"
-                                            className="bg-[#1B64F3] rounded-[4px] my-3 h-[30px] w-[110px] gap-[6px]"
-                                            onClick={(e:any)=>{
-                                                if(disabled){
-                                                    let source_corrections = item?.source_corrections && item?.source_corrections.length>0 && item?.source_corrections[item?.source_corrections.length-1]
-                                                    let innertext = source_corrections ? source_corrections.corrected_summary : item?.source_run?.summary
-                                                    setSummaryParams({id:id,message:innertext})
-                                                    setSummaryClick(false)
-                                                }
-                                            }}
-                                        >   
-                                            <span className='text-[12px]'>{intl.formatMessage({ id: `app.summaryhistory.submitText` })}</span>
-                                            <RedoOutlined className='text-[14px]'/>
-                                        </Button>
-                                    </div>
+                                    
                                     {
                                         item?.target_run?
                                             <div className='py-[12px]'>

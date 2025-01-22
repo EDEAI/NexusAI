@@ -20,35 +20,61 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
     const [boxLoading,setBoxLoading] = useState(false);
     const [inputShow,setinputShow] = useState(true);
     const scrollDom = useRef(null)
+    const historyPage = useRef(1)
     const historyHeight = useRef(false)
+    const isUpload = useRef(true);
+    const totalPages = useRef(0)
+    const [isLoad,setisLoad] = useState(false);
 
-    const getSummaryHistory=async(isScroll=true)=>{
+    const summaryParams = useChatroomStore(state=>state.summaryParams);
+    const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
+
+    const getSummaryHistory=async(isScroll=true,init=true)=>{
+        if(totalPages.current!=0 && totalPages.current < historyPage.current){
+            setisLoad(false)
+            return
+        }; 
         let resData=await getMeetingSummaryHistory({
             'chatroom_id':id,
-            'page':1,
-            'page_size':9999
+            'page':historyPage.current,
+            'page_size':10
         })
         if(resData.code == 0){
             if(resData?.data?.list && resData?.data?.list?.length){
-                setSummaryHistory(resData.data.list);
+                totalPages.current=resData?.data?.total_pages
+                setSummaryHistory(pre=>{
+                    return init? [...resData.data.list.reverse()] : [...resData.data.list.reverse(),...pre]
+                });
                 setContentShow(true);
+                setisLoad(true)
+                setTimeout(()=>{isUpload.current = true},300)
             }
+            setTimeout(()=>{
+                scrollDom?.current?.scrollTo({top: 0});
+            },200)
             if(!isScroll){
-                setTimeout(()=>{
-                    scrollDom?.current?.scrollTo({top: 0});
-                },200)
                 setRoomId(summaryParams.id)
                 setSummaryParams({})
             }
         }
     }
+
+    const historyLoad =async(e)=>{
+        if( e.target.scrollHeight + (e.target.scrollTop - e.target.clientHeight) < 10 && isUpload.current){
+            isUpload.current = false
+            setisLoad(true)
+            historyPage.current = historyPage.current+=1
+            getSummaryHistory(true,false)
+        }
+
+    }
     
     useEffect(()=>{
+        historyPage.current = 1
         getSummaryHistory()
     },[id])
 
-    const summaryParams = useChatroomStore(state=>state.summaryParams);
-    const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
+
     useEffect(()=>{
         if(summaryParams && summaryParams.id){
             setContentShow(true);
@@ -61,6 +87,8 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
             if(packUp){
                 setPackUp(false)
             }
+
+            historyPage.current = 1
 
             setSummaryShow(true);
             
@@ -90,7 +118,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                                     `}>
                                    {!packUp?<VerticalLeftOutlined className='text-[20px]'/>:<VerticalRightOutlined className='text-[20px]'/>}
                                 </div>
-                                <div className={`h-full min-h-full overflow-y-auto flex flex-col-reverse scroll-smooth`}  ref={scrollDom}>
+                                <div className={`h-full min-h-full overflow-y-auto flex flex-col-reverse scroll-smooth relative`} onScroll={historyLoad} ref={scrollDom}>
                                     <div>
                                         {summaryHistory.length?<SummaryHistoryDom id={id} scrollDom={scrollDom} list={summaryHistory} historyHeight={historyHeight.current}/>:<></>}
                                         <div className={`w-full px-4 h-full`} style={{minHeight:summaryShow?scrollDom?.current?.offsetHeight:''}}>
@@ -110,6 +138,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                                             />:<></>}
                                         </div>
                                     </div>
+                                    {isLoad?<div className="text-center justify-center items-center flex"><Spin /></div>:<></>}
                                 </div>
                             </>
                         }

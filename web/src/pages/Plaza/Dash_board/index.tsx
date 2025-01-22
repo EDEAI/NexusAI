@@ -389,7 +389,7 @@ const RunLogs :React.FC<BlockParmas> = parmas =>{
                                             <div className='items-center gap-x-[8px] inline-flex justify-end w-full'>
                                                 <span className='flex-1 truncate'>{item.app_runs_name || item.run_name}</span>
                                                 {item.status==2?1:0}
-                                                {item?.need_human_confirm==1 || item?.status==1?<Tag className=' text-[12px] flex items-center justify-center margin-0' color="blue">{intl.formatMessage({id:'app.summaryhistory.tag'})}</Tag>:<></>}
+                                                {item?.need_human_confirm==1?<Tag className=' text-[12px] flex items-center justify-center margin-0' color="blue">{intl.formatMessage({id:'app.summaryhistory.tag'})}</Tag>:<></>}
                                             </div>
                                         }
                                         textDetails={
