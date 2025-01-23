@@ -33,8 +33,8 @@ class AIToolLLMRecords(MySQL):
             int: The ID of the newly created record.
         """
 
-        current_gen_count = self.select_one(
-            columns=['current_gen_count'],
+        record_info = self.select_one(
+            columns=['loop_id'],
             conditions=[
                 {"column": "app_run_id", "value": app_run_id},
                 {"column": "loop_id", "value": loop_id}
@@ -42,10 +42,14 @@ class AIToolLLMRecords(MySQL):
             order_by='id DESC',
             limit=1
         )
-        if current_gen_count is None:
-            current_gen_count = loop_count
+
+        if record_info:
+            record_loop_count = self.get_record_loop_count(app_run_id, loop_id, batch_generation_tool_mode)
+            remaining_count = loop_limit - record_loop_count
         else:
-            current_gen_count = current_gen_count['current_gen_count']
+            remaining_count = loop_limit
+
+        current_gen_count = min(loop_count, remaining_count)
 
         if batch_generation_tool_mode == 1:
             loop_count = max(loop_count - 1, 0)
