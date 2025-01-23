@@ -190,8 +190,6 @@ class AIToolLLMRecords(MySQL):
         from languages import get_language_content
         from core.llm.prompt import Prompt
 
-        
-
         # Get all records for current batch
         batch_records = self.select(
             columns=['id', 'inputs', 'outputs', 'user_prompt'],
@@ -257,14 +255,18 @@ class AIToolLLMRecords(MySQL):
             loop_id (int): The ID of the loop iteration
             
         Returns:
-            Dict[str, Any]: List of processed output values from the records
-            
+            Dict[str, Any]: Dictionary containing:
+                - name: "text"
+                - type: "json"
+                - value: Dictionary containing multi-agent outputs
+                
         Note:
-            - Gets the current generation count from the latest record
-            - Retrieves records up to the current generation count
+            - Gets the current generation count from latest record
+            - Retrieves records up to current generation count
             - Extracts and validates output values from each record
-            - Filters out invalid/empty outputs
+            - Handles JSON string parsing for output values
         """
+        import json
         try:
             # Get current generation count from latest record
             latest_record = self.select_one(
@@ -278,7 +280,11 @@ class AIToolLLMRecords(MySQL):
             )
             
             if not latest_record or 'current_gen_count' not in latest_record:
-                return []
+                return {
+                    "name": "text",
+                    "type": "json",
+                    "value": {"multi-agent": []}
+                }
                 
             gen_count = latest_record['current_gen_count']
             
@@ -295,24 +301,35 @@ class AIToolLLMRecords(MySQL):
             # Process and validate outputs
             outputs_list = []
             for record in records:
-                outputs = record.get('outputs')
-                if not outputs or not isinstance(outputs, dict):
+                try:
+                    outputs = record.get('outputs')
+                    if not outputs or not isinstance(outputs, dict):
+                        continue
+                        
+                    output_value = outputs.get('value')
+                    if output_value:
+                        # Parse JSON string if value is string
+                        if isinstance(output_value, str):
+                            output_value = json.loads(output_value)
+                        outputs_list.append(output_value)
+                except json.JSONDecodeError:
+                    # Skip invalid JSON values
                     continue
-                    
-                output_value = outputs.get('value')
-                if output_value:
-                    outputs_list.append(output_value)
 
             return {
                 "name": "text",
                 "type": "json",
-                "value":{
+                "value": {
                     "multi-agent": outputs_list
                 }
             }
             
         except Exception as e:
             # Log error if needed
-            return {}
+            return {
+                "name": "text",
+                "type": "json",
+                "value": {"multi-agent": []}
+            }
 
 

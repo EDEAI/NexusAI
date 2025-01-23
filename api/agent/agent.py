@@ -653,7 +653,6 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
     """
     # False: single generation, True: multiple generation
     single_or_multiple = False
-    outputs_list = AIToolLLMRecords().append_record_outputs(data.app_run_id, data.loop_id)
     app_run_id = data.app_run_id
     if app_run_id <= 0:
         start_datetime_str = datetime.fromtimestamp(time()) \
@@ -687,6 +686,7 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         if runing_record:
             # There are records that are being executed.
             return response_error(get_language_content("agent_batch_exist_runing_rocord"))
+        
         record_loop_count = AIToolLLMRecords().get_record_loop_count(data.app_run_id, loop_id)
         remaining_count = data.loop_limit - record_loop_count
     else:
