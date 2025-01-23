@@ -86,11 +86,13 @@ const SummaryHistoryDom: React.FC<{
     scrollDom: any;
     historyHeight: any;
     id: any;
+    runid:any
 }> = parmas => {
-    let { list, scrollDom, historyHeight, id } = parmas;
+    let { list, scrollDom, historyHeight, id , runid} = parmas;
     let intl = useIntl();
     const [summaryHistory, setSummaryHistory] = useState([]);
     const domHeight = useRef('100%');
+    const [appRunId,setAppRunId] = useState(0)
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const timeConversion = time => {
         let newTime = new Date(time);
@@ -138,12 +140,19 @@ const SummaryHistoryDom: React.FC<{
         setSummaryHistory([...list]);
     }, [list]);
 
+    useEffect(()=>{
+        console.log(runid);
+        
+        setAppRunId(runid)
+    },[runid])
+
     return (
         <>
             <div className="px-4" style={{ minHeight: domHeight.current }}>
                 {summaryHistory && summaryHistory.length ? (
                     summaryHistory.map(item =>
-                        item?.source_run && item?.source_run.summary ? (
+                        item?.source_run && item?.source_run.summary && (!appRunId ||  appRunId!=item?.source_run?.id)? (
+                            
                             <div
                                 className="pt-[16px] border-b-[1px] border-color-[#eee] "
                                 key={item.source_run.id}
