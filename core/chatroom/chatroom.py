@@ -19,8 +19,9 @@ from core.database.models import (
 )
 from core.helper import truncate_messages_by_token_limit
 from core.llm import Prompt
+from core.workflow.context import Context
 from core.workflow.nodes import AgentNode, LLMNode
-from core.workflow.variables import create_variable_from_dict, Variable
+from core.workflow.variables import create_variable_from_dict, ObjectVariable
 from languages import get_language_content
 from log import Logger
 
@@ -119,7 +120,7 @@ class Chatroom:
                     )
                     description = description.format(
                         obligations=agent['obligations'],
-                        abilities=abilities_content
+                        abilities_content=abilities_content
                     )
                 else:
                     description: str = get_language_content(
@@ -155,8 +156,8 @@ class Chatroom:
                 'role': user_str if agent_id == 0 else agent_str,
                 'message': message['message']
             }
-            if (topic := message['topic']) is not None:
-                message_for_llm['topic'] = topic
+            # if (topic := message['topic']) is not None:
+            #     message_for_llm['topic'] = topic
             messages.append(message_for_llm)
         messages_in_last_section = deque()
         for message in reversed(messages):
@@ -302,119 +303,49 @@ class Chatroom:
         prompt_tokens = 0
         completion_tokens = 0
         total_tokens = 0
-        agent = self._all_agents[agent_id]
-        abilities = agent['abilities']
-        messages, messages_in_last_section = self._get_history_messages_list(self._model_config_ids[agent_id])
 
-        # Prepare the input for the agent
-        if abilities:
-            # If the agent has abilities, use the prompt template for agents with abilities
-            agent_user_prompt = get_language_content(
-                'chatroom_agent_user_with_abilities',
-                self._user_id,
-                append_ret_lang_prompt=False
-            ).format(
-                messages = json.dumps(messages, ensure_ascii=False),
-                topic = self._topic,
-                user_message = messages_in_last_section[0]['message'],
-                messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
-                id_ = agent_id,
-                name = agent['name'],
-                obligations = agent['obligations'],
-                abilities = json.dumps([ability['content'] for ability in abilities], ensure_ascii=False)
-            )
-        else:
-            # If the agent has no abilities, use the prompt template for agents with no abilities
-            agent_user_prompt = get_language_content(
-                'chatroom_agent_user_with_no_ability',
-                self._user_id,
-                append_ret_lang_prompt=False
-            ).format(
-                messages = json.dumps(messages, ensure_ascii=False),
-                topic = self._topic,
-                user_message = messages_in_last_section[0]['message'],
-                messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
-                id_ = agent_id,
-                name = agent['name'],
-                obligations = agent['obligations']
-            )
-        prompt = Prompt(
-            system=get_language_content('chatroom_agent_system', self._user_id),
-            user=agent_user_prompt
+        messages, messages_in_last_section = self._get_history_messages_list(self._model_config_ids[agent_id])
+        user_message = messages_in_last_section[0]['message']
+        agent_user_subprompt = get_language_content(
+            'chatroom_agent_user_subprompt',
+            self._user_id,
+            append_ret_lang_prompt=False
+        ).format(
+            messages = json.dumps(messages, ensure_ascii=False),
+            topic = self._topic,
+            user_message = user_message,
+            messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False)
         )
+        prompt = Prompt(user=agent_user_subprompt)
         agent_node = AgentNode(
             title=f'Agent {agent_id}',
-            desc=f'Agent {agent_id}',
+            input=ObjectVariable('Input'),
             agent_id=agent_id,
             prompt=prompt
         )
-        logger.debug('Requesting LLM...')
-        start_time = monotonic()
-        now = datetime.now().replace(microsecond=0).isoformat(sep='_')
-        agent_run_id = AppRuns().insert(
-            {
-                # the local variable `app_id` is the APP ID of the workflow when `node_exec_id` is not 0
-                # and is the APP ID of the agent when `node_exec_id` is 0
-                'app_id': agent['app_id'],
-                'user_id': self._user_id,
-                'agent_id': agent_id,
-                'type': 2,
-                'name': f'Agent-{agent_id}-Roundtable-{self._chatroom_id}_{now}',
-                'raw_user_prompt': agent_user_prompt,
-                'messages': [
-                    ['system', prompt.system.to_dict()],
-                    ['user', prompt.user.to_dict()]
-                ],
-                'status': 2
-            }
-        )
-        try:
-            self._console_log('Agent message: \033[36m')  # Print the agent message in green
-            full_chunk: Optional[AIMessageChunk] = None
-            # Request LLM
-            async for chunk in agent_node.run_in_chatroom(self._user_id):
-                if content := chunk.content:
-                    self._console_log(content)
-                    full_chunk = chunk if full_chunk is None else full_chunk + chunk
-                    await self._ws_manager.send_agent_reply(
-                        self._chatroom_id,
-                        agent_id,
-                        content,
-                        full_chunk.content
-                    )
-                # Get token usage
-                if usage_metadata := chunk.usage_metadata:
-                    prompt_tokens = usage_metadata['input_tokens']
-                    completion_tokens = usage_metadata['output_tokens']
-                    total_tokens = usage_metadata['total_tokens']
-            self._console_log('\033[0m\n')  # Reset the color
-            agent_message = full_chunk.content if full_chunk else ''
-            elapsed_time = monotonic() - start_time
-            AppRuns().update(
-                {'column': 'id', 'value': agent_run_id},
-                {
-                    'status': 3,
-                    'outputs': Variable(
-                        name='text',
-                        type='string',
-                        value=agent_message
-                    ).to_dict(),
-                    'elapsed_time': elapsed_time,
-                    'prompt_tokens': prompt_tokens,
-                    'completion_tokens': completion_tokens,
-                    'total_tokens': total_tokens,
-                    'finished_time': datetime.now()
-                }
-            )
-        except Exception as e:
-            AppRuns().update(
-                {'column': 'id', 'value': agent_run_id},
-                {
-                    'status': 4,
-                    'error': str(e)
-                }
-            )
-            raise
+        self._console_log('Agent message: \033[36m')  # Print the agent message in green
+        # Request LLM
+        agent_message = ''
+        async for chunk in agent_node.run_in_chatroom(
+            context=Context(),
+            user_id=self._user_id,
+            type=2,
+            override_rag_input=user_message
+        ):
+            if content := chunk.content:
+                self._console_log(content)
+                agent_message += content
+                await self._ws_manager.send_agent_reply(
+                    self._chatroom_id,
+                    agent_id,
+                    content,
+                    agent_message
+                )
+            if usage_metadata := chunk.usage_metadata:
+                prompt_tokens = usage_metadata['input_tokens']
+                completion_tokens = usage_metadata['output_tokens']
+                total_tokens = usage_metadata['total_tokens']
+        self._console_log('\033[0m\n')  # Reset the color
         await self._ws_manager.end_agent_reply(
             self._chatroom_id,
             agent_id,

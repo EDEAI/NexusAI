@@ -135,7 +135,7 @@ class ReqSkillDataCreateSchema(BaseModel):
     app_id: Optional[int] = None  # Required for updates
     input_variables: Optional[Dict[str, Any]] = None
     dependencies: Optional[Dict[str, Any]] = None
-    code: Optional[Dict[str, Any]] = None
+    code: Optional[str] = None
     output_type: Optional[int] = None
     output_variables: Optional[Dict[str, Any]] = None
     is_public: Optional[int] = None  # Added for app visibility control
@@ -147,7 +147,7 @@ class ReqSkillDebugSchema(BaseModel):
     description: str
     input_variables: dict
     dependencies: dict
-    code: dict
+    code: Optional[str] = None
     output_type: int  # 1:text 2:database 3:code 4:document
     output_variables: dict
     test_input: Dict[str, Any]  # Input data for testing

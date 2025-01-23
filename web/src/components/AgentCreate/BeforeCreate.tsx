@@ -27,7 +27,7 @@ const BeforeCreate = memo(({ type = 'single', loading = false, onClick, hasHover
                     src={type === 'single' ? '/icons/agent_create.svg' : '/icons/agents_create.svg'} 
                     className="size-16" 
                 />
-                <div className="mt-2">
+                <div className="text-lg font-medium mt-4">
                     {type === 'single' 
                         ? intl.formatMessage({ id: 'agent.before.single.desc' })
                         : intl.formatMessage({ id: 'agent.before.batch.desc' })
