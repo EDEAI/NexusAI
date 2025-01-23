@@ -310,6 +310,7 @@ class AIToolLLMRecords(MySQL):
                     {"column": "app_run_id", "value": app_run_id},
                     {"column": "loop_id", "value": loop_id}
                 ],
+                order_by='id DESC',
                 limit=gen_count
             )
 
