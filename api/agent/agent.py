@@ -651,8 +651,8 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         supplement_prompt: str, Additional requirements for generation
         loop_id: int, Loop iteration ID
     """
-    # False: single generation, True: multiple generation
-    single_or_multiple = False
+    # 1: single generation, 2: multiple generation
+    batch_generation_tool_mode = 1
     app_run_id = data.app_run_id
     if app_run_id <= 0:
         start_datetime_str = datetime.fromtimestamp(time()) \
@@ -687,7 +687,7 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             # There are records that are being executed.
             return response_error(get_language_content("agent_batch_exist_runing_rocord"))
         
-        record_loop_count = AIToolLLMRecords().get_record_loop_count(data.app_run_id, loop_id)
+        record_loop_count = AIToolLLMRecords().get_record_loop_count(data.app_run_id, loop_id, batch_generation_tool_mode)
         remaining_count = data.loop_limit - record_loop_count
     else:
         # Start new batch
@@ -723,7 +723,7 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         model_info = Models().get_model_by_config_id(model_config_id)
         outputs_list = truncate_messages_by_token_limit(outputs_list, model_info)
 
-        if single_or_multiple:
+        if batch_generation_tool_mode is 2:
             system_prompt = get_language_content('agent_batch_generate_system', userinfo.uid)
             user_prompt = get_language_content('agent_batch_generate_user', userinfo.uid, False)
             user_prompt = user_prompt.format(
@@ -758,7 +758,7 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             loop_count=loop_count,
             inputs=input_,
             user_prompt=data.supplement_prompt,
-            single_or_multiple=single_or_multiple
+            batch_generation_tool_mode=batch_generation_tool_mode
         )
 
         if not record_id:
