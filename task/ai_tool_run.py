@@ -220,6 +220,7 @@ def create_celery_task(
     loop_limit: int,
     loop_count: int,
     run_ai_tool_type: int,
+    current_gen_count: int,
     prompt_dict: Optional[Dict[str, Any]] = None,
     return_json: bool = False,
     correct_llm_output: bool = False,
@@ -237,6 +238,7 @@ def create_celery_task(
     :param correct_llm_output: Flag to indicate if correct LLM output is found.
     :param id: The ID of the ai_tool_llm_records.
     :param ai_tool_type: The ai_tool_type of the app run.
+    :param current_gen_count: current_gen_count of number of agents generated.
     """
     app_run_info = app_run.get_search_app_run_team_id(app_run_id)
     team_id = app_run_info['team_id']
@@ -250,7 +252,7 @@ def create_celery_task(
         correct_llm_output=correct_llm_output
     )
     # Add task to global tasks list
-    global_tasks.append((task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type, loop_count, loop_id, run_ai_tool_type, loop_limit))
+    global_tasks.append((task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type, loop_count, loop_id, run_ai_tool_type, loop_limit, current_gen_count))
     logger.info(f"Task added for run:{app_run_id} id:{id} task_id:{task.id}")
 
 
@@ -314,7 +316,7 @@ def task_delay_thread():
                     correct_llm_output = False
                 update_app_run(app_run_id, {'status': 2})
                 update_ai_run(id, {'status': 2})
-                create_celery_task(app_run_id, id, ai_tool_type, run['loop_id'], run['loop_limit'], run['loop_count'], run['ai_tool_type'], prompt_dict, return_json, correct_llm_output)
+                create_celery_task(app_run_id, id, ai_tool_type, run['loop_id'], run['loop_limit'], run['loop_count'], run['ai_tool_type'], run['current_gen_count'], prompt_dict, return_json, correct_llm_output)
                 logger.debug(f"Task assigned completed and the App Run table ID is:{app_run_id}")
                 continue
 
@@ -331,7 +333,7 @@ def task_callback_thread():
     global running
     while running:
         for item in list(global_tasks):
-            task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type, loop_count, loop_id, run_ai_tool_type, loop_limit = item
+            task, team_id, user_id, app_run_id, prompt_dict, return_json, correct_llm_output, id, ai_tool_type, loop_count, loop_id, run_ai_tool_type, loop_limit, current_gen_count = item
             if task.ready():
                 try:
                     result = task.get(timeout=task_timeout)  # Wait for the task to complete with a timeout
@@ -442,7 +444,8 @@ def task_callback_thread():
                                         loop_limit=loop_limit,
                                         loop_count=loop_count,
                                         inputs=inputs_new,
-                                        batch_generation_tool_mode=batch_generation_tool_mode
+                                        batch_generation_tool_mode=batch_generation_tool_mode,
+                                        current_gen_count=current_gen_count
                                     )
                                     app_run_data = {
                                         'status': 1
