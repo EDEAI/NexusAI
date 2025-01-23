@@ -122,7 +122,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                                 </div>
                                 <div className={`h-full min-h-full overflow-y-auto flex flex-col-reverse scroll-smooth relative`} onScroll={historyLoad} ref={scrollDom}>
                                     <div>
-                                        {summaryHistory.length?<SummaryHistoryDom id={id} scrollDom={scrollDom} list={summaryHistory} historyHeight={historyHeight.current}/>:<></>}
+                                        {summaryHistory.length?<SummaryHistoryDom id={id} runid={appRunId} scrollDom={scrollDom} list={summaryHistory} historyHeight={historyHeight.current}/>:<></>}
                                         <div className={`w-full px-4 h-full`} style={{minHeight:summaryShow?scrollDom?.current?.offsetHeight:''}}>
                                             <RevisionsMeetingSummary 
                                                 setShow={setRunboxShow}
