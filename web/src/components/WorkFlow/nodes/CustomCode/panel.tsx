@@ -260,7 +260,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                         value: 'number',
                                     },
                                     {
-                                        label: 'JSON',
+                                        label: 'Object',
                                         value: 'json',
                                     },
                                 ]}
