@@ -251,17 +251,28 @@ class AIToolLLMRecords(MySQL):
         # Return formatted prompts
         return Prompt(system=system_prompt, user=user_prompt).to_dict()
 
-    def get_record_loop_count(self, app_run_id: int, loop_id: int) -> int:
-        result = self.select(
-            aggregates={"loop_count": "sum"},
-            conditions=[
-                {"column": "app_run_id", "value": app_run_id},
-                {"column": "loop_id", "value": loop_id},
-                {"column": "run_type", "value": 4}
-            ]
-        )
-        return result[0]["sum_loop_count"] if result else 0
-       
+    def get_record_loop_count(self, app_run_id: int, loop_id: int, batch_generation_tool_mode: int = 1) -> int:
+        if batch_generation_tool_mode is 2:
+            result = self.select(
+                aggregates={"loop_count": "sum"},
+                conditions=[
+                    {"column": "app_run_id", "value": app_run_id},
+                    {"column": "loop_id", "value": loop_id},
+                    {"column": "run_type", "value": 4}
+                ]
+            )
+            return result[0]["sum_loop_count"] if result else 0
+        else:
+            result = self.select(
+                aggregates={"loop_id": "count"},
+                conditions=[
+                    {"column": "app_run_id", "value": app_run_id},
+                    {"column": "loop_id", "value": loop_id},
+                    {"column": "run_type", "value": 4}
+                ]
+            )
+            return result[0]["count_loop_id"] if result else 0
+
     def append_record_outputs(self, app_run_id: int, loop_id: int) -> Dict[str, Any]:
         """
         Retrieve and process outputs from records for a specific app run and loop iteration
