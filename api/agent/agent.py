@@ -651,11 +651,8 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         supplement_prompt: str, Additional requirements for generation
         loop_id: int, Loop iteration ID
     """
-    # Validate app run exists and belongs to user
-    # app_run_info = AppRuns().get_app_run_info(data.app_run_id, userinfo.uid)
-    # if not app_run_info:
-    #     return response_error(get_language_content('app_run_error'))
-    
+    # 1: single generation, 2: multiple generation
+    batch_generation_tool_mode = 1
     app_run_id = data.app_run_id
     if app_run_id <= 0:
         start_datetime_str = datetime.fromtimestamp(time()) \
@@ -668,17 +665,9 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             'status': 1  # Initial status
         })
     else:
-        app_run_info = AppRuns().select_one(
-            columns=["id"],
-            conditions=[
-                {"column": "id", "value": app_run_id},
-                {"column": "user_id", "value": userinfo.uid}
-            ]
-        )   
+        app_run_info = AppRuns().get_app_run_info(data.app_run_id, userinfo.uid)
         if not app_run_info:
             return response_error(get_language_content('app_run_error'))
-
-
 
     if data.loop_id > 0:
         # Continue existing batch
@@ -697,7 +686,8 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         if runing_record:
             # There are records that are being executed.
             return response_error(get_language_content("agent_batch_exist_runing_rocord"))
-        record_loop_count = AIToolLLMRecords().get_record_loop_count(data.app_run_id, loop_id)
+        
+        record_loop_count = AIToolLLMRecords().get_record_loop_count(data.app_run_id, loop_id, batch_generation_tool_mode)
         remaining_count = data.loop_limit - record_loop_count
     else:
         # Start new batch
@@ -710,13 +700,6 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         return response_error(get_language_content("api_agent_batch_size_invalid"))
  
     try:
-        # Prepare input with history outputs
-        # input_ = AIToolLLMRecords().inputs_append_history_outputs(
-        #     app_run_id=data.app_run_id,
-        #     loop_id=loop_id,
-        #     agent_supplement=data.supplement_prompt
-        # )
-
         record_list = AIToolLLMRecords().select(
             columns=['outputs'],
             conditions=[
@@ -740,15 +723,23 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
         model_info = Models().get_model_by_config_id(model_config_id)
         outputs_list = truncate_messages_by_token_limit(outputs_list, model_info)
 
-        system_prompt = get_language_content('agent_batch_generate_system', userinfo.uid)
-        user_prompt = get_language_content('agent_batch_generate_user', userinfo.uid, False)
-        user_prompt = user_prompt.format(
-            agent_batch_requirements=data.supplement_prompt,
-            agent_batch_number=loop_count,
-            history_agents=outputs_list
-        )
-
-        input_ = Prompt(system=system_prompt, user=user_prompt).to_dict()
+        if batch_generation_tool_mode is 2:
+            system_prompt = get_language_content('agent_batch_generate_system', userinfo.uid)
+            user_prompt = get_language_content('agent_batch_generate_user', userinfo.uid, False)
+            user_prompt = user_prompt.format(
+                agent_batch_requirements=data.supplement_prompt,
+                agent_batch_number=loop_count,
+                history_agents=outputs_list
+            )
+            input_ = Prompt(system=system_prompt, user=user_prompt).to_dict()
+        else:
+            # Prepare input with history outputs
+            input_ = AIToolLLMRecords().inputs_append_history_outputs(
+                app_run_id=data.app_run_id,
+                loop_id=loop_id,
+                agent_supplement=data.supplement_prompt,
+                user_id=userinfo.uid
+            )
 
 
         # Update app run status
@@ -766,7 +757,8 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             loop_id=loop_id,
             loop_count=loop_count,
             inputs=input_,
-            user_prompt=data.supplement_prompt
+            user_prompt=data.supplement_prompt,
+            batch_generation_tool_mode=batch_generation_tool_mode
         )
 
         if not record_id:

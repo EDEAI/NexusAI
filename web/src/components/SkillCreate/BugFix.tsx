@@ -23,13 +23,13 @@ const BugFix = memo(({ open, onCancel, skillData }: BugFixProps) => {
     useEffect(() => {
         if (!open) {
             setSkillRunResult('');
-            // formRef.current?.resetFields();
+            formRef.current?.resetFields();
         }
     }, [open]);
 
     const handleCancel = () => {
         setSkillRunResult('');
-        // formRef.current?.resetFields();
+        formRef.current?.resetFields();
         onCancel();
     };
 
@@ -95,7 +95,7 @@ const BugFix = memo(({ open, onCancel, skillData }: BugFixProps) => {
                     )}
                 </div>
 
-                <div className="w-1/2 h-full overflow-y-auto">
+                <div className="w-1/2">
                     <ProForm
                         formRef={formRef}
                         submitter={{

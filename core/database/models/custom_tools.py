@@ -12,18 +12,18 @@ class CustomTools(MySQL):
     """
     A class that extends MySQL to manage operations on the {table_name} table.
     """
-    
+
     table_name = "custom_tools"
     """
     Indicates whether the `custom_tools` table has an `update_time` column that tracks when a record was last updated.
     """
     have_updated_time = True
 
-
-    def get_skill_info(self,user_id: int, app_id: int, publish_status: int,team_id:int) -> Dict[str, Any]:
+    def get_skill_info(self, user_id: int, app_id: int, publish_status: int, team_id: int) -> Dict[str, Any]:
         apps_model = Apps()
         app = apps_model.select_one(
-            columns=["id AS app_id", "user_id", "name", "description", "icon", "icon_background", "is_public","publish_status AS app_publish_status",
+            columns=["id AS app_id", "user_id", "name", "description", "icon", "icon_background", "is_public",
+                     "publish_status AS app_publish_status",
                      "enable_api", "created_time", "status"],
             conditions=[
                 {"column": "id", "value": app_id},
@@ -72,14 +72,16 @@ class CustomTools(MySQL):
             return {'status': 2, 'message': 'Skill not found'}
         return {'status': 1, 'message': 'ok', 'data': skill}
 
-    def get_skill_by_id(self,skill_id: int):
+    def get_skill_by_id(self, skill_id: int):
         skill = self.select_one(columns='*',
                                 conditions=[
                                     {"column": "id", "value": skill_id},
                                     {"column": "status", "value": 1}
                                 ])
         return skill if skill else {}
-    def skill_list(self, page: int = 1, page_size: int = 10, uid: int = 0, team_id : int = 0, skill_search_type: int = 1, name: str = ""):
+
+    def skill_list(self, page: int = 1, page_size: int = 10, uid: int = 0, team_id: int = 0, skill_search_type: int = 1,
+                   name: str = ""):
         if skill_search_type == 1:
             conditions = [
                 {"column": "custom_tools.user_id", "value": uid},
@@ -151,7 +153,7 @@ class CustomTools(MySQL):
         """
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         app_model = Apps()
-        app_id = data.get('app_id',None)
+        app_id = data.get('app_id', None)
         if app_id:
             app_update_data = {
                 "name": data.get('name'),
@@ -168,10 +170,10 @@ class CustomTools(MySQL):
             }
             app_model.update([{'column': 'id', 'value': app_id}], app_update_data)
             conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
-                      {'column': 'publish_status', 'value': 0}]
+                          {'column': 'publish_status', 'value': 0}]
             self.update(conditions, update_data)
             # Handle tags
-            tag_ids = data.get('tag_ids',[])
+            tag_ids = data.get('tags', [])
             if tag_ids:
                 tag_bindings = TagBindings()
                 if not tag_bindings.batch_update_bindings([app_id], tag_ids):
@@ -200,7 +202,7 @@ class CustomTools(MySQL):
             return {"status": 2, "message": get_language_content("apps_insert_error")}
 
         # Handle tags
-        tag_ids = data.get('tag_ids',[])
+        tag_ids = data.get('tags', [])
         if tag_ids:
             tag_bindings = TagBindings()
             if not tag_bindings.batch_update_bindings([app_id], tag_ids):
@@ -224,7 +226,7 @@ class CustomTools(MySQL):
         draft_info = self.get_publish_skill_info(user_id, app_id, 0)
 
         draft_info = draft_info['data']
-        
+
         tool_data = {
             "team_id": draft_info['team_id'],
             "user_id": draft_info['user_id'],
@@ -241,16 +243,16 @@ class CustomTools(MySQL):
         }
         skill_id = self.insert(tool_data)
         apps_data = {
-                    "publish_status": 1,
-                    "updated_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                }
+            "publish_status": 1,
+            "updated_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
         app_model.update([{'column': 'id', 'value': app_id}], apps_data)
         return {
-        "status": 1,
-        "message": get_language_content("skill_create_success"),
-        "skill_id": skill_id,
-        "app_id": app_id
-    }
+            "status": 1,
+            "message": get_language_content("skill_create_success"),
+            "skill_id": skill_id,
+            "app_id": app_id
+        }
 
-        
+
 

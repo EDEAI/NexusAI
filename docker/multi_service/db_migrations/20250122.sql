@@ -1,0 +1,2 @@
+ALTER TABLE `ai_tool_llm_records` ADD `current_gen_count` INT NOT NULL DEFAULT '0' COMMENT 'The number of batches currently generated' AFTER `loop_count`;
+ALTER TABLE `ai_tool_llm_records` ADD INDEX(`current_gen_count`);
