@@ -218,12 +218,10 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                             placeholder="Please select"
                                             defaultValue={'string'}
                                             options={[
-                                                { value: 'string', label: 'string' },
-                                                { value: 'number', label: 'number' },
-                                                { value: 'object', label: 'object' },
-                                                { value: 'Array[string]', label: 'Array[string]' },
-                                                { value: 'Array[number]', label: 'Array[number]' },
-                                                { value: 'Array[object]', label: 'Array[object]' },
+                                                { value: 'string', label: 'String' },
+                                                { value: 'number', label: 'Number' },
+                                                { value: 'json', label: 'Object' },
+                                             
                                             ]}
                                         />
                                     </Form.Item>

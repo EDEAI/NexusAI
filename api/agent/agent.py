@@ -758,7 +758,8 @@ async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: Toke
             loop_count=loop_count,
             inputs=input_,
             user_prompt=data.supplement_prompt,
-            batch_generation_tool_mode=batch_generation_tool_mode
+            batch_generation_tool_mode=batch_generation_tool_mode,
+            current_gen_count=loop_count
         )
 
         if not record_id:

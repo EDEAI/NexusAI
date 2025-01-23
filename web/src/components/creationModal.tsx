@@ -200,7 +200,7 @@ const CreationModal: React.FC<ChildProps> = ({
                             <Profilephoto CardData={PitchOnPhone} setCardData={setPitchOnPhone} />
                             <Input
                                 showCount
-                                maxLength={20}
+                                maxLength={50}
                                 placeholder={intl.formatMessage({
                                     id: 'creation.placeholder.appname',
                                 })}
@@ -221,7 +221,7 @@ const CreationModal: React.FC<ChildProps> = ({
                         </p>
                         <TextArea
                             showCount
-                            maxLength={100}
+                            maxLength={1000}
                             rows={4}
                             placeholder={intl.formatMessage({
                                 id: 'creation.placeholder.appdescribe',

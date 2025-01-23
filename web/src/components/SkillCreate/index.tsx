@@ -23,6 +23,7 @@ import CodeEditor from '../WorkFlow/components/Editor/CodeEditor';
 import BeforeCreate from './BeforeCreate';
 import BugFix from './BugFix';
 import ResultDisplay from './ResultDisplay';
+import InfiniteScrollDemo from '../common/InfiniteScrollDemo';
 
 const SkillCreate = memo(() => {
     const intl = useIntl();
@@ -47,7 +48,7 @@ const SkillCreate = memo(() => {
         () => (
             <CodeEditor
                 language="python3"
-                value={skillCreateResult?.code?.['python3']}
+                value={changeSkillLast.current?.code?.['python3']}
                 onChange={value => {
                     setChangeSkill(prev => ({
                         ...prev,
@@ -243,7 +244,7 @@ const SkillCreate = memo(() => {
                         <ResultDisplay
                             loading={loading}
                             onChange={setChangeSkill}
-                            initialValues={skillCreateResult}
+                            initialValues={changeSkillLast.current}
                         ></ResultDisplay>
                         <div className="absolute bottom-2 right-2 flex gap-2 p-1  bg-opacity-50 rounded-md">
                             <Tooltip
@@ -351,11 +352,12 @@ const SkillCreate = memo(() => {
             onCancel={handleCancel}
             
         >
+            {/* <InfiniteScrollDemo></InfiniteScrollDemo> */}
             {skillCreateResult ? <Created loading={loading} /> : <Create loading={loading} />}
             <BugFix
                 open={bugFixshow}
                 onCancel={() => setBugFixshow(false)}
-                skillData={{ ...changeSkill, app_run_id: params?.app_run_id }}
+                skillData={{ ...changeSkillLast.current, app_run_id: params?.app_run_id }}
                 onSubmit={handleBugFixSubmit}
             />
         </Modal>

@@ -215,8 +215,9 @@ const SkillFirst: React.FC<ChildProps> = ({
                                                 // style={{ width: 120 }}
                                                 defaultValue={'string'}
                                                 options={[
-                                                    { value: 'string', label: 'string' },
-                                                    { value: 'number', label: 'number' },
+                                                    { value: 'string', label: 'String' },
+                                                    { value: 'number', label: 'Number' },
+                                                    { value: 'json', label: 'Object' },
                                                 ]}
                                             />
                                         </Form.Item>

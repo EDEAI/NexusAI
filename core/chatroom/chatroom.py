@@ -174,7 +174,8 @@ class Chatroom:
         Append a user message to the history messages and insert it into the database.
         '''
         self._console_log(f'User message: \033[91m{user_message}\033[0m\n')
-        self._history_messages.append({'agent_id': 0, 'message': user_message, 'topic': self._topic})
+        # self._history_messages.append({'agent_id': 0, 'message': user_message, 'topic': self._topic})
+        self._history_messages.append({'agent_id': 0, 'message': user_message})
         self._user_message_id = chatroom_messages.insert(
             {
                 'chatroom_id': self._chatroom_id,
@@ -278,9 +279,10 @@ class Chatroom:
             llm_output = json.loads(manager_message)
             # Update the topic if the last speaker is the user
             if last_speaker_id == 0:
-                self._topic = llm_output['topic']
+                # self._topic = llm_output['topic']
+                self._topic = llm_output['instruction']
                 logger.debug('Current topic: %s', self._topic)
-                self._history_messages[-1]['topic'] = self._topic
+                # self._history_messages[-1]['topic'] = self._topic
                 chatroom_messages.update(
                     {'column': 'id', 'value': self._user_message_id},
                     {'topic': self._topic}
@@ -353,7 +355,8 @@ class Chatroom:
         )
 
         # Append the agent message to the history messages and insert it into the database
-        self._history_messages.append({'agent_id': agent_id, 'message': agent_message, 'topic': self._topic})
+        # self._history_messages.append({'agent_id': agent_id, 'message': agent_message, 'topic': self._topic})
+        self._history_messages.append({'agent_id': agent_id, 'message': agent_message})
         has_connections = self._ws_manager.has_connections(self._chatroom_id)
         chatroom_messages.insert(
             {

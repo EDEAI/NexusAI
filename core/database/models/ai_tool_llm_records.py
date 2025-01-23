@@ -13,7 +13,7 @@ class AIToolLLMRecords(MySQL):
     """
     have_updated_time = True
 
-    def initialize_execution_record(self, app_run_id: int, ai_tool_type: int, run_type: int = 1, loop_id: int = 0, loop_limit: int = 0, loop_count: int = 0, inputs: Dict[str, Any] = None, correct_prompt: Dict[str, Any] = None, user_prompt: str = None, batch_generation_tool_mode: int = 1) -> int:
+    def initialize_execution_record(self, app_run_id: int, ai_tool_type: int, run_type: int = 1, loop_id: int = 0, loop_limit: int = 0, loop_count: int = 0, inputs: Dict[str, Any] = None, correct_prompt: Dict[str, Any] = None, user_prompt: str = None, batch_generation_tool_mode: int = 1, current_gen_count: int = 0) -> int:
         """
         Initializes an execution record with the given parameters.
         
@@ -28,24 +28,11 @@ class AIToolLLMRecords(MySQL):
             correct_prompt (Dict[str, Any]): The correct prompt for the execution record.
             user_prompt (str, optional): The user-provided prompt. Defaults to None.
             batch_generation_tool_mode(int)  # Batch generation switch   2: Multiple agent generation, 1: Single agent generation
+            current_gen_count(int)  # The number of batches currently generated
         
         Returns:
             int: The ID of the newly created record.
         """
-
-        current_gen_count = self.select_one(
-            columns=['current_gen_count'],
-            conditions=[
-                {"column": "app_run_id", "value": app_run_id},
-                {"column": "loop_id", "value": loop_id}
-            ],
-            order_by='id DESC',
-            limit=1
-        )
-        if current_gen_count is None:
-            current_gen_count = loop_count
-        else:
-            current_gen_count = current_gen_count['current_gen_count']
 
         if batch_generation_tool_mode == 1:
             loop_count = max(loop_count - 1, 0)
@@ -124,6 +111,7 @@ class AIToolLLMRecords(MySQL):
                 'loop_id',
                 'loop_count',
                 'loop_limit',
+                'current_gen_count',
                 'inputs',
                 'correct_prompt',
                 'outputs',
@@ -322,6 +310,7 @@ class AIToolLLMRecords(MySQL):
                     {"column": "app_run_id", "value": app_run_id},
                     {"column": "loop_id", "value": loop_id}
                 ],
+                order_by='id DESC',
                 limit=gen_count
             )
 
