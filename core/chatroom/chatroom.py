@@ -288,7 +288,7 @@ class Chatroom:
             # Update the topic if the last speaker is the user
             if last_speaker_id == 0:
                 # self._topic = llm_output['topic']
-                self._topic = llm_output['instruction']
+                self._topic = llm_output['summary']
                 logger.debug('Current topic: %s', self._topic)
                 # self._history_messages[-1]['topic'] = self._topic
                 chatroom_messages.update(
@@ -334,66 +334,68 @@ class Chatroom:
             agent_id=agent_id,
             prompt=prompt
         )
-        self._console_log('Agent message: \033[36m')  # Print the agent message in green
-        # Request LLM
-        agent_message = ''
-        async for chunk in agent_node.run_in_chatroom(
-            context=Context(),
-            user_id=self._user_id,
-            type=2,
-            override_rag_input=user_message
-        ):
-            if content := chunk.content:
-                self._console_log(content)
-                agent_message += content
-                await self._ws_manager.send_agent_reply(
-                    self._chatroom_id,
-                    agent_id,
-                    content,
-                    agent_message
-                )
-            if usage_metadata := chunk.usage_metadata:
-                prompt_tokens = usage_metadata['input_tokens']
-                completion_tokens = usage_metadata['output_tokens']
-                total_tokens = usage_metadata['total_tokens']
-        self._console_log('\033[0m\n')  # Reset the color
-        await self._ws_manager.end_agent_reply(
-            self._chatroom_id,
-            agent_id,
-            agent_message
-        )
-
-        # Append the agent message to the history messages and insert it into the database
-        # self._history_messages.append({'agent_id': agent_id, 'message': agent_message, 'topic': self._topic})
-        self._history_messages.append({'agent_id': agent_id, 'message': agent_message})
-        has_connections = self._ws_manager.has_connections(self._chatroom_id)
-        chatroom_messages.insert(
-            {
-                'chatroom_id': self._chatroom_id,
-                'app_run_id': self._app_run_id,
-                'agent_id': agent_id,
-                'llm_input': [
-                    ['system', prompt.get_system()],
-                    ['user', prompt.get_user()]
-                ],
-                'message': agent_message,
-                'topic': self._topic,
-                'is_read': 1 if has_connections else 0,
-                'prompt_tokens': prompt_tokens,
-                'completion_tokens': completion_tokens,
-                'total_tokens': total_tokens
-            }
-        )
-        app_runs.increment_steps(self._app_run_id)
-        app_runs.increment_token_usage(
-            self._app_run_id,
-            prompt_tokens, completion_tokens, total_tokens
-        )
-        if not has_connections:
-            chatrooms.update(
-                {'column': 'id', 'value': self._chatroom_id},
-                {'active': 1}
+        try:
+            self._console_log('Agent message: \033[36m')  # Print the agent message in green
+            # Request LLM
+            agent_message = ''
+            async for chunk in agent_node.run_in_chatroom(
+                context=Context(),
+                user_id=self._user_id,
+                type=2,
+                override_rag_input=user_message
+            ):
+                if content := chunk.content:
+                    self._console_log(content)
+                    agent_message += content
+                    await self._ws_manager.send_agent_reply(
+                        self._chatroom_id,
+                        agent_id,
+                        content,
+                        agent_message
+                    )
+                if usage_metadata := chunk.usage_metadata:
+                    prompt_tokens = usage_metadata['input_tokens']
+                    completion_tokens = usage_metadata['output_tokens']
+                    total_tokens = usage_metadata['total_tokens']
+            await self._ws_manager.end_agent_reply(
+                self._chatroom_id,
+                agent_id,
+                agent_message
             )
+
+            # Append the agent message to the history messages and insert it into the database
+            # self._history_messages.append({'agent_id': agent_id, 'message': agent_message, 'topic': self._topic})
+            self._history_messages.append({'agent_id': agent_id, 'message': agent_message})
+            chatroom_messages.insert(
+                {
+                    'chatroom_id': self._chatroom_id,
+                    'app_run_id': self._app_run_id,
+                    'agent_id': agent_id,
+                    'llm_input': [
+                        ['system', prompt.get_system()],
+                        ['user', prompt.get_user()]
+                    ],
+                    'message': agent_message,
+                    'topic': self._topic,
+                    'is_read': 1 if has_connections else 0,
+                    'prompt_tokens': prompt_tokens,
+                    'completion_tokens': completion_tokens,
+                    'total_tokens': total_tokens
+                }
+            )
+            app_runs.increment_steps(self._app_run_id)
+            app_runs.increment_token_usage(
+                self._app_run_id,
+                prompt_tokens, completion_tokens, total_tokens
+            )
+        finally:
+            self._console_log('\033[0m\n')  # Reset the color
+            has_connections = self._ws_manager.has_connections(self._chatroom_id)
+            if not has_connections:
+                chatrooms.update(
+                    {'column': 'id', 'value': self._chatroom_id},
+                    {'active': 1}
+                )
 
     def _terminate(self) -> bool:
         '''
