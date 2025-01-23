@@ -1,7 +1,7 @@
 import { ProForm, ProFormRadio, ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Spin, Typography } from 'antd';
-import { forwardRef, memo, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import TagSearch from '../TagSearch';
 import Variable from '../WorkFlow/components/Variable';
 
@@ -50,53 +50,49 @@ const ResultDisplay = memo(
             if (readOnly) return;
             const newValues = { ...values, ...updates };
             console.log('values', newValues);
-
+            
             setValues(newValues);
             onChange?.(newValues);
         };
 
-        const handleVariableChange =
-            (type: 'input' | 'output') => (data: { value: any[]; free: any }) => {
-                const properties = data.value.reduce(
-                    (acc, cur) => ({
-                        ...acc,
-                        [cur.name]: cur,
-                    }),
-                    {},
-                );
+        const handleVariableChange = (type: 'input' | 'output') => (data: { value: any[]; free: any }) => {
+            const properties = data.value.reduce((acc, cur) => ({
+                ...acc,
+                [cur.name]: cur
+            }), {});
 
-                if (type === 'input') {
-                    handleChange({
-                        input_variables: {
-                            ...values.input_variables,
-                            properties,
-                        },
-                    });
-                } else {
-                    handleChange({
-                        output_variables: {
-                            ...values.output_variables,
-                            properties,
-                        },
-                    });
-                }
-            };
+            if (type === 'input') {
+                handleChange({
+                    input_variables: {
+                        ...values.input_variables,
+                        properties
+                    }
+                });
+            } else {
+                handleChange({
+                    output_variables: {
+                        ...values.output_variables,
+                        properties
+                    }
+                });
+            }
+        };
 
         const handleDependenciesChange = (deps: string[]) => {
             handleChange({
                 dependencies: {
-                    python3: deps,
-                },
+                    python3: deps
+                }
             });
         };
 
-        return (
-            <div className="flex-1 h-full pb-4 overflow-auto rounded-lg border border-gray-200 px-4 bg-gray-50 overflow-y-auto">
-                <Spin
-                    spinning={loading}
-                    className="h-full"
-                    wrapperClassName="!h-full"
-                    tip="loading..."
+    return (
+        <div className="flex-1 h-full pb-4 overflow-auto rounded-lg border border-gray-200 px-4 bg-gray-50 overflow-y-auto">
+            <Spin
+                spinning={loading}
+                className="h-full"
+                wrapperClassName="!h-full"
+                tip="正在生成..."
                 >
                     <div className="h-full pb-10">
                         <div className="px-4 pt-6 flex items-center gap-2">
@@ -115,7 +111,10 @@ const ResultDisplay = memo(
                                     !readOnly ? 'hover:bg-blue-100' : ''
                                 } !mb-0 relative rounded-lg text-blue-600 text-[16px] flex items-center`}
                             >
-                                <img src="/icons/agent_create.svg" className="size-6 mr-1"></img>
+                                <img
+                                    src="/icons/agent_create.svg"
+                                    className="size-6 mr-1"
+                                ></img>
                                 {values.name}
                             </Paragraph>
                         </div>
@@ -160,12 +159,8 @@ const ResultDisplay = memo(
 
                             <div>
                                 <Variable
-                                    variables={Object.values(
-                                        values.input_variables?.properties || {},
-                                    )}
-                                    title={intl.formatMessage({
-                                        id: 'skill.result.input.variables',
-                                    })}
+                                    variables={Object.values(values.input_variables?.properties || {})}
+                                    title={intl.formatMessage({ id: 'skill.result.input.variables' })}
                                     onChange={handleVariableChange('input')}
                                     variableTypes={['string', 'number', 'json']}
                                 />
@@ -192,9 +187,9 @@ const ResultDisplay = memo(
                                 onValuesChange={(_, allValues) => {
                                     handleChange({
                                         dependencies: {
-                                            python3: allValues.dependencies,
+                                            python3: allValues.dependencies
                                         },
-                                        output_type: allValues.output_type,
+                                        output_type: allValues.output_type
                                     });
                                 }}
                             >
@@ -224,30 +219,10 @@ const ResultDisplay = memo(
                                     }}
                                     fieldProps={{
                                         options: [
-                                            {
-                                                label: intl.formatMessage({
-                                                    id: 'skill.result.output.type.text',
-                                                }),
-                                                value: 1,
-                                            },
-                                            {
-                                                label: intl.formatMessage({
-                                                    id: 'skill.result.output.type.database',
-                                                }),
-                                                value: 2,
-                                            },
-                                            {
-                                                label: intl.formatMessage({
-                                                    id: 'skill.result.output.type.code',
-                                                }),
-                                                value: 3,
-                                            },
-                                            {
-                                                label: intl.formatMessage({
-                                                    id: 'skill.result.output.type.document',
-                                                }),
-                                                value: 4,
-                                            },
+                                            { label: intl.formatMessage({ id: 'skill.result.output.type.text' }), value: 1 },
+                                            { label: intl.formatMessage({ id: 'skill.result.output.type.database' }), value: 2 },
+                                            { label: intl.formatMessage({ id: 'skill.result.output.type.code' }), value: 3 },
+                                            { label: intl.formatMessage({ id: 'skill.result.output.type.document' }), value: 4 },
                                         ],
                                     }}
                                 />
@@ -282,8 +257,8 @@ const ResultDisplay = memo(
                         </div>
                     </div>
                 </Spin>
-            </div>
-        );
+        </div>
+    );
     }),
 );
 

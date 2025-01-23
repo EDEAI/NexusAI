@@ -818,31 +818,32 @@ language_packs = {
         'generate_skill_system_prompt': '''
             You are a python tool generation assistant.
             Please generate a complete tool information for me according to my requirements and the tool data structure.
+            Note that after the tool information is generated, you need to perform a variable naming check and optimization. The variable names in "input_variables" and "output_variables", as well as the corresponding function input parameters or variable names in the Python 3 code, must comply with the code variable naming specifications and can only contain letters, numbers, and underscores, cannot start with numbers, and cannot use Python keywords.
             Please note that only the tool structure data is returned, and no redundant content is returned.
             Tool data json structure description:
             {{
-                "name":"(string type) tool name",
-                "description":"(string type) tool description",
+                "name":"tool name",
+                "description":"tool description",
                 "input_variables": [
                     {{
-                        "name":"(string type) input variable name",
-                        "type":"(string type) input variable type ['string','number']",
-                        "required":"(bool type) whether the input variable is required: True means required, False means non-required",
-                        "display_name":"(string type) variable display name, which can be used as a description of the function and purpose of the variable"
+                        "name":"variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
+                        "type":"Variable type, including ['string', 'number'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python",
+                        "required":"(bool type), whether the variable is required: True means required, False means non-required",
+                        "display_name":"variable display name, which can be used as a description of the function and purpose of the variable"
                     }}
                 ],
                 "dependencies": {{
                     "python3": []
                 }},
                 "code": {{
-                    "python3":"(string type) python3 code. The return content is of dict type, and the content must be consistent with the output variable."
+                    "python3":"python3 code. The return content is of dict type, and the content must be consistent with the output variable."
                 }},
                 "output_type":"(int type) output type includes the following four types: 1: Get text or ordinary variable data 2: Write to database 3: Write code 4: Write to file",
                 "output_variables":[
                     {{
-                        "name": "(string type) Output variable name",
-                        "type": "(string type) Output variable type ['string','number','json']",
-                        "display_name": "(string type) Variable display name, can be used as a description of the function and purpose of the variable"
+                        "name": "variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
+                        "type": "Variable type, including ['string', 'number', 'json'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python",
+                        "display_name": "Variable display name, can be used as a description of the function and purpose of the variable"
                     }}
                 ]
             }}
@@ -860,7 +861,6 @@ language_packs = {
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
             5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
-            7. The variable names in "input_variables" and "output_variables", as well as the corresponding variable names in the Python 3 code, must conform to the code variable naming conventions
         ''',
         'generate_skill_user': '''
             My requirements:
@@ -869,31 +869,32 @@ language_packs = {
         'correction_skill_system_prompt': '''
             You are a python tool generation assistant.
             You have generated a tool. Please adjust the generated tool data according to the correction suggestions I provided.
+            Note that after the tool information is generated, you need to perform a variable naming check and optimization. The variable names in "input_variables" and "output_variables", as well as the corresponding function input parameters or variable names in the Python 3 code, must comply with the code variable naming specifications and can only contain letters, numbers, and underscores, cannot start with numbers, and cannot use Python keywords.
             Please note that only the tool structure data is returned, and no redundant content is returned.
             Tool data json structure description:
             {{
-                "name":"(string type) tool name",
-                "description":"(string type) tool description",
+                "name":"tool name",
+                "description":"tool description",
                 "input_variables": [
                     {{
-                        "name":"(string type) input variable name",
-                        "type":"(string type) input variable type ['string','number']",
-                        "required":"(bool type) whether the input variable is required: True means required, False means non-required",
-                        "display_name":"(string type) variable display name, which can be used as a description of the function and purpose of the variable"
+                        "name":"variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
+                        "type":"Variable type, including ['string', 'number'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python",
+                        "required":"(bool type), whether the variable is required: True means required, False means non-required",
+                        "display_name":"variable display name, which can be used as a description of the function and purpose of the variable"
                     }}
                 ],
                 "dependencies": {{
                     "python3": []
                 }},
                 "code": {{
-                    "python3":"(string type) python3 code. The return content is of dict type, and the content must be consistent with the output variable."
+                    "python3":"python3 code. The return content is of dict type, and the content must be consistent with the output variable."
                 }},
                 "output_type":"(int type) output type includes the following four types: 1: Get text or ordinary variable data 2: Write to database 3: Write code 4: Write to file",
                 "output_variables":[
                     {{
-                        "name": "(string type) Output variable name",
-                        "type": "(string type) Output variable type ['string','number','json']",
-                        "display_name": "(string type) Variable display name, can be used as a description of the function and purpose of the variable"
+                        "name": "variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
+                        "type": "Variable type, including ['string', 'number', 'json'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python",
+                        "display_name": "Variable display name, can be used as a description of the function and purpose of the variable"
                     }}
                 ]
             }}
@@ -911,7 +912,6 @@ language_packs = {
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
             5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
-            7. The variable names in "input_variables" and "output_variables", as well as the corresponding variable names in the Python 3 code, must conform to the code variable naming conventions
         ''',
         'correction_skill_user': '''
             Correction suggestion:
@@ -1485,31 +1485,32 @@ language_packs = {
         # 'generate_skill_system_prompt':'''
         #     你是一个python工具生成助手。
         #     请通过我的需求内容，按照工具的数据结构为我生成一个完整的工具信息。
+        #     注意工具信息生成完成之后，你要做一次变量命名检测和优化，"input_variables"和"output_variables"中的变量名称，以及python3代码中对应的函数入参或变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字。
         #     注意只返回工具的结构数据，不要返回多余的内容。
         #     工具数据json结构说明：
         #     {{
-        #         "name":"(string类型)工具名称",
-        #         "description":"(string类型)工具描述",
+        #         "name":"工具名称",
+        #         "description":"工具描述",
         #         "input_variables": [
         #             {{
-        #                 "name":"(string类型)输入变量名称",
-        #                 "type":"(string类型)输入变量类型 ['string','number']",
-        #                 "required":"(bool类型)输入变量是否必填：True代表必填，False代表非必填",
-        #                 "display_name":"(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #                 "name":"变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字",
+        #                 "type":"变量类型，包含['string','number']，'string'对应python中的str类型，'number'对应python中的int或者float类型",
+        #                 "required":"(bool类型)，变量是否必填：True代表必填，False代表非必填",
+        #                 "display_name":"变量显示名，可以作为变量的功能和用途说明"
         #             }}
         #         ],
         #         "dependencies": {{
         #             "python3": []
         #         }},
         #         "code": {{
-        #             "python3":"(string类型)python3代码。return内容为dict类型，内容要和输出变量一致。"
+        #             "python3":"python3代码。return内容为dict类型，内容要和输出变量一致。"
         #         }},
         #         "output_type":"(int类型)输出类型包含以下四种类型：1:获取文本或者普通变量数据 2:写入数据库 3:编写代码 4:写入文件",
         #         "output_variables":[
         #             {{
-        #                 "name": "(string类型)输出变量名称",
-        #                 "type": "(string类型)输出变量类型 ['string','number','json']",
-        #                 "display_name": "(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #                 "name": "变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字",
+        #                 "type": "变量类型，包含['string','number','json']，'string'对应python中的str类型，'number'对应python中的int或者float类型，'json'对应python中的dict或者list类型",
+        #                 "display_name": "变量显示名，可以作为变量的功能和用途说明"
         #             }}
         #         ]
         #     }}
@@ -1527,7 +1528,6 @@ language_packs = {
         #     4. "output_variables"为工具运行完成后的输出变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
         #     5. 注意"output_variables"中每个输出变量的类型，如果在python3代码中的返回数据中对应的变量类型为"dict"或者"list"，则对应的输出变量类型为"json"，否则为"string"或者"number"。
         #     6. "output_type"为工具的输出类型，上面的工具数据json结构说明中已经提供了所有类型，要注意工具的输出类型并不取决于python3代码返回的数据类型，而是取决于python3代码的整体执行意图。
-        #     7. "input_variables"和"output_variables"中的变量名称，以及python3代码中对应的变量名称，一定要符合代码变量命名规范
         # ''',
         # 'generate_skill_user':'''
         #     需求内容：
@@ -1536,31 +1536,32 @@ language_packs = {
         # 'correction_skill_system_prompt':'''
         #     你是一个python工具生成助手。
         #     你已经生成了一个工具，请通过我提供的修正意见，对已生成的工具数据进行调整。
+        #     注意工具信息生成完成之后，你要做一次变量命名检测和优化，"input_variables"和"output_variables"中的变量名称，以及python3代码中对应的函数入参或变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字。
         #     注意只返回工具的结构数据，不要返回多余的内容。
         #     工具数据json结构说明：
         #     {{
-        #         "name":"(string类型)工具名称",
-        #         "description":"(string类型)工具描述",
+        #         "name":"工具名称",
+        #         "description":"工具描述",
         #         "input_variables": [
         #             {{
-        #                 "name":"(string类型)输入变量名称",
-        #                 "type":"(string类型)输入变量类型 ['string','number']",
-        #                 "required":"(bool类型)输入变量是否必填：True代表必填，False代表非必填",
-        #                 "display_name":"(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #                 "name":"变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字",
+        #                 "type":"变量类型，包含['string','number']，'string'对应python中的str类型，'number'对应python中的int或者float类型",
+        #                 "required":"(bool类型)，变量是否必填：True代表必填，False代表非必填",
+        #                 "display_name":"变量显示名，可以作为变量的功能和用途说明"
         #             }}
         #         ],
         #         "dependencies": {{
         #             "python3": []
         #         }},
         #         "code": {{
-        #             "python3":"(string类型)python3代码。return内容为dict类型，内容要和输出变量一致。"
+        #             "python3":"python3代码。return内容为dict类型，内容要和输出变量一致。"
         #         }},
         #         "output_type":"(int类型)输出类型包含以下四种类型：1:获取文本或者普通变量数据 2:写入数据库 3:编写代码 4:写入文件",
         #         "output_variables":[
         #             {{
-        #                 "name": "(string类型)输出变量名称",
-        #                 "type": "(string类型)输出变量类型 ['string','number','json']",
-        #                 "display_name": "(string类型)变量显示名，可以作为变量的功能和用途说明"
+        #                 "name": "变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字",
+        #                 "type": "变量类型，包含['string','number','json']，'string'对应python中的str类型，'number'对应python中的int或者float类型，'json'对应python中的dict或者list类型",
+        #                 "display_name": "变量显示名，可以作为变量的功能和用途说明"
         #             }}
         #         ]
         #     }}
@@ -1578,7 +1579,6 @@ language_packs = {
         #     4. "output_variables"为工具运行完成后的输出变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
         #     5. 注意"output_variables"中每个输出变量的类型，如果在python3代码中的返回数据中对应的变量类型为"dict"或者"list"，则对应的输出变量类型为"json"，否则为"string"或者"number"。
         #     6. "output_type"为工具的输出类型，上面的工具数据json结构说明中已经提供了所有类型，要注意工具的输出类型并不取决于python3代码返回的数据类型，而是取决于python3代码的整体执行意图。
-        #     7. "input_variables"和"output_variables"中的变量名称，以及python3代码中对应的变量名称，一定要符合代码变量命名规范
         # ''',
         # 'correction_skill_user':'''
         #     修正意见：
