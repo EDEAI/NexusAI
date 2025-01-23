@@ -208,7 +208,7 @@ export default memo((props: VariableList) => {
                             value: type,
                         })) || [
                             {
-                                label: intl.formatMessage({ id: 'workflow.vars.text' }),
+                                label: intl.formatMessage({ id: 'workflow.vars.string' }),
                                 value: 'string',
                             },
                             {

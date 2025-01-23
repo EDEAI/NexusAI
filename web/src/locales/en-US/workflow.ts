@@ -235,7 +235,7 @@ export default {
     'workflow.vars.string': 'Text',
     'workflow.vars.paragraph': 'Paragraph',
     'workflow.vars.number': 'Number',
-    'workflow.vars.json': 'JSON',
+    'workflow.vars.json': 'Object',
     'workflow.vars.required': 'Required',
     'workflow.vars.inputFields': 'Input Fields',
     'workflow.vars.createVariable': 'Create Variable',

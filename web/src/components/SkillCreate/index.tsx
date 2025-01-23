@@ -23,6 +23,7 @@ import CodeEditor from '../WorkFlow/components/Editor/CodeEditor';
 import BeforeCreate from './BeforeCreate';
 import BugFix from './BugFix';
 import ResultDisplay from './ResultDisplay';
+import InfiniteScrollDemo from '../common/InfiniteScrollDemo';
 
 const SkillCreate = memo(() => {
     const intl = useIntl();
@@ -351,6 +352,7 @@ const SkillCreate = memo(() => {
             onCancel={handleCancel}
             
         >
+            {/* <InfiniteScrollDemo></InfiniteScrollDemo> */}
             {skillCreateResult ? <Created loading={loading} /> : <Create loading={loading} />}
             <BugFix
                 open={bugFixshow}
