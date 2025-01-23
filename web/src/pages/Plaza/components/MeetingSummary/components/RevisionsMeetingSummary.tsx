@@ -3,6 +3,7 @@ import useChatroomStore from '@/store/chatroomstate';
 import useSocketStore from '@/store/websocket';
 import { useIntl } from '@umijs/max';
 import { Button, Input, Spin } from 'antd';
+import { RedoOutlined } from '@ant-design/icons';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
@@ -14,6 +15,37 @@ interface params {
     setAppRunId: any;
     scrollDom:any;
 }
+
+const Redirect: React.FC<{ id: any; message: any }> = memo(parmas => {
+    let { id, message } = parmas;
+    let intl = useIntl();
+    const setSummaryClick = useChatroomStore(state => state.setSummaryClick);
+    const [disabled, setDisabled] = useState(true);
+    const summaryClick = useChatroomStore(state => state.summaryClick);
+    const setSummaryParams = useChatroomStore(state => state.setSummaryParams);
+    useEffect(() => {
+        setDisabled(summaryClick);
+    }, [summaryClick]);
+    return (
+        <div className="flex flex-row-reverse">
+            <Button
+                type="primary"
+                className="bg-[#1B64F3] rounded-[4px] my-3 h-[30px] w-[110px] gap-[6px]"
+                onClick={(e: any) => {
+                    if (disabled) {
+                        setSummaryParams({ id: id, message: message });
+                        setSummaryClick(false);
+                    }
+                }}
+            >
+                <span className="text-[12px]">
+                    {intl.formatMessage({ id: `app.summaryhistory.submitText` })}
+                </span>
+                <RedoOutlined className="text-[14px]" />
+            </Button>
+        </div>
+    );
+});
 
 const RevisionsMeetingSummary: React.FC<params> = params => {
     let { setShow, inputShow, setBoxLoading, setAppRunId,scrollDom} = params;
@@ -101,6 +133,14 @@ const RevisionsMeetingSummary: React.FC<params> = params => {
     useEffect(() => {
         if (summaryParams && summaryParams.id) {
             roomId.current = summaryParams.id;
+            if(currentHistory){
+                setCurrentHistory(null);
+            }
+
+            if(buttonLoading){
+                setButtonLoading(false)
+            }
+            
             if(summaryContent){
                 setSummaryContent('');
             }            
@@ -123,15 +163,19 @@ const RevisionsMeetingSummary: React.FC<params> = params => {
                     </div>
                     <div className="text-[14px] pt-[12px] leading-[23px] px-[8px]">
                         {summaryContent ? (
-                            <div
-                                className={` ${
-                                    inputShow ? 'max-h-[400px]' : 'max-h-[400px]'
-                                } p-[12px]  bg-[#F7F7F7]  relative overflow-y-auto`}
-                            >
-                                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                                    {currentHistory?currentHistory?.source_run?.summary:summaryContent}
-                                </ReactMarkdown>
-                            </div>
+                           <>
+                                <div
+                                    className={` ${
+                                        inputShow ? 'max-h-[400px]' : 'max-h-[400px]'
+                                    } p-[12px]  bg-[#F7F7F7]  relative overflow-y-auto`}
+                                >
+                                    <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                                        {currentHistory?currentHistory?.source_run?.summary:summaryContent}
+                                    </ReactMarkdown>
+                                </div>
+                                {currentHistory && currentHistory?.source_corrections?.length>0 || !inputShow ? <Redirect id={roomId.current} message={currentHistory?currentHistory?.source_run?.summary:summaryContent}/> : <></>}  
+                           </>
+
                         ) : (
                             <div className="min-h-[120px] flex items-center justify-center">
                                 <Spin size="large" />
@@ -143,19 +187,22 @@ const RevisionsMeetingSummary: React.FC<params> = params => {
                             <div> 
                                 <div className='text-[16px] font-[600] py-[8px]'>{intl.formatMessage({id:'app.summaryhistory.orientation'})}:</div>
                                 {
-                                    currentHistory.source_corrections.map(item=>(
-                                        <div key={item.created_time} className='last-of-type:bg-blue-100 rounded-[4px] bg-[#F7F7F7] mb-[16px] '>
-                                            <div className='p-[12px]   leading-[22px]'>
-                                                <div className='tetx-[14px] font-[600] pb-[12px]'>
-                                                    {intl.formatMessage({id:'app.summaryhistory.userPrompt'})}: {item.user_prompt}
+                                    currentHistory.source_corrections.map((item,index)=>(
+                                        <div key={item.created_time} className='mb-[16px]'>
+                                            <div key={item.created_time} className={`rounded-[4px]  ${currentHistory.source_corrections.length-1  == index?'bg-blue-100':'bg-[#F7F7F7]'}`}>
+                                                <div className='p-[12px]   leading-[22px]'>
+                                                    <div className='tetx-[14px] font-[600] pb-[12px]'>
+                                                        {intl.formatMessage({id:'app.summaryhistory.userPrompt'})}: {item.user_prompt}
+                                                    </div>
+                                                    <div className='tetx-[14px] font-[600] pb-[12px]'>
+                                                        {intl.formatMessage({id:'app.summaryhistory.time'})}: {timeConversion(item.created_time)}
+                                                    </div>
+                                                    <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
+                                                        {item?.corrected_summary}
+                                                    </ReactMarkdown>
                                                 </div>
-                                                <div className='tetx-[14px] font-[600] pb-[12px]'>
-                                                    {intl.formatMessage({id:'app.summaryhistory.time'})}: {timeConversion(item.created_time)}
-                                                </div>
-                                                <ReactMarkdown  rehypePlugins={[rehypeHighlight]}>
-                                                    {item?.corrected_summary}
-                                                </ReactMarkdown>
                                             </div>
+                                            { !inputShow || currentHistory.source_corrections.length-1 != index ? <Redirect id={roomId.current} message={item?.corrected_summary}/> : <></>}  
                                         </div>
                                     ))
                                 }
