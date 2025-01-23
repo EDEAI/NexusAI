@@ -207,18 +207,16 @@ const RunsWorkFlow:FC<params>=(params) =>{
                     <RenderConfirm data={confirmNodes} />
                 </ProForm>
                 :<>
-                  {currentVariate!=null?Object.values(currentVariate).map((item:any)=>(
-                        <div>
-                            <div className='text-[16px] color-[#000] font-[600] py-[12px]'>{intl.formatMessage({id:'app.summaryhistory.input'})}:</div>
-                            
-                            <div>
+                    {currentVariate!=null?<div>
+                        <div className='text-[16px] color-[#000] font-[600] py-[12px]'>{intl.formatMessage({id:'app.summaryhistory.input'})}:</div>
+                        {Object.values(currentVariate).map((item:any)=>(
+                            <div className='pb-[10px]'>
                                     <div className='pb-[8px] font-[600]'>{item.display_name || item.name}</div>
                                     
                                 <div className='py-[4px] px-[11px] text-[14px] leading-[1.5] '>{item.value}</div>
                             </div>
-                            
-                        </div>
-                  )):<></>}
+                        ))}
+                    </div>:<></>}
                 </>
             }
             
