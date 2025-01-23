@@ -172,6 +172,10 @@ class CustomTools(MySQL):
             conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
                           {'column': 'publish_status', 'value': 0}]
             self.update(conditions, update_data)
+            update_data['published_time'] = current_time
+            conditions_1 = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
+                          {'column': 'publish_status', 'value': 1}]
+            self.update(conditions_1, {'publish_status': 1, 'published_time': current_time})  
             # Handle tags
             tag_ids = data.get('tags', [])
             if tag_ids:
