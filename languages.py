@@ -22,105 +22,108 @@ language_packs = {
                 All category sets: {categories}.
             """,
         },
-        "agent_system_prompt_with_auto_match_ability": (
-            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
-            'Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).'
-            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
-            'If your responsibilities and abilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.\n'
-            'Your ID: {id_}\n'
-            'Your name: {name}\n'
-            'Your description: {description}\n'
-            'Your responsibilities (or identity) are as follows:\n'
-            '{obligations}\n\n'
-            'You have some abilities, each ability is in the form of a tuple (ability ID, specific information of the ability, output format of the ability) in the following Python list:\n'
-            '{abilities_content_and_output_format}\n\n'
-            '{retrieved_docs_format}\n'
-            '{reply_requirement}\n'
-            'Finally, return a JSON formatted dictionary as follows:\n'
-            '{{"ability_id": ability ID (integer type), "output": content replied in the corresponding format of the ability}}\n'
-            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
-        ),
-        "agent_system_prompt_with_auto_match_ability_direct_output": (
-            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
-            'Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).'
-            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
-            'If your responsibilities and abilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.\n'
-            'Your ID: {id_}\n'
-            'Your name: {name}\n'
-            'Your description: {description}\n'
-            'Your responsibilities (or identity) are as follows:\n'
-            '{obligations}\n\n'
-            'You have some abilities, each ability is in the form of a tuple (ability ID, specific information of the ability, output format of the ability) in the following Python list:\n'
-            '{abilities_content_and_output_format}\n\n'
-            '{retrieved_docs_format}\n'
-            '{reply_requirement}\n'
-            'Finally, reply in the corresponding format of the ability.\n'
-            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
-        ),
-        "agent_system_prompt_with_abilities": (
-            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
-            'Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).'
-            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
-            'If your responsibilities and abilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.\n'
-            'Your ID: {id_}\n'
-            'Your name: {name}\n'
-            'Your description: {description}\n'
-            'Your responsibilities (or identity) are as follows:\n'
-            '{obligations}\n\n'
-            'You have the following abilities:\n'
-            '{abilities_content}\n\n'
-            '{retrieved_docs_format}\n'
-            '{reply_requirement}\n'
-            'Finally, reply in {output_format} format.\n'
-            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
-        ),
-        "agent_system_prompt_with_no_ability": (
-            'You are an AI agent. Please answer questions or handle needs according to the user\'s questions or needs.'
-            'Please note that you should respond based on your description, responsibilities and relevant content retrieved from the knowledge base (if provided).'
-            'Note that the user\'s questions or requirements may contain additional reply rules.\n'
-            'If your responsibilities are not directly related to the user\'s problems or needs, please analyze the current conversation scenario through the user\'s questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities.\n'
-            'Your ID: {id_}\n'
-            'Your name: {name}\n'
-            'Your description: {description}\n'
-            'Your responsibilities (or identity) are as follows:\n'
-            '{obligations}\n\n'
-            '{retrieved_docs_format}\n'
-            '{reply_requirement}\n'
-            'Finally, reply in {output_format} format.\n'
-            'Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.'
-        ),
-        "agent_retrieved_docs_format": (
-            'I will provide the information retrieved from the knowledge base based on the user input text '
-            'in the following JSON format: [{"content": content, "source": source document name}, ...])'
-        ),
-        "agent_reply_requirement_with_auto_match_ability": (
-            'Please match one corresponding ability based on the user input information and reply in the format corresponding to the ability.'
-        ),
-        "agent_reply_requirement_with_task_splitting_and_auto_match_ability": (
-            'Please match one corresponding ability based on the user input information, and based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it, and reply in the format corresponding to the ability.'
-        ),
-        "agent_reply_requirement_with_task_splitting_and_abilities": (
-            'Based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it.'
-        ),
-        "agent_reply_requirement_with_task_splitting_and_no_ability": (
-            'Based on your responsibilities, select the part of the overall task that you should be responsible for and process it.'
-        ),
+        "agent_system_prompt_with_auto_match_ability": '''
+            You are an AI agent. Please answer questions or handle needs according to the user's questions or needs.
+            Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).
+            Note that the user's questions or requirements may contain additional reply rules.
+
+            If your responsibilities and abilities are not directly related to the user's problems or needs, please analyze the current conversation scenario through the user's questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.
+
+            Your ID: {id_}
+            Your name: {name}
+            Your description: {description}
+            Your responsibilities (or identity) are as follows:
+            {obligations}
+
+            You have some abilities, each ability is in the form of a tuple (ability ID, specific information of the ability, output format of the ability) in the following Python list:
+            {abilities_content_and_output_format}
+
+            {retrieved_docs_format}
+            {reply_requirement}
+            Finally, return a JSON formatted dictionary as follows:
+            {{"ability_id": ability ID (integer type), "output": content replied in the corresponding format of the ability}}
+            Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
+        ''',
+        "agent_system_prompt_with_auto_match_ability_direct_output": '''
+            You are an AI agent. Please answer questions or handle needs according to the user's questions or needs.
+            Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).
+            Note that the user's questions or requirements may contain additional reply rules.
+
+            If your responsibilities and abilities are not directly related to the user's problems or needs, please analyze the current conversation scenario through the user's questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.
+
+            Your ID: {id_}
+            Your name: {name}
+            Your description: {description}
+            Your responsibilities (or identity) are as follows:
+            {obligations}
+
+            You have some abilities, each ability is in the form of a tuple (ability ID, specific information of the ability, output format of the ability) in the following Python list:
+            {abilities_content_and_output_format}
+
+            {retrieved_docs_format}
+            {reply_requirement}
+            Finally, reply in the corresponding format of the ability.
+            Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
+        ''',
+        "agent_system_prompt_with_abilities": '''
+            You are an AI agent. Please answer questions or handle needs according to the user's questions or needs.
+            Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).
+            Note that the user's questions or requirements may contain additional reply rules.
+
+            If your responsibilities and abilities are not directly related to the user's problems or needs, please analyze the current conversation scenario through the user's questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.
+
+            Your ID: {id_}
+            Your name: {name}
+            Your description: {description}
+            Your responsibilities (or identity) are as follows:
+            {obligations}
+
+            You have the following abilities:
+            {abilities_content}
+
+            {retrieved_docs_format}
+            {reply_requirement}
+            Finally, reply in {output_format} format.
+            Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
+        ''',
+        "agent_system_prompt_with_no_ability": '''
+            You are an AI agent. Please answer questions or handle needs according to the user's questions or needs.
+            Please note that you should respond based on your description, responsibilities and relevant content retrieved from the knowledge base (if provided).
+            Note that the user's questions or requirements may contain additional reply rules.
+
+            If your responsibilities are not directly related to the user's problems or needs, please analyze the current conversation scenario through the user's questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities.
+
+            Your ID: {id_}
+            Your name: {name}
+            Your description: {description}
+            Your responsibilities (or identity) are as follows:
+            {obligations}
+
+            {retrieved_docs_format}
+            {reply_requirement}
+            Finally, reply in {output_format} format.
+            Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
+        ''',
+        "agent_retrieved_docs_format": "I will provide the information retrieved from the knowledge base based on the user input text in the following JSON format: [{'content': content, 'source': source document name}, ...])",
+        "agent_reply_requirement_with_auto_match_ability": "Please match one corresponding ability based on the user input information and reply in the format corresponding to the ability.",
+        "agent_reply_requirement_with_task_splitting_and_auto_match_ability": "Please match one corresponding ability based on the user input information, and based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it, and reply in the format corresponding to the ability.",
+        "agent_reply_requirement_with_task_splitting_and_abilities": "Based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it.",
+        "agent_reply_requirement_with_task_splitting_and_no_ability": "Based on your responsibilities, select the part of the overall task that you should be responsible for and process it.",
         "agent_output_format_1": "plain text",
         "agent_output_format_2": "JSON",
         "agent_output_format_3": "code",
-        "agent_user_prompt": (
-            'Below is the user\'s questions or needs:\n'
-            '{user_prompt}'
-        ),
-        "agent_user_prompt_with_retrieved_docs": (
-            'Below is the user\'s questions or needs:\n'
-            '{user_prompt}\n\n'
-            'Below is the information retrieved from the knowledge base:\n'
-            '{formatted_docs}'
-        ),
-        "llm_reply_requirement_with_task_splitting": (
-            'Please select the part of the overall task that you should be responsible for and process it.'
-        ),
+        "agent_user_prompt": '''
+            Below is the user's questions or needs:
+            {user_prompt}
+        ''',
+        "agent_user_prompt_with_retrieved_docs": '''
+            Below is the user's questions or needs:
+            {user_prompt}
+
+            Below is the information retrieved from the knowledge base:
+            {formatted_docs}
+        ''',
+        "llm_reply_requirement_with_task_splitting": "Please select the part of the overall task that you should be responsible for and process it.",
         "recursive_task_generation": {
             "system": """
                 Please generate detailed task data according to the requirements, task generation goals and task data structure I provided, and try to split the steps and levels of the task in more detail.
@@ -324,105 +327,99 @@ language_packs = {
         'chatroom_agent_relation_does_not_exist': 'agent relation does not exist',
         'chatroom_status_is_incorrect': 'The current status is incorrect',
         'chatroom_agent_number_less_than_one': 'There must be at least 1 agent present in the meeting room.',
-        'chatroom_manager_system': (
-            'You are the moderator of the meeting room, where there is one user and at least one AI agent.\n'
-            'You are responsible for selecting the next agent to speak.\n'
-            'I will provide a list of detailed information about all agents in the meeting room in the following JSON format:'
-            '[{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];\n'
-            'And the chat history list in the following JSON format:'
-            '[message, ...];\n'
-            'The JSON structure for each message is as follows:'
-            '{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content, "topic": meeting topic}.\n\n'
-            'First, you need to analyze the current meeting topic from the user\'s latest message content. The meeting topic should not be too concise, try to be detailed, and do not copy the meeting topic from historical messages.\n'
-            'Then, respond according to the following requirements:\n'
-            '1. Please only select agents from the provided agent list. Do not select agents that exist in the chat history but not in the agent list;\n'
-            '2. Please select the next agent to speak based on the current meeting topic and all agents\' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the historical message content;\n'
-            '3. Please return in JSON format: {"topic": current meeting topic, "id": the ID of the agent you selected}. Sometimes an agent\'s name might look like an ID number, but you must still return the agent\'s ID, not their name.'
-        ),
+        'chatroom_manager_system': '''
+            You are the moderator of the meeting room, where there is one user and at least one AI agent.
+            You are responsible for selecting the next agent to speak.
+            I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
+            [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
+            A list consisting of the content of each message of the user in the following JSON format: [content string, ...]
+            And the chat history list in the following JSON format: [message, ...]
+            where the JSON structure for each message is as follows:
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}.
 
-        'chatroom_manager_system_with_optional_selection': (
-            'You are the moderator of the meeting room, where there is one user and at least one AI agent.\n'
-            'You are responsible for selecting the next agent to speak or ending the conversation.\n'
-            'I will provide a list of detailed information about all agents in the meeting room in the following JSON format:'
-            '[{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];\n'
-            'And the current meeting topic;\n'
-            'Also, the chat history list in the following JSON format:'
-            '[message, ...];\n'
-            'The JSON structure for each message is as follows:'
-            '{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content, "topic": meeting topic}.\n\n'
-            'You should determine whether to end the conversation according to the following rules:\n'
-            '1. You should try to encourage all agents to actively participate in the dialogue regarding the current meeting topic;\n'
-            '2. You should also analyze the coherence of agent responses. If there is no content related to the current meeting topic in the content of the last message in the chat history (the content of the "message" field), please end the conversation. Note that only the last message in the chat history is considered, and no other messages are considered.\n\n'
-            'Then, respond according to the following requirements:\n'
-            '1. If you think the conversation should end, please only return in JSON format: {"id": 0, "message": reason for ending the conversation}; otherwise, select an agent according to the following requirements.\n'
-            '2. Please only select agents from the provided agent list. Do not select agents that exist in the chat history but not in the agent list;\n'
-            '3. Please select the next agent to speak based on the current meeting topic, chat history, and all agents\' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the current meeting topic;\n'
-            '4. Please return in JSON format: {"id": the ID of the agent you selected}. Sometimes an agent\'s name might look like an ID number, but you must still return the agent\'s ID, not their name.'
-        ),
+            First, you need to summarize the instruction to be given to the agent based on user's messages. The instruction should be fairly detailed, and do not copy the instruction from historical messages.
+            Then, respond according to the following requirements:
+            1. Please only select agents from the provided agent list. Do not select agents that exist in the chat history but not in the agent list;
+            2. Please select the next agent to speak based on the instruction and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the historical message content;
+            3. Please return in JSON format: {"instruction": instruction, "id": the ID of the agent you selected}. Sometimes an agent's name might look like an ID number, but you must still return the agent's ID, not their name.
+        ''',
 
-        'chatroom_manager_user_invalid_selection': (
-            'Your last selected ID was {agent_id}, but this ID does not correspond to any agent in the meeting room. Please select again.\n\n'
-        ),
+        'chatroom_manager_system_with_optional_selection': '''
+            You are the moderator of the meeting room, where there is one user and at least one AI agent.
+            You are responsible for selecting the next agent to speak or ending the conversation.
+            I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
+            [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
+            And the current user's instruction;
+            Also, the chat history list in the following JSON format:
+            [message, ...];
+            The JSON structure for each message is as follows:
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}.
 
-        'chatroom_manager_user': (
-            'Total number of agents: {agent_count}\n'
-            'Below is the detailed information list of all agents in the meeting room:\n'
-            '{agents}\n\n'
-            'Below is the chat history list:\n'
-            '{messages}\n\n'
-            'User\'s latest message content: {user_message}\n'
-            'Please select the next agent to speak from the agent list according to the requirements.'
-        ),
+            You should determine whether to end the conversation according to the following rules:
+            1. You should try to encourage all agents to actively participate in the dialogue regarding the user's instruction;
+            2. You should also analyze the coherence of agent responses. If there is no content related to the user's instruction in the content of the last message in the chat history (the content of the "message" field), please end the conversation. Note that only the last message in the chat history is considered, and no other messages are considered.
 
-        'chatroom_manager_user_with_optional_selection': (
-            'Total number of agents: {agent_count}\n'
-            'Below is the detailed information list of all agents in the meeting room:\n'
-            '{agents}\n\n'
-            'Current meeting topic: {topic}\n'
-            'Below is the chat history list:\n'
-            '{messages}\n\n'
-            'Please select the next agent to speak from the agent list according to the requirements, or end the conversation.'
-        ),
+            Then, respond according to the following requirements:
+            1. If you think the conversation should end, please only return in JSON format: {"id": 0, "message": reason for ending the conversation}; otherwise, select an agent according to the following requirements.
+            2. Please only select agents from the provided agent list. Do not select agents that exist in the chat history but not in the agent list;
+            3. Please select the next agent to speak based on the user's instruction, chat history, and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the user's instruction;
+            4. Please return in JSON format: {"id": the ID of the agent you selected}. Sometimes an agent's name might look like an ID number, but you must still return the agent's ID, not their name.
+        ''',
 
-        'chatroom_agent_user_subprompt': (
-            # 'You are in a meeting room, where there is one user and at least one AI agent.\n'
-            'Before now, other agents have already responded to the current user\'s questions or needs. I will provide records of the responses of other agents.'
-            'You need to answer questions or handle needs based on the user\'s questions or needs, as well as the response records of other agents.'
-            'The agents\' response records may contain questions or requirements initiated by the user.\n'
-            'The response records are in the following JSON format: [record, ...];\n'
-            'The JSON structure for each record is as follows:\n'
-            '{{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}}.\n\n'
+        'chatroom_manager_user_invalid_selection': "Your last selected ID was {agent_id}, but this ID does not correspond to any agent in the meeting room. Please select again.",
 
-            'Current user questions or needs:\n'
-            '{user_message}\n\n'
+        'chatroom_manager_user': '''
+            Total number of agents: {agent_count}
+            Below is the detailed information list of all agents in the meeting room:
+            {agents}
 
-            'Response records:\n'
-            '{messages}\n\n'
-            #'Now the meeting room needs you to speak. Please speak according to the current meeting topic and chat history.\n'
-            #'I will provide the current meeting topic;\n'
-            #'And the chat history list in the following JSON format: [message, ...];\n'
-            #'The JSON structure for each message is as follows:'
-            #'{{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content, "topic": meeting topic}}.\n\n'
-            #'Below is the chat history list:\n'
-            #'{messages}\n\n'
-            #'Current meeting topic: {topic}\n'
-            # 'Your response must follow these requirements:\n'
-            # '1. If your responsibilities and capabilities are not directly related to the current meeting topic, please try to adapt to the topic and provide relevant responses, rather than being limited to your specific responsibilities and capabilities.\n'
-            # '2. Note that historical messages are for reference only. Do not meaninglessly repeat content from historical messages in your response.\n'
-            # '3. Make sure to respond with text content only, do not wrap your response in the JSON structure used in the message history.\n'
-            # '4. Do not explicitly mention the current topic in your response unless the user specifically asks about it.'
-        ),
-        'chatroom_agent_description_with_abilities': (
-            'Agent responsibilities (or identity):\n'
-            '{obligations}\n\n'
-            'Agent capabilities (listed in JSON format):\n'
-            '{abilities_content}'
-        ),
+            Below is the chat history list:
+            {messages}
 
-        'chatroom_agent_description_with_no_ability': (
-            'Agent responsibilities (or identity):\n'
-            '{obligations}'
-        ),
+            Please select the next agent to speak from the agent list according to the requirements.
+        ''',
+
+        'chatroom_manager_user_with_optional_selection': '''
+            Total number of agents: {agent_count}
+            Below is the detailed information list of all agents in the meeting room:
+            {agents}
+
+            User's instruction:
+            {topic}
+
+            Below is the chat history list:
+            {messages}
+
+            Please select the next agent to speak from the agent list according to the requirements, or end the conversation.
+        ''',
+
+        'chatroom_agent_user_subprompt': '''
+            Before now, other agents have already responded to the current user's questions or needs. I will provide records of the responses of other agents.
+            You need to answer questions or handle needs by centering on the user's instruction, and basing on the response records of other agents.
+            The agents' response records may contain questions or needs initiated by the user.
+            The user's messages are in the following JSON format: [message string, ...];
+            The response records are in the following JSON format: [record, ...];
+            The JSON structure for each record is as follows:
+            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}}.
+            
+            User's instruction:
+            {topic}
+
+            Response records:
+            {messages}
+        ''',
+        'chatroom_agent_description_with_abilities': '''
+            Agent responsibilities (or identity):
+            {obligations}
+            
+            Agent capabilities (listed in JSON format):
+            {abilities_content}
+        ''',
+
+        'chatroom_agent_description_with_no_ability': '''
+            Agent responsibilities (or identity):
+            {obligations}
+        ''',
         'chatroom_request_sent_successfully': 'Request successful, please wait',
         'chatroom_role_user': 'user',
         'chatroom_role_agent': 'agent',
