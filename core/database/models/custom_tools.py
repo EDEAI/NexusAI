@@ -160,6 +160,8 @@ class CustomTools(MySQL):
                 "description": data.get('description'),
                 "updated_time": current_time
             }
+            app_model.update([{'column': 'id', 'value': app_id}], app_update_data)
+            
             update_data = {
                 "updated_time": current_time,
                 "input_variables": data['input_variables'],
@@ -168,14 +170,16 @@ class CustomTools(MySQL):
                 "output_type": data['output_type'],
                 "output_variables": data['output_variables']
             }
-            app_model.update([{'column': 'id', 'value': app_id}], app_update_data)
+            
             conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
                           {'column': 'publish_status', 'value': 0}]
             self.update(conditions, update_data)
+            
+            
             update_data['published_time'] = current_time
             conditions_1 = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
                           {'column': 'publish_status', 'value': 1}]
-            self.update(conditions_1, {'publish_status': 1, 'published_time': current_time})  
+            self.update(conditions_1,update_data)  
             # Handle tags
             tag_ids = data.get('tags', [])
             if tag_ids:
