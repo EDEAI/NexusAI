@@ -337,7 +337,7 @@ language_packs = {
             where the JSON structure for each message is as follows:
             {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}.
 
-            First, you need to summarize the instruction to be given to the agent based on user's messages. The instruction should be fairly detailed, and do not copy the instruction from historical messages.
+            First, you need to summarize the instruction to be given to the agent based on user's messages. The instruction should be fairly detailed, and do not copy the instruction from historical messages. Besides, refer to the user in the first person.
             Then, respond according to the following requirements:
             1. Please only select agents from the provided agent list. Do not select agents that exist in the chat history but not in the agent list;
             2. Please select the next agent to speak based on the instruction and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the historical message content;
@@ -356,7 +356,7 @@ language_packs = {
             {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}.
 
             You should determine whether to end the conversation according to the following rules:
-            1. You should try to encourage all agents to actively participate in the dialogue regarding the user's instruction;
+            1. You should try to encourage all agents to actively participate in the dialogue regarding the user's instruction, even if some of the agents have met the user's needs;
             2. You should also analyze the coherence of agent responses. If there is no content related to the user's instruction in the content of the last message in the chat history (the content of the "message" field), please end the conversation. Note that only the last message in the chat history is considered, and no other messages are considered.
 
             Then, respond according to the following requirements:
@@ -372,6 +372,9 @@ language_packs = {
             Total number of agents: {agent_count}
             Below is the detailed information list of all agents in the meeting room:
             {agents}
+
+            Below is the user's message content list:
+            {user_messages}
 
             Below is the chat history list:
             {messages}
@@ -394,8 +397,8 @@ language_packs = {
         ''',
 
         'chatroom_agent_user_subprompt': '''
-            Before now, other agents have already responded to the current user's questions or needs. I will provide records of the responses of other agents.
-            You need to answer questions or handle needs by centering on the user's instruction, and basing on the response records of other agents.
+            Before now, other agents have already responded to the current user's questions or needs. I will provide the responses records of other agents.
+            You must answer questions or handle needs by centering on the user's instruction and basing on the response records.
             The agents' response records may contain questions or needs initiated by the user.
             The user's messages are in the following JSON format: [message string, ...];
             The response records are in the following JSON format: [record, ...];

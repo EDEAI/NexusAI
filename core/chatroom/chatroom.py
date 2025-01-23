@@ -140,7 +140,8 @@ class Chatroom:
         
     def _get_history_messages_list(self, model_config_id: int) -> Tuple[
         List[Dict[str, Union[int, str]]],
-        List[Dict[str, Union[int, str]]]
+        List[Dict[str, Union[int, str]]],
+        List[str],
     ]:
         '''
         Get all history messages and the last section of them as JSON strings in an AI prompt.
@@ -159,14 +160,20 @@ class Chatroom:
             # if (topic := message['topic']) is not None:
             #     message_for_llm['topic'] = topic
             messages.append(message_for_llm)
+        messages = truncate_messages_by_token_limit(messages, self._model_configs[model_config_id])
         messages_in_last_section = deque()
         for message in reversed(messages):
             messages_in_last_section.appendleft(message)
             if message['id'] == 0:
                 break
+        user_messages = []
+        for message in messages:
+            if message['id'] == 0:
+                user_messages.append(message['message'])
         return (
-            truncate_messages_by_token_limit(messages, self._model_configs[model_config_id]),
-            list(messages_in_last_section)
+            messages,
+            list(messages_in_last_section),
+            user_messages
         )
     
     def _user_speak(self, user_message: str) -> None:
@@ -218,14 +225,15 @@ class Chatroom:
                         self._user_id,
                         append_ret_lang_prompt=False
                     )
-            messages, messages_in_last_section = self._get_history_messages_list(self._model_config_ids[0])
+            messages, messages_in_last_section, user_messages = self._get_history_messages_list(self._model_config_ids[0])
             user_prompt = user_prompt.format(
                 agent_count = len(self._model_config_ids) - 1,
                 agents = self._get_agents_info(),
                 user_message = messages_in_last_section[0]['message'],
                 topic = self._topic,
                 messages = json.dumps(messages, ensure_ascii=False),
-                messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False)
+                messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
+                user_messages = user_messages
             )
             if i > 0:
                 # the Speaker Selector has tried more than once
@@ -306,7 +314,7 @@ class Chatroom:
         completion_tokens = 0
         total_tokens = 0
 
-        messages, messages_in_last_section = self._get_history_messages_list(self._model_config_ids[agent_id])
+        messages, messages_in_last_section, user_messages = self._get_history_messages_list(self._model_config_ids[agent_id])
         user_message = messages_in_last_section[0]['message']
         agent_user_subprompt = get_language_content(
             'chatroom_agent_user_subprompt',
@@ -316,7 +324,8 @@ class Chatroom:
             messages = json.dumps(messages, ensure_ascii=False),
             topic = self._topic,
             user_message = user_message,
-            messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False)
+            messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
+            user_messages = user_messages
         )
         prompt = Prompt(user=agent_user_subprompt)
         agent_node = AgentNode(
