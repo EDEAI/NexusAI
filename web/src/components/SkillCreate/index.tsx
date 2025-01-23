@@ -35,6 +35,7 @@ const SkillCreate = memo(() => {
     const [skillCreateResult, setSkillCreateResult] = useState(null);
     const [bugFixshow, setBugFixshow] = useState(false);
     const [params, setParams] = useSetState(null);
+    const lastParams=useLatest(params)
     const flowMessage = useSocketStore(state => state.flowMessage);
     const [hasProcessed, setHasProcessed] = useState(false);
     const [changeSkill, setChangeSkill] = useState(null);
@@ -47,13 +48,13 @@ const SkillCreate = memo(() => {
             <CodeEditor
                 language="python3"
                 value={skillCreateResult?.code?.['python3']}
-                onChange={(value) => {
+                onChange={value => {
                     setChangeSkill(prev => ({
                         ...prev,
                         code: {
                             ...prev?.code,
-                            python3: value
-                        }
+                            python3: value,
+                        },
                     }));
                 }}
                 title={
@@ -82,7 +83,7 @@ const SkillCreate = memo(() => {
     }, []);
 
     const handleCancel = () => {
-        if(skillCreateResult){
+        if (skillCreateResult) {
             Modal.confirm({
                 title: intl.formatMessage({ id: 'agent.modal.leave.title' }),
                 content: intl.formatMessage({ id: 'agent.modal.leave.content' }),
@@ -91,6 +92,7 @@ const SkillCreate = memo(() => {
                     resetState();
                 },
             });
+            return 
         }
         resetState();
     };
@@ -133,8 +135,6 @@ const SkillCreate = memo(() => {
                 if (res.code == 0) {
                     // setSkillCreateResult(res.data);
                     setHasProcessed(false);
-                    setParams(res.data);
-                 
                 }
             } catch (e) {
                 console.log(e);
@@ -191,14 +191,20 @@ const SkillCreate = memo(() => {
         [prompt],
     );
 
-    const onSave = async () => {
+    const onSave = useCallback(async () => {
         setSkillCreateResult(changeSkillLast.current);
         try {
             setLoading(true);
+            console.log({
+                ...changeSkillLast.current,
+                code: JSON.stringify(changeSkillLast.current?.code || {}),
+                app_id: lastParams.current?.app_id || null,
+            });
+
             const res = await skillDataCreate({
                 ...changeSkillLast.current,
                 code: JSON.stringify(changeSkillLast.current?.code || {}),
-                app_id: params?.app_id || null,
+                app_id: lastParams.current?.app_id || null,
             });
             if (res.code == 0) {
                 setParams(res.data);
@@ -212,7 +218,12 @@ const SkillCreate = memo(() => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [changeSkillLast]);
+    
+    useEffect(()=>{
+        console.log('params',params);
+        
+    },[params])
 
     const Created = useCallback(
         ({ loading }) => {
@@ -338,7 +349,7 @@ const SkillCreate = memo(() => {
             onOk={handleOk}
             centered
             onCancel={handleCancel}
-            destroyOnClose
+            
         >
             {skillCreateResult ? <Created loading={loading} /> : <Create loading={loading} />}
             <BugFix

@@ -11,23 +11,24 @@ from log import Logger
 
 logger = Logger.get_logger('celery-app')
 
+
 class SkillNode(SandboxBaseNode):
     """
     A SkillNode object is used to integrate external skills into the workflow.
     """
 
     def __init__(
-        self,
-        skill_id: int = 0,
-        title: str = "",
-        desc: str = "",
-        input: Optional[ObjectVariable] = None,
-        output: Optional[ObjectVariable] = None,
-        wait_for_all_predecessors: bool = False,
-        manual_confirmation: bool = False,
-        flow_data: Dict[str, Any] = {},
-        original_node_id: Optional[str] = None,
-        custom_data: Optional[Dict[str, Any]] = None
+            self,
+            skill_id: int = 0,
+            title: str = "",
+            desc: str = "",
+            input: Optional[ObjectVariable] = None,
+            output: Optional[ObjectVariable] = None,
+            wait_for_all_predecessors: bool = False,
+            manual_confirmation: bool = False,
+            flow_data: Dict[str, Any] = {},
+            original_node_id: Optional[str] = None,
+            custom_data: Optional[Dict[str, Any]] = None
     ):
         """
         Initializes a SkillNode object.
@@ -48,6 +49,7 @@ class SkillNode(SandboxBaseNode):
             init_kwargs["original_node_id"] = original_node_id
 
         super().__init__(**init_kwargs)
+
     def validate(self):
         if self.data['skill_id'] > 0:
             skill_id = self.data['skill_id']
@@ -57,7 +59,6 @@ class SkillNode(SandboxBaseNode):
         assert custom_data['input_variables'], get_language_content('skill_input_variables_error')
         assert custom_data['output_variables'], get_language_content('skill_output_variables_error')
         assert custom_data['code'], get_language_content('skill_code_error')
-        
 
     def run(
             self,
@@ -83,7 +84,6 @@ class SkillNode(SandboxBaseNode):
                 custom_data = self.data['custom_data']
                 custom_data['app_id'] = 0
                 skill_id = 0
-                # self.data['custom_code'] = custom_data['code']
             start_time_str = start_time.replace(microsecond=0).isoformat(sep='_')
             skill_run_id = AppRuns().insert(
                 {
@@ -96,24 +96,27 @@ class SkillNode(SandboxBaseNode):
                     'status': 2
                 }
             )
-            
+
             self.data['code_dependencies'] = custom_data['dependencies']
             self.data['custom_code'] = ast.literal_eval(custom_data['code'])
             self.data['output'] = create_variable_from_dict(custom_data['output_variables'])
-            
+
             input = self.data['input']
             replace_variable_value_with_context(input, context)
             validate_required_variable(input)
             if custom_data['app_id'] > 0:
                 Apps().increment_execution_times(custom_data['app_id'])
-            
-            response = self.run_custom_code()
 
+            response = self.run_custom_code()
+            type_map = {
+                str: 'string',
+                int: 'number',
+                float: 'number'
+            }
             # Validate the response status
             status = response['status']
+            output = ObjectVariable(name='output')
             if status == 0:
-                output = ObjectVariable(name='output')
-
                 # Parse stdout if available
                 stdout_text = response['data']['stdout']
                 if stdout_text:
@@ -121,11 +124,6 @@ class SkillNode(SandboxBaseNode):
                         stdout_dict = json.loads(stdout_text)
                         self.output_check(self.data['output'], stdout_dict)
                         for key, value in stdout_dict.items():
-                            type_map = {
-                                str: 'string',
-                                int: 'number',
-                                float: 'number'
-                            }
                             var_type = type_map.get(type(value), 'json')
                             if var_type == 'json':
                                 value = json.dumps(value, ensure_ascii=False)
@@ -135,21 +133,18 @@ class SkillNode(SandboxBaseNode):
                             'status': 'failed',
                             'message': f"Failed to parse stdout as JSON: {e}"
                         }
-                        # raise ValueError(
-                        #     f"Failed to parse stdout as JSON: {e}")
                 else:
+                    stderr_text = response['data']['stderr']
                     return {
                         'status': 'failed',
-                        'message': response['data']['stderr']
+                        'message': stderr_text
                     }
-                    # raise ValueError(response['data']['stderr'])
             else:
+                stderr_text = response['data']['stderr']
                 return {
                     'status': 'failed',
-                    'message': response['msg']
+                    'message': stderr_text
                 }
-                # raise ValueError(response['msg'])
-
             end_time = datetime.now()
             elapsed_time = end_time.timestamp() - start_time.timestamp()
             outputs = output.to_dict()

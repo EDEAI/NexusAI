@@ -37,31 +37,31 @@ celery_app = Celery('celery_app', broker=redis_url, backend=redis_url)
 # It creates the node and the context from these dictionaries, then runs the node with the context and any additional keyword arguments
 @celery_app.task
 def run_workflow_node(
-    node_dict: Dict[str, Any],
-    **kwargs
+        node_dict: Dict[str, Any],
+        **kwargs
 ) -> Dict[str, Any]:
     context_dict = kwargs.pop('context_dict', None)
     if context_dict:
         kwargs['context'] = create_context_from_dict(context_dict)
-        
+
     task = kwargs['task']
     if task:
         task['current'] = create_recursive_task_category_from_dict(task['current']) if task['current'] else None
         task['parent'] = create_recursive_task_category_from_dict(task['parent']) if task['parent'] else None
-        
+
     user_id = kwargs.get('user_id', 0)
     os.environ['ACTUAL_USER_ID'] = str(user_id)
-        
+
     return create_node_from_dict(node_dict).run(**kwargs)
 
 
 @celery_app.task
 def run_app(
-    app_type: Literal['agent', 'skill'],
-    id_: int,
-    user_id: int,
-    input_dict: Dict[str, Any],
-    **kwargs
+        app_type: Literal['agent', 'skill'],
+        id_: int,
+        user_id: int,
+        input_dict: Dict[str, Any],
+        **kwargs
 ) -> Dict[str, Any]:
     os.environ['ACTUAL_USER_ID'] = str(user_id)
     input_: ObjectVariable = create_variable_from_dict(input_dict)
@@ -78,13 +78,13 @@ def run_app(
                 agent_id=id_,
                 ability_id=kwargs['ability_id'],
                 prompt=create_prompt_from_dict(kwargs['prompt']),
-                data_source_run_id = kwargs['data_source_run_id'],
+                data_source_run_id=kwargs['data_source_run_id'],
             )
         case 'skill':
             if 'custom_data' in kwargs:
                 app_id = 0
                 run_type = 2
-                custom_data = kwargs['custom_data'] 
+                custom_data = kwargs['custom_data']
                 node = SkillNode(
                     title=custom_data['name'],
                     desc=custom_data['description'],
@@ -92,7 +92,7 @@ def run_app(
                     skill_id=id_,
                     custom_data=custom_data
                 )
-                kwargs['custom_data'] = kwargs['custom_data'] 
+                kwargs['custom_data'] = kwargs['custom_data']
             else:
                 skill = CustomTools().get_skill_by_id(id_)
                 app_id = skill['app_id']
@@ -106,7 +106,7 @@ def run_app(
                 )
         case _:
             raise ValueError(f'Invalid app type: {app_type}')
-        
+
     # App validation
     # try:
     #     node.validate()
@@ -115,7 +115,7 @@ def run_app(
     #         'status': 'failed',
     #         'message': str(e)
     #     }
-    
+
     # Run app
     result = node.run(
         Context(),
@@ -124,8 +124,11 @@ def run_app(
         type=run_type,
         **kwargs
     )
-    outputs = result['data'].get('outputs')
-    result['data']['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
+    if 'data' not in result:
+        return result
+    else:
+        outputs = result['data'].get('outputs')
+        result['data']['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
     if app_type == 'agent':
         result['data']['outputs_md'] = get_first_variable_value(create_variable_from_dict(outputs))
     else:
@@ -135,10 +138,10 @@ def run_app(
 
 @celery_app.task
 def run_dataset(
-    dataset_id: int,
-    user_id: int,
-    user_input: str,
-    **kwargs
+        dataset_id: int,
+        user_id: int,
+        user_input: str,
+        **kwargs
 ) -> Dict[str, Any]:
     logger = Logger.get_logger('dataset')
     try:
@@ -169,12 +172,12 @@ def run_dataset(
 
 @celery_app.task
 def run_node(
-    node_dict: Dict[str, Any],
-    node_input: Optional[Dict[str, Any]],
-    user_id: int,
-    workflow_id: int,
-    context: Optional[List[Dict[str, Any]]],
-    **kwargs
+        node_dict: Dict[str, Any],
+        node_input: Optional[Dict[str, Any]],
+        user_id: int,
+        workflow_id: int,
+        context: Optional[List[Dict[str, Any]]],
+        **kwargs
 ) -> Dict[str, Any]:
     os.environ['ACTUAL_USER_ID'] = str(user_id)
     app_node_exec = AppNodeExecutions()
@@ -250,9 +253,11 @@ def run_node(
         )
     return result
 
+
 @celery_app.task
 def reindex_dataset(dataset_id: int, new_embeddings_config_id: int):
     DatasetManagement.reindex_dataset(dataset_id, new_embeddings_config_id)
+
 
 @celery_app.task
 def import_output_variable_to_knowledge_base(
@@ -277,6 +282,7 @@ def import_output_variable_to_knowledge_base(
         {'need_human_confirm': 0}
     )
 
+
 @celery_app.task
 def run_llm_tool(
     team_id: int,
@@ -296,6 +302,7 @@ def run_llm_tool(
         prompt=prompt,
     )
     return ai_tool.run(app_run_id=app_run_id, return_json=return_json, correct_llm_output=correct_llm_output)
+
 
 # Update Celery application configuration
 # Set the expiration time of task results to 3600 seconds (1 hour)
