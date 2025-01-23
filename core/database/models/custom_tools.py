@@ -222,26 +222,9 @@ class CustomTools(MySQL):
             "output_variables": data['output_variables'],
         }
         skill_id = self.insert(skill_data)
-
-        draft_info = self.get_publish_skill_info(user_id, app_id, 0)
-
-        draft_info = draft_info['data']
-
-        tool_data = {
-            "team_id": draft_info['team_id'],
-            "user_id": draft_info['user_id'],
-            "app_id": draft_info['app_id'],
-            "config": draft_info['config'],
-            "input_variables": draft_info['input_variables'],
-            "dependencies": draft_info['dependencies'],
-            "code": draft_info['code'],
-            "output_type": draft_info['output_type'],
-            "output_variables": draft_info['output_variables'],
-            "publish_status": 1,
-            "published_time": datetime.now(),
-            "status": 1
-        }
-        skill_id = self.insert(tool_data)
+        skill_data['publish_status'] = 1
+        skill_data['published_time'] = current_time
+        skill_id = self.insert(skill_data)
         apps_data = {
             "publish_status": 1,
             "updated_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
