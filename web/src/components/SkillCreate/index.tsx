@@ -48,7 +48,7 @@ const SkillCreate = memo(() => {
         () => (
             <CodeEditor
                 language="python3"
-                value={skillCreateResult?.code?.['python3']}
+                value={changeSkillLast.current?.code?.['python3']}
                 onChange={value => {
                     setChangeSkill(prev => ({
                         ...prev,
@@ -244,7 +244,7 @@ const SkillCreate = memo(() => {
                         <ResultDisplay
                             loading={loading}
                             onChange={setChangeSkill}
-                            initialValues={skillCreateResult}
+                            initialValues={changeSkillLast.current}
                         ></ResultDisplay>
                         <div className="absolute bottom-2 right-2 flex gap-2 p-1  bg-opacity-50 rounded-md">
                             <Tooltip
@@ -357,7 +357,7 @@ const SkillCreate = memo(() => {
             <BugFix
                 open={bugFixshow}
                 onCancel={() => setBugFixshow(false)}
-                skillData={{ ...changeSkill, app_run_id: params?.app_run_id }}
+                skillData={{ ...changeSkillLast.current, app_run_id: params?.app_run_id }}
                 onSubmit={handleBugFixSubmit}
             />
         </Modal>
