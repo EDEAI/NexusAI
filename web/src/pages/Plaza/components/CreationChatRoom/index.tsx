@@ -237,7 +237,7 @@ const ChatroomDetial: React.FC<CreationChatRoom> = param => {
                                                         placeholder={intl.formatMessage({
                                                             id: 'app.create_chatroom.label_1_pl',
                                                         })}
-                                                        maxLength={20}
+                                                        maxLength={50}
                                                         style={{
                                                             height: 40,
                                                             background: '#F7F7F7',
@@ -265,7 +265,7 @@ const ChatroomDetial: React.FC<CreationChatRoom> = param => {
                                                 >
                                                     <TextArea
                                                         showCount
-                                                        maxLength={100}
+                                                        maxLength={1000}
                                                         placeholder={intl.formatMessage({
                                                             id: 'app.create_chatroom.label_2_pl',
                                                         })}

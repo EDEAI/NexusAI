@@ -250,7 +250,7 @@ const SummaryHistoryDom: React.FC<{
                                                         {getProperties(
                                                             item?.target_run?.inputs?.properties,
                                                         ).map(i => (
-                                                            <div>
+                                                            <div className='pb-[10px]'>
                                                                 <div className="pb-[8px] font-[600]">
                                                                     {i.display_name || i.name}
                                                                 </div>
