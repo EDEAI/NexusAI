@@ -2,7 +2,7 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import useChatroomStore from '@/store/chatroomstate'
 import DraggablePanel from '@/components/Panel/DraggablePanel';
 import {Spin} from 'antd';
-import {VerticalLeftOutlined,VerticalRightOutlined,} from '@ant-design/icons'
+import {MenuUnfoldOutlined,MenuFoldOutlined} from '@ant-design/icons'
 import { getMeetingSummaryHistory } from '@/api/plaza';
 import RunsMeetingSummary from './components/RunsMeetingSummary'
 import RevisionsMeetingSummary from './components/RevisionsMeetingSummary'
@@ -109,16 +109,19 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                 contentShow ? 
                     <DraggablePanel
                         minWidth={400}
-                        className={`relative h-full right-0 border-0 returned-0 px-[0] ${packUp?'translate-x-full flex-[0]':''}`}
+                        className={`relative h-full right-0 border-0 returned-0 px-[0] ${packUp?'translate-x-full flex-[0]':'translate-x-0'}`}
                     >
                         {boxLoading?<div className='h-full w-full absolute top-0 left-0 flex justify-center items-center z-[100] bg-[rgba(255,255,255,0.5)]'><Spin size="large" /></div>:<></>}
                         {
                             <>
                                 <div onClick={()=>{ setPackUp(pre=>!pre)}} className={`
-                                        ${!packUp?'right-[6px] top-[60px]':'right-[100%] top-[4px]' }
-                                        fixed w-[40px] h-[40px]  flex justify-center items-center cursor-pointer z-[99]
+                                        ${!packUp?'right-[99%] top-[60px]':'right-[100%] top-[60px]' }
+                                        history_packup
+                                        hover:text-[#1B64F3]
+                                        fixed w-[30px] h-[60px] bg-[rgba(255,255,255,1)] shadow-md flex justify-center items-center cursor-pointer z-[99]
                                     `}>
-                                   {!packUp?<VerticalLeftOutlined className='text-[20px]'/>:<VerticalRightOutlined className='text-[20px]'/>}
+                                   {!packUp?<MenuUnfoldOutlined className='text-[18px]'/>:<MenuFoldOutlined className='text-[18px]'/>}
+                                   
                                 </div>
                                 <div className={`h-full min-h-full overflow-y-auto flex flex-col-reverse scroll-smooth relative`} onScroll={historyLoad} ref={scrollDom}>
                                     <div>
