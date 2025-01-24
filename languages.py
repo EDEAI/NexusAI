@@ -867,7 +867,7 @@ language_packs = {
                 3.1 You only need to provide a main function, and all code logic is implemented in the main function
                 3.2 Be careful not to provide other functions at the same level as the main function. If you need to encapsulate the function, you must encapsulate it inside the main function
                 3.3 Do not provide the function calling code. I will automatically call the main function during actual operation
-                3.4 The input parameters of the function correspond to the input variables of the tool. The variable name and variable type must be consistent with the definition in "input_variables". Non-mandatory variables must have default values
+                3.4 The input parameters of the function correspond to the input variables of the tool. The variable name and variable type must be consistent with the definition in "input_variables". Non-mandatory variables must have default values, variables with default values should be placed last.
                 3.5 The return data type of the function must be specified
                 3.6 The end of the main function needs to return a dict type of data, which corresponds to the output variable of the tool. The key name of the dict data is the output variable name. The variable name and variable type must be consistent with the definition in "output_variables"
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
@@ -1534,7 +1534,7 @@ language_packs = {
         #         3.1 你只需要提供一个主函数即可，所有代码逻辑都在主函数中实现
         #         3.2 注意不要提供与主函数同层级的其他函数，如果需要封装函数，一定要在主函数内部进行封装
         #         3.3 不要提供函数的调用代码，实际运行时我会自动调用主函数
-        #         3.4 函数的入参对应工具的输入变量，变量名称、变量类型要与"input_variables"中的定义一致，非必填变量要有默认值
+        #         3.4 函数的入参对应工具的输入变量，变量名称、变量类型要与"input_variables"中的定义一致，非必填变量要有默认值，具有默认值的变量应该放在最后。
         #         3.5 要规定函数的返回数据类型
         #         3.6 主函数的结尾需要固定返回一个dict类型的数据，对应工具的输出变量，dict数据的键名即为输出的变量名，变量名称、变量类型要和"output_variables"中的定义一致
         #     4. "output_variables"为工具运行完成后的输出变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
