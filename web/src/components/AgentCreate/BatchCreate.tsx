@@ -188,7 +188,16 @@ const BatchCreate = memo(
                         });
                         return mergedList;
                     });
-                    setMoreLoading(false);
+                    console.log(agentList.length % batchParams.loop_count);
+                    const nextAgentNumber=agentList.length+1
+                    if (
+                        (nextAgentNumber!== 0 &&
+                            nextAgentNumber % batchParams.loop_count === 0) ||
+                            nextAgentNumber === batchParams.loop_limit
+                    ) {
+                        setMoreLoading(false);
+                      
+                    }
                 }
             }, [batchMessages, agentTagsMap, selectedTags]);
 
@@ -275,16 +284,18 @@ const BatchCreate = memo(
             };
 
             const MoreLoading = () => {
-                let moreNumber =
-                    (batchParams?.loop_count > batchParams.loop_limit
-                        ? batchParams.loop_limit
-                        : batchParams?.loop_count) || 0;
-                if (batchParams?.loop_limit && agentList.length) {
-                    const remaining = batchParams.loop_limit - agentList.length;
-                    if (remaining < moreNumber) {
-                        moreNumber = Math.max(0, remaining);
-                    }
-                }
+                // let moreNumber =
+                //     (batchParams?.loop_count > batchParams.loop_limit
+                //         ? batchParams.loop_limit
+                //         : batchParams?.loop_count) || 0;
+                // if (batchParams?.loop_limit && agentList.length) {
+                //     const remaining = batchParams.loop_limit - agentList.length;
+                //     if (remaining < moreNumber) {
+                //         moreNumber = Math.max(0, remaining);
+                //     }
+                // }
+
+                let moreNumber = agentList.length < batchParams.loop_limit ? 1 : 0;
 
                 moreNumber = Math.floor(Math.max(0, moreNumber));
 
@@ -386,7 +397,7 @@ const BatchCreate = memo(
                                             className={`rounded-lg relative border p-4 cursor-pointer transition-all ${
                                                 isSelected(item.id)
                                                     ? 'border-gray-100 text-gray-300'
-                                                    : 'border-gray-300 hover:border-blue-500 '
+                                                    : 'border-gray-300 hover:shadow-md '
                                             }`}
                                             onClick={() => handleAgentClick(item)}
                                         >

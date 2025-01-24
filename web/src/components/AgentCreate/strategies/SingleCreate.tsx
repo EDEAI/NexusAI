@@ -12,6 +12,7 @@ interface SingleCreateProps {
     agentCreateResultOutput: AgentResult | null;
     correctVisible: boolean;
     prompt: string;
+    conPrompt?:string;
     resultDisplayRef: React.RefObject<ResultDisplayRef>;
     onFormChange: (values: AgentFormData) => void;
     onSubmit: (prompt: string) => void;
@@ -29,6 +30,7 @@ const SingleCreate = memo(
         agentCreateResultOutput,
         correctVisible,
         prompt,
+        conPrompt,
         resultDisplayRef,
         onFormChange,
         onSubmit,
@@ -93,6 +95,7 @@ const SingleCreate = memo(
                                     className="h-[100px]"
                                     loading={loading}
                                     onClose={() => onCorrectVisibleChange(false)}
+                                    defaultValue={conPrompt}
                                     onSubmit={onCorrect}
                                     submitButtonProps={{
                                         size: 'small',
