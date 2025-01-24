@@ -140,7 +140,8 @@ class Chatroom:
         
     def _get_history_messages_list(self, model_config_id: int) -> Tuple[
         List[Dict[str, Union[int, str]]],
-        List[Dict[str, Union[int, str]]]
+        List[Dict[str, Union[int, str]]],
+        List[str],
     ]:
         '''
         Get all history messages and the last section of them as JSON strings in an AI prompt.
@@ -153,20 +154,26 @@ class Chatroom:
             message_for_llm = {
                 'id': agent_id,
                 'name': user_str if agent_id == 0 else self._all_agents[agent_id]['name'],
-                'role': user_str if agent_id == 0 else agent_str,
+                # 'role': user_str if agent_id == 0 else agent_str,
                 'message': message['message']
             }
             # if (topic := message['topic']) is not None:
             #     message_for_llm['topic'] = topic
             messages.append(message_for_llm)
+        messages = truncate_messages_by_token_limit(messages, self._model_configs[model_config_id])
         messages_in_last_section = deque()
         for message in reversed(messages):
             messages_in_last_section.appendleft(message)
             if message['id'] == 0:
                 break
+        user_messages = []
+        for message in messages:
+            if message['id'] == 0:
+                user_messages.append(message['message'])
         return (
-            truncate_messages_by_token_limit(messages, self._model_configs[model_config_id]),
-            list(messages_in_last_section)
+            messages,
+            list(messages_in_last_section),
+            user_messages
         )
     
     def _user_speak(self, user_message: str) -> None:
@@ -218,14 +225,15 @@ class Chatroom:
                         self._user_id,
                         append_ret_lang_prompt=False
                     )
-            messages, messages_in_last_section = self._get_history_messages_list(self._model_config_ids[0])
+            messages, messages_in_last_section, user_messages = self._get_history_messages_list(self._model_config_ids[0])
             user_prompt = user_prompt.format(
                 agent_count = len(self._model_config_ids) - 1,
                 agents = self._get_agents_info(),
                 user_message = messages_in_last_section[0]['message'],
                 topic = self._topic,
                 messages = json.dumps(messages, ensure_ascii=False),
-                messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False)
+                messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
+                user_messages = user_messages
             )
             if i > 0:
                 # the Speaker Selector has tried more than once
@@ -280,7 +288,7 @@ class Chatroom:
             # Update the topic if the last speaker is the user
             if last_speaker_id == 0:
                 # self._topic = llm_output['topic']
-                self._topic = llm_output['instruction']
+                self._topic = llm_output['summary']
                 logger.debug('Current topic: %s', self._topic)
                 # self._history_messages[-1]['topic'] = self._topic
                 chatroom_messages.update(
@@ -306,7 +314,7 @@ class Chatroom:
         completion_tokens = 0
         total_tokens = 0
 
-        messages, messages_in_last_section = self._get_history_messages_list(self._model_config_ids[agent_id])
+        messages, messages_in_last_section, user_messages = self._get_history_messages_list(self._model_config_ids[agent_id])
         user_message = messages_in_last_section[0]['message']
         agent_user_subprompt = get_language_content(
             'chatroom_agent_user_subprompt',
@@ -316,7 +324,8 @@ class Chatroom:
             messages = json.dumps(messages, ensure_ascii=False),
             topic = self._topic,
             user_message = user_message,
-            messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False)
+            messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
+            user_messages = user_messages
         )
         prompt = Prompt(user=agent_user_subprompt)
         agent_node = AgentNode(
@@ -325,66 +334,69 @@ class Chatroom:
             agent_id=agent_id,
             prompt=prompt
         )
-        self._console_log('Agent message: \033[36m')  # Print the agent message in green
-        # Request LLM
-        agent_message = ''
-        async for chunk in agent_node.run_in_chatroom(
-            context=Context(),
-            user_id=self._user_id,
-            type=2,
-            override_rag_input=user_message
-        ):
-            if content := chunk.content:
-                self._console_log(content)
-                agent_message += content
-                await self._ws_manager.send_agent_reply(
-                    self._chatroom_id,
-                    agent_id,
-                    content,
-                    agent_message
-                )
-            if usage_metadata := chunk.usage_metadata:
-                prompt_tokens = usage_metadata['input_tokens']
-                completion_tokens = usage_metadata['output_tokens']
-                total_tokens = usage_metadata['total_tokens']
-        self._console_log('\033[0m\n')  # Reset the color
-        await self._ws_manager.end_agent_reply(
-            self._chatroom_id,
-            agent_id,
-            agent_message
-        )
-
-        # Append the agent message to the history messages and insert it into the database
-        # self._history_messages.append({'agent_id': agent_id, 'message': agent_message, 'topic': self._topic})
-        self._history_messages.append({'agent_id': agent_id, 'message': agent_message})
-        has_connections = self._ws_manager.has_connections(self._chatroom_id)
-        chatroom_messages.insert(
-            {
-                'chatroom_id': self._chatroom_id,
-                'app_run_id': self._app_run_id,
-                'agent_id': agent_id,
-                'llm_input': [
-                    ['system', prompt.get_system()],
-                    ['user', prompt.get_user()]
-                ],
-                'message': agent_message,
-                'topic': self._topic,
-                'is_read': 1 if has_connections else 0,
-                'prompt_tokens': prompt_tokens,
-                'completion_tokens': completion_tokens,
-                'total_tokens': total_tokens
-            }
-        )
-        app_runs.increment_steps(self._app_run_id)
-        app_runs.increment_token_usage(
-            self._app_run_id,
-            prompt_tokens, completion_tokens, total_tokens
-        )
-        if not has_connections:
-            chatrooms.update(
-                {'column': 'id', 'value': self._chatroom_id},
-                {'active': 1}
+        try:
+            self._console_log('Agent message: \033[36m')  # Print the agent message in green
+            # Request LLM
+            agent_message = ''
+            async for chunk in agent_node.run_in_chatroom(
+                context=Context(),
+                user_id=self._user_id,
+                type=2,
+                override_rag_input=user_message
+            ):
+                if content := chunk.content:
+                    self._console_log(content)
+                    agent_message += content
+                    await self._ws_manager.send_agent_reply(
+                        self._chatroom_id,
+                        agent_id,
+                        content,
+                        agent_message
+                    )
+                if usage_metadata := chunk.usage_metadata:
+                    prompt_tokens = usage_metadata['input_tokens']
+                    completion_tokens = usage_metadata['output_tokens']
+                    total_tokens = usage_metadata['total_tokens']
+            await self._ws_manager.end_agent_reply(
+                self._chatroom_id,
+                agent_id,
+                agent_message
             )
+
+            # Append the agent message to the history messages and insert it into the database
+            # self._history_messages.append({'agent_id': agent_id, 'message': agent_message, 'topic': self._topic})
+            self._history_messages.append({'agent_id': agent_id, 'message': agent_message})
+            has_connections = self._ws_manager.has_connections(self._chatroom_id)
+            chatroom_messages.insert(
+                {
+                    'chatroom_id': self._chatroom_id,
+                    'app_run_id': self._app_run_id,
+                    'agent_id': agent_id,
+                    'llm_input': [
+                        ['system', prompt.get_system()],
+                        ['user', prompt.get_user()]
+                    ],
+                    'message': agent_message,
+                    'topic': self._topic,
+                    'is_read': 1 if has_connections else 0,
+                    'prompt_tokens': prompt_tokens,
+                    'completion_tokens': completion_tokens,
+                    'total_tokens': total_tokens
+                }
+            )
+            app_runs.increment_steps(self._app_run_id)
+            app_runs.increment_token_usage(
+                self._app_run_id,
+                prompt_tokens, completion_tokens, total_tokens
+            )
+        finally:
+            self._console_log('\033[0m\n')  # Reset the color
+            has_connections = self._ws_manager.has_connections(self._chatroom_id)
+            if not has_connections:
+                chatrooms.update(
+                    {'column': 'id', 'value': self._chatroom_id},
+                    {'active': 1}
+                )
 
     def _terminate(self) -> bool:
         '''

@@ -23,12 +23,8 @@ language_packs = {
             """,
         },
         "agent_system_prompt_with_auto_match_ability": '''
-            You are an AI agent. Please answer questions or handle needs according to the user's questions or needs.
-            Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).
-            Note that the user's questions or requirements may contain additional reply rules.
-
-            If your responsibilities and abilities are not directly related to the user's problems or needs, please analyze the current conversation scenario through the user's questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.
-
+            You are an AI agent, and your identity is defined as follows:
+            ********************Start of identity definition content********************
             Your ID: {id_}
             Your name: {name}
             Your description: {description}
@@ -43,14 +39,16 @@ language_packs = {
             Finally, return a JSON formatted dictionary as follows:
             {{"ability_id": ability ID (integer type), "output": content replied in the corresponding format of the ability}}
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
+            ********************End of identity definition content********************
+
+            Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
+            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
         ''',
         "agent_system_prompt_with_auto_match_ability_direct_output": '''
-            You are an AI agent. Please answer questions or handle needs according to the user's questions or needs.
-            Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).
-            Note that the user's questions or requirements may contain additional reply rules.
-
-            If your responsibilities and abilities are not directly related to the user's problems or needs, please analyze the current conversation scenario through the user's questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.
-
+            You are an AI agent, and your identity is defined as follows:
+            ********************Start of identity definition content********************
             Your ID: {id_}
             Your name: {name}
             Your description: {description}
@@ -64,14 +62,16 @@ language_packs = {
             {reply_requirement}
             Finally, reply in the corresponding format of the ability.
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
+            ********************End of identity definition content********************
+
+            Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
+            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
         ''',
         "agent_system_prompt_with_abilities": '''
-            You are an AI agent. Please answer questions or handle needs according to the user's questions or needs.
-            Please note that you should respond based on your description, responsibilities, abilities and relevant content retrieved from the knowledge base (if provided).
-            Note that the user's questions or requirements may contain additional reply rules.
-
-            If your responsibilities and abilities are not directly related to the user's problems or needs, please analyze the current conversation scenario through the user's questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities and abilities.
-
+            You are an AI agent, and your identity is defined as follows:
+            ********************Start of identity definition content********************
             Your ID: {id_}
             Your name: {name}
             Your description: {description}
@@ -85,14 +85,16 @@ language_packs = {
             {reply_requirement}
             Finally, reply in {output_format} format.
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
+            ********************End of identity definition content********************
+
+            Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
+            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
         ''',
         "agent_system_prompt_with_no_ability": '''
-            You are an AI agent. Please answer questions or handle needs according to the user's questions or needs.
-            Please note that you should respond based on your description, responsibilities and relevant content retrieved from the knowledge base (if provided).
-            Note that the user's questions or requirements may contain additional reply rules.
-
-            If your responsibilities are not directly related to the user's problems or needs, please analyze the current conversation scenario through the user's questions or needs, and then try to adapt to the conversation scenario and provide relevant responses, rather than being limited to your specific responsibilities.
-
+            You are an AI agent, and your identity is defined as follows:
+            ********************Start of identity definition content********************
             Your ID: {id_}
             Your name: {name}
             Your description: {description}
@@ -103,6 +105,12 @@ language_packs = {
             {reply_requirement}
             Finally, reply in {output_format} format.
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
+            ********************End of identity definition content********************
+
+            Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
+            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
         ''',
         "agent_retrieved_docs_format": "I will provide the information retrieved from the knowledge base based on the user input text in the following JSON format: [{'content': content, 'source': source document name}, ...])",
         "agent_reply_requirement_with_auto_match_ability": "Please match one corresponding ability based on the user input information and reply in the format corresponding to the ability.",
@@ -329,19 +337,19 @@ language_packs = {
         'chatroom_agent_number_less_than_one': 'There must be at least 1 agent present in the meeting room.',
         'chatroom_manager_system': '''
             You are the moderator of the meeting room, where there is one user and at least one AI agent.
-            You are responsible for selecting the next agent to speak.
+            You are responsible for summarizing the content of the user's message and selecting the next agent to speak.
             I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
             [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
             A list consisting of the content of each message of the user in the following JSON format: [content string, ...]
             And the chat history list in the following JSON format: [message, ...]
             where the JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "message": message content}.
 
-            First, you need to summarize the instruction to be given to the agent based on user's messages. The instruction should be fairly detailed, and do not copy the instruction from historical messages.
+            You should summarize the content of the user's message, and the summary should be fairly detailed and in the user's perspective.
             Then, respond according to the following requirements:
             1. Please only select agents from the provided agent list. Do not select agents that exist in the chat history but not in the agent list;
-            2. Please select the next agent to speak based on the instruction and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the historical message content;
-            3. Please return in JSON format: {"instruction": instruction, "id": the ID of the agent you selected}. Sometimes an agent's name might look like an ID number, but you must still return the agent's ID, not their name.
+            2. Please select the next agent to speak based on the summary and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the historical message content;
+            3. Please return in JSON format: {"summary": summary, "id": the ID of the agent you selected}. Sometimes an agent's name might look like an ID number, but you must still return the agent's ID, not their name.
         ''',
 
         'chatroom_manager_system_with_optional_selection': '''
@@ -349,20 +357,21 @@ language_packs = {
             You are responsible for selecting the next agent to speak or ending the conversation.
             I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
             [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
-            And the current user's instruction;
+            And the current user's speech summary;
             Also, the chat history list in the following JSON format:
             [message, ...];
             The JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "message": message content}.
 
             You should determine whether to end the conversation according to the following rules:
-            1. You should try to encourage all agents to actively participate in the dialogue regarding the user's instruction;
-            2. You should also analyze the coherence of agent responses. If there is no content related to the user's instruction in the content of the last message in the chat history (the content of the "message" field), please end the conversation. Note that only the last message in the chat history is considered, and no other messages are considered.
-
+            1. You should try to encourage all agents to actively participate in the dialogue regarding the user's speech summary, even if some of the agents have met the user's needs;
+            2. If all agents have participated in the dialogue after the user's last speech and the user's needs have been met, you can end the conversation;
+            3. If the conversation has been ongoing for a long time without reaching a conclusion, you can also end the conversation;
+            
             Then, respond according to the following requirements:
             1. If you think the conversation should end, please only return in JSON format: {"id": 0, "message": reason for ending the conversation}; otherwise, select an agent according to the following requirements.
             2. Please only select agents from the provided agent list. Do not select agents that exist in the chat history but not in the agent list;
-            3. Please select the next agent to speak based on the user's instruction, chat history, and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the user's instruction;
+            3. Please select the next agent to speak based on the user's speech summary, chat history, and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the user's speech summary;
             4. Please return in JSON format: {"id": the ID of the agent you selected}. Sometimes an agent's name might look like an ID number, but you must still return the agent's ID, not their name.
         ''',
 
@@ -372,6 +381,9 @@ language_packs = {
             Total number of agents: {agent_count}
             Below is the detailed information list of all agents in the meeting room:
             {agents}
+
+            Below is the user's message content list:
+            {user_messages}
 
             Below is the chat history list:
             {messages}
@@ -384,7 +396,7 @@ language_packs = {
             Below is the detailed information list of all agents in the meeting room:
             {agents}
 
-            User's instruction:
+            User's speech summary:
             {topic}
 
             Below is the chat history list:
@@ -394,19 +406,22 @@ language_packs = {
         ''',
 
         'chatroom_agent_user_subprompt': '''
-            Before now, other agents have already responded to the current user's questions or needs. I will provide records of the responses of other agents.
-            You need to answer questions or handle needs by centering on the user's instruction, and basing on the response records of other agents.
-            The agents' response records may contain questions or needs initiated by the user.
+            Before now, other agents have already responded to the current user's questions or needs. I will provide the reply records of other agents.
+            You must reply to the user by answering questions or handling needs, centered on the user's speech summary and based on the reply records.
+            The agents' reply records may contain questions or needs initiated by the user.
             The user's messages are in the following JSON format: [message string, ...];
-            The response records are in the following JSON format: [record, ...];
+            The reply records are in the following JSON format: [record, ...];
             The JSON structure for each record is as follows:
-            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}}.
+            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "message": message content}}.
             
-            User's instruction:
+            User's speech summary:
             {topic}
+            {user_message}
 
-            Response records:
+            Reply records:
             {messages}
+
+            Do not explicitly mention the user's speech summary and the reply records in your response.
         ''',
         'chatroom_agent_description_with_abilities': '''
             Agent responsibilities (or identity):

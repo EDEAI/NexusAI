@@ -587,7 +587,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 requirements_and_goals_kwargs=requirements_and_goals_kwargs,
                 override_rag_input=override_rag_input
             )
-            print(model_data)
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
                 {'messages': model_data['messages']}
