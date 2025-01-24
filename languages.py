@@ -425,6 +425,7 @@ language_packs = {
             
             User's instructions:
             {topic}
+            {user_message}
 
             Conversation history:
             {messages}
