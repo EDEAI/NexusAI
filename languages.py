@@ -343,7 +343,7 @@ language_packs = {
             A list consisting of the content of each message of the user in the following JSON format: [content string, ...]
             And the chat history list in the following JSON format: [message, ...]
             where the JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "message": message content}.
 
             You should summarize the content of the user's message, and the summary should be fairly detailed and in the user's perspective.
             Then, respond according to the following requirements:
@@ -361,7 +361,7 @@ language_packs = {
             Also, the chat history list in the following JSON format:
             [message, ...];
             The JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "message": message content}.
 
             You should determine whether to end the conversation according to the following rules:
             1. You should try to encourage all agents to actively participate in the dialogue regarding the user's speech summary, even if some of the agents have met the user's needs;
@@ -412,12 +412,10 @@ language_packs = {
             The user's messages are in the following JSON format: [message string, ...];
             The reply records are in the following JSON format: [record, ...];
             The JSON structure for each record is as follows:
-            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}}.
+            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "message": message content}}.
             
             User's speech summary:
             {topic}
-
-            User's last speech content:
             {user_message}
 
             Reply records:
