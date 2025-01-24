@@ -98,7 +98,7 @@ def push_websocket_message(
     :param loop_id: Loop ID, identifying the loop ID of this run.
     """
     if run_ai_tool_type == 1 and ai_tool_type == 'generate_agent_batch':
-        outputs['value'] = json.dumps(json.loads(outputs['value'])['multi-agent'], ensure_ascii=False)
+        # outputs['value'] = json.dumps(json.loads(outputs['value'])['multi-agent'], ensure_ascii=False)
         data = {
             'user_id': user_id,
             'type': ai_tool_type,
@@ -476,15 +476,16 @@ def task_callback_thread():
                                 # Multiple agent generation
                                 push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
                             else:
+                                logger.info("------------------------------------------------------------------------------------")
+                                logger.info(f"Batch generate agent returns:{result['data']['outputs']}")
+                                logger.info("------------------------------------------------------------------------------------")
+                                push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
                                 # Single agent generation
-                                if loop_count == 0:
-                                    # 拼接所有agent的输出结果并返回给前端（需要调用郑帅的接口）
-                                    outPuts = ai_tool_llm_records.append_record_outputs(app_run_id, loop_id)
-                                    outPuts['value'] = json.dumps(outPuts['value'], ensure_ascii=False)
-                                    # logger.info("---------------------------------------------------------------------------------------------------")
-                                    # logger.info(f"outPuts:{outPuts}")
-                                    # logger.info("---------------------------------------------------------------------------------------------------")
-                                    push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', outPuts, elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
+                                # if loop_count == 0:
+                                #     # 拼接所有agent的输出结果并返回给前端（需要调用郑帅的接口）
+                                #     outPuts = ai_tool_llm_records.append_record_outputs(app_run_id, loop_id)
+                                #     outPuts['value'] = json.dumps(outPuts['value'], ensure_ascii=False)
+                                #     push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', outPuts, elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
                         else:
                             push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
                     else:
