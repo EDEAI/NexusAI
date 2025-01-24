@@ -154,7 +154,7 @@ class Chatroom:
             message_for_llm = {
                 'id': agent_id,
                 'name': user_str if agent_id == 0 else self._all_agents[agent_id]['name'],
-                # 'role': user_str if agent_id == 0 else agent_str,
+                'role': user_str if agent_id == 0 else agent_str,
                 'message': message['message']
             }
             # if (topic := message['topic']) is not None:
