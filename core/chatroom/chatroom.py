@@ -366,6 +366,7 @@ class Chatroom:
             # Append the agent message to the history messages and insert it into the database
             # self._history_messages.append({'agent_id': agent_id, 'message': agent_message, 'topic': self._topic})
             self._history_messages.append({'agent_id': agent_id, 'message': agent_message})
+            has_connections = self._ws_manager.has_connections(self._chatroom_id)
             chatroom_messages.insert(
                 {
                     'chatroom_id': self._chatroom_id,
