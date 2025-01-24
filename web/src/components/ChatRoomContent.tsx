@@ -69,7 +69,7 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
                     className="w-[40px] h-[40px] rounded-[6px]  bg-[#fff] border border-[#ddd] cursor-pointer absolute top-[-67px] left-2/4 flex items-center justify-center hidden"
                     onClick={(e: any) => {
                         scrollDomRef.current.scrollTo({
-                            top: scrollDomRef.current.scrollHeight,
+                            top:0,
                             behavior: 'smooth',
                         });
                     }}
@@ -372,7 +372,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                         return [...pre, userObj];
                     });
                     setTimeout(() => {
-                        scrollDomRef.current.scrollTop = scrollDomRef.current.scrollHeight;
+                        scrollDomRef.current.scrollTop = 0;
                         upButtonDom.current.style.display = 'none';
                     });
                     break;
@@ -424,7 +424,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
             }
         }
         if (data.indexOf('--NEXUSAI-INSTRUCTION-') === -1 && chatReturn.current) {
-            scrollDomRef.current.scrollTop = scrollDomRef.current.scrollHeight;
+            scrollDomRef.current.scrollTop = 0;
             upButtonDom.current.style.display = 'none';
             agentText.current += data;
             setCurrentMessage((pre: any) => {
@@ -559,12 +559,12 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
     useEffect(() => {
         if (isEnd) {
             setUserMessage((pre: any) => {
-                return [...pre, ...currentMessageContent];
+                return [...currentMessageContent.reverse(),...pre];
             });
             setCurrentMessageContent([]);
             setTimeout(() => {
                 setisEnd(false);
-                scrollDomRef.current.scrollTop = scrollDomRef.current.scrollHeight;
+                scrollDomRef.current.scrollTop = 0;
             }, 200);
         }
     }, [isEnd]);
@@ -689,8 +689,6 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
     const isupButtonShow = useRef(false);
     // WebSocket trigger command
     const [sendValue, setSendValue] = useState('');
-
-    const scrollchildDomRef = useRef(null);
     // Loading
     const scrollDomload = useRef(null);
     // Whether to load on upward scroll
@@ -707,38 +705,40 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
         if (id) {
             let res = await getRoomMessage(id, {
                 page: roomMessagepage.current,
-                page_size: 20,
+                page_size: 10,
             });
             if (res.code == 0) {
                 roomMessageContentpage.current = res.data.total_pages;
+                if(!init){
+                    scrollDomload.current.style.display = 'none';
+                }
                 setUserMessage(pre => {
-                    return init ? [...res.data.list] : [...res.data.list, ...pre];
+                    return init ? [...res.data.list.reverse()] : [...pre,...res.data.list.reverse()];
                 });
                 if (init) {
                     setTimeout(() => {
-                        scrollDomRef.current.scrollTop = scrollDomRef.current.scrollHeight;
+                        scrollDomRef.current.scrollTop = 0;
                         upButtonDom.current.style.display = 'none';
                     });
                 } else {
                     newAddLength.current = res.data.list.length
                     // toTOP({ length: res.data.list.length });
                 }
+                isUpload.current = true
             }
         }
     };
     // Scroll movement
     const slideScroll = (e: any) => {
-        let scrollPosition = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight;
-        if (isupButtonShow.current !== Math.ceil(scrollPosition) > 50) {
-            isupButtonShow.current = Math.ceil(scrollPosition) > 50;
+        let scrollPosition = e.target.scrollHeight + (e.target.scrollTop-e.target.clientHeight);
+        if (isupButtonShow.current !== Math.ceil(e.target.scrollTop) < -50) {
+            isupButtonShow.current = Math.ceil(e.target.scrollTop) < -50;
             upButtonDom.current.style.display = isupButtonShow.current ? 'flex' : 'none';
         }
-        if (e.target.scrollTop == 0 && isUpload.current) {
+        if(scrollPosition < 10  && isUpload.current){
             isUpload.current = false;
-            const firstChild = scrollchildDomRef.current.firstChild;
             roomMessagepage.current = roomMessagepage.current + 1;
             scrollDomload.current.style.display = 'flex';
-            roomMessageContentpage.current;
             if (roomMessageContentpage.current >= roomMessagepage.current) {
                 getChathistory(false);
             } else {
@@ -770,113 +770,113 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
         }
     }, [instruction]);
 
-    useEffect(() => {
-        if(newAddLength.current && scrollchildDomRef.current.children[newAddLength.current]){
-            scrollDomRef.current.scrollTop = scrollchildDomRef.current.children[newAddLength.current].offsetTop;
-            isUpload.current = true;
-        }
-    }, [userMessage]);
 
     useEffect(() => {
         roomMessagepage.current = 1;
         getChathistory(true);
     }, []);
-
     return (
-        <div
-            className={`flex-1 box-border relative overflow-y-auto chatroom overflow-x-hidden`}
-            ref={scrollDomRef}
-            onScroll={slideScroll}
-        >
+        <div className='flex-1 min-h-0'>
             <div
-                className="text-center justify-center items-center flex"
-                style={{ display: 'none' }}
-                ref={scrollDomload}
-            >
-                {/* <div className='loader_box'></div> */}
-                <Spin />
-            </div>
-            <div className="max-w-[920px] mx-auto" style={{minHeight:'calc(100% - 50px)'}} ref={scrollchildDomRef}>
-                {userMessage.map((item, index) => (
-                    <div
-                        key={index}
-                        id={`c${item.id}`}
-                        className={`w-full flex gap-[15px] pt-[15px] pb-[15px] ${
-                            item.is_agent != 1 ? 'flex-row-reverse' : ''
-                        }`}
-                    >
-                        <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
-                            {item.is_agent == 1 ? (
-                                <img
-                                    src={headportrait('single', item.icon)}
-                                    alt=""
-                                    className="w-[18px]  h-[18px]"
-                                />
-                            ) : (
-                                <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
-                            )}
-                        </div>
-                        <div className="flex1 max-w-[560px] text-right" id={`content${index}`}>
-                            <div
-                                className={`${item.is_agent == 1 ?'text-left':'text-right'} font-[500] text-[14px] text-[#213044] pb-[8px]`}
-                            >
-                                {item.name ? item.name : userinfodata('GET').nickname}
-                            </div>
-                            <div className={`flex ${item.is_agent == 1 ?'flex-row':'flex-row-reverse'}`}>
-                                <div
-                                    className={`text-left markdown-container inline-block text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
-                                    style={
-                                        item.is_agent == 1
-                                            ? { borderRadius: ' 0px 8px 8px 8px' }
-                                            : {
-                                                borderRadius: '8px 0px 8px 8px',
-                                                background: 'rgba(27,100,243,0.1)',
-                                                whiteSpace:'pre-wrap'
-                                            }
-                                    }
-                                    id={`chilContent${index}`}
-                                >
-                                    <ReactMarkdown
-                                        rehypePlugins={[rehypeHighlight]}
-                                        components={renderers(index, intl)}
+                className={`h-full min-h-full overflow-y-auto flex flex-col-reverse  scroll-smooth chatroom`}
+                ref={scrollDomRef}
+                onScroll={slideScroll}
+            >   
+                <div>
+                    <div className="max-w-[920px] ">
+                        <div className='flex flex-col-reverse'>
+                            <>
+                                {userMessage&&userMessage.length?userMessage.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        id={`c${item.id}`}
+                                        className={`w-full flex gap-[15px] pt-[15px] pb-[15px] ${
+                                            item.is_agent != 1 ? 'flex-row-reverse' : ''
+                                        }`}
                                     >
-                                        {item.content}
-                                    </ReactMarkdown>
-                                </div>
-                            </div>
-                            {item.is_agent == 1 ? (
-                                <div className='flex gap-x-[20px]'>
-                                    <Chatcopy
-                                        messageApi={messageApi}
-                                        idName="content"
-                                        cidName="chilContent"
-                                        index={index}
-                                    />
-                                    <SummaryButton
-                                        id={id}
-                                        index={index}
-                                        idName="content"
-                                        cidName="chilContent"
-                                    />
-                                </div>
-                            ) : (
-                                <></>
-                            )}
+                                        <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
+                                            {item.is_agent == 1 ? (
+                                                <img
+                                                    src={headportrait('single', item.icon)}
+                                                    alt=""
+                                                    className="w-[18px]  h-[18px]"
+                                                />
+                                            ) : (
+                                                <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
+                                            )}
+                                        </div>
+                                        <div className="flex1 max-w-[560px] text-right" id={`content${index}`}>
+                                            <div
+                                                className={`${item.is_agent == 1 ?'text-left':'text-right'} font-[500] text-[14px] text-[#213044] pb-[8px]`}
+                                            >
+                                                {item.name ? item.name : userinfodata('GET').nickname}
+                                            </div>
+                                            <div className={`flex ${item.is_agent == 1 ?'flex-row':'flex-row-reverse'}`}>
+                                                <div
+                                                    className={`text-left markdown-container inline-block text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
+                                                    style={
+                                                        item.is_agent == 1
+                                                            ? { borderRadius: ' 0px 8px 8px 8px' }
+                                                            : {
+                                                                borderRadius: '8px 0px 8px 8px',
+                                                                background: 'rgba(27,100,243,0.1)',
+                                                                whiteSpace:'pre-wrap'
+                                                            }
+                                                    }
+                                                    id={`chilContent${index}`}
+                                                >
+                                                    <ReactMarkdown
+                                                        rehypePlugins={[rehypeHighlight]}
+                                                        components={renderers(index, intl)}
+                                                    >
+                                                        {item.content}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            </div>
+                                            {item.is_agent == 1 ? (
+                                                <div className='flex gap-x-[20px]'>
+                                                    <Chatcopy
+                                                        messageApi={messageApi}
+                                                        idName="content"
+                                                        cidName="chilContent"
+                                                        index={index}
+                                                    />
+                                                    <SummaryButton
+                                                        id={id}
+                                                        index={index}
+                                                        idName="content"
+                                                        cidName="chilContent"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <></>
+                                            )}
+                                        </div>
+                                    </div>
+                                )):<></>}
+                            </>
                         </div>
+                        <ChatwindowCont
+                            messageApi={messageApi}
+                            setUserMessage={setUserMessage}
+                            sendValue={sendValue}
+                            agentList={agentList}
+                            scrollDomRef={scrollDomRef}
+                            upButtonDom={upButtonDom}
+                            setIsStop={setIsStop}
+                            setSendValue={setSendValue}
+                        ></ChatwindowCont>
                     </div>
-                ))}
-                <ChatwindowCont
-                    messageApi={messageApi}
-                    setUserMessage={setUserMessage}
-                    sendValue={sendValue}
-                    agentList={agentList}
-                    scrollDomRef={scrollDomRef}
-                    upButtonDom={upButtonDom}
-                    setIsStop={setIsStop}
-                    setSendValue={setSendValue}
-                ></ChatwindowCont>
+                    <div className='w-full flex justify-center pb-[10px]'>{!disableInput &&  userMessage.length?<MeetingSummaryBtn roomid={id}/>:<></>}</div>
+                </div>
+                <div
+                    className="text-center justify-center items-center flex"
+                    style={{ display: 'none' }}
+                    ref={scrollDomload}
+                >
+                    <Spin />
+                </div>
             </div>
-            <div className='w-full flex justify-center pb-[10px]'>{!disableInput &&  userMessage.length?<MeetingSummaryBtn roomid={id}/>:<></>}</div>
         </div>
     );
 });
@@ -902,10 +902,10 @@ export const ChatRoomContent :FC<parameters> = memo((porpos)=>{
         <>
         {contextHolder}
         <div
-            className="mx-[44px] flex justify-center relative box-border pt-[12px]   overflow-auto"
-            style={{ height: 'calc(100% )' }}
+            className="mx-[44px] flex justify-center relative box-border pt-[12px] h-full"
+            // style={{ height: 'calc(100% )' }}
         >
-            <div className="flex flex-col w-full">
+            <div className="flex flex-col w-full h-full">
                 <ChatRoomContentbox
                     instruction={instruction}
                     setInstruction={setInstruction}
