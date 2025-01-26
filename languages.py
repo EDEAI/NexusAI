@@ -638,6 +638,33 @@ language_packs = {
             Requirements for batch generation of agents:
             {agent_batch_requirements}
         ''',
+        # 'agent_batch_one_system': '''
+        #     You are an AI agent generation assistant.
+        #     Please generate a complete agent information for me according to the agent data structure based on the requirements for batch generation of agents provided by me.
+        #     Please pay attention to the following requirements when generating:
+        #     1. To ensure the high-quality generation of agents, the agent information should be sufficient and detailed
+        #     2. The agent name should simply and directly reflect the key information of the agent and be as anthropomorphic as possible
+        #     3. The agent description should be as detailed as possible and cover all the information of the agent
+        #     4. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
+        #     5. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+        #     6. Pay attention to only generate one agent information, do not generate in batches.
+        #     7. If the history of the agent that has been generated in batches has real content, the new agent should try to keep the difference with the history of the generated agent
+        #     8. Be sure to strictly abide by the json structure of the agent data
+        #     Pay attention to only return the json structure data of the agent, do not return redundant content
+        #     Agent data json structure description:
+        #     {{
+        #         "name": "(string type) Agent name",
+        #         "description": "(string type) Agent description",
+        #         "obligations": "(string type) Agent functional information (including but not limited to the identity, responsibilities, positions, skills, etc. of the agent)",
+        #         "abilities": [
+        #             {{
+        #                 "name": "(string type) Ability name",
+        #                 "content": "(string type) Specific content of the ability. When the agent is running, the selected ability content will be submitted to the LLM model as a prompt",
+        #                 "output_format": "(int type), the output format of the ability, 1: text format, 2: json format, 3: pure code format (excluding non-code content), the agent will return the content according to the output format corresponding to the selected ability when running"
+        #             }}
+        #         ]
+        #     }}
+        # ''',
         'agent_batch_one_system': '''
             You are an AI agent generation assistant.
             Please generate a complete agent information for me according to the agent data structure based on the requirements for batch generation of agents provided by me.
@@ -645,8 +672,8 @@ language_packs = {
             1. To ensure the high-quality generation of agents, the agent information should be sufficient and detailed
             2. The agent name should simply and directly reflect the key information of the agent and be as anthropomorphic as possible
             3. The agent description should be as detailed as possible and cover all the information of the agent
-            4. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
-            5. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            4. The functional information of the agent should not only cover its literal "function" aspect, but also other relevant features, including but not limited to: clearly defining the identity, role, and purpose of the agent in its operating environment. Provide a detailed description of the agent's core responsibilities and tasks. List the specific skills, professional knowledge, and knowledge areas that the agent possesses. Mentioning the tools, techniques, or frameworks used by agents to perform their functions. Explain how agents interact with users, systems, or other agents, including communication methods and collaboration capabilities. Emphasize the ability of agents to adapt to different environments, tasks, or user needs, as well as their customization options. Provide detailed information on how to measure agency performance, including accuracy, efficiency, and reliability. Functional descriptions should be generated as much as possible to ensure sufficient depth and coverage of all relevant aspects. The language should be clear, professional, and focused on providing actionable insights into agency capabilities and operating environments. The functional information of the agent should be as detailed as possible, not limited to the literal "functional" information, but should also include other relevant feature information.
+            5. Generate as many abilities as possible, ensuring that the specific content of each ability includes the following elements:Clearly describe the primary purpose and goals of the ability, including its intended use and value to the user.Provide a detailed explanation of how the ability is implemented, including the technologies, algorithms, tools, or frameworks used. Break down the implementation process into clear steps if applicable.Describe the scenarios, industries, or domains in which the ability is applicable. Include examples of real-world applications to illustrate its relevance.Provide detailed examples of possible outputs generated by the ability. Include sample data, visualizations, or code snippets to help users better understand its functionality.Highlight any limitations, constraints, or special considerations related to the ability. Explain how these limitations might impact its use and suggest potential workarounds if applicable.Include any additional context that might help users understand the ability better, such as performance benchmarks, integration requirements, or dependencies on other systems or tools.The language used in the ability description should be professional yet easy to understand, avoiding overly simplistic or vague expressions. Focus on providing comprehensive and actionable insights into the ability's functionality and use cases.
             6. Pay attention to only generate one agent information, do not generate in batches.
             7. If the history of the agent that has been generated in batches has real content, the new agent should try to keep the difference with the history of the generated agent
             8. Be sure to strictly abide by the json structure of the agent data
