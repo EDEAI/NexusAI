@@ -16,7 +16,7 @@ import {
 } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { useLatest, useSetState, useUpdateEffect } from 'ahooks';
-import { Button, Modal, Tooltip } from 'antd';
+import { Button, Modal, Spin, Tooltip } from 'antd';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { PromptTextarea } from '../AgentCreate/ResultDisplay';
 import CodeEditor from '../WorkFlow/components/Editor/CodeEditor';
@@ -50,26 +50,33 @@ const SkillCreate = memo(() => {
     }));
     const CodeEditorMemo = useMemo(
         () => (
-            <CodeEditor
-                language="python3"
-                value={changeSkillLast.current?.code?.['python3']}
-                onChange={value => {
-                    setChangeSkill(prev => ({
-                        ...prev,
-                        code: {
-                            ...prev?.code,
-                            python3: value,
-                        },
-                    }));
-                }}
-                title={
-                    <div>
-                        python3 <EditOutlined></EditOutlined>
+            <div className="h-full relative">
+                <CodeEditor
+                    language="python3"
+                    value={changeSkillLast.current?.code?.['python3']}
+                    onChange={value => {
+                        setChangeSkill(prev => ({
+                            ...prev,
+                            code: {
+                                ...prev?.code,
+                                python3: value,
+                            },
+                        }));
+                    }}
+                    title={
+                        <div>
+                            python3 <EditOutlined></EditOutlined>
+                        </div>
+                    }
+                />
+                {loading && (
+                    <div className="absolute top-0 left-0 w-full h-full bg-white bg-opacity-50 flex items-center justify-center">
+                        <Spin></Spin>
                     </div>
-                }
-            />
+                )}
+            </div>
         ),
-        [skillCreateResult?.code],
+        [skillCreateResult?.code, loading],
     );
 
     useEffect(() => {
@@ -161,7 +168,6 @@ const SkillCreate = memo(() => {
                 const output = JSON.parse(currentMessage?.data?.exec_data?.outputs?.value);
                 setChangeSkill(output);
                 setSkillCreateResult(output);
-                
             } catch (e) {
                 console.log(e);
             }
@@ -241,9 +247,8 @@ const SkillCreate = memo(() => {
         setCorrectVisible(false);
     }, []);
     const ConPrompt = useCallback(() => {
-        
         if (!lastCorrectVisible.current) return null;
-        
+
         return (
             <div className="absolute bottom-2 right-2 w-[calc(100%-20px)] z-10">
                 <PromptTextarea
@@ -268,11 +273,11 @@ const SkillCreate = memo(() => {
                 />
             </div>
         );
-    }, [lastCorrectVisible.current,loading,conPrompt]);
+    }, [lastCorrectVisible.current, loading, conPrompt]);
     const Created = useCallback(
         ({ loading }) => {
             console.log('changeSkillLast', changeSkillLast.current);
-            
+
             return (
                 <div className="flex gap-4 h-full relative z-[10000]">
                     <div className="relative flex-1">
@@ -337,7 +342,7 @@ const SkillCreate = memo(() => {
                 </div>
             );
         },
-        [skillCreateResult, CodeEditorMemo, prompt,changeSkillLast],
+        [skillCreateResult, CodeEditorMemo, prompt, changeSkillLast],
     );
 
     const handleBugFixSubmit = useCallback(async (values: any) => {
@@ -369,7 +374,10 @@ const SkillCreate = memo(() => {
             <BugFix
                 open={bugFixshow}
                 onCancel={() => setBugFixshow(false)}
-                skillData={{ ...changeSkillLast.current, app_run_id: lastParams.current?.app_run_id }}
+                skillData={{
+                    ...changeSkillLast.current,
+                    app_run_id: lastParams.current?.app_run_id,
+                }}
                 onSubmit={handleBugFixSubmit}
             />
         </Modal>

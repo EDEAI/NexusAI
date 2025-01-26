@@ -92,7 +92,7 @@ const ResultDisplay = memo(
                 spinning={loading}
                 className="h-full"
                 wrapperClassName="!h-full"
-                tip="正在生成..."
+                tip="loading..."
                 >
                     <div className="h-full pb-10">
                         <div className="px-4 pt-6 flex items-center gap-2">

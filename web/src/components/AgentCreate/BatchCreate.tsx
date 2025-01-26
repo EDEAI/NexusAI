@@ -376,14 +376,21 @@ const BatchCreate = memo(
                                     </div>
                                 </div>
                                 {agentList?.length != batchParams.loop_limit && (
-                                    <div className="px-2">
-                                        <Progress
+                                    <div className="px-2 pt-2">
+                                        {/* <Progress
                                             percent={
                                                 (agentList?.length / batchParams.loop_limit) * 100
                                             }
                                             size="small"
                                             showInfo={false}
-                                        />
+                                        /> */}
+                                        <div className='w-full h-[6px] rounded-md bg-gray-100 relative overflow-hidden'>
+                                            <div className='absolute top-0 left-0 h-full bg-blue-500 rounded-md' style={{
+                                                width: `${(agentList?.length / batchParams.loop_limit) * 100}%`
+                                            }}>
+                                                <div className='animation-progress bg-gradient-to-r from-blue-400 to-blue-600 h-full'></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>
