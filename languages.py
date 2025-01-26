@@ -346,14 +346,11 @@ language_packs = {
             You are responsible for summarizing the content of the user's message and selecting the next agent to speak.
             I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
             [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
-            A list of the user's speech history in the following JSON format: [message string, ...]
-            And the conversation history list in the following JSON format: [message, ...]
+            The conversation history list in the following JSON format: [message, ...]
             where the JSON structure for each message is as follows:
             {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
 
-            You need to generate a complete and detailed instruction for the next agent to receive the instruction based on the user's speech history. Pay attention to the following requirements:
-            1. Please make sure that the instruction is from the user's perspective
-            2. The instruction should fully and in detail summarize the key information, rules and requirements of the user's speech history
+            You need to fully analyze and understand the conversation history through the conversation history message data structure, analyze the current conversation scene and conversation progress, and combine the user's last speech content to analyze what the next agent needs to do and the specific execution rules and requirements. This content will be passed to the next agent as an instruction
 
             Then, respond according to the following requirements:
             1. Please only select agents from the provided agent list. Do not select agents that exist in the conversation history but not in the agent list;
@@ -391,12 +388,12 @@ language_packs = {
             Below is the detailed information list of all agents in the meeting room:
             {agents}
 
-            Below is the user's message content list:
-            {user_messages}
-
-            Below is the chat history list:
+            Below is the conversation history list:
             {messages}
-
+            
+            Below is the user's last speech content:
+            {user_message}
+            
             Please select the next agent to speak from the agent list according to the requirements.
         ''',
 
@@ -408,7 +405,7 @@ language_packs = {
             User's speech summary:
             {topic}
 
-            Below is the chat history list:
+            Below is the conversation history list:
             {messages}
 
             Please select the next agent to speak from the agent list according to the requirements, or end the conversation.
@@ -417,7 +414,7 @@ language_packs = {
         'chatroom_agent_user_subprompt': '''
             You are an AI agent in a meeting room, where there is one user and at least one AI agent.
             You need to reply to the user's instructions. Please pay attention to the following requirements when responding:
-            1. You need to analyze the conversation history through its JSON structure and use it as context information for reference
+            1. You need to fully analyze and understand the conversation history through the data structure of the conversation history, analyze the current conversation scene and the progress of the conversation
             2. You need to analyze and understand the user's instruction intentions and strictly abide by the rules in the instructions
             The JSON format of the conversation history is as follows: [message, ...];
             The JSON structure of each message is as follows:
@@ -425,7 +422,6 @@ language_packs = {
             
             User's instructions:
             {topic}
-            {user_message}
 
             Conversation history:
             {messages}
