@@ -73,6 +73,7 @@ const RevisionsMeetingSummary: React.FC<params> = params => {
             if(data.app_run_id){
                 isModified.current = true
             }
+            // scrollDom.current.scrollTo({top: 1});
         }
     };
 
@@ -87,6 +88,7 @@ const RevisionsMeetingSummary: React.FC<params> = params => {
                 setShow(true);
                 setBoxLoading(false);
                 setSummaryClick(true)
+                scrollDom.current.scrollTo({top: 0});
             }
         }
     };
@@ -124,7 +126,7 @@ const RevisionsMeetingSummary: React.FC<params> = params => {
                 setShow(true);
                 setSummaryClick(true)
                 setBoxLoading(false);
-                // scrollDom.current.scrollTo({top: 0});
+                scrollDom.current.scrollTo({top: 0});
             }
         }
     }, [meetingSummary]);

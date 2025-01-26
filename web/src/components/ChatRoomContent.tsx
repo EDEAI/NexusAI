@@ -1,14 +1,19 @@
-import React, { FC, memo, useEffect, useRef, useState ,ReactNode, } from 'react';
 import useWebSocketManager from '@//hooks/useSocket';
 import { getRoomMessage } from '@/api/plaza';
-import { headportrait, userinfodata } from '@/utils/useUser';
-import { ArrowDownOutlined, PauseCircleOutlined,FileDoneOutlined,FundProjectionScreenOutlined} from '@ant-design/icons';
 import useChatroomStore from '@/store/chatroomstate';
+import { headportrait, userinfodata } from '@/utils/useUser';
+import {
+    ArrowDownOutlined,
+    FileDoneOutlined,
+    FundProjectionScreenOutlined,
+    PauseCircleOutlined,
+} from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Input,Spin,message} from 'antd';
+import { Input, Spin, message } from 'antd';
 import copy from 'copy-to-clipboard';
 import 'highlight.js/styles/atom-one-dark.css';
 import { throttle } from 'lodash';
+import React, { FC, ReactNode, memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import { useParams } from 'umi';
@@ -23,19 +28,13 @@ interface inputFieldParameters {
     upButtonDom?: any;
 }
 const InputField: FC<inputFieldParameters> = memo(porpos => {
-    let {
-        setInstruction,
-        messageApi,
-        isStop,
-        scrollDomRef,
-        upButtonDom,
-    } = porpos;
+    let { setInstruction, messageApi, isStop, scrollDomRef, upButtonDom } = porpos;
     // useIntl
     let intl = useIntl();
 
-    const disableInput = useChatroomStore(state=>state.disableInput)
+    const disableInput = useChatroomStore(state => state.disableInput);
 
-    const setDisableInput = useChatroomStore(state=>state.setDisableInput)
+    const setDisableInput = useChatroomStore(state => state.setDisableInput);
 
     // Value entered by the user
     const [userSendvalue, setUserSendvalue] = useState('');
@@ -69,7 +68,7 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
                     className="w-[40px] h-[40px] rounded-[6px]  bg-[#fff] border border-[#ddd] cursor-pointer absolute top-[-67px] left-2/4 flex items-center justify-center hidden"
                     onClick={(e: any) => {
                         scrollDomRef.current.scrollTo({
-                            top:0,
+                            top: 0,
                             behavior: 'smooth',
                         });
                     }}
@@ -116,7 +115,11 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
                                 setUserSendvalue('');
                             }, 300)}
                         >
-                            <img src="/icons/send_icon_w.svg" alt="" className="w-[18px] h-[18px]" />
+                            <img
+                                src="/icons/send_icon_w.svg"
+                                alt=""
+                                className="w-[18px] h-[18px]"
+                            />
                             {/* <EnterOutlined style={{color:'#fff',fontSize:'20px'}}/> */}
                         </div>
                     ) : (
@@ -133,15 +136,15 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
     );
 });
 
-const extractTextFromElement = (element:ReactNode): string => {
+const extractTextFromElement = (element: ReactNode): string => {
     if (typeof element === 'string') {
-      return element;
+        return element;
     }
     if (Array.isArray(element)) {
-      return element.map(extractTextFromElement).join('');
+        return element.map(extractTextFromElement).join('');
     }
     if (React.isValidElement(element)) {
-      return extractTextFromElement(element.props.children);
+        return extractTextFromElement(element.props.children);
     }
     return '';
 };
@@ -149,7 +152,7 @@ const extractTextFromArray = (arr: any) => {
     return extractTextFromElement(arr);
 };
 // Code block copy functionality
-const renderers= (index: any, intl: any) => {
+const renderers = (index: any, intl: any) => {
     // const textRef = useRef(null)
     return {
         code: ({ node, className, children, ...props }) => {
@@ -250,65 +253,79 @@ const Chatcopy: FC<Chatcopyprops> = memo(props => {
         </div>
     );
 });
-const SummaryButton:FC<{id:any,index?: number,idName: string,cidName: string;}> = porpos =>{
+const SummaryButton: FC<{ id: any; index?: number; idName: string; cidName: string }> = porpos => {
     let { id, index, idName, cidName } = porpos;
     let intl = useIntl();
-    const setSummaryClick = useChatroomStore(state=>state.setSummaryClick);
-    const [disabled,setDisabled] = useState(true);
-    const summaryClick = useChatroomStore(state=>state.summaryClick);
-    useEffect(()=>{
-        setDisabled(summaryClick)
-    },[summaryClick])
-    const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
+    const setSummaryClick = useChatroomStore(state => state.setSummaryClick);
+    const [disabled, setDisabled] = useState(true);
+    const summaryClick = useChatroomStore(state => state.summaryClick);
+    useEffect(() => {
+        setDisabled(summaryClick);
+    }, [summaryClick]);
+    const setSummaryParams = useChatroomStore(state => state.setSummaryParams);
     return (
-        <div className={`flex gap-x-[4px] text-[#666] ${disabled?'cursor-pointer hover:text-[#1B64F3]':'cursor-no-drop'}`}>
-            <div className=" p-[2px]  rounded-md flex gap-x-[5px] items-center pt-[10px]" onClick={(e:any)=>{
-                if(disabled){
-                    const dom = e.target.closest(`#${idName}${index}`);
-                    const childElement = dom.querySelector(`#${cidName}${index}`);
-                    setSummaryParams({id:id,message:childElement.innerText})
-                    // setDisabled(false)
-                    setSummaryClick(false)
-                }
-            }}>
-                <FileDoneOutlined className='text-[16px]'/>
-                <span className='text-[12px]'>
+        <div
+            className={`flex gap-x-[4px] text-[#666] ${
+                disabled ? 'cursor-pointer hover:text-[#1B64F3]' : 'cursor-no-drop'
+            }`}
+        >
+            <div
+                className=" p-[2px]  rounded-md flex gap-x-[5px] items-center pt-[10px]"
+                onClick={(e: any) => {
+                    if (disabled) {
+                        const dom = e.target.closest(`#${idName}${index}`);
+                        const childElement = dom.querySelector(`#${cidName}${index}`);
+                        setSummaryParams({ id: id, message: childElement.innerText });
+                        // setDisabled(false)
+                        setSummaryClick(false);
+                    }
+                }}
+            >
+                <FileDoneOutlined className="text-[16px]" />
+                <span className="text-[12px]">
                     {intl.formatMessage({ id: 'app.chatroom.content.summary' })}
                 </span>
             </div>
         </div>
     );
-}
-const MeetingSummaryBtn:FC<{roomid:any}> = porpos =>{
-    let {roomid} = porpos
+};
+const MeetingSummaryBtn: FC<{ roomid: any }> = porpos => {
+    let { roomid } = porpos;
     let intl = useIntl();
-    const setSummaryClick = useChatroomStore(state=>state.setSummaryClick);
-    const [disabled,setDisabled] = useState(true);
-    const summaryClick = useChatroomStore(state=>state.summaryClick);
-    useEffect(()=>{
-        setDisabled(summaryClick)
-    },[summaryClick])
-    const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
+    const setSummaryClick = useChatroomStore(state => state.setSummaryClick);
+    const [disabled, setDisabled] = useState(true);
+    const summaryClick = useChatroomStore(state => state.summaryClick);
+    useEffect(() => {
+        setDisabled(summaryClick);
+    }, [summaryClick]);
+    const setSummaryParams = useChatroomStore(state => state.setSummaryParams);
     return (
-        <div className={`bg-[#fff] text-[#999999]   items-center justify-center rounded-[8px] ${disabled?'cursor-pointer hover:text-[#1B64F3]':'cursor-no-drop'}`} style={{boxShadow:'0px 0px 4px 0px rgba(0,0,0,0.1)'}}>
-            <div className=' gap-x-[4px] flex items-center justify-center h-[40px] px-[20px]' onClick={()=>{
-                
-                if(disabled){
-                    setSummaryParams({
-                        id:roomid
-                    })
-                    // setDisabled(false)
-                    setSummaryClick(false)
-                }
-            }}> 
-                <FundProjectionScreenOutlined className='text-[16px]'/>
-                <span className='text-[14px]'>
+        <div
+            className={`bg-[#fff] text-[#999999]   items-center justify-center rounded-[8px] ${
+                disabled ? 'cursor-pointer hover:text-[#1B64F3]' : 'cursor-no-drop'
+            }`}
+            style={{ boxShadow: '0px 0px 4px 0px rgba(0,0,0,0.1)' }}
+        >
+            <div
+                className=" gap-x-[4px] flex items-center justify-center h-[40px] px-[20px]"
+                onClick={() => {
+                    if (disabled) {
+                        setSummaryParams({
+                            id: roomid,
+                        });
+                        // setDisabled(false)
+                        setSummaryClick(false);
+                    }
+                }}
+            >
+                <FundProjectionScreenOutlined className="text-[16px]" />
+                <span className="text-[14px]">
                     {intl.formatMessage({ id: 'app.chatroom.content.meetingSummary' })}
                 </span>
             </div>
         </div>
     );
-}
+};
 // Current agent speaking
 interface chatwindowParameters {
     setisEnd?: any;
@@ -337,7 +354,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
     // page id
     const { id } = useParams<{ id: string }>();
 
-    const setDisableInput = useChatroomStore(state=>state.setDisableInput)
+    const setDisableInput = useChatroomStore(state => state.setDisableInput);
 
     // Current conversation
     const [currentMessage, setCurrentMessage]: any = useState({});
@@ -345,8 +362,8 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
     const chatReturn = useRef(false);
     // Current chat text
     const agentText = useRef('');
-    
-    const setTruncatable = useChatroomStore(state=>state.setTruncatable)
+
+    const setTruncatable = useChatroomStore(state => state.setTruncatable);
     // Get the value returned by WebSocket
     const getSocketMessage = (message: any) => {
         let data = message.data;
@@ -384,7 +401,9 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                     if (!array[1]) {
                         messageApi.open({
                             type: 'success',
-                            content: `${intl.formatMessage({ id: 'app.chatroom.sidebar.cleartips' })}`,
+                            content: `${intl.formatMessage({
+                                id: 'app.chatroom.sidebar.cleartips',
+                            })}`,
                             duration: 3,
                         });
                     }
@@ -402,7 +421,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
             if (data.indexOf('--NEXUSAI-INSTRUCTION-') !== -1) {
                 let agentId = JSON.parse(data.slice(22, -2))[1];
                 agentText.current = '';
-                chatReturn.current = true;                
+                chatReturn.current = true;
                 let currentAgent = agentList.current.filter(
                     (item: any) => item.agent_id == agentId,
                 )[0];
@@ -462,10 +481,9 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
 
     useEffect(() => {
         if (sendValue) {
-            if(readyState == 1){
+            if (readyState == 1) {
                 sendMessage(sendValue);
-            }else{
-
+            } else {
             }
         }
     }, [sendValue]);
@@ -494,22 +512,30 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                         )}
                     </div>
                     <div className="flex1 max-w-[560px] text-right" id={`addcontent`}>
-                        <div className={`${currentMessage.is_agent == 1 ?'text-left':'text-right'} font-[500] text-[14px] text-[#213044] pb-[8px]`}>
+                        <div
+                            className={`${
+                                currentMessage.is_agent == 1 ? 'text-left' : 'text-right'
+                            } font-[500] text-[14px] text-[#213044] pb-[8px]`}
+                        >
                             {currentMessage.name
                                 ? currentMessage.name
                                 : userinfodata('GET').nickname}
                         </div>
-                        <div className={`flex ${currentMessage.is_agent == 1 ?'flex-row':'flex-row-reverse'}`}>
+                        <div
+                            className={`flex ${
+                                currentMessage.is_agent == 1 ? 'flex-row' : 'flex-row-reverse'
+                            }`}
+                        >
                             <div
                                 className={`text-left inline-block markdown-container text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
                                 style={
                                     currentMessage.is_agent == 1
                                         ? { borderRadius: ' 0px 8px 8px 8px' }
                                         : {
-                                            borderRadius: '8px 0px 8px 8px',
-                                            background: 'rgba(27,100,243,0.1)',
-                                            whiteSpace:'pre-wrap'
-                                        }
+                                              borderRadius: '8px 0px 8px 8px',
+                                              background: 'rgba(27,100,243,0.1)',
+                                              whiteSpace: 'pre-wrap',
+                                          }
                                 }
                                 id={`addchilContent`}
                             >
@@ -559,7 +585,7 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
     useEffect(() => {
         if (isEnd) {
             setUserMessage((pre: any) => {
-                return [...currentMessageContent.reverse(),...pre];
+                return [...currentMessageContent.reverse(), ...pre];
             });
             setCurrentMessageContent([]);
             setTimeout(() => {
@@ -590,24 +616,32 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                                 <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
                             )}
                         </div>
-                        <div className="flex1 max-w-[560px] text-right" id={`currentContent${index}`}>
+                        <div
+                            className="flex1 max-w-[560px] text-right"
+                            id={`currentContent${index}`}
+                        >
                             <div
-                                className={`${item.is_agent == 1 ?'text-left':'text-right'} font-[500] text-[14px] text-[#213044] pb-[8px]`}
+                                className={`${
+                                    item.is_agent == 1 ? 'text-left' : 'text-right'
+                                } font-[500] text-[14px] text-[#213044] pb-[8px]`}
                             >
                                 {item.name ? item.name : userinfodata('GET').nickname}
                             </div>
-                            <div className={`flex ${item.is_agent == 1 ?'flex-row':'flex-row-reverse'}`}>
+                            <div
+                                className={`flex ${
+                                    item.is_agent == 1 ? 'flex-row' : 'flex-row-reverse'
+                                }`}
+                            >
                                 <div
                                     className={`text-left inline-block markdown-container text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
                                     style={
                                         item.is_agent == 1
                                             ? { borderRadius: ' 0px 8px 8px 8px' }
                                             : {
-                                                borderRadius: '8px 0px 8px 8px',
-                                                background: 'rgba(27,100,243,0.1)',
-                                                whiteSpace:'pre-wrap'
-                                                
-                                            }
+                                                  borderRadius: '8px 0px 8px 8px',
+                                                  background: 'rgba(27,100,243,0.1)',
+                                                  whiteSpace: 'pre-wrap',
+                                              }
                                     }
                                     id={`currentChilContent${index}`}
                                 >
@@ -620,7 +654,7 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                                 </div>
                             </div>
                             {item.is_agent == 1 ? (
-                                <div className='flex gap-x-[20px]'>
+                                <div className="flex gap-x-[20px]">
                                     <Chatcopy
                                         messageApi={messageApi}
                                         index={index}
@@ -697,8 +731,8 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
     const roomMessageContentpage = useRef(2);
 
     const roomMessagepage = useRef(1);
-    
-    const newAddLength = useRef(0)
+
+    const newAddLength = useRef(0);
 
     // Retrieve chat history
     const getChathistory = async (init: boolean, toTOP: any = () => {}) => {
@@ -709,11 +743,13 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
             });
             if (res.code == 0) {
                 roomMessageContentpage.current = res.data.total_pages;
-                if(!init){
+                if (!init) {
                     scrollDomload.current.style.display = 'none';
                 }
                 setUserMessage(pre => {
-                    return init ? [...res.data.list.reverse()] : [...pre,...res.data.list.reverse()];
+                    return init
+                        ? [...res.data.list.reverse()]
+                        : [...pre, ...res.data.list.reverse()];
                 });
                 if (init) {
                     setTimeout(() => {
@@ -721,21 +757,21 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                         upButtonDom.current.style.display = 'none';
                     });
                 } else {
-                    newAddLength.current = res.data.list.length
+                    newAddLength.current = res.data.list.length;
                     // toTOP({ length: res.data.list.length });
                 }
-                isUpload.current = true
+                isUpload.current = true;
             }
         }
     };
     // Scroll movement
     const slideScroll = (e: any) => {
-        let scrollPosition = e.target.scrollHeight + (e.target.scrollTop-e.target.clientHeight);
+        let scrollPosition = e.target.scrollHeight + (e.target.scrollTop - e.target.clientHeight);
         if (isupButtonShow.current !== Math.ceil(e.target.scrollTop) < -50) {
             isupButtonShow.current = Math.ceil(e.target.scrollTop) < -50;
             upButtonDom.current.style.display = isupButtonShow.current ? 'flex' : 'none';
         }
-        if(scrollPosition < 10  && isUpload.current){
+        if (scrollPosition < 10 && isUpload.current) {
             isUpload.current = false;
             roomMessagepage.current = roomMessagepage.current + 1;
             scrollDomload.current.style.display = 'flex';
@@ -753,15 +789,13 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
         setSendValue(JSON.stringify(initChatRoomstok));
     };
 
-    const disableInput = useChatroomStore(state=>state.disableInput)
+    const disableInput = useChatroomStore(state => state.disableInput);
 
-    const clearMemory = useChatroomStore(state=>state.clearMemory)
+    const clearMemory = useChatroomStore(state => state.clearMemory);
 
-    useEffect(()=>{
-        clearMemory && clearMemory.length && setsendMessageinit(clearMemory[0],clearMemory[1])
-    },[clearMemory])
-
-
+    useEffect(() => {
+        clearMemory && clearMemory.length && setsendMessageinit(clearMemory[0], clearMemory[1]);
+    }, [clearMemory]);
 
     useEffect(() => {
         if (instruction && instruction.length) {
@@ -770,23 +804,22 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
         }
     }, [instruction]);
 
-
     useEffect(() => {
         roomMessagepage.current = 1;
         getChathistory(true);
     }, []);
     return (
-        <div className='flex-1 min-h-0'>
+        <div className="flex-1 min-h-0">
             <div
-                className={`h-full min-h-full overflow-y-auto flex flex-col-reverse  scroll-smooth chatroom`}
+                className={`h-full min-h-full overflow-y-auto flex flex-col-reverse  items-center  scroll-smooth chatroom`}
                 ref={scrollDomRef}
                 onScroll={slideScroll}
-            >   
-                <div>
-                    <div className="max-w-[920px] ">
-                        <div className='flex flex-col-reverse'>
-                            <>
-                                {userMessage&&userMessage.length?userMessage.map((item, index) => (
+            >
+                <div className="w-[920px] ">
+                    <div className="flex flex-col-reverse">
+                        <>
+                            {userMessage && userMessage.length ? (
+                                userMessage.map((item, index) => (
                                     <div
                                         key={index}
                                         id={`c${item.id}`}
@@ -802,26 +835,43 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                     className="w-[18px]  h-[18px]"
                                                 />
                                             ) : (
-                                                <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
+                                                <img
+                                                    src="/icons/user_header.svg"
+                                                    className="w-[18px]  h-[18px]"
+                                                />
                                             )}
                                         </div>
-                                        <div className="flex1 max-w-[560px] text-right" id={`content${index}`}>
+                                        <div
+                                            className="flex1 max-w-[560px] text-right"
+                                            id={`content${index}`}
+                                        >
                                             <div
-                                                className={`${item.is_agent == 1 ?'text-left':'text-right'} font-[500] text-[14px] text-[#213044] pb-[8px]`}
+                                                className={`${
+                                                    item.is_agent == 1 ? 'text-left' : 'text-right'
+                                                } font-[500] text-[14px] text-[#213044] pb-[8px]`}
                                             >
-                                                {item.name ? item.name : userinfodata('GET').nickname}
+                                                {item.name
+                                                    ? item.name
+                                                    : userinfodata('GET').nickname}
                                             </div>
-                                            <div className={`flex ${item.is_agent == 1 ?'flex-row':'flex-row-reverse'}`}>
+                                            <div
+                                                className={`flex ${
+                                                    item.is_agent == 1
+                                                        ? 'flex-row'
+                                                        : 'flex-row-reverse'
+                                                }`}
+                                            >
                                                 <div
                                                     className={`text-left markdown-container inline-block text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
                                                     style={
                                                         item.is_agent == 1
                                                             ? { borderRadius: ' 0px 8px 8px 8px' }
                                                             : {
-                                                                borderRadius: '8px 0px 8px 8px',
-                                                                background: 'rgba(27,100,243,0.1)',
-                                                                whiteSpace:'pre-wrap'
-                                                            }
+                                                                  borderRadius: '8px 0px 8px 8px',
+                                                                  background:
+                                                                      'rgba(27,100,243,0.1)',
+                                                                  whiteSpace: 'pre-wrap',
+                                                              }
                                                     }
                                                     id={`chilContent${index}`}
                                                 >
@@ -834,7 +884,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                 </div>
                                             </div>
                                             {item.is_agent == 1 ? (
-                                                <div className='flex gap-x-[20px]'>
+                                                <div className="flex gap-x-[20px]">
                                                     <Chatcopy
                                                         messageApi={messageApi}
                                                         idName="content"
@@ -853,21 +903,29 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                             )}
                                         </div>
                                     </div>
-                                )):<></>}
-                            </>
-                        </div>
-                        <ChatwindowCont
-                            messageApi={messageApi}
-                            setUserMessage={setUserMessage}
-                            sendValue={sendValue}
-                            agentList={agentList}
-                            scrollDomRef={scrollDomRef}
-                            upButtonDom={upButtonDom}
-                            setIsStop={setIsStop}
-                            setSendValue={setSendValue}
-                        ></ChatwindowCont>
+                                ))
+                            ) : (
+                                <></>
+                            )}
+                        </>
                     </div>
-                    <div className='w-full flex justify-center pb-[10px]'>{!disableInput &&  userMessage.length?<MeetingSummaryBtn roomid={id}/>:<></>}</div>
+                    <ChatwindowCont
+                        messageApi={messageApi}
+                        setUserMessage={setUserMessage}
+                        sendValue={sendValue}
+                        agentList={agentList}
+                        scrollDomRef={scrollDomRef}
+                        upButtonDom={upButtonDom}
+                        setIsStop={setIsStop}
+                        setSendValue={setSendValue}
+                    ></ChatwindowCont>
+                </div>
+                <div className="w-full flex justify-center pb-[10px]">
+                    {!disableInput && userMessage.length ? (
+                        <MeetingSummaryBtn roomid={id} />
+                    ) : (
+                        <></>
+                    )}
                 </div>
                 <div
                     className="text-center justify-center items-center flex"
@@ -881,12 +939,11 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
     );
 });
 
-
-interface parameters{
-    agentList?:any
+interface parameters {
+    agentList?: any;
 }
-export const ChatRoomContent :FC<parameters> = memo((porpos)=>{
-    let {agentList} = porpos
+export const ChatRoomContent: FC<parameters> = memo(porpos => {
+    let { agentList } = porpos;
     // Get current scroll
     const scrollDomRef = useRef(null);
     // Get DOM
@@ -895,35 +952,35 @@ export const ChatRoomContent :FC<parameters> = memo((porpos)=>{
     const [isStop, setIsStop] = useState(false);
     // Parameters to be sent
     const [instruction, setInstruction] = useState([]);
-    
+
     const [messageApi, contextHolder] = message.useMessage();
 
     return (
         <>
-        {contextHolder}
-        <div
-            className="mx-[44px] flex justify-center relative box-border pt-[12px] h-full"
-            // style={{ height: 'calc(100% )' }}
-        >
-            <div className="flex flex-col w-full h-full">
-                <ChatRoomContentbox
-                    instruction={instruction}
-                    setInstruction={setInstruction}
-                    messageApi={messageApi}
-                    scrollDomRef={scrollDomRef}
-                    setIsStop={setIsStop}
-                    upButtonDom={upButtonDom}
-                    agentList={agentList}
-                ></ChatRoomContentbox>
-                <InputField
-                    setInstruction={setInstruction}
-                    messageApi={messageApi}
-                    isStop={isStop}
-                    upButtonDom={upButtonDom}
-                    scrollDomRef={scrollDomRef}
-                ></InputField>
+            {contextHolder}
+            <div
+                className="mx-[44px] flex justify-center relative box-border pt-[12px] h-full"
+                // style={{ height: 'calc(100% )' }}
+            >
+                <div className="flex flex-col w-full h-full">
+                    <ChatRoomContentbox
+                        instruction={instruction}
+                        setInstruction={setInstruction}
+                        messageApi={messageApi}
+                        scrollDomRef={scrollDomRef}
+                        setIsStop={setIsStop}
+                        upButtonDom={upButtonDom}
+                        agentList={agentList}
+                    ></ChatRoomContentbox>
+                    <InputField
+                        setInstruction={setInstruction}
+                        messageApi={messageApi}
+                        isStop={isStop}
+                        upButtonDom={upButtonDom}
+                        scrollDomRef={scrollDomRef}
+                    ></InputField>
+                </div>
             </div>
-        </div>
         </>
-    )
-})
+    );
+});
