@@ -101,6 +101,7 @@ class Chatroom:
         # - message: str
         # - topic: str
         self._history_messages: List[Dict[str, Union[int, str]]] = []
+        self._last_speaker_id = 0
 
     def _get_agents_info(self) -> str:
         '''
@@ -108,7 +109,7 @@ class Chatroom:
         '''
         info = []
         for agent_id in self._model_config_ids:
-            if agent_id != 0:
+            if agent_id != 0 and agent_id != self._last_speaker_id:
                 agent = self._all_agents[agent_id]
                 abilities = agent['abilities']
                 if abilities:
@@ -182,6 +183,7 @@ class Chatroom:
         '''
         self._console_log(f'User message: \033[91m{user_message}\033[0m\n')
         # self._history_messages.append({'agent_id': 0, 'message': user_message, 'topic': self._topic})
+        self._last_speaker_id = 0
         self._history_messages.append({'agent_id': 0, 'message': user_message})
         self._user_message_id = chatroom_messages.insert(
             {
@@ -365,6 +367,7 @@ class Chatroom:
 
             # Append the agent message to the history messages and insert it into the database
             # self._history_messages.append({'agent_id': agent_id, 'message': agent_message, 'topic': self._topic})
+            self._last_speaker_id = agent_id
             self._history_messages.append({'agent_id': agent_id, 'message': agent_message})
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
             chatroom_messages.insert(
