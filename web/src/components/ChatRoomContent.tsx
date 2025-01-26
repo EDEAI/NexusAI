@@ -814,118 +814,121 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                 className={`h-full min-h-full overflow-y-auto flex flex-col-reverse  items-center  scroll-smooth chatroom`}
                 ref={scrollDomRef}
                 onScroll={slideScroll}
-            >
-                <div className="w-[920px] ">
-                    <div className="flex flex-col-reverse">
-                        <>
-                            {userMessage && userMessage.length ? (
-                                userMessage.map((item, index) => (
-                                    <div
-                                        key={index}
-                                        id={`c${item.id}`}
-                                        className={`w-full flex gap-[15px] pt-[15px] pb-[15px] ${
-                                            item.is_agent != 1 ? 'flex-row-reverse' : ''
-                                        }`}
-                                    >
-                                        <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
-                                            {item.is_agent == 1 ? (
-                                                <img
-                                                    src={headportrait('single', item.icon)}
-                                                    alt=""
-                                                    className="w-[18px]  h-[18px]"
-                                                />
-                                            ) : (
-                                                <img
-                                                    src="/icons/user_header.svg"
-                                                    className="w-[18px]  h-[18px]"
-                                                />
-                                            )}
-                                        </div>
+            >   
+                
+                <div className="w-[920px]">
+                    <div className="w-full">
+                        <div className="flex flex-col-reverse">
+                            <>
+                                {userMessage && userMessage.length ? (
+                                    userMessage.map((item, index) => (
                                         <div
-                                            className="flex1 max-w-[560px] text-right"
-                                            id={`content${index}`}
+                                            key={index}
+                                            id={`c${item.id}`}
+                                            className={`w-full flex gap-[15px] pt-[15px] pb-[15px] ${
+                                                item.is_agent != 1 ? 'flex-row-reverse' : ''
+                                            }`}
                                         >
-                                            <div
-                                                className={`${
-                                                    item.is_agent == 1 ? 'text-left' : 'text-right'
-                                                } font-[500] text-[14px] text-[#213044] pb-[8px]`}
-                                            >
-                                                {item.name
-                                                    ? item.name
-                                                    : userinfodata('GET').nickname}
+                                            <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
+                                                {item.is_agent == 1 ? (
+                                                    <img
+                                                        src={headportrait('single', item.icon)}
+                                                        alt=""
+                                                        className="w-[18px]  h-[18px]"
+                                                    />
+                                                ) : (
+                                                    <img
+                                                        src="/icons/user_header.svg"
+                                                        className="w-[18px]  h-[18px]"
+                                                    />
+                                                )}
                                             </div>
                                             <div
-                                                className={`flex ${
-                                                    item.is_agent == 1
-                                                        ? 'flex-row'
-                                                        : 'flex-row-reverse'
-                                                }`}
+                                                className="flex1 max-w-[560px] text-right"
+                                                id={`content${index}`}
                                             >
                                                 <div
-                                                    className={`text-left markdown-container inline-block text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
-                                                    style={
-                                                        item.is_agent == 1
-                                                            ? { borderRadius: ' 0px 8px 8px 8px' }
-                                                            : {
-                                                                  borderRadius: '8px 0px 8px 8px',
-                                                                  background:
-                                                                      'rgba(27,100,243,0.1)',
-                                                                  whiteSpace: 'pre-wrap',
-                                                              }
-                                                    }
-                                                    id={`chilContent${index}`}
+                                                    className={`${
+                                                        item.is_agent == 1 ? 'text-left' : 'text-right'
+                                                    } font-[500] text-[14px] text-[#213044] pb-[8px]`}
                                                 >
-                                                    <ReactMarkdown
-                                                        rehypePlugins={[rehypeHighlight]}
-                                                        components={renderers(index, intl)}
+                                                    {item.name
+                                                        ? item.name
+                                                        : userinfodata('GET').nickname}
+                                                </div>
+                                                <div
+                                                    className={`flex ${
+                                                        item.is_agent == 1
+                                                            ? 'flex-row'
+                                                            : 'flex-row-reverse'
+                                                    }`}
+                                                >
+                                                    <div
+                                                        className={`text-left markdown-container inline-block text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
+                                                        style={
+                                                            item.is_agent == 1
+                                                                ? { borderRadius: ' 0px 8px 8px 8px' }
+                                                                : {
+                                                                    borderRadius: '8px 0px 8px 8px',
+                                                                    background:
+                                                                        'rgba(27,100,243,0.1)',
+                                                                    whiteSpace: 'pre-wrap',
+                                                                }
+                                                        }
+                                                        id={`chilContent${index}`}
                                                     >
-                                                        {item.content}
-                                                    </ReactMarkdown>
+                                                        <ReactMarkdown
+                                                            rehypePlugins={[rehypeHighlight]}
+                                                            components={renderers(index, intl)}
+                                                        >
+                                                            {item.content}
+                                                        </ReactMarkdown>
+                                                    </div>
                                                 </div>
+                                                {item.is_agent == 1 ? (
+                                                    <div className="flex gap-x-[20px]">
+                                                        <Chatcopy
+                                                            messageApi={messageApi}
+                                                            idName="content"
+                                                            cidName="chilContent"
+                                                            index={index}
+                                                        />
+                                                        <SummaryButton
+                                                            id={id}
+                                                            index={index}
+                                                            idName="content"
+                                                            cidName="chilContent"
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <></>
+                                                )}
                                             </div>
-                                            {item.is_agent == 1 ? (
-                                                <div className="flex gap-x-[20px]">
-                                                    <Chatcopy
-                                                        messageApi={messageApi}
-                                                        idName="content"
-                                                        cidName="chilContent"
-                                                        index={index}
-                                                    />
-                                                    <SummaryButton
-                                                        id={id}
-                                                        index={index}
-                                                        idName="content"
-                                                        cidName="chilContent"
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <></>
-                                            )}
                                         </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <></>
-                            )}
-                        </>
+                                    ))
+                                ) : (
+                                    <></>
+                                )}
+                            </>
+                        </div>
+                        <ChatwindowCont
+                            messageApi={messageApi}
+                            setUserMessage={setUserMessage}
+                            sendValue={sendValue}
+                            agentList={agentList}
+                            scrollDomRef={scrollDomRef}
+                            upButtonDom={upButtonDom}
+                            setIsStop={setIsStop}
+                            setSendValue={setSendValue}
+                        ></ChatwindowCont>
                     </div>
-                    <ChatwindowCont
-                        messageApi={messageApi}
-                        setUserMessage={setUserMessage}
-                        sendValue={sendValue}
-                        agentList={agentList}
-                        scrollDomRef={scrollDomRef}
-                        upButtonDom={upButtonDom}
-                        setIsStop={setIsStop}
-                        setSendValue={setSendValue}
-                    ></ChatwindowCont>
-                </div>
-                <div className="w-full flex justify-center pb-[10px]">
-                    {!disableInput && userMessage.length ? (
-                        <MeetingSummaryBtn roomid={id} />
-                    ) : (
-                        <></>
-                    )}
+                    <div className="w-full flex justify-center pb-[10px]">
+                        {!disableInput && userMessage.length ? (
+                            <MeetingSummaryBtn roomid={id} />
+                        ) : (
+                            <></>
+                        )}
+                    </div>
                 </div>
                 <div
                     className="text-center justify-center items-center flex"
