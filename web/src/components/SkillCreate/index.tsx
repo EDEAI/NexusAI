@@ -23,12 +23,13 @@ import CodeEditor from '../WorkFlow/components/Editor/CodeEditor';
 import BeforeCreate from './BeforeCreate';
 import BugFix from './BugFix';
 import ResultDisplay from './ResultDisplay';
-import InfiniteScrollDemo from '../common/InfiniteScrollDemo';
 
 const SkillCreate = memo(() => {
     const intl = useIntl();
     const [prompt, setPrompt] = useState('');
+    const [conPrompt, setConPrompt] = useState('');
     const [loading, setLoading] = useState(false);
+    const lastLoading = useLatest(loading);
     const { skillCreateOpen, setSkillCreateOpen } = useUserStore(state => ({
         skillCreateOpen: state.skillCreateOpen,
         setSkillCreateOpen: state.setSkillCreateOpen,
@@ -36,11 +37,14 @@ const SkillCreate = memo(() => {
     const [skillCreateResult, setSkillCreateResult] = useState(null);
     const [bugFixshow, setBugFixshow] = useState(false);
     const [params, setParams] = useSetState(null);
-    const lastParams=useLatest(params)
+    const lastParams = useLatest(params);
     const flowMessage = useSocketStore(state => state.flowMessage);
     const [hasProcessed, setHasProcessed] = useState(false);
     const [changeSkill, setChangeSkill] = useState(null);
+    const [correctVisible, setCorrectVisible] = useState(false);
+    const lastCorrectVisible = useLatest(correctVisible);
     const changeSkillLast = useLatest(changeSkill);
+
     const { setUpdateNotification } = useUserStore(state => ({
         setUpdateNotification: state.setUpdateNotification,
     }));
@@ -93,7 +97,7 @@ const SkillCreate = memo(() => {
                     resetState();
                 },
             });
-            return 
+            return;
         }
         resetState();
     };
@@ -130,31 +134,34 @@ const SkillCreate = memo(() => {
 
     const handleCorrection = useCallback(
         async (value: string, app_run_id) => {
+            setConPrompt(value);
             setLoading(true);
             try {
                 const res = await skillCorrection(app_run_id, value);
                 if (res.code == 0) {
                     // setSkillCreateResult(res.data);
                     setHasProcessed(false);
+                    setParams(res.data);
                 }
             } catch (e) {
                 console.log(e);
             }
         },
-        [params],
+        [lastParams.current],
     );
 
     useUpdateEffect(() => {
         const currentMessage = flowMessage?.find(
             item =>
-                item?.data?.app_run_id == params?.app_run_id &&
-                item?.data?.exec_data?.exec_id == params?.record_id,
+                item?.data?.app_run_id == lastParams.current?.app_run_id &&
+                item?.data?.exec_data?.exec_id == lastParams.current?.record_id,
         );
         if (currentMessage && !hasProcessed) {
             try {
                 const output = JSON.parse(currentMessage?.data?.exec_data?.outputs?.value);
-                setSkillCreateResult(output);
                 setChangeSkill(output);
+                setSkillCreateResult(output);
+                
             } catch (e) {
                 console.log(e);
             }
@@ -220,24 +227,52 @@ const SkillCreate = memo(() => {
             setLoading(false);
         }
     }, [changeSkillLast]);
-    
-    useEffect(()=>{
-        console.log('params',params);
-        
-    },[params])
 
+    useEffect(() => {
+        console.log('params', params);
+    }, [params]);
+
+    const onCorrectVisibleChange = useCallback((visible: boolean) => {
+        setCorrectVisible(visible);
+    }, []);
+
+    const onCorrect = useCallback(async (value: string) => {
+        // 处理修正逻辑
+        setCorrectVisible(false);
+    }, []);
+    const ConPrompt = useCallback(() => {
+        
+        if (!lastCorrectVisible.current) return null;
+        
+        return (
+            <div className="absolute bottom-2 right-2 w-[calc(100%-20px)] z-10">
+                <PromptTextarea
+                    placeholder={intl.formatMessage({
+                        id: 'skill.create.prompt.modify',
+                    })}
+                    submitText={intl.formatMessage({
+                        id: 'skill.create.button.modify',
+                    })}
+                    submitIcon={<ToolOutlined />}
+                    showCloseButton={true}
+                    className="h-[100px]"
+                    loading={lastLoading.current}
+                    defaultValue={conPrompt}
+                    onClose={() => onCorrectVisibleChange(false)}
+                    onSubmit={e => handleCorrection(e, lastParams.current?.app_run_id || '')}
+                    submitButtonProps={{
+                        size: 'small',
+                        loading: lastLoading.current,
+                    }}
+                    key="single-prompt"
+                />
+            </div>
+        );
+    }, [lastCorrectVisible.current,loading,conPrompt]);
     const Created = useCallback(
         ({ loading }) => {
-            const [correctVisible, setCorrectVisible] = useState(false);
-            const onCorrectVisibleChange = useCallback((visible: boolean) => {
-                setCorrectVisible(visible);
-            }, []);
-
-            const onCorrect = useCallback(async (value: string) => {
-                // 处理修正逻辑
-                setCorrectVisible(false);
-            }, []);
-
+            console.log('changeSkillLast', changeSkillLast.current);
+            
             return (
                 <div className="flex gap-4 h-full relative z-[10000]">
                     <div className="relative flex-1">
@@ -285,29 +320,7 @@ const SkillCreate = memo(() => {
                                 />
                             </Tooltip>
                         </div>
-                        {correctVisible && (
-                            <div className="absolute bottom-2 right-2 w-[calc(100%-20px)] z-10">
-                                <PromptTextarea
-                                    placeholder={intl.formatMessage({
-                                        id: 'skill.create.prompt.modify',
-                                    })}
-                                    submitText={intl.formatMessage({
-                                        id: 'skill.create.button.modify',
-                                    })}
-                                    submitIcon={<ToolOutlined />}
-                                    showCloseButton={true}
-                                    className="h-[100px]"
-                                    loading={loading}
-                                    onClose={() => onCorrectVisibleChange(false)}
-                                    onSubmit={e => handleCorrection(e, params?.app_run_id || '')}
-                                    submitButtonProps={{
-                                        size: 'small',
-                                        loading: loading,
-                                    }}
-                                    key="single-prompt"
-                                />
-                            </div>
-                        )}
+                        <ConPrompt></ConPrompt>
                     </div>
                     <div className="w-1/2 flex flex-col gap-4">
                         <PromptTextarea
@@ -324,7 +337,7 @@ const SkillCreate = memo(() => {
                 </div>
             );
         },
-        [skillCreateResult, CodeEditorMemo, prompt],
+        [skillCreateResult, CodeEditorMemo, prompt,changeSkillLast],
     );
 
     const handleBugFixSubmit = useCallback(async (values: any) => {
@@ -350,14 +363,13 @@ const SkillCreate = memo(() => {
             onOk={handleOk}
             centered
             onCancel={handleCancel}
-            
         >
             {/* <InfiniteScrollDemo></InfiniteScrollDemo> */}
             {skillCreateResult ? <Created loading={loading} /> : <Create loading={loading} />}
             <BugFix
                 open={bugFixshow}
                 onCancel={() => setBugFixshow(false)}
-                skillData={{ ...changeSkillLast.current, app_run_id: params?.app_run_id }}
+                skillData={{ ...changeSkillLast.current, app_run_id: lastParams.current?.app_run_id }}
                 onSubmit={handleBugFixSubmit}
             />
         </Modal>

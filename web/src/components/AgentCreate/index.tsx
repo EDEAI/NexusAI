@@ -33,6 +33,7 @@ const AgentCreate = memo(() => {
     const { agentCreateOpen, setAgentCreateOpen } = useUserStore();
     const [modelOpen, setModelOpen] = useState(false);
     const [prompt, setPrompt] = useState('');
+    const [singleConPrompt,setSingleConPrompt]=useState('')
     const [loading, setLoading] = useState(false);
     const [correctVisible, setCorrectVisible] = useState(false);
     const [singleAgentResult, setSingleAgentResult] = useRafState<AgentResult | null>(null);
@@ -51,7 +52,7 @@ const AgentCreate = memo(() => {
     const batchCreateRef = useRef<BatchCreateRef>(null);
     const [createType, setCreateType] = useState<'single' | 'batch' | ''>('single');
     const [batchPrompt, setBatchPrompt] = useState('');
-
+    
     const [singleAgentCreateId, setSingleAgentCreateId] = useState('');
     const lastSingleAgentCreateId = useLatest(singleAgentCreateId);
     const intl = useIntl();
@@ -184,7 +185,7 @@ const AgentCreate = memo(() => {
     };
     const handleCorrectAgent = async prompt => {
         if (!singleGenerateId?.app_run_id) return;
-
+        setSingleConPrompt(prompt)
         try {
             const toSave = await toSaveAgentTemporarily();
             if (!toSave) {
@@ -278,6 +279,7 @@ const AgentCreate = memo(() => {
         setBatchModelVisible(false);
         setBatchLoading(false);
         setPrompt('');
+        setSingleConPrompt('')
         setBatchPrompt('')
         setLoading(false);
         setCorrectVisible(false);
@@ -294,6 +296,7 @@ const AgentCreate = memo(() => {
                     agentCreateResultOutput={singleAgentOutput}
                     correctVisible={correctVisible}
                     prompt={prompt}
+                    conPrompt={singleConPrompt}
                     resultDisplayRef={resultDisplayRef}
                     onFormChange={handleFormChange}
                     onSubmit={handleSubmit}

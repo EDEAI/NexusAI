@@ -317,6 +317,7 @@ export const PromptTextarea = memo(
                 {showCloseButton && (
                     <Button
                         type="text"
+                        disabled={loading}
                         icon={<CloseOutlined />}
                         className="absolute right-1 top-1"
                         onClick={onClose}

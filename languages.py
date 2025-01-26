@@ -83,7 +83,7 @@ language_packs = {
 
             {retrieved_docs_format}
             {reply_requirement}
-            Finally, reply in {output_format} format.
+            Finally, reply {output_format}.
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
             ********************End of identity definition content********************
 
@@ -103,7 +103,7 @@ language_packs = {
 
             {retrieved_docs_format}
             {reply_requirement}
-            Finally, reply in {output_format} format.
+            Finally, reply {output_format}.
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
             ********************End of identity definition content********************
 
@@ -117,19 +117,25 @@ language_packs = {
         "agent_reply_requirement_with_task_splitting_and_auto_match_ability": "Please match one corresponding ability based on the user input information, and based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it, and reply in the format corresponding to the ability.",
         "agent_reply_requirement_with_task_splitting_and_abilities": "Based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it.",
         "agent_reply_requirement_with_task_splitting_and_no_ability": "Based on your responsibilities, select the part of the overall task that you should be responsible for and process it.",
-        "agent_output_format_1": "plain text",
-        "agent_output_format_2": "JSON",
-        "agent_output_format_3": "code",
+        "agent_output_format_1": "as plain text",
+        "agent_output_format_2": "in JSON format",
+        "agent_output_format_3": "in code format",
         "agent_user_prompt": '''
             Below is the user's questions or needs:
+            ********************Start of the user's questions or needs********************
             {user_prompt}
+            ********************End of user's questions or needs********************
         ''',
         "agent_user_prompt_with_retrieved_docs": '''
             Below is the user's questions or needs:
+            ********************Start of the user's questions or needs********************
             {user_prompt}
+            ********************End of user's questions or needs********************
 
             Below is the information retrieved from the knowledge base:
+            ********************Start of information retrieved from the knowledge base********************
             {formatted_docs}
+            ********************End of information retrieved from the knowledge base********************
         ''',
         "llm_reply_requirement_with_task_splitting": "Please select the part of the overall task that you should be responsible for and process it.",
         "recursive_task_generation": {
@@ -340,14 +346,17 @@ language_packs = {
             You are responsible for summarizing the content of the user's message and selecting the next agent to speak.
             I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
             [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
-            A list consisting of the content of each message of the user in the following JSON format: [content string, ...]
-            And the chat history list in the following JSON format: [message, ...]
+            A list of the user's speech history in the following JSON format: [message string, ...]
+            And the conversation history list in the following JSON format: [message, ...]
             where the JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
 
-            You should summarize the content of the user's message, and the summary should be fairly detailed and in the user's perspective.
+            You need to generate a complete and detailed instruction for the next agent to receive the instruction based on the user's speech history. Pay attention to the following requirements:
+            1. Please make sure that the instruction is from the user's perspective
+            2. The instruction should fully and in detail summarize the key information, rules and requirements of the user's speech history
+
             Then, respond according to the following requirements:
-            1. Please only select agents from the provided agent list. Do not select agents that exist in the chat history but not in the agent list;
+            1. Please only select agents from the provided agent list. Do not select agents that exist in the conversation history but not in the agent list;
             2. Please select the next agent to speak based on the summary and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the historical message content;
             3. Please return in JSON format: {"summary": summary, "id": the ID of the agent you selected}. Sometimes an agent's name might look like an ID number, but you must still return the agent's ID, not their name.
         ''',
@@ -358,10 +367,10 @@ language_packs = {
             I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
             [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
             And the current user's speech summary;
-            Also, the chat history list in the following JSON format:
+            Also, the conversation history list in the following JSON format:
             [message, ...];
             The JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}.
 
             You should determine whether to end the conversation according to the following rules:
             1. You should try to encourage all agents to actively participate in the dialogue regarding the user's speech summary, even if some of the agents have met the user's needs;
@@ -370,8 +379,8 @@ language_packs = {
             
             Then, respond according to the following requirements:
             1. If you think the conversation should end, please only return in JSON format: {"id": 0, "message": reason for ending the conversation}; otherwise, select an agent according to the following requirements.
-            2. Please only select agents from the provided agent list. Do not select agents that exist in the chat history but not in the agent list;
-            3. Please select the next agent to speak based on the user's speech summary, chat history, and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the user's speech summary;
+            2. Please only select agents from the provided agent list. Do not select agents that exist in the conversation history but not in the agent list;
+            3. Please select the next agent to speak based on the user's speech summary, conversation history, and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the user's speech summary;
             4. Please return in JSON format: {"id": the ID of the agent you selected}. Sometimes an agent's name might look like an ID number, but you must still return the agent's ID, not their name.
         ''',
 
@@ -406,24 +415,22 @@ language_packs = {
         ''',
 
         'chatroom_agent_user_subprompt': '''
-            Before now, other agents have already responded to the current user's questions or needs. I will provide the reply records of other agents.
-            You must reply to the user by answering questions or handling needs, centered on the user's speech summary and based on the reply records.
-            The agents' reply records may contain questions or needs initiated by the user.
-            The user's messages are in the following JSON format: [message string, ...];
-            The reply records are in the following JSON format: [record, ...];
-            The JSON structure for each record is as follows:
-            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role (user or agent), "message": message content}}.
+            You are an AI agent in a meeting room, where there is one user and at least one AI agent.
+            You need to reply to the user's instructions. Please pay attention to the following requirements when responding:
+            1. You need to analyze the conversation history through its JSON structure and use it as context information for reference
+            2. You need to analyze and understand the user's instruction intentions and strictly abide by the rules in the instructions
+            The JSON format of the conversation history is as follows: [message, ...];
+            The JSON structure of each message is as follows:
+            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}}.
             
-            User's speech summary:
+            User's instructions:
             {topic}
-
-            User's last speech content:
             {user_message}
 
-            Reply records:
+            Conversation history:
             {messages}
-
-            Do not explicitly mention the user's speech summary and the reply records in your response.
+            
+            Do not explicitly mention the user's instructions and the conversation history in your response.
         ''',
         'chatroom_agent_description_with_abilities': '''
             Agent responsibilities (or identity):
@@ -896,7 +903,7 @@ language_packs = {
                 3.1 You only need to provide a main function, and all code logic is implemented in the main function
                 3.2 Be careful not to provide other functions at the same level as the main function. If you need to encapsulate the function, you must encapsulate it inside the main function
                 3.3 Do not provide the function calling code. I will automatically call the main function during actual operation
-                3.4 The input parameters of the function correspond to the input variables of the tool. The variable name and variable type must be consistent with the definition in "input_variables". Non-mandatory variables must have default values
+                3.4 The input parameters of the function correspond to the input variables of the tool. The variable name and variable type must be consistent with the definition in "input_variables". Non-mandatory variables must have default values, variables with default values should be placed last.
                 3.5 The return data type of the function must be specified
                 3.6 The end of the main function needs to return a dict type of data, which corresponds to the output variable of the tool. The key name of the dict data is the output variable name. The variable name and variable type must be consistent with the definition in "output_variables"
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
@@ -1563,7 +1570,7 @@ language_packs = {
         #         3.1 你只需要提供一个主函数即可，所有代码逻辑都在主函数中实现
         #         3.2 注意不要提供与主函数同层级的其他函数，如果需要封装函数，一定要在主函数内部进行封装
         #         3.3 不要提供函数的调用代码，实际运行时我会自动调用主函数
-        #         3.4 函数的入参对应工具的输入变量，变量名称、变量类型要与"input_variables"中的定义一致，非必填变量要有默认值
+        #         3.4 函数的入参对应工具的输入变量，变量名称、变量类型要与"input_variables"中的定义一致，非必填变量要有默认值，具有默认值的变量应该放在最后。
         #         3.5 要规定函数的返回数据类型
         #         3.6 主函数的结尾需要固定返回一个dict类型的数据，对应工具的输出变量，dict数据的键名即为输出的变量名，变量名称、变量类型要和"output_variables"中的定义一致
         #     4. "output_variables"为工具运行完成后的输出变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
