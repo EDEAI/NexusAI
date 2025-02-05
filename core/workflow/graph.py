@@ -145,8 +145,8 @@ class Graph:
 
         if start_node_count != 1:
             raise ValueError(get_language_content("graph_validation_errors.exactly_one_start_node"))
-        if end_node_count != 1:
-            raise ValueError(get_language_content("graph_validation_errors.exactly_one_end_node"))
+        # if end_node_count != 1:
+        #     raise ValueError(get_language_content("graph_validation_errors.exactly_one_end_node"))
 
     def _validate_llm_node(self, node_metadata):
         """
