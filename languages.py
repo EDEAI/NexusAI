@@ -354,11 +354,14 @@ language_packs = {
             You are responsible for summarizing the content of the user's message and selecting the next agent to speak.
             I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
             [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
-            The conversation history list in the following JSON format: [message, ...]
-            where the JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
+            The conversation history in the following JSON format: [round 1, (round 2,) ...]
+            where the conversation round in the following JSON format: [message 1, (message 2,) ...]
+            Each round starts with a user message and includes all subsequent agent messages until the next user message;
+            The JSON structure for each message is as follows:
+            {"agent_id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
+            Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
-            You need to fully analyze and understand the conversation history through the conversation history message data structure, analyze the current conversation scene and conversation progress, and combine the user's last speech content to analyze what the next agent needs to do and the specific execution rules and requirements. This content will be passed to the next agent as an instruction
+            You need to fully analyze and understand every round of the conversation history through its message data structure, analyze the current conversation scene and conversation progress, and combine the user's speech content in the last round to analyze what the agents need to do next and the specific execution rules and requirements. This content then will be passed to the agents as an instruction
 
             Then, respond according to the following requirements:
             1. Please only select agents from the provided agent list. Do not select agents that exist in the conversation history but not in the agent list;
@@ -372,14 +375,16 @@ language_packs = {
             I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
             [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
             And the current user's speech summary;
-            Also, the conversation history list in the following JSON format:
-            [message, ...];
+            Also, the conversation history in the following JSON format: [round 1, (round 2,) ...]
+            where the conversation round in the following JSON format: [message 1, (message 2,) ...]
+            Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}.
+            {"agent_id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}.
+            Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
             You should determine whether to end the conversation according to the following rules:
-            1. You should try to encourage all agents to actively participate in the dialogue regarding the user's speech summary, even if some of the agents have met the user's needs;
-            2. If all agents have participated in the dialogue after the user's last speech and the user's needs have been met, you can end the conversation;
+            1. You should try to encourage all agents to actively participate in the conversation regarding the user's speech summary, even if some of the agents have met the user's needs;
+            2. If all agents have participated in the last round of the conversation after the user's speech and the user's needs have been met, you can end the conversation;
             3. If the conversation has been ongoing for a long time without reaching a conclusion, you can also end the conversation;
             
             Then, respond according to the following requirements:
@@ -421,13 +426,17 @@ language_packs = {
             You are an AI agent in a meeting room, where there is one user and at least one AI agent.
             You should adapt your identity and role according to the context of the conversation.
             You need to reply to the user's instructions. Please pay attention to the following requirements when responding:
-            1. You need to fully analyze and understand the chat records, analyze the current conversation scene and progress through the data structure of the conversation record, focus on what the user wants, and provide enough details
+            1. You need to fully analyze and understand the conversation records, analyze the current conversation scene and progress through the last round of the conversation, focus on what the user wants, and provide enough details
             2. You need to fully analyze and understand the user's command intention through the current conversation scene and progress, as well as the user's instructions, focus on what the user wants, and do not miss important information, rules or requirements in the instructions
             3. You need to reply based on the current conversation scene and progress, as well as the user's command intention
             4. Don't copy the viewpoints of other agents in the meeting room.
-            The JSON format of the conversation history is as follows: [message, ...];
+
+            The JSON format of the conversation history is as follows: [round 1, (round 2,) ...]
+            where the conversation round in the following JSON format: [message 1, (message 2,) ...]
+            Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure of each message is as follows:
-            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}}.
+            {{"agent_id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}}.
+            Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
             
             User's instructions:
             {topic}
