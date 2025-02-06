@@ -153,9 +153,19 @@ class Workflows(MySQL):
         )[0]["count_id"]
 
         list = self.select(
-            columns=["workflows.id AS workflows_id", "workflows.user_id", "workflows.app_id", "apps.publish_status",
-                     "apps.name", "apps.description", "users.nickname", "users.avatar", "apps.icon_background",
-                     "apps.icon"],
+            columns=[
+                "workflows.id AS workflows_id", 
+                "workflows.user_id", 
+                "workflows.app_id", 
+                "apps.publish_status", 
+                "apps.name", 
+                "apps.description", 
+                "users.nickname", 
+                "users.avatar", 
+                "apps.icon_background",
+                "apps.icon",
+                "workflows.published_time AS workflow_published_time"
+                ],
             joins=[
                 ["left", "apps", "workflows.app_id = apps.id"],
                 ["left", "users", "workflows.user_id = users.id"]
