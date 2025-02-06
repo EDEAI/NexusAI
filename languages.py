@@ -358,7 +358,7 @@ language_packs = {
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
             Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure for each message is as follows:
-            {"agent_id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
             You need to fully analyze and understand every round of the conversation history through its message data structure, analyze the current conversation scene and conversation progress, and combine the user's speech content in the last round to analyze what the agents need to do next and the specific execution rules and requirements. This content then will be passed to the agents as an instruction
@@ -379,7 +379,7 @@ language_packs = {
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
             Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure for each message is as follows:
-            {"agent_id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
             You should determine whether to end the conversation according to the following rules:
@@ -435,7 +435,7 @@ language_packs = {
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
             Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure of each message is as follows:
-            {{"agent_id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}}.
+            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
             
             User's instructions:

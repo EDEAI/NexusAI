@@ -153,7 +153,7 @@ class Chatroom:
             agent_str = get_language_content('chatroom_role_agent', self._user_id, append_ret_lang_prompt=False)
             agent_id = message['agent_id']
             message_for_llm = {
-                'agent_id': agent_id,
+                'id': agent_id,
                 'name': user_str if agent_id == 0 else self._all_agents[agent_id]['name'],
                 'role': user_str if agent_id == 0 else agent_str,
                 'message': message['message']
@@ -165,11 +165,11 @@ class Chatroom:
         messages_in_last_section = deque()
         for message in reversed(messages):
             messages_in_last_section.appendleft(message)
-            if message['agent_id'] == 0:
+            if message['id'] == 0:
                 break
         user_messages = []
         for message in messages:
-            if message['agent_id'] == 0:
+            if message['id'] == 0:
                 user_messages.append(message['message'])
         return (
             messages,
@@ -199,7 +199,7 @@ class Chatroom:
             agent_str = get_language_content('chatroom_role_agent', self._user_id, append_ret_lang_prompt=False)
             agent_id = message['agent_id']
             message_for_llm = {
-                'agent_id': agent_id,
+                'id': agent_id,
                 'name': user_str if agent_id == 0 else self._all_agents[agent_id]['name'],
                 'role': user_str if agent_id == 0 else agent_str,
                 'message': message['message']
@@ -213,7 +213,7 @@ class Chatroom:
         message_sections = []
         current_section = []
         for message in messages:
-            if message['agent_id'] == 0 and current_section:  # When encountering a user message and current section is not empty
+            if message['id'] == 0 and current_section:  # When encountering a user message and current section is not empty
                 message_sections.append(current_section)
                 current_section = []
             current_section.append(message)
@@ -223,7 +223,7 @@ class Chatroom:
         # Get all user messages
         user_messages = []
         for message in messages:
-            if message['agent_id'] == 0:
+            if message['id'] == 0:
                 user_messages.append(message['message'])
                 
         return (
