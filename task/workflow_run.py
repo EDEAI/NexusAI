@@ -17,6 +17,8 @@ from celery_app import run_workflow_node
 from core.helper import push_to_websocket_queue, get_websocket_queue_length
 from languages import get_language_content
 
+logger = Logger.get_logger('workflow_run')
+
 task_timeout = 60  # Timeout for Celery task execution
 global_tasks = [] # List to store tasks
 running = True  # Global flag to control thread loops
@@ -76,10 +78,10 @@ def skip_edges_from_node(node_id, edge_maps, skipped_edges):
         if edge.id not in skipped_edges:
             skipped_edges.append(edge.id)
             if should_skip_node(edge.target_node_id, edge_maps, skipped_edges):
-                print(f"Recursively skipping edge: {edge.id} from node: {node_id}")
+                logger.debug(f"Recursively skipping edge: {edge.id} from node: {node_id}")
                 skip_edges_from_node(edge.target_node_id, edge_maps, skipped_edges)
             else:
-                print(f"Can not skip node:{edge.target_node_id} as there are other edges leading to it not skipped")
+                logger.debug(f"Can not skip node:{edge.target_node_id} as there are other edges leading to it not skipped")
                 
 def create_celery_task(
     team_id: int,
@@ -153,7 +155,7 @@ def create_celery_task(
     if level not in level_tasks[app_run_id]:
         level_tasks[app_run_id][level] = []
     level_tasks[app_run_id][level].append(task.id)
-    print(f"Task added for run:{app_run_id} level:{level} node:{node.id}:{node.data['type']}:{node.data['title']} task_id:{task.id}")
+    logger.info(f"Task added for run:{app_run_id} level:{level} node:{node.id}:{node.data['type']}:{node.data['title']} task_id:{task.id}")
     
 def remove_task_cache(item):
     """
@@ -295,7 +297,7 @@ def push_workflow_debug_message(
         }
     }
     push_to_websocket_queue(queue_data)
-    print(f"Debug message pushed for run:{app_run_id} node:{node.id}:{node.data['type']}:{node.data['title']} exec_id:{node_exec_id} data:{queue_data} queue_length:{get_websocket_queue_length()}")
+    logger.info(f"Debug message pushed for run:{app_run_id} node:{node.id}:{node.data['type']}:{node.data['title']} exec_id:{node_exec_id} data:{queue_data} queue_length:{get_websocket_queue_length()}")
     
 def push_workflow_progress_message(
     app_user_id: int, 
@@ -358,7 +360,7 @@ def push_workflow_progress_message(
             }
         }
         push_to_websocket_queue(queue_data)
-        print(f"Progress message pushed for user_id:{user_id} run:{app_run_id} data:{queue_data} queue_length:{get_websocket_queue_length()}")
+        logger.info(f"Progress message pushed for user_id:{user_id} run:{app_run_id} data:{queue_data} queue_length:{get_websocket_queue_length()}")
 
 def push_human_confirm_message(
     user_id: int,
@@ -427,7 +429,7 @@ def push_human_confirm_message(
             }
         }
         push_to_websocket_queue(data)
-        print(f"Human confirm message pushed for user_id:{uid} run:{app_run_id} node:{node.id}:{node.data['type']}:{node.data['title']} exec_id:{exec_id} data:{data} queue_length:{get_websocket_queue_length()}")
+        logger.info(f"Human confirm message pushed for user_id:{uid} run:{app_run_id} node:{node.id}:{node.data['type']}:{node.data['title']} exec_id:{exec_id} data:{data} queue_length:{get_websocket_queue_length()}")
 
 def push_remove_human_confirm_message(
     user_id: int,
@@ -458,7 +460,7 @@ def push_remove_human_confirm_message(
         }
     }
     push_to_websocket_queue(data)
-    print(f"Remove human confirm message pushed for user_id:{user_id} run:{app_run_id} exec_id:{exec_id} data:{data} queue_length:{get_websocket_queue_length()}")
+    logger.info(f"Remove human confirm message pushed for user_id:{user_id} run:{app_run_id} exec_id:{exec_id} data:{data} queue_length:{get_websocket_queue_length()}")
 
 def task_delay_thread():
     """
@@ -467,9 +469,9 @@ def task_delay_thread():
     global running
     while running:
         runs = app_run.get_runnable_workflow_runs()  # Retrieve runnable workflow runs from the database
-        # print(f"Runnable runs:{runs}")
+        # logger.debug(f"Runnable runs:{runs}")
         for run in runs:
-            print(f"Processing run id:{run['app_run_id']} type:{run['type']} level:{run['level']} completed_steps:{run['completed_steps']} actual_completed_steps:{run['actual_completed_steps']}")
+            logger.info(f"Processing run id:{run['app_run_id']} type:{run['type']} level:{run['level']} completed_steps:{run['completed_steps']} actual_completed_steps:{run['actual_completed_steps']}")
             try:
                 team_id = run['team_id']  # Get the team ID
                 app_user_id = run['app_user_id']  # Get the app user ID
@@ -533,17 +535,17 @@ def task_delay_thread():
 
                     if edge.id in completed_edges: # Check if the edge has been completed
                         current_level_completed_edge_count += 1
-                        print(f"Edge already completed for run:{app_run_id} edge:{edge.id}")
+                        logger.debug(f"Edge already completed for run:{app_run_id} edge:{edge.id}")
                         continue
 
                     if edge.id in skipped_edges: # Check if the edge has been skipped
                         completed_edges.append(edge.id)
                         completed_steps += 1
                         update_app_run(app_run_id, {'completed_edges': completed_edges, 'completed_steps': completed_steps})
-                        print(f"Edge already skipped for run:{app_run_id} edge:{edge.id}")
+                        logger.debug(f"Edge already skipped for run:{app_run_id} edge:{edge.id}")
                         continue
 
-                    print(f"Processing edge:{edge.to_dict()}")
+                    logger.info(f"Processing edge:{edge.to_dict()}")
                     target_node = None # target node for the edge
                     all_predecessors_executed = True # Flag to indicate if all predecessors have been executed
                     parent_node = None # parent node for the executor node
@@ -554,21 +556,21 @@ def task_delay_thread():
 
                     source_node_execution = app_node_exec.get_node_successful_execution(app_run_id, edge.source_node_id)
                     if not source_node_execution: # Check if the source node execution record exists
-                        print(f"Source node execution record not found for run {app_run_id} edge {edge.id}")
+                        logger.error(f"Source node execution record not found for run {app_run_id} edge {edge.id}")
                         raise Exception(f"Source node execution record not found for run {app_run_id} edge {edge.id}")
 
                     if edge.is_logical_branch:
                         if not edge.condition_id or not source_node_execution['condition_id']: # Check if condition ID is missing
-                            print(f"Condition ID is missing run {app_run_id} edge {edge.id}")
+                            logger.error(f"Condition ID is missing run {app_run_id} edge {edge.id}")
                             raise Exception(f"Condition ID is missing run {app_run_id} edge {edge.id}")
                         if edge.condition_id != source_node_execution['condition_id']: # Check if condition IDs match
-                            print(f"Condition IDs do not match for run:{app_run_id} edge:{edge.id}")
+                            logger.debug(f"Condition IDs do not match for run:{app_run_id} edge:{edge.id}")
                             skipped_edges.append(edge.id)
                             # Skip all edges leading to the target node
                             if should_skip_node(edge.target_node_id, edge_maps, skipped_edges):
                                 skip_edges_from_node(edge.target_node_id, edge_maps, skipped_edges)
                             else:
-                                print(f"Can not skip node:{edge.target_node_id} as there are other edges leading to it not skipped")
+                                logger.debug(f"Can not skip node:{edge.target_node_id} as there are other edges leading to it not skipped")
                             # Update app run record to skip the edge
                             completed_edges.append(edge.id)
                             completed_steps += 1
@@ -578,7 +580,7 @@ def task_delay_thread():
                     # Get the task assignment level or task execution node
                     if edge.target_node_type == 'recursive_task_execution':
                         task_condition = app_node_exec.get_recursive_task_condition(app_run_id, level, edge.target_node_id)
-                        print(f"Recursive task condition:{task_condition}")
+                        logger.debug(f"Recursive task condition:{task_condition}")
                         task_level = task_condition['child_level']
                         task_operation = task_condition['status']
                         if task_operation == 'assign_task':
@@ -596,11 +598,9 @@ def task_delay_thread():
                             parent_exec_id = task_condition['first_execution_id']
                     else:
                         target_node = graph.nodes.get_node(edge.target_node_id)
-                    if target_node.data['type'] == 'skill':
-                            # If the target node is a skill node, update the app run record with skill details
-                            print('skilldata',target_node.data['output'].to_dict())
+
                     if not target_node:  # Check if the target node exists
-                        print(f"Target node not found for run {app_run_id} edge {edge.id}")
+                        logger.error(f"Target node not found for run {app_run_id} edge {edge.id}")
                         raise Exception(f"Target node not found for run {app_run_id} edge {edge.id}")
                     target_node_dict = target_node.to_dict()  # Convert the target node to a dictionary
 
@@ -608,11 +608,11 @@ def task_delay_thread():
                     for e in graph.edges.edges:
                         if e.level >= level and e.id != edge.id and e.target_node_id == target_node.id and e.id not in skipped_edges and e.id not in completed_edges:
                             if e.level > level or app_node_exec.get_node_successful_execution(app_run_id, e.source_node_id):
-                                print(f"Wait edge:{e.id} for target node:{target_node.id}")
+                                logger.debug(f"Wait edge:{e.id} for target node:{target_node.id}")
                                 all_predecessors_executed = False
                                 break
                             else:
-                                print(f"Predecessor not executed for edge:{e.id}")
+                                logger.debug(f"Predecessor not executed for edge:{e.id}")
                                 skipped_edges.append(e.id)
                                 update_app_run(app_run_id, {'skipped_edges': skipped_edges})
                     if not all_predecessors_executed:
@@ -624,7 +624,7 @@ def task_delay_thread():
                     # Create a context object from the run's context dictionary and filter records based on the ancestor node IDs
                     ancestor_node_ids = graph.edges.get_all_ancestor_node_ids(parent_node.id if parent_node else target_node.id)
                     ancestor_context = context.get_related_records(level, ancestor_node_ids)
-                    # print(f"Context for ancestor_node_ids:{ancestor_node_ids} records:{context.to_dict()}")
+                    # logger.debug(f"Context for ancestor_node_ids:{ancestor_node_ids} records:{context.to_dict()}")
 
                     if app_run_status == 1:
                         update_app_run(app_run_id, {'status': 2}) # Update app run status to indicate it is running
@@ -636,7 +636,7 @@ def task_delay_thread():
                         if correct_llm_output_execution_id and last_llm_execution_id:
                             correct_llm_output = True
                             exec_id = correct_llm_output_execution_id
-                            print(f"Correct LLM output found for run:{app_run_id} edge:{edge.id} node:{target_node.id} exec_id:{exec_id}")
+                            logger.debug(f"Correct LLM output found for run:{app_run_id} edge:{edge.id} node:{target_node.id} exec_id:{exec_id}")
                             # Push remove human confirmation message
                             push_remove_human_confirm_message(user_id, app_id, workflow_id, app_run_id, last_llm_execution_id)
 
@@ -663,7 +663,7 @@ def task_delay_thread():
                             human_node_run_status = 1
                             need_human_confirm = 1
                             update_app_run(app_run_id, {'status': 1, 'need_human_confirm': 1}) # Update app run record to indicate human confirmation is needed
-                        print(f"Human node run status:{human_node_run_status}")
+                        logger.debug(f"Human node run status:{human_node_run_status}")
 
                     if not (correct_llm_output or (target_node.data['type'] == 'human' and human_node_run_status != 1)):
                         # Prepare data for node execution record
@@ -707,15 +707,15 @@ def task_delay_thread():
                                 run['total_steps'], run['created_time'], run['finished_time'], exec_id, parent_exec_id, 0, {'status': 2, 'error': None, 'need_human_confirm': 0})
 
                 if current_level_edge_count == 0:
-                    print(f"No edges found for run:{app_run_id} level:{level}")
+                    logger.error(f"No edges found for run:{app_run_id} level:{level}")
                     update_app_run(app_run_id, {'status': 4, 'error': f'No edges found for run:{app_run_id} level:{level}'})
                     continue
 
                 if need_human_confirm == 0 and current_level_edge_count == current_level_completed_edge_count: # Check if all edges for the level have been completed
-                    print(f"All edges completed for run:{app_run_id} level:{level}")
+                    logger.debug(f"All edges completed for run:{app_run_id} level:{level}")
                     update_app_run(app_run_id, {'level': level + 1})
             except:
-                print(f"Error processing run:{app_run_id} {traceback.format_exc()}")
+                logger.error(f"Error processing run:{app_run_id} {traceback.format_exc()}")
 
         time.sleep(1)
 
@@ -732,11 +732,11 @@ def task_callback_thread():
                     context = context if context else Context()  # Create a new context object if it does not exist
                     result = task.get(timeout=task_timeout)  # Wait for the task to complete with a timeout
                     current_time = datetime.now()  # Current timestamp
-                    print(f"Task completed for run:{app_run_id} level:{level} node:{target_node.id}:{target_node.data['type']}:{target_node.data['title']} task_result:{result}")
+                    logger.info(f"Task completed for run:{app_run_id} level:{level} node:{target_node.id}:{target_node.data['type']}:{target_node.data['title']} task_result:{result}")
 
                     run = app_run.get_running_app_run(app_run_id)  # Retrieve the running app run record
                     if not run:
-                        print(f"App run not found for run:{app_run_id}")
+                        logger.error(f"App run not found for run:{app_run_id}")
                         remove_task_cache(item)
                         continue
                     completed_edges = run['completed_edges'] if run['completed_edges'] else []  # Get completed edges
@@ -803,9 +803,6 @@ def task_callback_thread():
                             app_run_data['need_correct_llm'] = 0 # Reset the need correct LLM flag
                             if not task_operation or (task_operation == 'assign_task' and not task_id):
                                 app_run_data['level'] = level + 1 # Increment the level
-                        if target_node.data['type'] == 'skill':
-                            # If the target node is a skill node, update the app run record with skill details
-                            print('skilldata',target_node.data['output'].to_dict())
                     else:
                         task_id = None
                         node_exec_data = {'status': 4, 'error': result['message'], 'need_human_confirm': 1}
@@ -847,7 +844,7 @@ def task_callback_thread():
                             push_human_confirm_message(run['user_id'], run['app_id'], app_name, icon, icon_background, run['workflow_id'], app_run_id, run['type'], run_name, edge, target_node, 
                                 exec_id, node_exec_data['status'], parent_exec_id, first_task_exec_id)
                 except Exception as e:
-                    print(f"Error processing run:{app_run_id} {traceback.format_exc()}")
+                    logger.error(f"Error processing run:{app_run_id} {traceback.format_exc()}")
                     # Update records with failure status and error message if an exception occurred
                     redis.lpush(f'app_run_{app_run_id}_result', json.dumps({'status': 'failed', 'message': result['message']}))
                     redis.expire(f'app_run_{app_run_id}_result', 1)
@@ -868,8 +865,8 @@ if __name__ == '__main__':
         delay_thread.join()
         callback_thread.join()
     except KeyboardInterrupt:
-        print("Stopping threads...")
+        logger.debug("Stopping threads...")
         running = False
         delay_thread.join()
         callback_thread.join()
-        print("Program exited gracefully")
+        logger.debug("Program exited gracefully")
