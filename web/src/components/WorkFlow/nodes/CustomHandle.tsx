@@ -37,7 +37,7 @@ const CustomHandle = memo((props: CustomHandleProps & HandleProps) => {
     });
 
     useMount(() => {
-        console.log(props?.params);
+        // console.log(props?.params);
 
         addHandleList([
             {

@@ -174,7 +174,7 @@ export default () => {
                                                 id: 'workflow.noHumanConfirm',
                                             })}
                                         >
-                                            <CheckCircleOutlined className="text-[#808183]" />
+                                            <CheckCircleOutlined className="text-[#52C41C]" />
                                         </Tooltip>
                                     )}
                                 </div>

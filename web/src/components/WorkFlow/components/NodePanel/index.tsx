@@ -5,15 +5,17 @@ import { SearchOutlined } from '@ant-design/icons';
 import { ProForm, ProFormItem, ProFormRadio, ProFormText } from '@ant-design/pro-components';
 import { getLocale, useIntl } from '@umijs/max';
 import { useSetState } from 'ahooks';
-import { Tabs, TabsProps } from 'antd';
+import { Tabs, TabsProps, Spin } from 'antd';
+import VirtualList from 'rc-virtual-list';
 import Fuse from 'fuse.js';
 import { debounce } from 'lodash';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { getBaseNode } from '../../nodes/nodeDisperse';
 import useStore from '../../store';
 import { BlockEnum, TabConfig } from '../../types';
-import DraggableList from '../DraggableList';
+import DraggableList from './components/DraggableList';
 import { useTagStore } from '@/store/tags';
+import WorkFlowLeftMenu from '../Menu/WorkFlowLeftMenu';
 
 interface SearchNodeList {
     [BlockEnum.Agent]?: any;
@@ -25,6 +27,19 @@ interface NodePanelProps {
     visibleTabs?: ('node' | 'agent' | 'tool' | 'skill' | 'workflow')[];
     defaultActiveTab?: string;
     showTeamSwitch?: boolean;
+}
+
+interface ListItemProps {
+    data: any;
+    index: number;
+    onDragStart: (event: React.DragEvent, type: string, item: any) => void;
+    onItemClick: (item: any) => void;
+    type: string;
+    typeBadge?: {
+        icon: string;
+        tooltip: string;
+        color: string;
+    };
 }
 
 export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: NodePanelProps) => {
@@ -54,6 +69,7 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
         keyword: '',
         tag: [],
     });
+    const [isMinWidth, setIsMinWidth] = useState(false);
 
     const toolData = useStore(state => state.toolData);
 
@@ -208,17 +224,73 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
     );
 
     const RenderNodeList = useCallback(
-        ({ tabIndex }) => {
+        ({ tabIndex, showName = true }) => {
             const currentConfig = tabConfigs.find(config => config.key === tabIndex);
-            const [list, setList] = useState([]);
+            const [list, setList] = useState<any[]>([]);
+            const [loading, setLoading] = useState(true);
+            const [displayList, setDisplayList] = useState<any[]>([]);
+            const [pageSize] = useState(20);
+            const [containerHeight, setContainerHeight] = useState(500);
+            const containerRef = useRef<HTMLDivElement>(null);
+            const itemHeight = 54;
+
+            useEffect(() => {
+                const updateContainerHeight = () => {
+                    if (containerRef.current) {
+                        const height = containerRef.current.clientHeight;
+                        setContainerHeight(height);
+                    }
+                };
+
+                const handleResize = (e: CustomEvent) => {
+                    setContainerHeight(e.detail.height);
+                };
+
+                updateContainerHeight();
+                
+                if (containerRef.current) {
+                    containerRef.current.addEventListener('containerResize', handleResize as EventListener);
+                }
+                
+                window.addEventListener('resize', updateContainerHeight);
+                
+                return () => {
+                    if (containerRef.current) {
+                        containerRef.current.removeEventListener('containerResize', handleResize as EventListener);
+                    }
+                    window.removeEventListener('resize', updateContainerHeight);
+                };
+            }, []);
 
             useEffect(() => {
                 const fetchData = async () => {
-                    const data = await currentConfig.getData();
-                    setList(data || []);
+                    setLoading(true);
+                    try {
+                        const data = await currentConfig.getData();
+                        const processedData = data?.map((item: any, index: number) => ({
+                            ...item,
+                            id: `${currentConfig.tabKey}-${index}`,
+                        })) || [];
+                        setList(processedData);
+                        setDisplayList(processedData.slice(0, pageSize));
+                    } catch (error) {
+                        console.error('Failed to fetch data:', error);
+                    } finally {
+                        setLoading(false);
+                    }
                 };
                 fetchData();
             }, [currentConfig, filterData]);
+
+            const onScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
+                if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === containerHeight) {
+                    const currentLength = displayList.length;
+                    if (currentLength < list.length) {
+                        const nextItems = list.slice(currentLength, currentLength + pageSize);
+                        setDisplayList(prev => [...prev, ...nextItems]);
+                    }
+                }
+            };
 
             const handleItemClick = useCallback((category: any, item: any, categoryIndex?: number, toolIndex?: number) => {
                 console.log('Clicked category:', category);
@@ -240,23 +312,66 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
                 }
             }, [currentConfig.tabKey, lang]);
 
+            const ListItem = memo(({ data, index, onDragStart, onItemClick, type, typeBadge }: ListItemProps) => (
+                <DraggableList
+                    typeBadge={typeBadge}
+                    list={[data]}
+                    onDragStart={onDragStart}
+                    type={type}
+                    onItemClick={(item) => onItemClick(item)}
+                />
+            ));
+
             return (
-                <div className="overflow-y-auto">
-                    <DraggableList
-                        typeBadge={filterData?.keyword && currentConfig.tabKey != 'node' && {
-                            icon: `/icons/${currentConfig.tabKey}.svg`,
-                            tooltip: currentConfig.tabKey,
-                            color: '#1b64f3',
-                        }}
-                        list={list}
-                        onDragStart={onDragStart}
-                        type={currentConfig.type}
-                        onItemClick={handleItemClick}
-                    />
+                <div ref={containerRef} className="overflow-y-auto h-full">
+                    <Spin spinning={loading}>
+                        {filterData?.keyword ? (
+                            <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2">
+                                {displayList.map((item) => (
+                                    <ListItem 
+                                        key={item.id}
+                                        data={item}
+                                        index={displayList.indexOf(item)}
+                                        onDragStart={onDragStart}
+                                        onItemClick={handleItemClick}
+                                        type={currentConfig.type}
+                                        typeBadge={filterData?.keyword && currentConfig.tabKey != 'node' ? {
+                                            icon: `/icons/${currentConfig.tabKey}.svg`,
+                                            tooltip: currentConfig.tabKey,
+                                            color: '#1b64f3',
+                                        } : undefined}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <VirtualList
+                                data={displayList}
+                                height={containerHeight}
+                                itemHeight={itemHeight}
+                                itemKey="id"
+                                onScroll={onScroll}
+                            >
+                                {(item) => (
+                                    <ListItem 
+                                        data={item}
+                                        index={displayList.indexOf(item)}
+                                        onDragStart={onDragStart}
+                                        onItemClick={handleItemClick}
+                                        type={currentConfig.type}
+                                        typeBadge={filterData?.keyword && currentConfig.tabKey != 'node' ? {
+                                            icon: `/icons/${currentConfig.tabKey}.svg`,
+                                            tooltip: currentConfig.tabKey,
+                                            color: '#1b64f3',
+                                        } : undefined}
+                                    />
+                                )}
+                            </VirtualList>
+                        )}
+                    </Spin>
                 </div>
             );
         },
-        [tabIndex, filterData]
+        [tabIndex, filterData, isMinWidth]
     );
 
     const getAppsData = useCallback(
@@ -312,8 +427,23 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
             dragDirection="right"
             minWidth={70}
             className="fixed left-0 top-16 bg-white shadow-md"
+            onChange={(width, height) => {
+                requestAnimationFrame(() => {
+                    setIsMinWidth(width < 100);
+                    const containers = document.querySelectorAll('.overflow-y-auto');
+                    containers.forEach((container) => {
+                        if (container instanceof HTMLElement) {
+                            const height = container.clientHeight;
+                            const event = new CustomEvent('containerResize', { 
+                                detail: { height, width } 
+                            });
+                            container.dispatchEvent(event);
+                        }
+                    });
+                });
+            }}
         >
-            <div className="h-[calc(100vh-110px)] flex flex-col">
+            <div className="h-[calc(100vh-110px)] flex flex-col relative">
                 <div className="px-4 py-3">
                     <ProForm
                         submitter={false}
@@ -369,6 +499,7 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
                                 <TagSelect
                                     className="w-full"
                                     options={tags}
+                                    listStyle={isMinWidth?'horizontal':'vertical'}
                                     allowClear
                                     onChange={e => {}}
                                 ></TagSelect>
@@ -387,14 +518,33 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
                 </div>
                 <div className="flex-1 overflow-y-auto">
                     {filterData?.keyword ? (
-                        tabConfigs.map((item, index) => (
-                            <RenderNodeList tabIndex={index + 1 + ''} />
-                        ))
+                        <div className="grid gap-4">
+                            {tabConfigs.map((item, index) => (
+                                <div key={item.key} className="space-y-2">
+                                    <div className="text-base font-medium px-2">
+                                        {intl.formatMessage({
+                                            id: item.label,
+                                            defaultMessage: item.defaultMessage,
+                                        })}
+                                    </div>
+                                    <RenderNodeList 
+                                        key={item.key} 
+                                        tabIndex={index + 1 + ''} 
+                                        showName={!isMinWidth}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     ) : (
-                        <RenderNodeList tabIndex={tabIndex} />
+                        <RenderNodeList 
+                            tabIndex={tabIndex} 
+                            showName={!isMinWidth}
+                        />
                     )}
                 </div>
+                <WorkFlowLeftMenu></WorkFlowLeftMenu>
             </div>
+           
         </DraggablePanel>
     );
 });

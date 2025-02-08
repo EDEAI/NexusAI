@@ -220,7 +220,7 @@ const DnDFlow = () => {
                         <MiniMap
                             className="table"
                             nodeColor={'#1890ff'}
-                            position="bottom-left"
+                            position="bottom-right"
                             maskStrokeWidth={3}
                             pannable
                             nodeStrokeWidth={3}
@@ -239,7 +239,7 @@ const DnDFlow = () => {
                 )}
                 <Typography.Text>{workFlowInfo?.app?.description}</Typography.Text>
             </div>
-            {/*<NodePanel visibleTabs={['agent','workflow']}></NodePanel>*/}
+            <NodePanel visibleTabs={['node','agent','skill','tool']}></NodePanel>
             <Tools />
 
             <Panel></Panel>

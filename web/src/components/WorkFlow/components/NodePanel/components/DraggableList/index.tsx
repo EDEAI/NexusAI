@@ -2,14 +2,14 @@
  * @Author: wnagchi 1305bcd@gmail.com
  * @Date: 2024-12-30 17:31:04
  * @LastEditors: biz
- * @LastEditTime: 2025-01-03 09:50:13
+ * @LastEditTime: 2025-02-07 10:27:18
  * @FilePath: \NexusAI_GITHUB\web\src\components\WorkFlow\components\DraggableList\index.tsx
  */
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { getLocale } from '@umijs/max';
 import { Tooltip } from 'antd';
 import React, { memo } from 'react';
-import UserCon, { UserConProps } from '../UserCon';
+import UserCon, { UserConProps } from '../../../UserCon';
 
 interface DraggableListProps {
     list: any[];
@@ -130,7 +130,7 @@ const NodeWrapper = memo(({ children, onDragStart, onClick, type, item }: NodeWr
 
 // 修改 BaseNodeItem
 const BaseNodeItem = memo(({ item, onDragStart, typeBadge, onItemClick }: BaseNodeItemProps & { onItemClick?: (item: any) => void }) => (
-    <Tooltip placement="right" title={item?.baseData?.description}>
+    <Tooltip placement="right" title={item?.baseData?.description||item?.data?.descTools}>
         <div>
             <NodeWrapper 
                 onDragStart={onDragStart} 

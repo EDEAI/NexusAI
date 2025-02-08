@@ -18,8 +18,8 @@ import type { MenuProps } from 'antd';
 import { Menu, Popover } from 'antd';
 import React, { useRef, useState } from 'react';
 import { useIntl } from 'umi';
-import useSaveWorkFlow from '../WorkFlow/saveWorkFlow';
-import useStore from '../WorkFlow/store';
+import useSaveWorkFlow from '../../saveWorkFlow';
+import useStore from '../../store';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -179,7 +179,7 @@ const WorkFlowLeftMenu: React.FC = () => {
     };
     return (
         <>
-            <div className="fixed left-[0px] top-16 mt-2 transition-all duration-300 z-20">
+            <div className="absolute left-[calc(100%+26px)] -top-4 transition-all duration-300 z-20">
                 {/* <Typography.Title level={5}></Typography.Title> */}
 
                 <Menu

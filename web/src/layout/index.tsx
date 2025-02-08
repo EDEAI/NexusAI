@@ -15,7 +15,7 @@ interface PlazaProps {
 
 const PageWrap: React.FC<PlazaProps> = ({ children }) => {
     return (
-        <div className="layout">
+        <div className="layout ">
             <div>{children}</div>
 
             <RunPanelLog></RunPanelLog>
