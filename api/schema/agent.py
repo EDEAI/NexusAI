@@ -26,6 +26,7 @@ class ResAgentListSchema(BaseModel):
 
 class ReqAgentBaseCreateSchema(BaseModel):
     is_public: Optional[int] = None
+    attrs_are_visible: Optional[int] = None
     enable_api: Optional[int] = None
     obligations: Optional[str] = None
     input_variables: Optional[Dict[str, Any]] = None
@@ -74,6 +75,7 @@ class AgentInfoAppResponseData(BaseModel):
     icon: Optional[str] = None
     icon_background: Optional[str] = None
     is_public: Optional[int] = None
+    attrs_are_visible: Optional[int] = None
     enable_api: Optional[int] = None
     publish_status: Optional[int] = None
     created_time: Optional[datetime] = None
