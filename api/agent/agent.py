@@ -9,6 +9,7 @@ from core.database.models.agents import Agents
 from core.database.models.apps import Apps
 from core.database.models.app_runs import AppRuns
 from core.database.models.agent_abilities import AgentAbilities
+from core.database.models.agent_chat_messages import AgentChatMessages
 from core.workflow.nodes import AgentNode
 from core.workflow.variables import create_variable_from_dict
 from core.llm.prompt import create_prompt_from_dict, Prompt
@@ -942,3 +943,32 @@ async def agent_batch_create(data: ReqAgentBatchCreateSchema, userinfo: TokenDat
         data={"app_ids": app_ids},
         detail=get_language_content("api_agent_success")
     )
+
+
+@router.get("/{agent_id}/chatroom_message", response_model=AgentResponseBase, summary="Retrieve the list of historical messages from the intelligent agent")
+async def show_chatroom_details(agent_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Retrieve the message list for a specific Agent chat.
+    This endpoint retrieves chat information about agents and provides services for users who need to view chat history and participants.
+    Parameters:
+    -Agent_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
+    -Userinfo (TokenData): Information about the current user is provided through dependency injection. Compulsory.
+
+    Returns:
+    -A response object containing Agent chat messages and a list of joined agents, formatted according to the AgentResponse Base model.
+
+    Raises:
+    -HTTPException: If 'agent_id' is invalid, it indicates that the user has not been authenticated or the agent does not exist.
+    """
+    find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
+    if not find_agent:
+        return response_error(get_language_content("agent_does_not_exist"))
+
+    agent_msg_list = AgentChatMessages().history_agent_messages(
+        agent_id=agent_id,
+        uid=userinfo.uid,
+        page=page,
+        page_size=page_size
+    )
+
+    return response_success(agent_msg_list)

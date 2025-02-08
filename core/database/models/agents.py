@@ -804,3 +804,33 @@ class Agents(MySQL):
             return {"status": 1, "message": get_language_content("api_agent_success"), "app_id": app_id}
         except Exception as e:
             return {"status": 2, "message": get_language_content("api_agent_create_error")}
+
+    def get_agent_by_id_info(self, agent_id: int, user_id: int = 0) -> Dict[str, Any]:
+        """
+        Retrieves an agent record from the {table_name} table based on the specified agent ID.
+
+        :param agent_id: An integer representing the agent ID.
+        :param user_id: An integer representing the user ID.
+        :return: A dictionary representing the agent record.
+        """
+        agent_info = self.select_one(
+            columns=[
+                "agents.id",
+                "apps.name",
+                "apps.description",
+                "agents.app_id",
+                "agents.obligations",
+                "agents.input_variables",
+                "agents.auto_match_ability",
+                "agents.default_output_format",
+                "agents.model_config_id",
+                "agents.allow_upload_file",
+                "agents.publish_status"
+            ],
+            joins=[["inner", "apps", "agents.app_id = apps.id"]],
+            conditions=[
+                {"column": "id", "value": agent_id},
+                {"column": "status", "value": 1}
+            ]
+        )
+        return agent_info
