@@ -945,8 +945,8 @@ async def agent_batch_create(data: ReqAgentBatchCreateSchema, userinfo: TokenDat
     )
 
 
-@router.get("/{agent_id}/chatroom_message", response_model=AgentResponseBase, summary="Retrieve the list of historical messages from the intelligent agent")
-async def show_chatroom_details(agent_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
+@router.get("/{agent_id}/agent_message_list", response_model=AgentResponseBase, summary="Retrieve the list of historical messages from the intelligent agent")
+async def agent_message_list(agent_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
     """
     Retrieve the message list for a specific Agent chat.
     This endpoint retrieves chat information about agents and provides services for users who need to view chat history and participants.
@@ -972,3 +972,74 @@ async def show_chatroom_details(agent_id: int, page: int = 1, page_size: int = 1
     )
 
     return response_success(agent_msg_list)
+
+
+@router.get("/{agent_id}/agent_log_list", response_model=AgentLogListResponse, summary="Agent log list")
+async def agent_log_list(agent_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Fetch a list of all chat rooms.
+    This endpoint fetches a paginated list of all available chat rooms, allowing users to optionally filter the results by a name. The pagination is controlled through the page number and page size parameters.
+
+    Parameters:
+    - page (int): The current page number for pagination. Defaults to 1.
+    - page_size (int): The number of chat rooms to return per page. Defaults to 10.
+    -Agent_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
+    - userinfo (TokenData): Information about the current user, provided through dependency injection. Required.
+
+    Returns:
+    The successful response containing the Agent operation log is formatted according to the AgentLogListResponse model.
+
+    Raises:
+    - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
+    """
+    find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
+    if not find_agent:
+        return response_error(get_language_content("agent_does_not_exist"))
+
+    result = AppRuns().all_agent_log_list(
+        page=page,
+        page_size=page_size,
+        user_id=userinfo.uid,
+        agent_id=agent_id)
+    return response_success(result)
+
+
+@router.get("/{agent_id}/agent_log_details", response_model=AgentLogDetailResponse, summary="Agent log Details")
+async def agent_log_list(agent_id: int, app_run_id: int, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Fetch a list of all chat rooms.
+    This endpoint fetches a paginated list of all available chat rooms, allowing users to optionally filter the results by a name. The pagination is controlled through the page number and page size parameters.
+
+    Parameters:
+    - Agent_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
+    - app_run_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
+    - userinfo (TokenData): Information about the current user, provided through dependency injection. Required.
+
+    Returns:
+    The successful response containing the Agent operation log is formatted according to the AgentLogDetailResponse model.
+
+    Raises:
+    - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
+    """
+    find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
+    if not find_agent:
+        return response_error(get_language_content("agent_does_not_exist"))
+
+    result = AppRuns().select_one(
+        columns=['id', 'user_id', 'app_id', 'agent_id', 'workflow_id', 'dataset_id', 'tool_id', 'chatroom_id', 'type',
+                 'name', 'graph', 'inputs', 'raw_user_prompt', 'model_data', 'knowledge_base_mapping', 'level',
+                 'context', 'completed_edges', 'skipped_edges', 'status', 'completed_steps', 'actual_completed_steps',
+                 'need_human_confirm', 'need_correct_llm', 'error', 'outputs', 'elapsed_time', 'prompt_tokens',
+                 'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps',
+                 'created_time', 'updated_time', 'finished_time'],
+        conditions=[
+            {"column": "agent_id", "value": agent_id},
+            {"column": "user_id", "value": userinfo.uid},
+            {"column": "id", "value": app_run_id},
+            {'column': 'status', 'op': 'in', 'value': [3, 4]}
+        ]
+    )
+
+    if not result:
+        return response_error(get_language_content("app_run_error"))
+    return response_success(result)

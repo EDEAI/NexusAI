@@ -252,3 +252,47 @@ class AppRuns(MySQL):
                 {"column": "user_id", "value": user_id}
             ]
         )
+
+    def all_agent_log_list(self, page: int = 1, page_size: int = 10, user_id: int = 0, agent_id: int = 0):
+        """
+        Retrieves a list of chat rooms with pagination, filtering by user ID and chat room name.
+
+        :param page: The page number for pagination.
+        :param page_size: The number of items per page.
+        :param agent_id: The ID of the agent (from the agent table) whose messages are to be retrieved.
+        Defaults to 0, which may imply no specific agent is targeted.
+        :type agent_id: int
+
+        :param user_id: The ID of the user whose messages are to be retrieved.
+        Defaults to 0, which may imply no specific user is targeted.
+        :type user_id: int
+        :return: A dictionary containing the list of chat rooms, total count, total pages, current page, and page size.
+        """
+        conditions = [
+            {"column": "user_id", "value": user_id},
+            {"column": "agent_id", "value": agent_id},
+            {'column': 'status', 'op': 'in', 'value': [3, 4]}
+        ]
+
+        total_count = self.select_one(
+            aggregates={"id": "count"},
+            conditions=conditions,
+        )["count_id"]
+
+        app_run_list = []
+        if total_count > 0:
+            app_run_list = self.select(
+                columns=['id', 'user_id', 'app_id', 'agent_id', 'workflow_id', 'dataset_id', 'tool_id', 'chatroom_id', 'type', 'name', 'graph', 'inputs', 'raw_user_prompt', 'model_data', 'knowledge_base_mapping', 'level', 'context', 'completed_edges', 'skipped_edges', 'status', 'completed_steps', 'actual_completed_steps', 'need_human_confirm', 'need_correct_llm', 'error', 'outputs', 'elapsed_time', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps', 'created_time', 'updated_time', 'finished_time'],
+                conditions=conditions,
+                order_by="id DESC",
+                limit=page_size,
+                offset=(page - 1) * page_size
+            )
+
+        return {
+            "list": app_run_list,
+            "total_count": total_count,
+            "total_pages": math.ceil(total_count / page_size),
+            "page": page,
+            "page_size": page_size
+        }

@@ -260,3 +260,11 @@ class ResBatchAgentCreateSchema(BaseModel):
 
 class AgentResponseBase(BaseModel):
     data: Dict[str, Any]
+
+
+class AgentLogListResponse(BaseModel):
+    data: Dict[str, Any]
+
+
+class AgentLogDetailResponse(BaseModel):
+    data: Dict[str, Any]

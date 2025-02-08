@@ -68,6 +68,7 @@ class AgentChatMessages(MySQL):
         if offset != 0:
             if total_count - (page * page_size) < 0:
                 message_list = self.select(
+                    columns=['id', 'user_id', 'agent_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
                     conditions=conditions,
                     limit=page_size,
                     offset=0,
@@ -75,6 +76,7 @@ class AgentChatMessages(MySQL):
                 )
             else:
                 message_list = self.select(
+                    columns=['id', 'user_id', 'agent_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
                     conditions=conditions,
                     limit=page_size,
                     offset=offset,
@@ -84,6 +86,7 @@ class AgentChatMessages(MySQL):
         if offset == 0:
             if total_count > 0:
                 message_list = self.select(
+                    columns=['id', 'user_id', 'agent_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
                     conditions=conditions,
                     limit=page_size,
                     offset=0,
