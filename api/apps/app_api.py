@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
 
 from datetime import datetime
 from hashlib import md5
-from typing import Annotated, Dict, Optional
+from typing import Annotated, Any, Dict, Optional
 
 from fastapi import APIRouter, FastAPI, Header
 from fastapi.openapi.docs import get_redoc_html
@@ -38,7 +38,7 @@ router = APIRouter()
 async def run(
     authorization: Annotated[str, Header(description='API key')],
     encrypted_id: str,
-    input_: Any
+    kwargs: Dict[str, Any]
 ):  # type: ignore
     """
     Run the app with the given input.
@@ -84,7 +84,10 @@ async def run(
             
             # Get agent input and prompt
             input_obj = create_variable_from_dict(agent['input_variables'])
-            prompt = Prompt(user=input_.prompt)
+            try:
+                prompt = Prompt(user=kwargs['prompt'])
+            except:
+                return response_error('Missing field: "prompt"')
             
             # Run agent
             task = run_app.delay(
@@ -115,9 +118,14 @@ async def run(
                 return response_error('No available workflow, or the workflow is not published.')
             
             # Get workflow input
-            input_data: Dict[str, Union[int | float | str]] = input_.input_data.dict()
-            input_obj = unflatten_dict_with_values(input_data, 'input_var')
-            validate_required_variable(input_obj)
+            try:
+                input_data: Dict[str, Union[int | float | str]] = kwargs['input_data']
+                if not isinstance(input_data, dict):
+                    raise Exception('Field "input_data" must be a dictionary')
+                input_obj = unflatten_dict_with_values(input_data, 'input_var')
+                validate_required_variable(input_obj)
+            except Exception as e:
+                return response_error(str(e))
 
             # Check the input
             graph = create_graph_from_dict(workflow['graph'])
