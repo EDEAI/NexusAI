@@ -7,34 +7,44 @@ import useStore from '../../store';
 import CustomHandle from '../CustomHandle';
 
 export default memo((props: NodeProps) => {
- 
     const modelData = useStore(state => state.modelData);
+    const edges = useStore(state => state.edges);
+
+    // Check if current node is connected to executor_list
+    const isConnectedToExecutorList = edges.some(
+        edge => 
+            edge.source === props.id && 
+            edge.targetHandle === 'executor_list'
+    );
+
     const modelList = () => {
         const modeName = modelData?.list?.find(
             x => x.model_config_id == props.data?.model_config_id,
         )?.model_name;
         if (!modeName) return null;
         return (
-            <div className="relative mb-2 box-border -mr-2 flex flex-col bg-slate-100 px-2 py-1 rounded-md  gap-2 text-xs">
+            <div className="relative mb-2 box-border -mr-2 flex flex-col bg-slate-100 px-2 py-1 rounded-md gap-2 text-xs">
                 {modeName}
             </div>
         );
     };
+
     return (
         <div>
-            <CustomHandle
-                id="start_target"
-                type="target"
-                params={props}
-                position={Position.Left}
-            ></CustomHandle>
+            {!isConnectedToExecutorList && (
+                <CustomHandle
+                    id="start_target"
+                    type="target"
+                    params={props}
+                    position={Position.Left}
+                />
+            )}
             <CustomHandle
                 id="start_source"
                 type="source"
                 params={props}
                 position={Position.Right}
-            ></CustomHandle>
-      
+            />
             {modelList()}
         </div>
     );

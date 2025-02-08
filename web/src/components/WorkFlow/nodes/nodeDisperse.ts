@@ -199,6 +199,29 @@ export const NodeCustom = {
             },
         },
     },
+
+    [BlockEnum.Retriever]: {
+        node: Retriever,
+        icon: BlockEnum.Retriever,
+        panel: RetrieverPanel,
+        title: '检索器',
+        entitle: 'Retriever',
+        base: {
+            type: BlockEnum.Retriever,
+            data: {
+                title: '检索器',
+                entitle: 'Retriever',
+                desc: '',
+                descTools: '从知识库中查询与用户的问题相关的文本内容',
+                endescTools: 'Query text content related to user questions from the knowledge base',
+                outputInfo: {
+                    key: 'output',
+                    type: 'object',
+                    base: true,
+                },
+            },
+        },
+    },
     [BlockEnum.VariableAggregation]: {
         node: VariableAggregation,
         icon: BlockEnum.VariableAggregation,
@@ -223,29 +246,6 @@ export const NodeCustom = {
             },
         },
     },
-    [BlockEnum.Retriever]: {
-        node: Retriever,
-        icon: BlockEnum.Retriever,
-        panel: RetrieverPanel,
-        title: '检索器',
-        entitle: 'Retriever',
-        base: {
-            type: BlockEnum.Retriever,
-            data: {
-                title: '检索器',
-                entitle: 'Retriever',
-                desc: '',
-                descTools: '从知识库中查询与用户的问题相关的文本内容',
-                endescTools: 'Query text content related to user questions from the knowledge base',
-                outputInfo: {
-                    key: 'output',
-                    type: 'object',
-                    base: true,
-                },
-            },
-        },
-    },
-
     [BlockEnum.ConditionBranch]: {
         node: ConditionBranch,
         icon: BlockEnum.ConditionBranch,
@@ -405,63 +405,61 @@ interface NodeData {
     descTools: string;
     endescTools: string;
     outputInfo: {
-      key: string;
-      type: string;
-      base: boolean;
+        key: string;
+        type: string;
+        base: boolean;
     };
-  }
-  
-  interface BaseNode {
-    node: any; 
-    panel: any; 
+}
+
+interface BaseNode {
+    node: any;
+    panel: any;
     icon: BlockEnum;
     title: string;
     entitle: string;
     base: {
-      type: BlockEnum;
-      data: NodeData;
+        type: BlockEnum;
+        data: NodeData;
     };
-  }
-  
-  type NodeCustomType = {
-    [key in BlockEnum]: BaseNode;
-  };
-  
+}
 
-  
-  export const getBaseNode = (type?: BlockEnum): BaseNode | NodeCustomType => {
+type NodeCustomType = {
+    [key in BlockEnum]: BaseNode;
+};
+
+export const getBaseNode = (type?: BlockEnum): BaseNode | NodeCustomType => {
     const processNode = (node: BaseNode): BaseNode => {
-      if (getLocale() === 'en-US') {
-        function replaceEnPrefix(obj: any): any { 
-          return Object.keys(obj).reduce((acc, key) => {
-            const enKey = `en${key.charAt(0) + key.slice(1)}`;
-            if (obj[enKey]) {
-              acc[key] = obj[enKey];
-            } else {
-              acc[key] = obj[key];
+        if (getLocale() === 'en-US') {
+            function replaceEnPrefix(obj: any): any {
+                return Object.keys(obj).reduce((acc, key) => {
+                    const enKey = `en${key.charAt(0) + key.slice(1)}`;
+                    if (obj[enKey]) {
+                        acc[key] = obj[enKey];
+                    } else {
+                        acc[key] = obj[key];
+                    }
+                    if (typeof obj[key] === 'object') {
+                        acc[key] = replaceEnPrefix(obj[key]);
+                    }
+                    return acc;
+                }, {});
             }
-            if (typeof obj[key] === 'object') {
-              acc[key] = replaceEnPrefix(obj[key]);
-            }
-            return acc;
-          }, {});
+            node.base.data = replaceEnPrefix(node.base.data);
+            node.title = node.entitle;
         }
-        node.base.data = replaceEnPrefix(node.base.data);
-        node.title = node.entitle;
-      }
-      return node;
+        return node;
     };
-  
+
     if (type) {
-      const node = _.cloneDeep(NodeCustom[type]);
-      return processNode(node);
+        const node = _.cloneDeep(NodeCustom[type]);
+        return processNode(node);
     } else {
-      return Object.keys(NodeCustom).reduce((acc, key) => {
-        acc[key] = processNode(_.cloneDeep(NodeCustom[key]));
-        return acc;
-      }, {} as NodeCustomType);
+        return Object.keys(NodeCustom).reduce((acc, key) => {
+            acc[key] = processNode(_.cloneDeep(NodeCustom[key]));
+            return acc;
+        }, {} as NodeCustomType);
     }
-  };
+};
 export const NodeTypes = () => {
     const types = {};
     Object.keys(NodeCustom).forEach(key => {

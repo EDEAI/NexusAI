@@ -67,6 +67,14 @@ export default memo(({ node }: { node: AppNode }) => {
     const [datasetList, setDatasetList] = useState([]);
     const getNode = useStore(state => state.getNode);
     const datasetData = useStore(state => state.datasetData);
+    const edges = useStore(state => state.edges);
+
+    // Check if current node is connected to executor_list
+    const isConnectedToExecutorList = edges.some(
+        edge => 
+            edge.source === node.id && 
+            edge.targetHandle === 'executor_list'
+    );
 
     useMount(() => {
         setEditorLoading(true);
@@ -291,7 +299,7 @@ export default memo(({ node }: { node: AppNode }) => {
                         {/* <ProFormSwitch name="task_splitting" label=""></ProFormSwitch> */}
                         {/* <ProFormSwitch name="manual_confirmation" label=""></ProFormSwitch> */}
                         <SwitchManualConfirmation></SwitchManualConfirmation>
-                        {!node?.data?.['isChild'] && (
+                        {!node?.data?.['isChild'] && !isConnectedToExecutorList && (
                             <SwitchImportToKnowledgeBase></SwitchImportToKnowledgeBase>
                         )}
                     </div>

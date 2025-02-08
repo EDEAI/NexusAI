@@ -1,7 +1,7 @@
 import { getAppListByMode } from '@/api/workflow';
 import DraggablePanel from '@/components/Panel/DraggablePanel';
 import { TagSelect } from '@/components/TagSearch';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import { ProForm, ProFormItem, ProFormRadio, ProFormText } from '@ant-design/pro-components';
 import { getLocale, useIntl } from '@umijs/max';
 import { useSetState } from 'ahooks';
@@ -16,6 +16,7 @@ import { BlockEnum, TabConfig } from '../../types';
 import DraggableList from './components/DraggableList';
 import { useTagStore } from '@/store/tags';
 import WorkFlowLeftMenu from '../Menu/WorkFlowLeftMenu';
+import WorkflowTitle from '../WorkflowTitle';
 
 interface SearchNodeList {
     [BlockEnum.Agent]?: any;
@@ -27,6 +28,10 @@ interface NodePanelProps {
     visibleTabs?: ('node' | 'agent' | 'tool' | 'skill' | 'workflow')[];
     defaultActiveTab?: string;
     showTeamSwitch?: boolean;
+    workflowName?: string;
+    workflowDesc?: string;
+    publishStatus?: boolean;
+    onWidthChange?: (width: number) => void;
 }
 
 interface ListItemProps {
@@ -42,7 +47,15 @@ interface ListItemProps {
     };
 }
 
-export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: NodePanelProps) => {
+export default memo(({ 
+    visibleTabs, 
+    defaultActiveTab, 
+    showTeamSwitch = true,
+    workflowName,
+    workflowDesc,
+    publishStatus,
+    onWidthChange
+}: NodePanelProps) => {
     const intl = useIntl();
     const lang = getLocale() == 'en-US' ? 'en_US' : 'zh_Hans';
     const originNodes = getBaseNode();
@@ -63,13 +76,14 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
         [BlockEnum.Agent]: [],
         [BlockEnum.Skill]: [],
         ['workflow']: [],
-    });
+    }); 
     const [filterData, setFilterData] = useState({
         team: 1,
         keyword: '',
         tag: [],
     });
     const [isMinWidth, setIsMinWidth] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     const toolData = useStore(state => state.toolData);
 
@@ -78,6 +92,7 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
     }, [toolData]);
 
     const onDragStart = useCallback((event, nodeType, item) => {
+        console.log('onDragStart', event, nodeType, item);
         event.dataTransfer.setData(
             'application/reactflow',
             JSON.stringify({ type: nodeType, item }),
@@ -425,11 +440,17 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
     return (
         <DraggablePanel
             dragDirection="right"
-            minWidth={70}
+            minWidth={200}
+            maxWidth={415}
             className="fixed left-0 top-16 bg-white shadow-md"
+            defaultWidth={isCollapsed ? 100 : 415}
             onChange={(width, height) => {
                 requestAnimationFrame(() => {
                     setIsMinWidth(width < 100);
+                    // if (width < 100 && !isCollapsed) {
+                    //     setIsCollapsed(true);
+                    // }
+                    onWidthChange?.(width);
                     const containers = document.querySelectorAll('.overflow-y-auto');
                     containers.forEach((container) => {
                         if (container instanceof HTMLElement) {
@@ -444,89 +465,94 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
             }}
         >
             <div className="h-[calc(100vh-110px)] flex flex-col relative">
-                <div className="px-4 py-3">
-                    <ProForm
-                        submitter={false}
-                        initialValues={filterData}
-                        onValuesChange={onFilterChange}
-                    >
-                        {showTeamSwitch && (
-                            <div className="flex gap-2 items-center text-base mb-4">
-                                {intl.formatMessage({
-                                    id: 'workflow.nodeList',
-                                    defaultMessage: '列表',
-                                })}
-                                <ProFormRadio.Group
-                                    name="team"
-                                    fieldProps={{
-                                        options: [
-                                            {
-                                                label: intl.formatMessage({
-                                                    id: 'workflow.team',
-                                                    defaultMessage: '团队',
-                                                }),
-                                                value: 2,
-                                            },
-                                            {
-                                                label: intl.formatMessage({
-                                                    id: 'workflow.mine',
-                                                    defaultMessage: '我的',
-                                                }),
-                                                value: 1,
-                                            },
-                                        ],
-                                        size: 'small',
-                                        optionType: 'button',
-                                        buttonStyle: 'solid',
-                                    }}
-                                    formItemProps={{ className: 'mb-0' }}
-                                />
-                            </div>
-                        )}
+              
+                {!isCollapsed && (
+                    <div className="px-4 py-3">
+                        <ProForm
+                            submitter={false}
+                            initialValues={filterData}
+                            onValuesChange={onFilterChange}
+                        >
+                            {showTeamSwitch && (
+                                <div className="flex gap-2 items-center text-base mb-4">
+                                    {intl.formatMessage({
+                                        id: 'workflow.nodeList',
+                                        defaultMessage: '列表',
+                                    })}
+                                    <ProFormRadio.Group
+                                        name="team"
+                                        fieldProps={{
+                                            options: [
+                                                {
+                                                    label: intl.formatMessage({
+                                                        id: 'workflow.team',
+                                                        defaultMessage: '团队',
+                                                    }),
+                                                    value: 2,
+                                                },
+                                                {
+                                                    label: intl.formatMessage({
+                                                        id: 'workflow.mine',
+                                                        defaultMessage: '我的',
+                                                    }),
+                                                    value: 1,
+                                                },
+                                            ],
+                                            size: 'small',
+                                            optionType: 'button',
+                                            buttonStyle: 'solid',
+                                        }}
+                                        formItemProps={{ className: 'mb-0' }}
+                                    />
+                                </div>
+                            )}
 
-                        <ProFormText
-                            fieldProps={{
-                                prefix: <SearchOutlined />,
-                                placeholder: intl.formatMessage({
-                                    id: 'workflow.search',
-                                    defaultMessage: '搜索节点',
-                                }),
-                            }}
-                            name="keyword"
-                        />
-                        <div className="w-full">
-                            <ProFormItem name={'tag'}>
-                                <TagSelect
-                                    className="w-full"
-                                    options={tags}
-                                    listStyle={isMinWidth?'horizontal':'vertical'}
-                                    allowClear
-                                    onChange={e => {}}
-                                ></TagSelect>
-                            </ProFormItem>
-                        </div>
-                    </ProForm>
-                    {filterData?.keyword ? null : (
-                        <Tabs
-                            activeKey={tabIndex}
-                            items={tabItems}
-                            onChange={key => {
-                                setTabIndex(key);
-                            }}
-                        />
-                    )}
-                </div>
+                            <ProFormText
+                                fieldProps={{
+                                    prefix: <SearchOutlined />,
+                                    placeholder: intl.formatMessage({
+                                        id: 'workflow.search',
+                                        defaultMessage: '搜索节点',
+                                    }),
+                                }}
+                                name="keyword"
+                            />
+                            <div className="w-full">
+                                <ProFormItem name={'tag'}>
+                                    <TagSelect
+                                        className="w-full"
+                                        options={tags}
+                                        listStyle={isMinWidth?'horizontal':'vertical'}
+                                        allowClear
+                                        onChange={e => {}}
+                                    ></TagSelect>
+                                </ProFormItem>
+                            </div>
+                        </ProForm>
+                        {filterData?.keyword ? null : (
+                            <Tabs
+                                activeKey={tabIndex}
+                                items={tabItems}
+                                onChange={key => {
+                                    setTabIndex(key);
+                                }}
+                            />
+                        )}
+                    </div>
+                )}
                 <div className="flex-1 overflow-y-auto">
                     {filterData?.keyword ? (
                         <div className="grid gap-4">
                             {tabConfigs.map((item, index) => (
                                 <div key={item.key} className="space-y-2">
-                                    <div className="text-base font-medium px-2">
-                                        {intl.formatMessage({
-                                            id: item.label,
-                                            defaultMessage: item.defaultMessage,
-                                        })}
-                                    </div>
+                                    {!isCollapsed && (
+                                        <div className="text-base font-medium px-2">
+                                            {intl.formatMessage({
+                                                id: item.label,
+                                                defaultMessage: item.defaultMessage,
+                                            })}
+                                        </div>
+                                    )}
                                     <RenderNodeList 
                                         key={item.key} 
                                         tabIndex={index + 1 + ''} 
@@ -543,8 +569,14 @@ export default memo(({ visibleTabs, defaultActiveTab, showTeamSwitch = true }: N
                     )}
                 </div>
                 <WorkFlowLeftMenu></WorkFlowLeftMenu>
+                <div className="absolute left-[calc(100%+80px)] top-0">
+                    <WorkflowTitle 
+                        name={workflowName}
+                        description={workflowDesc}
+                        publishStatus={publishStatus}
+                    />
+                </div>
             </div>
-           
         </DraggablePanel>
     );
 });

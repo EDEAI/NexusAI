@@ -215,3 +215,16 @@ export interface TabConfig {
     show?: boolean;
 }
 
+export interface ConnectionValidator {
+    validate: (connection: Connection, nodes: AppNode[]) => boolean;
+    errorMessage?: string; 
+}
+
+export interface NodeConnectionRules {
+    [key: string]: ConnectionValidator; // key is handle id
+}
+
+export interface NodeTypeConnectionRules {
+    [key in BlockEnum]?: NodeConnectionRules;
+}
+

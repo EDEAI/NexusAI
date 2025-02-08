@@ -8,8 +8,7 @@ import CustomHandle from '../CustomHandle';
 
 export default memo((props: NodeProps) => {
     const { data, id } = props;
-    console.log('data', data);
-
+   
     const modelData = useStore(state => state.modelData);
     const modelList = () => {
         return modelData?.list?.find(x => x.model_config_id == props.data?.model)?.model_name;

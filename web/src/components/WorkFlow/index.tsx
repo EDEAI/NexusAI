@@ -2,7 +2,7 @@
  * @LastEditors: biz
  */
 import { devLogin } from '@/api';
-import { getWorkFlowInfo, publishWorkFlow } from '@/api/workflow';
+import { getWorkFlowInfo } from '@/api/workflow';
 import { history } from '@umijs/max';
 import {
     Background,
@@ -15,7 +15,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useDocumentVisibility, useMount, useUpdateEffect } from 'ahooks';
-import { Button, message, Modal, Typography } from 'antd';
+import { message, Modal } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useIntl, useSearchParams } from 'umi';
 import { CustomWorkflowContextProvider } from './context';
@@ -24,15 +24,14 @@ import useFetchData from './hooks/useFetchData'; // 引入自定义的hooks
 
 import './index.less';
 
-import { PlayCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import DealtWith from './components/DealtWith';
+import NodePanel from './components/NodePanel';
+import Tools from './components/Tools';
 import { ChildPanel, Panel } from './nodes';
 import { NodeTypes } from './nodes/nodeDisperse';
 import useSaveWorkFlow from './saveWorkFlow';
 import useStore from './store';
 import { AppNode, BlockEnum } from './types';
-import Tools from './components/Tools';
-import NodePanel from './components/NodePanel';
 // import usePageVisibilityEffect from './hooks/usePageVisibilityEffect';
 
 const DnDFlow = () => {
@@ -62,7 +61,6 @@ const DnDFlow = () => {
     });
     const documentVisibility = useDocumentVisibility();
 
-
     const saveWorkFlow = useSaveWorkFlow();
     const [toFn, setToFn] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,10 +71,10 @@ const DnDFlow = () => {
             // setViewPort(viewport);
         },
     });
+
     useMount(() => {
         setNodeTypes(NodeTypes());
         resetNodes();
-
         devLogin();
         init();
         setHandleList([]);
@@ -184,10 +182,6 @@ const DnDFlow = () => {
         getModelData();
     };
 
-    const runFlow = () => {
-        setRunPanelShow(true);
-    };
-
     const handleOk = () => {
         setToFn(true);
         console.log(toPath);
@@ -215,7 +209,6 @@ const DnDFlow = () => {
             <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                 <CustomWorkflowContextProvider>
                     <Background></Background>
-
                     <div>
                         <MiniMap
                             className="table"
@@ -228,20 +221,13 @@ const DnDFlow = () => {
                     </div>
                 </CustomWorkflowContextProvider>
             </div>
-            <div className="fixed left-8 top-16 flex  flex-col gap-2 pt-3 pl-4">
-                <Typography.Title className="!m-0" level={5}>
-                    {workFlowInfo?.app?.name}
-                </Typography.Title>
-                {publishStatus && (
-                    <Typography.Text>
-                        ( {intl.formatMessage({ id: 'workflow.nodeRunOtherMessage' })})
-                    </Typography.Text>
-                )}
-                <Typography.Text>{workFlowInfo?.app?.description}</Typography.Text>
-            </div>
-            <NodePanel visibleTabs={['node','agent','skill','tool']}></NodePanel>
+            <NodePanel
+                visibleTabs={['node', 'agent', 'skill', 'tool']}
+                workflowName={workFlowInfo?.app?.name}
+                workflowDesc={workFlowInfo?.app?.description}
+                publishStatus={publishStatus}
+            />
             <Tools />
-
             <Panel></Panel>
             <ChildPanel></ChildPanel>
             <DealtWith></DealtWith>

@@ -179,25 +179,19 @@ const WorkFlowLeftMenu: React.FC = () => {
     };
     return (
         <>
-            <div className="absolute left-[calc(100%+26px)] -top-4 transition-all duration-300 z-20">
-                {/* <Typography.Title level={5}></Typography.Title> */}
-
+            <div className={`absolute left-[calc(100%+26px)] -top-4  z-20 ${activeKey === '3' ? 'fixed -left-[14px]' : ''}`}>
                 <Menu
                     defaultSelectedKeys={['1']}
                     selectedKeys={[activeKey]}
                     className="w-10 rounded-md"
                     mode="vertical"
-                    // theme="dark"
                     inlineCollapsed={collapsed}
                     items={items}
                     onClick={onItemClick}
                 />
-                {/* <Button type="primary" onClick={toggleCollapsed} style={{ marginBottom: 16 }}>
-                    {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                </Button> */}
                 {activeKey == '0' && (
                     <div className="absolute top-0 left-full ml-2">
-                        <div className="w-[240px]  bg-white  rounded-md p-4 border border-gray-200">
+                        <div className="w-[240px] bg-white rounded-md p-4 border border-gray-200">
                             <ProForm
                                 formRef={ref}
                                 submitter={{ render: () => null }}
@@ -223,7 +217,7 @@ const WorkFlowLeftMenu: React.FC = () => {
             </div>
             {activeKey == '3' && (
                 <div
-                    className="fixed right-0 top-[56px]   pl-12 pt-4 pr-2 bg-white z-10"
+                    className="fixed right-0 top-[56px] pl-12 pt-4 pr-2 bg-white z-10"
                     style={{ height: `calc(100vh - 56px)` }}
                 >
                     <div className="bg-white rounded-md h-full">
@@ -231,7 +225,6 @@ const WorkFlowLeftMenu: React.FC = () => {
                     </div>
                 </div>
             )}
-
         </>
     );
 };

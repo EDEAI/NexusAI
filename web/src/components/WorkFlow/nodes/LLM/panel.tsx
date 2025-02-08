@@ -16,7 +16,6 @@ import {
 import useNodeIdUpdate from '../../hooks/useNodeIdUpdate';
 import useStore from '../../store';
 import { AppNode } from '../../types';
-import { createPrompt } from '../../utils/createNode';
 import { resetFormNodes } from '../../utils/resetFormNodes';
 
 type PromptItem = {
@@ -45,16 +44,23 @@ export default memo(({ node }: { node: AppNode }) => {
     const getVariables = useStore(state => state.getOutputVariables);
     const datasetData = useStore(state => state.datasetData);
     const setSelect = useStore(state => state.setSelect);
+    const edges = useStore(state => state.edges);
 
     const [systemEditor, setSystemEditor] = useState([]);
     const [userEditor, setUserEditor] = useState([]);
     const [modelList, setModelList] = useState([]);
     const [editorOptions, setEditorOptions] = useState([]);
     const getNode = useStore(state => state.getNode);
-  
+
+    // Check if current node is connected to executor_list
+    const isConnectedToExecutorList = edges.some(
+        edge => 
+            edge.source === node.id && 
+            edge.targetHandle === 'executor_list'
+    );
+
     useMount(() => {
         setEditorLoading(true);
-    
 
         const reset = resetFormNodes(formRef, node);
         setTimeout(() => {
@@ -71,17 +77,12 @@ export default memo(({ node }: { node: AppNode }) => {
         }
 
         const vars = getVariables(node.id);
-        console.log(vars);
 
         setEditorOptions(vars);
         getLLMModel();
         setTimeout(() => {
             setEditorLoading(false);
         }, 500);
-    });
-
-    useNodeIdUpdate((nodeId, node) => {
-        console.log(321, nodeId, node);
     });
 
     useUpdateEffect(() => {
@@ -121,16 +122,6 @@ export default memo(({ node }: { node: AppNode }) => {
             promptObj.assistant = { serializedContent: '', value: {} };
         }
     };
-    const editorChange = (e: any, type: string) => {
-        promptObj[type] = e;
-
-        updateNodeData(node.id, {
-            prompt: {
-                free: createPrompt(promptObj),
-                value: JSON.stringify(promptObj),
-            },
-        });
-    };
 
     const updateNodeDataHelper = (node, data) => {
         if (node?.data?.['isChild']) {
@@ -151,8 +142,6 @@ export default memo(({ node }: { node: AppNode }) => {
             updateNodeData(node.id, data);
         }
     };
-
-
 
     const editorTableChange = (key, value) => {
         if (editorLoading) {
@@ -192,7 +181,7 @@ export default memo(({ node }: { node: AppNode }) => {
                     ></SelectModelConfigId>
                     <div className="user-form">
                         <SwitchManualConfirmation></SwitchManualConfirmation>
-                        {!node?.data?.['isChild'] && (
+                        {!node?.data?.['isChild'] && !isConnectedToExecutorList && (
                             <SwitchImportToKnowledgeBase></SwitchImportToKnowledgeBase>
                         )}
                     </div>
@@ -218,7 +207,6 @@ export default memo(({ node }: { node: AppNode }) => {
                 <WrapperEditor
                     placeholder={intl.formatMessage({
                         id: 'workflow.placeholder.fillPrompt',
-                        defaultMessage: '，@',
                     })}
                     title={intl.formatMessage({
                         id: 'workflow.title.system',
@@ -231,7 +219,6 @@ export default memo(({ node }: { node: AppNode }) => {
                 <WrapperEditor
                     placeholder={intl.formatMessage({
                         id: 'workflow.placeholder.fillPrompt',
-                        defaultMessage: '，@',
                     })}
                     title={intl.formatMessage({
                         id: 'workflow.title.user',
