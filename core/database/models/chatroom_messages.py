@@ -73,6 +73,9 @@ class ChatroomMessages(MySQL):
 
         offset = total_count - (page * page_size)
 
+        if total_count == 0:
+            offset = 0
+
         if offset < 0:
             offset = 1
 

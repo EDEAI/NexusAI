@@ -256,3 +256,15 @@ class ResBatchAgentCreateSchema(BaseModel):
         description="Contains list of created app IDs",
         example={"app_ids": [1, 2, 3]}
     )
+
+
+class AgentResponseBase(BaseModel):
+    data: Dict[str, Any]
+
+
+class AgentLogListResponse(BaseModel):
+    data: Dict[str, Any]
+
+
+class AgentLogDetailResponse(BaseModel):
+    data: Dict[str, Any]
