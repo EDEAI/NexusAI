@@ -146,13 +146,15 @@ async def run(
             }
             app_run_id = AppRuns().insert(app_run_data)
             Apps().increment_execution_times(app_id)
+            Apps().commit()
 
             # Run workflow
             loop = asyncio.get_running_loop()
             result = await loop.run_in_executor(
                 None,
                 redis.blpop,
-                (f'app_run_{app_run_id}_result', settings.APP_API_TIMEOUT)
+                [f'app_run_{app_run_id}_result'],
+                settings.APP_API_TIMEOUT
             )
             if result is None:
                 return response_error('Timeout waiting for the workflow to complete')
