@@ -87,6 +87,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         agent: Dict[str, Any],
         workflow_id: int,
         user_id: int,
+        type: int,
         node_exec_id: int,
         task: Optional[Dict[str, RecursiveTaskCategory]],
         retrieve: bool,
@@ -197,6 +198,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'agent_reply_requirement_with_task_splitting_and_abilities',
                     append_ret_lang_prompt=False
                 )
+        if direct_output:
+            output_format = 1
             
         user_prompt = self.data['prompt'].get_user()
         
@@ -358,10 +361,12 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         datasets, agent_id, workflow_id, user_id, type
                     )
             
+            direct_output = bool(task)  # Content output only (ability ID is omitted) for auto match ability & Force plain text output
             output_format, input_, requirements_and_goals, requirements_and_goals_kwargs = self._prepare_prompt(
-                agent, workflow_id, user_id, node_exec_id, task, bool(datasets)
+                agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), direct_output
             )
             override_rag_input = kwargs.get('override_rag_input')
+            return_json = output_format in [None, 2]  # Auto match ability or force JSON output
             model_data, ai_output, prompt_tokens, completion_tokens, total_tokens = self.invoke(
                 app_run_id=app_run_id, 
                 edge_id=edge_id,
@@ -369,7 +374,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 retrieval_chain=retrieval_chain,
                 input=input_,
                 file_list=file_list,
-                return_json=output_format in [None, 2],  # Auto match ability or force JSON output
+                return_json=return_json,
                 correct_llm_output=correct_llm_output,
                 requirements_and_goals=requirements_and_goals,
                 requirements_and_goals_kwargs=requirements_and_goals_kwargs,
@@ -382,7 +387,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             print(model_data)
             # Process the AI message
             default_output_format = agent['default_output_format']
-            if output_format is None:
+            if output_format is None:  # Auto match ability
                 ability_id = ai_output['ability_id']
                 ai_output = ai_output['output']
                 if ability_id:
@@ -571,7 +576,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     )
             
             _, input_, requirements_and_goals, requirements_and_goals_kwargs = self._prepare_prompt(
-                agent, workflow_id, user_id, node_exec_id, task, bool(datasets), True
+                agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), True
             )
             override_rag_input = kwargs.get('override_rag_input')
             model_data, ainvoke = self.get_ainvoke_func(
