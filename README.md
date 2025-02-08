@@ -295,12 +295,6 @@ Copy `.env` and modify the `.env` configuration items as needed, For configurati
 cp .env.template .env
 ```
 
-Initialization vector database data
-```
-conda activate nexus_ai
-python scripts/import_documents_to_vdb.py
-```
-
 Configure icon access rules through nginx
 ```nginx
 server {
@@ -329,33 +323,6 @@ docker pull edeai/sandbox:<tag>
 docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<tag>
 ```
 
-Note that before executing all the Python scripts below, you must first execute `conda activate nexus_ai`
-
-Start the API service
-```bash
-python app.py
-```
-
-Start Celery asynchronous task service
-```bash
-python celery_app.py
-```
-
-Start the websocket service
-```bash
-python websocket.py
-```
-
-Start roundtable service
-```bash
-python task/chatroom_run.py
-```
-
-Start the workflow service
-```bash
-python task/workflow_run.py
-```
-
 ## WEB deployment
 Go to the web directory and copy `envConfig.ts`, Modify the `envConfig.ts` configuration items as needed. For configuration instructions, refer to [docker-compose.yml configuration instructions](#docker-composeyml-configuration-instructions)
 ```bash
@@ -368,10 +335,34 @@ Install dependency packages
 npm install
 ```
 
-Start the web service
+## Launch NexusAI
+Go to the project root directory, and copy `supervisord.conf`. Modify the configurations in `supervisord.conf` as needed.
 ```bash
-# You can also use other instructions in `package.json:scripts`
-npm run start
+cp supervisord.conf.template supervisord.conf
+```
+
+Activate the conda environment and start all services using supervisord
+```bash
+conda activate nexus_ai
+supervisord -c supervisord.conf
+```
+
+Check the status of all services
+```bash
+supervisorctl -c supervisord.conf status
+```
+
+You should see output similar to the following, showing the status of all services
+```bash
+ai_tool                          RUNNING   pid 121123, uptime 0:00:11
+api                              RUNNING   pid 121124, uptime 0:00:11
+celery                           RUNNING   pid 121125, uptime 0:00:11
+import_documents_to_vdb          RUNNING   pid 121126, uptime 0:00:11
+migrations                       FATAL     Exited too quickly (process log may have details)
+roundtable                       RUNNING   pid 121128, uptime 0:00:11
+web                              RUNNING   pid 121129, uptime 0:00:11
+websocket                        RUNNING   pid 121130, uptime 0:00:11
+workflow                         RUNNING   pid 121131, uptime 0:00:11
 ```
 
 Visit NexusAI
@@ -406,19 +397,7 @@ conda activate nexus_ai
 conda env update -f conda/nexus_ai.yml
 ```
 
-3. If there are `.sql` file updates in the `docker/multi_service/db_migrations directory`, you need to update the database
-```bash
-conda activate nexus_ai
-python scripts/migrations.py
-```
-
-4. If there are `.json` file updates in the `docker/multi_service/vdb_migrations directory`, you need to update the vector database
-```bash
-conda activate nexus_ai
-python scripts/import_documents_to_vdb.py
-```
-
-5. If the image corresponding to `docker-compose.yml:sandbox:image` is updated, you need to restart the sandbox container
+3. If the image corresponding to `docker-compose.yml:sandbox:image` is updated, you need to restart the sandbox container
 ```bash
 # Find the running sandbox container
 docker ps | grep sandbox
@@ -439,6 +418,10 @@ docker pull edeai/sandbox:<new tag>
 docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<new tag>
 ```
 
-6. Note that the updated content in `.env.template` is synchronized to `.env`, and the updated content in `web/config/envConfig.ts.template` is synchronized to `web/config/envConfig.ts`
+4. Note that the updated content in `.env.template` is synchronized to `.env`, and the updated content in `web/config/envConfig.ts.template` is synchronized to `web/config/envConfig.ts`
 
-7. Restart each service in turn `API` `Celery` `websocket` `roundtable` `workflow` `web` 
+5. Restart all services
+```bash
+conda activate nexus_ai
+supervisorctl -c supervisord.conf restart all
+```

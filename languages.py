@@ -23,7 +23,9 @@ language_packs = {
             """,
         },
         "agent_system_prompt_with_auto_match_ability": '''
-            You are an AI agent, and your identity is defined as follows:
+            You are an AI agent.
+            You should fully simulate a real person, and you should adapt your identity and role according to the context of the conversation.
+            Your identity is defined as follows:
             ********************Start of identity definition content********************
             Your ID: {id_}
             Your name: {name}
@@ -47,7 +49,9 @@ language_packs = {
             3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
         ''',
         "agent_system_prompt_with_auto_match_ability_direct_output": '''
-            You are an AI agent, and your identity is defined as follows:
+            You are an AI agent.
+            You should fully simulate a real person, and you should adapt your identity and role according to the context of the conversation.
+            Your identity is defined as follows:
             ********************Start of identity definition content********************
             Your ID: {id_}
             Your name: {name}
@@ -70,7 +74,9 @@ language_packs = {
             3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
         ''',
         "agent_system_prompt_with_abilities": '''
-            You are an AI agent, and your identity is defined as follows:
+            You are an AI agent.
+            You should fully simulate a real person, and you should adapt your identity and role according to the context of the conversation.
+            Your identity is defined as follows:
             ********************Start of identity definition content********************
             Your ID: {id_}
             Your name: {name}
@@ -93,7 +99,9 @@ language_packs = {
             3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
         ''',
         "agent_system_prompt_with_no_ability": '''
-            You are an AI agent, and your identity is defined as follows:
+            You are an AI agent.
+            You should fully simulate a real person, and you should adapt your identity and role according to the context of the conversation.
+            Your identity is defined as follows:
             ********************Start of identity definition content********************
             Your ID: {id_}
             Your name: {name}
@@ -346,14 +354,14 @@ language_packs = {
             You are responsible for summarizing the content of the user's message and selecting the next agent to speak.
             I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
             [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
-            A list of the user's speech history in the following JSON format: [message string, ...]
-            And the conversation history list in the following JSON format: [message, ...]
-            where the JSON structure for each message is as follows:
+            The conversation history in the following JSON format: [round 1, (round 2,) ...]
+            where the conversation round in the following JSON format: [message 1, (message 2,) ...]
+            Each round starts with a user message and includes all subsequent agent messages until the next user message;
+            The JSON structure for each message is as follows:
             {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
+            Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
-            You need to generate a complete and detailed instruction for the next agent to receive the instruction based on the user's speech history. Pay attention to the following requirements:
-            1. Please make sure that the instruction is from the user's perspective
-            2. The instruction should fully and in detail summarize the key information, rules and requirements of the user's speech history
+            You need to fully analyze and understand every round of the conversation history through its message data structure, analyze the current conversation scene and conversation progress, and combine the user's speech content in the last round to analyze what the agents need to do next and the specific execution rules and requirements. This content then will be passed to the agents as an instruction
 
             Then, respond according to the following requirements:
             1. Please only select agents from the provided agent list. Do not select agents that exist in the conversation history but not in the agent list;
@@ -367,14 +375,16 @@ language_packs = {
             I will provide a list of detailed information about all agents in the meeting room in the following JSON format:
             [{"id": agent ID, "name": agent name, "description": agent responsibilities and capabilities}, ...];
             And the current user's speech summary;
-            Also, the conversation history list in the following JSON format:
-            [message, ...];
+            Also, the conversation history in the following JSON format: [round 1, (round 2,) ...]
+            where the conversation round in the following JSON format: [message 1, (message 2,) ...]
+            Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure for each message is as follows:
             {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}.
+            Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
             You should determine whether to end the conversation according to the following rules:
-            1. You should try to encourage all agents to actively participate in the dialogue regarding the user's speech summary, even if some of the agents have met the user's needs;
-            2. If all agents have participated in the dialogue after the user's last speech and the user's needs have been met, you can end the conversation;
+            1. You should try to encourage all agents to actively participate in the conversation regarding the user's speech summary, even if some of the agents have met the user's needs;
+            2. If all agents have participated in the last round of the conversation after the user's speech and the user's needs have been met, you can end the conversation;
             3. If the conversation has been ongoing for a long time without reaching a conclusion, you can also end the conversation;
             
             Then, respond according to the following requirements:
@@ -387,28 +397,26 @@ language_packs = {
         'chatroom_manager_user_invalid_selection': "Your last selected ID was {agent_id}, but this ID does not correspond to any agent in the meeting room. Please select again.",
 
         'chatroom_manager_user': '''
-            Total number of agents: {agent_count}
             Below is the detailed information list of all agents in the meeting room:
             {agents}
 
-            Below is the user's message content list:
-            {user_messages}
-
-            Below is the chat history list:
+            Below is the conversation history list:
             {messages}
-
+            
+            Below is the user's last speech content:
+            {user_message}
+            
             Please select the next agent to speak from the agent list according to the requirements.
         ''',
 
         'chatroom_manager_user_with_optional_selection': '''
-            Total number of agents: {agent_count}
             Below is the detailed information list of all agents in the meeting room:
             {agents}
 
             User's speech summary:
             {topic}
 
-            Below is the chat history list:
+            Below is the conversation history list:
             {messages}
 
             Please select the next agent to speak from the agent list according to the requirements, or end the conversation.
@@ -416,16 +424,22 @@ language_packs = {
 
         'chatroom_agent_user_subprompt': '''
             You are an AI agent in a meeting room, where there is one user and at least one AI agent.
+            You should adapt your identity and role according to the context of the conversation.
             You need to reply to the user's instructions. Please pay attention to the following requirements when responding:
-            1. You need to analyze the conversation history through its JSON structure and use it as context information for reference
-            2. You need to analyze and understand the user's instruction intentions and strictly abide by the rules in the instructions
-            The JSON format of the conversation history is as follows: [message, ...];
+            1. You need to fully analyze and understand the conversation records, analyze the current conversation scene and progress through the last round of the conversation, focus on what the user wants, and provide enough details
+            2. You need to fully analyze and understand the user's command intention through the current conversation scene and progress, as well as the user's instructions, focus on what the user wants, and do not miss important information, rules or requirements in the instructions
+            3. You need to reply based on the current conversation scene and progress, as well as the user's command intention
+            4. Don't copy the viewpoints of other agents in the meeting room.
+
+            The JSON format of the conversation history is as follows: [round 1, (round 2,) ...]
+            where the conversation round in the following JSON format: [message 1, (message 2,) ...]
+            Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure of each message is as follows:
             {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}}.
+            Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
             
             User's instructions:
             {topic}
-            {user_message}
 
             Conversation history:
             {messages}
@@ -536,7 +550,20 @@ language_packs = {
             "end_node_outgoing_edges": "End node cannot have outgoing edges.",
             "node_incoming_outgoing_edges": "Node {node_id} must have at least one incoming and one outgoing edge.",
             "exactly_one_start_node": "There must be exactly one start node.",
-            "exactly_one_end_node": "There must be exactly one end node."
+            "exactly_one_end_node": "There must be exactly one end node.",
+            # properties
+            "required_field_empty": "Required field '{field_name}' in node '{node_title}' must not be empty",
+            "required_properties_empty": "Input properties in node '{node_title}' must be configured",
+            "prompt_params_required": "In node '{node_title}', either system prompt or user prompt must be specified",
+            "input_config_required": "Input configuration in node '{node_title}' is required and must not be empty",
+            "prompt_user_parser_required": "User parser prompt in node '{node_title}' is required and must not be empty",
+            "llm_prompt_required": "Missing [system] or [user] prompt in node [{node_title}]",
+            "agent_prompt_required": "Missing [user] prompt in node [{node_title}]",
+            "executor_llm_prompt_required": "Missing [system] or [user] prompt in executor [{executor_title}] of node [{node_title}]",
+            "executor_agent_prompt_required": "Missing [user] prompt in executor [{executor_title}] of node [{node_title}]",
+            "input_config_missing": "Input properties not configured for node [{node_title}]",
+            "required_param_missing": "Required parameter [{param_name}] not filled in node [{node_title}]",
+            "input_config_no_properties": "No input properties configured in [{node_title}]. Please add the required input properties for data processing."
         },
         'tag_id_not_found': 'Tag ID not found',
         'tag_update_success': 'Tag update success',
@@ -560,8 +587,8 @@ language_packs = {
             1. To ensure the high-quality generation of agents, the agent information should be sufficient and detailed
             2. The name of the agent should simply and directly reflect the key information of the agent and be as humanized as possible
             3. The agent description should be as detailed as possible and cover all the information of the agent
-            4. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
-            5. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            4. The functional information of the agent should not only cover its literal "function" aspect, but also other relevant features, including but not limited to: clearly defining the identity, role, and purpose of the agent in its operating environment. Provide a detailed description of the agent's core responsibilities and tasks. List the specific skills, professional knowledge, and knowledge areas that the agent possesses. Mentioning the tools, techniques, or frameworks used by agents to perform their functions. Explain how agents interact with users, systems, or other agents, including communication methods and collaboration capabilities. Emphasize the ability of agents to adapt to different environments, tasks, or user needs, as well as their customization options. Provide detailed information on how to measure agency performance, including accuracy, efficiency, and reliability. Functional descriptions should be generated as much as possible to ensure sufficient depth and coverage of all relevant aspects. The language should be clear, professional, and focused on providing actionable insights into agency capabilities and operating environments. The functional information of the agent should be as detailed as possible, not limited to the literal "functional" information, but should also include other relevant feature information.
+            5. Generate as many abilities as possible, ensuring that the specific content of each ability includes the following elements:Clearly describe the primary purpose and goals of the ability, articulating its design intent, intended use, and core value to the user. The goals of the ability should directly address the user's actual needs, ensuring it can solve specific problems or improve efficiency. By defining clear objectives, users can quickly understand the practical application scenarios of the ability and the value it brings. The design of the ability should focus on the user's core pain points, providing actionable solutions to help achieve business goals or optimize workflows.Provide a detailed explanation of how the ability is implemented, focusing on its core logic, problem-solving approach, and key implementation steps. Avoid excessive technical jargon, and instead explain how the ability achieves its goals through systematic methods from the user's perspective. The description of the core logic should be clear and easy to understand, helping users grasp the basic operational principles of the ability. The implementation explanation should cover the complete process from input to output, ensuring users fully understand how the ability works.Describe the scenarios and universality of the ability, emphasizing its broad applicability across different industries and domains. Through abstract descriptions, highlight the flexibility and adaptability of the ability to meet diverse needs. The description of universality should avoid being confined to specific fields, instead showcasing the potential application value of the ability in different environments. The explanation of applicable scenarios should cover multiple use cases, helping users understand how the ability can function in various contexts.Provide a detailed explanation of the possible outputs generated by the ability, helping users intuitively understand its functionality. The output description should be clear and specific, ensuring users can anticipate the results of using the ability. The detailed explanation of outputs should cover possible result formats and their practical significance to users, helping them evaluate the practicality of the ability. The depth of the output description should be sufficient to allow users to understand the specific value of the ability and support their subsequent decision-making.Highlight any limitations, constraints, or special considerations related to the ability, clearly explaining how these limitations might impact its use and suggesting feasible solutions or alternatives. Ensure users can avoid potential issues when utilizing the ability. The description of limitations should be comprehensive and specific, helping users plan their usage strategies in advance. The explanation of special considerations should cover potential risk points and mitigation measures, ensuring users can safely and efficiently use the ability.Include any additional context that might help users understand the ability better, such as performance benchmarks, integration requirements, dependencies, or other relevant background information. This information should be comprehensive and specific, helping users evaluate the applicability and practicality of the ability. The description of context should cover the ability's performance, compatibility with other systems, and best practices for usage. The additional context should provide sufficient information to help users fully assess the applicability of the ability.The language should be professional yet easy to understand, avoiding overly simplistic or vague expressions, ensuring the content is comprehensive, specific, and actionable, providing users with clear insights into the ability's functionality and use cases. The language should emphasize logical and coherent expression, ensuring users can easily understand the core value and usage methods of the ability.
             6. Be sure to strictly abide by the json structure of the agent data
             Note that only the json structure data of the agent is returned, and no redundant content is returned.
             Description of the json structure of agent data:
@@ -622,8 +649,8 @@ language_packs = {
             1. To ensure the high-quality generation of agents, the agent information should be sufficient and detailed
             2. The name of the agent should simply and directly reflect the key information of the agent and be as humanized as possible
             3. The agent description should be as detailed as possible and cover all the information of the agent
-            4. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
-            5. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            4. The functional information of the agent should not only cover its literal "function" aspect, but also other relevant features, including but not limited to: clearly defining the identity, role, and purpose of the agent in its operating environment. Provide a detailed description of the agent's core responsibilities and tasks. List the specific skills, professional knowledge, and knowledge areas that the agent possesses. Mentioning the tools, techniques, or frameworks used by agents to perform their functions. Explain how agents interact with users, systems, or other agents, including communication methods and collaboration capabilities. Emphasize the ability of agents to adapt to different environments, tasks, or user needs, as well as their customization options. Provide detailed information on how to measure agency performance, including accuracy, efficiency, and reliability. Functional descriptions should be generated as much as possible to ensure sufficient depth and coverage of all relevant aspects. The language should be clear, professional, and focused on providing actionable insights into agency capabilities and operating environments. The functional information of the agent should be as detailed as possible, not limited to the literal "functional" information, but should also include other relevant feature information.
+            5. Generate as many abilities as possible, ensuring that the specific content of each ability includes the following elements:Clearly describe the primary purpose and goals of the ability, articulating its design intent, intended use, and core value to the user. The goals of the ability should directly address the user's actual needs, ensuring it can solve specific problems or improve efficiency. By defining clear objectives, users can quickly understand the practical application scenarios of the ability and the value it brings. The design of the ability should focus on the user's core pain points, providing actionable solutions to help achieve business goals or optimize workflows.Provide a detailed explanation of how the ability is implemented, focusing on its core logic, problem-solving approach, and key implementation steps. Avoid excessive technical jargon, and instead explain how the ability achieves its goals through systematic methods from the user's perspective. The description of the core logic should be clear and easy to understand, helping users grasp the basic operational principles of the ability. The implementation explanation should cover the complete process from input to output, ensuring users fully understand how the ability works.Describe the scenarios and universality of the ability, emphasizing its broad applicability across different industries and domains. Through abstract descriptions, highlight the flexibility and adaptability of the ability to meet diverse needs. The description of universality should avoid being confined to specific fields, instead showcasing the potential application value of the ability in different environments. The explanation of applicable scenarios should cover multiple use cases, helping users understand how the ability can function in various contexts.Provide a detailed explanation of the possible outputs generated by the ability, helping users intuitively understand its functionality. The output description should be clear and specific, ensuring users can anticipate the results of using the ability. The detailed explanation of outputs should cover possible result formats and their practical significance to users, helping them evaluate the practicality of the ability. The depth of the output description should be sufficient to allow users to understand the specific value of the ability and support their subsequent decision-making.Highlight any limitations, constraints, or special considerations related to the ability, clearly explaining how these limitations might impact its use and suggesting feasible solutions or alternatives. Ensure users can avoid potential issues when utilizing the ability. The description of limitations should be comprehensive and specific, helping users plan their usage strategies in advance. The explanation of special considerations should cover potential risk points and mitigation measures, ensuring users can safely and efficiently use the ability.Include any additional context that might help users understand the ability better, such as performance benchmarks, integration requirements, dependencies, or other relevant background information. This information should be comprehensive and specific, helping users evaluate the applicability and practicality of the ability. The description of context should cover the ability's performance, compatibility with other systems, and best practices for usage. The additional context should provide sufficient information to help users fully assess the applicability of the ability.The language should be professional yet easy to understand, avoiding overly simplistic or vague expressions, ensuring the content is comprehensive, specific, and actionable, providing users with clear insights into the ability's functionality and use cases. The language should emphasize logical and coherent expression, ensuring users can easily understand the core value and usage methods of the ability.
             6. Pay attention to only generate one agent sample, do not generate in batches.
             7. Be sure to strictly abide by the json structure of the agent data
             Note that only the json structure data of the agent is returned, and no redundant content is returned.
@@ -652,8 +679,8 @@ language_packs = {
             1. To ensure the high-quality generation of agents, the agent information should be sufficient and detailed
             2. The agent name should simply and directly reflect the key information of the agent and be as anthropomorphic as possible
             3. The agent description should be as detailed as possible and cover all the information of the agent
-            4. The agent's functional information should be as detailed as possible, not just limited to the literal "functional" information, but also include other relevant feature information
-            5. The ability splitting of the agent should be as detailed as possible, the specific content of each ability should be described in detail, and the output format of the ability should be selected in an appropriate format
+            4. The functional information of the agent should not only cover its literal "function" aspect, but also other relevant features, including but not limited to: clearly defining the identity, role, and purpose of the agent in its operating environment. Provide a detailed description of the agent's core responsibilities and tasks. List the specific skills, professional knowledge, and knowledge areas that the agent possesses. Mentioning the tools, techniques, or frameworks used by agents to perform their functions. Explain how agents interact with users, systems, or other agents, including communication methods and collaboration capabilities. Emphasize the ability of agents to adapt to different environments, tasks, or user needs, as well as their customization options. Provide detailed information on how to measure agency performance, including accuracy, efficiency, and reliability. Functional descriptions should be generated as much as possible to ensure sufficient depth and coverage of all relevant aspects. The language should be clear, professional, and focused on providing actionable insights into agency capabilities and operating environments. The functional information of the agent should be as detailed as possible, not limited to the literal "functional" information, but should also include other relevant feature information.
+            5. Generate as many abilities as possible, ensuring that the specific content of each ability includes the following elements:Clearly describe the primary purpose and goals of the ability, articulating its design intent, intended use, and core value to the user. The goals of the ability should directly address the user's actual needs, ensuring it can solve specific problems or improve efficiency. By defining clear objectives, users can quickly understand the practical application scenarios of the ability and the value it brings. The design of the ability should focus on the user's core pain points, providing actionable solutions to help achieve business goals or optimize workflows.Provide a detailed explanation of how the ability is implemented, focusing on its core logic, problem-solving approach, and key implementation steps. Avoid excessive technical jargon, and instead explain how the ability achieves its goals through systematic methods from the user's perspective. The description of the core logic should be clear and easy to understand, helping users grasp the basic operational principles of the ability. The implementation explanation should cover the complete process from input to output, ensuring users fully understand how the ability works.Describe the scenarios and universality of the ability, emphasizing its broad applicability across different industries and domains. Through abstract descriptions, highlight the flexibility and adaptability of the ability to meet diverse needs. The description of universality should avoid being confined to specific fields, instead showcasing the potential application value of the ability in different environments. The explanation of applicable scenarios should cover multiple use cases, helping users understand how the ability can function in various contexts.Provide a detailed explanation of the possible outputs generated by the ability, helping users intuitively understand its functionality. The output description should be clear and specific, ensuring users can anticipate the results of using the ability. The detailed explanation of outputs should cover possible result formats and their practical significance to users, helping them evaluate the practicality of the ability. The depth of the output description should be sufficient to allow users to understand the specific value of the ability and support their subsequent decision-making.Highlight any limitations, constraints, or special considerations related to the ability, clearly explaining how these limitations might impact its use and suggesting feasible solutions or alternatives. Ensure users can avoid potential issues when utilizing the ability. The description of limitations should be comprehensive and specific, helping users plan their usage strategies in advance. The explanation of special considerations should cover potential risk points and mitigation measures, ensuring users can safely and efficiently use the ability.Include any additional context that might help users understand the ability better, such as performance benchmarks, integration requirements, dependencies, or other relevant background information. This information should be comprehensive and specific, helping users evaluate the applicability and practicality of the ability. The description of context should cover the ability's performance, compatibility with other systems, and best practices for usage. The additional context should provide sufficient information to help users fully assess the applicability of the ability.The language should be professional yet easy to understand, avoiding overly simplistic or vague expressions, ensuring the content is comprehensive, specific, and actionable, providing users with clear insights into the ability's functionality and use cases. The language should emphasize logical and coherent expression, ensuring users can easily understand the core value and usage methods of the ability.
             6. Pay attention to only generate one agent information, do not generate in batches.
             7. If the history of the agent that has been generated in batches has real content, the new agent should try to keep the difference with the history of the generated agent
             8. Be sure to strictly abide by the json structure of the agent data
@@ -1201,7 +1228,19 @@ language_packs = {
             "end_node_outgoing_edges": "结束节点不能有传出edge。",
             "node_incoming_outgoing_edges": "节点 {node_id} 必须至少有一个传入edge和一个传出edge。",
             "exactly_one_start_node": "必须有且只有一个开始节点。",
-            "exactly_one_end_node": "必须有且只有一个结束节点。"
+            "exactly_one_end_node": "必须有且只有一个结束节点。",
+            "required_field_empty": "节点 '{node_title}' 中的必填字段 '{field_name}' 不能为空",
+            "required_properties_empty": "节点 '{node_title}' 的输入属性配置不能为空",
+            "prompt_params_required": "节点 '{node_title}' 中的系统提示词或用户提示词必须指定其中之一",
+            "input_config_required": "节点 '{node_title}' 的输入配置为必填项且不能为空",
+            "prompt_user_parser_required": "节点 '{node_title}' 的用户提示词解析器为必填项且不能为空",
+            "llm_prompt_required": "未填写[{node_title}]的[system]或[user]部分提示词",
+            "agent_prompt_required": "未填写[{node_title}]的[user]部分提示词",
+            "executor_llm_prompt_required": "未填写[{node_title}]下执行器[{executor_title}]的[system]或[user]部分提示词",
+            "executor_agent_prompt_required": "未填写[{node_title}]下执行器[{executor_title}]的[user]部分提示词",
+            "input_config_missing": "未配置[{node_title}]的输入属性",
+            "required_param_missing": "未填写[{node_title}]的必填参数[{param_name}]",
+            "input_config_no_properties": "节点[{node_title}]未配置任何输入属性。请添加必要的输入属性以进行数据处理。"
         },
         'tag_id_not_found': '标签ID不存在',
         'tag_update_success': '标签更新成功',
@@ -1212,288 +1251,8 @@ language_packs = {
         'team_id_not_found': '团队ID不存在',
         'chatroom_app_run_id_not_found': '当前appRunID未找到',
         'chatroom_status_is_incorrect': '当前状态不正确',
-        
-        # 'chatroom_meeting_summary_system': '''
-        #     你是一个会议内容总结助手，请通过我提供的会议聊天历史进行会议总结，会议总结内容要尽量详细。
-        #     注意最终只返回会议总结内容，不要返回多余的内容。
-        # ''',
-        # 'chatroom_meeting_summary_user': '''
-        #     会议聊天历史：
-        #     {messages}
-        # ''',
-        # 'chatroom_meeting_summary_system_correct': '''
-        #     你是一个会议内容总结助手，你已经通过我提供的会议聊天历史进行了一次会议总结，我提供了你已生成的会议总结。
-        #     请通过我提供的会议聊天历史，已生成的会议总结，以及会议总结修正意见，对已生成的会议总结进行调整。
-        #     注意最终只返回修正后的会议总结内容，不要返回多余的内容。
-        # ''',
-        # 'chatroom_meeting_summary_user_correct': '''
-        #     会议聊天历史：
-        #     {messages}
-            
-        #     已生成的会议总结：
-        #     {meeting_summary}
-
-        #     会议总结修正意见：
-        #     {update_meeting}
-        # ''',
-
-        # 'chatroom_generate_meeting_summary_from_a_single_message_system_correct': '''
-        #     你是一个会议内容总结助手，你已经为我生成了一次会议总结，我提供了你已生成的会议总结。
-        #     请通过我提供的已生成的会议总结，以及会议总结修正意见，对已生成的会议总结进行调整。
-        #     注意最终只返回修正后的会议总结内容，不要返回多余的内容。
-        # ''',
-        # 'chatroom_generate_meeting_summary_from_a_single_message_user_correct': '''
-        #     已生成的会议总结：
-        #     {meeting_summary}
-
-        #     会议总结修正意见：
-        #     {update_meeting}
-        # ''',
-
-        # 'chatroom_conference_orientation_system': '''
-        #     你是一个数据转化助手，请通过我提供的会议总结内容以及工作导向数据进行数据导向转化。
-        #     转化时注意以下几点要求：
-        #     1. 注意我提供的工作导向数据中的拆分项，一定要保持原有拆分项，不要创建新的拆分项，也不要删除拆分项
-        #     2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构
-        #     3. 一定要注意工作导向数据json格式说明中的字段说明和要求，还有我提供的工作导向数据补充说明，两项结合作为拆分参考规则
-        #     4. 拆分项的内容一定要符合拆分参考规则中的对应拆分项的定义和要求，在符合定义和要求的前提下要尽量详细
-        #     5. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
-        #     6. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
-
-        #     工作导向数据json格式说明：
-        #     1. 结构类型说明：variables对应的数据整体为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型
-        #     2. 格式、字段说明和要求：
-        #     {{
-        #         'variables': [
-        #             {{
-        #                 name: 拆分项对应的变量名，不要更改此字段，
-        #                 display_name: 拆分项对应的变量显示名，可以作为拆分项的功能和用途说明，可以作为拆分项的提取依据，不要更改此字段，
-        #                 type: 拆分项对应的变量类型，可为"number"或者"string"，注意拆分项内容一定要与变量类型对应，不要更改此字段，
-        #                 value: 最终的工作导向拆分项内容
-        #             }}
-        #         ]
-        #     }}
-        # ''',
-        # 'chatroom_conference_orientation_user': '''
-        #     会议总结内容：
-        #     {meeting_summary}
-            
-        #     工作导向数据：
-        #     {{'variables':{prompt_variables}}}
-            
-        #     工作导向数据补充说明：
-        #     {prompt_variables_supplement}
-        # ''',
-        # 'chatroom_conference_orientation_system_correct': '''
-        #     你是一个数据转化助手，你已经通过我提供的会议总结内容进行了一次数据导向转化，我提供了已转化的工作导向数据。
-        #     请通过我提供的会议总结内容，已转化的工作导向数据，以及数据修正意见，对已转化的工作导向数据进行调整。
-        #     调整时注意以下几点要求：
-        #     1. 注意我提供的工作导向数据中的拆分项，一定要保持原有拆分项，不要创建新的拆分项，也不要删除拆分项
-        #     2. 最终生成的工作导向数据一定要符合工作导向数据json格式要求，不要改变数据结构
-        #     3. 一定要注意工作导向数据json格式说明中的字段说明和要求，以此为拆分参考规则
-        #     4. 切记我提供的工作导向数据中的name，display_name，type这三个字段一定不要更改，只需要将拆分项内容填写value字段
-        #     5. 一定要严格遵守数据修正意见
-        #     6. 一定要严格遵守工作导向数据json格式，注意最终只返回生成后的json格式内容，不要返回多余的内容。
-
-        #     工作导向数据json格式说明：
-        #     1. 结构类型说明：variables对应的数据整体为list类型，list中每个元素为一个数据拆分项，数据拆分项为dict类型
-        #     2. 格式、字段说明和要求：
-        #     {{
-        #         'variables': [
-        #             {{
-        #                 name: 拆分项对应的变量名，不要更改此字段，
-        #                 display_name: 拆分项对应的变量显示名，可以作为拆分项的功能和用途说明，可以作为拆分项的提取依据，不要更改此字段，
-        #                 type: 拆分项对应的变量类型，可为"number"或者"string"，注意拆分项内容一定要与变量类型对应，不要更改此字段，
-        #                 value: 最终的工作导向拆分项内容
-        #             }}
-        #         ]
-        #     }}
-        # ''',
-        # 'chatroom_conference_orientation_user_correct': '''
-        #     会议总结内容：
-        #     {meeting_summary}
-
-        #     已转化的工作导向数据：
-        #     {{'variables':{value_meeting_summary}}}
-            
-        #     数据修正意见：
-        #     {update_meeting}
-        # ''',
-
         'chatroom_request_sent_successfully': '请求成功，请等待',
-        
-        # 'generate_agent_system_prompt': '''
-        #     你是一个AI智能体生成助手。
-        #     请通过我的需求内容，按照智能体的数据结构为我生成一个完整的智能体信息。
-        #     生成时注意以下几点要求：
-        #     1. 要保证智能体的高质量生成，智能体的信息要足够充分和详细
-        #     2. 智能体名称要可简单直接的体现智能体的关键信息，并且要尽量拟人化
-        #     3. 智能体描述要尽量详细，要覆盖智能体的所有信息
-        #     4. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
-        #     5. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
-        #     6. 一定要严格遵守智能体数据json结构
-        #     注意只返回智能体的json结构数据，不要返回多余的内容。
-        #     智能体数据json结构说明：
-        #     {{
-        #         "name": "(string类型) 智能体名称",
-        #         "description": "(string类型) 智能体描述",
-        #         "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
-        #         "abilities": [
-        #             {{
-        #                 "name": "(string类型) 能力名称",
-        #                 "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
-        #                 "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
-        #             }}
-        #         ]
-        #     }}
-        #     {append_prompt}
-        # ''',
-        # 'generate_agent_user':(
-        #     '需求内容：\n'
-        #     '{user_prompt}\n\n'
-        # ),
 
-        # 'regenerate_agent_system': (
-        #     '注意：你已经生成了一些智能体，你需要再生成一个全新的智能体，新智能体数据要尽量与已生成的智能体历史数据内容不同。\n'
-        # ),
-        # 'regenerate_agent_user': (
-        #     '已生成的智能体历史数据：\n'
-        #     '{history_agent_list}\n'
-        # ),
-
-        # 'agent_supplement_system':(
-        #     '你是一个AI智能体生成助手。'
-        #     '你已经生成了一个智能体，请通过我提供的修正意见，对已生成的智能体数据进行调整。\n'
-        #     '注意只返回智能体的json结构数据，不要返回多余的内容。\n'
-        #     '智能体数据json结构说明：\n'
-        #     '{{\n'
-        #     '  "name": "(string类型) 智能体名称",\n'
-        #     '  "description": "(string类型) 智能体描述",\n'
-        #     '  "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",\n'
-        #     '  "abilities": [\n'
-        #     '    {{\n'
-        #     '      "name": "(string类型) 能力名称",\n'
-        #     '      "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",\n'
-        #     '      "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"\n'
-        #     '    }}\n'
-        #     '  ]\n'
-        #     '}}\n'
-        # ),
-        # 'agent_supplement_user':(
-        #     '修正意见：\n'
-        #     '{agent_supplement}\n\n'
-        #     '已生成的智能体数据：\n'
-        #     '{history_agent}\n'
-        # ),
-
-        # 'agent_batch_sample_system': '''
-        #     你是一个AI智能体生成助手。
-        #     请通过我提供的批量生成智能体的需求，按照智能体的数据结构为我生成一个完整的样例智能体信息。
-        #     生成时注意以下几点要求：
-        #     1. 要保证智能体的高质量生成，智能体的信息要足够充分和详细
-        #     2. 智能体名称要可简单直接的体现智能体的关键信息，并且要尽量拟人化
-        #     3. 智能体描述要尽量详细，要覆盖智能体的所有信息
-        #     4. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
-        #     5. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
-        #     6. 注意只生成一个智能体样例，不要进行批量生成。
-        #     7. 一定要严格遵守智能体数据json结构
-        #     注意只返回智能体的json结构数据，不要返回多余的内容。
-        #     智能体数据json结构说明：
-        #     {{
-        #         "name": "(string类型) 智能体名称",
-        #         "description": "(string类型) 智能体描述",
-        #         "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
-        #         "abilities": [
-        #             {{
-        #                 "name": "(string类型) 能力名称",
-        #                 "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
-        #                 "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
-        #             }}
-        #         ]
-        #     }}
-        # ''',
-        # 'agent_batch_sample_user': '''
-        #     批量生成智能体的需求：
-        #     {agent_batch_requirements}
-        # ''',
-        # 'agent_batch_one_system': '''
-        #     你是一个AI智能体生成助手。
-        #     请通过我提供的批量生成智能体的需求，按照智能体的数据结构为我生成一个完整的智能体信息。
-        #     生成时注意以下几点要求：
-        #     1. 要保证智能体的高质量生成，智能体的信息要足够充分和详细
-        #     2. 智能体名称要可简单直接的体现智能体的关键信息，并且要尽量拟人化
-        #     3. 智能体描述要尽量详细，要覆盖智能体的所有信息
-        #     4. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
-        #     5. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
-        #     6. 注意只生成一个智能体信息，不要进行批量生成。
-        #     7. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
-        #     8. 一定要严格遵守智能体数据json结构
-        #     注意只返回智能体的json结构数据，不要返回多余的内容。
-        #     智能体数据json结构说明：
-        #     {{
-        #         "name": "(string类型) 智能体名称",
-        #         "description": "(string类型) 智能体描述",
-        #         "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
-        #         "abilities": [
-        #             {{
-        #                 "name": "(string类型) 能力名称",
-        #                 "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
-        #                 "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
-        #             }}
-        #         ]
-        #     }}
-        # ''',
-        # 'agent_batch_one_user': '''
-        #     批量生成智能体的需求：
-        #     {agent_batch_requirements}
-            
-        #     已批量生成的智能体历史：
-        #     {history_agents}
-        # ''',
-        # 'agent_batch_generate_system': '''
-        #     你是一个AI智能体生成助手。
-        #     请通过我提供的批量生成智能体的需求、批量生成智能体的数量、多智能体的数据结构为我生成一批完整的智能体信息。
-        #     生成时注意以下几点要求：
-        #     1. 不要因为批量生成智能体而降低每个智能体的生成质量，每个智能体的信息要足够充分和详细
-        #     2. 智能体名称要可简单直接的体现智能体的关键信息，并且要尽量拟人化
-        #     3. 智能体描述要尽量详细，要覆盖智能体的所有信息
-        #     4. 智能体的职能信息要尽量详细，不要仅仅局限于字面意义上的“职能”信息，也要包括其他相关的特征信息
-        #     5. 智能体的能力拆分要尽量详细，每个能力的具体内容要详细描述，能力的输出结果格式要选择合适的格式
-        #     6. 一定要严格按照我提供的批量生成智能体的数量去生成智能体，不要多余或少于此数量
-        #     7. 批量生成的智能体数据要尽量保持差异性，不要生成重复的智能体
-        #     8. 如果已批量生成的智能体历史有真实内容，新的智能体要尽量与已生成的智能体历史保持差异性
-        #     9. 一定要严格遵守多智能体数据json结构
-        #     10. 不需要考虑模型上下文长度限制，不要精简智能体信息
-        #     在所有智能体生成完成后，一定要基于上述要求对每个智能体的信息进行丰富和完善，确保每个智能体的信息足够充分和详细。
-        #     注意只返回生成的多智能体json结构数据，不要返回多余的内容。
-        #     多智能体数据json结构说明：
-        #     {{
-        #         "multi-agent": [
-        #             {{
-        #                 "name": "(string类型) 智能体名称",
-        #                 "description": "(string类型) 智能体描述",
-        #                 "obligations": "(string类型) 智能体的职能信息（包括但不限于智能体的身份、职责、岗位、技能等信息）",
-        #                 "abilities": [
-        #                     {{
-        #                         "name": "(string类型) 能力名称",
-        #                         "content": "(string类型) 能力的具体内容，智能体运行时会把选择的能力内容作为prompt提交给LLM模型",
-        #                         "output_format": "(int类型)，能力的输出结果格式，1：文本形式，2：json格式，3：纯代码形式（不包含非代码类内容），智能体运行时会按照选择的能力对应的输出结果格式进行内容返回"
-        #                     }}
-        #                 ]
-        #             }}
-        #         ]
-        #     }}
-        # ''',
-        # 'agent_batch_generate_user': '''
-        #     批量生成智能体的需求：
-        #     {agent_batch_requirements}
-            
-        #     批量生成智能体的数量：
-        #     {agent_batch_number}
-            
-        #     已批量生成的智能体历史：
-        #     {history_agents}
-        # ''',
         'app_run_error': 'app运行记录不存在',
         'api_agent_generate_failed': 'agent生成记录失败',
         'api_agent_user_prompt_required': '提示词不能为空',
@@ -1503,111 +1262,6 @@ language_packs = {
         'api_agent_save_record_error': '保存记录失败',
         'api_agent_record_error': '记录不存在',
         
-        # 'generate_skill_system_prompt':'''
-        #     你是一个python工具生成助手。
-        #     请通过我的需求内容，按照工具的数据结构为我生成一个完整的工具信息。
-        #     注意工具信息生成完成之后，你要做一次变量命名检测和优化，"input_variables"和"output_variables"中的变量名称，以及python3代码中对应的函数入参或变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字。
-        #     注意只返回工具的结构数据，不要返回多余的内容。
-        #     工具数据json结构说明：
-        #     {{
-        #         "name":"工具名称",
-        #         "description":"工具描述",
-        #         "input_variables": [
-        #             {{
-        #                 "name":"变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字",
-        #                 "type":"变量类型，包含['string','number']，'string'对应python中的str类型，'number'对应python中的int或者float类型",
-        #                 "required":"(bool类型)，变量是否必填：True代表必填，False代表非必填",
-        #                 "display_name":"变量显示名，可以作为变量的功能和用途说明"
-        #             }}
-        #         ],
-        #         "dependencies": {{
-        #             "python3": []
-        #         }},
-        #         "code": {{
-        #             "python3":"python3代码。return内容为dict类型，内容要和输出变量一致。"
-        #         }},
-        #         "output_type":"(int类型)输出类型包含以下四种类型：1:获取文本或者普通变量数据 2:写入数据库 3:编写代码 4:写入文件",
-        #         "output_variables":[
-        #             {{
-        #                 "name": "变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字",
-        #                 "type": "变量类型，包含['string','number','json']，'string'对应python中的str类型，'number'对应python中的int或者float类型，'json'对应python中的dict或者list类型",
-        #                 "display_name": "变量显示名，可以作为变量的功能和用途说明"
-        #             }}
-        #         ]
-        #     }}
-        #     特殊规则说明: 
-        #     1. "input_variables"为工具运行时所需的输入变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
-        #     2. "dependencies"为工具代码运行时需要通过pip单独安装的python3依赖，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的列表中每个元素为一个依赖名称。
-        #     3. "code"为工具的python3代码，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的值为python3代码，代码为string类型。
-        #         生成python3代码时注意以下几点要求：
-        #         3.1 你只需要提供一个主函数即可，所有代码逻辑都在主函数中实现
-        #         3.2 注意不要提供与主函数同层级的其他函数，如果需要封装函数，一定要在主函数内部进行封装
-        #         3.3 不要提供函数的调用代码，实际运行时我会自动调用主函数
-        #         3.4 函数的入参对应工具的输入变量，变量名称、变量类型要与"input_variables"中的定义一致，非必填变量要有默认值，具有默认值的变量应该放在最后
-        #         3.5 要规定函数的返回数据类型
-        #         3.6 主函数的结尾需要固定返回一个dict类型的数据，对应工具的输出变量，dict数据的键名即为输出的变量名，变量名称、变量类型要和"output_variables"中的定义一致
-        #     4. "output_variables"为工具运行完成后的输出变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
-        #     5. 注意"output_variables"中每个输出变量的类型，如果在python3代码中的返回数据中对应的变量类型为"dict"或者"list"，则对应的输出变量类型为"json"，否则为"string"或者"number"。
-        #     6. "output_type"为工具的输出类型，上面的工具数据json结构说明中已经提供了所有类型，要注意工具的输出类型并不取决于python3代码返回的数据类型，而是取决于python3代码的整体执行意图。
-        # ''',
-        # 'generate_skill_user':'''
-        #     需求内容：
-        #     {user_prompt}
-        # ''',
-        # 'correction_skill_system_prompt':'''
-        #     你是一个python工具生成助手。
-        #     你已经生成了一个工具，请通过我提供的修正意见，对已生成的工具数据进行调整。
-        #     注意工具信息生成完成之后，你要做一次变量命名检测和优化，"input_variables"和"output_variables"中的变量名称，以及python3代码中对应的函数入参或变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字。
-        #     注意只返回工具的结构数据，不要返回多余的内容。
-        #     工具数据json结构说明：
-        #     {{
-        #         "name":"工具名称",
-        #         "description":"工具描述",
-        #         "input_variables": [
-        #             {{
-        #                 "name":"变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字",
-        #                 "type":"变量类型，包含['string','number']，'string'对应python中的str类型，'number'对应python中的int或者float类型",
-        #                 "required":"(bool类型)，变量是否必填：True代表必填，False代表非必填",
-        #                 "display_name":"变量显示名，可以作为变量的功能和用途说明"
-        #             }}
-        #         ],
-        #         "dependencies": {{
-        #             "python3": []
-        #         }},
-        #         "code": {{
-        #             "python3":"python3代码。return内容为dict类型，内容要和输出变量一致。"
-        #         }},
-        #         "output_type":"(int类型)输出类型包含以下四种类型：1:获取文本或者普通变量数据 2:写入数据库 3:编写代码 4:写入文件",
-        #         "output_variables":[
-        #             {{
-        #                 "name": "变量名称，一定要符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用python关键字",
-        #                 "type": "变量类型，包含['string','number','json']，'string'对应python中的str类型，'number'对应python中的int或者float类型，'json'对应python中的dict或者list类型",
-        #                 "display_name": "变量显示名，可以作为变量的功能和用途说明"
-        #             }}
-        #         ]
-        #     }}
-        #     特殊规则说明: 
-        #     1. "input_variables"为工具运行时所需的输入变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
-        #     2. "dependencies"为工具代码运行时需要通过pip单独安装的python3依赖，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的列表中每个元素为一个依赖名称。
-        #     3. "code"为工具的python3代码，整体结构为dict类型，内部的"python3"为固定键，"python3"对应的值为python3代码，代码为string类型。
-        #         生成python3代码时注意以下几点要求：
-        #         3.1 你只需要提供一个主函数即可，所有代码逻辑都在主函数中实现
-        #         3.2 注意不要提供与主函数同层级的其他函数，如果需要封装函数，一定要在主函数内部进行封装
-        #         3.3 不要提供函数的调用代码，实际运行时我会自动调用主函数
-        #         3.4 函数的入参对应工具的输入变量，变量名称、变量类型要与"input_variables"中的定义一致，非必填变量要有默认值，具有默认值的变量应该放在最后
-        #         3.5 要规定函数的返回数据类型
-        #         3.6 主函数的结尾需要固定返回一个dict类型的数据，对应工具的输出变量，dict数据的键名即为输出的变量名，变量名称、变量类型要和"output_variables"中的定义一致
-        #     4. "output_variables"为工具运行完成后的输出变量，整体结构为list类型，list中每个元素为一个输入变量，单个输入变量为dict类型。
-        #     5. 注意"output_variables"中每个输出变量的类型，如果在python3代码中的返回数据中对应的变量类型为"dict"或者"list"，则对应的输出变量类型为"json"，否则为"string"或者"number"。
-        #     6. "output_type"为工具的输出类型，上面的工具数据json结构说明中已经提供了所有类型，要注意工具的输出类型并不取决于python3代码返回的数据类型，而是取决于python3代码的整体执行意图。
-        # ''',
-        # 'correction_skill_user':'''
-        #     修正意见：
-        #     {correction_prompt}
-        #
-        #     已生成的工具数据：
-        #     {history_skill}
-        # ''',
         'api_skill_success': '请求成功，请等待',
         'api_skill_generate_failed': '请求失败，请稍后再试',
         'api_skill_correction_failed': '请求失败，请稍后再试',

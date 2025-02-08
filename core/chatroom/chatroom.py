@@ -101,6 +101,7 @@ class Chatroom:
         # - message: str
         # - topic: str
         self._history_messages: List[Dict[str, Union[int, str]]] = []
+        self._last_speaker_id = 0
 
     def _get_agents_info(self) -> str:
         '''
@@ -108,7 +109,7 @@ class Chatroom:
         '''
         info = []
         for agent_id in self._model_config_ids:
-            if agent_id != 0:
+            if agent_id != 0 and agent_id != self._last_speaker_id:
                 agent = self._all_agents[agent_id]
                 abilities = agent['abilities']
                 if abilities:
@@ -176,12 +177,68 @@ class Chatroom:
             user_messages
         )
     
+    def _get_history_messages_list_grouped(self, model_config_id: int) -> Tuple[
+        List[List[Dict[str, Union[int, str]]]],
+        List[Dict[str, Union[int, str]]],
+        List[str],
+    ]:
+        '''
+        Get all history messages (grouped by sections) and the last section of them as JSON strings in an AI prompt.
+        Each section starts with a user message and includes all subsequent agent messages until the next user message.
+        
+        Returns:
+            Tuple containing:
+            - List of message sections, where each section is a list of message dictionaries
+            - List of messages in the last section (from the last user message)
+            - List of all user messages
+        '''
+        # Process individual messages as in the original function
+        messages = []
+        for message in self._history_messages:
+            user_str = get_language_content('chatroom_role_user', self._user_id, append_ret_lang_prompt=False)
+            agent_str = get_language_content('chatroom_role_agent', self._user_id, append_ret_lang_prompt=False)
+            agent_id = message['agent_id']
+            message_for_llm = {
+                'id': agent_id,
+                'name': user_str if agent_id == 0 else self._all_agents[agent_id]['name'],
+                'role': user_str if agent_id == 0 else agent_str,
+                'message': message['message']
+            }
+            messages.append(message_for_llm)
+        
+        # Truncate messages based on token limit
+        messages = truncate_messages_by_token_limit(messages, self._model_configs[model_config_id])
+        
+        # Group messages into sections
+        message_sections = []
+        current_section = []
+        for message in messages:
+            if message['id'] == 0 and current_section:  # When encountering a user message and current section is not empty
+                message_sections.append(current_section)
+                current_section = []
+            current_section.append(message)
+        if current_section:  # Add the last section
+            message_sections.append(current_section)
+                
+        # Get all user messages
+        user_messages = []
+        for message in messages:
+            if message['id'] == 0:
+                user_messages.append(message['message'])
+                
+        return (
+            message_sections,
+            message_sections[-1],
+            user_messages
+        )
+    
     def _user_speak(self, user_message: str) -> None:
         '''
         Append a user message to the history messages and insert it into the database.
         '''
         self._console_log(f'User message: \033[91m{user_message}\033[0m\n')
         # self._history_messages.append({'agent_id': 0, 'message': user_message, 'topic': self._topic})
+        self._last_speaker_id = 0
         self._history_messages.append({'agent_id': 0, 'message': user_message})
         self._user_message_id = chatroom_messages.insert(
             {
@@ -225,7 +282,7 @@ class Chatroom:
                         self._user_id,
                         append_ret_lang_prompt=False
                     )
-            messages, messages_in_last_section, user_messages = self._get_history_messages_list(self._model_config_ids[0])
+            messages, messages_in_last_section, user_messages = self._get_history_messages_list_grouped(self._model_config_ids[0])
             user_prompt = user_prompt.format(
                 agent_count = len(self._model_config_ids) - 1,
                 agents = self._get_agents_info(),
@@ -314,7 +371,7 @@ class Chatroom:
         completion_tokens = 0
         total_tokens = 0
 
-        messages, messages_in_last_section, user_messages = self._get_history_messages_list(self._model_config_ids[agent_id])
+        messages, messages_in_last_section, user_messages = self._get_history_messages_list_grouped(self._model_config_ids[agent_id])
         user_message = messages_in_last_section[0]['message']
         agent_user_subprompt = get_language_content(
             'chatroom_agent_user_subprompt',
@@ -365,6 +422,7 @@ class Chatroom:
 
             # Append the agent message to the history messages and insert it into the database
             # self._history_messages.append({'agent_id': agent_id, 'message': agent_message, 'topic': self._topic})
+            self._last_speaker_id = agent_id
             self._history_messages.append({'agent_id': agent_id, 'message': agent_message})
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
             chatroom_messages.insert(
