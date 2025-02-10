@@ -22,7 +22,7 @@ class CustomTools(MySQL):
     def get_skill_info(self, user_id: int, app_id: int, publish_status: int, team_id: int) -> Dict[str, Any]:
         apps_model = Apps()
         app = apps_model.select_one(
-            columns=["id AS app_id", "user_id", "name", "description", "icon", "icon_background", "is_public",
+            columns=["id AS app_id", "user_id", "name", "description", "icon", "icon_background", "is_public", "attrs_are_visible",
                      "publish_status AS app_publish_status",
                      "enable_api", "created_time", "status"],
             conditions=[
