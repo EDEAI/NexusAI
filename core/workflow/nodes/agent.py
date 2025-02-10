@@ -104,7 +104,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         }
         
         # Generate the system prompt based on the agent's abilities and output format
-        sys_prompt_append_ret_lang_prompt = not bool(task)
         ability_id = self.data['ability_id']
         default_output_format = agent['default_output_format']
         if ability_id == 0:
@@ -130,8 +129,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                             if direct_output
                             else 'agent_system_prompt_with_auto_match_ability'
                         ),
-                        uid=user_id,
-                        append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                        uid=user_id
                     )
                     input_['abilities_content_and_output_format'] = abilities_content_and_output_format
                     if self.data['task_splitting']:
@@ -149,8 +147,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     abilities_content = '\n'.join(ability['content'] for ability in abilities)
                     system_prompt = get_language_content(
                         'agent_system_prompt_with_abilities',
-                        uid=user_id,
-                        append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                        uid=user_id
                     )
                     input_['abilities_content'] = abilities_content
                     input_['output_format'] = get_language_content(
@@ -166,8 +163,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 output_format = default_output_format
                 system_prompt = get_language_content(
                     'agent_system_prompt_with_no_ability',
-                    uid=user_id,
-                    append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                    uid=user_id
                 )
                 input_['output_format'] = get_language_content(
                     f'agent_output_format_{output_format}',
@@ -185,8 +181,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 output_format = default_output_format
             system_prompt = get_language_content(
                 'agent_system_prompt_with_abilities',
-                uid=user_id,
-                append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                uid=user_id
             )
             input_['abilities_content'] = ability['content']
             input_['output_format'] = get_language_content(
