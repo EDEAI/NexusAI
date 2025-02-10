@@ -123,6 +123,7 @@ class SkillNode(SandboxBaseNode):
                     try:
                         stdout_dict = json.loads(stdout_text)
                         self.output_check(self.data['output'], stdout_dict)
+                        stdout_dict = self.skill_file_handler(stdout_dict,app_run_id=app_run_id,workflow_id=kwargs['workflow_id'])
                         for key, value in stdout_dict.items():
                             var_type = type_map.get(type(value), 'json')
                             if var_type == 'json':
