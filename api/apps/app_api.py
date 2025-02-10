@@ -72,7 +72,7 @@ async def run(
         case 1:  # Agent
             # Get agent info
             agent = Agents().select_one(
-                columns=['id', 'input_variables'],
+                columns=['id', 'user_id', 'input_variables'],
                 conditions=[
                     {'column': 'app_id', 'value': app_id},
                     {'column': 'status', 'value': 1},
@@ -93,7 +93,7 @@ async def run(
             task = run_app.delay(
                 app_type='agent',
                 id_=agent['id'],
-                user_id=0,
+                user_id=agent['user_id'],
                 input_dict=input_obj.to_dict(),
                 ability_id=0,
                 prompt=prompt.to_dict()

@@ -54,8 +54,6 @@ class LLMBaseNode(Node):
         input: Dict[str, Any] = {},
         file_list: Optional[ArrayVariable] = None,
         correct_llm_output: bool = False,
-        requirements_and_goals: Optional[str] = None,
-        requirements_and_goals_kwargs: Optional[Dict[str, str]] = None,
         override_rag_input: Optional[str] = None
     ) -> Tuple[Messages, Dict[str, Any]]:
         if correct_llm_output:
@@ -119,12 +117,7 @@ class LLMBaseNode(Node):
             user_prompt = input['user_prompt'] if override_rag_input is None else override_rag_input
             rag_result = retrieval_chain.invoke(user_prompt if override_rag_input is None else override_rag_input)
             formatted_docs = format_docs(rag_result)
-            if requirements_and_goals_kwargs:
-                requirements_and_goals_kwargs['formatted_docs'] = formatted_docs
-            else:
-                input['formatted_docs'] = formatted_docs
-        if requirements_and_goals:
-            input['requirements_and_goals'] = requirements_and_goals.format(**requirements_and_goals_kwargs)
+            input['formatted_docs'] = formatted_docs
 
         return messages, input
         
@@ -138,8 +131,6 @@ class LLMBaseNode(Node):
         file_list: Optional[ArrayVariable] = None,
         return_json: bool = False,
         correct_llm_output: bool = False,
-        requirements_and_goals: Optional[str] = None,
-        requirements_and_goals_kwargs: Optional[Dict[str, str]] = None,
         override_rag_input: Optional[str] = None
     ) -> Tuple[Dict[str, Any], str, int, int, int]:
         """
@@ -154,8 +145,6 @@ class LLMBaseNode(Node):
             file_list (Optional[ArrayVariable]): The list of files to be uploaded to the model.
             return_json (bool): Indicates whether to return the output in JSON format.
             correct_llm_output (bool): Indicates whether to correct the LLM output using the correct prompt.
-            requirements_and_goals (Optional[str]): The requirements and goals to be passed to the model.
-            requirements_and_goals_kwargs (Optional[Dict[str, str]]): The keyword arguments to be passed to the requirements and goals.
             override_rag_input (Optional[str]): The input to be used for the retrieval chain.
             
         Returns:
@@ -178,8 +167,6 @@ class LLMBaseNode(Node):
             input=input,
             file_list=file_list,
             correct_llm_output=correct_llm_output,
-            requirements_and_goals=requirements_and_goals,
-            requirements_and_goals_kwargs=requirements_and_goals_kwargs,
             override_rag_input=override_rag_input
         )
 
@@ -211,8 +198,6 @@ class LLMBaseNode(Node):
         file_list: Optional[ArrayVariable] = None,
         return_json: bool = False,
         correct_llm_output: bool = False,
-        requirements_and_goals: Optional[str] = None,
-        requirements_and_goals_kwargs: Optional[Dict[str, str]] = None,
         override_rag_input: Optional[str] = None
     ) -> Tuple[Dict[str, Any], Callable[[], AsyncIterator[AIMessageChunk]]]:
         """
@@ -227,8 +212,6 @@ class LLMBaseNode(Node):
             file_list (Optional[ArrayVariable]): The list of files to be uploaded to the model.
             return_json (bool): Indicates whether to return the output in JSON format.
             correct_llm_output (bool): Indicates whether to correct the LLM output using the correct prompt.
-            requirements_and_goals (Optional[str]): The requirements and goals to be passed to the model.
-            requirements_and_goals_kwargs (Optional[Dict[str, str]]): The keyword arguments to be passed to the requirements and goals.
             override_rag_input (Optional[str]): The input to be used for the retrieval chain, if provided.
 
         Returns:
@@ -250,8 +233,6 @@ class LLMBaseNode(Node):
             input=input,
             file_list=file_list,
             correct_llm_output=correct_llm_output,
-            requirements_and_goals=requirements_and_goals,
-            requirements_and_goals_kwargs=requirements_and_goals_kwargs,
             override_rag_input=override_rag_input
         )
 
