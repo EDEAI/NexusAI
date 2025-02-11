@@ -251,6 +251,8 @@ language_packs = {
         'switch_the_language_success': 'Switch language success',
         # agent
         'agent_does_not_exist': 'Agent does not exist',
+        'agent_message_does_not_exist': 'Agent Chat Message does not exist',
+        'agent_message_does_not_exist_ok': 'Operation successful',
         'agent_empty_obligation': 'Agent obligation should not be empty!',
         'agent_empty_llm_model': 'Please fill in the LLM model for the Agent!',
         'agent_empty_ability': 'Agent ability should not be empty!',
@@ -1043,6 +1045,8 @@ language_packs = {
         'switch_the_language_success': '切换语言成功',
 
         'agent_does_not_exist': '智能体不存在！',
+        'agent_message_does_not_exist': '智能体聊天消息不存在！',
+        'agent_message_does_not_exist_ok': '清除聊天消息成功',
         'agent_empty_obligation': '智能体职能不应为空！',
         'agent_empty_llm_model': '请填写智能体的LLM模型！',
         'agent_empty_ability': '智能体能力不应为空！',

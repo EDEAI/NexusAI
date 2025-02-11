@@ -1043,3 +1043,48 @@ async def agent_log_list(agent_id: int, app_run_id: int, userinfo: TokenData = D
     if not result:
         return response_error(get_language_content("app_run_error"))
     return response_success(result)
+
+
+@router.post("/{agent_id}/clear_agent_chat_memory", response_model=ClearAgentChatMemory, summary="Clear agent chat memory")
+async def clear_agent_chat_memory(agent_id: int, message_id: int, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Clear the chat memory for a specific Agent chat.
+    This endpoint allows users to clear the chat history of a specific agent chat room,
+    removing all messages associated with the provided message ID.
+
+    Parameters:
+    - agent_id (int): A unique identifier used to specify the agent whose chat memory needs to be cleared. Compulsory.
+    - message_id (int): A unique identifier used to specify the message or chat session to be cleared. Compulsory.
+    - userinfo (TokenData): Information about the current user is provided through dependency injection. Compulsory.
+
+    Returns:
+    - A response object formatted according to the AgentResponseBase model, indicating the success or failure of the operation.
+
+    Raises:
+    - HTTPException:
+        - If 'agent_id' is invalid, it indicates that the user has not been authenticated or the agent does not exist.
+        - If 'message_id' is invalid, it indicates that the specified message or chat session does not exist.
+    """
+
+    find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
+    if not find_agent:
+        return response_error(get_language_content("agent_does_not_exist"))
+    find_message = AgentChatMessages().select_one(
+        columns=['id'],
+        conditions=[
+            {"column": "agent_id", "value": agent_id},
+            {"column": "user_id", "value": userinfo.uid},
+            {"column": "id", "value": message_id}
+        ]
+    )['id']
+    if not find_message:
+        return response_error(get_language_content("agent_message_does_not_exist"))
+
+    AgentChatMessages().update(
+        {'column': 'id', 'value': find_message},
+        {'history_cleared': 1}
+    )
+
+    return response_success(
+        {"message_id": find_message}
+    )
