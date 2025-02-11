@@ -197,6 +197,29 @@ class ObjectVariable:
             properties_to_convert = self.properties.values()
         return '\n'.join([value.to_string() for value in properties_to_convert])
         
+    def extract_file_variables(self, new_name: str = "file_variables") -> "ObjectVariable":
+        """
+        Extracts all file-type variables from this object and its nested properties,
+        and returns them in a new ObjectVariable.
+
+        :param new_name: str, the name for the new ObjectVariable (default: "file_variables")
+        :return: ObjectVariable containing only the file-type variables
+        """
+        result = ObjectVariable(name=new_name)
+        
+        def extract_files(var: Union[Variable, ArrayVariable, "ObjectVariable"]):
+            if isinstance(var, Variable) and var.type == "file":
+                result.add_property(var.name, var)
+            elif isinstance(var, ArrayVariable):
+                for value in var.values:
+                    extract_files(value)
+            elif isinstance(var, ObjectVariable):
+                for value in var.properties.values():
+                    extract_files(value)
+        
+        extract_files(self)
+        return result
+        
 VariableTypes = Union[Variable, ArrayVariable, ObjectVariable]
 
 def create_variable_from_dict(data: Dict[str, Any]) -> VariableTypes:

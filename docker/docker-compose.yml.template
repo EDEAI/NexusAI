@@ -197,6 +197,7 @@ services:
       - ./nginx/websocket_proxy.conf:/etc/nginx/websocket_proxy.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ../assets/tool:/app/tool_icon
+      - ../storage:/app/storage
       - ./volumes/logs/nginx:/var/log/nginx
     ports:
       - "9470:80"

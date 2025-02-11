@@ -219,6 +219,9 @@ WEB_URL: http://127.0.0.1:9470
 # Backend icon resource access address
 ICON_URL: http://127.0.0.1:9470
 
+# Backend storage resource access address
+STORAGE_URL: http://127.0.0.1:9470
+
 # Agent/workflow API access timeout
 APP_API_TIMEOUT: 60
 
@@ -295,13 +298,22 @@ Copy `.env` and modify the `.env` configuration items as needed, For configurati
 cp .env.template .env
 ```
 
-Configure icon access rules through nginx
+Configure icon and storage access rules through nginx
 ```nginx
 server {
     listen 9475; # The port should be consistent with ICON_URL in `.env`
 
     location /tool_icon {
         alias NexusAI/assets/tool; # Fill in the real path of the project
+        try_files $uri $uri/ =404;
+    }
+}
+
+server {
+    listen 9476; # The port should be consistent with STORAGE_URL in `.env`
+
+    location /file {
+        alias NexusAI/storage; # Fill in the real path of the project
         try_files $uri $uri/ =404;
     }
 }
