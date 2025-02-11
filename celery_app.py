@@ -78,7 +78,7 @@ def run_app(
                 agent_id=id_,
                 ability_id=kwargs['ability_id'],
                 prompt=create_prompt_from_dict(kwargs['prompt']),
-                data_source_run_id=kwargs['data_source_run_id'],
+                data_source_run_id=kwargs.get('data_source_run_id', 0),
             )
         case 'skill':
             if 'custom_data' in kwargs:

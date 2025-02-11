@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
 
 from datetime import datetime
 from hashlib import md5
-from typing import Annotated, Dict, Optional
+from typing import Annotated, Any, Dict, Optional
 
 from fastapi import APIRouter, FastAPI, Header
 from fastapi.openapi.docs import get_redoc_html
@@ -38,7 +38,7 @@ router = APIRouter()
 async def run(
     authorization: Annotated[str, Header(description='API key')],
     encrypted_id: str,
-    input_: Any
+    kwargs: Dict[str, Any]
 ):  # type: ignore
     """
     Run the app with the given input.
@@ -72,7 +72,7 @@ async def run(
         case 1:  # Agent
             # Get agent info
             agent = Agents().select_one(
-                columns=['id', 'input_variables'],
+                columns=['id', 'user_id', 'input_variables'],
                 conditions=[
                     {'column': 'app_id', 'value': app_id},
                     {'column': 'status', 'value': 1},
@@ -84,13 +84,16 @@ async def run(
             
             # Get agent input and prompt
             input_obj = create_variable_from_dict(agent['input_variables'])
-            prompt = Prompt(user=input_.prompt)
+            try:
+                prompt = Prompt(user=kwargs['prompt'])
+            except:
+                return response_error('Missing field: "prompt"')
             
             # Run agent
             task = run_app.delay(
                 app_type='agent',
                 id_=agent['id'],
-                user_id=0,
+                user_id=agent['user_id'],
                 input_dict=input_obj.to_dict(),
                 ability_id=0,
                 prompt=prompt.to_dict()
@@ -115,9 +118,14 @@ async def run(
                 return response_error('No available workflow, or the workflow is not published.')
             
             # Get workflow input
-            input_data: Dict[str, Union[int | float | str]] = input_.input_data.dict()
-            input_obj = unflatten_dict_with_values(input_data, 'input_var')
-            validate_required_variable(input_obj)
+            try:
+                input_data: Dict[str, Union[int | float | str]] = kwargs['input_data']
+                if not isinstance(input_data, dict):
+                    raise Exception('Field "input_data" must be a dictionary')
+                input_obj = unflatten_dict_with_values(input_data, 'input_var')
+                validate_required_variable(input_obj)
+            except Exception as e:
+                return response_error(str(e))
 
             # Check the input
             graph = create_graph_from_dict(workflow['graph'])
@@ -138,13 +146,15 @@ async def run(
             }
             app_run_id = AppRuns().insert(app_run_data)
             Apps().increment_execution_times(app_id)
+            Apps().commit()
 
             # Run workflow
             loop = asyncio.get_running_loop()
             result = await loop.run_in_executor(
                 None,
                 redis.blpop,
-                (f'app_run_{app_run_id}_result', settings.APP_API_TIMEOUT)
+                [f'app_run_{app_run_id}_result'],
+                settings.APP_API_TIMEOUT
             )
             if result is None:
                 return response_error('Timeout waiting for the workflow to complete')
