@@ -14,6 +14,7 @@ interface ResizablePanelProps {
     maxHeight?: number;
     defaultWidth?: number;
     defaultHeight?: number;
+    onChange?: (width: number, height: number) => void;
 }
 
 const ResizablePanel: React.FC<ResizablePanelProps> = ({
@@ -26,6 +27,7 @@ const ResizablePanel: React.FC<ResizablePanelProps> = ({
     maxHeight = 800,
     defaultWidth = 415,
     defaultHeight = 300,
+    onChange,
 }) => {
     const [panelWidth, setPanelWidth] = useState<number>(defaultWidth);
     const [panelHeight, setPanelHeight] = useState<number>(defaultHeight);
@@ -34,8 +36,9 @@ const ResizablePanel: React.FC<ResizablePanelProps> = ({
         (width: number, height: number) => {
             setPanelWidth(width);
             if (height) setPanelHeight(height);
+            onChange?.(width, height);
         },
-        [setPanelWidth, setPanelHeight],
+        [setPanelWidth, setPanelHeight, onChange],
     );
 
     const { triggerRef, containerRef } = useResizePanel({

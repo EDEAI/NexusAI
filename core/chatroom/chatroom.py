@@ -316,7 +316,8 @@ class Chatroom:
             manager_message_var = create_variable_from_dict(result_data['outputs'])
             manager_message = manager_message_var.value
             logger.debug('Speaker selector output: %s', manager_message)
-            llm_input_var = result_data['model_data']['messages']
+            model_data = result_data['model_data']
+            llm_input_var = model_data['messages']
             llm_input = []
             for role, message_var in llm_input_var:
                 llm_input.append((role, create_variable_from_dict(message_var).value))
@@ -330,6 +331,7 @@ class Chatroom:
                     'app_run_id': self._app_run_id,
                     'llm_input': llm_input,
                     'message': manager_message,
+                    'model_data': model_data,
                     'is_read': 1 if has_connections else 0,
                     'prompt_tokens': prompt_tokens,
                     'completion_tokens': completion_tokens,

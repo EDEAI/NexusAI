@@ -92,7 +92,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         task: Optional[Dict[str, RecursiveTaskCategory]],
         retrieve: bool,
         direct_output: bool = False
-    ) -> Tuple[Optional[int], Dict[str, Any], Optional[str], Optional[Dict[str, str]]]:
+    ) -> Tuple[Optional[int], Dict[str, Any]]:
         agent_id = agent['id']
         input_ = {
             'id_': agent_id,
@@ -104,7 +104,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         }
         
         # Generate the system prompt based on the agent's abilities and output format
-        sys_prompt_append_ret_lang_prompt = not bool(task)
         ability_id = self.data['ability_id']
         default_output_format = agent['default_output_format']
         if ability_id == 0:
@@ -130,8 +129,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                             if direct_output
                             else 'agent_system_prompt_with_auto_match_ability'
                         ),
-                        uid=user_id,
-                        append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                        uid=user_id
                     )
                     input_['abilities_content_and_output_format'] = abilities_content_and_output_format
                     if self.data['task_splitting']:
@@ -149,8 +147,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     abilities_content = '\n'.join(ability['content'] for ability in abilities)
                     system_prompt = get_language_content(
                         'agent_system_prompt_with_abilities',
-                        uid=user_id,
-                        append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                        uid=user_id
                     )
                     input_['abilities_content'] = abilities_content
                     input_['output_format'] = get_language_content(
@@ -166,8 +163,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 output_format = default_output_format
                 system_prompt = get_language_content(
                     'agent_system_prompt_with_no_ability',
-                    uid=user_id,
-                    append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                    uid=user_id
                 )
                 input_['output_format'] = get_language_content(
                     f'agent_output_format_{output_format}',
@@ -185,8 +181,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 output_format = default_output_format
             system_prompt = get_language_content(
                 'agent_system_prompt_with_abilities',
-                uid=user_id,
-                append_ret_lang_prompt=sys_prompt_append_ret_lang_prompt
+                uid=user_id
             )
             input_['abilities_content'] = ability['content']
             input_['output_format'] = get_language_content(
@@ -225,26 +220,19 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     append_ret_lang_prompt=False
                 )
             )
-        input_['user_prompt'] = user_prompt
-        requirements_and_goals = None
-        requirements_and_goals_kwargs = None
+        
         if task:
-            prompt_config = get_language_content("recursive_task_execute")
-            task_prompt = Prompt(system=prompt_config["system"], user=prompt_config["user"])
-            
             current_task_dict = task['current'].to_dict(first_level_only=True)
             child_task_dict = current_task_dict.pop('subcategories', [])
             child_task_names = [task['name'] for task in child_task_dict]
             
-            invoke_input = {
-                'obligations': self.data['prompt'].get_system().format(**input_),
+            user_subprompt_kwargs = {
+                'requirements_and_goals': user_prompt,
                 'current_task': json.dumps(current_task_dict, ensure_ascii=False),
                 'parent_task': json.dumps(task['parent'].to_dict(exclude_subcategories=True) if task['parent'] else "", ensure_ascii=False),
                 'child_tasks': json.dumps(child_task_names, ensure_ascii=False),
                 'related_content': ''
             }
-            requirements_and_goals = self.data['prompt'].get_user()
-            requirements_and_goals_kwargs = input_
             if self.data['retrieval_task_datasets']:
                 workflow = Workflows().get_workflow_app(workflow_id)
                 if not workflow:
@@ -263,12 +251,16 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 if retrieval_result:
                     previous_documents_results = DatasetRetrieval.get_full_documents(retrieval_result)
                     if previous_documents_results:
-                        invoke_input['related_content'] = json.dumps(previous_documents_results, ensure_ascii=False)
-            self.data["prompt"] = task_prompt
-            input_ = invoke_input
-            input_['user_prompt'] = user_prompt
+                        user_subprompt_kwargs['related_content'] = json.dumps(previous_documents_results, ensure_ascii=False)
+            user_prompt = get_language_content(
+                "recursive_task_execute_agent_user_subprompt",
+                user_id,
+                append_ret_lang_prompt=False
+            ).format(**user_subprompt_kwargs)
 
-        return output_format, input_, requirements_and_goals, requirements_and_goals_kwargs
+        input_['user_prompt'] = user_prompt
+
+        return output_format, input_
         
     def run(
         self,
@@ -362,7 +354,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     )
             
             direct_output = bool(task)  # Content output only (ability ID is omitted) for auto match ability & Force plain text output
-            output_format, input_, requirements_and_goals, requirements_and_goals_kwargs = self._prepare_prompt(
+            output_format, input_ = self._prepare_prompt(
                 agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), direct_output
             )
             override_rag_input = kwargs.get('override_rag_input')
@@ -376,15 +368,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 file_list=file_list,
                 return_json=return_json,
                 correct_llm_output=correct_llm_output,
-                requirements_and_goals=requirements_and_goals,
-                requirements_and_goals_kwargs=requirements_and_goals_kwargs,
                 override_rag_input=override_rag_input
             )
+            print(model_data)
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
-                {'messages': model_data['messages']}
+                {'model_data': model_data}
             )
-            print(model_data)
             # Process the AI message
             default_output_format = agent['default_output_format']
             if output_format is None:  # Auto match ability
@@ -575,7 +565,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         datasets, agent_id, workflow_id, user_id, type
                     )
             
-            _, input_, requirements_and_goals, requirements_and_goals_kwargs = self._prepare_prompt(
+            _, input_ = self._prepare_prompt(
                 agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), True
             )
             override_rag_input = kwargs.get('override_rag_input')
@@ -588,13 +578,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 file_list=file_list,
                 return_json=False,
                 correct_llm_output=correct_llm_output,
-                requirements_and_goals=requirements_and_goals,
-                requirements_and_goals_kwargs=requirements_and_goals_kwargs,
                 override_rag_input=override_rag_input
-            )
-            AppRuns().update(
-                {'column': 'id', 'value': agent_run_id},
-                {'messages': model_data['messages']}
             )
 
             full_chunk: Optional[AIMessageChunk] = None
@@ -612,6 +596,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 reranking_tokens = retrieval_token_counter['reranking']
             else:
                 embedding_tokens, reranking_tokens = 0, 0
+
+            model_data['raw_output'] = full_chunk.content
+            AppRuns().update(
+                {'column': 'id', 'value': agent_run_id},
+                {'model_data': model_data}
+            )
+
             outputs = Variable(
                 name="text",
                 type="string",

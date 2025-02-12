@@ -705,7 +705,7 @@ export const transformer = {
             if (node?.data?.infoData?.output_variables) {
                 params.output = node?.data?.infoData?.output_variables;
             }
-            console.log(params, new SkillNode(params), node?.data?.infoData?.input_variables);
+            // console.log(params, new SkillNode(params), node?.data?.infoData?.input_variables);
 
             return new SkillNode(params);
         },

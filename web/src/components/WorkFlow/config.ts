@@ -50,15 +50,16 @@ export const NODE_COLOR={
 
     [BlockEnum.ConditionBranch]: '#E49B68',
     [BlockEnum.RequirementCategory]: '#E49B68',
-    [BlockEnum.Retriever]: '#E49B68',
-
+    [BlockEnum.VariableAggregation]: '#E49B68',
+    
+    [BlockEnum.Retriever]: '#D569AF',
     [BlockEnum.Agent]: '#7967C8',
     [BlockEnum.Human]: '#2382DF',
     [BlockEnum.LLM]: '#AF68D0',
-    [BlockEnum.VariableAggregation]: '#D569AF',
+    
     [BlockEnum.Skill]: '#DBAF16',
     [BlockEnum.HttpRequest]: '#E086AB',
-    [BlockEnum.Tool]: '#5A8852',
+    [BlockEnum.Tool]: '#eaf7e8',
 }
 export const NODES_GROUP={
     custom:{

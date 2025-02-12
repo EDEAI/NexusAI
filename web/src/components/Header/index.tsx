@@ -6,6 +6,7 @@ import React from 'react';
 import { SelectLang } from '../RightContent';
 import { AvatarDropdown, AvatarName } from '../RightContent/AvatarDropdown';
 import {creationsearchdata} from "@/utils/useUser";
+import { Tooltip } from 'antd';
 
 const Header: React.FC = () => {
     const { location } = history;
@@ -146,8 +147,50 @@ const Header: React.FC = () => {
             ],
         },
     ];
+
+    const renderMenuContent = (item: any, index: number, isActive: boolean) => {
+        const content = (
+            <div
+                key={index}
+                onClick={() => {
+                    creationsearchdata('SET',6)
+                    history.push(item.children[0].path);
+                }}
+                className={`flex gap-2 items-center justify-center ${
+                    isActive 
+                        ? 'bg-white shadow-black' 
+                        : 'hover:bg-[#EEEFF1]'
+                } h-8 px-[15px] py-[6px] rounded-lg mr-5 cursor-pointer`}
+            >
+                <img 
+                    src={isActive ? item.activeIcon : item.icon} 
+                    alt={item.name} 
+                    className="" 
+                />
+                <span className={`${
+                    isActive ? 'text-[#1B64F3]' : 'text-[#213044]'
+                } lg:inline hidden`}>
+                    {item.name}
+                </span>
+            </div>
+        );
+
+        return (
+            <>
+                <div className="lg:block hidden">
+                    {content}
+                </div>
+                <div className="lg:hidden block">
+                    <Tooltip title={item.name} placement="bottom">
+                        {content}
+                    </Tooltip>
+                </div>
+            </>
+        );
+    };
+
     return (
-        <div className="w-full h-full bg-[#F7F7F7] flex items-center justify-between px-[30px]">
+        <div className="w-full h-full bg-[#F7F7F7] flex items-center justify-between px-[30px]  min-w-[1160px]">
             <div className="logo">
                 <Link to={menuList[0].children[0].path}>
                     <img src="/images/logo.svg" alt="logo" className="h-6" />
@@ -155,37 +198,8 @@ const Header: React.FC = () => {
             </div>
             <div className="flex-1 flex justify-center items-center">
                 {menuList.map((item, index) => {
-                
-                    if (item.children.some(x => x.path == pathname)) {
-                        
-                        return (
-                            <div
-                                key={index}
-                                onClick={() => {
-                                    creationsearchdata('SET',6)
-                                    history.push(item.children[0].path);
-                                }}
-                                className="flex items-center justify-center bg-white h-8 px-[15px] py-[6px] rounded-lg shadow-black mr-5 cursor-pointer"
-                            >
-                                <img src={item.activeIcon} alt={item.name} className="mr-2" />
-                                <span className="text-[#1B64F3]">{item.name}</span>
-                            </div>
-                        );
-                    }
-                    return (
-                        <div
-                            key={index}
-                            onClick={() => {
-                                creationsearchdata('SET',6)
-                                history.push(item.children[0].path);
-
-                            }}
-                            className="flex items-center justify-center h-8 px-[15px] py-[6px] rounded-lg shadow-black mr-5 cursor-pointer hover:bg-[#EEEFF1]"
-                        >
-                            <img src={item.icon} alt={item.name} className="mr-2" />
-                            <span className="text-[#213044]">{item.name}</span>
-                        </div>
-                    );
+                    const isActive = item.children.some(x => x.path == pathname);
+                    return renderMenuContent(item, index, isActive);
                 })}
             </div>
             <div className="user flex h-full">

@@ -196,6 +196,22 @@ language_packs = {
                 Related task content for reference only: {related_content}
             """,
         },
+        "recursive_task_execute_agent_user_subprompt": """
+            You are a task executor. Please perform the current task as detailed as possible according to the requirements and goals of the current task, the current task content I provide, the parent task content for reference only, the subtask list for reference only, and the related task content for reference only.
+            When performing the current task, pay attention to the following points:
+            1. The current task must be performed strictly in accordance with the requirements and goals of the current task.
+            2. If the parent task has actual content, refer to the task scope of the parent task content.
+            3. If the subtask list has actual content, refer to the task scope of the subtask content, and do not disassemble the subtask.
+            4. If the related task has actual content, please note that it is only for related reference.
+            Task json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: task content}}.
+            In the end, only the task content you performed will be returned, and no redundant content will be returned.
+            
+            Requirements and goals of the current task: {requirements_and_goals}
+            Current task content: {current_task}
+            Parent task content for reference only: {parent_task}
+            Subtask list for reference only: {child_tasks}
+            Related task content for reference only: {related_content}
+        """,
 
         # HTTP requeust node
         'http_request_failed': 'HTTP request failed with status code {status_code}',
@@ -251,6 +267,8 @@ language_packs = {
         'switch_the_language_success': 'Switch language success',
         # agent
         'agent_does_not_exist': 'Agent does not exist',
+        'agent_message_does_not_exist': 'Agent Chat Message does not exist',
+        'agent_message_does_not_exist_ok': 'Operation successful',
         'agent_empty_obligation': 'Agent obligation should not be empty!',
         'agent_empty_llm_model': 'Please fill in the LLM model for the Agent!',
         'agent_empty_ability': 'Agent ability should not be empty!',
@@ -279,6 +297,7 @@ language_packs = {
         'api_agent_run_ability_status_not_normal': 'The ability status is not normal',
         'api_agent_base_update_agent_id_required': 'agent_id is required',
         'api_agent_base_update_is_public_error': 'is_public can only input 0 or 1',
+        'api_agent_base_update_attrs_are_visible_error': 'attrs_are_visible can only input 0 or 1',
         'api_agent_base_update_enable_api_error': 'enable_api can only input 0 or 1',
         'api_agent_base_update_input_variables_wrong': 'input_variables data in wrong format',
         'api_agent_base_update_m_config_id_required': 'm_config_id is required',
@@ -1042,6 +1061,8 @@ language_packs = {
         'switch_the_language_success': '切换语言成功',
 
         'agent_does_not_exist': '智能体不存在！',
+        'agent_message_does_not_exist': '智能体聊天消息不存在！',
+        'agent_message_does_not_exist_ok': '清除聊天消息成功',
         'agent_empty_obligation': '智能体职能不应为空！',
         'agent_empty_llm_model': '请填写智能体的LLM模型！',
         'agent_empty_ability': '智能体能力不应为空！',
@@ -1070,6 +1091,7 @@ language_packs = {
         'api_agent_run_ability_status_not_normal': '能力状态不正确',
         'api_agent_base_update_agent_id_required': '智能体ID是必传的',
         'api_agent_base_update_is_public_error': '是否团队可见只能输入0或1',
+        'api_agent_base_update_attrs_are_visible_error': '是否属性可见只能输入0或1',
         'api_agent_base_update_enable_api_error': '启用接口只能输入0或1',
         'api_agent_base_update_input_variables_wrong': '输入变量数据格式错误',
         'api_agent_base_update_m_config_id_required': '模型配置ID是必传的',
@@ -1310,6 +1332,7 @@ prompt_keys = {
     "recursive_task_generation",
     "recursive_task_assign",
     "recursive_task_execute",
+    "recursive_task_execute_agent_user_subprompt",
     "chatroom_manager_system",
     "chatroom_manager_system_with_optional_selection",
     "chatroom_manager_user_invalid_selection",

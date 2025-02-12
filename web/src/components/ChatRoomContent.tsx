@@ -816,7 +816,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                 onScroll={slideScroll}
             >   
                 
-                <div className="w-[920px]">
+                <div>
                     <div className="w-full">
                         <div className="flex flex-col-reverse">
                             <>
