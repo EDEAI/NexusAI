@@ -13,6 +13,7 @@ from core.database.models.app_runs import AppRuns
 from core.database.models.ai_tool_llm_records import AIToolLLMRecords
 from core.llm.prompt import create_prompt_from_dict, Prompt
 from time import time
+import os
 
 router = APIRouter()
 tools_db = CustomTools()
@@ -293,7 +294,28 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
         return response_success({"outputs":{
                 'error': result["message"]
             }})
-    return response_success({"outputs": result["data"]["outputs"]})
+
+    outputs = result["data"]["outputs"]
+    file_list = []
+    storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
+
+    if skill and skill.get("output_variables"):
+        output_vars = create_variable_from_dict(skill["output_variables"])
+        file_vars = output_vars.extract_file_variables()
+        for var in file_vars.properties.values():
+            if var.name in outputs:
+                file_path = outputs[var.name]
+                if file_path:
+                    file_name = file_path.split('/')[-1]
+                    full_path = f"{storage_url}{file_path}"
+                    file_list.append({
+                        "file_name": file_name,
+                        "file_path": full_path
+                    })
+    return response_success({
+        "outputs": outputs,
+        "file_list": file_list
+    })
 
 
 @router.post("/skill_generate", response_model=ResSkillGenerateSchema)
