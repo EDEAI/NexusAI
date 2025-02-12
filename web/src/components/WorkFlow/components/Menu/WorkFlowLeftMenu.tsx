@@ -179,7 +179,7 @@ const WorkFlowLeftMenu: React.FC = () => {
     };
     return (
         <>
-            <div className={`absolute left-[calc(100%+26px)] -top-4  z-20 ${activeKey === '3' ? 'fixed -left-[14px]' : ''}`}>
+            <div className={`absolute left-[calc(100%+26px)] -top-4  z-20 ${activeKey === '3' ? ' !-left-[14px]' : ''}`}>
                 <Menu
                     defaultSelectedKeys={['1']}
                     selectedKeys={[activeKey]}

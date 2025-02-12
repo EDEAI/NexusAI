@@ -164,7 +164,7 @@ export default memo((props: NodeProps) => {
                 type="source"
                 position={Position.Right}
             ></CustomHandle>
-            <div className="mt-2 mb-4">
+            {/* <div className="mt-2 mb-4">
                 <CustomHandle
                     id="executor_list"
                     type="target"
@@ -174,14 +174,14 @@ export default memo((props: NodeProps) => {
                     isValidConnection={()=>true}
                 ></CustomHandle>
                 <div className="pl-2">执行器</div>
-            </div>
-            {/* <div className="flex flex-col gap-2 mb-2">
+            </div> */}
+            <div className="flex flex-col gap-2 mb-2">
                 {data?.executor_list &&
                     Array.isArray(data?.executor_list) &&
                     data?.executor_list.map((x, i) => {
                         return <RenderChildrenItem key={x?.currentId} x={x} index={i} />;
                     })}
-            </div> */}
+            </div>
         </div>
     );
 });
