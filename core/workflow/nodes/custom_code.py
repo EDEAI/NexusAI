@@ -53,34 +53,23 @@ class CustomCodeNode(SandboxBaseNode):
         """
         try:
             start_time = datetime.now()
-            
             input = self.data['input']
             replace_variable_value_with_context(input, context)
             validate_required_variable(input)
-            
             response = self.run_custom_code()
-
             # Validate the response status
             status = response['status']
             if status == 0:
-                output = ObjectVariable(name='output')
-
                 # Parse stdout if available
                 stdout_text = response['data']['stdout']
                 if stdout_text:
                     try:
+                        output_obj = self.data['output']
                         stdout_dict = json.loads(stdout_text)
-                        self.output_check(self.data['output'], stdout_dict)
-                        for key, value in stdout_dict.items():
-                            type_map = {
-                                str: 'string',
-                                int: 'number',
-                                float: 'number'
-                            }
-                            var_type = type_map.get(type(value), 'json')
-                            if var_type == 'json':
-                                value = json.dumps(value, ensure_ascii=False)
-                            output.add_property(key=key, value=Variable(name=key, value=value, type=var_type))
+                        self.output_check(output_obj, stdout_dict)
+                        stdout_dict = self.skill_file_handler(stdout_dict,app_run_id=kwargs.get('app_run_id',0),workflow_id=kwargs.get('workflow_id',0))
+                        for key, variable in output_obj.properties.items():
+                            variable.value = stdout_dict[key]
                     except json.JSONDecodeError as e:
                         return {
                             'status': 'failed',
@@ -96,7 +85,6 @@ class CustomCodeNode(SandboxBaseNode):
                     'status': 'failed',
                     'message': response['msg']
                 }
-
             end_time = datetime.now()
             return {
                 'status': 'success',
@@ -105,7 +93,7 @@ class CustomCodeNode(SandboxBaseNode):
                     'elapsed_time': end_time.timestamp() - start_time.timestamp(),
                     'inputs': input.to_dict(),
                     'output_type': 1,
-                    'outputs': output.to_dict()
+                    'outputs': self.data['output'].to_dict()
                 }
             }
         except Exception as e:
