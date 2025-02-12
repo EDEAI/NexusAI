@@ -129,7 +129,7 @@ class Agents(MySQL):
 
     def agent_base_update(self, agent_id: int, uid: int = 0, team_id: int = 0, is_public: int = 0, enable_api: int = 0,
                           obligations: str = "", input_variables: Dict[str, Any] = None, dataset_ids: List[int] = None,
-                          m_config_id: int = 0, allow_upload_file: int = 0, default_output_format: int = 1):
+                          m_config_id: int = 0, allow_upload_file: int = 0, default_output_format: int = 1, agent_base_update: int = 0):
         """
         Update base agent data based on parameters
 
@@ -137,6 +137,7 @@ class Agents(MySQL):
         :param uid: User ID.
         :param team_id: Team ID.
         :param is_public: Is it open to team members? 0: No 1: Yes.
+        :param agent_base_update: Are attributes of this app visible? 0: No 1: Yes.
         :param enable_api: Whether to enable API 0: No 1: Yes.
         :param obligations: Agent obligations.
         :param input_variables: Input variables.
@@ -199,6 +200,7 @@ class Agents(MySQL):
             # update app
             apps_data = {
                 "is_public": is_public,
+                "agent_base_update": agent_base_update,
                 "enable_api": enable_api,
                 "updated_time": current_time
             }
@@ -538,7 +540,7 @@ class Agents(MySQL):
         # get app
         apps_model = Apps()
         app = apps_model.select_one(
-            columns=["id AS app_id", "user_id", "name", "description", "icon", "icon_background", "is_public",
+            columns=["id AS app_id", "user_id", "name", "description", "icon", "icon_background", "is_public", "attrs_are_visible",
                      "publish_status", "api_token", "enable_api", "created_time", "status"],
             conditions=[
                 {"column": "id", "value": app_id},
@@ -802,3 +804,33 @@ class Agents(MySQL):
             return {"status": 1, "message": get_language_content("api_agent_success"), "app_id": app_id}
         except Exception as e:
             return {"status": 2, "message": get_language_content("api_agent_create_error")}
+
+    def get_agent_by_id_info(self, agent_id: int, user_id: int = 0) -> Dict[str, Any]:
+        """
+        Retrieves an agent record from the {table_name} table based on the specified agent ID.
+
+        :param agent_id: An integer representing the agent ID.
+        :param user_id: An integer representing the user ID.
+        :return: A dictionary representing the agent record.
+        """
+        agent_info = self.select_one(
+            columns=[
+                "agents.id",
+                "apps.name",
+                "apps.description",
+                "agents.app_id",
+                "agents.obligations",
+                "agents.input_variables",
+                "agents.auto_match_ability",
+                "agents.default_output_format",
+                "agents.model_config_id",
+                "agents.allow_upload_file",
+                "agents.publish_status"
+            ],
+            joins=[["inner", "apps", "agents.app_id = apps.id"]],
+            conditions=[
+                {"column": "id", "value": agent_id},
+                {"column": "status", "value": 1}
+            ]
+        )
+        return agent_info

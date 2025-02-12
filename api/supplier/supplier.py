@@ -184,7 +184,6 @@ async def switching_models(model_switch_request: ModelSwitchRequest, userinfo: T
         conditions=[
             {'column': 'models.type', 'value': model_switch_request.type},
             {'column': 'models.mode', 'value': 1},
-            {'column': 'model_configurations.default_used', 'value': 1},
             {'column': 'model_configurations.team_id', 'value': team_id}
         ]
     )

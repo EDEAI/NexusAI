@@ -30,6 +30,7 @@ class ReqSkillUpdateSchema(BaseModel):
     updated_time: Optional[datetime] = None
     status: Optional[int] = None
     is_public: Optional[int] = None
+    attrs_are_visible: Optional[int] = None
 
 class SkillBaseInfoResponseData(BaseModel):
     id: Optional[int] = None
