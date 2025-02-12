@@ -47,7 +47,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                 });
                 setContentShow(true);
                 setisLoad(true)
-                setTimeout(()=>{isUpload.current = true},300)
+                setTimeout(()=>{isUpload.current = true},500)
             }
             if(init){
                 setTimeout(()=>{
@@ -62,7 +62,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
     }
 
     const historyLoad =async(e)=>{
-        if( e.target.scrollHeight + (e.target.scrollTop - e.target.clientHeight) < 10 && isUpload.current){
+        if( e.target.scrollHeight + (e.target.scrollTop - e.target.clientHeight) < 400 && isUpload.current){
             isUpload.current = false
             setisLoad(true)
             historyPage.current = historyPage.current+=1
@@ -109,16 +109,16 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                 contentShow ? 
                     <DraggablePanel
                         minWidth={400}
-                        className={`relative h-full right-0 border-0 returned-0 px-[0] ${packUp?'translate-x-full flex-[0]':'translate-x-0'}`}
+                        className={`relative h-full right-0 border-0 returned-0 px-[0] ${packUp?'translate-x-full flex-[0]':''}`}
                     >
                         {boxLoading?<div className='h-full w-full absolute top-0 left-0 flex justify-center items-center z-[100] bg-[rgba(255,255,255,0.5)]'><Spin size="large" /></div>:<></>}
                         {
                             <>
                                 <div onClick={()=>{ setPackUp(pre=>!pre)}} className={`
-                                        ${!packUp?'right-[99%] top-[60px]':'right-[100%] top-[60px]' }
+                                        ${!packUp?'absolute right-[99%] top-[60px]':'fixed right-[100%] top-[60px]' }
                                         history_packup
                                         hover:text-[#1B64F3]
-                                        fixed w-[30px] h-[60px] bg-[rgba(255,255,255,1)] shadow-md flex justify-center items-center cursor-pointer z-[99]
+                                         w-[30px] h-[60px] bg-[rgba(255,255,255,1)] shadow-md flex justify-center items-center cursor-pointer z-[99]
                                     `}>
                                    {!packUp?<MenuUnfoldOutlined className='text-[18px]'/>:<MenuFoldOutlined className='text-[18px]'/>}
                                    

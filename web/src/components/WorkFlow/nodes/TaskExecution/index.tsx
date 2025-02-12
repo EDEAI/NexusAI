@@ -4,17 +4,26 @@
 import useUserStore from '@/store/user';
 import { ProForm, ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { NodeProps, Position } from '@xyflow/react';
+import { NodeProps, Position, Connection } from '@xyflow/react';
 import { useHover, useMemoizedFn, useMount, useUpdateEffect } from 'ahooks';
 import _ from 'lodash';
-import { memo, useRef, useState } from 'react';
+import { memo, useRef, useState, useCallback } from 'react';
+import { NODE_COLOR } from '../../config';
 import useStore from '../../store';
 import { resetFormNodes } from '../../utils/resetFormNodes';
 import CustomHandle from '../CustomHandle';
-import { NODE_COLOR } from '../../config';
+import { BlockEnum } from '../../types';
 
 export default memo((props: NodeProps) => {
     const intl = useIntl();
+    const nodes = useStore(state => state.nodes);
+
+    const isValidConnection = (connection: Connection) => {
+        if (!connection.source) return false;
+        debugger
+        const sourceNode = nodes.find(node => node.id === connection.source);
+        return sourceNode?.type === BlockEnum.LLM || sourceNode?.type === BlockEnum.Agent;
+    };
 
     const { data, id } = props;
     // console.log('data', data);
@@ -23,15 +32,15 @@ export default memo((props: NodeProps) => {
     const teamDatasetData = useStore(state => state.teamDatasetData);
     const updateNodeData = useStore(state => state.updateNodeData);
     const currentUpdateNodeValue = useUserStore(state => state.currentUpdateNodeValue);
-    const setCurrentUpdateNodePanel=useUserStore(state=>state.setCurrentUpdateNodePanel)
+    const setCurrentUpdateNodePanel = useUserStore(state => state.setCurrentUpdateNodePanel);
     // const modelData = useStore(state => state.modelData);
     // const modelList = () => {
     //     return modelData?.list?.find(x => x.model_config_id == props.data?.model)?.model_name;
     // };
-    const updateNodeDataHelper = (node, data) => {
+    const updateNodeDataHelper = (node: any, data: any) => {
         if (node?.data?.['isChild']) {
             const parentNode = props;
-            const executor_list = _.cloneDeep(parentNode?.data?.executor_list);
+            const executor_list = _.cloneDeep(parentNode?.data?.executor_list) as any[];
             const editIndex = executor_list?.findIndex(x => x.currentId == node?.currentId);
             if (!executor_list?.[editIndex]?.data) return;
             executor_list[editIndex].data = Object.assign(
@@ -57,19 +66,22 @@ export default memo((props: NodeProps) => {
         const setNodeChange = (addItem: { [key: string]: any }, all, index) => {
             updateNodeDataHelper(x, all);
             setCurrentUpdateNodePanel({
-                data:all,
+                data: all,
                 index,
-                item:x
-            })
+                item: x,
+            });
         };
         useMount(() => {
             resetFormNodes(formRef, x);
         });
         useUpdateEffect(() => {
-            if (currentUpdateNodeValue?.index == index&&currentUpdateNodeValue?.item?.id==x?.id) {
+            if (
+                currentUpdateNodeValue?.index == index &&
+                currentUpdateNodeValue?.item?.id == x?.id
+            ) {
                 const currentValues = formRef.current.getFieldsValue();
-                const datas=currentUpdateNodeValue?.data
-                if(currentValues!==datas){
+                const datas = currentUpdateNodeValue?.data;
+                if (currentValues !== datas) {
                     formRef.current.setFieldsValue(datas);
                 }
 
@@ -89,7 +101,10 @@ export default memo((props: NodeProps) => {
                     className=" -mr-2 p-2 flex flex-col bg-slate-100 transition hover:bg-slate-200 cursor-pointer rounded-md gap-2 text-xs"
                 >
                     <div className="flex gap-2 items-center">
-                        <div style={{ backgroundColor: NODE_COLOR[x.type] }} className="bg-blue-400 p-1 rounded">
+                        <div
+                            style={{ backgroundColor: NODE_COLOR[x.type] }}
+                            className="bg-blue-400 p-1 rounded"
+                        >
                             <img src={`/icons/${x.type}.svg`} className="size-4" alt="" />
                         </div>
                         {x?.data?.title}
@@ -137,7 +152,9 @@ export default memo((props: NodeProps) => {
                 type="target"
                 params={props}
                 connectionCount={1}
+                className="!top-6"
                 position={Position.Left}
+              
             ></CustomHandle>
 
             {/* <CreateNodesToolbar {...props} position="left"></CreateNodesToolbar> */}
@@ -147,7 +164,17 @@ export default memo((props: NodeProps) => {
                 type="source"
                 position={Position.Right}
             ></CustomHandle>
-
+            {/* <div className="mt-2 mb-4">
+                <CustomHandle
+                    id="executor_list"
+                    type="target"
+                    params={props}
+                    className="!top-[65px]"
+                    position={Position.Left}
+                    isValidConnection={()=>true}
+                ></CustomHandle>
+                <div className="pl-2">执行器</div>
+            </div> */}
             <div className="flex flex-col gap-2 mb-2">
                 {data?.executor_list &&
                     Array.isArray(data?.executor_list) &&
