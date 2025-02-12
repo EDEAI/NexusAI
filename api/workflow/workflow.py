@@ -145,7 +145,9 @@ async def node_run(data: WorkflowsNodeRunSchema,
         inputs = data.inputs
         if inputs:
             inputs = create_variable_from_dict(inputs)
+
         node_data = create_node_from_dict(node_data)
+        
         task = run_node.delay(
             node_data.to_dict(),
             inputs.to_dict() if inputs else None,
@@ -156,6 +158,27 @@ async def node_run(data: WorkflowsNodeRunSchema,
         while not task.ready():
             await asyncio.sleep(0.1)
         result = task.get(timeout=100)
+
+        if node_data.data['type'] == 'skill':
+            node_data_dict = node_data.to_dict()
+
+            file_list = []
+            outputs = result['data']['outputs']
+            storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
+            output_vars = create_variable_from_dict(node_data_dict["data"]["output"])
+            file_vars = output_vars.extract_file_variables()
+            for var in file_vars.properties.values():
+                if var.name in outputs:
+                    file_path = outputs[var.name]
+                    if file_path:
+                        file_name = file_path.split('/')[-1]
+                        full_path = f"{storage_url}{file_path}"
+                        file_list.append({
+                            "file_name": file_name,
+                            "file_path": full_path
+                        })
+            result['data']['file_list'] = file_list
+
         return response_success(result)
     except Exception as e:
         return response_error(str(e))
