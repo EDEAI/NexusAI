@@ -370,11 +370,11 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 correct_llm_output=correct_llm_output,
                 override_rag_input=override_rag_input
             )
+            print(model_data)
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
-                {'messages': model_data['messages']}
+                {'model_data': model_data}
             )
-            print(model_data)
             # Process the AI message
             default_output_format = agent['default_output_format']
             if output_format is None:  # Auto match ability
@@ -580,10 +580,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 correct_llm_output=correct_llm_output,
                 override_rag_input=override_rag_input
             )
-            AppRuns().update(
-                {'column': 'id', 'value': agent_run_id},
-                {'messages': model_data['messages']}
-            )
 
             full_chunk: Optional[AIMessageChunk] = None
             async for chunk in ainvoke():
@@ -600,6 +596,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 reranking_tokens = retrieval_token_counter['reranking']
             else:
                 embedding_tokens, reranking_tokens = 0, 0
+
+            model_data['raw_output'] = full_chunk.content
+            AppRuns().update(
+                {'column': 'id', 'value': agent_run_id},
+                {'model_data': model_data}
+            )
+
             outputs = Variable(
                 name="text",
                 type="string",
