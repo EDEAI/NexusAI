@@ -14,7 +14,6 @@ from core.database.models.ai_tool_llm_records import AIToolLLMRecords
 from core.llm.prompt import create_prompt_from_dict, Prompt
 from time import time
 import os
-import json
 
 router = APIRouter()
 tools_db = CustomTools()
@@ -553,32 +552,3 @@ async def skill_debug(data: ReqSkillDebugSchema, userinfo: TokenData = Depends(g
         return response_success({"outputs": result["data"]["outputs"]})
     except Exception as e:
         return response_error(str(e))
-    
-    skill_id = data.skill_id
-    app_run_id = data.app_run_id
-
-    skill_outputs = AppRuns().get_skill_app_run_outputs(app_run_id, skill_id)
-
-    if skill_outputs is None:
-        return response_error(get_language_content("skill_outputs_not_found"))
-
-    file_info = []
-
-    # 获取properties字典
-    properties = skill_outputs.get('outputs', {}).get('properties', {})
-
-    # 遍历properties中的所有项
-    for prop in properties.values():
-        # 检查type是否为file
-        if isinstance(prop, dict) and prop.get('type') == 'file':
-            file_path = prop.get('value')
-            if file_path:
-                # 从路径中提取文件名
-                file_name = file_path.split('/')[-1]
-                file_info.append(ResSkillFileUploadData(
-                    file_name=file_name,
-                    file_path=file_path
-                ))
-
-    return response_success({'file_list': file_info})
-
