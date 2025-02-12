@@ -108,27 +108,19 @@ class SkillNode(SandboxBaseNode):
                 Apps().increment_execution_times(custom_data['app_id'])
 
             response = self.run_custom_code()
-            type_map = {
-                str: 'string',
-                int: 'number',
-                float: 'number'
-            }
             # Validate the response status
             status = response['status']
-            output = ObjectVariable(name='output')
             if status == 0:
                 # Parse stdout if available
                 stdout_text = response['data']['stdout']
                 if stdout_text:
                     try:
+                        output_obj = self.data['output']
                         stdout_dict = json.loads(stdout_text)
-                        self.output_check(self.data['output'], stdout_dict)
+                        self.output_check(output_obj, stdout_dict)
                         stdout_dict = self.skill_file_handler(stdout_dict,app_run_id=app_run_id,workflow_id=kwargs.get('workflow_id',0))
-                        for key, value in stdout_dict.items():
-                            var_type = type_map.get(type(value), 'json')
-                            if var_type == 'json':
-                                value = json.dumps(value, ensure_ascii=False)
-                            output.add_property(key=key, value=Variable(name=key, value=value, type=var_type))
+                        for key, variable in output_obj.properties.items():
+                            variable.value = stdout_dict[key]
                     except json.JSONDecodeError as e:
                         return {
                             'status': 'failed',
@@ -148,7 +140,7 @@ class SkillNode(SandboxBaseNode):
                 }
             end_time = datetime.now()
             elapsed_time = end_time.timestamp() - start_time.timestamp()
-            outputs = output.to_dict()
+            outputs = self.data['output'].to_dict()
             AppRuns().update(
                 {'column': 'id', 'value': skill_run_id},
                 {
