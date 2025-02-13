@@ -171,6 +171,8 @@ async def node_run(data: WorkflowsNodeRunSchema,
                 if var.name in outputs:
                     file_path = outputs[var.name]
                     if file_path:
+                        if not file_path.startswith('/'):
+                            file_path = '/' + file_path
                         file_name = file_path.split('/')[-1]
                         full_path = f"{storage_url}{file_path}"
                         file_list.append({
