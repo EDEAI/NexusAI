@@ -32,6 +32,7 @@ class LLMBaseNode(Node):
         Initializes a new instance of the LLMBaseNode class.
         """
         super().__init__(**kwargs)
+        self.schema_key = None # The schema key to be used for the LLM pipeline
         
     def duplicate_braces(self, text: str) -> str:
         """
@@ -157,7 +158,7 @@ class LLMBaseNode(Node):
         llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
         if return_json:
             llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
-        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config)
+        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config, schema_key=self.schema_key)
 
         messages, input = self._prepare_messages_and_input(
             app_run_id=app_run_id, 
@@ -224,7 +225,7 @@ class LLMBaseNode(Node):
         llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
         if return_json:
             llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
-        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config)
+        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config, schema_key=self.schema_key)
         messages, input = self._prepare_messages_and_input(
             app_run_id=app_run_id, 
             edge_id=edge_id,

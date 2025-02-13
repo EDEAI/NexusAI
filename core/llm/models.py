@@ -1,4 +1,4 @@
-from typing import List
+import json
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
@@ -26,12 +26,7 @@ from langchain_google_vertexai import ChatVertexAI
 from langchain_community.chat_models import VolcEngineMaasChat
 from langchain_community.chat_models import QianfanChatEndpoint
 from langchain_community.chat_models import ChatZhipuAI
-from langchain_core.documents import Document
-from langchain_core.runnables import RunnableParallel, RunnablePassthrough
-from langchain_core.runnables import Runnable
-from langchain_core.runnables.utils import Input, Output
-
-from languages import get_language_content
+from .output_schemas import LLM_OUTPUT_SCHEMAS
 
 
 class LLMPipeline:
@@ -39,38 +34,31 @@ class LLMPipeline:
     Represents a pipeline for generating text using a language model.
     """
     
-    def __init__(self, supplier: str, config: dict):
+    def __init__(self, supplier: str, config: dict, schema_key: str = None):
         """
         Initializes an LLMPipeline object with a supplier and configuration dictionary.
         
         :param supplier: str, the name of the supplier to use for the pipeline.
         :param config: dict, a dictionary of configuration options for the supplier.
+        :param schema_key: str, optional key to use specific schema from output_schemas.py.
         """
         self.supplier = supplier
         if self.supplier == 'Anthropic':
-            '''
-            config = {
-                "model_name": "default_model",  # Model name to use
-                "max_tokens_to_sample": 1024,   # Denotes the number of tokens to predict per generation
-                "temperature": 0.8,             # A non-negative float that tunes the degree of randomness in generation
-                "top_k": 50,                    # Number of most likely tokens to consider at each step
-                "top_p": 0.9,                   # Total probability mass of tokens to consider at each step
-                "timeout": 30.0,                # Timeout for requests to Anthropic Completion API
-                "max_retries": 2,               # Number of retries allowed for requests sent to the Anthropic Completion API
-                "anthropic_api_url": "https://api.anthropic.com",  # URL for the Anthropic API
-                "api_key": "your_api_key_here",  # Automatically read from env var `ANTHROPIC_API_KEY` if not provided
-                "default_headers": {
-                    "Content-Type": "application/json"
-                },  # Headers to pass to the Anthropic clients, will be used for every API call
-                "model_kwargs": {},             # Additional keyword arguments for the model
-                "streaming": False              # If the response should be streamed
-            }
-            '''
+            # Get schema if schema_key is provided
+            schema = None
+            if schema_key and supplier in LLM_OUTPUT_SCHEMAS:
+                schema = LLM_OUTPUT_SCHEMAS[supplier].get(schema_key)
+
             # Check if model_kwargs contains JSON response format configuration
             if config.get('model_kwargs', {}).get('response_format') == {"type": "json_object"}:
                 config['model_kwargs'] = {}
-                # config['default_headers'] = {"Content-Type": "application/json"}
-            self.llm = ChatAnthropic(**config)
+                
+            # Initialize Anthropic with schema if available
+            if schema:
+                self.llm = ChatAnthropic(**config).with_structured_output(schema=schema, include_raw=True)
+            else:
+                self.llm = ChatAnthropic(**config)
+                
         elif self.supplier == 'Azure_OpenAI':
             '''
            config = {
@@ -544,7 +532,9 @@ class LLMPipeline:
     def standardize_response(self, response):
         """
         Standardize the response format to match OpenAI's structure.
-        Only processes Anthropic responses to match OpenAI format.
+        Handles two types of Anthropic responses:
+        1. Structured output with schema
+        2. Regular unstructured output
         Other suppliers' responses are returned as-is.
         
         Args:
@@ -554,11 +544,27 @@ class LLMPipeline:
             A standardized response with content and token usage information.
         """
         if self.supplier == 'Anthropic':
-            # Extract required information from Anthropic's response
+            # Handle structured output when schema is defined
+            if isinstance(response, dict) and 'raw' in response:
+                raw_response = response['raw']
+                usage_metadata = raw_response.usage_metadata
+                
+                standardized_response = type('StandardizedResponse', (), {
+                    'content': json.dumps(response['parsed'], ensure_ascii=False),
+                    'response_metadata': {
+                        'token_usage': {
+                            'prompt_tokens': usage_metadata['input_tokens'],
+                            'completion_tokens': usage_metadata['output_tokens'],
+                            'total_tokens': usage_metadata['total_tokens']
+                        }
+                    }
+                })
+                return standardized_response
+
+            # Handle regular unstructured output
             content = response.content
             usage_metadata = response.usage_metadata
             
-            # Create a new response object matching OpenAI's format
             standardized_response = type('StandardizedResponse', (), {
                 'content': content,
                 'response_metadata': {
@@ -585,4 +591,5 @@ class LLMPipeline:
             The standardized output of the pipeline chain.
         """
         response = self.chain(messages).invoke(input)
+        print(response)
         return self.standardize_response(response)

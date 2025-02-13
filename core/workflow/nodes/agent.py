@@ -123,14 +123,11 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         )
                         for ability in abilities
                     ]
-                    system_prompt = get_language_content(
-                        (
-                            'agent_system_prompt_with_auto_match_ability_direct_output'
-                            if direct_output
-                            else 'agent_system_prompt_with_auto_match_ability'
-                        ),
-                        uid=user_id
-                    )
+                    if direct_output:
+                        system_prompt = get_language_content('agent_system_prompt_with_auto_match_ability_direct_output', uid=user_id)
+                    else:
+                        self.schema_key = 'agent_system_prompt_with_auto_match_ability'
+                        system_prompt = get_language_content('agent_system_prompt_with_auto_match_ability', uid=user_id)
                     input_['abilities_content_and_output_format'] = abilities_content_and_output_format
                     if self.data['task_splitting']:
                         input_['reply_requirement'] = get_language_content(
