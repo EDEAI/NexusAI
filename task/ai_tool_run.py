@@ -247,6 +247,7 @@ def create_celery_task(
         team_id=team_id,
         user_id=user_id,
         app_run_id=app_run_id,
+        ai_tool_type=ai_tool_type,
         prompt_dict=prompt_dict,
         return_json=return_json,
         correct_llm_output=correct_llm_output

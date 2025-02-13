@@ -257,6 +257,7 @@ class Chatroom:
             last_speaker_id = self._history_messages[-1]['agent_id']
             if last_speaker_id == 0:
                 # If the last speaker is the user, the Speaker Selector must choose an agent
+                schema_key = "chatroom_manager_system"
                 system_prompt = get_language_content(
                     'chatroom_manager_system',
                     self._user_id
@@ -273,6 +274,7 @@ class Chatroom:
                     return 0
                 else:
                     # and smart selection is disabled, the Speaker Selector will choose an agent, or stop the chat
+                    schema_key = "chatroom_manager_system_with_optional_selection"
                     system_prompt = get_language_content(
                         'chatroom_manager_system_with_optional_selection',
                         self._user_id
@@ -310,6 +312,7 @@ class Chatroom:
                 model_config_id=self._model_config_ids[0],
                 prompt=Prompt(system_prompt, user_prompt)
             )
+            llm_node.schema_key = schema_key
             result = llm_node.run(return_json=True)
             assert result['status'] == 'success', result['message']
             result_data = result['data']
