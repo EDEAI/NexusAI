@@ -129,7 +129,7 @@ class Agents(MySQL):
 
     def agent_base_update(self, agent_id: int, uid: int = 0, team_id: int = 0, is_public: int = 0, enable_api: int = 0,
                           obligations: str = "", input_variables: Dict[str, Any] = None, dataset_ids: List[int] = None,
-                          m_config_id: int = 0, allow_upload_file: int = 0, default_output_format: int = 1, agent_base_update: int = 0):
+                          m_config_id: int = 0, allow_upload_file: int = 0, default_output_format: int = 1, attrs_are_visible: int = 0):
         """
         Update base agent data based on parameters
 
@@ -137,7 +137,7 @@ class Agents(MySQL):
         :param uid: User ID.
         :param team_id: Team ID.
         :param is_public: Is it open to team members? 0: No 1: Yes.
-        :param agent_base_update: Are attributes of this app visible? 0: No 1: Yes.
+        :param attrs_are_visible: Are attributes of this app visible? 0: No 1: Yes.
         :param enable_api: Whether to enable API 0: No 1: Yes.
         :param obligations: Agent obligations.
         :param input_variables: Input variables.
@@ -200,7 +200,7 @@ class Agents(MySQL):
             # update app
             apps_data = {
                 "is_public": is_public,
-                "agent_base_update": agent_base_update,
+                "attrs_are_visible": attrs_are_visible,
                 "enable_api": enable_api,
                 "updated_time": current_time
             }

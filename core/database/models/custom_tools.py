@@ -55,6 +55,7 @@ class CustomTools(MySQL):
         user_data = Users().select_one(columns='*', conditions=[{"column": "id", "value": skill['user_id']}])
         skill['name'] = app['name']
         skill['description'] = app['description']
+        skill['attrs_are_visible'] = app['attrs_are_visible']
         skill['is_public'] = app['is_public']
         skill['nickname'] = user_data['nickname']
         skill['is_creator'] = 0 if app["user_id"] != user_id else 1
