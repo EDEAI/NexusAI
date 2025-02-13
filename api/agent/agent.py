@@ -94,7 +94,7 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
     agents_model = Agents()
     result = agents_model.agent_base_update(agent_id, userinfo.uid, userinfo.team_id, is_public, enable_api,
                                             obligations, input_variables, dataset_ids, m_config_id, allow_upload_file,
-                                            default_output_format, agent_base_update)
+                                            default_output_format, attrs_are_visible)
     if result["status"] != 1:
         return response_error(result["message"])
     app_id = result["data"]["app_id"]
@@ -186,9 +186,10 @@ async def agent_delete(request: Request, app_id: int, userinfo: TokenData = Depe
     return response_success(result["data"], get_language_content("api_agent_success"))
 
 
-@router.get("/agent_info/{app_id}", response_model=ResAgentInfoSchema)
+@router.get("/agent_info/{app_id}", response_model=ResAgentInfoSchemaUpdate)
 async def agent_info(app_id: int, publish_status: int, userinfo: TokenData = Depends(get_current_user)):
     """
+    # ResAgentInfoSchema
     agent info
 
     app_id: int, App id
@@ -1088,3 +1089,101 @@ async def clear_agent_chat_memory(agent_id: int, message_id: int, userinfo: Toke
     return response_success(
         {"message_id": find_message}
     )
+
+
+@router.post("/agent_chat_message", response_model=ResAgentRunSchema)
+async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    agent run
+
+    agent_id: int, Agent id
+    ability_id: int, Ability id
+    input_dict: dict, Input data
+    prompt: dict, Prompt data
+    """
+    agent_id = data.agent_id
+    ability_id = data.ability_id
+    input_dict = data.input_dict
+    prompt = data.prompt
+    uid = userinfo.uid
+    team_id = userinfo.team_id
+    data_source_run_id = data.data_source_run_id
+
+    if agent_id <= 0:
+        return response_error(get_language_content("api_agent_run_agent_id_required"))
+    if not input_dict:
+        return response_error(get_language_content("api_agent_run_input_dict_required"))
+    try:
+        create_variable_from_dict(input_dict)
+    except:
+        return response_error(get_language_content("api_agent_run_input_dict_wrong"))
+    if not prompt:
+        return response_error(get_language_content("api_agent_run_prompt_required"))
+    try:
+        create_prompt_from_dict(prompt)
+    except:
+        return response_error(get_language_content("api_agent_run_prompt_wrong"))
+
+    # get agent
+    agents_model = Agents()
+    agent = agents_model.select_one(
+        columns="*",
+        conditions=[
+            {"column": "id", "value": agent_id},
+            {"column": "team_id", "value": team_id},
+            {"column": "status", "op": "in", "value": [1, 2]}
+        ]
+    )
+    if not agent:
+        return response_error(get_language_content("api_agent_run_agent_error"))
+    if agent["user_id"] != uid:
+        if agent["status"] != 1:
+            return response_error(get_language_content("api_agent_run_agent_status_not_normal"))
+        if agent["publish_status"] != 1:
+            return response_error(get_language_content("api_agent_run_not_creators"))
+
+    # get app
+    apps_model = Apps()
+    app = apps_model.select_one(
+        columns="*",
+        conditions=[
+            {"column": "id", "value": agent["app_id"]},
+            {"column": "team_id", "value": team_id},
+            {"column": "mode", "value": 1},
+            {"column": "status", "op": "in", "value": [1, 2]}
+        ]
+    )
+    if not app:
+        return response_error(get_language_content("api_agent_run_app_error"))
+    if app["user_id"] != uid:
+        if app["is_public"] == 0:
+            return response_error(get_language_content("api_agent_run_team_not_open"))
+        if app["status"] != 1:
+            return response_error(get_language_content("api_agent_run_app_status_not_normal"))
+
+    # get agent ability
+    if ability_id != 0:
+        agent_abilities_model = AgentAbilities()
+        ability = agent_abilities_model.select_one(
+            columns="*",
+            conditions=[
+                {"column": "id", "value": ability_id},
+                {"column": "agent_id", "value": agent_id},
+                {"column": "status", "op": "in", "value": [1, 2]}
+            ]
+        )
+        if not ability:
+            return response_error(get_language_content("api_agent_run_ability_error"))
+        if ability["user_id"] != uid and ability["status"] != 1:
+            return response_error(get_language_content("api_agent_run_ability_status_not_normal"))
+
+    task = run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id,
+                         prompt=prompt, data_source_run_id=data_source_run_id)
+    while not task.ready():
+        await asyncio.sleep(0.1)
+    result = task.get()
+    if result["status"] != "success":
+        return response_error(result["message"])
+
+    return response_success({"outputs": result["data"]["outputs"], "outputs_md": result["data"]["outputs_md"]},
+                            get_language_content("api_agent_success"))

@@ -102,7 +102,7 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
     if 'is_public' in update_data and update_data['is_public'] not in [0, 1]:
         return response_error(get_language_content("is_public_invalid"))
 
-    if update_data['attrs_are_visible'] not in [0, 1]:
+    if 'attrs_are_visible' in update_data and update_data['attrs_are_visible'] not in [0, 1]:
         return response_error(get_language_content("api_agent_base_update_attrs_are_visible_error"))
     try:
         if 'is_public' in update_data:
