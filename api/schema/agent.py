@@ -269,5 +269,14 @@ class AgentLogListResponse(BaseModel):
 class AgentLogDetailResponse(BaseModel):
     data: Dict[str, Any]
 
+
 class ClearAgentChatMemory(BaseModel):
+    data: Dict[str, Any]
+
+
+class AgentChatMessage(BaseModel):
+    data: Dict[str, Any]
+
+
+class ResAgentInfoSchemaUpdate(BaseModel):
     data: Dict[str, Any]
