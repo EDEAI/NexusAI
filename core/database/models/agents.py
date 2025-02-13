@@ -633,15 +633,27 @@ class Agents(MySQL):
             ]
         )
 
-        data = {
-            "app": app,
-            "agent": agent,
-            "agent_dataset_relation_list": agent_dataset_relation_list,
-            "agent_abilities_list": agent_abilities_list,
-            "m_configurations_list": m_configurations_list,
-            "is_creator": 0 if app["user_id"] != uid else 1,
-            "creator_nickname": user["nickname"] if user else None
-        }
+        if app["user_id"] != uid and app["attrs_are_visible"] != 1:
+            data = {
+                "app": app,
+                "agent": '',
+                "agent_dataset_relation_list": '',
+                "agent_abilities_list": '',
+                "m_configurations_list": '',
+                "is_creator": 0 if app["user_id"] != uid else 1,
+                "creator_nickname": user["nickname"] if user else None
+            }
+        else:
+            data = {
+                "app": app,
+                "agent": agent,
+                "agent_dataset_relation_list": agent_dataset_relation_list,
+                "agent_abilities_list": agent_abilities_list,
+                "m_configurations_list": m_configurations_list,
+                "is_creator": 0 if app["user_id"] != uid else 1,
+                "creator_nickname": user["nickname"] if user else None
+            }
+
         return {"status": 1, "message": get_language_content("api_agent_success"), "data": data}
 
     def create_agent_with_configs(self, data: dict, user_id: int, team_id: int) -> dict:
