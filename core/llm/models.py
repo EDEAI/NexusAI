@@ -66,6 +66,10 @@ class LLMPipeline:
                 "streaming": False              # If the response should be streamed
             }
             '''
+            # Check if model_kwargs contains JSON response format configuration
+            if config.get('model_kwargs', {}).get('response_format') == {"type": "json_object"}:
+                config['model_kwargs'] = {}
+                # config['default_headers'] = {"Content-Type": "application/json"}
             self.llm = ChatAnthropic(**config)
         elif self.supplier == 'Azure_OpenAI':
             '''
@@ -537,11 +541,48 @@ class LLMPipeline:
         llm_chain = prompt_template | self.llm
         return llm_chain
 
+    def standardize_response(self, response):
+        """
+        Standardize the response format to match OpenAI's structure.
+        Only processes Anthropic responses to match OpenAI format.
+        Other suppliers' responses are returned as-is.
+        
+        Args:
+            response: The response from the LLM model.
+            
+        Returns:
+            A standardized response with content and token usage information.
+        """
+        if self.supplier == 'Anthropic':
+            # Extract required information from Anthropic's response
+            content = response.content
+            usage_metadata = response.usage_metadata
+            
+            # Create a new response object matching OpenAI's format
+            standardized_response = type('StandardizedResponse', (), {
+                'content': content,
+                'response_metadata': {
+                    'token_usage': {
+                        'prompt_tokens': usage_metadata['input_tokens'],
+                        'completion_tokens': usage_metadata['output_tokens'],
+                        'total_tokens': usage_metadata['total_tokens']
+                    }
+                }
+            })
+            return standardized_response
+            
+        return response
+
     def invoke(self, messages, input={}):
         """
         Invoke the pipeline chain with the provided prompt.
         
-        :param messages: str or list, the messages to use for the pipeline chain.
-        :return: the output of the pipeline chain.
+        Args:
+            messages: str or list, the messages to use for the pipeline chain.
+            input: dict, optional input parameters for the chain.
+            
+        Returns:
+            The standardized output of the pipeline chain.
         """
-        return self.chain(messages).invoke(input)
+        response = self.chain(messages).invoke(input)
+        return self.standardize_response(response)

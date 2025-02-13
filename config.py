@@ -1311,6 +1311,707 @@ model_config = [
             'text2img': [],
             'moderation': []
         }
+    },
+    {
+        'supplier': 'Anthropic',
+        'mode': 1,
+        'config': [
+            {
+                "key": "api_key",
+                "type": "str",
+                "value": "",
+                "secret": True,
+                "options": None,
+                "optional": False,
+                "description": "Automatically inferred from env var `ANTHROPIC_API_KEY` if not provided.",
+                "default_value": ""
+            }
+        ],
+        'models': {
+            'text-generation': [
+                {
+                    'model_name': 'claude-3-5-sonnet-latest',
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 200000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 8192
+                    },
+                    'config': [
+                        {
+                            "key": "model_name",
+                            "type": "str",
+                            "value": "",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "claude-3-haiku-20240307"
+                        },
+                        {
+                            "key": "max_tokens_to_sample",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Denotes the number of tokens to predict per generation.",
+                            "default_value": 1024
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "A non-negative float that tunes the degree of randomness in generation.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "top_k",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of most likely tokens to consider at each step.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "top_p",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Total probability mass of tokens to consider at each step.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Timeout for requests to Anthropic Completion API.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of retries allowed for requests sent to the Anthropic Completion API.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "anthropic_api_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Headers to pass to the Anthropic clients, will be used for every API call.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to use streaming or not.",
+                            "default_value": False
+                        }
+                    ]
+                },
+                {
+                    'model_name': 'claude-3-5-haiku-latest',
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 200000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 8192
+                    },
+                    'config': [
+                        {
+                            "key": "model_name",
+                            "type": "str",
+                            "value": "",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "claude-3-haiku-20240307"
+                        },
+                        {
+                            "key": "max_tokens_to_sample",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Denotes the number of tokens to predict per generation.",
+                            "default_value": 1024
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "A non-negative float that tunes the degree of randomness in generation.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "top_k",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of most likely tokens to consider at each step.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "top_p",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Total probability mass of tokens to consider at each step.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Timeout for requests to Anthropic Completion API.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of retries allowed for requests sent to the Anthropic Completion API.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "anthropic_api_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Headers to pass to the Anthropic clients, will be used for every API call.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to use streaming or not.",
+                            "default_value": False
+                        }
+                    ]
+                },
+                {
+                    'model_name': 'claude-3-opus-latest',
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 200000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 4096
+                    },
+                    'config': [
+                        {
+                            "key": "model_name",
+                            "type": "str",
+                            "value": "",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "claude-3-haiku-20240307"
+                        },
+                        {
+                            "key": "max_tokens_to_sample",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Denotes the number of tokens to predict per generation.",
+                            "default_value": 1024
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "A non-negative float that tunes the degree of randomness in generation.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "top_k",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of most likely tokens to consider at each step.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "top_p",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Total probability mass of tokens to consider at each step.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Timeout for requests to Anthropic Completion API.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of retries allowed for requests sent to the Anthropic Completion API.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "anthropic_api_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Headers to pass to the Anthropic clients, will be used for every API call.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to use streaming or not.",
+                            "default_value": False
+                        }
+                    ]
+                },
+                {
+                    'model_name': 'claude-3-sonnet-20240229',
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 200000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 4096
+                    },
+                    'config': [
+                        {
+                            "key": "model_name",
+                            "type": "str",
+                            "value": "",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "claude-3-haiku-20240307"
+                        },
+                        {
+                            "key": "max_tokens_to_sample",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Denotes the number of tokens to predict per generation.",
+                            "default_value": 1024
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "A non-negative float that tunes the degree of randomness in generation.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "top_k",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of most likely tokens to consider at each step.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "top_p",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Total probability mass of tokens to consider at each step.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Timeout for requests to Anthropic Completion API.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of retries allowed for requests sent to the Anthropic Completion API.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "anthropic_api_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Headers to pass to the Anthropic clients, will be used for every API call.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to use streaming or not.",
+                            "default_value": False
+                        }
+                    ]
+                },
+                {
+                    'model_name': 'claude-3-haiku-20240307',
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 200000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 4096
+                    },
+                    'config': [
+                        {
+                            "key": "model_name",
+                            "type": "str",
+                            "value": "",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "claude-3-haiku-20240307"
+                        },
+                        {
+                            "key": "max_tokens_to_sample",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Denotes the number of tokens to predict per generation.",
+                            "default_value": 1024
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "A non-negative float that tunes the degree of randomness in generation.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "top_k",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of most likely tokens to consider at each step.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "top_p",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Total probability mass of tokens to consider at each step.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Timeout for requests to Anthropic Completion API.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of retries allowed for requests sent to the Anthropic Completion API.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "anthropic_api_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Headers to pass to the Anthropic clients, will be used for every API call.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to use streaming or not.",
+                            "default_value": False
+                        }
+                    ]
+                }
+            ],
+            'embeddings': [],
+            'reranking': [],
+            'speech2text': [],
+            'tts': [],
+            'text2img': [],
+            'moderation': []
+        }
     }
 ]
 
