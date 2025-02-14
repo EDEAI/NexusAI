@@ -98,6 +98,7 @@ class WorkflowLogInfo(BaseModel):
     child_executions: Optional[List['WorkflowLogInfo']] = None
     need_human_confirm: Optional[int] = None
     human_confirm_info: Optional[List[HumanConfirmInfo]] = None
+    file_list: Optional[List[Dict[str, Any]]] = None
 
 class WorkspaceWorkflowLogInfoResponseData(BaseModel):
     list: Optional[List[WorkflowLogInfo]] = None
