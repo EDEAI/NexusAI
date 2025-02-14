@@ -634,9 +634,13 @@ class Agents(MySQL):
         )
 
         if app["user_id"] != uid and app["attrs_are_visible"] != 1:
+            input_variables = {
+                "input_variables": agent['input_variables']
+            }
+
             data = {
                 "app": app,
-                "agent": '',
+                "agent": input_variables,
                 "agent_dataset_relation_list": '',
                 "agent_abilities_list": '',
                 "m_configurations_list": '',
