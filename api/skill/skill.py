@@ -312,23 +312,9 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
 
     outputs = result["data"]["outputs"]
     file_list = []
-    storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
 
     if skill and skill.get("output_variables"):
-        output_vars = create_variable_from_dict(skill["output_variables"])
-        file_vars = output_vars.extract_file_variables()
-        for var in file_vars.properties.values():
-            if var.name in outputs:
-                file_path = outputs[var.name]
-                if file_path:
-                    if not file_path.startswith('/'):
-                        file_path = '/' + file_path
-                    file_name = file_path.split('/')[-1]
-                    full_path = f"{storage_url}{file_path}"
-                    file_list.append({
-                        "file_name": file_name,
-                        "file_path": full_path
-                    })
+        file_list = extract_file_list_from_skill_output(outputs, skill["output_variables"])
     return response_success({
         "outputs": outputs,
         "file_list": file_list

@@ -13,6 +13,7 @@ from core.workflow.variables import create_variable_from_dict, get_first_variabl
 from core.workflow.recursive_task import create_recursive_task_category_from_dict
 from languages import get_language_content
 import os
+from api.utils.common import extract_file_list_from_skill_output
 
 # Uploaded files are stored in an ArrayVariable, which is in the `input` ObjectVariable
 # And this is the specific key of this ArrayVariable.
@@ -211,23 +212,24 @@ class Workspaces(MySQL):
                         task_dict = json.loads(get_first_variable_value(create_variable_from_dict(outputs)))
                         app_node['outputs_md'] = create_recursive_task_category_from_dict(task_dict).to_markdown()
                     elif app_node['node_type'] in ['skill']:
-                        file_list = []
-                        skill_output = app_node['outputs']
-                        storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
-                        output_vars = create_variable_from_dict(app_node['node_graph']['data']['output'])
-                        file_vars = output_vars.extract_file_variables()
-                        for var in file_vars.properties.values():
-                            if var.name in skill_output:
-                                file_path = skill_output[var.name]
-                                if file_path:
-                                    if not file_path.startswith('/'):
-                                        file_path = '/' + file_path
-                                    file_name = file_path.split('/')[-1]
-                                    full_path = f"{storage_url}{file_path}"
-                                    file_list.append({
-                                        "file_name": file_name,
-                                        "file_path": full_path
-                                    })
+                        file_list = extract_file_list_from_skill_output(app_node['outputs'], app_node['node_graph']['data']['output'])
+                        # file_list = []
+                        # skill_output = app_node['outputs']
+                        # storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
+                        # output_vars = create_variable_from_dict(app_node['node_graph']['data']['output'])
+                        # file_vars = output_vars.extract_file_variables()
+                        # for var in file_vars.properties.values():
+                        #     if var.name in skill_output:
+                        #         file_path = skill_output[var.name]
+                        #         if file_path:
+                        #             if not file_path.startswith('/'):
+                        #                 file_path = '/' + file_path
+                        #             file_name = file_path.split('/')[-1]
+                        #             full_path = f"{storage_url}{file_path}"
+                        #             file_list.append({
+                        #                 "file_name": file_name,
+                        #                 "file_path": full_path
+                        #             })
                         app_node['file_list'] = file_list
                     else:
                         app_node['outputs_md'] = None
