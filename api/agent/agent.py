@@ -1091,8 +1091,8 @@ async def clear_agent_chat_memory(agent_id: int, message_id: int, userinfo: Toke
     )
 
 
-@router.post("/agent_chat_message", response_model=ResAgentRunSchema)
-async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_current_user)):
+@router.post("/agent_chat_message", response_model=ResAgentRunSchemaReturn)
+async def agent_chat_message(data: AgentChatMessage, userinfo: TokenData = Depends(get_current_user)):
     """
     agent run
 
@@ -1107,7 +1107,7 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
     prompt = data.prompt
     uid = userinfo.uid
     team_id = userinfo.team_id
-    data_source_run_id = data.data_source_run_id
+    message = data.message
 
     if agent_id <= 0:
         return response_error(get_language_content("api_agent_run_agent_id_required"))
@@ -1177,13 +1177,13 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
         if ability["user_id"] != uid and ability["status"] != 1:
             return response_error(get_language_content("api_agent_run_ability_status_not_normal"))
 
-    task = run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id,
-                         prompt=prompt, data_source_run_id=data_source_run_id)
-    while not task.ready():
-        await asyncio.sleep(0.1)
-    result = task.get()
-    if result["status"] != "success":
-        return response_error(result["message"])
+    # Insert Message
+    message_id = AgentChatMessages().insert({
+        'user_id': userinfo.uid,
+        'agent_id': agent_id,
+        'message': message
+    })
 
-    return response_success({"outputs": result["data"]["outputs"], "outputs_md": result["data"]["outputs_md"]},
-                            get_language_content("api_agent_success"))
+    run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id, prompt=prompt, is_chat=True)
+    return response_success({"message_id": message_id, "detail": get_language_content("api_agent_success")})
+
