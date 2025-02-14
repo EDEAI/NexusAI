@@ -33,6 +33,7 @@ export default {
     'agent.cannotmodify': '(您正在查看已发布版本数据，无法修改)',
     'agent.appdescription': '智能体描述',
     'agent.teamvisibility': '是否团队可见',
+    'agent.attrVisible':'属性是否可见',
     'agent.APIswitch': '是否开启API',
     'agent.filesupload': '是否允许上传文件',
     'agent.LLMmodel': 'LLM模型',

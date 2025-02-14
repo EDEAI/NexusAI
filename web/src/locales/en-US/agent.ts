@@ -33,6 +33,7 @@ export default {
     'agent.cannotmodify': '(You are viewing published version data, which cannot be modified)',
     'agent.appdescription': 'Agent Description',
     'agent.teamvisibility': 'Team Visibility',
+    'agent.attrVisible':'attribute Visible',
     'agent.APIswitch': 'Enable API',
     'agent.filesupload': 'Allow File Upload',
     'agent.LLMmodel': 'LLM Model',
