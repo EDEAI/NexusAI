@@ -16,6 +16,7 @@ import { transformer } from './transformWrokFlow';
 import { AppNode, AppState, BlockEnum, NodeCreate } from './types';
 import { customFreeNode } from './utils/createNode';
 import { connectionRules } from './connectionRules';
+import { transformRules, NodeTypeTransformRules } from './transformRules';
 let lastSelect = '';
 
 // this is our useStore hook that we can use in our components to get parts of the store and call actions
@@ -147,13 +148,75 @@ const useStore = create(
             transformWorkFlow() {
                 const { nodes, edges } = get().flowSetLevel();
                 const freeNodes = new Nodes();
+                
+                // First pass: Find all special handle nodes
+                const specialHandleNodes = new Map();
+                edges.forEach(edge => {
+                    const targetNode = nodes.find(node => node.id === edge.target);
+                    const sourceNode = nodes.find(node => node.id === edge.source);
+                    
+                    // Get transform rules for target node type
+                    const nodeRules = transformRules[targetNode?.type];
+                    if (nodeRules?.handles) {
+                        // Find matching handle rule
+                        const handleRule = nodeRules.handles.find(rule => 
+                            rule.handleId === edge.targetHandle
+                        );
+                        
+                        if (handleRule && sourceNode) {
+                            if (!specialHandleNodes.has(targetNode.id)) {
+                                specialHandleNodes.set(targetNode.id, new Map());
+                            }
+                            
+                            const handleMap = specialHandleNodes.get(targetNode.id);
+                            if (!handleMap.has(handleRule.handleId)) {
+                                handleMap.set(handleRule.handleId, []);
+                            }
+                            
+                            // Transform and add source node
+                            const transformedNode = {
+                                ...sourceNode,
+                                ...handleRule.transform(sourceNode)
+                            };
+                            handleMap.get(handleRule.handleId).push(transformedNode);
+                        }
+                    }
+                });
+
+                // Second pass: Transform nodes
                 const newNodes = nodes.map(node => {
                     const handle = transformer[node.type]?.handle;
                     if (!handle) {
                         return node;
                     }
-                    const freeNode = handle(node);
-                    freeNodes.addNode(freeNode);
+
+                    // Check if node has special handles
+                    if (specialHandleNodes.has(node.id)) {
+                        const handleMap = specialHandleNodes.get(node.id);
+                        const nodeWithHandles = {
+                            ...node,
+                            data: {
+                                ...node.data,
+                                selected: false,
+                            }
+                        };
+                        
+                        // Add all special handle data
+                        handleMap.forEach((nodes, handleId) => {
+                            nodeWithHandles.data[handleId] = nodes;
+                        });
+                        
+                        const freeNode = handle(nodeWithHandles);
+                        freeNodes.addNode(freeNode);
+                        return nodeWithHandles;
+                    }
+
+                    // Normal node handling
+                    if (!isNodeInSpecialHandles(node.id, specialHandleNodes)) {
+                        const freeNode = handle(node);
+                        freeNodes.addNode(freeNode);
+                    }
+                    
                     return {
                         ...node,
                         data: {
@@ -163,62 +226,65 @@ const useStore = create(
                     };
                 }) as AppNode[];
 
+                // Handle edges
                 const freeEdges = new Edges();
-                const newEdges = edges.map(edge => {
-                    const edgeParams = {
-                        level: edge.level,
-                        source_node_id: edge.source,
-                        target_node_id: edge.target,
-                        source_node_type: edge.sourceType,
-                        target_node_type: edge.targetType,
-                        is_logical_branch: edge.is_logical_branch,
-                        condition_id: null,
-                        original_edge_id: edge.id,
-                    };
-                    if (edge.is_logical_branch) {
-                        if (edge.sourceType == BlockEnum.ConditionBranch) {
-                            const sourceFreeNode = freeNodes.nodes.find(x => x.id == edge.source);
-                            console.log(sourceFreeNode, edge);
-                            if (edge.sourceHandle == 'start_source_else') {
-                                const id = sourceFreeNode?.data?.logic_branches?.else_branch?.id;
-                                if (id) {
-                                    edgeParams.condition_id = id;
+                const newEdges = edges
+                    .filter(edge => !isSpecialHandle(edge.targetHandle, transformRules))
+                    .map(edge => {
+                        const edgeParams = {
+                            level: edge.level,
+                            source_node_id: edge.source,
+                            target_node_id: edge.target,
+                            source_node_type: edge.sourceType,
+                            target_node_type: edge.targetType,
+                            is_logical_branch: edge.is_logical_branch,
+                            condition_id: null,
+                            original_edge_id: edge.id,
+                        };
+                        if (edge.is_logical_branch) {
+                            if (edge.sourceType == BlockEnum.ConditionBranch) {
+                                const sourceFreeNode = freeNodes.nodes.find(x => x.id == edge.source);
+                                console.log(sourceFreeNode, edge);
+                                if (edge.sourceHandle == 'start_source_else') {
+                                    const id = sourceFreeNode?.data?.logic_branches?.else_branch?.id;
+                                    if (id) {
+                                        edgeParams.condition_id = id;
+                                    }
+                                } else {
+                                    const id =
+                                        sourceFreeNode?.data?.logic_branches?.branches[
+                                            edge.sourceHandle
+                                        ]?.id;
+                                    console.log(111, id);
+
+                                    if (id) {
+                                        edgeParams.condition_id = id;
+                                    }
                                 }
-                            } else {
+                            }
+                            if (edge.sourceType == BlockEnum.RequirementCategory) {
+                                const sourceFreeNode = freeNodes.nodes.find(x => x.id == edge.source);
+                                console.log(edge, sourceFreeNode);
                                 const id =
-                                    sourceFreeNode?.data?.logic_branches?.branches[
+                                    sourceFreeNode?.data?.requirement_category?.categories[
                                         edge.sourceHandle
                                     ]?.id;
-                                console.log(111, id);
-
                                 if (id) {
                                     edgeParams.condition_id = id;
                                 }
                             }
+                            console.log(edge);
                         }
-                        if (edge.sourceType == BlockEnum.RequirementCategory) {
-                            const sourceFreeNode = freeNodes.nodes.find(x => x.id == edge.source);
-                            console.log(edge, sourceFreeNode);
-                            const id =
-                                sourceFreeNode?.data?.requirement_category?.categories[
-                                    edge.sourceHandle
-                                ]?.id;
-                            if (id) {
-                                edgeParams.condition_id = id;
-                            }
-                        }
-                        console.log(edge);
-                    }
-                    const edgeObj = new Edge(edgeParams);
-                    freeEdges.addEdge(edgeObj);
-                    return edgeObj;
-                });
+                        const edgeObj = new Edge(edgeParams);
+                        freeEdges.addEdge(edgeObj);
+                        return edgeObj;
+                    });
 
                 return {
                     freeNodes,
                     freeEdges,
                     nodes: newNodes,
-                    edges,
+                    edges
                 };
             },
             flowSetLevel() {
@@ -628,3 +694,21 @@ const useStore = create(
 );
 
 export default useStore;
+
+// Helper functions
+function isNodeInSpecialHandles(nodeId: string, specialHandleNodes: Map<string, Map<string, any[]>>) {
+    for (const handleMap of specialHandleNodes.values()) {
+        for (const nodes of handleMap.values()) {
+            if (nodes.some(node => node.id === nodeId)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function isSpecialHandle(handleId: string, rules: NodeTypeTransformRules): boolean {
+    return Object.values(rules).some(nodeRules => 
+        nodeRules.handles.some(rule => rule.handleId === handleId)
+    );
+}

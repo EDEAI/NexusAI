@@ -404,7 +404,7 @@ interface NodeData {
     desc: string;
     descTools: string;
     endescTools: string;
-    outputInfo: {
+    outputInfo?: {
         key: string;
         type: string;
         base: boolean;

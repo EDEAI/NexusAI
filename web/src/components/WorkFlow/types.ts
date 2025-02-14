@@ -10,6 +10,7 @@ import {
     OnEdgesChange,
     OnInit,
     OnNodesChange,
+    Connection as FlowConnection,
 } from '@xyflow/react';
 import { response } from 'express';
 
@@ -124,7 +125,7 @@ export type AppState = {
 };
 
 export interface NodeCreate {
-    createType: BlockEnum;
+    createType: BlockEnum | PropertyNodeEnum;
     position?: { x: number; y: number };
 }
 
@@ -146,6 +147,21 @@ export enum BlockEnum {
     TaskGeneration = 'recursive_task_generation',
     Tool = 'tool',
 }
+
+export enum PropertyNodeEnum {
+    KnowledgeRetrieval = 'knowledge_retrieval',
+}
+
+export interface PropertyNodeData extends AppNodeData {
+    propertyType: PropertyNodeEnum;
+    targetNodeTypes: BlockEnum[];
+}
+
+export type PropertyNode = BaseNode & {
+    type: PropertyNodeEnum;
+    data: PropertyNodeData;
+};
+
 export enum Conditions {
     Contains = '',
     DoesNotContain = '',
@@ -215,16 +231,46 @@ export interface TabConfig {
     show?: boolean;
 }
 
+export interface Connection extends FlowConnection {
+    sourceHandle: string;
+    targetHandle: string;
+}
+
 export interface ConnectionValidator {
     validate: (connection: Connection, nodes: AppNode[]) => boolean;
     errorMessage?: string; 
 }
 
 export interface NodeConnectionRules {
-    [key: string]: ConnectionValidator; // key is handle id
+    [key: string]: ConnectionValidator;
 }
 
 export interface NodeTypeConnectionRules {
-    [key in BlockEnum]?: NodeConnectionRules;
+    [key: string]: NodeConnectionRules;
+}
+
+export interface NodeTransformRule {
+    handleId: string;
+    transform: (sourceNode: AppNode) => Partial<AppNode>;
+}
+
+export interface NodeTypeTransformRules {
+    [key: string]: {
+        handles: NodeTransformRule[];
+    };
+}
+
+export interface NodeHandleRule {
+    validate?: (connection: Connection, nodes: AppNode[]) => boolean;
+    errorMessage?: string;
+    transform?: (sourceNode: AppNode) => Partial<AppNode>;
+}
+
+export interface NodeTypeRules {
+    [key: string]: {
+        handles: {
+            [handleId: string]: NodeHandleRule;
+        };
+    };
 }
 

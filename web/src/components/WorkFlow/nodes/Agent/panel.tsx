@@ -71,9 +71,7 @@ export default memo(({ node }: { node: AppNode }) => {
 
     // Check if current node is connected to executor_list
     const isConnectedToExecutorList = edges.some(
-        edge => 
-            edge.source === node.id && 
-            edge.targetHandle === 'executor_list'
+        edge => edge.source === node.id && edge.targetHandle === 'executor_list',
     );
 
     useMount(() => {
@@ -179,8 +177,6 @@ export default memo(({ node }: { node: AppNode }) => {
                 ]);
             }
         }
-
-
     };
 
     useUpdateEffect(() => {

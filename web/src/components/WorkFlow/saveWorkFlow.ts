@@ -41,13 +41,7 @@ const useSaveWorkFlow = () => {
 
         const freeData = transformWorkFlow();
         console.log(freeData);
-        if (freeData?.edges && freeData?.edges?.[0]?.sourceType != BlockEnum.Start) {
-
-            return false;
-        } else if (freeData?.edges && freeData.edges?.[0]?.source != freeData.nodes?.[0]?.id) {
-
-            return false;
-        }
+ 
         let graph = null;
         try {
             graph=new Graph(freeData.freeNodes, freeData.freeEdges, {

@@ -12,9 +12,7 @@ export default memo((props: NodeProps) => {
 
     // Check if current node is connected to executor_list
     const isConnectedToExecutorList = edges.some(
-        edge => 
-            edge.source === props.id && 
-            edge.targetHandle === 'executor_list'
+        edge => edge.source === props.id && edge.targetHandle === 'executor_list',
     );
 
     const modelList = () => {
@@ -39,9 +37,26 @@ export default memo((props: NodeProps) => {
                     position={Position.Left}
                 />
             )}
+
+            {isConnectedToExecutorList && (
+                <div className="mt-2 mb-4">
+                    <CustomHandle
+                        id="retrieval_task_datasets"
+                        type="target"
+                        params={props}
+                        enableToolbar={false}
+                        className="!top-[65px]"
+                        position={Position.Left}
+                        isValidConnection={() => true}
+                    ></CustomHandle>
+                    <div className="pl-2">知识库检索</div>
+                </div>
+            )}
+
             <CustomHandle
                 id="start_source"
                 type="source"
+                connectionCount={isConnectedToExecutorList ? 1 : 999}
                 params={props}
                 position={Position.Right}
             />

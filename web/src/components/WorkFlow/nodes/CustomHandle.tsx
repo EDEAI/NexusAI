@@ -17,10 +17,11 @@ interface CustomHandleProps {
     className?: string;
     index?: number;
     connectionCount?: number;
+    enableToolbar?: boolean;
     [key: string]: any;
 }
 const CustomHandle = memo((props: CustomHandleProps & HandleProps) => {
-    const { className, index, connectionCount = 1000, params, ...rest } = props;
+    const { className, index, connectionCount = 1000, params, enableToolbar = true, ...rest } = props;
     const addHandleList = useStore(state => state.addHandleList);
     const [selected, setSelected] = useState(false);
     const [toolsShow, setToolsShow] = useState(false);
@@ -37,8 +38,6 @@ const CustomHandle = memo((props: CustomHandleProps & HandleProps) => {
     });
 
     useMount(() => {
-        // console.log(props?.params);
-
         addHandleList([
             {
                 id: props.id,
@@ -110,17 +109,17 @@ const CustomHandle = memo((props: CustomHandleProps & HandleProps) => {
                 connections.length < connectionCount && (
                     <PlusOutlined className="pointer-events-none text-white" />
                 )}
-            {/* {toolsShow && ( */}
-            <div ref={toolBarRef}>
-                <CreateNodesToolbarPanel
-                    {...params}
-                    show={toolsShow}
-                    onSelect={onSelect}
-                    sourceHandle={props.id}
-                    position={props.type == 'source' ? 'right' : 'left'}
-                ></CreateNodesToolbarPanel>
-            </div>
-            {/* )} */}
+            {enableToolbar && (
+                <div ref={toolBarRef}>
+                    <CreateNodesToolbarPanel
+                        {...params}
+                        show={toolsShow}
+                        onSelect={onSelect}
+                        sourceHandle={props.id}
+                        position={props.type == 'source' ? 'right' : 'left'}
+                    />
+                </div>
+            )}
         </Handle>
     );
 });
