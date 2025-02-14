@@ -34,6 +34,9 @@ const SkillFirst: React.FC<ChildProps> = ({
     const SkillFSwitch = (checked: any) => {
         setSkillInfo({ ...Skillinfo, is_public: checked ? 1 : 0 });
     };
+    const attrFirstAPI = (checked: any) => {
+        setSkillInfo({ ...Skillinfo, attrs_are_visible: checked ? 1 : 0 });
+    };
     //
     const nextStep = (value: any, type: any) => {
         const input_variables = new ObjectVariable('output', '', '');
@@ -50,6 +53,7 @@ const SkillFirst: React.FC<ChildProps> = ({
         const data = {
             input_variables: input_variables,
             is_public: Skillinfo.is_public,
+            attrs_are_visible:Skillinfo.attrs_are_visible
         };
         FirstValue(data);
     };
@@ -115,6 +119,16 @@ const SkillFirst: React.FC<ChildProps> = ({
                                     size="small"
                                     onChange={SkillFSwitch}
                                     checked={Skillinfo && Skillinfo.is_public == 1 ? true : false}
+                                />
+                            </Form.Item>
+                            <Form.Item className="mb-[30px]">
+                                <div className="mb-[15px] text-[#555555] text-xs">
+                                    {intl.formatMessage({ id: 'agent.attrVisible' })}
+                                </div>
+                                <Switch
+                                    size="small"
+                                    onChange={attrFirstAPI}
+                                    checked={Skillinfo && Skillinfo.attrs_are_visible == 1 ? true : false}
                                 />
                             </Form.Item>
                             <div className="mb-[11px] text-xs font-bold flex justify-between items-center">
