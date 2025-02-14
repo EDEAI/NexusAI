@@ -820,8 +820,6 @@ def task_callback_thread():
                             app_run_data['need_correct_llm'] = 0 # Reset the need correct LLM flag
                             if not task_operation or (task_operation == 'assign_task' and not task_id):
                                 app_run_data['level'] = level + 1 # Increment the level
-                        elif target_node.data['type'] == 'skill':
-                            pass
                     else:
                         task_id = None
                         node_exec_data = {'status': 4, 'error': result['message'], 'need_human_confirm': 1}
