@@ -53,6 +53,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
             obligations: null,
             input_variables: {},
             dataset_ids: [],
+            attrs_are_visible:0
         },
     });
     useEffect(() => {
@@ -107,6 +108,16 @@ const AgentsFirst: React.FC<ChildProps> = ({
             data: { ...AgentsFirstData.data, enable_api: SwitchValue ? 1 : 0 },
         });
     };
+    const attrFirstAPI = (SwitchValue) =>{
+        setDetaillist({
+            ...Detaillist,
+            app: { ...Detaillist.app, attrs_are_visible: SwitchValue ? 1 : 0 },
+        });
+        setAgentsFirstData({
+            ...AgentsFirstData,
+            data: { ...AgentsFirstData.data, attrs_are_visible: SwitchValue ? 1 : 0 },
+        });
+    }
 
     const TPUpload = (checked: boolean) => {
         // AgentengineSet(null, checked ? 1 : 0)
@@ -223,6 +234,18 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     Detaillist && Detaillist.app.is_public === 1
                                                         ? true
                                                         : false
+                                                }
+                                            />
+                                        </div>
+                                        <div className="mb-[30px]  font-medium">
+                                            <div className="mb-[15px] text-[#555555] text-xs">
+                                                {intl.formatMessage({ id: 'agent.attrVisible' })}
+                                            </div>
+                                            <Switch
+                                                size="small"
+                                                onChange={attrFirstAPI}
+                                                checked={
+                                                    Detaillist && Detaillist.app.attrs_are_visible === 1
                                                 }
                                             />
                                         </div>
