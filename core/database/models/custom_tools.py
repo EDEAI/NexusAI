@@ -71,6 +71,7 @@ class CustomTools(MySQL):
                 "user_id": user_id,
                 "app_id": app['app_id'],
                 "nickname": user_data['nickname'],
+                "app_publish_status": app['app_publish_status'],
                 "is_creator": 0 if app["user_id"] != user_id else 1,
                 "input_variables": input_variables
             }
