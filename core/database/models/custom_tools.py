@@ -61,6 +61,7 @@ class CustomTools(MySQL):
         skill['is_creator'] = 0 if app["user_id"] != user_id else 1
         skill['app_publish_status'] = app['app_publish_status']
         input_variables = skill['input_variables']
+        skill_publish_status = skill['publish_status']
         if app["user_id"] != user_id and app["attrs_are_visible"] != 1:
             skill = {
                 "name": app['name'],
@@ -71,7 +72,7 @@ class CustomTools(MySQL):
                 "user_id": user_id,
                 "app_id": app['app_id'],
                 "nickname": user_data['nickname'],
-                "app_publish_status": app['app_publish_status'],
+                "publish_status": skill_publish_status,
                 "is_creator": 0 if app["user_id"] != user_id else 1,
                 "input_variables": input_variables
             }
