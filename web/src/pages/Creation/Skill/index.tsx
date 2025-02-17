@@ -237,6 +237,7 @@ const Skill: React.FC = () => {
                             data = {
                                 input_variables: arraytoobject(FirstSkillref.getFieldsValue()),
                                 is_public: Skillinfo.is_public,
+                                attrs_are_visible:Skillinfo.attrs_are_visible,
                                 dependencies: { python3: !!SkillRelyOn ? SkillRelyOn : [] },
                                 code: Newcode
                                     ? Newcode
@@ -272,6 +273,7 @@ const Skill: React.FC = () => {
             const data = {
                 input_variables: arraytoobject(FirstSkillref.getFieldsValue()),
                 is_public: Skillinfo.is_public,
+                attrs_are_visible:Skillinfo.attrs_are_visible,
                 dependencies: { python3: !!SkillRelyOn ? SkillRelyOn : [] },
                 code: Newcode
                     ? Newcode

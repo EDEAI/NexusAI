@@ -73,6 +73,7 @@ const ProgressContainer :React.FC<{progressObj:any}> = parmas => {
 // Run button
 const OperationButton :React.FC<{operationObj:any}> = parmas => {
     let {operationObj} = parmas;
+    const intl = useIntl();
     const setRunId = useUserStore(state => state.setRunId);
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
@@ -85,13 +86,29 @@ const OperationButton :React.FC<{operationObj:any}> = parmas => {
                     style={{ boxShadow: 'none', background: 'transparent', border: 'none' }}
                     disabled={operationObj.publish_status == 0}
                     icon={
-                        <img
-                            src={
-                                operationObj.publish_status == 0
-                                    ? '/icons/operation_disable_icon.svg'
-                                    : '/icons/operation_icon.svg'
-                            }
-                        ></img>
+                        operationObj?.workflow_published_time?
+                        <>
+                            <Tooltip
+                                title={`${operationObj?.workflow_published_time} ${intl.formatMessage({id: 'creation.publish',})}`}
+                            >
+                                <img
+                                    src={
+                                        operationObj.publish_status == 0
+                                            ? '/icons/operation_disable_icon.svg'
+                                            : '/icons/operation_icon.svg'
+                                    }
+                                ></img>
+                            </Tooltip>
+                        </>:
+                        <>
+                            <img
+                                src={
+                                    operationObj.publish_status == 0
+                                        ? '/icons/operation_disable_icon.svg'
+                                        : '/icons/operation_icon.svg'
+                                }
+                            ></img>
+                        </>
                     }
                     onClick={e => {
                         e.stopPropagation();
