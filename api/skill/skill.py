@@ -108,21 +108,17 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
         if 'is_public' in update_data:
             apps_data = {
                 "is_public": update_data['is_public'],
-                "attrs_are_visible": update_data['attrs_are_visible'],
                 "updated_time": update_data['updated_time']
             }
             apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
             del update_data['is_public']
-            del update_data['attrs_are_visible']
 
         if 'attrs_are_visible' in update_data:
             apps_data = {
-                "is_public": update_data['is_public'],
                 "attrs_are_visible": update_data['attrs_are_visible'],
                 "updated_time": update_data['updated_time']
             }
             apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
-            del update_data['is_public']
             del update_data['attrs_are_visible']
         conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
                       {'column': 'publish_status', 'value': 0}]
