@@ -61,6 +61,8 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
     allow_upload_file: int, Is it allowed to upload files? 0: No 1: Yes
     default_output_format: int, Default output format 1: text 2: json 3: code
     """
+
+    update_data = data.dict(exclude_unset=True)
     is_public = data.is_public
     attrs_are_visible = data.attrs_are_visible
     enable_api = data.enable_api
@@ -75,8 +77,10 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
         return response_error(get_language_content("api_agent_base_update_agent_id_required"))
     if is_public not in [0, 1]:
         return response_error(get_language_content("api_agent_base_update_is_public_error"))
-    if attrs_are_visible not in [0, 1]:
+    if 'attrs_are_visible' in update_data and attrs_are_visible not in [0, 1]:
         return response_error(get_language_content("api_agent_base_update_attrs_are_visible_error"))
+    if 'attrs_are_visible' not in update_data:
+        attrs_are_visible = 1
     if enable_api not in [0, 1]:
         return response_error(get_language_content("api_agent_base_update_enable_api_error"))
     if input_variables:
@@ -92,6 +96,9 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
         return response_error(get_language_content("api_agent_base_update_default_output_format_error"))
 
     agents_model = Agents()
+    print('-------------------------------------------------------------------------------------------------')
+    print(attrs_are_visible)
+    print('-------------------------------------------------------------------------------------------------')
     result = agents_model.agent_base_update(agent_id, userinfo.uid, userinfo.team_id, is_public, enable_api,
                                             obligations, input_variables, dataset_ids, m_config_id, allow_upload_file,
                                             default_output_format, attrs_are_visible)
