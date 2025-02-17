@@ -210,17 +210,17 @@ class SandboxBaseNode(Node):
         # Convert source and target paths to absolute paths
         source_path = os.path.abspath(source_path)
         target_path = os.path.abspath(target_path)
-
+        print(f'[[[[[[[[[[[[[[{target_path}]]]]]]]]]]]]]]')
         # Check if the source file exists
         if not os.path.exists(source_path):
             return False, f"Source file does not exist: {source_path}"
         try:
             print(os.path.dirname(target_path))
             # Ensure the target directory exists
-            os.makedirs(target_path, exist_ok=True)
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
 
             # Change ownership of the target directory to the current user
-            shutil.chown(target_path, user=os.getuid(), group=os.getgid())
+            shutil.chown(os.path.dirname(target_path), user=os.getuid(), group=os.getgid())
 
             # Copy the file
             shutil.copy2(source_path, target_path)
