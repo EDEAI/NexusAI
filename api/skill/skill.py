@@ -103,27 +103,23 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
     if 'is_public' in update_data and update_data['is_public'] not in [0, 1]:
         return response_error(get_language_content("is_public_invalid"))
 
-    if update_data['attrs_are_visible'] not in [0, 1]:
+    if 'attrs_are_visible' in update_data and update_data['attrs_are_visible'] not in [0, 1]:
         return response_error(get_language_content("api_agent_base_update_attrs_are_visible_error"))
     try:
         if 'is_public' in update_data:
             apps_data = {
                 "is_public": update_data['is_public'],
-                "attrs_are_visible": update_data['attrs_are_visible'],
                 "updated_time": update_data['updated_time']
             }
             apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
             del update_data['is_public']
-            del update_data['attrs_are_visible']
 
         if 'attrs_are_visible' in update_data:
             apps_data = {
-                "is_public": update_data['is_public'],
                 "attrs_are_visible": update_data['attrs_are_visible'],
                 "updated_time": update_data['updated_time']
             }
             apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
-            del update_data['is_public']
             del update_data['attrs_are_visible']
         conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
                       {'column': 'publish_status', 'value': 0}]
@@ -312,21 +308,9 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
 
     outputs = result["data"]["outputs"]
     file_list = []
-    storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
 
     if skill and skill.get("output_variables"):
-        output_vars = create_variable_from_dict(skill["output_variables"])
-        file_vars = output_vars.extract_file_variables()
-        for var in file_vars.properties.values():
-            if var.name in outputs:
-                file_path = outputs[var.name]
-                if file_path:
-                    file_name = file_path.split('/')[-1]
-                    full_path = f"{storage_url}{file_path}"
-                    file_list.append({
-                        "file_name": file_name,
-                        "file_path": full_path
-                    })
+        file_list = extract_file_list_from_skill_output(outputs, skill["output_variables"])
     return response_success({
         "outputs": outputs,
         "file_list": file_list

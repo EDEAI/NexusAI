@@ -161,22 +161,7 @@ async def node_run(data: WorkflowsNodeRunSchema,
 
         if node_data.data['type'] == 'skill':
             node_data_dict = node_data.to_dict()
-
-            file_list = []
-            outputs = result['data']['outputs']
-            storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
-            output_vars = create_variable_from_dict(node_data_dict["data"]["output"])
-            file_vars = output_vars.extract_file_variables()
-            for var in file_vars.properties.values():
-                if var.name in outputs:
-                    file_path = outputs[var.name]
-                    if file_path:
-                        file_name = file_path.split('/')[-1]
-                        full_path = f"{storage_url}{file_path}"
-                        file_list.append({
-                            "file_name": file_name,
-                            "file_path": full_path
-                        })
+            file_list = extract_file_list_from_skill_output(result['data']['outputs'], node_data_dict["data"]["output"])
             result['data']['file_list'] = file_list
 
         return response_success(result)

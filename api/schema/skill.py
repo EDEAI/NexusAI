@@ -54,6 +54,7 @@ class SkillBaseInfoResponseData(BaseModel):
     is_public: Optional[int] = None
     is_creator: Optional[int] = None
     nickname: Optional[str] = None
+    attrs_are_visible: Optional[int] = None
 class ResSkillBaseInfoSchema(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
