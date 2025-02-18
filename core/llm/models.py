@@ -52,6 +52,9 @@ class LLMPipeline:
             # Check if model_kwargs contains JSON response format configuration
             if config.get('model_kwargs', {}).get('response_format') == {"type": "json_object"}:
                 config['model_kwargs'] = {}
+            
+            print("LLM config", config)
+            print("Using schema", schema)
                 
             # Initialize Anthropic with schema if available
             if schema:
@@ -590,6 +593,7 @@ class LLMPipeline:
         Returns:
             The standardized output of the pipeline chain.
         """
+        print("Input messages:", messages)
         response = self.chain(messages).invoke(input)
-        print(response)
+        print("Model response:", response)
         return self.standardize_response(response)
