@@ -96,9 +96,6 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
         return response_error(get_language_content("api_agent_base_update_default_output_format_error"))
 
     agents_model = Agents()
-    print('-------------------------------------------------------------------------------------------------')
-    print(attrs_are_visible)
-    print('-------------------------------------------------------------------------------------------------')
     result = agents_model.agent_base_update(agent_id, userinfo.uid, userinfo.team_id, is_public, enable_api,
                                             obligations, input_variables, dataset_ids, m_config_id, allow_upload_file,
                                             default_output_format, attrs_are_visible)

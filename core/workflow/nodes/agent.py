@@ -372,7 +372,10 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 file_list=file_list,
                 return_json=return_json,
                 correct_llm_output=correct_llm_output,
-                override_rag_input=override_rag_input
+                override_rag_input=override_rag_input,
+                is_chat=is_chat,
+                user_id=user_id,
+                agent_id=agent_id
             )
             print(model_data)
             AppRuns().update(
@@ -412,6 +415,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'user_id': user_id,
                     'agent_id': agent_id,
                     'message': ai_output,
+                    'agent_run_id': app_run_id,
                     'prompt_tokens': prompt_tokens,
                     'completion_tokens': completion_tokens,
                     'total_tokens': total_tokens,
