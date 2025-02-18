@@ -53,7 +53,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
             obligations: null,
             input_variables: {},
             dataset_ids: [],
-            attrs_are_visible:0
+            attrs_are_visible:1
         },
     });
     useEffect(() => {
