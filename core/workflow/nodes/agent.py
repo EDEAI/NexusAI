@@ -415,7 +415,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'user_id': user_id,
                     'agent_id': agent_id,
                     'message': ai_output,
-                    'agent_run_id': app_run_id,
+                    'agent_run_id': agent_run_id,
                     'prompt_tokens': prompt_tokens,
                     'completion_tokens': completion_tokens,
                     'total_tokens': total_tokens,
