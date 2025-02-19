@@ -155,6 +155,7 @@ export const agentdefault = (): any => {
                 m_configurations_list: [],
                 is_creator: 1,
                 creator_nickname: '',
+                attrs_are_visible:1
             },
         };
         const res = await getModelList();
@@ -189,6 +190,7 @@ export const skilldefault = (): any => {
             is_public: 1,
             is_creator: 1,
             nickname: '',
+            attrs_are_visible:1,
         },
     };
     return data;
