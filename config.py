@@ -1061,6 +1061,201 @@ model_config = [
                             "default_value": None
                         }
                     ]
+                },
+                {
+                    'model_name': 'o3-mini',
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 200000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 100000
+                    },
+                    'config': [
+                        {
+                            "key": "model",
+                            "type": "str",
+                            "value": "",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "o3-mini-2025-01-31"
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": 1,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "What sampling temperature to use.",
+                            "default_value": 1
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "base_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "organization",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Automatically inferred from env var `OPENAI_ORG_ID` if not provided.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "openai_proxy",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Supports explicit proxy for OpenAI.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Timeout for requests to OpenAI completion API. Can be float, httpx.Timeout or None.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Maximum number of retries to make when generating.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to stream the results or not.",
+                            "default_value": False
+                        },
+                        {
+                            "key": "n",
+                            "type": "int",
+                            "value": 1,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of chat completions to generate for each prompt.",
+                            "default_value": 1
+                        },
+                        {
+                            "key": "max_tokens",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Maximum number of tokens to generate.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "tiktoken_model_name",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "The model name to pass to tiktoken when using this class.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default headers.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_query",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default query.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.Client. Only used for sync invocations. Must specify http_async_client as well if you'd like a custom client for async invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_async_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.AsyncClient. Only used for async invocations. Must specify http_client as well if you'd like a custom client for sync invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "stop_sequences",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default stop sequences.",
+                            "default_value": None
+                        }
+                    ]
                 }
             ],
             'embeddings': [
@@ -2001,6 +2196,1017 @@ model_config = [
                             "optional": False,
                             "description": "Whether to use streaming or not.",
                             "default_value": False
+                        }
+                    ]
+                }
+            ],
+            'embeddings': [],
+            'reranking': [],
+            'speech2text': [],
+            'tts': [],
+            'text2img': [],
+            'moderation': []
+        }
+    },
+{
+        'supplier': 'Doubao',
+        'mode': 1,
+        'config': [
+            {
+                "key": "api_key",
+                "type": "str",
+                "value": "",
+                "secret": True,
+                "options": None,
+                "optional": False,
+                "description": "Automatically inferred from env var `OPENAI_API_KEY` if not provided.",
+                "default_value": ""
+            },
+            {
+                "key": "base_url",
+                "type": "str",
+                "value": "https://ark.cn-beijing.volces.com/api/v3",
+                "secret": False,
+                "options": None,
+                "optional": False,
+                "description": "Base URL for API requests",
+                "default_value": "https://ark.cn-beijing.volces.com/api/v3"
+            }
+        ],
+        'models': {
+            'text-generation': [
+                {
+                    'model_name': 'Doubao-1.5-pro-256k',  # 1
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 256000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 12000
+                    },
+                    'config': [
+                        {
+                            "key": "model",
+                            "type": "str",
+                            "value": "ep-20250213164639-kgtq2",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "ep-20250213164639-kgtq2"
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": 0.7,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "What sampling temperature to use.",
+                            "default_value": 0.7
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "base_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "organization",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Automatically inferred from env var `OPENAI_ORG_ID` if not provided.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "openai_proxy",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Supports explicit proxy for OpenAI.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Timeout for requests to OpenAI completion API. Can be float, httpx.Timeout or None.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Maximum number of retries to make when generating.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to stream the results or not.",
+                            "default_value": False
+                        },
+                        {
+                            "key": "n",
+                            "type": "int",
+                            "value": 1,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of chat completions to generate for each prompt.",
+                            "default_value": 1
+                        },
+                        {
+                            "key": "max_tokens",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Maximum number of tokens to generate.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "tiktoken_model_name",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "The model name to pass to tiktoken when using this class.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default headers.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_query",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default query.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.Client. Only used for sync invocations. Must specify http_async_client as well if you'd like a custom client for async invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_async_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.AsyncClient. Only used for async invocations. Must specify http_client as well if you'd like a custom client for sync invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "stop_sequences",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default stop sequences.",
+                            "default_value": None
+                        }
+                    ]
+                },
+                {
+                    'model_name': 'Doubao-1.5-pro-32k',   # 2
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 32000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 12000
+                    },
+                    'config': [
+                        {
+                            "key": "model",
+                            "type": "str",
+                            "value": "ep-20250213145156-lgdnr",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "ep-20250213145156-lgdnr"
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": 0.7,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "What sampling temperature to use.",
+                            "default_value": 0.7
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "base_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "organization",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Automatically inferred from env var `OPENAI_ORG_ID` if not provided.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "openai_proxy",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Supports explicit proxy for OpenAI.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Timeout for requests to OpenAI completion API. Can be float, httpx.Timeout or None.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Maximum number of retries to make when generating.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to stream the results or not.",
+                            "default_value": False
+                        },
+                        {
+                            "key": "n",
+                            "type": "int",
+                            "value": 1,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of chat completions to generate for each prompt.",
+                            "default_value": 1
+                        },
+                        {
+                            "key": "max_tokens",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Maximum number of tokens to generate.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "tiktoken_model_name",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "The model name to pass to tiktoken when using this class.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default headers.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_query",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default query.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.Client. Only used for sync invocations. Must specify http_async_client as well if you'd like a custom client for async invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_async_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.AsyncClient. Only used for async invocations. Must specify http_client as well if you'd like a custom client for sync invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "stop_sequences",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default stop sequences.",
+                            "default_value": None
+                        }
+                    ]
+                },
+                {
+                    'model_name': 'Doubao-1.5-lite-32k',  # 3
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 32000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 12000
+                    },
+                    'config': [
+                        {
+                            "key": "model",
+                            "type": "str",
+                            "value": "ep-20250213164550-m586m",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "ep-20250213164550-m586m"
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": 0.7,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "What sampling temperature to use.",
+                            "default_value": 0.7
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "base_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "organization",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Automatically inferred from env var `OPENAI_ORG_ID` if not provided.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "openai_proxy",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Supports explicit proxy for OpenAI.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Timeout for requests to OpenAI completion API. Can be float, httpx.Timeout or None.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Maximum number of retries to make when generating.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to stream the results or not.",
+                            "default_value": False
+                        },
+                        {
+                            "key": "n",
+                            "type": "int",
+                            "value": 1,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of chat completions to generate for each prompt.",
+                            "default_value": 1
+                        },
+                        {
+                            "key": "max_tokens",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Maximum number of tokens to generate.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "tiktoken_model_name",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "The model name to pass to tiktoken when using this class.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default headers.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_query",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default query.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.Client. Only used for sync invocations. Must specify http_async_client as well if you'd like a custom client for async invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_async_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.AsyncClient. Only used for async invocations. Must specify http_client as well if you'd like a custom client for sync invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "stop_sequences",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default stop sequences.",
+                            "default_value": None
+                        }
+                    ]
+                },
+                {
+                    'model_name': 'Doubao-pro-256k',      # 4
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 256000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 4000
+                    },
+                    'config': [
+                        {
+                            "key": "model",
+                            "type": "str",
+                            "value": "ep-20250213164639-kgtq2",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "ep-20250213164639-kgtq2"
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": 0.7,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "What sampling temperature to use.",
+                            "default_value": 0.7
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "base_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "organization",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Automatically inferred from env var `OPENAI_ORG_ID` if not provided.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "openai_proxy",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Supports explicit proxy for OpenAI.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Timeout for requests to OpenAI completion API. Can be float, httpx.Timeout or None.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Maximum number of retries to make when generating.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to stream the results or not.",
+                            "default_value": False
+                        },
+                        {
+                            "key": "n",
+                            "type": "int",
+                            "value": 1,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of chat completions to generate for each prompt.",
+                            "default_value": 1
+                        },
+                        {
+                            "key": "max_tokens",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Maximum number of tokens to generate.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "tiktoken_model_name",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "The model name to pass to tiktoken when using this class.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default headers.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_query",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default query.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.Client. Only used for sync invocations. Must specify http_async_client as well if you'd like a custom client for async invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_async_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.AsyncClient. Only used for async invocations. Must specify http_client as well if you'd like a custom client for sync invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "stop_sequences",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default stop sequences.",
+                            "default_value": None
+                        }
+                    ]
+                },
+                {
+                    'model_name': 'Doubao-lite-128k',     # 5
+                    'max_context_tokens': {
+                        "key": "max_context_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum context length for model.",
+                        "default_value": 128000
+                    },
+                    'max_output_tokens': {
+                        "key": "max_output_tokens",
+                        "type": "int",
+                        "value": "",
+                        "secret": False,
+                        "options": None,
+                        "optional": False,
+                        "description": "Maximum output length for model.",
+                        "default_value": 4000
+                    },
+                    'config': [
+                        {
+                            "key": "model",
+                            "type": "str",
+                            "value": "ep-20250213164724-95xlf",
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Model name to use.",
+                            "default_value": "ep-20250213164724-95xlf"
+                        },
+                        {
+                            "key": "temperature",
+                            "type": "float",
+                            "value": 0.7,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "What sampling temperature to use.",
+                            "default_value": 0.7
+                        },
+                        {
+                            "key": "model_kwargs",
+                            "type": "str",
+                            "value": {},
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Holds any model parameters valid for `create` call not explicitly specified.",
+                            "default_value": {}
+                        },
+                        {
+                            "key": "base_url",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Base URL path for API requests, leave blank if not using a proxy or service emulator.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "organization",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Automatically inferred from env var `OPENAI_ORG_ID` if not provided.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "openai_proxy",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Supports explicit proxy for OpenAI.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "timeout",
+                            "type": "float",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Timeout for requests to OpenAI completion API. Can be float, httpx.Timeout or None.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "max_retries",
+                            "type": "int",
+                            "value": 2,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Maximum number of retries to make when generating.",
+                            "default_value": 2
+                        },
+                        {
+                            "key": "streaming",
+                            "type": "bool",
+                            "value": False,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Whether to stream the results or not.",
+                            "default_value": False
+                        },
+                        {
+                            "key": "n",
+                            "type": "int",
+                            "value": 1,
+                            "secret": False,
+                            "options": None,
+                            "optional": False,
+                            "description": "Number of chat completions to generate for each prompt.",
+                            "default_value": 1
+                        },
+                        {
+                            "key": "max_tokens",
+                            "type": "int",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Maximum number of tokens to generate.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "tiktoken_model_name",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "The model name to pass to tiktoken when using this class.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_headers",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default headers.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "default_query",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default query.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.Client. Only used for sync invocations. Must specify http_async_client as well if you'd like a custom client for async invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "http_async_client",
+                            "type": "Any",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Optional httpx.AsyncClient. Only used for async invocations. Must specify http_client as well if you'd like a custom client for sync invocations.",
+                            "default_value": None
+                        },
+                        {
+                            "key": "stop_sequences",
+                            "type": "str",
+                            "value": None,
+                            "secret": False,
+                            "options": None,
+                            "optional": True,
+                            "description": "Default stop sequences.",
+                            "default_value": None
                         }
                     ]
                 }

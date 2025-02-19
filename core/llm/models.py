@@ -33,11 +33,11 @@ class LLMPipeline:
     """
     Represents a pipeline for generating text using a language model.
     """
-    
+
     def __init__(self, supplier: str, config: dict, schema_key: str = None):
         """
         Initializes an LLMPipeline object with a supplier and configuration dictionary.
-        
+
         :param supplier: str, the name of the supplier to use for the pipeline.
         :param config: dict, a dictionary of configuration options for the supplier.
         :param schema_key: str, optional key to use specific schema from output_schemas.py.
@@ -52,36 +52,33 @@ class LLMPipeline:
             # Check if model_kwargs contains JSON response format configuration
             if config.get('model_kwargs', {}).get('response_format') == {"type": "json_object"}:
                 config['model_kwargs'] = {}
-            
-            print("LLM config", config)
-            print("Using schema", schema)
-                
+
             # Initialize Anthropic with schema if available
             if schema:
                 self.llm = ChatAnthropic(**config).with_structured_output(schema=schema, include_raw=True)
             else:
                 self.llm = ChatAnthropic(**config)
-                
+
         elif self.supplier == 'Azure_OpenAI':
             '''
            config = {
             "azure_endpoint": "https://example-resource.azure.openai.com/",  # Your Azure endpoint, including the resource
             # Automatically inferred from env var `AZURE_OPENAI_ENDPOINT` if not provided.
             # Example: `https://example-resource.azure.openai.com/`
-            
+
             "azure_deployment": "your_deployment_name",  # A model deployment
             # If given sets the base client URL to include `/deployments/{azure_deployment}`.
             # Note: this means you won't be able to use non-deployment endpoints.
-            
+
             "api_version": "2023-05-15",  # Automatically inferred from env var `OPENAI_API_VERSION` if not provided.
             "api_key": "your_api_key_here",  # Automatically inferred from env var `AZURE_OPENAI_API_KEY` if not provided.
             "azure_ad_token": "your_ad_token_here",  # Your Azure Active Directory token
             # Automatically inferred from env var `AZURE_OPENAI_AD_TOKEN` if not provided.
             # For more: https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id
-            
+
             "azure_ad_token_provider": lambda: "your_token",  # A function that returns an Azure Active Directory token
             # Will be invoked on every request.
-            
+
             "model_version": "1.0.0",    # Legacy, for openai<1.0.0 support
             "openai_api_type": "azure",  # Legacy, for openai<1.0.0 support
             "validate_base_url": True    # Whether to validate the base URL
@@ -109,24 +106,24 @@ class LLMPipeline:
             config = {
                 "region_name": None,  # The AWS region e.g., `us-west-2`
                 # Falls back to `AWS_DEFAULT_REGION` env variable or region specified in `~/.aws/config` if not provided here.
-            
+
                 "credentials_profile_name": None,  # The name of the profile in the ~/.aws/credentials or ~/.aws/config files
                 # If not specified, the default credential profile or credentials from IMDS will be used. See:
                 # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
-            
+
                 "config": None,  # An optional botocore.config.Config instance to pass to the client
-            
+
                 "provider": None,  # The model provider, e.g., amazon, cohere, ai21, etc.
                 # When not supplied, provider is extracted from the first part of the model_id
-            
+
                 "model_id": "your_model_id",  # Id of the model to call, e.g., amazon.titan-text-express-v1
-            
+
                 "model_kwargs": {},  # Keyword arguments to pass to the model, initialized to an empty dictionary
-            
+
                 "endpoint_url": None,  # Needed if you don't want to default to us-east-1 endpoint
-            
+
                 "streaming": False,  # Whether to stream the results
-            
+
                 "provider_stop_sequence_key_name_map": {
                     "anthropic": "stop_sequences",
                     "amazon": "stopSequences",
@@ -134,7 +131,7 @@ class LLMPipeline:
                     "cohere": "stop_sequences",
                     "mistral": "stop_sequences",
                 },  # Maps provider to stop sequence key name
-            
+
                 "provider_stop_reason_key_map": {
                     "anthropic": "stop_reason",
                     "amazon": "completionReason",
@@ -142,7 +139,7 @@ class LLMPipeline:
                     "cohere": "finish_reason",
                     "mistral": "stop_reason",
                 },  # Maps provider to stop reason key name
-            
+
                 "guardrails": {
                     "trace": None,
                     "guardrailIdentifier": None,
@@ -189,29 +186,29 @@ class LLMPipeline:
                                              # Supported examples:
                                              # - gemini-pro
                                              # - models/text-bison-001
-            
+
                 "google_api_key": None,  # Optional Google API key
-            
+
                 "credentials": None,  # Default custom credentials (google.auth.credentials.Credentials) to use
                                       # when making API calls. If not provided, credentials will be 
                                       # ascertained from the GOOGLE_API_KEY env var
-            
+
                 "temperature": 0.7,  # Run inference with this temperature. Must be in the closed interval [0.0, 1.0]
-            
+
                 "top_p": None,  # Decode using nucleus sampling: consider the smallest set of tokens whose
                                 # probability sum is at least top_p. Must be in the closed interval [0.0, 1.0]
-            
+
                 "top_k": None,  # Decode using top-k sampling: consider the set of top_k most probable tokens.
                                 # Must be positive
-            
+
                 "max_output_tokens": None,  # Maximum number of tokens to include in a candidate. 
                                             # Must be greater than zero. If unset, will default to 64
-            
+
                 "n": 1,  # Number of chat completions to generate for each prompt. Note that the API may
                          # not return the full n completions if duplicates are generated
-            
+
                 "max_retries": 6,  # The maximum number of retries to make when generating
-            
+
                 "timeout": None  # The maximum number of seconds to wait for a response
             }
             '''
@@ -372,7 +369,7 @@ class LLMPipeline:
             }
             '''
             self.llm = ChatOllama(**config)
-        elif self.supplier == 'OpenAI':
+        elif self.supplier in ['OpenAI', 'Doubao']:
             '''
             config = {
                 "model": "gpt-3.5-turbo",  # Model name to use.
@@ -498,7 +495,7 @@ class LLMPipeline:
     def chain(self, messages):
         """
         Create a pipeline chain based on the type of messages provided.
-        
+
         :param messages: str or list, the messages to use for the pipeline chain.
         :return: the pipeline chain.
         """
@@ -513,7 +510,7 @@ class LLMPipeline:
     def create_llm_chain(self, message: str):
         """
         Create a pipeline chain for a language model prompt.
-        
+
         :param message: str, the message to use for the pipeline chain.
         :return: the pipeline chain.
         """
@@ -524,7 +521,7 @@ class LLMPipeline:
     def create_chat_chain(self, messages: list):
         """
         Create a pipeline chain for a chat prompt.
-        
+
         :param messages: list, the message to use for the pipeline chain.
         :return: the pipeline chain.
         """
@@ -539,10 +536,10 @@ class LLMPipeline:
         1. Structured output with schema
         2. Regular unstructured output
         Other suppliers' responses are returned as-is.
-        
+
         Args:
             response: The response from the LLM model.
-            
+
         Returns:
             A standardized response with content and token usage information.
         """
@@ -551,7 +548,7 @@ class LLMPipeline:
             if isinstance(response, dict) and 'raw' in response:
                 raw_response = response['raw']
                 usage_metadata = raw_response.usage_metadata
-                
+
                 standardized_response = type('StandardizedResponse', (), {
                     'content': json.dumps(response['parsed'], ensure_ascii=False),
                     'response_metadata': {
@@ -567,7 +564,7 @@ class LLMPipeline:
             # Handle regular unstructured output
             content = response.content
             usage_metadata = response.usage_metadata
-            
+
             standardized_response = type('StandardizedResponse', (), {
                 'content': content,
                 'response_metadata': {
@@ -579,21 +576,20 @@ class LLMPipeline:
                 }
             })
             return standardized_response
-            
+
         return response
 
     def invoke(self, messages, input={}):
         """
         Invoke the pipeline chain with the provided prompt.
-        
+
         Args:
             messages: str or list, the messages to use for the pipeline chain.
             input: dict, optional input parameters for the chain.
-            
+
         Returns:
             The standardized output of the pipeline chain.
         """
-        print("Input messages:", messages)
         response = self.chain(messages).invoke(input)
         print("Model response:", response)
         return self.standardize_response(response)
