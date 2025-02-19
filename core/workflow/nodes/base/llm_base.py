@@ -27,12 +27,13 @@ class LLMBaseNode(Node):
     Base class for all LLM nodes.
     """
     
+    schema_key = None # The schema key for the LLM model
+    
     def __init__(self, **kwargs):
         """
         Initializes a new instance of the LLMBaseNode class.
         """
         super().__init__(**kwargs)
-        self.schema_key = None # The schema key to be used for the LLM pipeline
         
     def duplicate_braces(self, text: str) -> str:
         """
@@ -170,6 +171,9 @@ class LLMBaseNode(Node):
             correct_llm_output=correct_llm_output,
             override_rag_input=override_rag_input
         )
+        
+        if model_info["supplier_name"] == "Anthropic":
+            messages.reorganize_messages()
 
         ai_message = llm_pipeline.invoke(messages.to_langchain_format(), input)
         content = ai_message.content
@@ -236,13 +240,19 @@ class LLMBaseNode(Node):
             correct_llm_output=correct_llm_output,
             override_rag_input=override_rag_input
         )
+        
+        if model_info["supplier_name"] == "Anthropic":
+            messages.reorganize_messages()
 
         async def ainvoke():
             llm_input = [(role, message.value.format(**input)) for role, message in messages.messages]
 
             for _ in range(5):
                 try:
-                    llm_aiter = llm_pipeline.llm.astream(llm_input, stream_usage=True)
+                    if model_info["supplier_name"] == "Anthropic":
+                        llm_aiter = llm_pipeline.llm.astream(llm_input)
+                    else:
+                        llm_aiter = llm_pipeline.llm.astream(llm_input, stream_usage=True)
                     while True:
                         try:
                             yield await asyncio.wait_for(anext(llm_aiter), timeout=20)

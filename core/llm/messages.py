@@ -125,6 +125,29 @@ class Messages:
             result.append((role, message.to_dict()))
         return result
 
+    def reorganize_messages(self) -> None:
+        """
+        Reorganizes the messages by:
+        1. Keeping only the last system message
+        2. Moving that system message to the beginning
+        3. Preserving the order of other messages
+        """
+        # Find the last system message
+        last_system_message = None
+        non_system_messages = []
+        
+        for role, message in self.messages:
+            if role == "system":
+                last_system_message = (role, message)
+            else:
+                non_system_messages.append((role, message))
+        
+        # Reconstruct the messages list
+        self.messages = []
+        if last_system_message:
+            self.messages.append(last_system_message)
+        self.messages.extend(non_system_messages)
+
 def create_messages_from_serialized_format(serialized_data: List[Tuple[str, Dict[str, str]]]) -> Messages:
     """
     Converts a list of dictionaries to a Messages object.
