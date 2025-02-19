@@ -13,6 +13,7 @@ from ..context import Context, replace_variable_value_with_context
 from ..variables import ObjectVariable, Variable
 from ..recursive_task import RecursiveTaskCategory
 from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
+from core.database.models.agent_chat_messages import AgentChatMessages
 from core.database.models import Apps, AgentAbilities, AgentDatasetRelation, Agents, Workflows, AppRuns, AppNodeExecutions, Models
 from core.dataset import DatasetRetrieval
 from core.llm.messages import Messages
@@ -20,9 +21,11 @@ from core.llm.models import LLMPipeline
 from core.llm.prompt import Prompt, replace_prompt_with_context
 from languages import get_language_content
 from log import Logger
+from core.helper import push_to_websocket_queue
 
 
 logger = Logger.get_logger('celery-app')
+logger_chat = Logger.get_logger('agent-chat-llm-return')
 
 
 class AgentNode(ImportToKBBaseNode, LLMBaseNode):
@@ -276,6 +279,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         task: Optional[Dict[str, RecursiveTaskCategory]] = None,
         correct_llm_output: bool = False,
         data_source_run_id : Optional[int] = 0,
+        is_chat: bool = False,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -403,6 +407,37 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 reranking_tokens = retrieval_token_counter['reranking']
             else:
                 embedding_tokens, reranking_tokens = 0, 0
+            if is_chat:
+                chat_message_id = AgentChatMessages().insert({
+                    'user_id': user_id,
+                    'agent_id': agent_id,
+                    'message': ai_output,
+                    'prompt_tokens': prompt_tokens,
+                    'completion_tokens': completion_tokens,
+                    'total_tokens': total_tokens,
+                })
+                chat_message_llm_return = 'chat_message_llm_return'
+                datetime_now = datetime.now()
+                json_data = json.dumps(ai_output, ensure_ascii=False)
+                data = {
+                    'user_id': user_id,
+                    'type': chat_message_llm_return,
+                    'data': {
+                        'message_id': chat_message_id,
+                        'status': 1,
+                        'error': "",
+                        'prompt_tokens': prompt_tokens,
+                        'completion_tokens': completion_tokens,
+                        'total_tokens': total_tokens,
+                        'created_time': datetime_now,
+                        'finished_time': datetime_now,
+                        'user_id': user_id,
+                        'agent_id': agent_id,
+                        'message': json_data
+                    }
+                }
+                push_to_websocket_queue(data)
+                logger_chat.info(f"Push results generated through AI:{user_id} agent_id:{agent_id} chat_message_id：{chat_message_id} message:{ai_output} status:{1} data:{data}")
             outputs = Variable(
                 name="text",
                 type="json" if output_format == 2 else "string",
@@ -468,6 +503,30 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     }
                 )
             self.delete_documents_by_node_exec_id(node_exec_id)
+
+            if is_chat:
+                chat_message_llm_return = 'chat_message_llm_return'
+                message_error = str(e)
+                datetime_now = datetime.now()
+                data = {
+                    'user_id': user_id,
+                    'type': chat_message_llm_return,
+                    'data': {
+                        'message_id': '',
+                        'status': 0,
+                        'error': message_error,
+                        'prompt_tokens': '',
+                        'completion_tokens': '',
+                        'total_tokens': '',
+                        'created_time': datetime_now,
+                        'finished_time': datetime_now
+                    }
+                }
+                push_to_websocket_queue(data)
+                logger_chat.info("----------------------------------------------------------------------------")
+                logger_chat.exception(f"Push results generated through AI ERROR:{user_id} error:{str(e)} status:{4} data:{data}")
+                logger_chat.info("----------------------------------------------------------------------------")
+
             return {
                 'status': 'failed',
                 'message': str(e)
