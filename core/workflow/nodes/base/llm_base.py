@@ -98,7 +98,6 @@ class LLMBaseNode(Node):
                 replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)
             messages = Messages()
             if is_chat:
-
                 chat_history = AgentChatMessages().get_chat_agent_history(agent_id=agent_id, user_id=user_id)
 
                 # Truncate Messages By Token Limit
@@ -114,7 +113,6 @@ class LLMBaseNode(Node):
                     if chat['agent_run_id'] > 0:
                         messages.add_ai_message(Variable(name="text", type="string", value=chat_message))
                     else:
-                        # messages.add_human_message(Variable(name="text", type="string", value=chat_message))
                         # Determine if it is the last message
                         if index == len(chatMessageList) - 1:
                             messages.add_human_message(Variable(name="text", type="string", value=self.data["prompt"].get_user()))

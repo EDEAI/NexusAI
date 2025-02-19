@@ -1106,17 +1106,17 @@ async def clear_agent_chat_memory(agent_id: int, message_id: int, userinfo: Toke
             {"column": "user_id", "value": userinfo.uid},
             {"column": "id", "value": message_id}
         ]
-    )['id']
+    )
     if not find_message:
         return response_error(get_language_content("agent_message_does_not_exist"))
 
     AgentChatMessages().update(
-        {'column': 'id', 'value': find_message},
+        {'column': 'id', 'value': message_id},
         {'history_cleared': 1}
     )
 
     return response_success(
-        {"message_id": find_message}
+        {"message_id": message_id}
     )
 
 
@@ -1136,7 +1136,6 @@ async def agent_chat_message(data: AgentChatMessage, userinfo: TokenData = Depen
     prompt = data.prompt
     uid = userinfo.uid
     team_id = userinfo.team_id
-    message = data.message
 
     if agent_id <= 0:
         return response_error(get_language_content("api_agent_run_agent_id_required"))
@@ -1210,7 +1209,7 @@ async def agent_chat_message(data: AgentChatMessage, userinfo: TokenData = Depen
     message_id = AgentChatMessages().insert({
         'user_id': userinfo.uid,
         'agent_id': agent_id,
-        'message': message
+        'message': prompt['user']['value']
     })
 
     run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id, prompt=prompt, is_chat=True)
