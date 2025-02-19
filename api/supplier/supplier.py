@@ -152,27 +152,34 @@ async def supplier_authorize(supplier_request: SupplierRequest, userinfo: TokenD
     if not supplier:
         return response_error(get_language_content("supplier_not_found"))
 
-        # Fetch the existing supplier configuration
+    # Fetch the existing supplier configuration
     supplier_config = SupplierConfigurations().get_supplier_config_id(supplier_id, team_id)
 
-    # Convert the config dictionary to a JSON-serializable format
-    config_data = {}
-    for config_item in config:
-        config_data[config_item['key']] = config_item['value']
+    # Convert the front-end config list to a dict
+    config_data = {config_item['key']: config_item['value'] for config_item in config}
 
-    new_config = {
-        'supplier_id': supplier_id,
-        'config': config_data,
-        'team_id': team_id
-    }
-
-    # Update the existing configuration or insert a new one if it doesn't exist
     if supplier_config:
-        # Compare the existing config with the new config
-        if supplier_config['config'] != config_data:
+        # Merge new config with existing config without replacing unrelated keys
+        existing_config = supplier_config.get('config', {})
+        updated = False
+        for key, value in config_data.items():
+            if key not in existing_config or existing_config[key] != value:
+                existing_config[key] = value
+                updated = True
+        if updated:
+            new_config = {
+                'supplier_id': supplier_id,
+                'config': existing_config,
+                'team_id': team_id
+            }
             column = [{'column': 'id', 'value': supplier_config['id']}]
             SupplierConfigurations().update(column, new_config)
     else:
+        new_config = {
+            'supplier_id': supplier_id,
+            'config': config_data,
+            'team_id': team_id
+        }
         SupplierConfigurations().insert(new_config)
 
     # Return a success response
