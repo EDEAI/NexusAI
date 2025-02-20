@@ -38,23 +38,23 @@ ALTER TABLE `model_configurations`
 ALTER TABLE `model_configurations`
 	CHANGE COLUMN `sort_order` `sort_order` TINYINT(11) NOT NULL DEFAULT '0' COMMENT 'Model Sort Order' AFTER `default_used`;
 
-UPDATE model_configurations SET sort_order = 1 WHERE id = 1;
-UPDATE model_configurations SET sort_order = 1 WHERE id = 2;
-UPDATE model_configurations SET sort_order = 4 WHERE id = 3;
-UPDATE model_configurations SET sort_order = 1 WHERE id = 4;
-UPDATE model_configurations SET sort_order = 5 WHERE id = 5;
-UPDATE model_configurations SET sort_order = 6 WHERE id = 6;
-UPDATE model_configurations SET sort_order = 7 WHERE id = 7;
+UPDATE model_configurations SET sort_order = 100 WHERE id = 1;
+UPDATE model_configurations SET sort_order = 100 WHERE id = 2;
+UPDATE model_configurations SET sort_order = 96 WHERE id = 3;
+UPDATE model_configurations SET sort_order = 100 WHERE id = 4;
+UPDATE model_configurations SET sort_order = 97 WHERE id = 5;
+UPDATE model_configurations SET sort_order = 98 WHERE id = 6;
+UPDATE model_configurations SET sort_order = 99 WHERE id = 7;
 UPDATE model_configurations SET sort_order = 100 WHERE id = 8;
-UPDATE model_configurations SET sort_order = 1 WHERE id = 9;
-UPDATE model_configurations SET sort_order = 1 WHERE id = 10;
-UPDATE model_configurations SET sort_order = 2 WHERE id = 11;
-UPDATE model_configurations SET sort_order = 3 WHERE id = 12;
-UPDATE model_configurations SET sort_order = 4 WHERE id = 13;
+UPDATE model_configurations SET sort_order = 95 WHERE id = 9;
+UPDATE model_configurations SET sort_order = 96 WHERE id = 10;
+UPDATE model_configurations SET sort_order = 97 WHERE id = 11;
+UPDATE model_configurations SET sort_order = 98 WHERE id = 12;
+UPDATE model_configurations SET sort_order = 99 WHERE id = 13;
 UPDATE model_configurations SET sort_order = 100 WHERE id = 14;
-UPDATE model_configurations SET sort_order = 1 WHERE id = 15;
-UPDATE model_configurations SET sort_order = 2 WHERE id = 16;
-UPDATE model_configurations SET sort_order = 3 WHERE id = 17;
-UPDATE model_configurations SET sort_order = 4 WHERE id = 18;
+UPDATE model_configurations SET sort_order = 96 WHERE id = 15;
+UPDATE model_configurations SET sort_order = 97 WHERE id = 16;
+UPDATE model_configurations SET sort_order = 98 WHERE id = 17;
+UPDATE model_configurations SET sort_order = 99 WHERE id = 18;
 UPDATE model_configurations SET sort_order = 100 WHERE id = 19;
 
