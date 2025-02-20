@@ -27,6 +27,8 @@ class LLMBaseNode(Node):
     Base class for all LLM nodes.
     """
     
+    schema_key = None # The schema key for the LLM model
+    
     def __init__(self, **kwargs):
         """
         Initializes a new instance of the LLMBaseNode class.
@@ -157,7 +159,7 @@ class LLMBaseNode(Node):
         llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
         if return_json:
             llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
-        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config)
+        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config, schema_key=self.schema_key)
 
         messages, input = self._prepare_messages_and_input(
             app_run_id=app_run_id, 
@@ -169,6 +171,9 @@ class LLMBaseNode(Node):
             correct_llm_output=correct_llm_output,
             override_rag_input=override_rag_input
         )
+        
+        if model_info["supplier_name"] == "Anthropic":
+            messages.reorganize_messages()
 
         ai_message = llm_pipeline.invoke(messages.to_langchain_format(), input)
         content = ai_message.content
@@ -224,7 +229,7 @@ class LLMBaseNode(Node):
         llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
         if return_json:
             llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
-        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config)
+        llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config, schema_key=self.schema_key)
         messages, input = self._prepare_messages_and_input(
             app_run_id=app_run_id, 
             edge_id=edge_id,
@@ -235,13 +240,19 @@ class LLMBaseNode(Node):
             correct_llm_output=correct_llm_output,
             override_rag_input=override_rag_input
         )
+        
+        if model_info["supplier_name"] == "Anthropic":
+            messages.reorganize_messages()
 
         async def ainvoke():
             llm_input = [(role, message.value.format(**input)) for role, message in messages.messages]
 
             for _ in range(5):
                 try:
-                    llm_aiter = llm_pipeline.llm.astream(llm_input, stream_usage=True)
+                    if model_info["supplier_name"] == "Anthropic":
+                        llm_aiter = llm_pipeline.llm.astream(llm_input)
+                    else:
+                        llm_aiter = llm_pipeline.llm.astream(llm_input, stream_usage=True)
                     while True:
                         try:
                             yield await asyncio.wait_for(anext(llm_aiter), timeout=20)

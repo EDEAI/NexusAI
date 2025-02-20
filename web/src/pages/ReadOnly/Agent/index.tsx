@@ -54,6 +54,7 @@ const Agents: React.FC = () => {
             key: '2',
             icon: <CodeOutlined />,
             label: intl.formatMessage({ id: 'agent.menu.Capacityoutput' }),
+            disabled:Detaillist && Detaillist.app.attrs_are_visible === 0,
             style: {
                 padding: '15px',
                 width: '100%',
@@ -90,10 +91,12 @@ const Agents: React.FC = () => {
         console.log(params.get('type'));
         const res = await GetagentInfo(params.get('app_id'), params.get('type'));
         const data = res.data;
-        const repositoryID = res.data.agent_dataset_relation_list.map((item: any) => {
-            return item.dataset_id;
-        });
-        setRepository(repositoryID);
+        if(res.data.agent_dataset_relation_list && res.data.agent_dataset_relation_list.length){
+            const repositoryID = res.data.agent_dataset_relation_list.map((item: any) => {
+                return item.dataset_id;
+            });
+            setRepository(repositoryID);
+        }
         setDetaillist(res.data);
         setOperationbentate(
             res.data.agent.publish_status === 0 && res.data.is_creator === 1 ? 'false' : 'true',
@@ -103,41 +106,47 @@ const Agents: React.FC = () => {
         }
        
         Ffromref.setFieldsValue(objecttoarray(data.agent.input_variables));
-      
-        const user = res.data.agent_abilities_list.map((item: any) => {
-            return item.status == 1 ? { ...item, status: true } : { ...item, status: false };
-        });
-        Sformref.setFieldsValue({
-            users: !user[0] ? [{ agent_ability_id: 0, name: '', content: '', status: true }] : user,
-        });
-       
-        const list = data.agent_abilities_list.filter((item: any) => {
-            return item.output_format !== 0;
-        });
-        Tformref.setFieldsValue({
-            users: list.map((item: any) => {
-                return {
-                    agent_ability_id: item.agent_ability_id,
-                    output_format: item.output_format,
-                };
-            }),
-        });
-       
-        setFourthly_select_list(
-            data.m_configurations_list.map((item: any) => {
-                return { value: item.m_config_id, label: item.m_name };
-            }),
-        );
-        setFourthly_config_id(data.agent.m_config_id);
-        const newabilitieslist = data.agent_abilities_list.filter((item: any, i: any) => {
-            return item.status === 1;
-        });
         
-        setFourthly_abilities_list(
-            selectlistdata(newabilitieslist).concat([
-                { value: 0, label: intl.formatMessage({ id: 'agent.allability' }) },
-            ]),
-        );
+        if(res.data.agent_abilities_list){
+            const user = res.data.agent_abilities_list.map((item: any) => {
+                return item.status == 1 ? { ...item, status: true } : { ...item, status: false };
+            });
+            Sformref.setFieldsValue({
+                users: !user[0] ? [{ agent_ability_id: 0, name: '', content: '', status: true }] : user,
+            });
+
+            const list = data.agent_abilities_list.filter((item: any) => {
+                return item.output_format !== 0;
+            });
+            Tformref.setFieldsValue({
+                users: list.map((item: any) => {
+                    return {
+                        agent_ability_id: item.agent_ability_id,
+                        output_format: item.output_format,
+                    };
+                }),
+            });
+        }       
+        if(data.m_configurations_list){
+            setFourthly_select_list(
+                data.m_configurations_list.map((item: any) => {
+                    return { value: item.m_config_id, label: item.m_name };
+                }),
+            );
+        }
+       
+        setFourthly_config_id(data.agent.m_config_id);
+        if(data.agent_abilities_list){
+            const newabilitieslist = data.agent_abilities_list.filter((item: any, i: any) => {
+                return item.status === 1;
+            });
+            setFourthly_abilities_list(
+                selectlistdata(newabilitieslist).concat([
+                    { value: 0, label: intl.formatMessage({ id: 'agent.allability' }) },
+                ]),
+            );
+        }
+
     };
   
     const objecttoarray = (obj?: any) => {
