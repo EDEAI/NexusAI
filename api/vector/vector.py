@@ -747,12 +747,6 @@ async def dataset_set(
         embeddings_config_id = Models().get_model_by_type(2, team_id, mode, user_id)['model_config_id']
 
         if datasets_data['embedding_model_config_id'] != embeddings_config_id:
-            Datasets().update(
-                [
-                    {'column': 'id', 'value': dataset_id},
-                ],
-                {'embedding_model_config_id': embeddings_config_id}
-            )
             reindex_dataset.delay(dataset_id, embeddings_config_id)
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:
