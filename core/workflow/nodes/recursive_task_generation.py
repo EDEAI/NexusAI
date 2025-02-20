@@ -91,6 +91,7 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
                 invoke_input["task_generation_goals"] = self.duplicate_braces(self.data["prompt"].get_system())
                 
             prompt_config = get_language_content("recursive_task_generation")
+            self.schema_key = "recursive_task_generation"
             self.data["prompt"] = Prompt(system=prompt_config["system"], user=prompt_config["user"])
             
             model_data, tasks, prompt_tokens, completion_tokens, total_tokens = self.invoke(

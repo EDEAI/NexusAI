@@ -367,6 +367,7 @@ const Agents: React.FC = () => {
                     data: {
                         is_public: Detaillist.app.is_public,
                         enable_api: Detaillist.app.enable_api,
+                        attrs_are_visible:Detaillist.app.attrs_are_visible,
                         obligations: Detaillist.agent.obligations,
                         input_variables: arraytoobject(Ffromref.getFieldsValue()),
                         dataset_ids: repository,

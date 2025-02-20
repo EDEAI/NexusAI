@@ -13,7 +13,7 @@ from config import settings
 from core.database import redis
 
 import tiktoken
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Callable, Union
 try:
     from anthropic import Anthropic
     ANTHROPIC_AVAILABLE = True
@@ -140,7 +140,7 @@ def encrypt_id(id_: int):
 def decrypt_id(encrypted_id: str):
     return int.from_bytes(_aes.decrypt(bytes.fromhex(encrypted_id)), 'big')
 
-def get_tokenizer(model_name: str) -> Union[tiktoken.Encoding, Anthropic]:
+def get_tokenizer(model_name: str, api_key: str) -> Union[tiktoken.Encoding, Anthropic]:
     """
     Get the appropriate tokenizer based on the model name
     
@@ -151,12 +151,18 @@ def get_tokenizer(model_name: str) -> Union[tiktoken.Encoding, Anthropic]:
         Union[tiktoken.Encoding, Anthropic]: Tokenizer object
     """
     if model_name.startswith('claude') and ANTHROPIC_AVAILABLE:
-        return Anthropic()
+        anthropic = Anthropic(api_key=api_key)
+        def anthropic_token_counter(text: str) -> int:
+            return anthropic.messages.count_tokens(
+                model=model_name,
+                messages=[{'role': 'user', 'content': text}],
+            ).input_tokens
+        return anthropic_token_counter
     else:
         # Use cl100k_base encoder as default
         return tiktoken.encoding_for_model(model_name)
 
-def count_tokens(tokenizer: Union[tiktoken.Encoding, Anthropic], text: str) -> int:
+def count_tokens(tokenizer: Union[tiktoken.Encoding, Callable[[str], int]], text: str) -> int:
     """
     Count tokens in text using the appropriate tokenizer
     
@@ -169,8 +175,8 @@ def count_tokens(tokenizer: Union[tiktoken.Encoding, Anthropic], text: str) -> i
     """
     if isinstance(tokenizer, tiktoken.Encoding):
         return len(tokenizer.encode(text))
-    elif ANTHROPIC_AVAILABLE and isinstance(tokenizer, Anthropic):
-        return tokenizer.count_tokens(text)
+    elif ANTHROPIC_AVAILABLE and isinstance(tokenizer, Callable):
+        return tokenizer(text)
     return 0
 
 def truncate_messages_by_token_limit(messages: List[Dict[str, Any]], model_config: dict) -> List[Dict[str, Any]]:
@@ -190,12 +196,13 @@ def truncate_messages_by_token_limit(messages: List[Dict[str, Any]], model_confi
         
     # Get model information
     model_name = model_config['model_name']
+    api_key = model_config['supplier_config']['api_key']
     max_context_tokens = model_config['max_context_tokens']
     max_output_tokens = model_config['max_output_tokens']
     token_limit = int((max_context_tokens - max_output_tokens) * 0.9)  # Use 90% of context length as limit
     
     # Get appropriate tokenizer
-    tokenizer = get_tokenizer(model_name)
+    tokenizer = get_tokenizer(model_name, api_key)
     
     truncated_messages = deque()
     current_tokens = 0

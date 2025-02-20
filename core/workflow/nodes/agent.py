@@ -13,6 +13,7 @@ from ..context import Context, replace_variable_value_with_context
 from ..variables import ObjectVariable, Variable
 from ..recursive_task import RecursiveTaskCategory
 from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
+from core.database.models.agent_chat_messages import AgentChatMessages
 from core.database.models import Apps, AgentAbilities, AgentDatasetRelation, Agents, Workflows, AppRuns, AppNodeExecutions, Models
 from core.dataset import DatasetRetrieval
 from core.llm.messages import Messages
@@ -20,9 +21,11 @@ from core.llm.models import LLMPipeline
 from core.llm.prompt import Prompt, replace_prompt_with_context
 from languages import get_language_content
 from log import Logger
+from core.helper import push_to_websocket_queue
 
 
 logger = Logger.get_logger('celery-app')
+logger_chat = Logger.get_logger('agent-chat-llm-return')
 
 
 class AgentNode(ImportToKBBaseNode, LLMBaseNode):
@@ -123,14 +126,11 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         )
                         for ability in abilities
                     ]
-                    system_prompt = get_language_content(
-                        (
-                            'agent_system_prompt_with_auto_match_ability_direct_output'
-                            if direct_output
-                            else 'agent_system_prompt_with_auto_match_ability'
-                        ),
-                        uid=user_id
-                    )
+                    if direct_output:
+                        system_prompt = get_language_content('agent_system_prompt_with_auto_match_ability_direct_output', uid=user_id)
+                    else:
+                        self.schema_key = 'agent_system_prompt_with_auto_match_ability'
+                        system_prompt = get_language_content('agent_system_prompt_with_auto_match_ability', uid=user_id)
                     input_['abilities_content_and_output_format'] = abilities_content_and_output_format
                     if self.data['task_splitting']:
                         input_['reply_requirement'] = get_language_content(
@@ -276,6 +276,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         task: Optional[Dict[str, RecursiveTaskCategory]] = None,
         correct_llm_output: bool = False,
         data_source_run_id : Optional[int] = 0,
+        is_chat: bool = False,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -403,6 +404,37 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 reranking_tokens = retrieval_token_counter['reranking']
             else:
                 embedding_tokens, reranking_tokens = 0, 0
+            if is_chat:
+                chat_message_id = AgentChatMessages().insert({
+                    'user_id': user_id,
+                    'agent_id': agent_id,
+                    'message': ai_output,
+                    'prompt_tokens': prompt_tokens,
+                    'completion_tokens': completion_tokens,
+                    'total_tokens': total_tokens,
+                })
+                chat_message_llm_return = 'chat_message_llm_return'
+                datetime_now = datetime.now()
+                json_data = json.dumps(ai_output, ensure_ascii=False)
+                data = {
+                    'user_id': user_id,
+                    'type': chat_message_llm_return,
+                    'data': {
+                        'message_id': chat_message_id,
+                        'status': 1,
+                        'error': "",
+                        'prompt_tokens': prompt_tokens,
+                        'completion_tokens': completion_tokens,
+                        'total_tokens': total_tokens,
+                        'created_time': datetime_now,
+                        'finished_time': datetime_now,
+                        'user_id': user_id,
+                        'agent_id': agent_id,
+                        'message': json_data
+                    }
+                }
+                push_to_websocket_queue(data)
+                logger_chat.info(f"Push results generated through AI:{user_id} agent_id:{agent_id} chat_message_id：{chat_message_id} message:{ai_output} status:{1} data:{data}")
             outputs = Variable(
                 name="text",
                 type="json" if output_format == 2 else "string",
@@ -468,6 +500,30 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     }
                 )
             self.delete_documents_by_node_exec_id(node_exec_id)
+
+            if is_chat:
+                chat_message_llm_return = 'chat_message_llm_return'
+                message_error = str(e)
+                datetime_now = datetime.now()
+                data = {
+                    'user_id': user_id,
+                    'type': chat_message_llm_return,
+                    'data': {
+                        'message_id': '',
+                        'status': 0,
+                        'error': message_error,
+                        'prompt_tokens': '',
+                        'completion_tokens': '',
+                        'total_tokens': '',
+                        'created_time': datetime_now,
+                        'finished_time': datetime_now
+                    }
+                }
+                push_to_websocket_queue(data)
+                logger_chat.info("----------------------------------------------------------------------------")
+                logger_chat.exception(f"Push results generated through AI ERROR:{user_id} error:{str(e)} status:{4} data:{data}")
+                logger_chat.info("----------------------------------------------------------------------------")
+
             return {
                 'status': 'failed',
                 'message': str(e)
@@ -488,7 +544,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         correct_llm_output: bool = False,
         data_source_run_id : Optional[int] = 0,
         **kwargs
-    ) -> AsyncIterator[AIMessageChunk]:
+    ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
             prompt_tokens = 0
             completion_tokens = 0
@@ -640,6 +696,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 chatroomdriven_info = ChatroomDrivenRecords().get_data_by_data_source_run_id(data_source_run_id)
                 if chatroomdriven_info:
                     ChatroomDrivenRecords().update_data_driven_run_id(chatroomdriven_info['id'],data_source_run_id, agent_run_id)
+            yield agent_run_id
         except Exception as e:
             logger.exception('ERROR!!')
             if 'agent_run_id' in locals():

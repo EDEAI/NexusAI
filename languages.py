@@ -205,7 +205,7 @@ language_packs = {
             4. If the related task has actual content, please note that it is only for related reference.
             Task json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: task content}}.
             In the end, only the task content you performed will be returned, and no redundant content will be returned.
-
+            
             Requirements and goals of the current task: {requirements_and_goals}
             Current task content: {current_task}
             Parent task content for reference only: {parent_task}
@@ -405,7 +405,7 @@ language_packs = {
             1. You should try to encourage all agents to actively participate in the conversation regarding the user's speech summary, even if some of the agents have met the user's needs;
             2. If all agents have participated in the last round of the conversation after the user's speech and the user's needs have been met, you can end the conversation;
             3. If the conversation has been ongoing for a long time without reaching a conclusion, you can also end the conversation;
-
+            
             Then, respond according to the following requirements:
             1. If you think the conversation should end, please only return in JSON format: {"id": 0, "message": reason for ending the conversation}; otherwise, select an agent according to the following requirements.
             2. Please only select agents from the provided agent list. Do not select agents that exist in the conversation history but not in the agent list;
@@ -421,10 +421,10 @@ language_packs = {
 
             Below is the conversation history list:
             {messages}
-
+            
             Below is the user's last speech content:
             {user_message}
-
+            
             Please select the next agent to speak from the agent list according to the requirements.
         ''',
 
@@ -456,19 +456,19 @@ language_packs = {
             The JSON structure of each message is as follows:
             {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
-
+            
             User's instructions:
             {topic}
 
             Conversation history:
             {messages}
-
+            
             Do not explicitly mention the user's instructions and the conversation history in your response.
         ''',
         'chatroom_agent_description_with_abilities': '''
             Agent responsibilities (or identity):
             {obligations}
-
+            
             Agent capabilities (listed in JSON format):
             {abilities_content}
         ''',
@@ -928,7 +928,6 @@ language_packs = {
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
             5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
-            7. Additional file writing constraint: If the requirement ("My requirements:") involves writing files, the file paths in the requirements must start with "/storage", and any file path returned must include the prefix "file://". Also, when a file path is returned, its data type must be a file.
         ''',
         'generate_skill_user': '''
             My requirements:
@@ -980,12 +979,11 @@ language_packs = {
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
             5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
-            7. Additional file writing constraint: If the requirement ("My requirements:") involves writing files, the file paths in the requirements must start with "/storage", and any file path returned must include the prefix "file://". Also, when a file path is returned, its data type must be a file.
         ''',
         'correction_skill_user': '''
             Correction suggestion:
             {correction_prompt}
-
+            
             Generated tool data:
             {history_skill}
         ''',
@@ -1285,7 +1283,7 @@ language_packs = {
         'api_agent_supplement_prompt_required': '补充提示词不能为空',
         'api_agent_save_record_error': '保存记录失败',
         'api_agent_record_error': '记录不存在',
-
+        
         'api_skill_success': '请求成功，请等待',
         'api_skill_generate_failed': '请求失败，请稍后再试',
         'api_skill_correction_failed': '请求失败，请稍后再试',

@@ -7,12 +7,14 @@ type FlowState = {
     summaryParams:any;
     runsSummaryShow:any;
     summaryClick:any;
+    orientationShow:any;
     setClearMemory:(value:any) => void;
     setTruncatable:(value:any) => void;
     setDisableInput:(value:any) => void;
     setSummaryParams:(value:any) => void;
     setRunsSummaryShow:(value:any) => void;
     setSummaryClick:(value:any)=> void;
+    setOrientationShow:(value:any)=> void;
 };
 const chatroomStore = create(
     devtools<FlowState>((set, get) => ({
@@ -22,6 +24,7 @@ const chatroomStore = create(
         summaryParams:null,
         runsSummaryShow:false,
         summaryClick:true,
+        orientationShow:true,
         setClearMemory:(value:any)=>{
             set({clearMemory:value})
         },
@@ -39,8 +42,10 @@ const chatroomStore = create(
         },
         setSummaryClick:(value:any)=>{
             console.log(value);
-            
             set({summaryClick:value})
+        },
+        setOrientationShow:(value:any)=>{
+            set({orientationShow:value})
         }
     })),
 );

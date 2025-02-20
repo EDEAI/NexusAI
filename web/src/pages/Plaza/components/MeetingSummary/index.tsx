@@ -101,7 +101,14 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
         }
     },[summaryParams])
 
+    const setOrientationShow = useChatroomStore(state => state.setOrientationShow);
 
+    useEffect(()=>{
+        if(contentShow){
+            setOrientationShow(true)
+        }
+    },[contentShow])
+    
     return (
         <>
             

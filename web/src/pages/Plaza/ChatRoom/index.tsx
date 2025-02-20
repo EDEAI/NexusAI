@@ -44,7 +44,7 @@ const Chatroom: React.FC = memo(() => {
     }, []);
     return (
         <>
-            <div className="w-full flex bg-[#fff] overflow-hidden" style={{ height: 'calc(100vh - 56px)' }}>
+            <div className="w-full flex bg-[#fff] overflow-hidden overflow-x-auto" style={{ height: 'calc(100vh - 56px)' }}>
                 <Sidebar
                     roomDetail={getRoomDetail.current}
                     setAgent={agentList}

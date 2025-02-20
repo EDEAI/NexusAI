@@ -257,6 +257,7 @@ class Chatroom:
             last_speaker_id = self._history_messages[-1]['agent_id']
             if last_speaker_id == 0:
                 # If the last speaker is the user, the Speaker Selector must choose an agent
+                schema_key = "chatroom_manager_system"
                 system_prompt = get_language_content(
                     'chatroom_manager_system',
                     self._user_id
@@ -273,6 +274,7 @@ class Chatroom:
                     return 0
                 else:
                     # and smart selection is disabled, the Speaker Selector will choose an agent, or stop the chat
+                    schema_key = "chatroom_manager_system_with_optional_selection"
                     system_prompt = get_language_content(
                         'chatroom_manager_system_with_optional_selection',
                         self._user_id
@@ -310,6 +312,7 @@ class Chatroom:
                 model_config_id=self._model_config_ids[0],
                 prompt=Prompt(system_prompt, user_prompt)
             )
+            llm_node.schema_key = schema_key
             result = llm_node.run(return_json=True)
             assert result['status'] == 'success', result['message']
             result_data = result['data']
@@ -396,6 +399,7 @@ class Chatroom:
         try:
             self._console_log('Agent message: \033[36m')  # Print the agent message in green
             # Request LLM
+            agent_run_id = 0
             agent_message = ''
             async for chunk in agent_node.run_in_chatroom(
                 context=Context(),
@@ -403,6 +407,9 @@ class Chatroom:
                 type=2,
                 override_rag_input=user_message
             ):
+                if isinstance(chunk, int):
+                    agent_run_id = chunk
+                    continue
                 if content := chunk.content:
                     self._console_log(content)
                     agent_message += content
@@ -432,6 +439,7 @@ class Chatroom:
                     'chatroom_id': self._chatroom_id,
                     'app_run_id': self._app_run_id,
                     'agent_id': agent_id,
+                    'agent_run_id': agent_run_id,
                     'llm_input': [
                         ['system', prompt.get_system()],
                         ['user', prompt.get_user()]
