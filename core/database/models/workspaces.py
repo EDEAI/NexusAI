@@ -300,7 +300,11 @@ class Workspaces(MySQL):
         """
 
         conditions = [
-            {"column": "app_runs.workflow_id", "op": ">", "value": 0},
+            # {"column": "app_runs.workflow_id", "op": ">", "value": 0},
+            [
+                {"column": "app_runs.workflow_id", "op": ">", "value": 0, 'logic': 'or'},
+                {"column": "app_runs.agent_id", "op": ">", "value": 0}
+            ],
             [
                 {"column": "apps.user_id", "value": uid, 'logic': 'or'},
                 {"column": "app_runs.user_id", "value": uid}
