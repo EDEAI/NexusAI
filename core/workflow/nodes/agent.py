@@ -547,7 +547,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         correct_llm_output: bool = False,
         data_source_run_id : Optional[int] = 0,
         **kwargs
-    ) -> AsyncIterator[AIMessageChunk]:
+    ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
             prompt_tokens = 0
             completion_tokens = 0
@@ -699,6 +699,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 chatroomdriven_info = ChatroomDrivenRecords().get_data_by_data_source_run_id(data_source_run_id)
                 if chatroomdriven_info:
                     ChatroomDrivenRecords().update_data_driven_run_id(chatroomdriven_info['id'],data_source_run_id, agent_run_id)
+            yield agent_run_id
         except Exception as e:
             logger.exception('ERROR!!')
             if 'agent_run_id' in locals():

@@ -396,6 +396,7 @@ class Chatroom:
         try:
             self._console_log('Agent message: \033[36m')  # Print the agent message in green
             # Request LLM
+            agent_run_id = 0
             agent_message = ''
             async for chunk in agent_node.run_in_chatroom(
                 context=Context(),
@@ -403,6 +404,9 @@ class Chatroom:
                 type=2,
                 override_rag_input=user_message
             ):
+                if isinstance(chunk, int):
+                    agent_run_id = chunk
+                    continue
                 if content := chunk.content:
                     self._console_log(content)
                     agent_message += content
@@ -432,6 +436,7 @@ class Chatroom:
                     'chatroom_id': self._chatroom_id,
                     'app_run_id': self._app_run_id,
                     'agent_id': agent_id,
+                    'agent_run_id': agent_run_id,
                     'llm_input': [
                         ['system', prompt.get_system()],
                         ['user', prompt.get_user()]
