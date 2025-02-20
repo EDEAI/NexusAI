@@ -38,6 +38,7 @@ x-common-environment-backend: &common-environment-backend
   CHATROOM_WEBSOCKET_PORT: 9474
   WEB_URL: http://127.0.0.1:9470
   ICON_URL: http://127.0.0.1:9470
+  STORAGE_URL: http://127.0.0.1:9470
   APP_API_TIMEOUT: 60
   FASTAPI_WORKERS: 2
   CELERY_WORKERS: 4

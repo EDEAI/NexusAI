@@ -35,11 +35,11 @@ Clone the NexusAI source code to your local environment
 git clone https://github.com/EDEAI/NexusAI.git
 ```
 
-## Initialize the model directory and storage directory
+## Initialize model, storage, and logs directories
 ```bash
 cd NexusAI
-mkdir -p models storage
-chmod 777 storage
+mkdir -p models storage logs
+chmod 777 storage logs
 ```
 
 ## Cloning the Embedding and Reranker models for offline mode
@@ -263,7 +263,7 @@ Before deploying NexusAI locally, we need to deploy the following basic services
 If you want to enable Milvus authentication, refer to [Milvus Authentication](https://milvus.io/docs/authenticate.md) to set up Milvus authentication.
 
 ## Server deployment
-[Initialize the model directory and storage directory](#initialize-the-model-directory-and-storage-directory)
+[Initialize model, storage, and logs directories](#initialize-model-storage-and-logs-directories)
 
 [Cloning the Embedding and Reranker models for offline mode](#cloning-the-embedding-and-reranker-models-for-offline-mode)
 
