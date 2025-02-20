@@ -2,19 +2,19 @@ INSERT INTO `suppliers` (`id`, `name`, `mode`, `created_time`, `updated_time`, `
 VALUES (4, 'Doubao', '1', CURRENT_TIMESTAMP, NULL, '1');
 
 INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `created_time`, `updated_time`, `status`)
-VALUES (15, '4', 'Doubao-1.5-pro-256k', '1', '1', '256000', '12000', CURRENT_TIMESTAMP, NULL, '1');
+VALUES (15, '4', 'Doubao-1.5-pro-256k', '1', '1', '256000', '12288', CURRENT_TIMESTAMP, NULL, '1');
 
 INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `created_time`, `updated_time`, `status`)
-VALUES (16, '4', 'Doubao-1.5-pro-32k', '1', '1', '32000', '12000', CURRENT_TIMESTAMP, NULL, '1');
+VALUES (16, '4', 'Doubao-1.5-pro-32k', '1', '1', '32000', '12288', CURRENT_TIMESTAMP, NULL, '1');
 
 INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `created_time`, `updated_time`, `status`)
-VALUES (17, '4', 'Doubao-1.5-lite-32k', '1', '1', '32000', '12000', CURRENT_TIMESTAMP, NULL, '1');
+VALUES (17, '4', 'Doubao-1.5-lite-32k', '1', '1', '32000', '12288', CURRENT_TIMESTAMP, NULL, '1');
 
 INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `created_time`, `updated_time`, `status`)
-VALUES (18, '4', 'Doubao-pro-256k', '1', '1', '256000', '4000', CURRENT_TIMESTAMP, NULL, '1');
+VALUES (18, '4', 'Doubao-pro-256k', '1', '1', '256000', '4096', CURRENT_TIMESTAMP, NULL, '1');
 
 INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `created_time`, `updated_time`, `status`)
-VALUES (19, '4', 'Doubao-lite-128k', '1', '1', '128000', '4000', CURRENT_TIMESTAMP, NULL, '1');
+VALUES (19, '4', 'Doubao-lite-128k', '1', '1', '128000', '4096', CURRENT_TIMESTAMP, NULL, '1');
 
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `created_time`, `updated_time`, `status`)
 VALUES (15, '1', '15', '{"model": "doubao-1-5-pro-256k-250115", "temperature": 0.7, "model_kwargs": {}, "organization": null, "openai_proxy": null, "timeout": null, "max_retries": 2, "streaming": false, "n": 1, "max_tokens": null, "tiktoken_model_name": null, "default_headers": null, "default_query": null, "http_client": null, "http_async_client": null, "stop_sequences": null}', '0', CURRENT_TIMESTAMP, NULL, '1');
