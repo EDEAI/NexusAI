@@ -531,7 +531,10 @@ class DatasetManagement:
         # Update dataset status to reindexing
         datasets.update(
             {'column': 'id', 'value': dataset_id},
-            {'collection_name': 'reindexing'}
+            {
+                'collection_name': 'reindexing',
+                'embedding_model_config_id': new_embeddings_config_id
+            }
         )
 
         # Get all enabled documents and segments and update their status to not indexed
