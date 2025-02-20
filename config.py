@@ -2219,7 +2219,7 @@ model_config = [
                 "secret": True,
                 "options": None,
                 "optional": False,
-                "description": "Automatically inferred from env var `OPENAI_API_KEY` if not provided.",
+                "description": "The API Key is an important credential for you to request the Volcano Ark large model service.",
                 "default_value": ""
             },
             {
