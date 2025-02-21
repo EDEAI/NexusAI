@@ -324,7 +324,7 @@ class Workspaces(MySQL):
             ],
             columns=['app_runs.id AS app_run_id', 'apps.name AS apps_name', 'app_runs.name AS app_runs_name',
                      'app_runs.workflow_id', 'app_runs.created_time', 'app_runs.elapsed_time', 'app_runs.status',
-                     'app_runs.completed_steps', 'app_runs.total_steps',"apps.icon_background", "apps.icon"],
+                     'app_runs.completed_steps', 'app_runs.total_steps',"apps.icon_background", "apps.icon", "apps.mode"],
             conditions=conditions,
             order_by="app_runs.id DESC",
             limit=page_size,
