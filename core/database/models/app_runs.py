@@ -282,12 +282,25 @@ class AppRuns(MySQL):
         app_run_list = []
         if total_count > 0:
             app_run_list = self.select(
-                columns=['id', 'user_id', 'app_id', 'agent_id', 'workflow_id', 'dataset_id', 'tool_id', 'chatroom_id', 'type', 'name', 'graph', 'inputs', 'raw_user_prompt', 'model_data', 'knowledge_base_mapping', 'level', 'context', 'completed_edges', 'skipped_edges', 'status', 'completed_steps', 'actual_completed_steps', 'need_human_confirm', 'need_correct_llm', 'error', 'outputs', 'elapsed_time', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps', 'created_time', 'updated_time', 'finished_time'],
+                columns=['users.nickname as nickname', 'app_runs.id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.agent_id', 'app_runs.workflow_id', 'app_runs.dataset_id', 'app_runs.tool_id', 'app_runs.chatroom_id', 'app_runs.type', 'app_runs.name', 'app_runs.graph', 'app_runs.inputs', 'app_runs.raw_user_prompt', 'app_runs.knowledge_base_mapping', 'app_runs.level', 'app_runs.context', 'app_runs.completed_edges', 'app_runs.skipped_edges', 'app_runs.status', 'app_runs.completed_steps', 'app_runs.actual_completed_steps', 'app_runs.need_human_confirm', 'app_runs.need_correct_llm', 'app_runs.error', 'app_runs.outputs', 'app_runs.elapsed_time', 'app_runs.prompt_tokens', 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens', 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.updated_time', 'app_runs.finished_time'],
+                joins=[
+                    ["left", "users", "users.id = app_runs.user_id"]
+                ],
                 conditions=conditions,
                 order_by="id DESC",
                 limit=page_size,
                 offset=(page - 1) * page_size
             )
+            if app_run_list:
+                for log in app_run_list:
+                    if 'status' in log:
+                        status = log['status']
+                        if status in (1, 2):
+                            log['status'] = 1
+                        elif status == 3:
+                            log['status'] = 2
+                        elif status == 4:
+                            log['status'] = 3
 
         return {
             "list": app_run_list,

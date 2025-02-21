@@ -50,6 +50,14 @@ class Messages:
                 }
             ],
         )
+
+    def add_system_message(self, system_message: Variable) -> None:
+        """
+        Adds a system message to the list of messages.
+
+        :param message: Variable, the system message to add.
+        """
+        self.messages.append(("system", Variable(name="system", type="string", value=str(system_message.value))))
     
     def add_prompt(self, prompt: Prompt) -> None:
         """

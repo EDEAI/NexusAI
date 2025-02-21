@@ -100,3 +100,43 @@ class AgentChatMessages(MySQL):
             "page": page,
             "page_size": page_size
         }
+
+    def get_chat_agent_history(self, user_id: int, agent_id: int):
+        """
+        Retrieves the chat history for a specific user and agent.
+
+        :param user_id: The ID of the user.
+        :param agent_id: The ID of the agent.
+        :return: A list of chat messages.
+        """
+        # Query to find the largest id where history_cleared is 1 for the given user and agent
+        # Query to find the largest id where history_cleared is 1 for the given user and agent
+        conditions = [
+            {"column": "history_cleared", "value": 1, "op": "="},
+            {"column": "user_id", "value": user_id, "op": "="},
+            {"column": "agent_id", "value": agent_id, "op": "="}
+        ]
+
+        cleared_messages = self.select_one(
+            columns=["id"],
+            conditions=conditions,
+            order_by='id DESC',  # Order by id descending to get the latest first
+        )
+
+        if cleared_messages:
+            start_id = cleared_messages['id']
+        else:
+            start_id = 0
+
+        # Query to select all messages with id greater than the start_id
+        conditions = [
+            {"column": "id", "value": start_id, "op": ">"},
+            {"column": "user_id", "value": user_id},
+            {"column": "agent_id", "value": agent_id}
+        ]
+        messages = self.select(
+            columns=["message", "agent_run_id"],
+            conditions=conditions,
+            order_by='id ASC'
+        )
+        return messages

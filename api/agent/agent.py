@@ -1031,12 +1031,25 @@ async def agent_log_list(agent_id: int, app_run_id: int, userinfo: TokenData = D
         return response_error(get_language_content("agent_does_not_exist"))
 
     result = AppRuns().select_one(
-        columns=['id', 'user_id', 'app_id', 'agent_id', 'workflow_id', 'dataset_id', 'tool_id', 'chatroom_id', 'type',
-                 'name', 'graph', 'inputs', 'raw_user_prompt', 'model_data', 'knowledge_base_mapping', 'level',
-                 'context', 'completed_edges', 'skipped_edges', 'status', 'completed_steps', 'actual_completed_steps',
-                 'need_human_confirm', 'need_correct_llm', 'error', 'outputs', 'elapsed_time', 'prompt_tokens',
-                 'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps',
-                 'created_time', 'updated_time', 'finished_time'],
+        # columns=['id', 'user_id', 'app_id', 'agent_id', 'workflow_id', 'dataset_id', 'tool_id', 'chatroom_id', 'type',
+        #          'name', 'graph', 'inputs', 'raw_user_prompt', 'knowledge_base_mapping', 'level',
+        #          'context', 'completed_edges', 'skipped_edges', 'status', 'completed_steps', 'actual_completed_steps',
+        #          'need_human_confirm', 'need_correct_llm', 'error', 'outputs', 'elapsed_time', 'prompt_tokens',
+        #          'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps',
+        #          'created_time', 'updated_time', 'finished_time'],
+        columns=['users.nickname as nickname', 'app_runs.id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.agent_id',
+                 'app_runs.workflow_id', 'app_runs.dataset_id', 'app_runs.tool_id', 'app_runs.chatroom_id',
+                 'app_runs.type', 'app_runs.name', 'app_runs.graph', 'app_runs.inputs', 'app_runs.raw_user_prompt',
+                 'app_runs.knowledge_base_mapping', 'app_runs.level', 'app_runs.context', 'app_runs.completed_edges',
+                 'app_runs.skipped_edges', 'app_runs.status', 'app_runs.completed_steps',
+                 'app_runs.actual_completed_steps', 'app_runs.need_human_confirm', 'app_runs.need_correct_llm',
+                 'app_runs.error', 'app_runs.outputs', 'app_runs.elapsed_time', 'app_runs.prompt_tokens',
+                 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens',
+                 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.updated_time',
+                 'app_runs.finished_time', 'app_runs.model_data'],
+        joins=[
+            ["left", "users", "users.id = app_runs.user_id"]
+        ],
         conditions=[
             {"column": "agent_id", "value": agent_id},
             {"column": "user_id", "value": userinfo.uid},
@@ -1045,6 +1058,18 @@ async def agent_log_list(agent_id: int, app_run_id: int, userinfo: TokenData = D
         ]
     )
 
+    if 'status' in result:
+        result_status = result['status']
+        if result_status in (1, 2):
+            result['status'] = 1
+        elif result_status == 3:
+            result['status'] = 2
+        elif result_status == 4:
+            result['status'] = 3
+    messages = result['model_data']['messages']
+    del result['model_data']
+    result['prompt_data'] = {}
+    result['prompt_data'] = messages
     if not result:
         return response_error(get_language_content("app_run_error"))
     return response_success(result)
@@ -1081,17 +1106,17 @@ async def clear_agent_chat_memory(agent_id: int, message_id: int, userinfo: Toke
             {"column": "user_id", "value": userinfo.uid},
             {"column": "id", "value": message_id}
         ]
-    )['id']
+    )
     if not find_message:
         return response_error(get_language_content("agent_message_does_not_exist"))
 
     AgentChatMessages().update(
-        {'column': 'id', 'value': find_message},
+        {'column': 'id', 'value': message_id},
         {'history_cleared': 1}
     )
 
     return response_success(
-        {"message_id": find_message}
+        {"message_id": message_id}
     )
 
 
@@ -1111,7 +1136,6 @@ async def agent_chat_message(data: AgentChatMessage, userinfo: TokenData = Depen
     prompt = data.prompt
     uid = userinfo.uid
     team_id = userinfo.team_id
-    message = data.message
 
     if agent_id <= 0:
         return response_error(get_language_content("api_agent_run_agent_id_required"))
@@ -1185,7 +1209,7 @@ async def agent_chat_message(data: AgentChatMessage, userinfo: TokenData = Depen
     message_id = AgentChatMessages().insert({
         'user_id': userinfo.uid,
         'agent_id': agent_id,
-        'message': message
+        'message': prompt['user']['value']
     })
 
     run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id, prompt=prompt, is_chat=True)
