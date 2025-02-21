@@ -1223,8 +1223,10 @@ async def get_agent_chatrooms(agent_id: int, page: int = 1, page_size: int = 10,
                               userinfo: TokenData = Depends(get_current_user)):
     """
     Retrieve the list of chat rooms in which the specified agent is present.
+    Only returns chat rooms owned by the current user.
     Supports pagination; if 'all' is True, returns all records.
     """
-    result = Chatrooms().get_chatrooms_by_agent(agent_id, page, page_size, show_all=all)
+    result = Chatrooms().get_chatrooms_by_agent(agent_id, page, page_size, show_all=all, current_user_id=userinfo.uid)
     return response_success(result)
+
 

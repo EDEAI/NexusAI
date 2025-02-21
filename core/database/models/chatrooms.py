@@ -195,16 +195,17 @@ class Chatrooms(MySQL):
             print(f"An error occurred: {e}")
             return {"list": []}
 
-    def get_chatrooms_by_agent(self, agent_id: int, page: int = 1, page_size: int = 10, show_all: bool = False):
+    def get_chatrooms_by_agent(self, agent_id: int, page: int = 1, page_size: int = 10, show_all: bool = False, current_user_id: int = 0):
         """
-        Retrieve a list of chat rooms where the specified agent is present.
+        Retrieve chat rooms where the specified agent is present and only those owned by current user.
         Supports pagination unless show_all is True.
         """
         conditions = [
             {"column": "chatrooms.status", "value": 1},
             {"column": "apps.status", "value": 1},
             {"column": "apps.mode", "value": 5},
-            {"column": "chatroom_agent_relation.agent_id", "value": agent_id}
+            {"column": "chatroom_agent_relation.agent_id", "value": agent_id},
+            {"column": "chatrooms.user_id", "value": current_user_id}  # New condition: only current user's chatrooms
         ]
         joins = [
             ["inner", "chatroom_agent_relation", "chatrooms.id = chatroom_agent_relation.chatroom_id"],
