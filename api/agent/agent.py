@@ -22,7 +22,7 @@ from core.database.models.ai_tool_llm_records import AIToolLLMRecords
 import traceback
 from core.database.models.models import Models
 from core.helper import truncate_messages_by_token_limit
-
+from core.database.models.chatrooms import Chatrooms  # add import if not present
 
 router = APIRouter()
 
@@ -96,9 +96,6 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
         return response_error(get_language_content("api_agent_base_update_default_output_format_error"))
 
     agents_model = Agents()
-    print('-------------------------------------------------------------------------------------------------')
-    print(attrs_are_visible)
-    print('-------------------------------------------------------------------------------------------------')
     result = agents_model.agent_base_update(agent_id, userinfo.uid, userinfo.team_id, is_public, enable_api,
                                             obligations, input_variables, dataset_ids, m_config_id, allow_upload_file,
                                             default_output_format, attrs_are_visible)
@@ -1193,4 +1190,15 @@ async def agent_chat_message(data: AgentChatMessage, userinfo: TokenData = Depen
 
     run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id, prompt=prompt, is_chat=True)
     return response_success({"message_id": message_id, "detail": get_language_content("api_agent_success")})
+
+
+@router.get("/{agent_id}/chatrooms", summary="Get chat rooms for an agent", response_model=ResAgentChatRoomsSchema)
+async def get_agent_chatrooms(agent_id: int, page: int = 1, page_size: int = 10, all: bool = False,
+                              userinfo: TokenData = Depends(get_current_user)):
+    """
+    Retrieve the list of chat rooms in which the specified agent is present.
+    Supports pagination; if 'all' is True, returns all records.
+    """
+    result = Chatrooms().get_chatrooms_by_agent(agent_id, page, page_size, show_all=all)
+    return response_success(result)
 

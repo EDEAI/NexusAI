@@ -292,3 +292,26 @@ class AgentChatMessage(BaseModel):
 
 class ResAgentRunSchemaReturn(BaseModel):
     data: Dict[str, Any]
+
+class ChatRoomData(BaseModel):
+    chatroom_id: int
+    name: Optional[str] = None
+    description: Optional[str] = None
+    chat_status: Optional[int] = None
+    active: Optional[int] = None
+    chatroom_status: Optional[int] = None
+    smart_selection: Optional[int] = None
+    app_id: int
+    agent_list: Optional[List[Dict[str, Any]]] = []
+
+class AgentChatRoomsResponse(BaseModel):
+    list: List[ChatRoomData]
+    total_count: Optional[int] = None
+    total_pages: Optional[int] = None
+    page: Optional[int] = None
+    page_size: Optional[int] = None
+
+class ResAgentChatRoomsSchema(BaseModel):
+    code: int
+    detail: str
+    data: AgentChatRoomsResponse

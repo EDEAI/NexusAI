@@ -194,3 +194,94 @@ class Chatrooms(MySQL):
         except Exception as e:
             print(f"An error occurred: {e}")
             return {"list": []}
+
+    def get_chatrooms_by_agent(self, agent_id: int, page: int = 1, page_size: int = 10, show_all: bool = False):
+        """
+        Retrieve a list of chat rooms where the specified agent is present.
+        Supports pagination unless show_all is True.
+        """
+        conditions = [
+            {"column": "chatrooms.status", "value": 1},
+            {"column": "apps.status", "value": 1},
+            {"column": "apps.mode", "value": 5},
+            {"column": "chatroom_agent_relation.agent_id", "value": agent_id}
+        ]
+        joins = [
+            ["inner", "chatroom_agent_relation", "chatrooms.id = chatroom_agent_relation.chatroom_id"],
+            ["left", "apps", "chatrooms.app_id = apps.id"]
+        ]
+        if show_all:
+            chat_list = self.select(
+                columns=[
+                    "apps.name",
+                    "apps.description",
+                    "chatrooms.id as chatroom_id",
+                    "chatrooms.chat_status",
+                    "chatrooms.active",
+                    "chatrooms.status as chatroom_status",
+                    "chatrooms.smart_selection",
+                    "apps.id as app_id"
+                ],
+                joins=joins,
+                conditions=conditions,
+                order_by="chatrooms.id DESC"
+            )
+            total_count = len(chat_list)
+            total_pages = 1
+            current_page = 1
+            current_page_size = total_count
+        else:
+            total_count = self.select_one(
+                aggregates={"id": "count"},
+                joins=joins,
+                conditions=conditions,
+            )["count_id"]
+            chat_list = self.select(
+                columns=[
+                    "apps.name",
+                    "apps.description",
+                    "chatrooms.id as chatroom_id",
+                    "chatrooms.chat_status",
+                    "chatrooms.active",
+                    "chatrooms.status as chatroom_status",
+                    "chatrooms.smart_selection",
+                    "apps.id as app_id"
+                ],
+                joins=joins,
+                conditions=conditions,
+                order_by="chatrooms.id DESC",
+                limit=page_size,
+                offset=(page - 1) * page_size
+            )
+            total_pages = (total_count + page_size - 1) // page_size
+            current_page = page
+            current_page_size = page_size
+
+        # Populate each chatroom with its agent list (unchanged)
+        for chat_item in chat_list:
+            chat_item['agent_list'] = []
+            agent_list = ChatroomAgentRelation().select(
+                columns=["agent_id", "chatroom_id"],
+                conditions=[{"column": "chatroom_id", "value": chat_item['chatroom_id']}],
+                order_by="id DESC"
+            )
+            if agent_list:
+                for agent_item in agent_list:
+                    if agent_item['agent_id'] > 0:
+                        chat_item['agent_list'].append(
+                            Agents().select_one(
+                                columns=[
+                                    "apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id",
+                                    "apps.icon", "apps.icon_background", "agents.obligations"
+                                ],
+                                conditions=[{"column": "id", "value": agent_item['agent_id']}],
+                                joins=[["left", "apps", "apps.id = agents.app_id"]]
+                            )
+                        )
+        return {
+            "list": chat_list,
+            "total_count": total_count,
+            "total_pages": total_pages,
+            "page": current_page,
+            "page_size": current_page_size
+        }
