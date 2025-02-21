@@ -270,7 +270,7 @@ class AgentLogDetailResponse(BaseModel):
     data: Dict[str, Any]
 
 
-class ClearAgentChatMemory(BaseModel):
+class ClearAgentChatMemoryReturn(BaseModel):
     data: Dict[str, Any]
 
 
@@ -314,3 +314,7 @@ class ResAgentChatRoomsSchema(BaseModel):
     code: int
     detail: str
     data: AgentChatRoomsResponse
+
+class ClearAgentChatMemory(BaseModel):
+    agent_id: Optional[int] = None
+    message_id: Optional[int] = None
