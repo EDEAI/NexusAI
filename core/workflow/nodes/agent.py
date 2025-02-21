@@ -383,6 +383,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 {'model_data': model_data}
             )
             # Process the AI message
+            ability_id = self.data['ability_id']
             default_output_format = agent['default_output_format']
             if output_format is None:  # Auto match ability
                 ability_id = ai_output['ability_id']
@@ -414,6 +415,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 chat_message_id = AgentChatMessages().insert({
                     'user_id': user_id,
                     'agent_id': agent_id,
+                    'ability_id': ability_id,
                     'message': ai_output,
                     'agent_run_id': agent_run_id,
                     'prompt_tokens': prompt_tokens,
@@ -437,6 +439,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         'finished_time': datetime_now,
                         'user_id': user_id,
                         'agent_id': agent_id,
+                        'ability_id': ability_id,
                         'message': json_data
                     }
                 }
