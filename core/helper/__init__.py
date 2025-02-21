@@ -241,12 +241,13 @@ def truncate_agent_messages_by_token_limit(messages: List[Dict[str, Any]], model
 
     # Get model information
     model_name = model_config['model_name']
+    api_key = model_config['supplier_config']['api_key']
     max_context_tokens = model_config['max_context_tokens']
     max_output_tokens = model_config['max_output_tokens']
     token_limit = int((max_context_tokens - max_output_tokens) * 0.9)  # Use 90% of context length as limit
 
     # Get appropriate tokenizer
-    tokenizer = get_tokenizer(model_name)
+    tokenizer = get_tokenizer(model_name, api_key)
 
     truncated_messages = deque()
     current_tokens = 0
