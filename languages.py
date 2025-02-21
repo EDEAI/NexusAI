@@ -351,6 +351,7 @@ language_packs = {
         # meeting room
         'chatroom_name_is_required': 'meeting room name is required',
         'chatroom_max_round_is_required': 'max_round is required',
+        'chatroom_max_round_must_be_greater_than_zero': 'max_round must be greater than zero',
         'chatroom_agent_is_required': 'agent is required',
         'chatroom_agent_item_must_be_a_dictionary': 'agent item must be a dictionary',
         'chatroom_agent_item_missing_keys': 'agent item missing keys',
@@ -1145,6 +1146,7 @@ language_packs = {
 
         'chatroom_name_is_required': '会议室标题不能为空',
         'chatroom_max_round_is_required': '最大回合数不能为空',
+        'chatroom_max_round_must_be_greater_than_zero': '最大回合数必须大于0',
         'chatroom_agent_is_required': '智能体不能为空',
         'chatroom_agent_item_must_be_a_dictionary': '智能体的每个元素必须是一个字典',
         'chatroom_agent_item_missing_keys': '智能体的元素缺少必要的键',

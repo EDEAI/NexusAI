@@ -503,7 +503,8 @@ class Chatroom:
         else:
             # Start a new chat
             self._user_speak(user_message)
-            
+        
+        round_ = 0
         for round_ in range(performed_rounds, self._max_round):
             agent_id = await self._select_next_speaker()
             logger.debug('Selected agent: %s', agent_id)
