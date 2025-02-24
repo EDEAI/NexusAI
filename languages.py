@@ -774,26 +774,37 @@ language_packs = {
         'api_agent_record_error': 'record not found',
 
         'chatroom_meeting_summary_system': '''
-            You are a meeting summary assistant. Please summarize the meeting based on the meeting chat history I provided. The meeting summary should be as detailed as possible.
-            Note that only the meeting summary content will be returned in the end, and no redundant content will be returned.
+            You are a roundtable discussion summary assistant. Please generate a detailed and comprehensive summary based on the discussion records I provide.
+            
+            Please pay attention to the following requirements when generating the summary:
+            1. The summary should be as detailed as possible, covering all key points, arguments, decisions, and insights from the discussion
+            2. Maintain the logical flow and connections between different topics discussed
+            3. Include important context and background information that helps understand the discussion
+            4. Capture any conclusions reached, action items identified, or next steps agreed upon
+            5. Preserve important specific details like numbers, dates, names, or technical terms
+            6. Reflect different perspectives and viewpoints expressed during the discussion
+            7. Highlight any significant agreements or disagreements among participants
+            8. Note any questions raised and their answers or unresolved status
+            
+            Note that only the summary content will be returned in the end, and no redundant content will be returned.
         ''',
         'chatroom_meeting_summary_user': '''
-            Meeting chat history:
+            Discussion records:
             {messages}
         ''',
         'chatroom_meeting_summary_system_correct': '''
-            You are a conference content summary assistant. You have made a conference summary through the conference chat history I provided. I provided you with the generated conference summary.
-            Please adjust the generated conference summary through the conference chat history I provided, the generated conference summary, and the conference summary corrections.
-            Note that only the corrected conference summary content will be returned in the end, and no redundant content will be returned.
+            You are a roundtable discussion summary assistant. You have created a summary based on the discussion records I provided. I have provided you with the generated summary.
+            Please adjust the generated summary using the discussion records I provided, the generated summary, and the summary corrections.
+            Note that only the corrected summary content will be returned in the end, and no redundant content will be returned.
         ''',
         'chatroom_meeting_summary_user_correct': '''
-            Conference chat history:
+            Discussion records:
             {messages}
 
-            Generated conference summary:
+            Generated summary:
             {meeting_summary}
 
-            Conference summary corrections:
+            Summary corrections:
             {update_meeting}
         ''',
         'chatroom_generate_meeting_summary_from_a_single_message_system_correct': '''
@@ -801,11 +812,16 @@ language_packs = {
             Please adjust the generated meeting summary based on the generated meeting summary and meeting summary corrections I provided.
             Note that only the corrected meeting summary content will be returned in the end, and no redundant content will be returned.
         ''',
+        'chatroom_generate_meeting_summary_from_a_single_message_system_correct': '''
+            You are a roundtable discussion summary assistant. You have generated a summary for me. I have provided you with the generated summary.
+            Please adjust the generated summary based on the generated summary and summary corrections I provided.
+            Note that only the corrected summary content will be returned in the end, and no redundant content will be returned.
+        ''',
         'chatroom_generate_meeting_summary_from_a_single_message_user_correct': '''
-            Generated meeting summary:
+            Generated summary:
             {meeting_summary}
 
-            Meeting summary corrections:
+            Summary corrections:
             {update_meeting}
         ''',
         'chatroom_conference_orientation_system': '''
