@@ -380,7 +380,7 @@ language_packs = {
             {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
-            You need to fully analyze and understand every round of the conversation history through its message data structure, analyze the current conversation scene and conversation progress, and combine the user's speech content in the last round to analyze what the agents need to do next and the specific execution rules and requirements. This content then will be passed to the agents as an instruction
+            You need to fully analyze and understand every round of the conversation history through its message data structure, analyze the current conversation scene and conversation progress, and combine the user's speech content in the last round to summarize what the agents need to do next and the specific execution rules and requirements. This summary then will be passed to the agents as an instruction
 
             Then, respond according to the following requirements:
             1. Please only select agents from the provided agent list. Do not select agents that exist in the conversation history but not in the agent list;
