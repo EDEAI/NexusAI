@@ -68,6 +68,7 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
     description: str = chat_data['description']
     max_round: int = chat_data['max_round']
     agent = chat_data['agent']
+    is_temporary: int = chat_data.get('is_temporary', 0)
     mode: int = 5
 
     if not name:
@@ -107,7 +108,8 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
             'user_id': userinfo.uid,
             'app_id': app_id,
             'max_round': max_round,
-            'status': 1
+            'status': 1,
+            'is_temporary': is_temporary
         }
     )
     ChatroomAgentRelation().insert_agent(

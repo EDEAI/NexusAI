@@ -239,6 +239,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
     description = data['description']
     icon = data['icon']
     icon_background = data['icon_background']
+    temporary_chatroom_id = data.temporary_chatroom_id
 
     if not name:
         return response_error(get_language_content("name_is_required"))
@@ -301,7 +302,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
         if not workflow_id:
             return response_error(get_language_content("workflow_insert_error"))
 
-    if mode ==3:
+    if mode == 3:
         try:
             embeddings_config_id = Models().get_model_by_type(2, team_id, 1, uid)['model_config_id']
         except AssertionError as e:
@@ -318,6 +319,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
             "collection_name":collection_name,
             "embedding_model_config_id":embeddings_config_id,
             "retriever_config":retriever_config_dict,
+            "temporary_chatroom_id": temporary_chatroom_id,
             "created_time": current_time,
             "updated_time": current_time
         }
