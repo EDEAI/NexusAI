@@ -88,11 +88,13 @@ async def get_cost(
 
 
 @router.get('/dataset_list/{is_individual}', response_model=DatasetListResponse)
-async def dataset_list(is_individual: int, userinfo: TokenData = Depends(get_current_user)) -> DatasetListResponse:
+async def dataset_list(is_individual: int, temporary_chatroom_id: int = 0, userinfo: TokenData = Depends(get_current_user)) -> DatasetListResponse:
     """
     Get a list of all datasets
 
     Args:
+        is_individual: int, 1 personage 2 Team visible and individual
+        temporary_chatroom_id: int, temporary chatroom id, default is 0
         userinfo: TokenData, the user information obtained from the token
 
     Returns:
@@ -105,7 +107,7 @@ async def dataset_list(is_individual: int, userinfo: TokenData = Depends(get_cur
     """
     user_id = userinfo.uid
     team_id = userinfo.team_id
-    datasets_list = Datasets().get_dataset_list(team_id, user_id, is_individual)
+    datasets_list = Datasets().get_dataset_list(team_id, user_id, is_individual, temporary_chatroom_id)
     datasets_list = [{'dataset_id': item[0], 'app_id': item[1], 'name': item[2]} for item in datasets_list]
     response = {'data': datasets_list}
     return response_success(response,get_language_content("api_vector_success"))

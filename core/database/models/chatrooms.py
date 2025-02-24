@@ -89,6 +89,7 @@ class Chatrooms(MySQL):
             {"column": "apps.status", "value": 1},
             {"column": "apps.mode", "value": 5},
             {"column": "chatrooms.user_id", "value": uid},
+            {"column": "chatrooms.is_temporary", "value": 0},
         ]
 
         if name:
@@ -207,7 +208,8 @@ class Chatrooms(MySQL):
             {"column": "apps.status", "value": 1},
             {"column": "apps.mode", "value": 5},
             {"column": "chatroom_agent_relation.agent_id", "value": agent_id},
-            {"column": "chatrooms.user_id", "value": current_user_id}  # Only current user's rooms
+            {"column": "chatrooms.user_id", "value": current_user_id},
+            {"column": "chatrooms.is_temporary", "value": 1},
         ]
         joins = [
             ["inner", "chatroom_agent_relation", "chatrooms.id = chatroom_agent_relation.chatroom_id"],

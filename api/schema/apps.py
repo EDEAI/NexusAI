@@ -45,6 +45,7 @@ class ReqAppBaseCreateSchema(BaseModel):
     icon: Optional[str] = None
     icon_background: Optional[str] = None
     mode: Optional[int] = None
+    temporary_chatroom_id: int = 0
 
 class ResAppsCreateData(BaseModel):
    app_id: Optional[int] = None
