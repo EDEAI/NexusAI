@@ -276,6 +276,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         task: Optional[Dict[str, RecursiveTaskCategory]] = None,
         correct_llm_output: bool = False,
         data_source_run_id : Optional[int] = 0,
+        override_rag_input: Optional[str] = None,
+        override_dataset_id: Optional[int] = None,
         is_chat: bool = False,
         **kwargs
     ) -> Dict[str, Any]:
@@ -338,10 +340,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             )
             
             # RAG chain generation
-            datasets = [
-                relation['dataset_id']
-                for relation in AgentDatasetRelation().get_relations_by_agent_id(agent_id)
-            ]
+            if override_dataset_id:
+                datasets = [override_dataset_id]
+            else:
+                datasets = [
+                    relation['dataset_id']
+                    for relation in AgentDatasetRelation().get_relations_by_agent_id(agent_id)
+                ]
             match len(datasets):
                 case 0:
                     retrieval_chain, retrieval_token_counter = None, None
@@ -358,7 +363,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             output_format, input_ = self._prepare_prompt(
                 agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), direct_output
             )
-            override_rag_input = kwargs.get('override_rag_input')
             return_json = output_format in [None, 2]  # Auto match ability or force JSON output
             model_data, ai_output, prompt_tokens, completion_tokens, total_tokens = self.invoke(
                 app_run_id=app_run_id, 
@@ -550,6 +554,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         task: Optional[Dict[str, RecursiveTaskCategory]] = None,
         correct_llm_output: bool = False,
         data_source_run_id : Optional[int] = 0,
+        override_rag_input: Optional[str] = None,
+        override_dataset_id: Optional[int] = None,
         **kwargs
     ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
@@ -612,10 +618,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             )
             
             # RAG chain generation
-            datasets = [
-                relation['dataset_id']
-                for relation in AgentDatasetRelation().get_relations_by_agent_id(agent_id)
-            ]
+            if override_dataset_id:
+                datasets = [override_dataset_id]
+            else:
+                datasets = [
+                    relation['dataset_id']
+                    for relation in AgentDatasetRelation().get_relations_by_agent_id(agent_id)
+                ]
             match len(datasets):
                 case 0:
                     retrieval_chain, retrieval_token_counter = None, None
@@ -631,7 +640,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             _, input_ = self._prepare_prompt(
                 agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), True
             )
-            override_rag_input = kwargs.get('override_rag_input')
             model_data, ainvoke = self.get_ainvoke_func(
                 app_run_id=app_run_id, 
                 edge_id=edge_id,

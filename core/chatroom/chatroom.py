@@ -15,7 +15,8 @@ from core.database.models import (
     AppRuns,
     ChatroomMessages,
     Chatrooms,
-    Models
+    Models,
+    Datasets
 )
 from core.helper import truncate_messages_by_token_limit
 from core.llm import Prompt
@@ -32,6 +33,7 @@ agent_abilities = AgentAbilities()
 app_runs = AppRuns()
 chatrooms = Chatrooms()
 chatroom_messages = ChatroomMessages()
+datasets = Datasets()
 
 
 class Chatroom:
@@ -253,20 +255,36 @@ class Chatroom:
 
     async def _select_next_speaker(self) -> int:
         agent_id = None
+        last_speaker_id = self._history_messages[-1]['agent_id']
+
         for i in range(5):  # Try 5 times
-            last_speaker_id = self._history_messages[-1]['agent_id']
             if last_speaker_id == 0:
+                # If there is only one agent in the chatroom, handle directly
+                if len(self._model_config_ids) <= 2:  # Including Speaker Selector (id=0) and one agent
+                    # Set user message as topic directly
+                    self._topic = self._history_messages[-1]['message']
+                    logger.debug('Current topic: %s', self._topic)
+                    chatroom_messages.update(
+                        {'column': 'id', 'value': self._user_message_id},
+                        {'topic': self._topic}
+                    )
+                    # Return the ID of the only agent
+                    for agent_id in self._model_config_ids:
+                        if agent_id != 0:
+                            return agent_id
+                    return 0
                 # If the last speaker is the user, the Speaker Selector must choose an agent
-                schema_key = "chatroom_manager_system"
-                system_prompt = get_language_content(
-                    'chatroom_manager_system',
-                    self._user_id
-                )
-                user_prompt = get_language_content(
-                    'chatroom_manager_user',
-                    self._user_id,
-                    append_ret_lang_prompt=False
-                )
+                else:
+                    schema_key = "chatroom_manager_system"
+                    system_prompt = get_language_content(
+                        'chatroom_manager_system',
+                        self._user_id
+                    )
+                    user_prompt = get_language_content(
+                        'chatroom_manager_user',
+                        self._user_id,
+                        append_ret_lang_prompt=False
+                    )
             else:
                 # If the last speaker is an agent,
                 if self._smart_selection or len(self._model_config_ids) <= 2:
@@ -376,6 +394,15 @@ class Chatroom:
         completion_tokens = 0
         total_tokens = 0
 
+        # Check if there is a temporary dataset for this chatroom
+        override_dataset = datasets.select_one(
+            columns=['id'],
+            conditions=[
+                {'column': 'temporary_chatroom_id', 'value': self._chatroom_id},
+                {'column': 'status', 'value': 1}
+            ]
+        )
+
         messages, messages_in_last_section, user_messages = self._get_history_messages_list_grouped(self._model_config_ids[agent_id])
         user_message = messages_in_last_section[0]['message']
         agent_user_subprompt = get_language_content(
@@ -405,7 +432,8 @@ class Chatroom:
                 context=Context(),
                 user_id=self._user_id,
                 type=2,
-                override_rag_input=user_message
+                override_rag_input=user_message,
+                override_dataset_id=override_dataset['id'] if override_dataset else None
             ):
                 if isinstance(chunk, int):
                     agent_run_id = chunk

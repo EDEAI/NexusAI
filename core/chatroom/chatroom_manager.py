@@ -248,6 +248,7 @@ class ChatroomManager:
                                 chatroom_to_truncate = chatroom_id
                             if not chatroom_to_truncate:
                                 assert chatroom_id, 'You should ENTER the chatroom first.'
+                            self._get_chatroom_info(chatroom_to_truncate, user_id, check_chat_status=True)  # Also check if the chatroom is available
                             last_message_id = self._get_last_message_id(chatroom_to_truncate)
                             if last_message_id:
                                 chatrooms.update(
