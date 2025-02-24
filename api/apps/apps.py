@@ -239,7 +239,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
     description = data['description']
     icon = data['icon']
     icon_background = data['icon_background']
-    temporary_chatroom_id = data.temporary_chatroom_id
+    temporary_chatroom_id = data.get('temporary_chatroom_id', 0)
 
     if not name:
         return response_error(get_language_content("name_is_required"))
@@ -321,7 +321,8 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
             "retriever_config":retriever_config_dict,
             "temporary_chatroom_id": temporary_chatroom_id,
             "created_time": current_time,
-            "updated_time": current_time
+            "updated_time": current_time,
+            "temporary_chatroom_id": temporary_chatroom_id
         }
 
         datasets_model= Datasets()
