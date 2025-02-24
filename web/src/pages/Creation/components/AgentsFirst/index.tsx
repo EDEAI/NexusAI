@@ -1,5 +1,6 @@
 import { GetdatasetList } from '@/api/agents';
 import Callword from '@/components/callword';
+import { useInitialModels, useModelSelect } from '@/store/modelList';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Form, Input, Radio, Select, Switch } from 'antd';
@@ -159,8 +160,12 @@ const AgentsFirst: React.FC<ChildProps> = ({
             agent: { ...Detaillist.agent, default_output_format: e.target.value },
         });
     };
+
+
+    const { options, defaultValue } = useModelSelect();
+
     return (
-        <div style={{ height: '100%', width: '900px', marginBottom: '30px' }}>
+        <div style={{ height: '100%', width: '100%', marginBottom: '30px' }}>
             <div className="flex align-center justify-between mt-[30px]">
                 <div className="text-base font-medium mb-[30px] text-[#333333]">
                     {intl.formatMessage({ id: 'agent.menu.basicsetup' })}
@@ -170,7 +175,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                 <Form
                     name="dynamic_form_nest_item"
                     // onFinish={nextStep}
-                    style={{ width: '900px' }}
+                    style={{ width: '100%' }}
                     // labelCol={{ span: 24 }}
                     // wrapperCol={{ span: 24 }}
                     autoComplete="off"
@@ -298,8 +303,9 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                       })
                                                     : Fourthly_config_id
                                             }
+                                            variant="filled"
                                             onChange={FourthlySelect}
-                                            options={Fourthly_select_list}
+                                            options={options}
                                         />
                                     </div>
                                 </Form.Item>

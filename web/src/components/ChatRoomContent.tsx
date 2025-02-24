@@ -578,10 +578,12 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
         setIsStop,
         setSendValue,
     } = porpos;
-    let intl = useIntl();
-    const [currentMessageContent, setCurrentMessageContent]: any = useState([]);
-    const [isEnd, setisEnd] = useState(false);
+
+    const intl = useIntl();
     const { id } = useParams<{ id: string }>();
+    const [currentMessageContent, setCurrentMessageContent] = useState([]);
+    const [isEnd, setisEnd] = useState(false);
+
     useEffect(() => {
         if (isEnd) {
             setUserMessage((pre: any) => {
@@ -593,47 +595,36 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                 scrollDomRef.current.scrollTop = 0;
             }, 200);
         }
-    }, [isEnd]);
+    }, [isEnd, currentMessageContent, setUserMessage, scrollDomRef]);
+
     return (
         <>
             {currentMessageContent.length ? (
-                currentMessageContent.map((item: any, index: any) => (
-                    <div
-                        key={index}
-                        className={`w-full flex gap-[15px] pt-[15px] pb-[15px] ${
-                            item.is_agent != 1 ? 'flex-row-reverse' : ''
-                        }`}
-                    >
-                        {/* <div className='h-[30px]'><Avatar size={30} className='bg-[#ddd]' icon={item.icon?item.icon:<UserOutlined />}/></div> */}
-                        <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
-                            {item.is_agent == 1 ? (
-                                <img
-                                    src={headportrait('single', item.icon)}
-                                    alt=""
-                                    className="w-[18px]  h-[18px]"
-                                />
-                            ) : (
-                                <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
-                            )}
-                        </div>
+                <div className="flex flex-col gap-4 overflow-y-auto max-h-[calc(100vh-300px)] px-4">
+                    {currentMessageContent.map((item: any, index: any) => (
                         <div
-                            className="flex1 max-w-[560px] text-right"
-                            id={`currentContent${index}`}
+                            key={index}
+                            className={`w-full flex gap-[15px] pt-[15px] pb-[15px] ${
+                                item.is_agent != 1 ? 'flex-row-reverse' : ''
+                            }`}
                         >
-                            <div
-                                className={`${
-                                    item.is_agent == 1 ? 'text-left' : 'text-right'
-                                } font-[500] text-[14px] text-[#213044] pb-[8px]`}
-                            >
-                                {item.name ? item.name : userinfodata('GET').nickname}
+                            <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
+                                {item.is_agent == 1 ? (
+                                    <img
+                                        src={headportrait('single', item.icon)}
+                                        alt=""
+                                        className="w-[18px] h-[18px]"
+                                    />
+                                ) : (
+                                    <img src="/icons/user_header.svg" className="w-[18px] h-[18px]" />
+                                )}
                             </div>
-                            <div
-                                className={`flex ${
-                                    item.is_agent == 1 ? 'flex-row' : 'flex-row-reverse'
-                                }`}
-                            >
+                            <div className="flex-1 min-w-0">
+                                <div className="text-[12px] text-[#999999] mb-[8px]">
+                                    {item.name}
+                                </div>
                                 <div
-                                    className={`text-left inline-block markdown-container text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
+                                    className={`text-left inline-block markdown-container text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px] w-full overflow-x-auto`}
                                     style={
                                         item.is_agent == 1
                                             ? { borderRadius: ' 0px 8px 8px 8px' }
@@ -645,38 +636,36 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                                     }
                                     id={`currentChilContent${index}`}
                                 >
-                                    <ReactMarkdown
-                                        rehypePlugins={[rehypeHighlight]}
-                                        components={renderers(index, intl)}
-                                    >
-                                        {item.content}
-                                    </ReactMarkdown>
+                                    <div className="max-h-[500px] overflow-y-auto pr-2">
+                                        <ReactMarkdown
+                                            rehypePlugins={[rehypeHighlight]}
+                                            components={renderers(index, intl)}
+                                        >
+                                            {item.content}
+                                        </ReactMarkdown>
+                                    </div>
                                 </div>
+                                {item.is_agent == 1 ? (
+                                    <div className="flex gap-x-[20px] mt-2">
+                                        <Chatcopy
+                                            messageApi={messageApi}
+                                            index={index}
+                                            idName="currentContent"
+                                            cidName="currentChilContent"
+                                        />
+                                        <SummaryButton
+                                            id={id}
+                                            index={index}
+                                            idName="currentContent"
+                                            cidName="currentChilContent"
+                                        />
+                                    </div>
+                                ) : null}
                             </div>
-                            {item.is_agent == 1 ? (
-                                <div className="flex gap-x-[20px]">
-                                    <Chatcopy
-                                        messageApi={messageApi}
-                                        index={index}
-                                        idName="currentContent"
-                                        cidName="currentChilContent"
-                                    />
-                                    <SummaryButton
-                                        id={id}
-                                        index={index}
-                                        idName="currentContent"
-                                        cidName="currentChilContent"
-                                    />
-                                </div>
-                            ) : (
-                                <></>
-                            )}
                         </div>
-                    </div>
-                ))
-            ) : (
-                <></>
-            )}
+                    ))}
+                </div>
+            ) : null}
             <Chatwindow
                 messageApi={messageApi}
                 setCurrentMessageContent={setCurrentMessageContent}
@@ -687,7 +676,7 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                 setIsStop={setIsStop}
                 setisEnd={setisEnd}
                 setSendValue={setSendValue}
-            ></Chatwindow>
+            />
         </>
     );
 });
@@ -814,7 +803,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                 className={`h-full min-h-full overflow-y-auto flex flex-col-reverse  items-center  scroll-smooth chatroom`}
                 ref={scrollDomRef}
                 onScroll={slideScroll}
-            >   
+            >
                 <div className="min-w-[860px]">
                     <div className="w-full">
                         <div className="flex flex-col-reverse">

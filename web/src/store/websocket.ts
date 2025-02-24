@@ -174,13 +174,18 @@ interface WorkflowNeedHumanConfirm {
 
 type FlowMessage = WorkflowRunDebug | WorkflowRunProgress | WorkflowNeedHumanConfirm;
 
-type MessageType = 'workflow_run_debug' | 'workflow_run_progress' | 'workflow_need_human_confirm' | 'generate_agent_batch';
+type MessageType =
+    | 'workflow_run_debug'
+    | 'workflow_run_progress'
+    | 'workflow_need_human_confirm'
+    | 'generate_agent_batch'
+    | 'chat_message_llm_return';
 
 type TypedMessageMap = {
     workflow_run_debug: WorkflowRunDebug[];
     workflow_run_progress: WorkflowRunProgress[];
     workflow_need_human_confirm: WorkflowNeedHumanConfirm[];
-    generate_agent_batch: any[]; 
+    generate_agent_batch: any[];
     [key: string]: any[];
 };
 
@@ -188,11 +193,14 @@ interface FlowState {
     flowMessage: any[];
     typedMessages: Partial<TypedMessageMap>;
     dealtWithData: any;
+    lastMessage: any;
+    setLastMessage: (message: any) => void;
     setDealtWithData: (value: any) => void;
     addFlowMessage: (message: any) => void;
     setFlowMessage: (message: any[]) => void;
     getMessage: () => any[];
     getTypedMessages: <T extends MessageType>(type: T) => Partial<TypedMessageMap>[T] | [];
+    getTypedLastMessage: <T extends MessageType>(type: T) => Partial<TypedMessageMap>[T] | null;
     filterMessages: (type: string, filterData?: any) => any[];
     fuzzyFilterMessages: (typePattern: string) => any[];
 }
@@ -203,6 +211,10 @@ const useSocketStore = create(
             flowMessage: [],
             typedMessages: {},
             dealtWithData: null,
+            lastMessage: null,
+            setLastMessage: (message: any) => {
+                set({ lastMessage: message });
+            },
             setDealtWithData: (value: any) => {
                 set({ dealtWithData: value });
             },
@@ -210,35 +222,37 @@ const useSocketStore = create(
                 set(state => {
                     const newFlowMessage = [...state.flowMessage, message];
                     const type = message.type as MessageType;
-                    
+                    console.log('typedMessages222222');
                     return {
                         flowMessage: newFlowMessage,
                         typedMessages: {
                             ...state.typedMessages,
-                            [type]: [...(state.typedMessages[type] || []), message]
-                        }
+                            [type]: [...(state.typedMessages[type] || []), message],
+                        },
                     };
                 });
             },
             setFlowMessage: message => {
                 set(state => {
-                 
                     const typedMessages = message.reduce((acc, msg) => {
                         const type = msg.type as MessageType;
                         return {
                             ...acc,
-                            [type]: [...(acc[type] || []), msg]
+                            [type]: [...(acc[type] || []), msg],
                         };
                     }, {} as TypedMessageMap);
-                    
+
                     return {
                         flowMessage: message,
-                        typedMessages
+                        typedMessages,
                     };
                 });
             },
             getTypedMessages: type => {
                 return get().typedMessages[type] || [];
+            },
+            getTypedLastMessage: type => {
+                return get().typedMessages[type]?.at(-1) || null;
             },
             getMessage: () => {
                 return get().flowMessage;
@@ -255,9 +269,9 @@ const useSocketStore = create(
 
                 return messageList;
             },
-            fuzzyFilterMessages: (typePattern) => {
-                return get().flowMessage.filter(item => 
-                    item.type?.toLowerCase().includes(typePattern.toLowerCase())
+            fuzzyFilterMessages: typePattern => {
+                return get().flowMessage.filter(item =>
+                    item.type?.toLowerCase().includes(typePattern.toLowerCase()),
                 );
             },
         }),
