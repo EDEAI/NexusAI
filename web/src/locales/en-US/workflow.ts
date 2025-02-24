@@ -255,7 +255,7 @@ export default {
     "workflow.message.setVariablesFirst": "Please set variables first",
 
     // Node list related
-    'workflow.nodeList': 'App List',
+    'workflow.nodeList': 'Space',
     'workflow.team': 'Team',
     'workflow.mine': 'Mine',
     'workflow.search': 'Search App',
@@ -263,7 +263,7 @@ export default {
 
     // Node types
     'workflow.node.start': 'Start',
-    'workflow.node.end': 'End', 
+    'workflow.node.end': 'End',
     'workflow.node.agent': 'Agent',
     'workflow.node.human': 'Human',
     'workflow.node.retriever': 'Retriever',

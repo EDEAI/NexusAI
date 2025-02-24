@@ -1,6 +1,7 @@
 import { PostskillRun, PutskillPublish } from '@/api/skill';
 import CodeEditor from '@/components/WorkFlow/components/Editor/CodeEditor';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
+import { DownloadOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Form, Input, message, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -67,11 +68,14 @@ const skillFourthly: React.FC<ChildProps> = ({
         }
     };
 
+    const [fileList, setFileList] = useState<any[]>([]);
+
     const SkillRun = async (param: any) => {
         PostskillRun(param)
             .then(res => {
                 message.success(intl.formatMessage({ id: 'skill.run.success' }));
                 setSkillRun(res.data.outputs);
+                setFileList(res.data.file_list || []);
                 setLoading(false);
             })
             .catch(err => {
@@ -81,11 +85,32 @@ const skillFourthly: React.FC<ChildProps> = ({
                 }
                 console.log(err, 'err-===>');
             });
-
     };
     const Goamend = async () => {
         history.push(`/Skill?app_id=${app_id ? app_id : Skillinfo?.app_id}&type=false`);
         location.reload();
+    };
+
+    const handleSaveOutline = async (outlineData: any) => {
+        try {
+            const response = await fetch(`/api/novel/${novelId}/outline`, {
+                method: 'POST',  // 改用 POST 方法
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(outlineData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            message.success('保存成功');
+        } catch (error) {
+            console.error('Error saving outline:', error);
+            message.error('保存失败');
+        }
     };
 
     return (
@@ -192,6 +217,34 @@ const skillFourthly: React.FC<ChildProps> = ({
                                     />
                                 ) : null}
                             </div>
+
+                            {fileList.length > 0 && (
+                                <div className="mb-4">
+                                    <div className="text-sm font-medium text-gray-700 mb-2">
+                                        {intl.formatMessage({ id: 'skill.downloadFiles' })}
+                                    </div>
+                                    <div className="space-y-2">
+                                        {fileList.map((file: any, index: number) => (
+                                            <div key={index} className="flex items-center justify-between bg-white rounded-md p-2">
+                                                <span className="text-sm text-gray-600">{file.file_name}</span>
+                                                <a
+                                                    href={file.file_path}
+                                                    download={file.file_name}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center space-x-1 text-blue-600 hover:text-blue-800"
+                                                >
+                                                    <DownloadOutlined className="w-4 h-4" />
+                                                    <span className="text-sm">
+                                                        {intl.formatMessage({ id: 'skill.download' })}
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="w-full flex justify-end items-center">
                                 <div className=" h-8 bg-[#e8effc] rounded-md">
                                     <Button

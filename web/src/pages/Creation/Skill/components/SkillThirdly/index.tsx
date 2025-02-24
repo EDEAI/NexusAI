@@ -67,8 +67,7 @@ const SkillThirdly: React.FC<ChildProps> = ({
                 .then(value => {
                     skillupdata();
                 })
-                .catch(err => {
-                });
+                .catch(err => {});
             // pageKeyfun('4')
             // setskillmenudisabled({ ...skillmenudisabled, second: false, })
         }
@@ -221,7 +220,7 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                                 { value: 'string', label: 'String' },
                                                 { value: 'number', label: 'Number' },
                                                 { value: 'json', label: 'Object' },
-                                             
+                                                { value: 'file', label: 'File' },
                                             ]}
                                         />
                                     </Form.Item>

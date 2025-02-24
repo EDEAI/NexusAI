@@ -47,9 +47,9 @@ interface ListItemProps {
     };
 }
 
-export default memo(({ 
-    visibleTabs, 
-    defaultActiveTab, 
+export default memo(({
+    visibleTabs,
+    defaultActiveTab,
     showTeamSwitch = true,
     workflowName,
     workflowDesc,
@@ -76,7 +76,7 @@ export default memo(({
         [BlockEnum.Agent]: [],
         [BlockEnum.Skill]: [],
         ['workflow']: [],
-    }); 
+    });
     const [filterData, setFilterData] = useState({
         team: 1,
         keyword: '',
@@ -262,13 +262,13 @@ export default memo(({
                 };
 
                 updateContainerHeight();
-                
+
                 if (containerRef.current) {
                     containerRef.current.addEventListener('containerResize', handleResize as EventListener);
                 }
-                
+
                 window.addEventListener('resize', updateContainerHeight);
-                
+
                 return () => {
                     if (containerRef.current) {
                         containerRef.current.removeEventListener('containerResize', handleResize as EventListener);
@@ -311,7 +311,7 @@ export default memo(({
                 console.log('Clicked category:', category);
                 console.log('Clicked item:', item);
                 console.log('Indices:', categoryIndex, toolIndex);
-                
+
                 switch(currentConfig.tabKey) {
                     case 'tool':
                         if (categoryIndex !== undefined && toolIndex !== undefined) {
@@ -319,10 +319,10 @@ export default memo(({
                         }
                         break;
                     case 'workflow':
-                    
+
                         break;
                     case 'agent':
-            
+
                         break;
                 }
             }, [currentConfig.tabKey, lang]);
@@ -343,7 +343,7 @@ export default memo(({
                         {filterData?.keyword ? (
                             <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2">
                                 {displayList.map((item) => (
-                                    <ListItem 
+                                    <ListItem
                                         key={item.id}
                                         data={item}
                                         index={displayList.indexOf(item)}
@@ -367,7 +367,7 @@ export default memo(({
                                 onScroll={onScroll}
                             >
                                 {(item) => (
-                                    <ListItem 
+                                    <ListItem
                                         data={item}
                                         index={displayList.indexOf(item)}
                                         onDragStart={onDragStart}
@@ -443,7 +443,7 @@ export default memo(({
             minWidth={200}
             maxWidth={415}
             className="fixed left-0 top-16 bg-white shadow-md"
-            defaultWidth={isCollapsed ? 100 : 415}
+            defaultWidth={isCollapsed ? 100 : 315}
             onChange={(width, height) => {
                 requestAnimationFrame(() => {
                     setIsMinWidth(width < 100);
@@ -455,8 +455,8 @@ export default memo(({
                     containers.forEach((container) => {
                         if (container instanceof HTMLElement) {
                             const height = container.clientHeight;
-                            const event = new CustomEvent('containerResize', { 
-                                detail: { height, width } 
+                            const event = new CustomEvent('containerResize', {
+                                detail: { height, width }
                             });
                             container.dispatchEvent(event);
                         }
@@ -465,7 +465,7 @@ export default memo(({
             }}
         >
             <div className="h-[calc(100vh-110px)] flex flex-col relative">
-              
+
                 {!isCollapsed && (
                     <div className="px-4 py-3">
                         <ProForm
@@ -477,7 +477,7 @@ export default memo(({
                                 <div className="flex gap-2 items-center text-base mb-4">
                                     {intl.formatMessage({
                                         id: 'workflow.nodeList',
-                                        defaultMessage: '列表',
+                                        defaultMessage: '',
                                     })}
                                     <ProFormRadio.Group
                                         name="team"
@@ -486,14 +486,14 @@ export default memo(({
                                                 {
                                                     label: intl.formatMessage({
                                                         id: 'workflow.team',
-                                                        defaultMessage: '团队',
+                                                        defaultMessage: '',
                                                     }),
                                                     value: 2,
                                                 },
                                                 {
                                                     label: intl.formatMessage({
                                                         id: 'workflow.mine',
-                                                        defaultMessage: '我的',
+                                                        defaultMessage: '',
                                                     }),
                                                     value: 1,
                                                 },
@@ -512,7 +512,7 @@ export default memo(({
                                     prefix: <SearchOutlined />,
                                     placeholder: intl.formatMessage({
                                         id: 'workflow.search',
-                                        defaultMessage: '搜索节点',
+                                        defaultMessage: '',
                                     }),
                                 }}
                                 name="keyword"
@@ -524,6 +524,10 @@ export default memo(({
                                         options={tags}
                                         listStyle={isMinWidth?'horizontal':'vertical'}
                                         allowClear
+                                        placeholder={intl.formatMessage({
+                                            id: 'creation.placeholder.selectTags',
+                                            defaultMessage: '',
+                                        })}
                                         onChange={e => {}}
                                     ></TagSelect>
                                 </ProFormItem>
@@ -553,24 +557,24 @@ export default memo(({
                                             })}
                                         </div>
                                     )}
-                                    <RenderNodeList 
-                                        key={item.key} 
-                                        tabIndex={index + 1 + ''} 
+                                    <RenderNodeList
+                                        key={item.key}
+                                        tabIndex={index + 1 + ''}
                                         showName={!isMinWidth}
                                     />
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <RenderNodeList 
-                            tabIndex={tabIndex} 
+                        <RenderNodeList
+                            tabIndex={tabIndex}
                             showName={!isMinWidth}
                         />
                     )}
                 </div>
                 <WorkFlowLeftMenu></WorkFlowLeftMenu>
                 <div className="absolute left-[calc(100%+80px)] top-0">
-                    <WorkflowTitle 
+                    <WorkflowTitle
                         name={workflowName}
                         description={workflowDesc}
                         publishStatus={publishStatus}
