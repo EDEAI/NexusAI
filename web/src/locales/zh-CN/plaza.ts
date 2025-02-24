@@ -41,6 +41,13 @@ export default {
     'app.check_agent_popup.chenck_text': '已选',
     'app.check_agent_popup.select_1': '我的 智能体',
     'app.check_agent_popup.select_2': '组织内 智能体',
+    'app.check_agent_popup.search': '搜索智能体',
+    'app.check_agent_popup.tag': '选择标签',
+
+    // 角色身份标签
+    'app.check_agent_popup.role.protagonist': '主角',
+    'app.check_agent_popup.role.supporting': '配角',
+    'app.check_agent_popup.role.antagonist': '反派',
     'app.check_agent_popup.search': '请输入关键词搜索',
     'app.check_agent_popup.save': '确认',
     'app.check_agent_popup.cancel': '取消',
@@ -105,7 +112,7 @@ export default {
     "app.summary.Runapp":"选择运行应用",
     "app.summary.SelectAgent":"选择智能体",
     "app.summary.SelectWorkflow":"选择工作流",
-    
+
     "app.summary.backlogTips":"你有一条待办项",
 
     "app.summaryhistory.orientation":"修正会议总结",

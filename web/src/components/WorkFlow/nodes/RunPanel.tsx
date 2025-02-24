@@ -8,6 +8,7 @@ import useSocketStore from '@/store/websocket';
 import {
     CheckCircleOutlined,
     CloseOutlined,
+    DownloadOutlined,
     InboxOutlined,
     LoadingOutlined,
     SyncOutlined,
@@ -811,6 +812,39 @@ const DetailContent = memo(({ endRun }) => {
                     })}
                 ></CodeEditor>
             </div>
+
+            {endRun?.data?.node_exec_data?.file_list?.length > 0 && (
+                <div className="mt-4">
+                    <div className="text-sm font-medium text-gray-700 mb-2">
+                        {intl.formatMessage({ id: 'skill.downloadFiles' })}
+                    </div>
+                    <div className="space-y-2">
+                        {endRun?.data?.node_exec_data?.file_list.map((file: any, index: number) => (
+                            <div
+                                key={index}
+                                className="flex items-center justify-between bg-white rounded-md p-2 gap-2"
+                            >
+                                <span className="text-sm text-gray-600 truncate">
+                                    {file.file_name}
+                                </span>
+                                <a
+                                    href={file.file_path}
+                                    download={file.file_name}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center space-x-1 text-blue-600 hover:text-blue-800"
+                                >
+                                    <DownloadOutlined className="w-4 h-4" />
+                                    <span className="text-sm shrink-0">
+                                        {intl.formatMessage({ id: 'skill.download' })}
+                                    </span>
+                                </a>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             <Divider orientationMargin="0" orientation="left">
                 {intl.formatMessage({ id: 'workflow.label.metadata', defaultMessage: '' })}
             </Divider>

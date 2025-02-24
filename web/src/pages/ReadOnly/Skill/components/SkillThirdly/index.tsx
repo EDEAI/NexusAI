@@ -176,7 +176,8 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                                             { value: 'string', label: 'String' },
                                                             { value: 'number', label: 'Number' },
                                                             { value: 'json', label: 'Object' },
-                                                           
+                                                            { value: 'file', label: 'File' },
+
                                                         ]}
                                                     />
                                                 </Form.Item>
