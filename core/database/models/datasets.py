@@ -133,7 +133,7 @@ class Datasets(MySQL):
             ],
         )['id']
 
-    def get_dataset_list(self, team_id: int, user_id: int, is_individual: int, temporary_chatroom_id: int = 0) -> List[Dict[str, Any]]:
+    def get_dataset_list(self, team_id: int, user_id: int, is_individual: int) -> List[Dict[str, Any]]:
         """
         Returns a list of datasets that the user has access to.
 
@@ -151,7 +151,7 @@ class Datasets(MySQL):
                     SELECT A.id as dataset_id,B.id as app_id,B.name FROM `datasets` AS A
                     LEFT JOIN `apps` AS B ON A.app_id = B.id
                     WHERE A.team_id = {team_id} AND A.status < 3 AND {where}
-                    AND A.temporary_chatroom_id = {temporary_chatroom_id}  
+                    AND A.temporary_chatroom_id = 0  
                 """
         return self.execute_query(sql).fetchall()
 
