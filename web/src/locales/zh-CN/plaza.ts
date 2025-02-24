@@ -48,7 +48,7 @@ export default {
     'app.check_agent_popup.role.protagonist': '主角',
     'app.check_agent_popup.role.supporting': '配角',
     'app.check_agent_popup.role.antagonist': '反派',
-    'app.check_agent_popup.search': '请输入关键词搜索',
+    // 'app.check_agent_popup.search': '请输入关键词搜索',
     'app.check_agent_popup.save': '确认',
     'app.check_agent_popup.cancel': '取消',
 
@@ -86,7 +86,7 @@ export default {
     'app.chatroom.content.addAgentTips_fail': '添加失败',
 
     'app.chatroom.content.summary':'导向',
-    'app.chatroom.content.meetingSummary':'会议导向',
+    'app.chatroom.content.meetingSummary':'圆桌导向',
 
     'app.dashboard.None': '暂无数据',
 
@@ -105,7 +105,7 @@ export default {
     "app.workflow.needHumanConfirm":"需要人工确认",
     "app.workflow.noHumanConfirm":"已处理人工确认",
 
-    "app.summary.title":"会议总结",
+    "app.summary.title":"讨论总结",
     "app.summary.submitText":"提交修正",
     "app.summary.next":"下一步",
     "app.summary.placeholder":"请输入你的修正建议….",
@@ -115,7 +115,7 @@ export default {
 
     "app.summary.backlogTips":"你有一条待办项",
 
-    "app.summaryhistory.orientation":"修正会议总结",
+    "app.summaryhistory.orientation":"修正讨论总结",
     "app.summaryhistory.time":"修正时间",
     "app.summaryhistory.runapp":"运行应用",
     "app.summaryhistory.input":"输入参数",
