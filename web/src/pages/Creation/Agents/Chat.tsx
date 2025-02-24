@@ -9,17 +9,54 @@ import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm, ProFormSelect, ProFormTextArea } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Button } from 'antd';
+import { Button, Spin } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
+import InfiniteScroll from '@/components/common/InfiniteScroll';
 
-interface MessageProps {
-    message: {
-        id: number;
+interface SocketMessage {
+    data: {
+        message_id: number;
         message: string;
         agent_run_id: number;
+        ability_id?: number;
+        error?: string;
+        created_time?: string;
+        total_tokens?: number;
     };
+}
+
+interface Message {
+    id: number;
+    message: string;
+    agent_run_id: number;
+    ability_id?: number;
+    error?: string;
+    created_time?: string;
+    total_tokens?: number;
+}
+
+interface MessageProps {
+    message: Message;
     detailList?: any;
     abilitiesList?: any;
+}
+
+interface Props {
+    data: {
+        detailList: {
+            agent: {
+                agent_id: number;
+                input_variables: any;
+            };
+            app?: {
+                name: string;
+            };
+        };
+        abilitiesList: Array<{
+            value: number;
+            label: string;
+        }>;
+    };
 }
 
 const UserMessageComponent = memo(({ message }: MessageProps) => (
@@ -31,6 +68,7 @@ const UserMessageComponent = memo(({ message }: MessageProps) => (
 ));
 
 const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: MessageProps) => {
+    const intl = useIntl();
     const ability = abilitiesList.find(item => item.value === message.ability_id);
     return (
         <div className="flex justify-start pb-4">
@@ -46,7 +84,7 @@ const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: Messag
                     {message.message && <div className="p-3">{message.message}</div>}
                     {message.error && (
                         <div className="p-3 text-red-500">
-                            <div>运行错误</div>
+                            <div>{intl.formatMessage({ id: 'agent.chat.error.message' })}</div>
                             {message.error}
                         </div>
                     )}
@@ -54,7 +92,7 @@ const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: Messag
                         <div className="text-xs text-gray-500 flex justify-between">
                             <div>{message.created_time}</div>
                             <div>
-                                tokens:{' '}
+                                {intl.formatMessage({ id: 'agent.chat.tokens' })}:{' '}
                                 <span className="text-blue-500">{message.total_tokens || 0}</span>
                             </div>
                         </div>
@@ -65,24 +103,21 @@ const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: Messag
     );
 });
 
-interface Message {
-    id: number;
-    content: string;
-    isUser: boolean;
-}
-
 export default memo(props => {
     const [messages, setMessages] = useState<Message[]>([]);
-    const [gettedMessage, setGettedMessage] = useState(false);
+    const [hasMoreHistory, setHasMoreHistory] = useState(true);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [initialLoading, setInitialLoading] = useState(true);
     const formRef = useRef<ProFormInstance>();
-    const messageContainerRef = useRef<HTMLDivElement>(null);
     const intl = useIntl();
-    const listenMessage = useSocketStore(state =>
+    const listenMessage = useSocketStore<SocketMessage[]>(state =>
         state.getTypedMessages('chat_message_llm_return'),
     );
-    const lastMessage = useSocketStore(state =>
+    const lastMessage = useSocketStore<SocketMessage>(state =>
         state.getTypedLastMessage('chat_message_llm_return'),
     );
+
     useUpdateEffect(() => {
         if (!lastMessage) return;
         const newMessage = {
@@ -91,22 +126,9 @@ export default memo(props => {
         };
 
         if (listenMessage.length > 0) {
-            setMessages([...messages, newMessage]);
-            setTimeout(() => {
-                messageContainerRef.current?.scrollTo({
-                    top: messageContainerRef.current.scrollHeight,
-                    behavior: 'smooth',
-                });
-            }, 100);
+            setMessages(prev => [...prev, newMessage]);
         }
     }, [listenMessage]);
-
-    useUpdateEffect(() => {
-        messageContainerRef.current?.scrollTo({
-            top: messageContainerRef.current.scrollHeight,
-            behavior: 'smooth',
-        });
-    }, [messages?.length]);
 
     const handleSubmit = async (values: { content: string }) => {
         console.log(values);
@@ -146,21 +168,69 @@ export default memo(props => {
     };
 
     const getMessageHistory = async () => {
-        const res = await getAgentMessageHistory(props.data.detailList.agent.agent_id);
-        console.log(props.data);
-
-        setGettedMessage(true);
-        setMessages(res.data.list);
+        try {
+            setInitialLoading(true);
+            const res = await getAgentMessageHistory(props.data?.detailList?.agent?.agent_id, 1);
+            if (res.data?.list) {
+                setMessages(res.data.list);
+                setHasMoreHistory(res.data.total_pages > 1);
+                setPage(1);
+            }
+        } catch (error) {
+            console.error('Failed to fetch initial messages:', error);
+        } finally {
+            setInitialLoading(false);
+        }
     };
+
+    const fetchHistoryMessages = async () => {
+        if (loading || !props.data?.detailList?.agent?.agent_id) return;
+
+        try {
+            setLoading(true);
+            const nextPage = page + 1;
+            const res = await getAgentMessageHistory(props.data.detailList.agent.agent_id, nextPage);
+
+            if (res.data?.list?.length > 0) {
+                setMessages(prev => [...res.data.list, ...prev]);
+                setPage(nextPage);
+                setHasMoreHistory(nextPage < res.data.total_pages);
+            } else {
+                setHasMoreHistory(false);
+            }
+        } catch (error) {
+            console.error('Failed to load more messages:', error);
+            setHasMoreHistory(false);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        if (props.data?.detailList?.agent?.agent_id && !gettedMessage) {
+        if (props.data?.detailList?.agent?.agent_id) {
             getMessageHistory();
         }
-    }, [props.data.detailList]);
+    }, [props.data?.detailList?.agent?.agent_id]);
+
+    const LoadingIndicator = () => (
+        <div className="flex items-center justify-center py-2 bg-white/80">
+            <Spin size="small" />
+            <span className="ml-2 text-sm text-gray-500">
+                {intl.formatMessage({ id: 'agent.chat.loading.more' })}
+            </span>
+        </div>
+    );
+
+    if (initialLoading) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <Spin />
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col h-full bg-gray-50">
-            {/* Messages Container */}
             <ProForm
                 formRef={formRef}
                 submitter={false}
@@ -175,7 +245,7 @@ export default memo(props => {
                     <ProFormSelect
                         label={intl.formatMessage({ id: 'agent.selectivepower' })}
                         name="ability_id"
-                        options={props.data.abilitiesList}
+                        options={props.data?.abilitiesList}
                         fieldProps={{
                             placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
                         }}
@@ -184,31 +254,38 @@ export default memo(props => {
                         }}
                     />
                 </div>
-                <div
-                    ref={messageContainerRef}
-                    className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[calc(100vh-218px)]"
-                >
-                    {messages.map(message =>
-                        message.agent_run_id === 0 ? (
-                            <UserMessageComponent key={message.id} message={message} />
-                        ) : (
-                            <LLMMessageComponent
-                                key={message.id}
-                                detailList={props?.data?.detailList}
-                                abilitiesList={props?.data?.abilitiesList}
-                                message={message}
-                            />
-                        ),
-                    )}
+                <div className="flex-1 max-h-[calc(100vh-218px)]">
+                    <InfiniteScroll
+                        className="h-full"
+                        onLoadPrevious={fetchHistoryMessages}
+                        hasPrevious={hasMoreHistory}
+                        hasMore={false}
+                        threshold={50}
+                        loadingComponent={<LoadingIndicator />}
+                    >
+                        <div className="px-4 py-2 space-y-4">
+                            {messages.map(message =>
+                                message.agent_run_id === 0 ? (
+                                    <UserMessageComponent key={message.id} message={message} />
+                                ) : (
+                                    <LLMMessageComponent
+                                        key={message.id}
+                                        detailList={props?.data?.detailList}
+                                        abilitiesList={props?.data?.abilitiesList}
+                                        message={message}
+                                    />
+                                ),
+                            )}
+                        </div>
+                    </InfiniteScroll>
                 </div>
 
-                {/* Input Area */}
                 <div className="border-t border-gray-200 bg-white p-4">
                     <div className="flex items-center p-[12px] gap-[10px] box-border border border-[#ccc] bg-[#fff] rounded-[8px]">
                         <div className="flex-1">
                             <ProFormTextArea
                                 name="content"
-                                placeholder="请输入消息..."
+                                placeholder={intl.formatMessage({ id: 'agent.chat.input.placeholder' })}
                                 fieldProps={{
                                     autoSize: { minRows: 1, maxRows: 4 },
                                     variant: 'borderless',
@@ -229,9 +306,9 @@ export default memo(props => {
                         <Button
                             onClick={() => formRef.current?.submit()}
                             type="primary"
-                            className="min-w-[30px] h-[30px]  flex items-center justify-center cursor-pointer rounded-[6px]"
+                            className="min-w-[30px] h-[30px] flex items-center justify-center cursor-pointer rounded-[6px]"
                             icon={<SendOutlined />}
-                        ></Button>
+                        />
                     </div>
                 </div>
             </ProForm>

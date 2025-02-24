@@ -24,6 +24,7 @@ import AgentsFirst from '../components/AgentsFirst';
 import AgentsFourthly from '../components/AgentsFourthly';
 import AgentsSecond from '../components/AgentsSecond';
 import Chat from './Chat';
+import Log from './Log';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -91,10 +92,10 @@ const Agents: React.FC = () => {
             },
         },
         {
-            key: '4',
+            key: '5',
             disabled: agentmenudisabled.fourthly,
             icon: <FileTextOutlined />,
-            label: intl.formatMessage({ id: 'agent.operationrun' }),
+            label:`运行日志`,
             style: {
                 padding: '15px',
                 width: '100%',
@@ -103,7 +104,7 @@ const Agents: React.FC = () => {
                 fontSize: '16px',
                 lineHeight: '22px',
                 fontWeight: '500',
-                color: pageKey == '4' ? '#1B64F3' : '#213044',
+                color: pageKey == '5' ? '#1B64F3' : '#213044',
             },
         },
     ];
@@ -531,7 +532,7 @@ const Agents: React.FC = () => {
                     ) : null}
                 </div>
             </div>
-            <div className="flex-1 grid grid-cols-2">
+            <div className="flex-1 grid grid-cols-2 relative">
                 <Spin spinning={loading} size="large" className="mt-[112px]">
                     <div
                         className="flex flex-col"
@@ -650,6 +651,13 @@ const Agents: React.FC = () => {
                         detailList:Detaillist
                     }}/>
                 </div>
+                {
+                    pageKey == '5' && (
+                        <div className='absolute bottom-0 left-0 right-0 bg-slate-50 w-full h-full z-10'>
+                            <Log></Log>
+                        </div>
+                    )
+                }
             </div>
         </div>
     );

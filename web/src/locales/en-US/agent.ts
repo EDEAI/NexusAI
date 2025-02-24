@@ -161,4 +161,10 @@ export default {
     'error.updateTag': 'Failed to update tag',
     'deleteTag.success': 'Tag deleted successfully',
     'updateTag.success': 'Tag updated successfully',
+
+    // Chat interface
+    'agent.chat.loading.more': 'Loading more messages...',
+    'agent.chat.input.placeholder': 'Type a message...',
+    'agent.chat.error.message': 'Runtime Error',
+    'agent.chat.tokens': 'tokens',
 };

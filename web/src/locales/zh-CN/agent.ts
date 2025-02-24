@@ -160,5 +160,11 @@ export default {
     'error.updateTag': '更新标签失败',
     'deleteTag.success': '标签删除成功',
     'updateTag.success': '标签更新成功',
+
+    // Chat interface
+    'agent.chat.loading.more': '加载更多消息...',
+    'agent.chat.input.placeholder': '请输入消息...',
+    'agent.chat.error.message': '运行错误',
+    'agent.chat.tokens': 'tokens',
 };
 // {intl.formatMessage({ id: 'agent.btn.back' })}

@@ -74,16 +74,21 @@ export const postAgentChatMessage = async (data: any) => {
     return res;
 };
 
-export const getAgentMessageHistory = async (agent_id: string) => {
+export const getAgentMessageHistory = async (agent_id: string,page:number) => {
     const res = await aniRequest<any>(`/v1/agent/${agent_id}/agent_message_list`, {
         method: 'GET',
+        data:{
+            page,
+            page_size:20
+        }
     });
     return res;
 };
 
-export const getAgentLogList = async (agent_id: string) => {
+export const getAgentLogList = async (agent_id: number,data:any) => {
     const res = await aniRequest<any>(`/v1/agent/${agent_id}/agent_log_list`, {
         method: 'GET',
+        data
     });
     return res;
 };
