@@ -130,18 +130,20 @@ class CreateDatasetSchema(BaseModel):
     process_rule_id: int
     data_source_type: int
     indexing_mode: int
+    temporary_chatroom_id: int = 0
 
     model_config = {
         "json_schema_extra": {
             "examples": [
                 {
-                    "name" : "TestName",
-                    "description" : "Description",
-                    "enable_api": "1",
-                    "is_public": "1",
-                    "process_rule_id": "1",
-                    "data_source_type": "1",
-                    "indexing_mode": "2"
+                    "name": "TestName",
+                    "description": "Description",
+                    "enable_api": 1,
+                    "is_public": 1,
+                    "process_rule_id": 1,
+                    "data_source_type": 1,
+                    "indexing_mode": 2,
+                    "temporary_chatroom_id": 123  # optional, default is 0
                 }
             ]
         }

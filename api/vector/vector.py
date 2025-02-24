@@ -149,18 +149,19 @@ async def create_dataset(data: CreateDatasetSchema,userinfo: TokenData = Depends
                 'is_public': is_public,
             }
         )
-        dataset_id = Datasets().insert(
-            {
-                'team_id': team_id,
-                'user_id': user_id,
-                'app_id': app_id,
-                'process_rule_id': process_rule_id,
-                'data_source_type': data_source_type,
-                'collection_name': collection_name,
-                'embedding_model_config_id': embeddings_config_id,
-                'retriever_config': retriever_config_dict
-            }
-        )
+        ds_data = {
+            'team_id': team_id,
+            'user_id': user_id,
+            'app_id': app_id,
+            'process_rule_id': process_rule_id,
+            'data_source_type': data_source_type,
+            'collection_name': collection_name,
+            'embedding_model_config_id': embeddings_config_id,
+            'retriever_config': retriever_config_dict
+        }
+        if data.temporary_chatroom_id != 0:
+            ds_data['temporary_chatroom_id'] = data.temporary_chatroom_id
+        dataset_id = Datasets().insert(ds_data)
     except Exception as e:
         msg = str(e)
         logger.info('create_dataset: %s desc: Request model %s, Current user id %s', msg, user_id)
