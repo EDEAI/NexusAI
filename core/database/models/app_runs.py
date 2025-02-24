@@ -102,8 +102,8 @@ class AppRuns(MySQL):
             {'column': 'app_node_executions.condition_id', 'op': 'is null'},
         ]
 
-        if 'mode'  in data  and data['mode'] != 0:
-            conditions.append({"column": "apps.mode", "value": data['mode']})
+        if data['need_human_confirm'] is not None:
+            conditions.append({"column": "app_node_executions.need_human_confirm", "value": data['need_human_confirm']})
 
         if data['user_id'] > 0:
             conditions.append({"column": "app_node_user_relation.user_id", "value": data['user_id']})
