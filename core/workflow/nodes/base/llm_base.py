@@ -107,7 +107,7 @@ class LLMBaseNode(Node):
                 model_info = models.get_model_by_type(1, userinfo['team_id'], uid=user_id)
                 model_info = models.get_model_by_config_id(model_info['model_config_id'])
                 chatMessageList = truncate_agent_messages_by_token_limit(chat_history, model_info)
-                # self.data["prompt"]
+                
                 messages.add_system_message(Variable(name="text", type="string", value=self.data["prompt"].get_system()))
 
                 for index, chat in enumerate(chatMessageList):
@@ -213,7 +213,7 @@ class LLMBaseNode(Node):
         if model_info["supplier_name"] == "Anthropic":
             messages.reorganize_messages()
 
-        ai_message = llm_pipeline.invoke(messages.to_langchain_format(), input)
+        ai_message = llm_pipeline.invoke(messages.to_langchain_format(not is_chat), input)
         content = ai_message.content
         if return_json:
             content = self.extract_json_from_string(content)

@@ -1075,8 +1075,8 @@ async def agent_log_list(agent_id: int, app_run_id: int, userinfo: TokenData = D
     return response_success(result)
 
 
-@router.post("/{agent_id}/clear_agent_chat_memory", response_model=ClearAgentChatMemory, summary="Clear agent chat memory")
-async def clear_agent_chat_memory(agent_id: int, message_id: int, userinfo: TokenData = Depends(get_current_user)):
+@router.post("/{agent_id}/clear_agent_chat_memory", response_model=ClearAgentChatMemoryReturn, summary="Clear agent chat memory")
+async def clear_agent_chat_memory(data: ClearAgentChatMemory, userinfo: TokenData = Depends(get_current_user)):
     """
     Clear the chat memory for a specific Agent chat.
     This endpoint allows users to clear the chat history of a specific agent chat room,
@@ -1095,6 +1095,8 @@ async def clear_agent_chat_memory(agent_id: int, message_id: int, userinfo: Toke
         - If 'agent_id' is invalid, it indicates that the user has not been authenticated or the agent does not exist.
         - If 'message_id' is invalid, it indicates that the specified message or chat session does not exist.
     """
+    agent_id = data.agent_id
+    message_id = data.message_id
 
     find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
     if not find_agent:
@@ -1221,8 +1223,10 @@ async def get_agent_chatrooms(agent_id: int, page: int = 1, page_size: int = 10,
                               userinfo: TokenData = Depends(get_current_user)):
     """
     Retrieve the list of chat rooms in which the specified agent is present.
+    Only returns chat rooms owned by the current user.
     Supports pagination; if 'all' is True, returns all records.
     """
-    result = Chatrooms().get_chatrooms_by_agent(agent_id, page, page_size, show_all=all)
+    result = Chatrooms().get_chatrooms_by_agent(agent_id, page, page_size, show_all=all, current_user_id=userinfo.uid)
     return response_success(result)
+
 

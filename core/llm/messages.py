@@ -103,7 +103,7 @@ class Messages:
                             str(var_value).replace('{', '{{').replace('}', '}}')
                         )
     
-    def to_langchain_format(self) -> List[Union[Tuple[str, str], HumanMessage]]:
+    def to_langchain_format(self, restrict_max_rounds: bool = True) -> List[Union[Tuple[str, str], HumanMessage]]:
         """
         Converts the Messages object to a list of tuples in the LangChain format, respecting the maximum rounds limit.
         
@@ -114,7 +114,7 @@ class Messages:
         for role, message in reversed(self.messages):
             if role == "ai":
                 rounds += 1
-                if rounds > HISTORY_MESSAGES_MAX_ROUNDS:
+                if restrict_max_rounds and rounds > HISTORY_MESSAGES_MAX_ROUNDS:
                     return result
             if role == "human" and message.type == "file":
                 result.insert(0, self._get_human_message_from_file_variable(message))
