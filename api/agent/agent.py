@@ -1066,7 +1066,10 @@ async def agent_log_details(agent_id: int, app_run_id: int, userinfo: TokenData 
             result['status'] = 2
         elif result_status == 4:
             result['status'] = 3
-    messages = result['model_data']['messages']
+    if result['model_data'] is not None:
+        messages = result['model_data']['messages']
+    else:
+        messages = ''
     del result['model_data']
     result['prompt_data'] = {}
     result['prompt_data'] = messages
