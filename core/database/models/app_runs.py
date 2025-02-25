@@ -101,8 +101,8 @@ class AppRuns(MySQL):
             {'column': 'app_node_executions.correct_output', 'value': 0},
             {'column': 'app_node_executions.condition_id', 'op': 'is null'},
         ]
-
-        if data['need_human_confirm'] is not None:
+        need_human_confirm = data.get('need_human_confirm', None)
+        if need_human_confirm is not None:
             conditions.append({"column": "app_node_executions.need_human_confirm", "value": data['need_human_confirm']})
 
         if data['user_id'] > 0:
