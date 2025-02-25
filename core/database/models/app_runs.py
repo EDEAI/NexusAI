@@ -272,9 +272,9 @@ class AppRuns(MySQL):
         :return: A dictionary containing the list of chat rooms, total count, total pages, current page, and page size.
         """
         conditions = [
-            {"column": "user_id", "value": user_id},
-            {"column": "agent_id", "value": agent_id},
-            {'column': 'status', 'op': 'in', 'value': [3, 4]}
+            {"column": "app_runs.user_id", "value": user_id},
+            {"column": "app_runs.agent_id", "value": agent_id},
+            {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]}
         ]
 
         total_count = self.select_one(
