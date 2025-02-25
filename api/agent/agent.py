@@ -979,7 +979,7 @@ async def agent_message_list(agent_id: int, page: int = 1, page_size: int = 10, 
     return response_success(agent_msg_list)
 
 
-@router.get("/{agent_id}/agent_log_list", response_model=AgentLogListResponse, summary="Agent log list")
+@router.get("/{app_id}/agent_log_list", response_model=AgentLogListResponse, summary="Agent log list")
 async def agent_log_list(app_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of all chat rooms.
@@ -988,7 +988,7 @@ async def agent_log_list(app_id: int, page: int = 1, page_size: int = 10, userin
     Parameters:
     - page (int): The current page number for pagination. Defaults to 1.
     - page_size (int): The number of chat rooms to return per page. Defaults to 10.
-    -Agent_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
+    -app_id (int): A unique identifier used to retrieve the chat message of the app. Compulsory.
     - userinfo (TokenData): Information about the current user, provided through dependency injection. Required.
 
     Returns:
@@ -1008,14 +1008,14 @@ async def agent_log_list(app_id: int, page: int = 1, page_size: int = 10, userin
     return response_success(data)
 
 
-@router.get("/{agent_id}/agent_log_details", response_model=AgentLogDetailResponse, summary="Agent log Details")
+@router.get("/{app_id}/agent_log_details", response_model=AgentLogDetailResponse, summary="Agent log Details")
 async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of all chat rooms.
     This endpoint fetches a paginated list of all available chat rooms, allowing users to optionally filter the results by a name. The pagination is controlled through the page number and page size parameters.
 
     Parameters:
-    - Agent_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
+    - app_id (int): A unique identifier used to retrieve the chat message of the app. Compulsory.
     - app_run_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
     - userinfo (TokenData): Information about the current user, provided through dependency injection. Required.
 
