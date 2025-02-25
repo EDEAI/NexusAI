@@ -256,7 +256,7 @@ class AppRuns(MySQL):
             ]
         )
 
-    def all_agent_log_list(self, page: int = 1, page_size: int = 10, user_id: int = 0, agent_id: int = 0):
+    def all_agent_log_list(self, page: int = 1, page_size: int = 10, user_id: int = 0, agent_id: List[int] = None):
         """
         Retrieves a list of chat rooms with pagination, filtering by user ID and chat room name.
 
@@ -272,14 +272,24 @@ class AppRuns(MySQL):
         :return: A dictionary containing the list of chat rooms, total count, total pages, current page, and page size.
         """
         conditions = [
-            {"column": "app_runs.user_id", "value": user_id},
-            {"column": "app_runs.agent_id", "value": agent_id},
+            # {"column": "app_runs.user_id", "value": user_id},
+
+            [
+                {"column": "apps.user_id", "value": user_id, 'logic': 'or'},
+                {"column": "app_runs.user_id", "value": user_id}
+            ],
+            # {"column": "app_runs.agent_id", "value": agent_id},
+            {"column": "app_runs.agent_id", 'op': 'in', 'value': agent_id},
             {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]}
         ]
 
         total_count = self.select_one(
             aggregates={"id": "count"},
             conditions=conditions,
+            joins=[
+                ["left", "apps", 'apps.id = app_runs.app_id'],
+                ["left", "users", "users.id = app_runs.user_id"]
+            ]
         )["count_id"]
 
         app_run_list = []
@@ -287,6 +297,7 @@ class AppRuns(MySQL):
             app_run_list = self.select(
                 columns=['users.nickname as nickname', 'app_runs.id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.agent_id', 'app_runs.workflow_id', 'app_runs.dataset_id', 'app_runs.tool_id', 'app_runs.chatroom_id', 'app_runs.type', 'app_runs.name', 'app_runs.graph', 'app_runs.inputs', 'app_runs.raw_user_prompt', 'app_runs.knowledge_base_mapping', 'app_runs.level', 'app_runs.context', 'app_runs.completed_edges', 'app_runs.skipped_edges', 'app_runs.status', 'app_runs.completed_steps', 'app_runs.actual_completed_steps', 'app_runs.need_human_confirm', 'app_runs.need_correct_llm', 'app_runs.error', 'app_runs.outputs', 'app_runs.elapsed_time', 'app_runs.prompt_tokens', 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens', 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.updated_time', 'app_runs.finished_time'],
                 joins=[
+                    ["left", "apps", 'apps.id = app_runs.app_id'],
                     ["left", "users", "users.id = app_runs.user_id"]
                 ],
                 conditions=conditions,

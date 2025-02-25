@@ -980,7 +980,7 @@ async def agent_message_list(agent_id: int, page: int = 1, page_size: int = 10, 
 
 
 @router.get("/{agent_id}/agent_log_list", response_model=AgentLogListResponse, summary="Agent log list")
-async def agent_log_list(agent_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
+async def agent_log_list(app_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of all chat rooms.
     This endpoint fetches a paginated list of all available chat rooms, allowing users to optionally filter the results by a name. The pagination is controlled through the page number and page size parameters.
@@ -997,20 +997,19 @@ async def agent_log_list(agent_id: int, page: int = 1, page_size: int = 10, user
     Raises:
     - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
     """
-    find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
+    find_agent = Agents().get_app_by_id_agent_info(app_id, userinfo.uid)
     if not find_agent:
         return response_error(get_language_content("agent_does_not_exist"))
-
     data = AppRuns().all_agent_log_list(
         page=page,
         page_size=page_size,
         user_id=userinfo.uid,
-        agent_id=agent_id)
+        agent_id=find_agent)
     return response_success(data)
 
 
 @router.get("/{agent_id}/agent_log_details", response_model=AgentLogDetailResponse, summary="Agent log Details")
-async def agent_log_details(agent_id: int, app_run_id: int, userinfo: TokenData = Depends(get_current_user)):
+async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of all chat rooms.
     This endpoint fetches a paginated list of all available chat rooms, allowing users to optionally filter the results by a name. The pagination is controlled through the page number and page size parameters.
@@ -1026,17 +1025,11 @@ async def agent_log_details(agent_id: int, app_run_id: int, userinfo: TokenData 
     Raises:
     - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
     """
-    find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
-    if not find_agent:
-        return response_error(get_language_content("agent_does_not_exist"))
+    find_app = Apps().get_app_by_id(app_id)
+    if find_app is None:
+        return response_error(get_language_content("api_agent_info_app_error"))
 
     result = AppRuns().select_one(
-        # columns=['id', 'user_id', 'app_id', 'agent_id', 'workflow_id', 'dataset_id', 'tool_id', 'chatroom_id', 'type',
-        #          'name', 'graph', 'inputs', 'raw_user_prompt', 'knowledge_base_mapping', 'level',
-        #          'context', 'completed_edges', 'skipped_edges', 'status', 'completed_steps', 'actual_completed_steps',
-        #          'need_human_confirm', 'need_correct_llm', 'error', 'outputs', 'elapsed_time', 'prompt_tokens',
-        #          'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps',
-        #          'created_time', 'updated_time', 'finished_time'],
         columns=['users.nickname as nickname', 'app_runs.id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.agent_id',
                  'app_runs.workflow_id', 'app_runs.dataset_id', 'app_runs.tool_id', 'app_runs.chatroom_id',
                  'app_runs.type', 'app_runs.name', 'app_runs.graph', 'app_runs.inputs', 'app_runs.raw_user_prompt',
@@ -1051,7 +1044,7 @@ async def agent_log_details(agent_id: int, app_run_id: int, userinfo: TokenData 
             ["left", "users", "users.id = app_runs.user_id"]
         ],
         conditions=[
-            {"column": "app_runs.agent_id", "value": agent_id},
+            {"column": "app_runs.app_id", "value": app_id},
             {"column": "app_runs.user_id", "value": userinfo.uid},
             {"column": "app_runs.id", "value": app_run_id},
             {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]}
@@ -1067,7 +1060,18 @@ async def agent_log_details(agent_id: int, app_run_id: int, userinfo: TokenData 
         elif result_status == 4:
             result['status'] = 3
     if result['model_data'] is not None:
-        messages = result['model_data']['messages']
+        find_app_user = Apps().select_one(
+            columns=['id'],
+            conditions=[
+                {'column': 'id', 'value': app_id},
+                {'column': 'status', 'value': 1},
+                {'column': 'user_id', 'value': userinfo.uid}
+            ]
+        )
+        if find_app_user is None:
+            messages = ''
+        else:
+            messages = result['model_data']['messages']
     else:
         messages = ''
     del result['model_data']

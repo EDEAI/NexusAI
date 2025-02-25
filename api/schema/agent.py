@@ -290,6 +290,8 @@ class AgentChatMessage(BaseModel):
 
 class ResAgentInfoSchemaUpdate(BaseModel):
     data: Dict[str, Any]
+    detail: Optional[str] = None
+    data: Dict[str, Any]
 
 
 class AgentChatMessage(BaseModel):
@@ -300,6 +302,8 @@ class AgentChatMessage(BaseModel):
 
 
 class ResAgentRunSchemaReturn(BaseModel):
+    data: Dict[str, Any]
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 class ChatRoomData(BaseModel):
