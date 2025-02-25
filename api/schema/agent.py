@@ -259,22 +259,32 @@ class ResBatchAgentCreateSchema(BaseModel):
 
 
 class AgentResponseBase(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 
 class AgentLogListResponse(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 
 class AgentLogDetailResponse(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 
 class ClearAgentChatMemoryReturn(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 
 class AgentChatMessage(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 

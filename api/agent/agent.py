@@ -1001,16 +1001,16 @@ async def agent_log_list(agent_id: int, page: int = 1, page_size: int = 10, user
     if not find_agent:
         return response_error(get_language_content("agent_does_not_exist"))
 
-    result = AppRuns().all_agent_log_list(
+    data = AppRuns().all_agent_log_list(
         page=page,
         page_size=page_size,
         user_id=userinfo.uid,
         agent_id=agent_id)
-    return response_success(result)
+    return response_success(data)
 
 
 @router.get("/{agent_id}/agent_log_details", response_model=AgentLogDetailResponse, summary="Agent log Details")
-async def agent_log_list(agent_id: int, app_run_id: int, userinfo: TokenData = Depends(get_current_user)):
+async def agent_log_details(agent_id: int, app_run_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of all chat rooms.
     This endpoint fetches a paginated list of all available chat rooms, allowing users to optionally filter the results by a name. The pagination is controlled through the page number and page size parameters.
@@ -1051,10 +1051,10 @@ async def agent_log_list(agent_id: int, app_run_id: int, userinfo: TokenData = D
             ["left", "users", "users.id = app_runs.user_id"]
         ],
         conditions=[
-            {"column": "agent_id", "value": agent_id},
-            {"column": "user_id", "value": userinfo.uid},
-            {"column": "id", "value": app_run_id},
-            {'column': 'status', 'op': 'in', 'value': [3, 4]}
+            {"column": "app_runs.agent_id", "value": agent_id},
+            {"column": "app_runs.user_id", "value": userinfo.uid},
+            {"column": "app_runs.id", "value": app_run_id},
+            {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]}
         ]
     )
 
