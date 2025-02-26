@@ -305,7 +305,12 @@ server {
 
     location /tool_icon {
         alias NexusAI/assets/tool; # Fill in the real path of the project
-        try_files $uri $uri/ =404;
+
+        if ($request_filename ~ "/$|/[^\.]+$") {
+            return 403;
+        }
+
+        try_files $uri =404;
     }
 }
 
@@ -314,7 +319,14 @@ server {
 
     location /file {
         alias NexusAI/storage; # Fill in the real path of the project
-        try_files $uri $uri/ =404;
+
+        if ($request_filename ~ "/$|/[^\.]+$") {
+            return 403;
+        }
+
+        add_header Content-Disposition "attachment";
+
+        try_files $uri =404;
     }
 }
 ```
