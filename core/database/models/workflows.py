@@ -163,8 +163,7 @@ class Workflows(MySQL):
                 "users.nickname", 
                 "users.avatar", 
                 "apps.icon_background",
-                "apps.icon",
-                "workflows.published_time AS workflow_published_time"
+                "apps.icon"
                 ],
             joins=[
                 ["left", "apps", "workflows.app_id = apps.id"],
@@ -176,6 +175,17 @@ class Workflows(MySQL):
             offset=(page - 1) * page_size
         )
 
+        for item in list:
+            if item['publish_status'] == 1:
+                workflow_info = self.select_one(
+                    columns=["published_time"],
+                    conditions=[
+                        {"column": "app_id", "value": item['app_id']},
+                        {"column": "publish_status", "value": 1}
+                    ]
+                )
+                item['workflow_published_time'] = workflow_info['published_time'] if workflow_info else None
+        
         return {
             "list": list,
             "total_count": total_count,
