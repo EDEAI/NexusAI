@@ -646,7 +646,7 @@ const Agents: React.FC = () => {
                     </div>
                 </Spin>
                 <div>
-                    <Chat data={{
+                    <Chat operationbentate={Operationbentate}  data={{
                         abilitiesList:Fourthly_abilities_list,
                         detailList:Detaillist
                     }}/>
@@ -654,7 +654,7 @@ const Agents: React.FC = () => {
                 {
                     pageKey == '5' && (
                         <div className='absolute bottom-0 left-0 right-0 bg-slate-50 w-full h-full z-10'>
-                            <Log></Log>
+                            <Log agent_id={Detaillist.agent.agent_id}></Log>
                         </div>
                     )
                 }

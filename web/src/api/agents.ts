@@ -85,15 +85,15 @@ export const getAgentMessageHistory = async (agent_id: string,page:number) => {
     return res;
 };
 
-export const getAgentLogList = async (agent_id: number,data:any) => {
-    const res = await aniRequest<any>(`/v1/agent/${agent_id}/agent_log_list`, {
+export const getAgentLogList = async (app_id: string,data:any) => {
+    const res = await aniRequest<any>(`/v1/agent/${app_id}/agent_log_list`, {
         method: 'GET',
         data
     });
     return res;
 };
-export const getAgentLogDetail = async (agent_id: string, app_run_id: string) => {
-    const res = await aniRequest<any>(`/v1/agent/${agent_id}/agent_log_list`, {
+export const getAgentLogDetail = async (app_id: string, app_run_id: string) => {
+    const res = await aniRequest<any>(`/v1/agent/${app_id}/agent_log_details`, {
         method: 'GET',
         data: {
             app_run_id,
@@ -101,9 +101,13 @@ export const getAgentLogDetail = async (agent_id: string, app_run_id: string) =>
     });
     return res;
 };
-export const clearAgentMessageMemory = async (agent_id: string, app_run_id: string) => {
+export const clearAgentMessageMemory = async (agent_id: string, message_id: number) => {
     const res = await aniRequest<any>(`/v1/agent/${agent_id}/clear_agent_chat_memory`, {
         method: 'POST',
+        data: {
+            message_id,
+            agent_id,
+        },
     });
     return res;
 };

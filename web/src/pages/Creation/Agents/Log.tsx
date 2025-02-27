@@ -3,7 +3,8 @@ import useUserStore from '@/store/user';
 import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { useIntl, useSearchParams } from '@umijs/max';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import LogDetail from './LogDetail';
 export const waitTimePromise = async (time: number = 100) => {
     return new Promise(resolve => {
         setTimeout(() => {
@@ -30,10 +31,32 @@ type GithubIssueItem = {
     created_at: string;
     updated_at: string;
     closed_at?: string;
+    agent_id?: number;
+    status?: number;
+    nickname?: string;
+    elapsed_time?: string;
+    total_tokens?: number;
+    created_time?: string;
 };
 
-export default () => {
+export default ({agent_id}:{agent_id:number}) => {
     const intl = useIntl();
+    const [searchParams] = useSearchParams();
+    const formRef = useRef(null);
+    const [logDetail, setLogDetail] = useState<any>(null);
+    const [showLogDetail, setShowLogDetail] = useState(false);
+    const appId = searchParams.get('app_id');
+    const handleCloseLogDetail = () => {
+        setShowLogDetail(false);
+    };
+
+    const handleViewLogDetail = (record: GithubIssueItem) => {
+        setLogDetail({
+            app_id: appId,
+            app_run_id: record.id,
+        });
+        setShowLogDetail(true);
+    };
 
     const columns: ProColumns<GithubIssueItem>[] = [
         {
@@ -49,11 +72,7 @@ export default () => {
             // onFilter: true,
             ellipsis: true,
             // valueType: 'select',
-            fieldProps: {
-                onChange: value => {
-                    formRef?.current?.submit();
-                },
-            },
+            search: false,
 
             valueEnum: {
                 1: {
@@ -70,7 +89,7 @@ export default () => {
                 },
             },
         },
-     
+
         {
             title: intl.formatMessage({ id: 'workflow.created_time', defaultMessage: '' }),
             dataIndex: 'created_time',
@@ -115,74 +134,70 @@ export default () => {
     ];
 
     // const actionRef = useRef<ActionType>();
-    const [searchParams] = useSearchParams();
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
-    const appId = searchParams.get('app_id');
-    const formRef = useRef(null);
+   
     return (
-        <ProTable<GithubIssueItem>
-            columns={columns}
-            formRef={formRef}
-            // actionRef={actionRef}
-            form={{
-                submitter: false,
-            }}
-            cardBordered
-            request={async (params, sort, filter) => {
-                console.log(params, sort, filter);
+        <div className='h-full'>
+            <ProTable
+                columns={columns}
+                formRef={formRef}
+                // actionRef={actionRef}
+                form={{
+                    submitter: false,
+                }}
+                cardBordered
+                style={{ height: 'calc(100% - 20px)' }}
+                scroll={{ y: 'calc(100vh - 230px)' }}
+                request={async (params, sort, filter) => {
+                    console.log(params, sort, filter);
 
-                const res = await getAgentLogList(3428, {
-                    page: params.current,
-                    page_size: params.pageSize,
-                });
-                console.log(res);
-                // const uniqueData = _.uniqBy(res.data.list, 'app_runs_id');
-                return {
-                    data: res.data.list,
-                    success: true,
-                    total: res.data.total_count,
-                };
-            }}
-            onRow={record => {
-                return {
-                    onClick: () => {
-                        console.log('Row clicked:', record);
-                        setRunPanelLogRecord(record);
+                    const res = await getAgentLogList(appId, {
+                        page: params.current,
+                        page_size: params.pageSize,
+                        // app_id: appId,
+                    });
+                    console.log(res);
+                    // const uniqueData = _.uniqBy(res.data.list, 'app_runs_id');
+                    return {
+                        data: res.data.list,
+                        success: true,
+                        total: res.data.total_count,
+                    };
+                }}
+                onRow={record => {
+                    return {
+                        onClick: () => {
+                            handleViewLogDetail(record);
+                        },
+                        className: logDetail?.app_run_id === record.id ? 'bg-blue-50' : '',
+                    };
+                }}
+                editable={{
+                    type: 'multiple',
+                }}
+                rowKey="app_runs_id"
+                search={false}
+                options={{
+                    search: false,
+                    setting: {
+                        listsHeight: 600,
                     },
-                };
-            }}
-            editable={{
-                type: 'multiple',
-            }}
-            // columnsState={{
-            //     persistenceKey: 'pro-table-singe-demos',
-            //     persistenceType: 'localStorage',
-            //     defaultValue: {
-            //         option: { fixed: 'right', disable: true },
-            //     },
-            //     onChange(value) {
-            //         console.log('value: ', value);
-            //     },
-            // }}
-            rowKey="app_runs_id"
-            search={{
-                labelWidth: 'auto',
-            }}
-            options={{
-                setting: {
-                    listsHeight: 600,
-                },
-            }}
-            pagination={{
-                pageSize: 12,
-                showSizeChanger: false,
-                // onChange: (page) => console.log(page),
-            }}
-            dateFormatter="string"
-            headerTitle={intl.formatMessage({
-                id: 'workflow.workflowLog',
-                defaultMessage: '',
-            })}
-        />
+                }}
+                pagination={{
+                    pageSize: 20,
+                    showSizeChanger: false,
+                }}
+                dateFormatter="string"
+                headerTitle={intl.formatMessage({ id: 'agent.log.list' })}
+            />
+            {
+                showLogDetail && logDetail?.app_id && logDetail?.app_run_id && (
+                    <LogDetail 
+                        data={logDetail} 
+                        onClose={handleCloseLogDetail} 
+                    />
+                )
+            }
+        </div>
     );
 };

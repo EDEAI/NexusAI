@@ -55,6 +55,7 @@ export default () => {
             title: intl.formatMessage({ id: 'workflow.created_time', defaultMessage: '' }),
             dataIndex: 'created_time',
             ellipsis: true,
+            width: 180,
             tooltip: intl.formatMessage({
                 id: 'workflow.created_time_des',
                 defaultMessage: intl.formatMessage({
@@ -72,6 +73,7 @@ export default () => {
             filters: true,
             onFilter: true,
             ellipsis: true,
+            width: 120,
             valueType: 'select',
             fieldProps: {
                 onChange: value => {
@@ -101,9 +103,9 @@ export default () => {
             })}S`,
             dataIndex: 'elapsed_time',
             ellipsis: true,
+            width: 100,
             tooltip: intl.formatMessage({
                 id: 'workflow.run_time',
-
             }),
             search: false,
         },
@@ -112,13 +114,15 @@ export default () => {
             title: 'Tokens',
             key: 'showTime',
             dataIndex: 'total_tokens',
-
+            width: 100,
             hideInSearch: true,
         },
         {
             title: intl.formatMessage({ id: 'workflow.user' }),
             dataIndex: 'nickname',
             search: false,
+            width: 120,
+            ellipsis: true,
             key: 'user',
         },
     ];
@@ -129,72 +133,77 @@ export default () => {
     const appId = searchParams.get('app_id');
     const formRef = useRef(null);
     return (
-        <ProTable<GithubIssueItem>
-            columns={columns}
-            formRef={formRef}
-            // actionRef={actionRef}
-            form={{
-                submitter: false,
-            }}
-            cardBordered
-            request={async (params, sort, filter) => {
-                console.log(params, sort, filter);
+        <div className="h-full w-screen pl-[60px] box-border">
+            <div>
+                <ProTable<GithubIssueItem>
+                    columns={columns}
+                    formRef={formRef}
+                    // actionRef={actionRef}
+                    form={{
+                        submitter: false,
+                    }}
+                    cardBordered
+                    style={{ height: 'calc(100% - 20px)' }}
+                    scroll={{ y: 'calc(100vh - 380px)', x: '100%' }}
+                    request={async (params, sort, filter) => {
+                        console.log(params, sort, filter);
 
-                const res = await getWorkFlowLogList({
-                    app_runs_name: '',
-                    app_runs_status: 0,
-                    ...params,
-                    app_id: appId,
-                });
-                console.log(res);
-                // const uniqueData = _.uniqBy(res.data.list, 'app_runs_id');
-                return {
-                    data: res.data.list,
-                    success: true,
-                    total: res.data.total_count,
-                };
-            }}
-            onRow={record => {
-                return {
-                    onClick: () => {
-                        console.log('Row clicked:', record);
-                        setRunPanelLogRecord(record);
-
-                    },
-                };
-            }}
-            editable={{
-                type: 'multiple',
-            }}
-            // columnsState={{
-            //     persistenceKey: 'pro-table-singe-demos',
-            //     persistenceType: 'localStorage',
-            //     defaultValue: {
-            //         option: { fixed: 'right', disable: true },
-            //     },
-            //     onChange(value) {
-            //         console.log('value: ', value);
-            //     },
-            // }}
-            rowKey="app_runs_id"
-            search={{
-                labelWidth: 'auto',
-            }}
-            options={{
-                setting: {
-                    listsHeight: 600,
-                },
-            }}
-            pagination={{
-                pageSize: 12,
-                showSizeChanger: false,
-                // onChange: (page) => console.log(page),
-            }}
-            dateFormatter="string"
-            headerTitle={intl.formatMessage({
-                id: 'workflow.workflowLog',
-                defaultMessage: '',
-            })}
-        />
+                        const res = await getWorkFlowLogList({
+                            app_runs_name: '',
+                            app_runs_status: 0,
+                            ...params,
+                            app_id: appId,
+                        });
+                        console.log(res);
+                        // const uniqueData = _.uniqBy(res.data.list, 'app_runs_id');
+                        return {
+                            data: res.data.list,
+                            success: true,
+                            total: res.data.total_count,
+                        };
+                    }}
+                    onRow={record => {
+                        return {
+                            onClick: () => {
+                                console.log('Row clicked:', record);
+                                setRunPanelLogRecord(record);
+                            },
+                        };
+                    }}
+                    editable={{
+                        type: 'multiple',
+                    }}
+                    // columnsState={{
+                    //     persistenceKey: 'pro-table-singe-demos',
+                    //     persistenceType: 'localStorage',
+                    //     defaultValue: {
+                    //         option: { fixed: 'right', disable: true },
+                    //     },
+                    //     onChange(value) {
+                    //         console.log('value: ', value);
+                    //     },
+                    // }}
+                    rowKey="app_runs_id"
+                    search={{
+                        labelWidth: 'auto',
+                    }}
+                    options={{
+                        setting: {
+                            listsHeight: 600,
+                        },
+                    }}
+                    pagination={{
+                        pageSize: 12,
+                        showSizeChanger: false,
+                        // onChange: (page) => console.log(page),
+                    }}
+                    dateFormatter="string"
+                    headerTitle={intl.formatMessage({
+                        id: 'workflow.workflowLog',
+                        defaultMessage: '',
+                    })}
+                />
+            </div>
+        </div>
     );
 };

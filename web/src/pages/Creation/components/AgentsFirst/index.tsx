@@ -403,7 +403,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     placeholder={intl.formatMessage({
                                                         id: 'agent.variable.name',
                                                     })}
-                                                    className="w-48 mr-5"
+                                                    className="mr-5"
                                                 />
                                             </Form.Item>
                                             <Form.Item
@@ -423,7 +423,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     placeholder={intl.formatMessage({
                                                         id: 'agent.variable.display',
                                                     })}
-                                                    className="w-52 mr-5"
+                                                    className="mr-5"
                                                 />
                                             </Form.Item>
                                             <Form.Item

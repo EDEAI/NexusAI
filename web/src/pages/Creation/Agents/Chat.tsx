@@ -1,17 +1,24 @@
 /*
  * @LastEditors: biz
  */
-import { getAgentMessageHistory, postAgentChatMessage } from '@/api/agents';
+import {
+    clearAgentMessageMemory,
+    getAgentMessageHistory,
+    postAgentChatMessage,
+    PutagentPublish,
+} from '@/api/agents';
+import InfiniteScroll from '@/components/common/InfiniteScroll';
 import { createPromptFromObject } from '@/py2js/prompt.js';
 import useSocketStore from '@/store/websocket';
-import { SendOutlined } from '@ant-design/icons';
+import { DeleteOutlined, SendOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm, ProFormSelect, ProFormTextArea } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Button, Spin } from 'antd';
+import { Button, message, Spin, Modal } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
-import InfiniteScroll from '@/components/common/InfiniteScroll';
+import ReactMarkdown from 'react-markdown';
+import rehypeHighlight from 'rehype-highlight';
 
 interface SocketMessage {
     data: {
@@ -74,14 +81,21 @@ const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: Messag
         <div className="flex justify-start pb-4">
             <div>
                 <div className="text-sm font-bold mb-2">
-                    {detailList?.app?.name}
-                    {
-                        ability?.label&&
-                        <span className='text-gray-500 font-normal text-xs'>({ability?.label})</span>
-                    }
+                    {detailList?.app?.name}{' '}
+                    {ability?.label && (
+                        <span className="text-gray-500 font-normal text-xs">
+                            ({ability?.label})
+                        </span>
+                    )}
                 </div>
-                <div className="max-w-[70%] rounded-lg  relative bg-white text-gray-900 border border-gray-200">
-                    {message.message && <div className="p-3">{message.message}</div>}
+                <div className="max-w-[90%] rounded-lg  relative bg-white text-gray-900 border border-gray-200">
+                    {message.message && (
+                        <div className="p-3">
+                            <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                                {message.message}
+                            </ReactMarkdown>
+                        </div>
+                    )}
                     {message.error && (
                         <div className="p-3 text-red-500">
                             <div>{intl.formatMessage({ id: 'agent.chat.error.message' })}</div>
@@ -108,8 +122,11 @@ export default memo(props => {
     const [hasMoreHistory, setHasMoreHistory] = useState(true);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [clearingMemory, setClearingMemory] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
     const formRef = useRef<ProFormInstance>();
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
     const intl = useIntl();
     const listenMessage = useSocketStore<SocketMessage[]>(state =>
         state.getTypedMessages('chat_message_llm_return'),
@@ -117,6 +134,10 @@ export default memo(props => {
     const lastMessage = useSocketStore<SocketMessage>(state =>
         state.getTypedLastMessage('chat_message_llm_return'),
     );
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
     useUpdateEffect(() => {
         if (!lastMessage) return;
@@ -127,6 +148,7 @@ export default memo(props => {
 
         if (listenMessage.length > 0) {
             setMessages(prev => [...prev, newMessage]);
+            setTimeout(scrollToBottom, 100);
         }
     }, [listenMessage]);
 
@@ -163,8 +185,9 @@ export default memo(props => {
             prompt,
         });
         setMessages([...messages, newMessage]);
-
         formRef.current?.resetFields(['content']);
+
+        setTimeout(scrollToBottom, 100);
     };
 
     const getMessageHistory = async () => {
@@ -189,7 +212,10 @@ export default memo(props => {
         try {
             setLoading(true);
             const nextPage = page + 1;
-            const res = await getAgentMessageHistory(props.data.detailList.agent.agent_id, nextPage);
+            const res = await getAgentMessageHistory(
+                props.data.detailList.agent.agent_id,
+                nextPage,
+            );
 
             if (res.data?.list?.length > 0) {
                 setMessages(prev => [...res.data.list, ...prev]);
@@ -206,11 +232,44 @@ export default memo(props => {
         }
     };
 
+    const handleClearMemory = async () => {
+        if (!props.data?.detailList?.agent?.agent_id || clearingMemory) return;
+
+        Modal.confirm({
+            title: intl.formatMessage({ id: 'agent.chat.clear.memory.confirm.title' }),
+            icon: <ExclamationCircleFilled />,
+            content: intl.formatMessage({ id: 'agent.chat.clear.memory.confirm.content' }),
+            okText: intl.formatMessage({ id: 'agent.chat.clear.memory.confirm.ok' }),
+            cancelText: intl.formatMessage({ id: 'agent.chat.clear.memory.confirm.cancel' }),
+            onOk: async () => {
+                try {
+                    setClearingMemory(true);
+                    await clearAgentMessageMemory(
+                        props.data.detailList.agent.agent_id,
+                        messages[messages.length - 1].id,
+                    );
+                    // setMessages([]);
+                    message.success(intl.formatMessage({ id: 'agent.chat.clear.memory.success' }));
+                } catch (error) {
+                    console.error('Failed to clear context memory:', error);
+                } finally {
+                    setClearingMemory(false);
+                }
+            },
+        });
+    };
+
     useEffect(() => {
         if (props.data?.detailList?.agent?.agent_id) {
             getMessageHistory();
         }
     }, [props.data?.detailList?.agent?.agent_id]);
+
+    useEffect(() => {
+        if (!initialLoading && messages.length > 0) {
+            scrollToBottom();
+        }
+    }, [initialLoading]);
 
     const LoadingIndicator = () => (
         <div className="flex items-center justify-center py-2 bg-white/80">
@@ -228,9 +287,17 @@ export default memo(props => {
             </div>
         );
     }
+    const agentPublish = async () => {
+        const res = await PutagentPublish(props.data?.detailList?.agent?.agent_id);
 
+        if (res.code == 0) {
+            message.success(intl.formatMessage({ id: 'agent.message.success.publish' }));
+        } else {
+            message.error(intl.formatMessage({ id: 'agent.message.fail.publish' }));
+        }
+    };
     return (
-        <div className="flex flex-col h-full bg-gray-50">
+        <div className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border">
             <ProForm
                 formRef={formRef}
                 submitter={false}
@@ -239,9 +306,14 @@ export default memo(props => {
                 initialValues={{
                     ability_id: 0,
                 }}
-                className="m-0 h-full flex flex-col"
+                style={{
+                    height: 'calc(100vh - 57px - 16px)',
+                }}
+                className="m-0 flex flex-col overflow-y-auto "
             >
-                <div className="p-5">
+                <div className="pb-4 flex gap-[10px]" style={{
+                    paddingBottom:'16px'
+                }}>
                     <ProFormSelect
                         label={intl.formatMessage({ id: 'agent.selectivepower' })}
                         name="ability_id"
@@ -250,68 +322,98 @@ export default memo(props => {
                             placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
                         }}
                         formItemProps={{
-                            className: 'mb-0',
+                            className: 'mb-0 flex-1',
                         }}
                     />
-                </div>
-                <div className="flex-1 max-h-[calc(100vh-218px)]">
-                    <InfiniteScroll
-                        className="h-full"
-                        onLoadPrevious={fetchHistoryMessages}
-                        hasPrevious={hasMoreHistory}
-                        hasMore={false}
-                        threshold={50}
-                        loadingComponent={<LoadingIndicator />}
+                    <Button
+                        type="primary"
+                        disabled={props.operationbentate == 'false' ? false : true}
+                        onClick={agentPublish}
+                        className=' min-w-40'
                     >
-                        <div className="px-4 py-2 space-y-4">
-                            {messages.map(message =>
-                                message.agent_run_id === 0 ? (
-                                    <UserMessageComponent key={message.id} message={message} />
-                                ) : (
-                                    <LLMMessageComponent
-                                        key={message.id}
-                                        detailList={props?.data?.detailList}
-                                        abilitiesList={props?.data?.abilitiesList}
-                                        message={message}
-                                    />
-                                ),
-                            )}
-                        </div>
-                    </InfiniteScroll>
+                        {intl.formatMessage({ id: 'agent.publish' })}
+                    </Button>
                 </div>
+                <div className='bg-gray-50 rounded-md border border-[#ccc] flex-1 overflow-y-auto flex flex-col'>
+                    <div
+                        className="flex-1 overflow-y-auto "
+                        ref={chatContainerRef}
+                    >
+                        <InfiniteScroll
+                            className="h-full"
+                            onLoadPrevious={fetchHistoryMessages}
+                            hasPrevious={hasMoreHistory}
+                            hasMore={false}
+                            threshold={50}
+                            loadingComponent={<LoadingIndicator />}
+                        >
+                            <div className="px-4 py-2 space-y-4">
+                                {messages.map(message =>
+                                    message.agent_run_id === 0 ? (
+                                        <UserMessageComponent key={message.id} message={message} />
+                                    ) : (
+                                        <LLMMessageComponent
+                                            key={message.id}
+                                            detailList={props?.data?.detailList}
+                                            abilitiesList={props?.data?.abilitiesList}
+                                            message={message}
+                                        />
+                                    ),
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
+                        </InfiniteScroll>
+                    </div>
 
-                <div className="border-t border-gray-200 bg-white p-4">
-                    <div className="flex items-center p-[12px] gap-[10px] box-border border border-[#ccc] bg-[#fff] rounded-[8px]">
-                        <div className="flex-1">
-                            <ProFormTextArea
-                                name="content"
-                                placeholder={intl.formatMessage({ id: 'agent.chat.input.placeholder' })}
-                                fieldProps={{
-                                    autoSize: { minRows: 1, maxRows: 4 },
-                                    variant: 'borderless',
-                                    onPressEnter: e => {
-                                        if (!e.shiftKey) {
-                                            e.preventDefault();
-                                            formRef.current?.submit();
-                                        }
-                                    },
-                                    className: '',
-                                }}
-                                formItemProps={{
-                                    className: 'mb-0',
-                                }}
-                                className="mb-0"
+                    <div className="border-t border-gray-200  p-4 relative">
+                        <div
+                            style={{
+                                top: '-40px',
+                            }}
+                            className="flex items-center mb-2 justify-end absolute !-top-10 right-3"
+                        >
+                            <Button
+                                icon={<DeleteOutlined />}
+                                loading={clearingMemory}
+                                onClick={handleClearMemory}
+                            >
+                                {intl.formatMessage({ id: 'agent.chat.clear.memory' })}
+                            </Button>
+                        </div>
+                        <div className="flex items-center p-[12px] gap-[10px] box-border border bg-white rounded-[8px]">
+                            <div className="flex-1">
+                                <ProFormTextArea
+                                    name="content"
+                                    placeholder={intl.formatMessage({
+                                        id: 'agent.chat.input.placeholder',
+                                    })}
+                                    fieldProps={{
+                                        autoSize: { minRows: 1, maxRows: 4 },
+                                        variant: 'borderless',
+                                        onPressEnter: e => {
+                                            if (!e.shiftKey) {
+                                                e.preventDefault();
+                                                formRef.current?.submit();
+                                            }
+                                        },
+                                        className: '',
+                                    }}
+                                    formItemProps={{
+                                        className: 'mb-0',
+                                    }}
+                                    className="mb-0"
+                                />
+                            </div>
+                            <Button
+                                onClick={() => formRef.current?.submit()}
+                                type="primary"
+                                className="min-w-[30px] h-[30px] flex items-center justify-center cursor-pointer rounded-[6px]"
+                                icon={<SendOutlined />}
                             />
                         </div>
-                        <Button
-                            onClick={() => formRef.current?.submit()}
-                            type="primary"
-                            className="min-w-[30px] h-[30px] flex items-center justify-center cursor-pointer rounded-[6px]"
-                            icon={<SendOutlined />}
-                        />
                     </div>
                 </div>
             </ProForm>
-        </div>
-    );
-});
+            </div>
+        );
+    });
