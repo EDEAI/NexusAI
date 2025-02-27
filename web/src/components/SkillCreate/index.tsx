@@ -13,6 +13,7 @@ import {
     SaveOutlined,
     SendOutlined,
     ToolOutlined,
+    WarningOutlined,
 } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { useLatest, useSetState, useUpdateEffect } from 'ahooks';
@@ -64,8 +65,18 @@ const SkillCreate = memo(() => {
                         }));
                     }}
                     title={
-                        <div>
-                            python3 <EditOutlined></EditOutlined>
+                        <div >
+                            python3  <Tooltip
+                                title={`${intl.formatMessage({ id: 'customcode.notice.title' })}:
+
+                                ${intl.formatMessage({ id: 'customcode.notice.file.write' })}：
+                                ${intl.formatMessage({ id: 'customcode.notice.file.write.desc' })}
+                                ${intl.formatMessage({ id: 'customcode.notice.file.write.example' })}
+                                
+                                ${intl.formatMessage({ id: 'customcode.notice.file.return' })}：
+                                ${intl.formatMessage({ id: 'customcode.notice.file.return.desc' })}
+                                ${intl.formatMessage({ id: 'customcode.notice.file.return.example' })}`}
+                            ><WarningOutlined className='text-red-900 cursor-pointer' /></Tooltip>
                         </div>
                     }
                 />

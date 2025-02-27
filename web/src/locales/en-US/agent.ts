@@ -77,7 +77,7 @@ export default {
     'agent.created': 'Create ',
     'agent.btn.nextstep': 'next Step',
     'agent.btn.back': 'cancel',
-    'agent.btn.savedebug': 'Save',
+    'agent.btn.savedebug': 'Save and debug',
     'agent.save.and.click': 'Please save the agent first',
 
     'agent.explain.teamvisibility':
@@ -173,7 +173,6 @@ export default {
     'agent.chat.clear.memory.confirm.content': 'Are you sure you want to clear the context memory? This will reset the context of the current conversation.',
     'agent.chat.clear.memory.confirm.ok': 'Confirm',
     'agent.chat.clear.memory.confirm.cancel': 'Cancel',
-    'agent.chat.input.disabled': 'Please select a valid agent first',
 
     // Log detail
     'agent.log.detail': 'Agent Run Log',
@@ -183,5 +182,18 @@ export default {
     'agent.log.error': 'Error Message',
     'agent.log.no.output': 'No output result',
     'agent.log.no.conversation': 'No historical prompts',
-    'skill.downloadFiles': 'Output Files',
+    'agent.file.download': 'Download',
+    'agent.file.output': 'Output Files',
+
+    // Variable Types
+    'workflow.vars.file': 'File',
+
+    // Custom Code
+    'customcode.notice.title': 'Notice',
+    'customcode.notice.file.write': 'File Writing Restriction',
+    'customcode.notice.file.write.desc': 'When writing files in code, the target file path must start with "/storage".',
+    'customcode.notice.file.write.example': 'Example: /storage/my_folder/my_file.txt',
+    'customcode.notice.file.return': 'File Return Requirement',
+    'customcode.notice.file.return.desc': 'If returning a file path, the value must start with "file://" for correct system recognition.',
+    'customcode.notice.file.return.example': 'Example: file:///storage/my_folder/my_file.txt',
 };
