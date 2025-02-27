@@ -51,7 +51,7 @@ class LLMPipeline:
 
             # Check if model_kwargs contains JSON response format configuration
             if config.get('model_kwargs', {}).get('response_format') == {"type": "json_object"}:
-                config['model_kwargs'] = {}
+                config.pop('model_kwargs', None)
 
             # Initialize Anthropic with schema if available
             if schema:
