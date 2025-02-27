@@ -38,7 +38,7 @@ const FileDownloadList: React.FC<FileDownloadListProps> = ({
         {files.map((file, index) => (
           <div
             key={index}
-            className="flex items-center justify-between bg-white rounded-md p-2 gap-2"
+            className="flex items-center justify-between p-2 gap-2 border-l-4 border-gray-300 bg-gray-50"
           >
             <span className="text-sm text-gray-600 truncate flex-1">
               {file.file_name}
@@ -52,7 +52,7 @@ const FileDownloadList: React.FC<FileDownloadListProps> = ({
             >
               <DownloadOutlined className="w-4 h-4" />
               <span className="text-sm shrink-0">
-                {intl.formatMessage({ id: 'skill.download' })}
+                {intl.formatMessage({ id: 'agent.file.download' })}
               </span>
             </a>
           </div>

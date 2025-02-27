@@ -222,7 +222,7 @@ const skillFourthly: React.FC<ChildProps> = ({
                             {fileList.length > 0 && (
                                 <FileDownloadList 
                                     files={fileList} 
-                                    title={intl.formatMessage({ id: 'skill.downloadFiles' })}
+                                    title={intl.formatMessage({ id: 'agent.file.output' })}
                                     className="mb-4"
                                 />
                             )}
