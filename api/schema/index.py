@@ -50,7 +50,7 @@ class MyWorkflowData(BaseModel):
     avatar: Optional[str] = None
     icon_background: Optional[str] = None
     icon: Optional[str] = None
-    workflow_published_time: Optional[datetime] = None
+    workflow_published_time: Optional[str] = None
 
 
 class MoreWorkflowData(BaseModel):
