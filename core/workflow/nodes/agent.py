@@ -425,7 +425,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 })
                 chat_message_llm_return = 'chat_message_llm_return'
                 datetime_now = datetime.now()
-                json_data = json.dumps(ai_output, ensure_ascii=False)
                 data = {
                     'user_id': user_id,
                     'type': chat_message_llm_return,
@@ -441,7 +440,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         'user_id': user_id,
                         'agent_id': agent_id,
                         'ability_id': ability_id,
-                        'message': json_data
+                        'message': ai_output
                     }
                 }
                 push_to_websocket_queue(data)
