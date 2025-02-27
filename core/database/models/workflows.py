@@ -14,7 +14,7 @@ from core.database.models.apps import Apps
 from core.database import SQLDatabase
 from core.database.models.custom_tools import CustomTools
 from core.database.models.datasets import Datasets
-from core.helper import generate_api_token, encrypt_id
+from core.helper import generate_api_token, encrypt_id, format_iso_time
 from hashlib import md5
 
 from languages import get_language_content
@@ -184,8 +184,7 @@ class Workflows(MySQL):
                         {"column": "publish_status", "value": 1}
                     ]
                 )
-                item['workflow_published_time'] = workflow_info['published_time'] if workflow_info else None
-        
+                item['workflow_published_time'] = format_iso_time(workflow_info['published_time']) if workflow_info else None
         return {
             "list": list,
             "total_count": total_count,

@@ -2,6 +2,9 @@ import sys, json, uuid, base64, random, string
 from collections import deque
 from hashlib import md5
 from pathlib import Path
+from datetime import datetime
+from typing import Union
+
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
 
 from datetime import datetime
@@ -266,3 +269,18 @@ def truncate_agent_messages_by_token_limit(messages: List[Dict[str, Any]], model
         current_tokens += message_tokens
         truncated_messages.appendleft(message)  # Insert message at beginning to maintain order
     return list(truncated_messages)
+
+
+def format_iso_time(dt: Union[datetime, None]) -> str:
+    """
+    Format a datetime object into a string in 'yyyy-mm-dd HH:MM:SS' format.
+
+    :param dt: A datetime object, can be None
+    :return: Formatted string, returns an empty string if input is None
+    """
+    if dt is None:
+        return ""
+    try:
+        return dt.strftime('%Y-%m-%d %H:%M:%S')
+    except Exception as e:
+        return ""
