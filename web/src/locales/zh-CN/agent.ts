@@ -160,5 +160,26 @@ export default {
     'error.updateTag': '更新标签失败',
     'deleteTag.success': '标签删除成功',
     'updateTag.success': '标签更新成功',
+
+    // Chat interface
+    'agent.chat.loading.more': '加载更多消息...',
+    'agent.chat.input.placeholder': '请输入消息...',
+    'agent.chat.error.message': '运行错误',
+    'agent.chat.tokens': 'tokens',
+    'agent.chat.clear.memory': '清除上下文记忆',
+    'agent.chat.clear.memory.success': '上下文记忆已清除',
+    'agent.chat.clear.memory.confirm.title': '确认清除',
+    'agent.chat.clear.memory.confirm.content': '确定要清除上下文记忆吗？这将重置当前对话的上下文。',
+    'agent.chat.clear.memory.confirm.ok': '确认',
+    'agent.chat.clear.memory.confirm.cancel': '取消',
+
+    // Log detail
+    'agent.log.detail': '智能体运行日志',
+    'agent.log.conversation': '历史Prompt',
+    'agent.log.output': '输出结果',
+    'agent.log.list': '智能体日志',
+    'agent.log.error': '错误信息',
+    'agent.log.no.output': '无输出结果',
+    'agent.log.no.conversation': '无历史Prompt',
 };
 // {intl.formatMessage({ id: 'agent.btn.back' })}

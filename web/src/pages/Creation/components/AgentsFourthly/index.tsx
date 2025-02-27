@@ -161,7 +161,7 @@ const AgentsFourthly: React.FC<ChildProps> = ({
                 <Form
                     name="dynamic_form_nest_item"
                     onFinish={nextStep}
-                    style={{ width: 900 }}
+                    style={{ width: '100%' }}
                     autoComplete="off"
                     form={Fourthlyref}
                 >
@@ -172,10 +172,10 @@ const AgentsFourthly: React.FC<ChildProps> = ({
                         {(fields, {}) => (
                             <>
                                 <div className="w-full flex justify-start items-center text-xs font-medium px-[10px] text-[#213044] h-12 bg-[#F7F7F7]  rounded-t-lg">
-                                    <div className="w-48 mr-5 ml-2.5">
+                                    <div className="mr-5 ml-2.5">
                                         {intl.formatMessage({ id: 'agent.variable.name' })}
                                     </div>
-                                    <div className="w-52">
+                                    <div className="">
                                         {intl.formatMessage({ id: 'agent.variable.value' })}
                                     </div>
                                 </div>
@@ -188,7 +188,7 @@ const AgentsFourthly: React.FC<ChildProps> = ({
                                                 name={[name, 'content']}
                                             >
                                                 <Input
-                                                    className="w-48 mr-5"
+                                                    className="mr-5"
                                                     style={{
                                                         color: '#213044',
                                                         fontWeight: '400',
@@ -216,7 +216,7 @@ const AgentsFourthly: React.FC<ChildProps> = ({
                                                 ]}
                                             >
                                                 <Input
-                                                    style={{ width: '660px' }}
+
                                                     placeholder={
                                                         Fourthlyref.getFieldsValue() &&
                                                         Fourthlyref.getFieldsValue().users[key]

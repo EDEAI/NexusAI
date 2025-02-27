@@ -161,4 +161,25 @@ export default {
     'error.updateTag': 'Failed to update tag',
     'deleteTag.success': 'Tag deleted successfully',
     'updateTag.success': 'Tag updated successfully',
+
+    // Chat interface
+    'agent.chat.loading.more': 'Loading more messages...',
+    'agent.chat.input.placeholder': 'Type a message...',
+    'agent.chat.error.message': 'Runtime Error',
+    'agent.chat.tokens': 'tokens',
+    'agent.chat.clear.memory': 'Clear Context Memory',
+    'agent.chat.clear.memory.success': 'Context memory cleared',
+    'agent.chat.clear.memory.confirm.title': 'Confirm Clearing',
+    'agent.chat.clear.memory.confirm.content': 'Are you sure you want to clear the context memory? This will reset the context of the current conversation.',
+    'agent.chat.clear.memory.confirm.ok': 'Confirm',
+    'agent.chat.clear.memory.confirm.cancel': 'Cancel',
+
+    // Log detail
+    'agent.log.detail': 'Agent Run Log',
+    'agent.log.conversation': 'Historical Prompts',
+    'agent.log.output': 'Output Result',
+    'agent.log.list': 'Agent Logs',
+    'agent.log.error': 'Error Message',
+    'agent.log.no.output': 'No output result',
+    'agent.log.no.conversation': 'No historical prompts',
 };
