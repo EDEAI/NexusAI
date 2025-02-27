@@ -77,7 +77,7 @@ export default {
     'agent.created': '创造',
     'agent.btn.nextstep': '下一步',
     'agent.btn.back': '取消',
-    'agent.btn.savedebug': '保存并调试',
+    'agent.btn.savedebug': '保存',
     'agent.save.and.click': '请先保存agent',
 
     'agent.explain.teamvisibility': 'agent发布后团队内其他成员也可以使用',
@@ -172,6 +172,7 @@ export default {
     'agent.chat.clear.memory.confirm.content': '确定要清除上下文记忆吗？这将重置当前对话的上下文。',
     'agent.chat.clear.memory.confirm.ok': '确认',
     'agent.chat.clear.memory.confirm.cancel': '取消',
+    'agent.chat.input.disabled': '请先选择有效的智能体',
 
     // Log detail
     'agent.log.detail': '智能体运行日志',
@@ -181,5 +182,6 @@ export default {
     'agent.log.error': '错误信息',
     'agent.log.no.output': '无输出结果',
     'agent.log.no.conversation': '无历史Prompt',
+    'skill.downloadFiles': '输出文件',
 };
 // {intl.formatMessage({ id: 'agent.btn.back' })}

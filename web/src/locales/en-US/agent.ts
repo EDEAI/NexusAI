@@ -77,7 +77,7 @@ export default {
     'agent.created': 'Create ',
     'agent.btn.nextstep': 'next Step',
     'agent.btn.back': 'cancel',
-    'agent.btn.savedebug': 'Save and debug',
+    'agent.btn.savedebug': 'Save',
     'agent.save.and.click': 'Please save the agent first',
 
     'agent.explain.teamvisibility':
@@ -173,6 +173,7 @@ export default {
     'agent.chat.clear.memory.confirm.content': 'Are you sure you want to clear the context memory? This will reset the context of the current conversation.',
     'agent.chat.clear.memory.confirm.ok': 'Confirm',
     'agent.chat.clear.memory.confirm.cancel': 'Cancel',
+    'agent.chat.input.disabled': 'Please select a valid agent first',
 
     // Log detail
     'agent.log.detail': 'Agent Run Log',
@@ -182,4 +183,5 @@ export default {
     'agent.log.error': 'Error Message',
     'agent.log.no.output': 'No output result',
     'agent.log.no.conversation': 'No historical prompts',
+    'skill.downloadFiles': 'Output Files',
 };
