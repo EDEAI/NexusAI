@@ -263,6 +263,10 @@ export default memo(({ node }: { node: AppNode }) => {
                                         label: 'Object',
                                         value: 'json',
                                     },
+                                    {
+                                        label:'File',
+                                        value:'file'
+                                    }
                                 ]}
                                 allowClear={false}
                                 name="veriable"

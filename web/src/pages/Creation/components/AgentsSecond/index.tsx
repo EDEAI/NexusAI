@@ -98,7 +98,7 @@ const AgentsSecond: React.FC<ChildProps> = ({
         });
     };
     return (
-        <div style={{ height: '100%' }}>
+        <div style={{ height: '100%' }} className='w-full flex-1'>
             <div className="text-base font-medium text-[#333333] my-[30px]">
                 {intl.formatMessage({ id: 'agent.Applicationcapabilitysetting' })}
             </div>
@@ -119,7 +119,7 @@ const AgentsSecond: React.FC<ChildProps> = ({
                 <Form
                     name="dynamic_form_nest_item"
                     onFinish={nextStep}
-                    style={{ width: 900 }}
+                    style={{ width: '100%' }}
                     // labelCol={{ span: 24 }}
                     // wrapperCol={{ span: 24 }}
                     autoComplete="off"
