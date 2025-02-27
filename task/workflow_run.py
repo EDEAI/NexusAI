@@ -257,7 +257,7 @@ def push_workflow_debug_message(
         elif node.data['type'] in ['recursive_task_generation', 'recursive_task_execution']:
             task_dict = json.loads(get_first_variable_value(create_variable_from_dict(outputs)))
             node_exec_data['outputs_md'] = create_recursive_task_category_from_dict(task_dict).to_markdown()
-        elif node.data['type'] in ['skill', 'end']:
+        elif node.data['type'] in ['skill', 'custom_code', 'end']:
             file_list = []
             skill_output = node_exec_data['outputs']
             storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
