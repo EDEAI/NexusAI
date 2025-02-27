@@ -945,6 +945,8 @@ language_packs = {
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
             5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
+            7. Additional file writing constraint: If the requirement ("My requirements:") involves writing files, the file paths in the requirements must start with "/storage", and any file path returned must include the prefix "file://".
+
         ''',
         'generate_skill_user': '''
             My requirements:
@@ -996,6 +998,7 @@ language_packs = {
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
             5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
+            7. Additional file writing constraint: If the requirement ("My requirements:") involves writing files, the file paths in the requirements must start with "/storage", and any file path returned must include the prefix "file://"
         ''',
         'correction_skill_user': '''
             Correction suggestion:
