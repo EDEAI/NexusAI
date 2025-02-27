@@ -17,6 +17,7 @@ import {
     FileTextOutlined,
 } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
+import { history } from 'umi';
 import type { MenuProps } from 'antd';
 import { Button, Form, Menu, message, Spin } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
@@ -323,11 +324,13 @@ const Agents: React.FC = () => {
                             }, 500);
                             setTimeout(() => {
                                 getAgent(res.data.app_id);
+                                
                                 const createdData = {
                                     ...createappdata('GET'),
                                     app_id: res.data.app_id,
                                 };
                                 createappdata('SET', createdData);
+                                history.replace(`/Agents?type=false&app_id=${res.data.app_id}`);
                             }, 1000);
                             setNewagentid(creationagentid);
                         })
@@ -416,13 +419,13 @@ const Agents: React.FC = () => {
                 agent_abilities[0].content == ''
             ) {
                 setAgentmunudisabled({ first: false, second: false, fourthly: false });
-                pageKeyfun('4');
+            
             } else {
                 PutagentAbilitiesset(params)
                     .then(res => {
                         if (res.code == 0) {
                             setAgentmunudisabled({ first: false, second: false, fourthly: false });
-                            pageKeyfun('4');
+                      
                         }
                     })
                     .catch(err => {});

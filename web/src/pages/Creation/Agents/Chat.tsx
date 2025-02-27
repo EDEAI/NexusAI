@@ -123,7 +123,7 @@ export default memo(props => {
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [clearingMemory, setClearingMemory] = useState(false);
-    const [initialLoading, setInitialLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(false);
     const formRef = useRef<ProFormInstance>();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -134,6 +134,14 @@ export default memo(props => {
     const lastMessage = useSocketStore<SocketMessage>(state =>
         state.getTypedLastMessage('chat_message_llm_return'),
     );
+    
+    // 判断智能体ID是否存在
+    const isAgentIdAvailable = !!props.data?.detailList?.agent?.agent_id;
+    
+    useEffect(()=>{
+       console.log(loading,initialLoading);
+       
+    },[loading,initialLoading])
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -320,6 +328,7 @@ export default memo(props => {
                         options={props.data?.abilitiesList}
                         fieldProps={{
                             placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
+                            disabled: !isAgentIdAvailable,
                         }}
                         formItemProps={{
                             className: 'mb-0 flex-1',
@@ -327,7 +336,7 @@ export default memo(props => {
                     />
                     <Button
                         type="primary"
-                        disabled={props.operationbentate == 'false' ? false : true}
+                        disabled={!isAgentIdAvailable}
                         onClick={agentPublish}
                         className=' min-w-40'
                     >
@@ -375,6 +384,7 @@ export default memo(props => {
                             <Button
                                 icon={<DeleteOutlined />}
                                 loading={clearingMemory}
+                                disabled={!isAgentIdAvailable}
                                 onClick={handleClearMemory}
                             >
                                 {intl.formatMessage({ id: 'agent.chat.clear.memory' })}
@@ -384,19 +394,26 @@ export default memo(props => {
                             <div className="flex-1">
                                 <ProFormTextArea
                                     name="content"
-                                    placeholder={intl.formatMessage({
-                                        id: 'agent.chat.input.placeholder',
-                                    })}
+                                    placeholder={
+                                        isAgentIdAvailable
+                                            ? intl.formatMessage({
+                                                id: 'agent.chat.input.placeholder',
+                                            })
+                                            : intl.formatMessage({
+                                                id: 'agent.chat.input.disabled',
+                                            })
+                                    }
                                     fieldProps={{
                                         autoSize: { minRows: 1, maxRows: 4 },
                                         variant: 'borderless',
                                         onPressEnter: e => {
-                                            if (!e.shiftKey) {
+                                            if (!e.shiftKey && isAgentIdAvailable) {
                                                 e.preventDefault();
                                                 formRef.current?.submit();
                                             }
                                         },
                                         className: '',
+                                        disabled: !isAgentIdAvailable,
                                     }}
                                     formItemProps={{
                                         className: 'mb-0',
@@ -407,6 +424,7 @@ export default memo(props => {
                             <Button
                                 onClick={() => formRef.current?.submit()}
                                 type="primary"
+                                disabled={!isAgentIdAvailable}
                                 className="min-w-[30px] h-[30px] flex items-center justify-center cursor-pointer rounded-[6px]"
                                 icon={<SendOutlined />}
                             />

@@ -181,5 +181,19 @@ export default {
     'agent.log.error': '错误信息',
     'agent.log.no.output': '无输出结果',
     'agent.log.no.conversation': '无历史Prompt',
+    'agent.file.download': '下载',
+    'agent.file.output': '输出文件',
+
+    // Variable Types
+    'workflow.vars.file': 'File',
+
+    // Custom Code
+    'customcode.notice.title': '注意事项',
+    'customcode.notice.file.write': '文件写入限制',
+    'customcode.notice.file.write.desc': '代码中涉及写文件操作时，目标文件路径必须以"/storage"开头。',
+    'customcode.notice.file.write.example': '例如：/storage/my_folder/my_file.txt',
+    'customcode.notice.file.return': '文件返回要求',
+    'customcode.notice.file.return.desc': '如果代码需要返回文件路径，该返回值必须以"file://"开头，以便系统正确识别为文件类型。',
+    'customcode.notice.file.return.example': '例如：file:///storage/my_folder/my_file.txt',
 };
 // {intl.formatMessage({ id: 'agent.btn.back' })}
