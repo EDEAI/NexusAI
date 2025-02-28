@@ -106,8 +106,8 @@ const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: Messag
                         <div className="text-xs text-gray-500 flex justify-between">
                             <div>{message.created_time}</div>
                             <div>
-                                {intl.formatMessage({ id: 'agent.chat.tokens' })}:{' '}
-                                <span className="text-blue-500">{message.total_tokens || 0}</span>
+                                {/* {intl.formatMessage({ id: 'agent.chat.tokens' })}:{' '}
+                                <span className="text-blue-500">{message.total_tokens || 0}</span> */}
                             </div>
                         </div>
                     </div>
