@@ -78,7 +78,8 @@ class Models(MySQL):
         '''
         Find the list of LLM (type=1) model configurations,
         group by supplier and return supplier info with their model_list.
-        The database orders the rows by default_used descending and sort_order ascending.
+        Now, suppliers are sorted ascending, and their models are sorted so that
+        models with model_default_used==1 appear first, then by sort_order ascending.
         '''
         rows = self.select(
             columns=[
@@ -94,7 +95,7 @@ class Models(MySQL):
                 ['inner', 'suppliers', 'models.supplier_id = suppliers.id']
             ],
             conditions=[{'column': 'models.type', 'value': 1}],
-            order_by="model_configurations.default_used DESC, model_configurations.sort_order ASC"
+            order_by="suppliers.id ASC, model_configurations.sort_order ASC"
         )
 
         grouped = {}
@@ -109,10 +110,14 @@ class Models(MySQL):
             grouped[sid]['model_list'].append({
                 'model_config_id': r['model_config_id'],
                 'model_name': r['model_name'],
-                'model_default_used': r['model_default_used']
+                'model_default_used': r['model_default_used'],
+                'sort_order': r['sort_order']
             })
-
-        result = list(grouped.values())
+        # For each supplier, sort model_list so that model_default_used==1 comes first, then by sort_order ascending
+        for supplier in grouped.values():
+            supplier['model_list'] = sorted(supplier['model_list'], key=lambda x: (0 if x['model_default_used'] == 1 else 1, x['sort_order']))
+        # Sort suppliers by supplier_id ascending
+        result = sorted(list(grouped.values()), key=lambda x: x['supplier_id'])
         return result[0] if len(result) == 1 else result
 
     def get_model_information(self, model_ids: Tuple) -> list:

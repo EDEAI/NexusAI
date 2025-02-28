@@ -49,14 +49,13 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
                 'sort_order': supplier['sort_order']
             })
 
-    for supplier in unique_suppliers.values():
+    # Sort suppliers by supplier_id in ascending order
+    suppliers = sorted(unique_suppliers.values(), key=lambda x: x['supplier_id'])
+    for supplier in suppliers:
         if supplier.get('models'):
-            # Prioritize models where model_default_used is 1, then sort by sort_order
-            supplier['models'] = sorted(supplier['models'],
-                                        key=lambda x: (0 if x['model_default_used'] == 1 else 1, x['sort_order']))
+            # Sort models by sort_order in ascending order
+            supplier['models'] = sorted(supplier['models'], key=lambda x: x['sort_order'])
 
-    # Convert the unique_suppliers dictionary to a list
-    suppliers = list(unique_suppliers.values())
     # Initialize result dictionary
     result = {'suppliers_list': [], 'models_list': []}
 
