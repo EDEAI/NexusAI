@@ -359,7 +359,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         datasets, agent_id, workflow_id, user_id, type
                     )
             
-            direct_output = bool(task)  # Content output only (ability ID is omitted) for auto match ability & Force plain text output
+            direct_output = bool(task) or is_chat  # Content output only (ability ID is omitted) for auto match ability & Force plain text output
             output_format, input_ = self._prepare_prompt(
                 agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), direct_output
             )
