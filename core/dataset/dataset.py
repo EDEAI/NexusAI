@@ -93,8 +93,7 @@ def get_embeddings_and_vector_database(
                 'embedding_function': embeddings,
                 'collection_name': collection_name,
                 'connection_args': {
-                    'host': vdb_config['host'],
-                    'port': vdb_config['port'],
+                    'uri': f'http://{vdb_config["host"]}:{vdb_config["port"]}',
                     'user': vdb_config['user'],
                     'password': vdb_config['password']
                 },
