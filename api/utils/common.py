@@ -87,6 +87,7 @@ def extract_file_list_from_skill_output(outputs: dict, node_data_dict: dict) -> 
                 full_path = f"{storage_url}{file_path}"
                 file_list.append({
                     "file_name": file_name,
-                    "file_path": full_path
+                    "file_path": full_path,
+                    "variable_name": var.name
                 })
     return file_list
