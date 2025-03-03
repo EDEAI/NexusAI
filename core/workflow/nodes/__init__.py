@@ -22,6 +22,7 @@ from .skill import SkillNode
 from .recursive_task_generation import RecursiveTaskGenerationNode
 from .recursive_task_execution import RecursiveTaskExecutionNode
 from .end import EndNode
+from .constant_variable import ConstantVariableNode
 from ..variables import create_variable_from_dict
 from core.llm.prompt import create_prompt_from_dict
 
@@ -108,6 +109,8 @@ def create_node_from_dict(node_dict: Dict[str, Any]) -> Node:
         return RecursiveTaskGenerationNode(**node_dict)
     elif node_type == 'recursive_task_execution':
         return RecursiveTaskExecutionNode(**node_dict)
+    elif node_type == 'constant_variable':
+        return ConstantVariableNode(**node_dict)
     elif node_type == 'end':
         return EndNode(**node_dict)
     else:
@@ -162,5 +165,6 @@ __all__ = [
     "SkillNode",
     "RecursiveTaskGenerationNode",
     "RecursiveTaskExecutionNode",
+    "ConstantVariableNode",
     "EndNode"
 ]
