@@ -72,7 +72,7 @@ const Agents: React.FC = () => {
             key: '5',
           
             icon: <FileTextOutlined />,
-            label:`运行日志`,
+            label:intl.formatMessage({id:'app.dashboard.run_log'}),
             style: {
                 padding: '15px',
                 width: '100%',
@@ -197,15 +197,19 @@ const Agents: React.FC = () => {
     };
 
     const SkillMenuClick: MenuProps['onClick'] = e => {
-        console.log(Detaillist.agent.obligations, '1111', Sformref.getFieldsValue().users);
-        if (pageKey == '1') {
-            const wordlist = Ffromref.getFieldsValue().users.map((item: any) => {
-                return { value: `<<${CURRENT_NODE_ID}.inputs.${item.name}>>`, label: item.name };
-            });
-            Fourthlyref.setFieldsValue(Ffromref.getFieldsValue());
-            setCallwordlist(wordlist);
+        // console.log(Detaillist.agent.obligations, '1111', Sformref.getFieldsValue().users);
+        try{
+            if (pageKey == '1') {
+                const wordlist = Ffromref.getFieldsValue().users.map((item: any) => {
+                    return { value: `<<${CURRENT_NODE_ID}.inputs.${item.name}>>`, label: item.name };
+                });
+                Fourthlyref.setFieldsValue(Ffromref.getFieldsValue());
+                setCallwordlist(wordlist);
+            }
+            pageKeyfun(e.key);
+        } catch (error) {
+            console.log(error, 'error');
         }
-        pageKeyfun(e.key);
     };
 
     return (

@@ -122,10 +122,10 @@ const UserMessageComponent = memo(({ message }: MessageProps) => (
 
 const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: MessageProps) => {
     const intl = useIntl();
-    const ability = abilitiesList.find(item => item.value === message.ability_id);
+    const ability = abilitiesList?.find(item => item.value === message.ability_id);
     return (
         <div className="flex justify-start pb-4">
-            <div>
+            <div className='max-w-full'>
                 <div className="text-sm font-bold mb-2">
                     {detailList?.app?.name}{' '}
                     {ability?.label && (
@@ -136,7 +136,7 @@ const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: Messag
                 </div>
                 <div className="max-w-[90%] rounded-lg  relative bg-white text-gray-900 border border-gray-200">
                     {message.message && (
-                        <div className="p-3">
+                        <div className="p-3 child  max-w-full [&_p]:mb-0 [&_div]:max-w-full break-words">
                             <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
                                 {message.message}
                             </ReactMarkdown>
@@ -167,12 +167,14 @@ const LoadingMessage = memo(({ detailList }: { detailList: MessageProps['detailL
     const intl = useIntl();
     return (
         <div className="flex justify-start pb-4 max-w-[90%] min-w-[70%]">
-            <div>
+            <div className='max-w-full'>
                 <div className="text-sm font-bold mb-2">{detailList?.app?.name}</div>
                 <div className="max-w-[90%] min-w-[200px] rounded-lg relative bg-white text-gray-900 border border-gray-200 p-4">
                     <div className="flex items-center gap-2 pr-4">
                         <Spin size="small" />
-                        <span className="text-gray-500">{intl.formatMessage({ id: 'agent.chat.waiting' })}</span>
+                        <span className="text-gray-500">
+                            {intl.formatMessage({ id: 'agent.chat.waiting' })}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -186,7 +188,7 @@ export default memo((props: Props) => {
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [clearingMemory, setClearingMemory] = useState(false);
-    const [initialLoading, setInitialLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(false);
     const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
     const formRef = useRef<ProFormInstance>();
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -201,16 +203,17 @@ export default memo((props: Props) => {
         (state as unknown as WebSocketStore).getTypedLastMessage('chat_message_llm_return'),
     );
     console.log(props.data);
-    
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
-    const handleSaveInfo = () => {
+    const handleSaveInfo = async () => {
         if (props?.saveInfo?.firstjudgingcondition()) {
+            return true
         } else if (props?.saveInfo?.secondjudgingcondition()) {
+            return true
         } else {
-            props?.saveInfo?.agentupdata();
+            return await props?.saveInfo?.agentupdata();
         }
     };
     useUpdateEffect(() => {
@@ -379,13 +382,17 @@ export default memo((props: Props) => {
         );
     }
     const agentPublish = async () => {
-        const res = await PutagentPublish(props.data?.detailList?.agent?.agent_id);
+        await handleSaveInfo();
 
-        if (res.code == 0) {
-            message.success(intl.formatMessage({ id: 'agent.message.success.publish' }));
-        } else {
-            message.error(intl.formatMessage({ id: 'agent.message.fail.publish' }));
-        }
+        setTimeout(async () => {
+            const res = await PutagentPublish(props.data?.detailList?.agent?.agent_id);
+
+            if (res.code == 0) {
+                message.success(intl.formatMessage({ id: 'agent.message.success.publish' }));
+            } else {
+                message.error(intl.formatMessage({ id: 'agent.message.fail.publish' }));
+            }
+        }, 500);
     };
     return (
         <div className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border">
@@ -408,7 +415,6 @@ export default memo((props: Props) => {
                         paddingBottom: '16px',
                     }}
                 >
-                  
                     {/* <ProFormSelect
                         label={intl.formatMessage({ id: 'agent.selectivepower' })}
                         name="ability_id"
@@ -420,25 +426,29 @@ export default memo((props: Props) => {
                             className: 'mb-0 flex-1',
                         }}
                     /> */}
-                    <div className='flex-1 flex items-center font-bold text-base'>
+                    <div className="flex-1 flex items-center font-bold text-base">
                         {props.data?.detailList?.app?.name}
                     </div>
-                    <Button
-                        type="primary"
-                        disabled={props.operationbentate == 'false' ? false : true}
-                        onClick={handleSaveInfo}
-                        className="min-w-24"
-                    >
-                        {intl.formatMessage({ id: 'agent.btn.savedebug' })}
-                    </Button>
-                    <Button
-                        type="primary"
-                        disabled={props.operationbentate == 'false' ? false : true}
-                        onClick={agentPublish}
-                        className="min-w-24"
-                    >
-                        {intl.formatMessage({ id: 'agent.publish' })}
-                    </Button>
+                    {props.operationbentate == 'false' && (
+                        <>
+                            <Button
+                                type="primary"
+                                disabled={props.operationbentate == 'false' ? false : true}
+                                onClick={handleSaveInfo}
+                                className="min-w-24"
+                            >
+                                {intl.formatMessage({ id: 'agent.btn.savedebug' })}
+                            </Button>
+                            <Button
+                                type="primary"
+                                disabled={props.operationbentate == 'false' ? false : true}
+                                onClick={agentPublish}
+                                className="min-w-24"
+                            >  
+                                {intl.formatMessage({ id: 'agent.publish' })}
+                            </Button>
+                        </>
+                    )}
                 </div>
                 <div className="bg-gray-50 rounded-md border border-[#ccc] flex-1 overflow-y-auto flex flex-col">
                     <div className="flex-1 overflow-y-auto " ref={chatContainerRef}>
@@ -472,7 +482,6 @@ export default memo((props: Props) => {
                     </div>
 
                     <div className="border-t border-gray-200 bg-white  px-4 py-2 relative">
-                        
                         <div className="flex items-center p-[8px] gap-[10px] box-border border bg-white rounded-[8px]">
                             <div className="flex-1">
                                 <ProFormTextArea
@@ -480,6 +489,7 @@ export default memo((props: Props) => {
                                     placeholder={intl.formatMessage({
                                         id: 'agent.chat.input.placeholder',
                                     })}
+                                    disabled={props?.data?.detailList?.agent?.agent_id == 0}
                                     fieldProps={{
                                         autoSize: { minRows: 1, maxRows: 4 },
                                         variant: 'borderless',
@@ -491,7 +501,9 @@ export default memo((props: Props) => {
                                         },
                                         size: 'small',
                                         className: '',
-                                        title: intl.formatMessage({ id: 'agent.chat.input.shift.enter' }),
+                                        title: intl.formatMessage({
+                                            id: 'agent.chat.input.shift.enter',
+                                        }),
                                     }}
                                     formItemProps={{
                                         className: 'mb-0',
@@ -502,6 +514,7 @@ export default memo((props: Props) => {
                             <Button
                                 onClick={() => formRef.current?.submit()}
                                 type="primary"
+                                disabled={props?.data?.detailList?.agent?.agent_id == 0}
                                 className="min-w-[30px] h-[30px] flex items-center justify-center cursor-pointer rounded-[6px]"
                                 icon={<SendOutlined />}
                                 title={intl.formatMessage({ id: 'agent.chat.send' })}
@@ -511,17 +524,29 @@ export default memo((props: Props) => {
                             <ProFormSelect
                                 // label={intl.formatMessage({ id: 'agent.selectivepower' })}
                                 name="ability_id"
-                                options={props.data?.abilitiesList}
+                                options={
+                                    props.data?.abilitiesList || [
+                                        {
+                                            value: 0,
+                                            label: intl.formatMessage({ id: 'agent.allability' }),
+                                        },
+                                    ]
+                                }
                                 fieldProps={{
                                     placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
                                     size: 'small',
                                 }}
+                                disabled={
+                                    props?.data?.detailList?.agent?.agent_id == 0 ||
+                                    !props.data?.abilitiesList?.length
+                                }
                                 formItemProps={{
                                     className: 'mb-0',
                                 }}
                             />
                             <Button
                                 icon={<DeleteOutlined />}
+                                disabled={props?.data?.detailList?.agent?.agent_id == 0}
                                 loading={clearingMemory}
                                 onClick={handleClearMemory}
                                 size="small"
