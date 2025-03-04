@@ -1075,8 +1075,9 @@ async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = 
     else:
         messages = ''
     del result['model_data']
-    result['prompt_data'] = {}
-    result['prompt_data'] = messages
+    # result['prompt_data'] = {}
+    # result['prompt_data'] = messages
+    result['prompt_data'] = []
     if not result:
         return response_error(get_language_content("app_run_error"))
     return response_success(result)
