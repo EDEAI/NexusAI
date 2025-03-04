@@ -15,6 +15,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import AgentsFirst from './components/AgentsFirst';
 import AgentsFourthly from './components/AgentsFourthly';
 import AgentsSecond from './components/AgentsSecond';
+import Chat from '@/pages/Creation/Agents/Chat';
+import Log from '@/pages/Creation/Agents/Log';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -54,7 +56,7 @@ const Agents: React.FC = () => {
             key: '2',
             icon: <CodeOutlined />,
             label: intl.formatMessage({ id: 'agent.menu.Capacityoutput' }),
-            disabled:Detaillist && Detaillist.app.attrs_are_visible === 0,
+            disabled: Detaillist && Detaillist.app.attrs_are_visible === 0,
             style: {
                 padding: '15px',
                 width: '100%',
@@ -67,31 +69,32 @@ const Agents: React.FC = () => {
             },
         },
         {
-            key: '4',
+            key: '5',
+          
             icon: <FileTextOutlined />,
-            label: intl.formatMessage({ id: 'agent.menu.operation' }),
+            label:`运行日志`,
             style: {
                 padding: '15px',
                 width: '100%',
                 margin: '0px',
-                // background: pageKey == '3' ? 'rgba(27,100,243,0.1)' : '#FAFAFA',
                 marginBottom: '10px',
                 fontSize: '16px',
+                lineHeight: '22px',
                 fontWeight: '500',
-                color: pageKey == '3' ? '#1B64F3' : '#213044',
+                color: pageKey == '5' ? '#1B64F3' : '#213044',
             },
         },
     ];
     useEffect(() => {
         getAgent();
     }, []);
-   
+
     const getAgent = async () => {
         let params = new URLSearchParams(window.location.search);
         console.log(params.get('type'));
         const res = await GetagentInfo(params.get('app_id'), params.get('type'));
         const data = res.data;
-        if(res.data.agent_dataset_relation_list && res.data.agent_dataset_relation_list.length){
+        if (res.data.agent_dataset_relation_list && res.data.agent_dataset_relation_list.length) {
             const repositoryID = res.data.agent_dataset_relation_list.map((item: any) => {
                 return item.dataset_id;
             });
@@ -104,15 +107,17 @@ const Agents: React.FC = () => {
         if (res.data.agent.publish_status === 1) {
             message.warning(intl.formatMessage({ id: 'agent.message.listwarning' }), 5);
         }
-       
+
         Ffromref.setFieldsValue(objecttoarray(data.agent.input_variables));
-        
-        if(res.data.agent_abilities_list){
+
+        if (res.data.agent_abilities_list) {
             const user = res.data.agent_abilities_list.map((item: any) => {
                 return item.status == 1 ? { ...item, status: true } : { ...item, status: false };
             });
             Sformref.setFieldsValue({
-                users: !user[0] ? [{ agent_ability_id: 0, name: '', content: '', status: true }] : user,
+                users: !user[0]
+                    ? [{ agent_ability_id: 0, name: '', content: '', status: true }]
+                    : user,
             });
 
             const list = data.agent_abilities_list.filter((item: any) => {
@@ -126,17 +131,17 @@ const Agents: React.FC = () => {
                     };
                 }),
             });
-        }       
-        if(data.m_configurations_list){
+        }
+        if (data.m_configurations_list) {
             setFourthly_select_list(
                 data.m_configurations_list.map((item: any) => {
                     return { value: item.m_config_id, label: item.m_name };
                 }),
             );
         }
-       
+
         setFourthly_config_id(data.agent.m_config_id);
-        if(data.agent_abilities_list){
+        if (data.agent_abilities_list) {
             const newabilitieslist = data.agent_abilities_list.filter((item: any, i: any) => {
                 return item.status === 1;
             });
@@ -146,9 +151,8 @@ const Agents: React.FC = () => {
                 ]),
             );
         }
-
     };
-  
+
     const objecttoarray = (obj?: any) => {
         console.log(!!obj && !!obj.properties, 'obj');
         const codeData = {
@@ -175,13 +179,13 @@ const Agents: React.FC = () => {
         };
         return codeData;
     };
-   
+
     const selectlistdata = (list: any) => {
         return list.map((item: any) => {
             return { value: item.agent_ability_id, label: item.name };
         });
     };
-  
+
     const returnList = () => {
         SkillMenuClick({
             key: pageKey,
@@ -191,7 +195,7 @@ const Agents: React.FC = () => {
         });
         history.back();
     };
-   
+
     const SkillMenuClick: MenuProps['onClick'] = e => {
         console.log(Detaillist.agent.obligations, '1111', Sformref.getFieldsValue().users);
         if (pageKey == '1') {
@@ -206,7 +210,6 @@ const Agents: React.FC = () => {
 
     return (
         <div className=" flex bg-white" style={{ height: 'calc(100vh - 56px)' }}>
-         
             <div className="flex flex-col w-[300px]" style={{ height: 'calc(100vh - 56px)' }}>
                 <div className="flex w-full items-center bg-white px-[30px] pt-[30px] border-[#e5e7eb] border-solid border-r">
                     <Button
@@ -220,7 +223,6 @@ const Agents: React.FC = () => {
                         <span className="text-sm font-medium text-[#213044]">
                             {intl.formatMessage({ id: 'agent.back' })}
                         </span>
-                  
                     </Button>
                 </div>
                 <div className="w-full flex-1 px-[30px] py-[30px] bg-white border-[#e5e7eb] border-solid border-r">
@@ -249,21 +251,22 @@ const Agents: React.FC = () => {
                     ) : null}
                 </div>
             </div>
-            <div
+           <div  className="flex-1 grid grid-cols-2 relative">
+             <div
                 className="flex flex-col  "
                 style={{
                     height: 'calc(100vh - 56px)',
-                    width: 'calc(100vw - 230px)',
+                
                     overflowY: 'scroll',
                     scrollbarWidth: 'none',
                 }}
             >
                 <div
                     className="px-[30px] "
-                    style={{ overflowX: 'auto', minWidth: '960px', height: '100%' }}
+                    style={{ overflowX: 'auto',  height: '100%' }}
                 >
                     <div className="w-full flex justify-center mt-[30px]">
-                        <div className="flex items-center  w-[900px]">
+                        <div className="flex items-center  w-full">
                             <div className="mr-[10px] w-[16px] h-[16px]">
                                 <img src="/icons/flag.svg" alt="" className="w-[16px] h-[16px]" />
                             </div>
@@ -319,6 +322,22 @@ const Agents: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <div>
+                <Chat
+                    operationbentate={Operationbentate}
+                    data={{
+                        abilitiesList: Fourthly_abilities_list,
+                        detailList: Detaillist,
+                    }}
+                />
+            </div>
+            {pageKey == '5' && (
+                <div className="absolute bottom-0 left-0 right-0 bg-slate-50 w-full h-full z-10">
+                    <Log agent_id={Detaillist.agent.agent_id}></Log>
+                </div>
+            )}
+           </div>
+           
         </div>
     );
 };

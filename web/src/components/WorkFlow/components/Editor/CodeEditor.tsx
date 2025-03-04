@@ -86,6 +86,7 @@ const CodeEditor: FC<Props> = memo(({
     };
 
     const handleEditorChange = (value: string | undefined) => {
+        valueRef.current = value;
         onChange(value || '');
         setTimeout(() => {
             resizeEditorToContent();
@@ -144,14 +145,15 @@ const CodeEditor: FC<Props> = memo(({
         return isFocus ? 'focus-theme' : 'blur-theme';
     })();
 
-    const Main = () => (
+    const Main = ({key}) => (
         <>
             <Editor
+                key={key}
                 // className='min-h-[100%]' // h-full
                 // language={language === CodeLanguage.javascript ? 'javascript' : 'python'}
                 language={languageMap[language] || 'python'}
                 theme={isMounted ? theme : 'default-theme'}
-                value={outPutValue}
+                value={!readOnly&&valueRef?.current||outPutValue}
                 onChange={handleEditorChange}
                 options={{
                     readOnly,
@@ -213,7 +215,7 @@ const CodeEditor: FC<Props> = memo(({
         );
     };
 
-    const RenderFix = () => {
+    const RenderFix = ({key}) => {
         return (
             <div
                 style={{ background: isFocus || !editorTypeJson ? '#ffffff' : '#f2f4f7' }}
@@ -224,7 +226,7 @@ const CodeEditor: FC<Props> = memo(({
                 {mdValue && <ToggleMd></ToggleMd>}
                 {editorTypeJson ? (
                     <div className="flex-1">
-                        <Main></Main>
+                        <Main key={key}></Main>
                     </div>
                 ) : (
                     <div className="w-full h-full flex-1 overflow-auto p-4">
@@ -276,11 +278,11 @@ const CodeEditor: FC<Props> = memo(({
                     >
                         <div className="w-1 h-6 bg-gray-300 rounded-sm"></div>
                     </div>
-                    <RenderFix></RenderFix>
+                    <RenderFix key={`editor-instance-${showBig}`}></RenderFix>
                 </div>
             );
         }
-        return RenderFix();
+        return <RenderFix key={`editor-instance-${showBig}`}></RenderFix>
     }, [showBig, value, editorTypeJson]);
 
     const handleFullscreenChange = useCallback(() => {

@@ -8,6 +8,7 @@ import React from 'react';
 interface FileItem {
   file_name: string;
   file_path: string;
+  variable_name?: string;
 }
 
 interface FileDownloadListProps {
@@ -40,9 +41,16 @@ const FileDownloadList: React.FC<FileDownloadListProps> = ({
             key={index}
             className="flex items-center justify-between p-2 gap-2 border-l-4 border-gray-300 bg-gray-50"
           >
-            <span className="text-sm text-gray-600 truncate flex-1">
-              {file.file_name}
-            </span>
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="text-sm text-gray-600 truncate">
+                {file.file_name}
+              </span>
+              {file.variable_name && (
+                <span className="text-xs text-gray-500">
+                  {intl.formatMessage({ id: 'agent.file.variable' })}: {file.variable_name}
+                </span>
+              )}
+            </div>
             <a
               href={file.file_path}
               download={file.file_name}

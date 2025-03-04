@@ -38,6 +38,6 @@ export default {
     ...createkb,
     ...user,
     ...plaza,
-    'skill.downloadFiles': '下载文件',
+    'skill.downloadFiles': '输出文件',
     'skill.download': '下载',
 };

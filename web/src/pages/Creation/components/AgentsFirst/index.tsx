@@ -543,7 +543,6 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 history.back();
                             }}
                         >
-                            {' '}
                             {intl.formatMessage({ id: 'agent.btn.back' })}
                         </Button>
                     </div>
