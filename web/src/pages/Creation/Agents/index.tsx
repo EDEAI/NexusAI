@@ -25,6 +25,7 @@ import AgentsFourthly from '../components/AgentsFourthly';
 import AgentsSecond from '../components/AgentsSecond';
 import Chat from './Chat';
 import Log from './Log';
+import { history } from 'umi';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -95,7 +96,7 @@ const Agents: React.FC = () => {
             key: '5',
             disabled: agentmenudisabled.fourthly,
             icon: <FileTextOutlined />,
-            label: `运行日志`,
+            label:intl.formatMessage({id:'app.dashboard.run_log'}),
             style: {
                 padding: '15px',
                 width: '100%',
@@ -307,14 +308,20 @@ const Agents: React.FC = () => {
     const agentupdata = () => {
         setLoading(true);
         var creationagentid = 0;
+        return new Promise((resolve,reject)=>{
+       
         if (!creationappid) {
             PostappsCreate(createappdata('GET'))
                 .then(res => {
                     setcreationappid(res.data.app_id);
                     GetagentInfo(creationappid ? creationappid : res.data.app_id, false)
                         .then(value => {
+                            resolve(value)
                             creationagentid = value.data.agent.agent_id;
                             agentfirst(creationagentid);
+                            if (res.data.app_id) {
+                                history.replace(`/Agents?app_id=${res.data.app_id}&type=false`);
+                            }
                             setTimeout(() => {
                                 agentsecond(creationagentid);
                                 message.success(
@@ -331,7 +338,7 @@ const Agents: React.FC = () => {
                             }, 1000);
                             setNewagentid(creationagentid);
                         })
-                        .catch(err => {});
+                        .catch(err => { resolve('')});
                 })
                 .catch(err => {});
         } else {
@@ -339,6 +346,7 @@ const Agents: React.FC = () => {
                 .then(value => {
                     creationagentid = value.data.agent.agent_id;
                     agentfirst(creationagentid);
+                    resolve('')
                     setTimeout(() => {
                         agentsecond(creationagentid);
                         message.success(intl.formatMessage({ id: 'skill.conserve.success' }));
@@ -348,8 +356,9 @@ const Agents: React.FC = () => {
                     }, 1000);
                     setNewagentid(creationagentid);
                 })
-                .catch(err => {});
+                .catch(err => { resolve('')});
         }
+    })
     };
 
     const agentfirst = (agent_id: any, e?: any) => {
@@ -532,7 +541,7 @@ const Agents: React.FC = () => {
                     ) : null}
                 </div>
             </div>
-            <div className="flex-1 relative">
+            <div className="flex-1 relative w-[calc(100%-300px)]">
                 <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
                     <Splitter.Panel defaultSize="50%" min="40%" max="70%">
                         <Spin spinning={loading} size="large" className="mt-[112px] mr-4">

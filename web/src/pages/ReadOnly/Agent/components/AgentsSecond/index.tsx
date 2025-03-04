@@ -20,7 +20,7 @@ const AgentsSecond: React.FC<ChildProps> = ({ Detaillist, Sformref }) => {
  
     useEffect(() => {});
     return (
-        <div style={{ height: '100%' }}>
+        <div style={{ height: '100%' ,width:'100%'}}>
             <div className="text-base font-medium text-[#333333] my-[30px]">
                 {intl.formatMessage({ id: 'agent.Applicationcapabilitysetting' })}
             </div>
