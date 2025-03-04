@@ -89,12 +89,14 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         self,
         agent: Dict[str, Any],
         workflow_id: int,
+        workflow_run_id: int,
         user_id: int,
         type: int,
         node_exec_id: int,
         task: Optional[Dict[str, RecursiveTaskCategory]],
         retrieve: bool,
-        direct_output: bool = False
+        direct_output: bool = False,
+        is_chat: bool = False
     ) -> Tuple[Optional[int], Dict[str, Any]]:
         agent_id = agent['id']
         input_ = {
@@ -120,7 +122,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                             ability['content'],
                             get_language_content(
                                 'agent_output_format_'
-                                f'{default_output_format if ability["output_format"] == 0 else ability["output_format"]}',
+                                f'{default_output_format if ability["output_format"] == 0 else ability["output_format"]}'
+                                f'{"_md" if (default_output_format if ability["output_format"] == 0 else ability["output_format"]) == 2 and is_chat else ""}',
                                 append_ret_lang_prompt=False
                             )
                         )
@@ -151,7 +154,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     )
                     input_['abilities_content'] = abilities_content
                     input_['output_format'] = get_language_content(
-                        f'agent_output_format_{output_format}',
+                        f'agent_output_format_{output_format}'
+                        f'{"_md" if output_format == 2 and is_chat else ""}',
                         append_ret_lang_prompt=False
                     )
                     if self.data['task_splitting']:
@@ -166,7 +170,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     uid=user_id
                 )
                 input_['output_format'] = get_language_content(
-                    f'agent_output_format_{output_format}',
+                    f'agent_output_format_{output_format}'
+                    f'{"_md" if output_format == 2 and is_chat else ""}',
                     append_ret_lang_prompt=False
                 )
                 if self.data['task_splitting']:
@@ -185,7 +190,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             )
             input_['abilities_content'] = ability['content']
             input_['output_format'] = get_language_content(
-                f'agent_output_format_{output_format}',
+                f'agent_output_format_{output_format}'
+                f'{"_md" if output_format == 2 and is_chat else ""}',
                 append_ret_lang_prompt=False
             )
             if self.data['task_splitting']:
@@ -244,9 +250,9 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 for task_execution in previous_executions:
                     previous_documents.append(f"{workflow['name']}-{task_execution['node_name']}-{task_execution['task_id']}-{task_execution['id']}")
                 if len(self.data['retrieval_task_datasets']) == 1:
-                    retrieval, _, _ = DatasetRetrieval.single_retrieve(self.data['retrieval_task_datasets'][0], 0, workflow_id, user_id, type, previous_documents)
+                    retrieval, _, _ = DatasetRetrieval.single_retrieve(self.data['retrieval_task_datasets'][0], 0, 0, workflow_id, workflow_run_id, user_id, type, previous_documents)
                 else:
-                    retrieval, _, _ = DatasetRetrieval.multiple_retrieve(self.data['retrieval_task_datasets'], 0, workflow_id, user_id, type, previous_documents)
+                    retrieval, _, _ = DatasetRetrieval.multiple_retrieve(self.data['retrieval_task_datasets'], 0, 0, workflow_id, workflow_run_id, user_id, type, previous_documents)
                 retrieval_result: List[Document] = retrieval.invoke(current_task_dict['keywords'])
                 if retrieval_result:
                     previous_documents_results = DatasetRetrieval.get_full_documents(retrieval_result)
@@ -299,6 +305,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'type': type,
                     'name': f'Agent-{agent_id}_{now}',
                     'inputs': self.data['input'].to_dict(),
+                    'selected_ability_id': self.data['ability_id'],
+                    'auto_match_ability': agent['auto_match_ability'],
                     'status': 2
                 }
             )
@@ -352,18 +360,26 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     retrieval_chain, retrieval_token_counter = None, None
                 case 1:
                     retrieval_chain, _, retrieval_token_counter = DatasetRetrieval.single_retrieve(
-                        datasets[0], agent_id, workflow_id, user_id, type
+                        datasets[0], agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
                 case _:
                     retrieval_chain, _, retrieval_token_counter = DatasetRetrieval.multiple_retrieve(
-                        datasets, agent_id, workflow_id, user_id, type
+                        datasets, agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
             
-            direct_output = bool(task) or is_chat  # Content output only (ability ID is omitted) for auto match ability & Force plain text output
+            # direct_output = bool(task) or is_chat  # Content output only (ability ID is omitted) for auto match ability & Force plain text output
+            direct_output = False
             output_format, input_ = self._prepare_prompt(
-                agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), direct_output
+                agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets), direct_output, is_chat
             )
-            return_json = output_format in [None, 2]  # Auto match ability or force JSON output
+            # Auto match ability
+            #       -- Force JSON output -- return_json is True
+            # Ability output format is JSON
+            #       -- In a workflow: Force JSON output -- return_json is True
+            #       -- Chat mode: JSON in Markdown format (text output) -- return_json is False
+            # Ability output format is not JSON
+            #       -- Text output -- return_json is False
+            return_json = (output_format is None) or (output_format == 2 and not is_chat)
             model_data, ai_output, prompt_tokens, completion_tokens, total_tokens = self.invoke(
                 app_run_id=app_run_id, 
                 edge_id=edge_id,
@@ -387,8 +403,14 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             ability_id = self.data['ability_id']
             default_output_format = agent['default_output_format']
             if output_format is None:  # Auto match ability
-                ability_id = ai_output['ability_id']
-                ai_output = ai_output['output']
+                try:
+                    ability_id = int(ai_output['ability_id'])
+                except:
+                    ability_id = 0
+                AppRuns().update(
+                    {'column': 'id', 'value': agent_run_id},
+                    {'matched_ability_id': ability_id}
+                )
                 if ability_id:
                     ability = AgentAbilities().get_ability_by_id(ability_id)
                     output_format = ability['output_format']
@@ -396,16 +418,20 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         output_format = default_output_format
                 else:
                     output_format = default_output_format
+                try:
+                    ai_output = ai_output['output']
+                except:
+                    pass
+
+            if not isinstance(ai_output, str):
+                ai_output = json.dumps(ai_output, ensure_ascii=False)
                     
-            if output_format == 2:
-                if isinstance(ai_output, str):
-                    # Check if AI output is a JSON string
-                    try:
-                        json.loads(ai_output)
-                    except json.JSONDecodeError:
-                        raise Exception(f'AI output is not a valid JSON string:\n{ai_output}')
-                else:
-                    ai_output = json.dumps(ai_output, ensure_ascii=False)
+            if output_format == 2 and not is_chat:
+                # Check if AI output is a JSON string
+                try:
+                    json.loads(ai_output)
+                except json.JSONDecodeError:
+                    raise Exception(f'AI output is not a valid JSON string:\n{ai_output}')
                 
             if retrieval_token_counter:
                 embedding_tokens = retrieval_token_counter['embedding']
@@ -576,6 +602,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'type': type,
                     'name': f'Agent-{agent_id}_{now}',
                     'inputs': self.data['input'].to_dict(),
+                    'selected_ability_id': self.data['ability_id'],
+                    'auto_match_ability': agent['auto_match_ability'],
                     'status': 2
                 }
             )
@@ -629,15 +657,15 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     retrieval_chain, retrieval_token_counter = None, None
                 case 1:
                     retrieval_chain, _, retrieval_token_counter = DatasetRetrieval.single_retrieve(
-                        datasets[0], agent_id, workflow_id, user_id, type
+                        datasets[0], agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
                 case _:
                     retrieval_chain, _, retrieval_token_counter = DatasetRetrieval.multiple_retrieve(
-                        datasets, agent_id, workflow_id, user_id, type
+                        datasets, agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
             
             _, input_ = self._prepare_prompt(
-                agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), True
+                agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets), True, True
             )
             model_data, ainvoke = self.get_ainvoke_func(
                 app_run_id=app_run_id, 

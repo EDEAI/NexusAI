@@ -38,8 +38,8 @@ language_packs = {
 
             {retrieved_docs_format}
             {reply_requirement}
-            Finally, return a JSON formatted dictionary as follows:
-            {{"ability_id": ability ID (integer type), "output": content replied in the corresponding format of the ability}}
+            Finally, you must return a JSON dictionary in the following format:
+            {{"ability_id": ability ID (integer type), "output": content replied to the user in the corresponding format of the ability}}
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
             ********************End of identity definition content********************
 
@@ -128,6 +128,7 @@ language_packs = {
         "agent_output_format_1": "as plain text",
         "agent_output_format_2": "in JSON format",
         "agent_output_format_3": "in code format",
+        "agent_output_format_2_md": "in JSON format contained in Markdown format",
         "agent_user_prompt": '''
             Below is the user's questions or needs:
             ********************Start of the user's questions or needs********************
@@ -1349,6 +1350,7 @@ prompt_keys = {
     "agent_output_format_1",
     "agent_output_format_2",
     "agent_output_format_3",
+    "agent_output_format_2_md",
     "agent_user_prompt",
     "agent_user_prompt_with_retrieved_docs",
     "llm_reply_requirement_with_task_splitting",

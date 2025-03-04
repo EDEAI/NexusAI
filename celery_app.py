@@ -147,7 +147,7 @@ def run_dataset(
     try:
         os.environ['ACTUAL_USER_ID'] = str(user_id)
         retrieval, retrieval_result, _ = DatasetRetrieval.single_retrieve(
-            dataset_id, 0, 0, user_id, 1
+            dataset_id, 0, 0, 0, 0, user_id, 1
         )
         retrieval.invoke(user_input)
         return {

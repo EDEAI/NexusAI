@@ -706,7 +706,9 @@ class DatasetRetrieval:
         cls,
         dataset_id: int,
         agent_id: int,
+        agent_run_id: int,
         workflow_id: int,
+        workflow_run_id: int,
         user_id: int,
         run_type: int,
         search_in_documents: Optional[List[str]] = None
@@ -725,7 +727,9 @@ class DatasetRetrieval:
                 {
                     'user_id': user_id,
                     'agent_id': agent_id,
+                    'agent_run_id': agent_run_id,
                     'workflow_id': workflow_id,
+                    'workflow_run_id': workflow_run_id,
                     'dataset_ids': [dataset_id],
                     'type': run_type,
                     'input': query,
@@ -818,7 +822,9 @@ class DatasetRetrieval:
         cls,
         dataset_ids: List[int],
         agent_id: int,
+        agent_run_id: int,
         workflow_id: int,
+        workflow_run_id: int,
         user_id: int,
         run_type: int,
         search_in_documents: Optional[List[str]] = None
@@ -837,7 +843,9 @@ class DatasetRetrieval:
                 {
                     'user_id': user_id,
                     'agent_id': agent_id,
+                    'agent_run_id': agent_run_id,
                     'workflow_id': workflow_id,
+                    'workflow_run_id': workflow_run_id,
                     'dataset_ids': dataset_ids,
                     'type': run_type,
                     'input': query,

@@ -52,6 +52,7 @@ class RetrieverNode(Node):
         workflow_id: int = 0,
         user_id: int = 0,
         type: int = 0,
+        app_run_id: int = 0,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -69,11 +70,11 @@ class RetrieverNode(Node):
                     raise Exception('No dataset selected!')
                 case 1:
                     retrieval, _, retrieval_token_counter = DatasetRetrieval.single_retrieve(
-                        self.data['datasets'][0], 0, workflow_id, user_id, type
+                        self.data['datasets'][0], 0, 0, workflow_id, app_run_id, user_id, type
                     )
                 case _:
                     retrieval, _, retrieval_token_counter = DatasetRetrieval.multiple_retrieve(
-                        self.data['datasets'], 0, workflow_id, user_id, type
+                        self.data['datasets'], 0, 0, workflow_id, app_run_id, user_id, type
                     )
             retrieval_result: List[Document] = retrieval.invoke(get_first_variable_value(self.data['input']))
             outputs = ArrayVariable(name='output', type='array[object]')
