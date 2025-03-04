@@ -169,7 +169,7 @@ const LoadingMessage = memo(({ detailList }: { detailList: MessageProps['detailL
         <div className="flex justify-start pb-4 max-w-[90%] min-w-[70%]">
             <div>
                 <div className="text-sm font-bold mb-2">{detailList?.app?.name}</div>
-                <div className="max-w-[90%] min-w-[70%] rounded-lg relative bg-white text-gray-900 border border-gray-200 p-4">
+                <div className="max-w-[90%] min-w-[200px] rounded-lg relative bg-white text-gray-900 border border-gray-200 p-4">
                     <div className="flex items-center gap-2 pr-4">
                         <Spin size="small" />
                         <span className="text-gray-500">{intl.formatMessage({ id: 'agent.chat.waiting' })}</span>
