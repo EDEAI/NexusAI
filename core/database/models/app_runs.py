@@ -142,9 +142,21 @@ class AppRuns(MySQL):
             offset = (data['page'] - 1) * data['page_size']
         )
 
+        # Add additional query to count records with need_human_confirm == 1
+        human_confirm_total = self.select(
+            aggregates={"id": "count"},
+            joins=[
+                ["inner", "apps", "app_runs.app_id = apps.id"],
+                ["inner", "app_node_user_relation", "app_node_user_relation.app_run_id = app_runs.id"],
+                ["inner", "app_node_executions", "app_node_executions.node_id = app_node_user_relation.node_id and app_node_executions.app_run_id = app_runs.id"]
+            ],
+            conditions=conditions + [{"column": "app_node_executions.need_human_confirm", "value": 1}]
+        )[0]["count_id"]
+
         return {
             "list": list,
             "total_count": total_count,
+            "human_confirm_total": human_confirm_total,
             "total_pages": math.ceil(total_count / data['page_size']),
             "page": data['page'],
             "page_size": data['page_size']
