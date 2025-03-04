@@ -62,6 +62,7 @@ class BackListData(BaseModel):
 class BackListResponseData(BaseModel):
     list: Optional[List[BackListData]] = None
     total_count: Optional[int] = None
+    human_confirm_total: Optional[int] = None  # New field for count of need_human_confirm==1
     total_pages: Optional[int] = None
     page: Optional[int] = None
     page_size: Optional[int] = None
