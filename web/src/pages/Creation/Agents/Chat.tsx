@@ -10,27 +10,46 @@ import {
 import InfiniteScroll from '@/components/common/InfiniteScroll';
 import { createPromptFromObject } from '@/py2js/prompt.js';
 import useSocketStore from '@/store/websocket';
-import { DeleteOutlined, SendOutlined, ExclamationCircleFilled } from '@ant-design/icons';
+import { DeleteOutlined, ExclamationCircleFilled, SendOutlined } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm, ProFormSelect, ProFormTextArea } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Button, message, Spin, Modal } from 'antd';
+import { Button, message, Modal, Spin } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 
-interface SocketMessage {
-    data: {
-        message_id: number;
-        message: string;
-        agent_run_id: number;
-        ability_id?: number;
-        error?: string;
-        created_time?: string;
-        total_tokens?: number;
-    };
+interface ApiResponse<T> {
+    code: number;
+    data: T;
+    message?: string;
 }
+
+interface SocketMessageData {
+    message_id: number;
+    message: string;
+    agent_run_id: number;
+    ability_id?: number;
+    error?: string;
+    created_time?: string;
+    total_tokens?: number;
+}
+
+interface SocketMessage {
+    data: SocketMessageData;
+}
+
+interface WebSocketStore {
+    getTypedMessages: (type: string) => SocketMessageData[];
+    getTypedLastMessage: (type: string) => SocketMessage | null;
+}
+
+interface SocketMessageResponse {
+    data: SocketMessageData;
+}
+
+type SocketMessages = SocketMessageResponse[];
 
 interface Message {
     id: number;
@@ -40,12 +59,28 @@ interface Message {
     error?: string;
     created_time?: string;
     total_tokens?: number;
+    content?: string;
+    isUser?: boolean;
+    agent_id?: number;
+    completion_tokens?: number;
+    prompt_tokens?: number;
 }
 
 interface MessageProps {
     message: Message;
-    detailList?: any;
-    abilitiesList?: any;
+    detailList?: {
+        agent: {
+            agent_id: number;
+            input_variables: any;
+        };
+        app?: {
+            name: string;
+        };
+    };
+    abilitiesList?: Array<{
+        value: number;
+        label: string;
+    }>;
 }
 
 interface Props {
@@ -64,6 +99,17 @@ interface Props {
             label: string;
         }>;
     };
+    operationbentate?: string;
+    saveInfo?: {
+        firstjudgingcondition: () => boolean;
+        secondjudgingcondition: () => boolean;
+        agentupdata: () => void;
+    };
+}
+
+interface HistoryResponse {
+    list: Message[];
+    total_pages: number;
 }
 
 const UserMessageComponent = memo(({ message }: MessageProps) => (
@@ -117,36 +163,67 @@ const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: Messag
     );
 });
 
-export default memo(props => {
+const LoadingMessage = memo(({ detailList }: { detailList: MessageProps['detailList'] }) => {
+    const intl = useIntl();
+    return (
+        <div className="flex justify-start pb-4 max-w-[90%] min-w-[70%]">
+            <div>
+                <div className="text-sm font-bold mb-2">{detailList?.app?.name}</div>
+                <div className="max-w-[90%] min-w-[70%] rounded-lg relative bg-white text-gray-900 border border-gray-200 p-4">
+                    <div className="flex items-center gap-2 pr-4">
+                        <Spin size="small" />
+                        <span className="text-gray-500">{intl.formatMessage({ id: 'agent.chat.waiting' })}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+});
+
+export default memo((props: Props) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [hasMoreHistory, setHasMoreHistory] = useState(true);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [clearingMemory, setClearingMemory] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
+    const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
     const formRef = useRef<ProFormInstance>();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const intl = useIntl();
-    const listenMessage = useSocketStore<SocketMessage[]>(state =>
-        state.getTypedMessages('chat_message_llm_return'),
+
+    const listenMessage = useSocketStore(state =>
+        (state as unknown as WebSocketStore).getTypedMessages('chat_message_llm_return'),
     );
-    const lastMessage = useSocketStore<SocketMessage>(state =>
-        state.getTypedLastMessage('chat_message_llm_return'),
+
+    const lastMessage = useSocketStore(state =>
+        (state as unknown as WebSocketStore).getTypedLastMessage('chat_message_llm_return'),
     );
+    console.log(props.data);
+    
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
-
+    const handleSaveInfo = () => {
+        if (props?.saveInfo?.firstjudgingcondition()) {
+        } else if (props?.saveInfo?.secondjudgingcondition()) {
+        } else {
+            props?.saveInfo?.agentupdata();
+        }
+    };
     useUpdateEffect(() => {
-        if (!lastMessage) return;
-        const newMessage = {
-            ...lastMessage.data,
-            id: lastMessage.data.message_id,
+        const messageData = lastMessage?.data;
+        if (!messageData) return;
+
+        const newMessage: Message = {
+            ...messageData,
+            id: messageData.message_id,
         };
 
-        if (listenMessage.length > 0) {
+        if (listenMessage && listenMessage.length > 0) {
+            setIsWaitingForResponse(false);
             setMessages(prev => [...prev, newMessage]);
             setTimeout(scrollToBottom, 100);
         }
@@ -154,7 +231,9 @@ export default memo(props => {
 
     const handleSubmit = async (values: { content: string }) => {
         console.log(values);
-        const val = formRef.current.getFieldsValue();
+        const val = formRef.current?.getFieldsValue();
+        if (!val || !values.content?.trim()) return;
+
         const agent_id = props.data.detailList.agent.agent_id;
         const input_dict = props.data.detailList.agent.input_variables;
         const ability_id = val.ability_id;
@@ -163,9 +242,8 @@ export default memo(props => {
                 value: val.content,
             },
         });
-        if (!values.content?.trim()) return;
 
-        const newMessage = {
+        const newMessage: Message = {
             id: Date.now(),
             content: values.content,
             isUser: true,
@@ -178,22 +256,35 @@ export default memo(props => {
             prompt_tokens: 0,
             total_tokens: 0,
         };
-        const res = await postAgentChatMessage({
-            agent_id,
-            input_dict,
-            ability_id,
-            prompt,
-        });
-        setMessages([...messages, newMessage]);
+
+        setIsWaitingForResponse(true);
+        setMessages(prev => [...prev, newMessage]);
         formRef.current?.resetFields(['content']);
+
+        try {
+            await postAgentChatMessage({
+                agent_id,
+                input_dict,
+                ability_id,
+                prompt,
+            });
+        } catch (error) {
+            setIsWaitingForResponse(false);
+            message.error('发送消息失败，请重试');
+        }
 
         setTimeout(scrollToBottom, 100);
     };
 
     const getMessageHistory = async () => {
+        if (!props.data?.detailList?.agent?.agent_id) return;
+
         try {
             setInitialLoading(true);
-            const res = await getAgentMessageHistory(props.data?.detailList?.agent?.agent_id, 1);
+            const res = await getAgentMessageHistory(
+                String(props.data.detailList.agent.agent_id),
+                1,
+            );
             if (res.data?.list) {
                 setMessages(res.data.list);
                 setHasMoreHistory(res.data.total_pages > 1);
@@ -212,10 +303,10 @@ export default memo(props => {
         try {
             setLoading(true);
             const nextPage = page + 1;
-            const res = await getAgentMessageHistory(
-                props.data.detailList.agent.agent_id,
+            const res = (await getAgentMessageHistory(
+                String(props.data.detailList.agent.agent_id),
                 nextPage,
-            );
+            )) as ApiResponse<HistoryResponse>;
 
             if (res.data?.list?.length > 0) {
                 setMessages(prev => [...res.data.list, ...prev]);
@@ -233,7 +324,7 @@ export default memo(props => {
     };
 
     const handleClearMemory = async () => {
-        if (!props.data?.detailList?.agent?.agent_id || clearingMemory) return;
+        if (!props.data?.detailList?.agent?.agent_id || clearingMemory || !messages.length) return;
 
         Modal.confirm({
             title: intl.formatMessage({ id: 'agent.chat.clear.memory.confirm.title' }),
@@ -244,11 +335,11 @@ export default memo(props => {
             onOk: async () => {
                 try {
                     setClearingMemory(true);
+                    const lastMessageId = messages[messages.length - 1].id;
                     await clearAgentMessageMemory(
-                        props.data.detailList.agent.agent_id,
-                        messages[messages.length - 1].id,
+                        String(props.data.detailList.agent.agent_id),
+                        lastMessageId,
                     );
-                    // setMessages([]);
                     message.success(intl.formatMessage({ id: 'agent.chat.clear.memory.success' }));
                 } catch (error) {
                     console.error('Failed to clear context memory:', error);
@@ -311,10 +402,14 @@ export default memo(props => {
                 }}
                 className="m-0 flex flex-col overflow-y-auto "
             >
-                <div className="pb-4 flex gap-[10px]" style={{
-                    paddingBottom:'16px'
-                }}>
-                    <ProFormSelect
+                <div
+                    className="pb-4 flex gap-[10px] "
+                    style={{
+                        paddingBottom: '16px',
+                    }}
+                >
+                  
+                    {/* <ProFormSelect
                         label={intl.formatMessage({ id: 'agent.selectivepower' })}
                         name="ability_id"
                         options={props.data?.abilitiesList}
@@ -324,21 +419,29 @@ export default memo(props => {
                         formItemProps={{
                             className: 'mb-0 flex-1',
                         }}
-                    />
+                    /> */}
+                    <div className='flex-1 flex items-center font-bold text-base'>
+                        {props.data?.detailList?.app?.name}
+                    </div>
+                    <Button
+                        type="primary"
+                        disabled={props.operationbentate == 'false' ? false : true}
+                        onClick={handleSaveInfo}
+                        className="min-w-24"
+                    >
+                        {intl.formatMessage({ id: 'agent.btn.savedebug' })}
+                    </Button>
                     <Button
                         type="primary"
                         disabled={props.operationbentate == 'false' ? false : true}
                         onClick={agentPublish}
-                        className=' min-w-40'
+                        className="min-w-24"
                     >
                         {intl.formatMessage({ id: 'agent.publish' })}
                     </Button>
                 </div>
-                <div className='bg-gray-50 rounded-md border border-[#ccc] flex-1 overflow-y-auto flex flex-col'>
-                    <div
-                        className="flex-1 overflow-y-auto "
-                        ref={chatContainerRef}
-                    >
+                <div className="bg-gray-50 rounded-md border border-[#ccc] flex-1 overflow-y-auto flex flex-col">
+                    <div className="flex-1 overflow-y-auto " ref={chatContainerRef}>
                         <InfiniteScroll
                             className="h-full"
                             onLoadPrevious={fetchHistoryMessages}
@@ -360,27 +463,17 @@ export default memo(props => {
                                         />
                                     ),
                                 )}
+                                {isWaitingForResponse && (
+                                    <LoadingMessage detailList={props?.data?.detailList} />
+                                )}
                                 <div ref={messagesEndRef} />
                             </div>
                         </InfiniteScroll>
                     </div>
 
-                    <div className="border-t border-gray-200  p-4 relative">
-                        <div
-                            style={{
-                                top: '-40px',
-                            }}
-                            className="flex items-center mb-2 justify-end absolute !-top-10 right-3"
-                        >
-                            <Button
-                                icon={<DeleteOutlined />}
-                                loading={clearingMemory}
-                                onClick={handleClearMemory}
-                            >
-                                {intl.formatMessage({ id: 'agent.chat.clear.memory' })}
-                            </Button>
-                        </div>
-                        <div className="flex items-center p-[12px] gap-[10px] box-border border bg-white rounded-[8px]">
+                    <div className="border-t border-gray-200 bg-white  px-4 py-2 relative">
+                        
+                        <div className="flex items-center p-[8px] gap-[10px] box-border border bg-white rounded-[8px]">
                             <div className="flex-1">
                                 <ProFormTextArea
                                     name="content"
@@ -396,7 +489,9 @@ export default memo(props => {
                                                 formRef.current?.submit();
                                             }
                                         },
+                                        size: 'small',
                                         className: '',
+                                        title: intl.formatMessage({ id: 'agent.chat.input.shift.enter' }),
                                     }}
                                     formItemProps={{
                                         className: 'mb-0',
@@ -409,11 +504,34 @@ export default memo(props => {
                                 type="primary"
                                 className="min-w-[30px] h-[30px] flex items-center justify-center cursor-pointer rounded-[6px]"
                                 icon={<SendOutlined />}
+                                title={intl.formatMessage({ id: 'agent.chat.send' })}
                             />
+                        </div>
+                        <div className="flex items-center mt-1 gap-2">
+                            <ProFormSelect
+                                // label={intl.formatMessage({ id: 'agent.selectivepower' })}
+                                name="ability_id"
+                                options={props.data?.abilitiesList}
+                                fieldProps={{
+                                    placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
+                                    size: 'small',
+                                }}
+                                formItemProps={{
+                                    className: 'mb-0',
+                                }}
+                            />
+                            <Button
+                                icon={<DeleteOutlined />}
+                                loading={clearingMemory}
+                                onClick={handleClearMemory}
+                                size="small"
+                            >
+                                {intl.formatMessage({ id: 'agent.chat.clear.memory' })}
+                            </Button>
                         </div>
                     </div>
                 </div>
             </ProForm>
-            </div>
-        );
-    });
+        </div>
+    );
+});

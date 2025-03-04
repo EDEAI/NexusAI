@@ -276,7 +276,7 @@ const AgentsSecond: React.FC<ChildProps> = ({
                             </>
                         )}
                     </Form.List>
-                    <div>
+                    {/* <div>
                         <Button
                             type="primary"
                             className="mr-[20px]"
@@ -293,7 +293,7 @@ const AgentsSecond: React.FC<ChildProps> = ({
                         >
                             {intl.formatMessage({ id: 'agent.btn.back' })}
                         </Button>
-                    </div>
+                    </div> */}
                     <div className="h-[30px] w-1"></div>
                 </Form>
             </div>

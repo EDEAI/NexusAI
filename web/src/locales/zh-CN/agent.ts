@@ -77,7 +77,7 @@ export default {
     'agent.created': '创造',
     'agent.btn.nextstep': '下一步',
     'agent.btn.back': '取消',
-    'agent.btn.savedebug': '保存并调试',
+    'agent.btn.savedebug': '保存',
     'agent.save.and.click': '请先保存agent',
 
     'agent.explain.teamvisibility': 'agent发布后团队内其他成员也可以使用',
@@ -166,10 +166,10 @@ export default {
     'agent.chat.input.placeholder': '请输入消息...',
     'agent.chat.error.message': '运行错误',
     'agent.chat.tokens': 'tokens',
-    'agent.chat.clear.memory': '清除上下文记忆',
-    'agent.chat.clear.memory.success': '上下文记忆已清除',
+    'agent.chat.clear.memory': '清除记忆',
+    'agent.chat.clear.memory.success': '记忆已清除',
     'agent.chat.clear.memory.confirm.title': '确认清除',
-    'agent.chat.clear.memory.confirm.content': '确定要清除上下文记忆吗？这将重置当前对话的上下文。',
+    'agent.chat.clear.memory.confirm.content': '确定要清除记忆吗？这将重置当前对话的上下文。',
     'agent.chat.clear.memory.confirm.ok': '确认',
     'agent.chat.clear.memory.confirm.cancel': '取消',
 
@@ -183,6 +183,7 @@ export default {
     'agent.log.no.conversation': '无历史Prompt',
     'agent.file.download': '下载',
     'agent.file.output': '输出文件',
+    'agent.file.variable': '变量名',
 
     // Variable Types
     'workflow.vars.file': 'File',
@@ -195,5 +196,20 @@ export default {
     'customcode.notice.file.return': '文件返回要求',
     'customcode.notice.file.return.desc': '如果代码需要返回文件路径，该返回值必须以"file://"开头，以便系统正确识别为文件类型。',
     'customcode.notice.file.return.example': '例如：file:///storage/my_folder/my_file.txt',
+    
+    // Chat interface additional translations
+    'agent.chat.waiting': '思考中...',
+    'agent.chat.send': '发送',
+    'agent.chat.input.shift.enter': 'Shift + Enter 换行',
+    'agent.chat.load.history': '加载历史消息',
+    'agent.chat.no.messages': '暂无消息',
+    'agent.chat.system.error': '系统错误，请稍后重试',
+    'agent.chat.network.error': '网络错误，请检查网络连接',
+    'agent.chat.retry': '重试',
+    'agent.chat.copy': '复制',
+    'agent.chat.copy.success': '复制成功',
+    'agent.chat.copy.failed': '复制失败',
+    'agent.chat.scroll.bottom': '滚动到底部',
+    'agent.chat.new.message': '有新消息',
 };
 // {intl.formatMessage({ id: 'agent.btn.back' })}

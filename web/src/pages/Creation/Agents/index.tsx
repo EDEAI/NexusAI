@@ -18,7 +18,7 @@ import {
 } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
-import { Button, Form, Menu, message, Spin } from 'antd';
+import { Button, Form, Menu, message, Spin, Splitter } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import AgentsFirst from '../components/AgentsFirst';
 import AgentsFourthly from '../components/AgentsFourthly';
@@ -95,7 +95,7 @@ const Agents: React.FC = () => {
             key: '5',
             disabled: agentmenudisabled.fourthly,
             icon: <FileTextOutlined />,
-            label:`运行日志`,
+            label: `运行日志`,
             style: {
                 padding: '15px',
                 width: '100%',
@@ -416,13 +416,13 @@ const Agents: React.FC = () => {
                 agent_abilities[0].content == ''
             ) {
                 setAgentmunudisabled({ first: false, second: false, fourthly: false });
-                pageKeyfun('4');
+                // pageKeyfun('4');
             } else {
                 PutagentAbilitiesset(params)
                     .then(res => {
                         if (res.code == 0) {
                             setAgentmunudisabled({ first: false, second: false, fourthly: false });
-                            pageKeyfun('4');
+                            // pageKeyfun('4');
                         }
                     })
                     .catch(err => {});
@@ -532,132 +532,148 @@ const Agents: React.FC = () => {
                     ) : null}
                 </div>
             </div>
-            <div className="flex-1 grid grid-cols-2 relative">
-                <Spin spinning={loading} size="large" className="mt-[112px]">
-                    <div
-                        className="flex flex-col"
-                        style={{
-                            height: 'calc(100vh - 56px)',
-                            // width: 'calc(100vw - 230px)',
-                            overflowY: 'scroll',
-                            scrollbarWidth: 'none',
-                        }}
-                    >
-                        <div
-                            className="px-[30px] "
-                            style={{ overflowX: 'auto', height: '100%' }}
-                        >
-                            <div className="w-full flex justify-center  mt-[30px]">
-                                <div className="flex items-center w-full ">
-                                    <div className="mr-[10px] w-[16px] h-[16px]">
-                                        <img
-                                            src="/icons/flag.svg"
-                                            alt=""
-                                            className="w-[16px] h-[16px]"
+            <div className="flex-1 relative">
+                <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+                    <Splitter.Panel defaultSize="50%" min="40%" max="70%">
+                        <Spin spinning={loading} size="large" className="mt-[112px] mr-4">
+                            <div
+                                className="flex flex-col"
+                                style={{
+                                    height: 'calc(100vh - 56px)',
+                                    // width: 'calc(100vw - 230px)',
+                                    overflowY: 'scroll',
+                                    scrollbarWidth: 'none',
+                                }}
+                            >
+                                <div
+                                    className="px-[30px] "
+                                    style={{ overflowX: 'auto', height: '100%' }}
+                                >
+                                    <div className="w-full flex justify-center  mt-[30px]">
+                                        <div className="flex items-center w-full ">
+                                            <div className="mr-[10px] w-[16px] h-[16px]">
+                                                <img
+                                                    src="/icons/flag.svg"
+                                                    alt=""
+                                                    className="w-[16px] h-[16px]"
+                                                />
+                                            </div>
+                                            <div className="flex items-center">
+                                                <div className="mr-[6px] text-lg text-[#213044] font-medium">
+                                                    {createappdata('GET')?.app_id
+                                                        ? intl.formatMessage({
+                                                              id: 'agent.compile',
+                                                          })
+                                                        : intl.formatMessage({
+                                                              id: 'agent.created',
+                                                          })}
+                                                    {intl.formatMessage({ id: 'agent' })}
+                                                </div>
+                                                {Detaillist?.app?.publish_status === 1 ? (
+                                                    <div className="bg-[#1B64F3] px-[7px] text-[#fff] rounded font-normal text-xs flex items-center justify-center h-[18px]">
+                                                        {intl.formatMessage({
+                                                            id: 'agent.havepublished',
+                                                        })}
+                                                    </div>
+                                                ) : (
+                                                    <div className=" bg-[#EEE] px-[7px]  text-[#999] rounded font-normal text-xs flex items-center justify-center h-[18px]">
+                                                        {intl.formatMessage({
+                                                            id: 'agent.unpublish',
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style={{
+                                            display: pageKey === '1' ? 'flex' : 'none',
+                                            height: 'calc(100vh - 146px)',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <AgentsFirst
+                                            FirstValue={handleValueFromChid}
+                                            Ffromref={Ffromref}
+                                            Detaillist={Detaillist}
+                                            setDetaillist={setDetaillist}
+                                            repository={repository}
+                                            setRepository={setRepository}
+                                            Newproperties={Newproperties}
+                                            setNewproperties={setNewproperties}
+                                            Operationbentate={Operationbentate}
+                                            Fourthly_config_id={Fourthly_config_id}
+                                            setFourthly_config_id={setFourthly_config_id}
+                                            Fourthly_select_list={Fourthly_select_list}
+                                            pageKeyfun={pageKeyfun}
+                                            firstjudgingcondition={firstjudgingcondition}
+                                            agentmenudisabled={agentmenudisabled}
+                                            setAgentmunudisabled={setAgentmunudisabled}
                                         />
                                     </div>
-                                    <div className="flex items-center">
-                                        <div className="mr-[6px] text-lg text-[#213044] font-medium">
-                                            {createappdata('GET')?.app_id
-                                                ? intl.formatMessage({ id: 'agent.compile' })
-                                                : intl.formatMessage({ id: 'agent.created' })}
-                                            {intl.formatMessage({ id: 'agent' })}
-                                        </div>
-                                        {Detaillist?.app?.publish_status === 1 ? (
-                                            <div className="bg-[#1B64F3] px-[7px] text-[#fff] rounded font-normal text-xs flex items-center justify-center h-[18px]">
-                                                {intl.formatMessage({ id: 'agent.havepublished' })}
-                                            </div>
-                                        ) : (
-                                            <div className=" bg-[#EEE] px-[7px]  text-[#999] rounded font-normal text-xs flex items-center justify-center h-[18px]">
-                                                {intl.formatMessage({ id: 'agent.unpublish' })}
-                                            </div>
-                                        )}
+                                    <div
+                                        style={{
+                                            display: pageKey === '2' ? 'flex' : 'none',
+                                            height: 'calc(100vh - 146px)',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <AgentsSecond
+                                            SecondValue={SecondValue}
+                                            Detaillist={Detaillist}
+                                            setDetaillist={setDetaillist}
+                                            Sformref={Sformref}
+                                            Operationbentate={Operationbentate}
+                                            handleBack={handleBack}
+                                            pageKeyfun={pageKeyfun}
+                                            SkillMenuClick={SkillMenuClick}
+                                            secondjudgingcondition={secondjudgingcondition}
+                                            agentupdata={agentupdata}
+                                        />
+                                    </div>
+                                    <div
+                                        style={{
+                                            display: pageKey === '4' ? 'flex' : 'none',
+                                            height: 'calc(100vh - 146px)',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <AgentsFourthly
+                                            handleBack={handleBack}
+                                            Detaillist={Detaillist}
+                                            setDetaillist={setDetaillist}
+                                            Fourthly_select_list={Fourthly_select_list}
+                                            Fourthly_config_id={Fourthly_config_id}
+                                            setFourthly_config_id={setFourthly_config_id}
+                                            Fourthlyref={Fourthlyref}
+                                            Fourthly_abilities_list={Fourthly_abilities_list}
+                                            Operationbentate={Operationbentate}
+                                            callwordlist={callwordlist}
+                                            newagentid={newagentid}
+                                        />
                                     </div>
                                 </div>
                             </div>
-                            <div
-                                style={{
-                                    display: pageKey === '1' ? 'flex' : 'none',
-                                    height: 'calc(100vh - 146px)',
-                                    justifyContent: 'center',
+                        </Spin>
+                    </Splitter.Panel>
+                    <Splitter.Panel>
+                        <div>
+                            <Chat
+                                saveInfo={{firstjudgingcondition,secondjudgingcondition,agentupdata}}
+                                operationbentate={Operationbentate}
+                                data={{
+                                    abilitiesList: Fourthly_abilities_list,
+                                    detailList: Detaillist,
                                 }}
-                            >
-                                <AgentsFirst
-                                    FirstValue={handleValueFromChid}
-                                    Ffromref={Ffromref}
-                                    Detaillist={Detaillist}
-                                    setDetaillist={setDetaillist}
-                                    repository={repository}
-                                    setRepository={setRepository}
-                                    Newproperties={Newproperties}
-                                    setNewproperties={setNewproperties}
-                                    Operationbentate={Operationbentate}
-                                    Fourthly_config_id={Fourthly_config_id}
-                                    setFourthly_config_id={setFourthly_config_id}
-                                    Fourthly_select_list={Fourthly_select_list}
-                                    pageKeyfun={pageKeyfun}
-                                    firstjudgingcondition={firstjudgingcondition}
-                                    agentmenudisabled={agentmenudisabled}
-                                    setAgentmunudisabled={setAgentmunudisabled}
-                                />
-                            </div>
-                            <div
-                                style={{
-                                    display: pageKey === '2' ? 'flex' : 'none',
-                                    height: 'calc(100vh - 146px)',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <AgentsSecond
-                                    SecondValue={SecondValue}
-                                    Detaillist={Detaillist}
-                                    setDetaillist={setDetaillist}
-                                    Sformref={Sformref}
-                                    Operationbentate={Operationbentate}
-                                    handleBack={handleBack}
-                                    pageKeyfun={pageKeyfun}
-                                    SkillMenuClick={SkillMenuClick}
-                                    secondjudgingcondition={secondjudgingcondition}
-                                    agentupdata={agentupdata}
-                                />
-                            </div>
-                            <div
-                                style={{
-                                    display: pageKey === '4' ? 'flex' : 'none',
-                                    height: 'calc(100vh - 146px)',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <AgentsFourthly
-                                    handleBack={handleBack}
-                                    Detaillist={Detaillist}
-                                    setDetaillist={setDetaillist}
-                                    Fourthly_select_list={Fourthly_select_list}
-                                    Fourthly_config_id={Fourthly_config_id}
-                                    setFourthly_config_id={setFourthly_config_id}
-                                    Fourthlyref={Fourthlyref}
-                                    Fourthly_abilities_list={Fourthly_abilities_list}
-                                    Operationbentate={Operationbentate}
-                                    callwordlist={callwordlist}
-                                    newagentid={newagentid}
-                                />
-                            </div>
+                            />
                         </div>
-                    </div>
-                </Spin>
-                <div>
-                    <Chat operationbentate={Operationbentate}  data={{
-                        abilitiesList:Fourthly_abilities_list,
-                        detailList:Detaillist
-                    }}/>
-                </div>
-                {
-                    pageKey == '5' && (
-                        <div className='absolute bottom-0 left-0 right-0 bg-slate-50 w-full h-full z-10'>
+                    </Splitter.Panel>
+                    {pageKey == '5' && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-slate-50 w-full h-full z-10">
                             <Log agent_id={Detaillist.agent.agent_id}></Log>
                         </div>
-                    )
-                }
+                    )}
+                </Splitter>
             </div>
         </div>
     );
