@@ -1,4 +1,4 @@
-INSERT INTO `suppliers` (`id`, `name`, `mode`, `created_time`, `updated_time`, `status`) VALUES (NULL, 'Anthropic', '1', CURRENT_TIMESTAMP, NULL, '1');
+INSERT INTO `suppliers` (`id`, `name`, `mode`, `created_time`, `updated_time`, `status`) VALUES (3, 'Anthropic', '1', CURRENT_TIMESTAMP, NULL, '1');
 
 INSERT INTO `supplier_configurations` (`id`, `team_id`, `supplier_id`, `config`, `created_time`, `updated_time`, `status`) VALUES (NULL, '1', '3', '{}', CURRENT_TIMESTAMP, NULL, '1');
 
