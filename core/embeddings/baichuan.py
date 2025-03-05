@@ -1,18 +1,17 @@
 from typing import List, Optional
 
 from langchain_community.embeddings import BaichuanTextEmbeddings as OriginalBaichuanTextEmbeddings
-from langchain_core.pydantic_v1 import Extra
+
 from requests import RequestException
 
 BAICHUAN_API_URL: str = "http://api.baichuan-ai.com/v1/embeddings"
 
 
 class BaichuanTextEmbeddings(OriginalBaichuanTextEmbeddings):
-    class Config:
-        """Configuration for this pydantic object."""
-
-        extra = Extra.allow
-        arbitrary_types_allowed = True
+    model_config = {
+        "extra": "allow",
+        "arbitrary_types_allowed": True,
+    }
         
         
     def __init__(self, *args, **kwargs):

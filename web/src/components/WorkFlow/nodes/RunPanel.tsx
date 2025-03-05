@@ -8,6 +8,7 @@ import useSocketStore from '@/store/websocket';
 import {
     CheckCircleOutlined,
     CloseOutlined,
+    DownloadOutlined,
     InboxOutlined,
     LoadingOutlined,
     SyncOutlined,
@@ -39,6 +40,7 @@ import {
 import useSaveWorkFlow from '../saveWorkFlow';
 import useStore from '../store';
 import { BlockEnum } from '../types';
+import FileDownloadList from '@/components/common/FileDownloadList';
 const { Text } = Typography;
 const { ErrorBoundary } = Alert;
 export default memo(() => {
@@ -245,7 +247,7 @@ export default memo(() => {
                                         !NOT_SHOW_OUTPUT_RESULT_NODE.includes(
                                             nodeInfo.node_type,
                                         ) && (
-                                            <div className="h-80 w-[300px]">
+                                            <div className="h-80 w-[314px]">
                                                 <CodeEditor
                                                     language="python3"
                                                     value={nodeInfo?.outputs}
@@ -259,6 +261,14 @@ export default memo(() => {
                                                 ></CodeEditor>
                                             </div>
                                         )}
+
+                                    {nodeInfo.file_list && nodeInfo.file_list.length > 0 && (
+                                        <FileDownloadList 
+                                            files={nodeInfo.file_list} 
+                                            title={intl.formatMessage({ id: 'skill.downloadFiles' })}
+                                            className="w-[314px]"
+                                        />
+                                    )}
                                 </div>
                             );
                         } else if (nodeInfo.status == 4) {
@@ -695,16 +705,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
     );
 });
 
-const ResultContent = memo(() => {
-    return (
-        <>
-            <Alert
-                message="Success TextSuccess TextSuccess TextSuccess TextSuccess TextSuccess TextSuccess Text"
-                type="success"
-            ></Alert>
-        </>
-    );
-});
+
 
 const DetailContent = memo(({ endRun }) => {
     const intl = useIntl();
@@ -811,6 +812,7 @@ const DetailContent = memo(({ endRun }) => {
                     })}
                 ></CodeEditor>
             </div>
+
             <Divider orientationMargin="0" orientation="left">
                 {intl.formatMessage({ id: 'workflow.label.metadata', defaultMessage: '' })}
             </Divider>
@@ -882,6 +884,13 @@ const DetailContent = memo(({ endRun }) => {
                     name="actual_completed_steps"
                 ></ProFormText>
             </ProForm>
+
+            {endRun?.data?.node_exec_data?.file_list?.length > 0 && (
+                <FileDownloadList 
+                    files={endRun.data.node_exec_data.file_list} 
+                    title={intl.formatMessage({ id: 'skill.downloadFiles' })}
+                />
+            )}
         </>
     );
 });

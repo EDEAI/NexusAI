@@ -15,7 +15,7 @@ class WorkflowsListData(BaseModel):
     icon_background: Optional[str] = None
     icon: Optional[str] = None
     publish_status: Optional[int] = None
-    workflow_published_time: Optional[datetime] = None
+    workflow_published_time: Optional[str] = None
 
 
 class WorkflowsListResponseData(BaseModel):

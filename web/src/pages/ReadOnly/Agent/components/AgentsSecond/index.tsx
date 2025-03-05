@@ -20,7 +20,7 @@ const AgentsSecond: React.FC<ChildProps> = ({ Detaillist, Sformref }) => {
  
     useEffect(() => {});
     return (
-        <div style={{ height: '100%' }}>
+        <div style={{ height: '100%' ,width:'100%'}}>
             <div className="text-base font-medium text-[#333333] my-[30px]">
                 {intl.formatMessage({ id: 'agent.Applicationcapabilitysetting' })}
             </div>
@@ -40,7 +40,7 @@ const AgentsSecond: React.FC<ChildProps> = ({ Detaillist, Sformref }) => {
             <div className="w-full">
                 <Form
                     name="dynamic_form_nest_item"
-                    style={{ width: 900 }}
+                    style={{ width: '100%' }}
                     autoComplete="off"
                     form={Sformref}
                 >
@@ -68,7 +68,7 @@ const AgentsSecond: React.FC<ChildProps> = ({ Detaillist, Sformref }) => {
                                                 id: 'agent.capabilityname',
                                             })}
                                             value={item.name}
-                                            className="w-80"
+                                            className="w-full"
                                         />
                                     </Form.Item>
                                     <div className="mb-[15px]">
@@ -90,7 +90,7 @@ const AgentsSecond: React.FC<ChildProps> = ({ Detaillist, Sformref }) => {
                                                 id: 'agent.capabilitydescription',
                                             })}
                                             autoSize={{ minRows: 3, maxRows: 10 }}
-                                            style={{ width: '700px' }}
+                                            style={{ width: '100%' }}
                                         />
                                     </Form.Item>
                                     <div className="text-[#555555] text-xs font-medium mb-[15px]">

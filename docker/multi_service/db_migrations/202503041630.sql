@@ -1,0 +1,5 @@
+-- Add gpt-4.5-preview model
+INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `created_time`, `updated_time`, `status`) VALUES (24, '1', 'gpt-4.5-preview', '1', '1', '128000', '16384', CURRENT_TIMESTAMP, NULL, '1');
+
+-- Add model configuration for gpt-4.5-preview
+INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) VALUES (24, '1', '24', '{\"n\": 1, \"stop\": null, \"model\": \"gpt-4.5-preview\", \"streaming\": false, \"max_tokens\": null, \"http_client\": null, \"max_retries\": 2, \"temperature\": 1, \"model_kwargs\": {}, \"openai_proxy\": null, \"default_query\": null, \"default_headers\": null, \"openai_api_base\": null, \"request_timeout\": null, \"http_async_client\": null, \"openai_organization\": null, \"tiktoken_model_name\": null}', '0', 91,CURRENT_TIMESTAMP, NULL, '1');

@@ -59,7 +59,7 @@ export default {
     'app.check_popup.check': 'Add all',
 
     'app.chatroom.content.summary':'Orientation',
-    'app.chatroom.content.meetingSummary':'Meeting Orientation',
+    'app.chatroom.content.meetingSummary':'Round Table Orientation',
 
     'app.chatroom.sidebar.return': 'Return',
     'app.chatroom.sidebar.agent_title': 'Agent',
@@ -99,7 +99,7 @@ export default {
     'app.workflow.needHumanConfirm': 'Need human confirmation',
     'app.workflow.noHumanConfirm': 'Human confirmation processed',
 
-    "app.summary.title":"Meeting Orientation",
+    "app.summary.title":"Discussion summary",
     "app.summary.submitText":"Submit revisions",
     "app.summary.next":"Next step",
     "app.summary.placeholder":"Please enter your correction suggestion... .",
@@ -109,7 +109,7 @@ export default {
 
     "app.summary.backlogTips":"You have a pending task",
 
-    "app.summaryhistory.orientation":"Revisions to the meeting summary",
+    "app.summaryhistory.orientation":"Revised discussion summary",
     "app.summaryhistory.time":"Correction time",
     "app.summaryhistory.runapp":"Run the application",
     "app.summaryhistory.input":"Input parameters",

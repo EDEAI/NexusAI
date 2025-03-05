@@ -140,6 +140,7 @@ class Datasets(MySQL):
         :param team_id: The ID of the team.
         :param user_id: The ID of the user.
         :param is_individual: int, 1 personage 2 Team visible and individual
+        :param temporary_chatroom_id: int, temporary chatroom id, default is 0
         :return: A list of datasets.
         """
         where = f"(B.is_public = 1 OR (B.is_public = 0 AND B.user_id = {user_id}))"
@@ -150,6 +151,7 @@ class Datasets(MySQL):
                     SELECT A.id as dataset_id,B.id as app_id,B.name FROM `datasets` AS A
                     LEFT JOIN `apps` AS B ON A.app_id = B.id
                     WHERE A.team_id = {team_id} AND A.status < 3 AND {where}
+                    AND A.temporary_chatroom_id = 0  
                 """
         return self.execute_query(sql).fetchall()
 

@@ -38,4 +38,6 @@ export default {
     ...user,
     ...skill,
     ...plaza,
+    'skill.downloadFiles': 'Output Files',
+    'skill.download': 'Download',
 };

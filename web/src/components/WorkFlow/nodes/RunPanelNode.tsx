@@ -3,7 +3,7 @@
  */
 import { runNode } from '@/api/workflow';
 import { ObjectVariable, Variable } from '@/py2js/variables.js';
-import { CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined, DownloadOutlined } from '@ant-design/icons';
 import {
     ProCard,
     ProForm,
@@ -20,6 +20,7 @@ import CodeEditor from '../components/Editor/CodeEditor';
 import useNodeIdUpdate from '../hooks/useNodeIdUpdate';
 import useSaveWorkFlow from '../saveWorkFlow';
 import useStore from '../store';
+import FileDownloadList from '@/components/common/FileDownloadList';
 
 export default memo(() => {
     const intl = useIntl();
@@ -154,6 +155,14 @@ export default memo(() => {
                             title={intl.formatMessage({ id: 'workflow.outputs' })}
                         ></CodeEditor>
                     </div>
+                )}
+
+                {result?.data?.file_list?.length > 0 && (
+                    <FileDownloadList 
+                        files={result.data.file_list} 
+                        title={intl.formatMessage({ id: 'skill.downloadFiles' })}
+                        className="mt-4"
+                    />
                 )}
 
                 <Divider orientationMargin="0" orientation="left">

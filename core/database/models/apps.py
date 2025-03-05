@@ -5,6 +5,7 @@ from core.database.models.app_workflow_relation import AppWorkflowRelations
 from core.database.models.tag_bindings import TagBindings
 from core.helper import generate_api_token
 from languages import get_language_content
+from core.database.models.datasets import Datasets
 
 
 class Apps(MySQL):
@@ -119,6 +120,24 @@ class Apps(MySQL):
             offset=(page - 1) * page_size
         )
 
+        if len(apps_mode_list) == 1 and int(apps_mode_list[0]) == 3:
+            # Collect app_ids with mode 3
+            mode_3_app_ids = [item['app_id'] for item in all_app if item['mode'] == 3]
+            
+            # Query datasets to get app_ids where temporary_chatroom_id is 0
+            valid_app_ids = Datasets().select(
+                columns=['app_id'], 
+                conditions=[
+                    {"column": "temporary_chatroom_id", "value": 0},
+                    {"column": "app_id", "op": "in", "value": mode_3_app_ids},
+                    {"column": "status", "op": "<", "value": 3}
+                ]
+            )
+            valid_app_ids = set(item['app_id'] for item in valid_app_ids)
+            
+            # Filter all_app to keep only valid apps
+            all_app = [item for item in all_app if item['mode'] != 3 or item['app_id'] in valid_app_ids]
+        
         workflow_app_ids = []
         other_app_ids = []
         for item in all_app:

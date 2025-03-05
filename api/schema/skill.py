@@ -102,6 +102,7 @@ class ReqSkillRunSchema(BaseModel):
 class ResSkillFileUploadData(BaseModel):
     file_name: Optional[str] = None
     file_path: Optional[str] = None
+    variable_name: Optional[str] = None
 
 class  ResSkillRunResponseData(BaseModel):
     outputs: Optional[Dict[str, Any]] = None

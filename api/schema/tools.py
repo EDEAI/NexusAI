@@ -1,7 +1,7 @@
-from typing import  Dict, Any, Optional
+from typing import Any, Optional
 from pydantic import BaseModel
 
 class toolsResponse(BaseModel):
     code: int
     detail: str
-    data: Optional[Dict[str, Any]] = None
+    data: Optional[Any] = None  # modified to support nested response structures

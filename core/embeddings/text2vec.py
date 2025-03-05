@@ -1,16 +1,15 @@
 from typing import List
 
 from langchain_community.embeddings.text2vec import Text2vecEmbeddings as OriginalText2vecEmbeddings
-from langchain_core.pydantic_v1 import Extra
+
 from numpy import ndarray
 
 
 class Text2vecEmbeddings(OriginalText2vecEmbeddings):
-    class Config:
-        """Configuration for this pydantic object."""
-
-        extra = Extra.allow
-        arbitrary_types_allowed = True
+    model_config = {
+        "extra": "allow",
+        "arbitrary_types_allowed": True,
+    }
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Embed documents using the text2vec embeddings model.

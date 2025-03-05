@@ -22,7 +22,7 @@ node_model = AppNodeExecutions()
 app_run_model = AppRuns()
 
 @router.get("/backlog_list", response_model = ResBackListSchema)
-async def backlog_list(page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
+async def backlog_list(page: int = 1, page_size: int = 10, need_human_confirm: int = None, userinfo: TokenData = Depends(get_current_user)):
     """
     backlog list
 
@@ -31,7 +31,7 @@ async def backlog_list(page: int = 1, page_size: int = 10, userinfo: TokenData =
     # team_id = userinfo.team_id
     # role = userinfo.role
 
-    result = app_run_model.get_backlogs_list({"user_id": user_id, "page_size": page_size, "page": page})
+    result = app_run_model.get_backlogs_list({"user_id": user_id, "page_size": page_size, "page": page, "need_human_confirm": need_human_confirm})
     # print(result)
     # if result['list']:
     #     for item in result['list']:

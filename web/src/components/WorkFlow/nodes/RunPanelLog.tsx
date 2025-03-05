@@ -2,6 +2,7 @@
  * @LastEditors: biz
  */
 import { getWorkFlowLogInfo, updateDealtWith } from '@/api/workflow';
+import FileDownloadList from '@/components/common/FileDownloadList';
 import useUserStore from '@/store/user';
 import useSocketStore from '@/store/websocket';
 import {
@@ -20,6 +21,7 @@ import CodeEditor from '../components/Editor/CodeEditor';
 import { NOT_SHOW_INPUT_RESULT_NODE, NOT_SHOW_OUTPUT_RESULT_NODE } from '../config';
 import useSaveWorkFlow from '../saveWorkFlow';
 import { BlockEnum } from '../types';
+
 interface TodoTagProps {
     humanConfirmInfo: Array<{
         user_id: string | number;
@@ -202,7 +204,7 @@ export default memo(() => {
                                             ></CodeEditor>
                                         </div>
                                     )}
-                           
+
                                     {nodeInfo.inputs &&
                                         !NOT_SHOW_INPUT_RESULT_NODE.includes(
                                             nodeInfo.node_type,
@@ -241,6 +243,15 @@ export default memo(() => {
                                                 ></CodeEditor>
                                             </div>
                                         )}
+                                    {nodeInfo.file_list && nodeInfo.file_list.length > 0 && (
+                                        <FileDownloadList
+                                            files={nodeInfo.file_list}
+                                            title={intl.formatMessage({
+                                                id: 'skill.downloadFiles',
+                                            })}
+                                            className="w-[314px]"
+                                        />
+                                    )}
                                 </div>
                             );
                         } else if (nodeInfo.status == 4) {
@@ -567,7 +578,13 @@ const DetailContent = memo(({ endRun }: { endRun: any }) => {
                     ></CodeEditor>
                 </div>
             )}
-
+            {endRun?.node_exec_data?.file_list?.length > 0 && (
+                <FileDownloadList
+                    files={endRun.node_exec_data.file_list}
+                    title={intl.formatMessage({ id: 'skill.downloadFiles' })}
+                    className="mt-4"
+                />
+            )}
             {/* <div className='text-sm font-bold mt-4 mb-2'>
 
             </div> */}

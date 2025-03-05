@@ -93,8 +93,7 @@ def get_embeddings_and_vector_database(
                 'embedding_function': embeddings,
                 'collection_name': collection_name,
                 'connection_args': {
-                    'host': vdb_config['host'],
-                    'port': vdb_config['port'],
+                    'uri': f'http://{vdb_config["host"]}:{vdb_config["port"]}',
                     'user': vdb_config['user'],
                     'password': vdb_config['password']
                 },
@@ -520,11 +519,24 @@ class DatasetManagement:
     @classmethod
     def reindex_dataset(cls, dataset_id: int, new_embeddings_config_id: int) -> None:
         dataset = datasets.get_dataset_by_id(dataset_id, check_is_reindexing=True)
+        
+        # Initialize old and new vector databases
+        collection_name = dataset['collection_name']
+        embeddings_config_id = dataset['embedding_model_config_id']
+        _, vdb = get_embeddings_and_vector_database(embeddings_config_id, collection_name)
+        new_collection_name = get_new_collection_name()
+        _, new_vdb = get_embeddings_and_vector_database(new_embeddings_config_id, new_collection_name)
+
+        # Update dataset status to reindexing
         datasets.update(
             {'column': 'id', 'value': dataset_id},
-            {'collection_name': 'reindexing'}
+            {
+                'collection_name': 'reindexing',
+                'embedding_model_config_id': new_embeddings_config_id
+            }
         )
 
+        # Get all enabled documents and segments and update their status to not indexed
         enabled_documents = documents.select(
             columns=['id', 'name', 'upload_file_id', 'node_exec_id'],
             conditions=[
@@ -555,9 +567,6 @@ class DatasetManagement:
             )
         
         # Delete dataset from vector database
-        collection_name = dataset['collection_name']
-        embeddings_config_id = dataset['embedding_model_config_id']
-        _, vdb = get_embeddings_and_vector_database(embeddings_config_id, collection_name)
         status = vdb.delete_dataset()
         if status == DeleteDatasetStatus.ERROR:
             raise Exception('Cannot delete dataset from vector database!')
@@ -589,10 +598,6 @@ class DatasetManagement:
             if contents:
                 vdb.embeddings.document_embedding_store.mdelete(contents)
         
-        # Create new dataset in vector database
-        collection_name = get_new_collection_name()
-        _, vdb = get_embeddings_and_vector_database(new_embeddings_config_id, collection_name)
-        
         # Add documents to new dataset
         for document in enabled_documents:
             if document['upload_file_id']:
@@ -613,7 +618,7 @@ class DatasetManagement:
                 )
                 
                 try:
-                    index_id = vdb.add_texts(
+                    index_id = new_vdb.add_texts(
                         [segment['content']],
                         [{'source': source_string}]
                     )[0]
@@ -625,7 +630,7 @@ class DatasetManagement:
                     raise
                 else:
                     completed_time = datetime.now()
-                    num_tokens = vdb.embeddings.get_and_reset_num_tokens()
+                    num_tokens = new_vdb.embeddings.get_and_reset_num_tokens()
                     document_segments.update(
                         {'column': 'id', 'value': segment_id},
                         {
@@ -638,7 +643,7 @@ class DatasetManagement:
         
         datasets.update(
             {'column': 'id', 'value': dataset_id},
-            {'collection_name': collection_name}
+            {'collection_name': new_collection_name}
         )
 
     @classmethod
@@ -701,7 +706,9 @@ class DatasetRetrieval:
         cls,
         dataset_id: int,
         agent_id: int,
+        agent_run_id: int,
         workflow_id: int,
+        workflow_run_id: int,
         user_id: int,
         run_type: int,
         search_in_documents: Optional[List[str]] = None
@@ -720,7 +727,9 @@ class DatasetRetrieval:
                 {
                     'user_id': user_id,
                     'agent_id': agent_id,
+                    'agent_run_id': agent_run_id,
                     'workflow_id': workflow_id,
+                    'workflow_run_id': workflow_run_id,
                     'dataset_ids': [dataset_id],
                     'type': run_type,
                     'input': query,
@@ -813,7 +822,9 @@ class DatasetRetrieval:
         cls,
         dataset_ids: List[int],
         agent_id: int,
+        agent_run_id: int,
         workflow_id: int,
+        workflow_run_id: int,
         user_id: int,
         run_type: int,
         search_in_documents: Optional[List[str]] = None
@@ -832,7 +843,9 @@ class DatasetRetrieval:
                 {
                     'user_id': user_id,
                     'agent_id': agent_id,
+                    'agent_run_id': agent_run_id,
                     'workflow_id': workflow_id,
+                    'workflow_run_id': workflow_run_id,
                     'dataset_ids': dataset_ids,
                     'type': run_type,
                     'input': query,

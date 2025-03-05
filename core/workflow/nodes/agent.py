@@ -13,6 +13,7 @@ from ..context import Context, replace_variable_value_with_context
 from ..variables import ObjectVariable, Variable
 from ..recursive_task import RecursiveTaskCategory
 from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
+from core.database.models.agent_chat_messages import AgentChatMessages
 from core.database.models import Apps, AgentAbilities, AgentDatasetRelation, Agents, Workflows, AppRuns, AppNodeExecutions, Models
 from core.dataset import DatasetRetrieval
 from core.llm.messages import Messages
@@ -20,9 +21,11 @@ from core.llm.models import LLMPipeline
 from core.llm.prompt import Prompt, replace_prompt_with_context
 from languages import get_language_content
 from log import Logger
+from core.helper import push_to_websocket_queue
 
 
 logger = Logger.get_logger('celery-app')
+logger_chat = Logger.get_logger('agent-chat-llm-return')
 
 
 class AgentNode(ImportToKBBaseNode, LLMBaseNode):
@@ -86,12 +89,14 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         self,
         agent: Dict[str, Any],
         workflow_id: int,
+        workflow_run_id: int,
         user_id: int,
         type: int,
         node_exec_id: int,
         task: Optional[Dict[str, RecursiveTaskCategory]],
         retrieve: bool,
-        direct_output: bool = False
+        direct_output: bool = False,
+        is_chat: bool = False
     ) -> Tuple[Optional[int], Dict[str, Any]]:
         agent_id = agent['id']
         input_ = {
@@ -117,20 +122,18 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                             ability['content'],
                             get_language_content(
                                 'agent_output_format_'
-                                f'{default_output_format if ability["output_format"] == 0 else ability["output_format"]}',
+                                f'{default_output_format if ability["output_format"] == 0 else ability["output_format"]}'
+                                f'{"_md" if (default_output_format if ability["output_format"] == 0 else ability["output_format"]) == 2 and is_chat else ""}',
                                 append_ret_lang_prompt=False
                             )
                         )
                         for ability in abilities
                     ]
-                    system_prompt = get_language_content(
-                        (
-                            'agent_system_prompt_with_auto_match_ability_direct_output'
-                            if direct_output
-                            else 'agent_system_prompt_with_auto_match_ability'
-                        ),
-                        uid=user_id
-                    )
+                    if direct_output:
+                        system_prompt = get_language_content('agent_system_prompt_with_auto_match_ability_direct_output', uid=user_id)
+                    else:
+                        self.schema_key = 'agent_system_prompt_with_auto_match_ability'
+                        system_prompt = get_language_content('agent_system_prompt_with_auto_match_ability', uid=user_id)
                     input_['abilities_content_and_output_format'] = abilities_content_and_output_format
                     if self.data['task_splitting']:
                         input_['reply_requirement'] = get_language_content(
@@ -151,7 +154,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     )
                     input_['abilities_content'] = abilities_content
                     input_['output_format'] = get_language_content(
-                        f'agent_output_format_{output_format}',
+                        f'agent_output_format_{output_format}'
+                        f'{"_md" if output_format == 2 and is_chat else ""}',
                         append_ret_lang_prompt=False
                     )
                     if self.data['task_splitting']:
@@ -166,7 +170,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     uid=user_id
                 )
                 input_['output_format'] = get_language_content(
-                    f'agent_output_format_{output_format}',
+                    f'agent_output_format_{output_format}'
+                    f'{"_md" if output_format == 2 and is_chat else ""}',
                     append_ret_lang_prompt=False
                 )
                 if self.data['task_splitting']:
@@ -185,7 +190,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             )
             input_['abilities_content'] = ability['content']
             input_['output_format'] = get_language_content(
-                f'agent_output_format_{output_format}',
+                f'agent_output_format_{output_format}'
+                f'{"_md" if output_format == 2 and is_chat else ""}',
                 append_ret_lang_prompt=False
             )
             if self.data['task_splitting']:
@@ -244,9 +250,9 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 for task_execution in previous_executions:
                     previous_documents.append(f"{workflow['name']}-{task_execution['node_name']}-{task_execution['task_id']}-{task_execution['id']}")
                 if len(self.data['retrieval_task_datasets']) == 1:
-                    retrieval, _, _ = DatasetRetrieval.single_retrieve(self.data['retrieval_task_datasets'][0], 0, workflow_id, user_id, type, previous_documents)
+                    retrieval, _, _ = DatasetRetrieval.single_retrieve(self.data['retrieval_task_datasets'][0], 0, 0, workflow_id, workflow_run_id, user_id, type, previous_documents)
                 else:
-                    retrieval, _, _ = DatasetRetrieval.multiple_retrieve(self.data['retrieval_task_datasets'], 0, workflow_id, user_id, type, previous_documents)
+                    retrieval, _, _ = DatasetRetrieval.multiple_retrieve(self.data['retrieval_task_datasets'], 0, 0, workflow_id, workflow_run_id, user_id, type, previous_documents)
                 retrieval_result: List[Document] = retrieval.invoke(current_task_dict['keywords'])
                 if retrieval_result:
                     previous_documents_results = DatasetRetrieval.get_full_documents(retrieval_result)
@@ -276,6 +282,9 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         task: Optional[Dict[str, RecursiveTaskCategory]] = None,
         correct_llm_output: bool = False,
         data_source_run_id : Optional[int] = 0,
+        override_rag_input: Optional[str] = None,
+        override_dataset_id: Optional[int] = None,
+        is_chat: bool = False,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -296,6 +305,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'type': type,
                     'name': f'Agent-{agent_id}_{now}',
                     'inputs': self.data['input'].to_dict(),
+                    'selected_ability_id': self.data['ability_id'],
+                    'auto_match_ability': agent['auto_match_ability'],
                     'status': 2
                 }
             )
@@ -337,28 +348,38 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             )
             
             # RAG chain generation
-            datasets = [
-                relation['dataset_id']
-                for relation in AgentDatasetRelation().get_relations_by_agent_id(agent_id)
-            ]
+            if override_dataset_id:
+                datasets = [override_dataset_id]
+            else:
+                datasets = [
+                    relation['dataset_id']
+                    for relation in AgentDatasetRelation().get_relations_by_agent_id(agent_id)
+                ]
             match len(datasets):
                 case 0:
                     retrieval_chain, retrieval_token_counter = None, None
                 case 1:
                     retrieval_chain, _, retrieval_token_counter = DatasetRetrieval.single_retrieve(
-                        datasets[0], agent_id, workflow_id, user_id, type
+                        datasets[0], agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
                 case _:
                     retrieval_chain, _, retrieval_token_counter = DatasetRetrieval.multiple_retrieve(
-                        datasets, agent_id, workflow_id, user_id, type
+                        datasets, agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
             
-            direct_output = bool(task)  # Content output only (ability ID is omitted) for auto match ability & Force plain text output
+            # direct_output = bool(task) or is_chat  # Content output only (ability ID is omitted) for auto match ability & Force plain text output
+            direct_output = False
             output_format, input_ = self._prepare_prompt(
-                agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), direct_output
+                agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets), direct_output, is_chat
             )
-            override_rag_input = kwargs.get('override_rag_input')
-            return_json = output_format in [None, 2]  # Auto match ability or force JSON output
+            # Auto match ability
+            #       -- Force JSON output -- return_json is True
+            # Ability output format is JSON
+            #       -- In a workflow: Force JSON output -- return_json is True
+            #       -- Chat mode: JSON in Markdown format (text output) -- return_json is False
+            # Ability output format is not JSON
+            #       -- Text output -- return_json is False
+            return_json = (output_format is None) or (output_format == 2 and not is_chat)
             model_data, ai_output, prompt_tokens, completion_tokens, total_tokens = self.invoke(
                 app_run_id=app_run_id, 
                 edge_id=edge_id,
@@ -368,7 +389,10 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 file_list=file_list,
                 return_json=return_json,
                 correct_llm_output=correct_llm_output,
-                override_rag_input=override_rag_input
+                override_rag_input=override_rag_input,
+                is_chat=is_chat,
+                user_id=user_id,
+                agent_id=agent_id
             )
             print(model_data)
             AppRuns().update(
@@ -376,10 +400,17 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 {'model_data': model_data}
             )
             # Process the AI message
+            ability_id = self.data['ability_id']
             default_output_format = agent['default_output_format']
             if output_format is None:  # Auto match ability
-                ability_id = ai_output['ability_id']
-                ai_output = ai_output['output']
+                try:
+                    ability_id = int(ai_output['ability_id'])
+                except:
+                    ability_id = 0
+                AppRuns().update(
+                    {'column': 'id', 'value': agent_run_id},
+                    {'matched_ability_id': ability_id}
+                )
                 if ability_id:
                     ability = AgentAbilities().get_ability_by_id(ability_id)
                     output_format = ability['output_format']
@@ -387,22 +418,59 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         output_format = default_output_format
                 else:
                     output_format = default_output_format
+                try:
+                    ai_output = ai_output['output']
+                except:
+                    pass
+
+            if not isinstance(ai_output, str):
+                ai_output = json.dumps(ai_output, ensure_ascii=False)
                     
-            if output_format == 2:
-                if isinstance(ai_output, str):
-                    # Check if AI output is a JSON string
-                    try:
-                        json.loads(ai_output)
-                    except json.JSONDecodeError:
-                        raise Exception(f'AI output is not a valid JSON string:\n{ai_output}')
-                else:
-                    ai_output = json.dumps(ai_output, ensure_ascii=False)
+            if output_format == 2 and not is_chat:
+                # Check if AI output is a JSON string
+                try:
+                    json.loads(ai_output)
+                except json.JSONDecodeError:
+                    raise Exception(f'AI output is not a valid JSON string:\n{ai_output}')
                 
             if retrieval_token_counter:
                 embedding_tokens = retrieval_token_counter['embedding']
                 reranking_tokens = retrieval_token_counter['reranking']
             else:
                 embedding_tokens, reranking_tokens = 0, 0
+            if is_chat:
+                chat_message_id = AgentChatMessages().insert({
+                    'user_id': user_id,
+                    'agent_id': agent_id,
+                    'ability_id': ability_id,
+                    'message': ai_output,
+                    'agent_run_id': agent_run_id,
+                    'prompt_tokens': prompt_tokens,
+                    'completion_tokens': completion_tokens,
+                    'total_tokens': total_tokens,
+                })
+                chat_message_llm_return = 'chat_message_llm_return'
+                datetime_now = datetime.now()
+                data = {
+                    'user_id': user_id,
+                    'type': chat_message_llm_return,
+                    'data': {
+                        'message_id': chat_message_id,
+                        'status': 1,
+                        'error': "",
+                        'prompt_tokens': prompt_tokens,
+                        'completion_tokens': completion_tokens,
+                        'total_tokens': total_tokens,
+                        'created_time': datetime_now,
+                        'finished_time': datetime_now,
+                        'user_id': user_id,
+                        'agent_id': agent_id,
+                        'ability_id': ability_id,
+                        'message': ai_output
+                    }
+                }
+                push_to_websocket_queue(data)
+                logger_chat.info(f"Push results generated through AI:{user_id} agent_id:{agent_id} chat_message_id：{chat_message_id} message:{ai_output} status:{1} data:{data}")
             outputs = Variable(
                 name="text",
                 type="json" if output_format == 2 else "string",
@@ -468,6 +536,30 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     }
                 )
             self.delete_documents_by_node_exec_id(node_exec_id)
+
+            if is_chat:
+                chat_message_llm_return = 'chat_message_llm_return'
+                message_error = str(e)
+                datetime_now = datetime.now()
+                data = {
+                    'user_id': user_id,
+                    'type': chat_message_llm_return,
+                    'data': {
+                        'message_id': '',
+                        'status': 0,
+                        'error': message_error,
+                        'prompt_tokens': '',
+                        'completion_tokens': '',
+                        'total_tokens': '',
+                        'created_time': datetime_now,
+                        'finished_time': datetime_now
+                    }
+                }
+                push_to_websocket_queue(data)
+                logger_chat.info("----------------------------------------------------------------------------")
+                logger_chat.exception(f"Push results generated through AI ERROR:{user_id} error:{str(e)} status:{4} data:{data}")
+                logger_chat.info("----------------------------------------------------------------------------")
+
             return {
                 'status': 'failed',
                 'message': str(e)
@@ -487,8 +579,10 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         task: Optional[Dict[str, RecursiveTaskCategory]] = None,
         correct_llm_output: bool = False,
         data_source_run_id : Optional[int] = 0,
+        override_rag_input: Optional[str] = None,
+        override_dataset_id: Optional[int] = None,
         **kwargs
-    ) -> AsyncIterator[AIMessageChunk]:
+    ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
             prompt_tokens = 0
             completion_tokens = 0
@@ -508,6 +602,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'type': type,
                     'name': f'Agent-{agent_id}_{now}',
                     'inputs': self.data['input'].to_dict(),
+                    'selected_ability_id': self.data['ability_id'],
+                    'auto_match_ability': agent['auto_match_ability'],
                     'status': 2
                 }
             )
@@ -549,26 +645,28 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             )
             
             # RAG chain generation
-            datasets = [
-                relation['dataset_id']
-                for relation in AgentDatasetRelation().get_relations_by_agent_id(agent_id)
-            ]
+            if override_dataset_id:
+                datasets = [override_dataset_id]
+            else:
+                datasets = [
+                    relation['dataset_id']
+                    for relation in AgentDatasetRelation().get_relations_by_agent_id(agent_id)
+                ]
             match len(datasets):
                 case 0:
                     retrieval_chain, retrieval_token_counter = None, None
                 case 1:
                     retrieval_chain, _, retrieval_token_counter = DatasetRetrieval.single_retrieve(
-                        datasets[0], agent_id, workflow_id, user_id, type
+                        datasets[0], agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
                 case _:
                     retrieval_chain, _, retrieval_token_counter = DatasetRetrieval.multiple_retrieve(
-                        datasets, agent_id, workflow_id, user_id, type
+                        datasets, agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
             
             _, input_ = self._prepare_prompt(
-                agent, workflow_id, user_id, type, node_exec_id, task, bool(datasets), True
+                agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets), True, True
             )
-            override_rag_input = kwargs.get('override_rag_input')
             model_data, ainvoke = self.get_ainvoke_func(
                 app_run_id=app_run_id, 
                 edge_id=edge_id,
@@ -640,6 +738,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 chatroomdriven_info = ChatroomDrivenRecords().get_data_by_data_source_run_id(data_source_run_id)
                 if chatroomdriven_info:
                     ChatroomDrivenRecords().update_data_driven_run_id(chatroomdriven_info['id'],data_source_run_id, agent_run_id)
+            yield agent_run_id
         except Exception as e:
             logger.exception('ERROR!!')
             if 'agent_run_id' in locals():

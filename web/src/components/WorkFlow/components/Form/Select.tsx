@@ -11,38 +11,47 @@ export const SelectModelConfigId = ({ name, form }) => {
     const { data, loading } = useRequest(
         () =>
             getModelList().then(res => {
-                return (
-                    res?.data?.data?.map(x => ({
-                        ...x,
-                        label: x.model_name,
-                        value: x.model_config_id,
-                    })) || []
-                );
+                const safeModels = Array.isArray(res?.data?.data) ? res.data.data : [];
+
+                const options = safeModels.map(supplier => ({
+                    label: supplier.supplier_name,
+                    options: Array.isArray(supplier.model_list) ? supplier.model_list.map(model => ({
+                        label: model.model_name,
+                        value: model.model_config_id,
+                    })) : []
+                }));
+
+                let defaultValue;
+                for (const supplier of safeModels) {
+                    if (Array.isArray(supplier.model_list)) {
+                        const defaultModel = supplier.model_list.find(model => model.model_default_used === 1);
+                        if (defaultModel) {
+                            defaultValue = defaultModel.model_config_id;
+                            break;
+                        }
+                    }
+                }
+
+                return {
+                    options,
+                    defaultValue
+                };
             }),
         {
             cacheKey: 'workFlowCacheModelConfigId',
             cacheTime: 60 * 1000,
         },
     );
-    console.log(form);
 
-    // useMount(()=>{
-    //     console.log(form?.current?.getFieldValue,data,!form?.current?.getFieldValue?.(name));
-
-    //     if (form?.current?.getFieldValue&&data && data.length > 0 && !form?.current?.getFieldValue?.(name)) {
-    //         form?.current?.setFieldsValue({ [name]: data[0].value });
-    //         debugger
-    //     }
-    // })
     return (
         <div className='min-h-8'>
            {
              !loading && (
                 <ProFormSelect
                     allowClear={false}
-                    options={data || []}
+                    options={data?.options || []}
                     name={name}
-                    initialValue={data?.[0]?.value || null}
+                    initialValue={data?.defaultValue}
                     label={intl.formatMessage({
                         id: 'workflow.label.selectModel',
                         defaultMessage: '',
