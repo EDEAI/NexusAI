@@ -359,17 +359,17 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         </Button>
                                     </div> */}
                                 </div>
-                                <div className="w-full flex justify-around items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
-                                    <div className="mr-5 ml-[10px] w-[30%]">
+                                <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
+                                    <div className="w-[22%] mr-2 ml-[10px]">
                                         {intl.formatMessage({ id: 'agent.variable.name' })}
                                     </div>
-                                    <div className="w-[20%]">
+                                    <div className="w-[25%] mr-2">
                                         {intl.formatMessage({ id: 'agent.variable.display' })}
                                     </div>
-                                    <div className="w-[20%]">
+                                    <div className="w-[18%] mr-2">
                                         {intl.formatMessage({ id: 'agent.variable.type' })}
                                     </div>
-                                    <div className="w-[20%]">
+                                    <div className="w-[15%] mr-2">
                                         {intl.formatMessage({ id: 'agent.variable.required' })}
                                     </div>
                                     <div className="w-[10%]">
@@ -379,9 +379,9 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 <div className="mb-[30px]">
                                     {fields.map(({ key, name, ...restField }) => (
                                         // <Space key={key} style={{ width:'100%', display: 'flex', marginBottom: 8, alignItems: 'center' }} align="baseline">
-                                        <div className="w-full h-20 flex justify-around gap-2 px-2.5 border-b border-x pt-7 last:rounded-b-lg">
+                                        <div className="w-full h-20 flex justify-start px-2.5 border-b border-x pt-7 last:rounded-b-lg">
                                             <Form.Item
-                                                className="m-0 w-[30%]"
+                                                className="m-0 w-[22%] mr-2"
                                                 {...restField}
                                                 name={[name, 'name']}
                                                 rules={[
@@ -403,11 +403,11 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     placeholder={intl.formatMessage({
                                                         id: 'agent.variable.name',
                                                     })}
-                                                    className=""
+                                                    className="w-full"
                                                 />
                                             </Form.Item>
                                             <Form.Item
-                                                className="m-0 w-[30%]"
+                                                className="m-0 w-[25%] mr-2"
                                                 {...restField}
                                                 name={[name, 'content']}
                                                 rules={[
@@ -423,11 +423,11 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     placeholder={intl.formatMessage({
                                                         id: 'agent.variable.display',
                                                     })}
-                                                    className=""
+                                                    className="w-full"
                                                 />
                                             </Form.Item>
                                             <Form.Item
-                                                className="m-0 w-[20%]"
+                                                className="w-[18%] mr-2 m-0"
                                                 {...restField}
                                                 name={[name, 'type']}
                                             >
@@ -440,7 +440,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                 />
                                             </Form.Item>
                                             <Form.Item
-                                                className="w-[20%]  m-0"
+                                                className="w-[15%] mr-2 m-0 flex pl-[2%]"
                                                 {...restField}
                                                 name={[name, 'status']}
                                                 // style={{ flex: 1, alignItems: 'center' }}
@@ -450,16 +450,12 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     // style={{ width: 70 }}
                                                 />
                                             </Form.Item>
-                                            <div className='w-[10%]'>
+                                            <Form.Item className="w-[10%] flex pl-[2%]">
                                                 {Ffromref &&
                                                 Ffromref.getFieldsValue().users.length > 1 ? (
-                                                    <Form.Item className="m-0">
-                                                        <DeleteOutlined
-                                                            onClick={() => remove(name)}
-                                                        />
-                                                    </Form.Item>
+                                                    <DeleteOutlined onClick={() => remove(name)} />
                                                 ) : null}
-                                            </div>
+                                            </Form.Item>
                                         </div>
                                         // </Space>
                                     ))}
