@@ -94,7 +94,12 @@ class Models(MySQL):
                 ['inner', 'model_configurations', 'models.id = model_configurations.model_id'],
                 ['inner', 'suppliers', 'models.supplier_id = suppliers.id']
             ],
-            conditions=[{'column': 'models.type', 'value': 1}],
+            conditions=[{'column': 'models.type', 'value': 1},
+                        {'column': 'models.status', 'value': 1},
+                        {'column': 'model_configurations.status', 'value': 1},
+                        {'column': 'suppliers.status', 'value': 1},
+                        {'column': 'model_configurations.team_id', 'value': 1}
+                        ],
             order_by="suppliers.id ASC, model_configurations.sort_order ASC"
         )
 
