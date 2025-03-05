@@ -7,18 +7,17 @@ from langchain_core.callbacks.manager import (
     CallbackManagerForRetrieverRun
 )
 from langchain_core.documents import Document
-from langchain_core.pydantic_v1 import Extra
+
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.runnables import RunnableConfig
 from langchain_core.vectorstores import VectorStore, VectorStoreRetriever
 
 
 class GeneralRetriever(BaseRetriever):
-    class Config:
-        """Configuration for this pydantic object."""
-
-        extra = Extra.allow
-        arbitrary_types_allowed = True
+    model_config = {
+        "extra": "allow",
+        "arbitrary_types_allowed": True,
+    }
     
     def __init__(self, retriever_type: str, *args, **kwargs):
         super().__init__(*args, **kwargs)

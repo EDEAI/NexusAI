@@ -33,6 +33,7 @@ export default {
     'agent.cannotmodify': '(You are viewing published version data, which cannot be modified)',
     'agent.appdescription': 'Agent Description',
     'agent.teamvisibility': 'Team Visibility',
+    'agent.attrVisible':'attribute Visible',
     'agent.APIswitch': 'Enable API',
     'agent.filesupload': 'Allow File Upload',
     'agent.LLMmodel': 'LLM Model',
@@ -76,7 +77,7 @@ export default {
     'agent.created': 'Create ',
     'agent.btn.nextstep': 'next Step',
     'agent.btn.back': 'cancel',
-    'agent.btn.savedebug': 'Save and debug',
+    'agent.btn.savedebug': 'Save',
     'agent.save.and.click': 'Please save the agent first',
 
     'agent.explain.teamvisibility':
@@ -160,4 +161,55 @@ export default {
     'error.updateTag': 'Failed to update tag',
     'deleteTag.success': 'Tag deleted successfully',
     'updateTag.success': 'Tag updated successfully',
+
+    // Chat interface
+    'agent.chat.loading.more': 'Loading more messages...',
+    'agent.chat.input.placeholder': 'Type a message...',
+    'agent.chat.error.message': 'Runtime Error',
+    'agent.chat.tokens': 'tokens',
+    'agent.chat.clear.memory': 'Clear Memory',
+    'agent.chat.clear.memory.success': 'Context memory cleared',
+    'agent.chat.clear.memory.confirm.title': 'Confirm Clearing',
+    'agent.chat.clear.memory.confirm.content': 'Are you sure you want to clear the memory? This will reset the context of the current conversation.',
+    'agent.chat.clear.memory.confirm.ok': 'Confirm',
+    'agent.chat.clear.memory.confirm.cancel': 'Cancel',
+
+    // Log detail
+    'agent.log.detail': 'Agent Run Log',
+    'agent.log.conversation': 'Historical Prompts',
+    'agent.log.output': 'Output Result',
+    'agent.log.list': 'Agent Logs',
+    'agent.log.error': 'Error Message',
+    'agent.log.no.output': 'No output result',
+    'agent.log.no.conversation': 'No historical prompts',
+    'agent.file.download': 'Download',
+    'agent.file.output': 'Output Files',
+    'agent.file.variable': 'Variable Name',
+
+    // Variable Types
+    'workflow.vars.file': 'File',
+
+    // Custom Code
+    'customcode.notice.title': 'Notice',
+    'customcode.notice.file.write': 'File Writing Restriction',
+    'customcode.notice.file.write.desc': 'When writing files in code, the target file path must start with "/storage".',
+    'customcode.notice.file.write.example': 'Example: /storage/my_folder/my_file.txt',
+    'customcode.notice.file.return': 'File Return Requirement',
+    'customcode.notice.file.return.desc': 'If returning a file path, the value must start with "file://" for correct system recognition.',
+    'customcode.notice.file.return.example': 'Example: file:///storage/my_folder/my_file.txt',
+    
+    // Chat interface additional translations
+    'agent.chat.waiting': 'Thinking...',
+    'agent.chat.send': 'Send',
+    'agent.chat.input.shift.enter': 'Shift + Enter for new line',
+    'agent.chat.load.history': 'Load History',
+    'agent.chat.no.messages': 'No messages',
+    'agent.chat.system.error': 'System error, please try again later',
+    'agent.chat.network.error': 'Network error, please check your connection',
+    'agent.chat.retry': 'Retry',
+    'agent.chat.copy': 'Copy',
+    'agent.chat.copy.success': 'Copied successfully',
+    'agent.chat.copy.failed': 'Copy failed',
+    'agent.chat.scroll.bottom': 'Scroll to bottom',
+    'agent.chat.new.message': 'New message',
 };

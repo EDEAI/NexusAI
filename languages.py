@@ -38,8 +38,8 @@ language_packs = {
 
             {retrieved_docs_format}
             {reply_requirement}
-            Finally, return a JSON formatted dictionary as follows:
-            {{"ability_id": ability ID (integer type), "output": content replied in the corresponding format of the ability}}
+            Finally, you must return a JSON dictionary in the following format:
+            {{"ability_id": ability ID (integer type), "output": content replied to the user in the corresponding format of the ability}}
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
             ********************End of identity definition content********************
 
@@ -128,6 +128,7 @@ language_packs = {
         "agent_output_format_1": "as plain text",
         "agent_output_format_2": "in JSON format",
         "agent_output_format_3": "in code format",
+        "agent_output_format_2_md": "in JSON format contained in Markdown format",
         "agent_user_prompt": '''
             Below is the user's questions or needs:
             ********************Start of the user's questions or needs********************
@@ -351,6 +352,7 @@ language_packs = {
         # meeting room
         'chatroom_name_is_required': 'meeting room name is required',
         'chatroom_max_round_is_required': 'max_round is required',
+        'chatroom_max_round_must_be_greater_than_zero': 'max_round must be greater than zero',
         'chatroom_agent_is_required': 'agent is required',
         'chatroom_agent_item_must_be_a_dictionary': 'agent item must be a dictionary',
         'chatroom_agent_item_missing_keys': 'agent item missing keys',
@@ -944,6 +946,9 @@ language_packs = {
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
             5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
+            7. File write restrictions: when the code involves file write operations, the target file path must start with "/storage". For example: /storage/my_folder/my_file.txt.
+               File return requirements: if the code needs to return the file path, the return value must start with "file://" so that the system can correctly identify it as a file type. For example: file:///storage/my_folder/my_file.txt.
+
         ''',
         'generate_skill_user': '''
             My requirements:
@@ -995,6 +1000,8 @@ language_packs = {
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
             5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
+            7. File write restrictions: when the code involves file write operations, the target file path must start with "/storage". For example: /storage/my_folder/my_file.txt.
+               File return requirements: if the code needs to return the file path, the return value must start with "file://" so that the system can correctly identify it as a file type. For example: file:///storage/my_folder/my_file.txt.
         ''',
         'correction_skill_user': '''
             Correction suggestion:
@@ -1161,6 +1168,7 @@ language_packs = {
 
         'chatroom_name_is_required': '会议室标题不能为空',
         'chatroom_max_round_is_required': '最大回合数不能为空',
+        'chatroom_max_round_must_be_greater_than_zero': '最大回合数必须大于0',
         'chatroom_agent_is_required': '智能体不能为空',
         'chatroom_agent_item_must_be_a_dictionary': '智能体的每个元素必须是一个字典',
         'chatroom_agent_item_missing_keys': '智能体的元素缺少必要的键',
@@ -1342,6 +1350,7 @@ prompt_keys = {
     "agent_output_format_1",
     "agent_output_format_2",
     "agent_output_format_3",
+    "agent_output_format_2_md",
     "agent_user_prompt",
     "agent_user_prompt_with_retrieved_docs",
     "llm_reply_requirement_with_task_splitting",

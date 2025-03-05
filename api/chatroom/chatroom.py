@@ -77,6 +77,9 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
     if max_round is None or max_round == '':
         return response_error(get_language_content("chatroom_max_round_is_required"))
 
+    if max_round == 0:
+        return response_error(get_language_content("chatroom_max_round_must_be_greater_than_zero"))
+
     if not agent or len(agent) == 0:
         return response_error(get_language_content("chatroom_agent_is_required"))
     else:

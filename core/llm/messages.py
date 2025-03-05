@@ -50,6 +50,14 @@ class Messages:
                 }
             ],
         )
+
+    def add_system_message(self, system_message: Variable) -> None:
+        """
+        Adds a system message to the list of messages.
+
+        :param message: Variable, the system message to add.
+        """
+        self.messages.append(("system", Variable(name="system", type="string", value=str(system_message.value))))
     
     def add_prompt(self, prompt: Prompt) -> None:
         """
@@ -95,7 +103,7 @@ class Messages:
                             str(var_value).replace('{', '{{').replace('}', '}}')
                         )
     
-    def to_langchain_format(self) -> List[Union[Tuple[str, str], HumanMessage]]:
+    def to_langchain_format(self, restrict_max_rounds: bool = True) -> List[Union[Tuple[str, str], HumanMessage]]:
         """
         Converts the Messages object to a list of tuples in the LangChain format, respecting the maximum rounds limit.
         
@@ -106,7 +114,7 @@ class Messages:
         for role, message in reversed(self.messages):
             if role == "ai":
                 rounds += 1
-                if rounds > HISTORY_MESSAGES_MAX_ROUNDS:
+                if restrict_max_rounds and rounds > HISTORY_MESSAGES_MAX_ROUNDS:
                     return result
             if role == "human" and message.type == "file":
                 result.insert(0, self._get_human_message_from_file_variable(message))
@@ -124,6 +132,29 @@ class Messages:
         for role, message in self.messages:
             result.append((role, message.to_dict()))
         return result
+
+    def reorganize_messages(self) -> None:
+        """
+        Reorganizes the messages by:
+        1. Keeping only the last system message
+        2. Moving that system message to the beginning
+        3. Preserving the order of other messages
+        """
+        # Find the last system message
+        last_system_message = None
+        non_system_messages = []
+        
+        for role, message in self.messages:
+            if role == "system":
+                last_system_message = (role, message)
+            else:
+                non_system_messages.append((role, message))
+        
+        # Reconstruct the messages list
+        self.messages = []
+        if last_system_message:
+            self.messages.append(last_system_message)
+        self.messages.extend(non_system_messages)
 
 def create_messages_from_serialized_format(serialized_data: List[Tuple[str, Dict[str, str]]]) -> Messages:
     """

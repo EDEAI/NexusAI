@@ -1,0 +1,1 @@
+ALTER TABLE `agent_chat_messages` ADD `ability_id` INT(11) NOT NULL DEFAULT '0' COMMENT 'Ability ID' AFTER `agent_id`;

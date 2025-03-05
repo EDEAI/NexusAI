@@ -51,6 +51,7 @@ const Skill: React.FC = () => {
             key: '2',
             icon: <CodeOutlined />,
             label: intl.formatMessage({ id: 'skill.menu.code' }),
+            disabled:SkillRelyOn && Skillinfo.attrs_are_visible == 0,
             style: {
                 padding: '15px',
                 width: '100%',
@@ -66,6 +67,7 @@ const Skill: React.FC = () => {
             key: '3',
             icon: <CreditCardOutlined />,
             label: intl.formatMessage({ id: 'skill.menu.output' }),
+            disabled:SkillRelyOn && Skillinfo.attrs_are_visible !== 1,
             style: {
                 padding: '15px',
                 width: '100%',

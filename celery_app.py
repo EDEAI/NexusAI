@@ -78,7 +78,7 @@ def run_app(
                 agent_id=id_,
                 ability_id=kwargs['ability_id'],
                 prompt=create_prompt_from_dict(kwargs['prompt']),
-                data_source_run_id=kwargs.get('data_source_run_id', 0),
+                data_source_run_id=kwargs.get('data_source_run_id', 0)
             )
         case 'skill':
             if 'custom_data' in kwargs:
@@ -147,7 +147,7 @@ def run_dataset(
     try:
         os.environ['ACTUAL_USER_ID'] = str(user_id)
         retrieval, retrieval_result, _ = DatasetRetrieval.single_retrieve(
-            dataset_id, 0, 0, user_id, 1
+            dataset_id, 0, 0, 0, 0, user_id, 1
         )
         retrieval.invoke(user_input)
         return {
@@ -288,6 +288,7 @@ def run_llm_tool(
     team_id: int,
     user_id: int,
     app_run_id: int,
+    ai_tool_type: str,
     prompt_dict: Dict[str, Any],
     return_json: bool = False,
     correct_llm_output: bool = False,
@@ -301,6 +302,12 @@ def run_llm_tool(
         model_config_id=model_info['model_config_id'],
         prompt=prompt,
     )
+    if 'agent_' in ai_tool_type:
+        ai_tool.schema_key = "generate_agent_system_prompt"
+    elif 'meeting_action_items_' in ai_tool_type:
+        ai_tool.schema_key = "chatroom_conference_orientation_system"
+    elif 'skill_' in ai_tool_type:
+        ai_tool.schema_key = "generate_skill_system_prompt"
     return ai_tool.run(app_run_id=app_run_id, return_json=return_json, correct_llm_output=correct_llm_output)
 
 

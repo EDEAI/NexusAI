@@ -112,7 +112,7 @@ export default {
     "app.summary.Runapp":"选择运行应用",
     "app.summary.SelectAgent":"选择智能体",
     "app.summary.SelectWorkflow":"选择工作流",
-    
+
     "app.summary.backlogTips":"你有一条待办项",
 
     "app.summaryhistory.orientation":"修正讨论总结",

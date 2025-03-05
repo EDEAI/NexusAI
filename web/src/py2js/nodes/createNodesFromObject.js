@@ -1,26 +1,26 @@
 import AgentNode from './agent.js';
 import { Nodes } from './base.js';
+import { createLogicBranchesFromObject, ConditionBranchNode } from './condition_branch.js';
+import ConstantVariableNode from './constant_variable.js';
+import CustomCodeNode from './custom_code.js';
 import EndNode from './end.js';
+import HttpRequestNode from './http_request.js';
 import HumanNode from './human.js';
 import LLMNode from './llm.js';
-import RetrieverNode from './retriever.js';
-import StartNode from './start.js';
 // import { MemoryInterruptNode } from './memory_interrupt.js';
-
-import { ConditionBranchNode, createLogicBranchesFromObject } from './condition_branch.js';
-import CustomCodeNode from './custom_code.js';
-import HttpRequestNode from './http_request.js';
+import {
+    createRequirementCategoryFromObject,
+    RequirementCategoryNode,
+} from './requirement_category.js';
+import RetrieverNode from './retriever.js';
 import SkillNode from './skill.js';
+import StartNode from './start.js';
 import TemplateConversionNode from './template_conversion.js';
 import ToolNode from './tool.js';
 import VariableAggregationNode from './variable_aggregation.js';
 
 import { createPromptFromObject } from '../prompt.js';
 import { createVariableFromObject } from '../variables.js';
-import {
-    createRequirementCategoryFromObject,
-    RequirementCategoryNode,
-} from './requirement_category.js';
 
 /**
  * Creates a node instance from the provided object. This function dynamically determines the type of node to create based on the 'type' property of the input object,
@@ -91,6 +91,8 @@ function createNodeFromObject(nodeDict) {
             return new TemplateConversionNode(nodeArgs);
         case 'variable_aggregation':
             return new VariableAggregationNode(nodeArgs);
+        case 'constant_variable':
+            return new ConstantVariableNode(nodeArgs);
         case 'tool':
             return new ToolNode(nodeArgs);
         case 'skill':

@@ -292,6 +292,7 @@ class Chatroom:
                     return 0
                 else:
                     # and smart selection is disabled, the Speaker Selector will choose an agent, or stop the chat
+                    schema_key = "chatroom_manager_system_with_optional_selection"
                     system_prompt = get_language_content(
                         'chatroom_manager_system_with_optional_selection',
                         self._user_id
@@ -329,6 +330,7 @@ class Chatroom:
                 model_config_id=self._model_config_ids[0],
                 prompt=Prompt(system_prompt, user_prompt)
             )
+            llm_node.schema_key = schema_key
             result = llm_node.run(return_json=True)
             assert result['status'] == 'success', result['message']
             result_data = result['data']
@@ -424,6 +426,7 @@ class Chatroom:
         try:
             self._console_log('Agent message: \033[36m')  # Print the agent message in green
             # Request LLM
+            agent_run_id = 0
             agent_message = ''
             async for chunk in agent_node.run_in_chatroom(
                 context=Context(),
@@ -432,6 +435,9 @@ class Chatroom:
                 override_rag_input=user_message,
                 override_dataset_id=override_dataset['id'] if override_dataset else None
             ):
+                if isinstance(chunk, int):
+                    agent_run_id = chunk
+                    continue
                 if content := chunk.content:
                     self._console_log(content)
                     agent_message += content
@@ -461,6 +467,7 @@ class Chatroom:
                     'chatroom_id': self._chatroom_id,
                     'app_run_id': self._app_run_id,
                     'agent_id': agent_id,
+                    'agent_run_id': agent_run_id,
                     'llm_input': [
                         ['system', prompt.get_system()],
                         ['user', prompt.get_user()]
@@ -524,7 +531,8 @@ class Chatroom:
         else:
             # Start a new chat
             self._user_speak(user_message)
-            
+        
+        round_ = 0
         for round_ in range(performed_rounds, self._max_round):
             agent_id = await self._select_next_speaker()
             logger.debug('Selected agent: %s', agent_id)

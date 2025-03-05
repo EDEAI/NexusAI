@@ -52,7 +52,7 @@ const AgentCreate = memo(() => {
     const batchCreateRef = useRef<BatchCreateRef>(null);
     const [createType, setCreateType] = useState<'single' | 'batch' | ''>('single');
     const [batchPrompt, setBatchPrompt] = useState('');
-    
+
     const [singleAgentCreateId, setSingleAgentCreateId] = useState('');
     const lastSingleAgentCreateId = useLatest(singleAgentCreateId);
     const intl = useIntl();
@@ -85,7 +85,7 @@ const AgentCreate = memo(() => {
             console.log(res);
             if (res.code == 0) {
                 message.success(
-                    lastSingleAgentCreateId?.current 
+                    lastSingleAgentCreateId?.current
                         ? intl.formatMessage({ id: 'agent.create.modify.success' })
                         : intl.formatMessage({ id: 'agent.create.success' })
                 );
@@ -227,6 +227,7 @@ const AgentCreate = memo(() => {
         }
     };
     useUpdateEffect(() => {
+        if(!modelOpen) return
         const currentMessage = flowMessage?.find(
             item =>
                 item?.data?.app_run_id ==
@@ -332,17 +333,17 @@ const AgentCreate = memo(() => {
                     block
                     size="small"
                     options={[
-                        { 
+                        {
                             label: <div className="w-[80px]">
                                 {intl.formatMessage({ id: 'agent.create.single' })}
-                            </div>, 
-                            value: 'single' 
+                            </div>,
+                            value: 'single'
                         },
-                        { 
+                        {
                             label: <div className="w-[80px]">
                                 {intl.formatMessage({ id: 'agent.create.batch' })}
-                            </div>, 
-                            value: 'batch' 
+                            </div>,
+                            value: 'batch'
                         },
                     ]}
                     disabled={loading}

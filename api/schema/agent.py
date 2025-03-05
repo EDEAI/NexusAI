@@ -259,26 +259,38 @@ class ResBatchAgentCreateSchema(BaseModel):
 
 
 class AgentResponseBase(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 
 class AgentLogListResponse(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 
 class AgentLogDetailResponse(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 
-class ClearAgentChatMemory(BaseModel):
+class ClearAgentChatMemoryReturn(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 
 class AgentChatMessage(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 
 class ResAgentInfoSchemaUpdate(BaseModel):
+    data: Dict[str, Any]
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 
@@ -287,10 +299,11 @@ class AgentChatMessage(BaseModel):
     ability_id: Optional[int] = None
     input_dict: Optional[Dict[str, Any]] = None
     prompt: Optional[Dict[str, Any]] = None
-    message: Optional[str] = None
 
 
 class ResAgentRunSchemaReturn(BaseModel):
+    data: Dict[str, Any]
+    detail: Optional[str] = None
     data: Dict[str, Any]
 
 class ChatRoomData(BaseModel):
@@ -315,3 +328,7 @@ class ResAgentChatRoomsSchema(BaseModel):
     code: int
     detail: str
     data: AgentChatRoomsResponse
+
+class ClearAgentChatMemory(BaseModel):
+    agent_id: Optional[int] = None
+    message_id: Optional[int] = None

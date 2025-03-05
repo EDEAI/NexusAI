@@ -851,3 +851,30 @@ class Agents(MySQL):
             ]
         )
         return agent_info
+
+    def get_app_by_id_agent_info(self, app_id: int, user_id: int = 0):
+        """
+        Retrieves an agent record from the {table_name} table based on the specified agent ID.
+
+        :param app_id: An integer representing the app ID.
+        :param user_id: An integer representing the user ID.
+        :return: A dictionary representing the agent record.
+        """
+        agent_info = self.select(
+            columns=[
+                "agents.id"
+            ],
+            joins=[["inner", "apps", "agents.app_id = apps.id"]],
+            conditions=[
+                {"column": "agents.app_id", "value": app_id},
+                {"column": "agents.status", "value": 1}
+            ]
+        )
+
+        agent_ids = []
+
+        for agent in agent_info:
+            agent_ids.append(agent["id"])
+
+        return agent_ids
+

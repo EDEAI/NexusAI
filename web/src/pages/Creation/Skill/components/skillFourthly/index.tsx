@@ -1,10 +1,12 @@
 import { PostskillRun, PutskillPublish } from '@/api/skill';
 import CodeEditor from '@/components/WorkFlow/components/Editor/CodeEditor';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
+import { DownloadOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Form, Input, message, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
+import FileDownloadList from '@/components/common/FileDownloadList';
 
 //
 const { TextArea, Search } = Input;
@@ -67,11 +69,14 @@ const skillFourthly: React.FC<ChildProps> = ({
         }
     };
 
+    const [fileList, setFileList] = useState<any[]>([]);
+
     const SkillRun = async (param: any) => {
         PostskillRun(param)
             .then(res => {
                 message.success(intl.formatMessage({ id: 'skill.run.success' }));
                 setSkillRun(res.data.outputs);
+                setFileList(res.data.file_list || []);
                 setLoading(false);
             })
             .catch(err => {
@@ -81,11 +86,32 @@ const skillFourthly: React.FC<ChildProps> = ({
                 }
                 console.log(err, 'err-===>');
             });
-
     };
     const Goamend = async () => {
         history.push(`/Skill?app_id=${app_id ? app_id : Skillinfo?.app_id}&type=false`);
         location.reload();
+    };
+
+    const handleSaveOutline = async (outlineData: any) => {
+        try {
+            const response = await fetch(`/api/novel/${novelId}/outline`, {
+                method: 'POST',  // 改用 POST 方法
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(outlineData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            message.success('保存成功');
+        } catch (error) {
+            console.error('Error saving outline:', error);
+            message.error('保存失败');
+        }
     };
 
     return (
@@ -192,6 +218,15 @@ const skillFourthly: React.FC<ChildProps> = ({
                                     />
                                 ) : null}
                             </div>
+
+                            {fileList.length > 0 && (
+                                <FileDownloadList 
+                                    files={fileList} 
+                                    title={intl.formatMessage({ id: 'agent.file.output' })}
+                                    className="mb-4"
+                                />
+                            )}
+
                             <div className="w-full flex justify-end items-center">
                                 <div className=" h-8 bg-[#e8effc] rounded-md">
                                     <Button

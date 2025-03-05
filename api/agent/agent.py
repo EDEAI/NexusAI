@@ -979,8 +979,8 @@ async def agent_message_list(agent_id: int, page: int = 1, page_size: int = 10, 
     return response_success(agent_msg_list)
 
 
-@router.get("/{agent_id}/agent_log_list", response_model=AgentLogListResponse, summary="Agent log list")
-async def agent_log_list(agent_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
+@router.get("/{app_id}/agent_log_list", response_model=AgentLogListResponse, summary="Agent log list")
+async def agent_log_list(app_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of all chat rooms.
     This endpoint fetches a paginated list of all available chat rooms, allowing users to optionally filter the results by a name. The pagination is controlled through the page number and page size parameters.
@@ -988,7 +988,7 @@ async def agent_log_list(agent_id: int, page: int = 1, page_size: int = 10, user
     Parameters:
     - page (int): The current page number for pagination. Defaults to 1.
     - page_size (int): The number of chat rooms to return per page. Defaults to 10.
-    -Agent_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
+    -app_id (int): A unique identifier used to retrieve the chat message of the app. Compulsory.
     - userinfo (TokenData): Information about the current user, provided through dependency injection. Required.
 
     Returns:
@@ -997,26 +997,25 @@ async def agent_log_list(agent_id: int, page: int = 1, page_size: int = 10, user
     Raises:
     - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
     """
-    find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
+    find_agent = Agents().get_app_by_id_agent_info(app_id, userinfo.uid)
     if not find_agent:
         return response_error(get_language_content("agent_does_not_exist"))
-
-    result = AppRuns().all_agent_log_list(
+    data = AppRuns().all_agent_log_list(
         page=page,
         page_size=page_size,
         user_id=userinfo.uid,
-        agent_id=agent_id)
-    return response_success(result)
+        agent_id=find_agent)
+    return response_success(data)
 
 
-@router.get("/{agent_id}/agent_log_details", response_model=AgentLogDetailResponse, summary="Agent log Details")
-async def agent_log_list(agent_id: int, app_run_id: int, userinfo: TokenData = Depends(get_current_user)):
+@router.get("/{app_id}/agent_log_details", response_model=AgentLogDetailResponse, summary="Agent log Details")
+async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of all chat rooms.
     This endpoint fetches a paginated list of all available chat rooms, allowing users to optionally filter the results by a name. The pagination is controlled through the page number and page size parameters.
 
     Parameters:
-    - Agent_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
+    - app_id (int): A unique identifier used to retrieve the chat message of the app. Compulsory.
     - app_run_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
     - userinfo (TokenData): Information about the current user, provided through dependency injection. Required.
 
@@ -1026,32 +1025,66 @@ async def agent_log_list(agent_id: int, app_run_id: int, userinfo: TokenData = D
     Raises:
     - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
     """
-    find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
-    if not find_agent:
-        return response_error(get_language_content("agent_does_not_exist"))
+    find_app = Apps().get_app_by_id(app_id)
+    if find_app is None:
+        return response_error(get_language_content("api_agent_info_app_error"))
 
     result = AppRuns().select_one(
-        columns=['id', 'user_id', 'app_id', 'agent_id', 'workflow_id', 'dataset_id', 'tool_id', 'chatroom_id', 'type',
-                 'name', 'graph', 'inputs', 'raw_user_prompt', 'model_data', 'knowledge_base_mapping', 'level',
-                 'context', 'completed_edges', 'skipped_edges', 'status', 'completed_steps', 'actual_completed_steps',
-                 'need_human_confirm', 'need_correct_llm', 'error', 'outputs', 'elapsed_time', 'prompt_tokens',
-                 'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps',
-                 'created_time', 'updated_time', 'finished_time'],
+        columns=['users.nickname as nickname', 'app_runs.id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.agent_id',
+                 'app_runs.workflow_id', 'app_runs.dataset_id', 'app_runs.tool_id', 'app_runs.chatroom_id',
+                 'app_runs.type', 'app_runs.name', 'app_runs.graph', 'app_runs.inputs', 'app_runs.raw_user_prompt',
+                 'app_runs.knowledge_base_mapping', 'app_runs.level', 'app_runs.context', 'app_runs.completed_edges',
+                 'app_runs.skipped_edges', 'app_runs.status', 'app_runs.completed_steps',
+                 'app_runs.actual_completed_steps', 'app_runs.need_human_confirm', 'app_runs.need_correct_llm',
+                 'app_runs.error', 'app_runs.outputs', 'app_runs.elapsed_time', 'app_runs.prompt_tokens',
+                 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens',
+                 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.updated_time',
+                 'app_runs.finished_time', 'app_runs.model_data'],
+        joins=[
+            ["left", "users", "users.id = app_runs.user_id"]
+        ],
         conditions=[
-            {"column": "agent_id", "value": agent_id},
-            {"column": "user_id", "value": userinfo.uid},
-            {"column": "id", "value": app_run_id},
-            {'column': 'status', 'op': 'in', 'value': [3, 4]}
+            {"column": "app_runs.app_id", "value": app_id},
+            {"column": "app_runs.user_id", "value": userinfo.uid},
+            {"column": "app_runs.id", "value": app_run_id},
+            {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]}
         ]
     )
 
+    if 'status' in result:
+        result_status = result['status']
+        if result_status in (1, 2):
+            result['status'] = 1
+        elif result_status == 3:
+            result['status'] = 2
+        elif result_status == 4:
+            result['status'] = 3
+    if result['model_data'] is not None:
+        find_app_user = Apps().select_one(
+            columns=['id'],
+            conditions=[
+                {'column': 'id', 'value': app_id},
+                {'column': 'status', 'value': 1},
+                {'column': 'user_id', 'value': userinfo.uid}
+            ]
+        )
+        if find_app_user is None:
+            messages = ''
+        else:
+            messages = result['model_data']['messages']
+    else:
+        messages = ''
+    del result['model_data']
+    # result['prompt_data'] = {}
+    # result['prompt_data'] = messages
+    result['prompt_data'] = []
     if not result:
         return response_error(get_language_content("app_run_error"))
     return response_success(result)
 
 
-@router.post("/{agent_id}/clear_agent_chat_memory", response_model=ClearAgentChatMemory, summary="Clear agent chat memory")
-async def clear_agent_chat_memory(agent_id: int, message_id: int, userinfo: TokenData = Depends(get_current_user)):
+@router.post("/{agent_id}/clear_agent_chat_memory", response_model=ClearAgentChatMemoryReturn, summary="Clear agent chat memory")
+async def clear_agent_chat_memory(data: ClearAgentChatMemory, userinfo: TokenData = Depends(get_current_user)):
     """
     Clear the chat memory for a specific Agent chat.
     This endpoint allows users to clear the chat history of a specific agent chat room,
@@ -1070,6 +1103,8 @@ async def clear_agent_chat_memory(agent_id: int, message_id: int, userinfo: Toke
         - If 'agent_id' is invalid, it indicates that the user has not been authenticated or the agent does not exist.
         - If 'message_id' is invalid, it indicates that the specified message or chat session does not exist.
     """
+    agent_id = data.agent_id
+    message_id = data.message_id
 
     find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
     if not find_agent:
@@ -1081,22 +1116,22 @@ async def clear_agent_chat_memory(agent_id: int, message_id: int, userinfo: Toke
             {"column": "user_id", "value": userinfo.uid},
             {"column": "id", "value": message_id}
         ]
-    )['id']
+    )
     if not find_message:
         return response_error(get_language_content("agent_message_does_not_exist"))
 
     AgentChatMessages().update(
-        {'column': 'id', 'value': find_message},
+        {'column': 'id', 'value': message_id},
         {'history_cleared': 1}
     )
 
     return response_success(
-        {"message_id": find_message}
+        {"message_id": message_id}
     )
 
 
-@router.post("/agent_chat_message", response_model=ResAgentRunSchema)
-async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_current_user)):
+@router.post("/agent_chat_message", response_model=ResAgentRunSchemaReturn)
+async def agent_chat_message(data: AgentChatMessage, userinfo: TokenData = Depends(get_current_user)):
     """
     agent run
 
@@ -1111,7 +1146,6 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
     prompt = data.prompt
     uid = userinfo.uid
     team_id = userinfo.team_id
-    data_source_run_id = data.data_source_run_id
 
     if agent_id <= 0:
         return response_error(get_language_content("api_agent_run_agent_id_required"))
@@ -1185,7 +1219,7 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
     message_id = AgentChatMessages().insert({
         'user_id': userinfo.uid,
         'agent_id': agent_id,
-        'message': message
+        'message': prompt['user']['value']
     })
 
     run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id, prompt=prompt, is_chat=True)

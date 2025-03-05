@@ -231,7 +231,7 @@ const ResultDisplay = memo(
                                 variables={Object.values(values.output_variables?.properties || {})}
                                 title={intl.formatMessage({ id: 'skill.result.output.variables' })}
                                 onChange={handleVariableChange('output')}
-                                variableTypes={['string', 'number', 'json']}
+                                variableTypes={['string', 'number', 'json','file']}
                             />
                         </div>
 
