@@ -26,6 +26,7 @@ class AppsListData(BaseModel):
     tags:Optional[List[AppListTagsData]] = None
     list:Optional[List[RealationInfo]] = None
     agent_id:Optional[int] = None
+    skill_id:Optional[int] = None
 
 class  ResAppsListData(BaseModel):
     list: Optional[List[AppsListData]] = None
