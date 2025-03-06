@@ -346,7 +346,7 @@ class Workspaces(MySQL):
         LEFT JOIN apps ON app_runs.app_id = apps.id
         LEFT JOIN users ON app_runs.user_id = users.id
         {where_clause}
-        ORDER BY app_runs.id ASC
+        ORDER BY app_runs.id DESC
         LIMIT {offset}, {page_size}
         """
         
@@ -367,9 +367,6 @@ class Workspaces(MySQL):
                     """
                     driver_result = self.execute_query(driver_sql)
                     driver_data = driver_result.mappings().first()
-                    print('----------------------------------------------------')
-                    print(driver_data)
-                    print('----------------------------------------------------')
                     log['driver_id'] = driver_data['driver_id'] if driver_data else 0
 
                     # 获取会议室名称
@@ -432,7 +429,7 @@ class Workspaces(MySQL):
                             conditions=conditions
                         )
                         log['file_list'] = []
-                        if app_node_list and app_node_list.get('outputs') and app_node_list.get('node_graph', {}).get('data', {}).get('output'):
+                        if app_node_list and app_node_list.get('outputs'):
                             file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
                             log['file_list'] = file_list
                 # agent运行记录 - 状态为2
@@ -449,11 +446,12 @@ class Workspaces(MySQL):
                     workflows_id = log['workflow_id']
                     app_runs_id = log['app_run_id']
                     app_node_executions = AppNodeExecutions()
+                    node_type = 'end'
                     conditions = [
                         {"column": "app_node_executions.workflow_id", "value": workflows_id},
                         {"column": "app_node_executions.app_run_id", "value": app_runs_id},
                         {"column": "app_node_executions.correct_output", "value": 0},
-                        {"column": "app_node_executions.node_type", "value": "end"}
+                        {"column": "app_node_executions.node_type", "value": node_type}
                     ]
 
                     app_node_list = app_node_executions.select_one(
@@ -472,7 +470,7 @@ class Workspaces(MySQL):
                         conditions=conditions
                     )
                     log['file_list'] = []
-                    if app_node_list and app_node_list.get('outputs') and app_node_list.get('node_graph', {}).get('data', {}).get('output'):
+                    if app_node_list and app_node_list.get('outputs'):
                         file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
                         log['file_list'] = file_list
                 else:
