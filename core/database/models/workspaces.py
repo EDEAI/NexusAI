@@ -213,23 +213,6 @@ class Workspaces(MySQL):
                         app_node['outputs_md'] = create_recursive_task_category_from_dict(task_dict).to_markdown()
                     elif app_node['node_type'] in ['skill', 'custom_code', 'end']:
                         file_list = extract_file_list_from_skill_output(app_node['outputs'], app_node['node_graph']['data']['output'])
-                        # file_list = []
-                        # skill_output = app_node['outputs']
-                        # storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
-                        # output_vars = create_variable_from_dict(app_node['node_graph']['data']['output'])
-                        # file_vars = output_vars.extract_file_variables()
-                        # for var in file_vars.properties.values():
-                        #     if var.name in skill_output:
-                        #         file_path = skill_output[var.name]
-                        #         if file_path:
-                        #             if not file_path.startswith('/'):
-                        #                 file_path = '/' + file_path
-                        #             file_name = file_path.split('/')[-1]
-                        #             full_path = f"{storage_url}{file_path}"
-                        #             file_list.append({
-                        #                 "file_name": file_name,
-                        #                 "file_path": full_path
-                        #             })
                         app_node['file_list'] = file_list
                     else:
                         app_node['outputs_md'] = None
@@ -321,40 +304,183 @@ class Workspaces(MySQL):
             - "page_size": The number of records per page.
         """
 
-        conditions = [
-            # {"column": "app_runs.workflow_id", "op": ">", "value": 0},
-            [
-                {"column": "app_runs.workflow_id", "op": ">", "value": 0, 'logic': 'or'},
-                {"column": "app_runs.agent_id", "op": ">", "value": 0}
-            ],
-            [
-                {"column": "apps.user_id", "value": uid, 'logic': 'or'},
-                {"column": "app_runs.user_id", "value": uid}
-            ]
-        ]
-        total_count = self.select(
-            aggregates={"id": "count"},
-            joins=[
-                ["inner", "app_runs", 'app_runs.app_id = apps.id']
-            ],
-            conditions=conditions,
-        )[0]["count_id"]
+        # 构建基础查询条件
+        where_clause = f"""
+        WHERE (app_runs.workflow_id > 0 OR app_runs.agent_id > 0)
+        AND (apps.user_id = {uid} OR app_runs.user_id = {uid})
+        """
 
-        log_list = self.select(
-            joins=[
-                ["inner", "app_runs", 'app_runs.app_id = apps.id']
-            ],
-            columns=['app_runs.id AS app_run_id', 'apps.name AS apps_name', 'app_runs.name AS app_runs_name',
-                     'app_runs.workflow_id', 'app_runs.created_time', 'app_runs.elapsed_time', 'app_runs.status',
-                     'app_runs.completed_steps', 'app_runs.total_steps',"apps.icon_background", "apps.icon"],
-            conditions=conditions,
-            order_by="app_runs.id DESC",
-            limit=page_size,
-            offset=(page - 1) * page_size
-        )
+        # 计算总数的查询
+        count_sql = f"""
+        SELECT COUNT(*) as count
+        FROM app_runs
+        LEFT JOIN apps ON app_runs.app_id = apps.id
+        LEFT JOIN chatroom_driven_records ON chatroom_driven_records.data_source_run_id = app_runs.id
+        {where_clause}
+        """
+        
+        total_count_result = self.execute_query(count_sql)
+        total_count = total_count_result.scalar()
+
+        offset = (page - 1) * page_size if page > 0 else 0
+        # 获取列表数据的查询
+        list_sql = f"""
+        SELECT 
+            app_runs.id AS app_run_id,
+            IFNULL(apps.name, '') AS apps_name,
+            app_runs.name AS app_runs_name,
+            IFNULL(app_runs.workflow_id, 0) AS workflow_id,
+            app_runs.created_time,
+            app_runs.elapsed_time,
+            app_runs.status,
+            app_runs.completed_steps,
+            app_runs.total_steps,
+            IFNULL(apps.icon_background, '') AS icon_background,
+            IFNULL(apps.icon, '') AS icon,
+            IFNULL(app_runs.chatroom_id, 0) AS chatroom_id,
+            IFNULL(app_runs.agent_id, 0) AS agent_id,
+            IFNULL(apps.id, 0) AS app_id,
+            IFNULL(app_runs.user_id, 0) AS user_id,
+            IFNULL(users.nickname, '') AS nickname
+        FROM app_runs
+        LEFT JOIN apps ON app_runs.app_id = apps.id
+        LEFT JOIN users ON app_runs.user_id = users.id
+        {where_clause}
+        ORDER BY app_runs.id ASC
+        LIMIT {offset}, {page_size}
+        """
+        
+        log_list_result = self.execute_query(list_sql)
+        log_list = [dict(row._mapping) for row in log_list_result]
 
         if log_list:
             for log in log_list:
+                # 会议导向 - 状态为1
+                if log['app_id'] == 0 and log['chatroom_id'] > 0:
+                    log['show_status'] = 1
+                    # 获取 driver_id
+                    driver_sql = f"""
+                    SELECT id as driver_id
+                    FROM chatroom_driven_records
+                    WHERE data_source_run_id = {log['app_run_id']}
+                    LIMIT 1
+                    """
+                    driver_result = self.execute_query(driver_sql)
+                    driver_data = driver_result.mappings().first()
+                    print('----------------------------------------------------')
+                    print(driver_data)
+                    print('----------------------------------------------------')
+                    log['driver_id'] = driver_data['driver_id'] if driver_data else 0
+
+                    # 获取会议室名称
+                    backup_sql = f"""
+                        SELECT DISTINCT IFNULL(apps.name, '') as chat_room_name
+                        FROM app_runs
+                        INNER JOIN chatrooms ON app_runs.chatroom_id = chatrooms.id
+                        INNER JOIN apps ON chatrooms.app_id = apps.id
+                        WHERE app_runs.id = {log['app_run_id']}
+                        """
+                    backup_result = self.execute_query(backup_sql)
+                    chat_room_data = backup_result.mappings().first()
+                    log['chat_room_name'] = chat_room_data['chat_room_name'] if chat_room_data else ''
+
+                    # 获取agent或workflow对应的app名称
+                    if log['agent_id'] > 0:
+                        agent_sql = f"""
+                        SELECT IFNULL(apps.name, '') as apps_name
+                        FROM agents
+                        INNER JOIN apps ON agents.app_id = apps.id
+                        WHERE agents.id = {log['agent_id']}
+                        """
+                        agent_result = self.execute_query(agent_sql)
+                        agent_data = agent_result.mappings().first()
+                        log['apps_name'] = agent_data['apps_name'] if agent_data else ''
+                    elif log['workflow_id'] > 0:
+                        workflow_sql = f"""
+                        SELECT IFNULL(apps.name, '') as apps_name
+                        FROM workflows
+                        INNER JOIN apps ON workflows.app_id = apps.id
+                        WHERE workflows.id = {log['workflow_id']}
+                        """
+                        workflow_result = self.execute_query(workflow_sql)
+                        workflow_data = workflow_result.mappings().first()
+                        log['apps_name'] = workflow_data['apps_name'] if workflow_data else ''
+
+                        workflows_id = log['workflow_id']
+                        app_runs_id = log['app_run_id']
+                        app_node_executions = AppNodeExecutions()
+                        conditions = [
+                            {"column": "app_node_executions.workflow_id", "value": workflows_id},
+                            {"column": "app_node_executions.app_run_id", "value": app_runs_id},
+                            {"column": "app_node_executions.correct_output", "value": 0},
+                            {"column": "app_node_executions.node_type", "value": "end"}
+                        ]
+
+                        app_node_list = app_node_executions.select_one(
+                            joins=[
+                                ["inner", "app_runs", 'app_runs.id = app_node_executions.app_run_id'],
+                                ["inner", "apps", 'app_runs.app_id = apps.id']
+                            ],
+                            columns=["app_node_executions.id", "app_node_executions.level", "app_node_executions.child_level",
+                                    "app_node_executions.pre_node_id", "app_node_executions.node_id", "app_node_executions.node_name",
+                                    "app_node_executions.node_type", "app_node_executions.node_graph", "app_node_executions.inputs",
+                                    "app_node_executions.model_data AS mod_data", "app_node_executions.task_id",
+                                    "app_node_executions.status",
+                                    "app_node_executions.error", "app_node_executions.outputs", "app_node_executions.elapsed_time",
+                                    "app_node_executions.created_time", "app_node_executions.updated_time",
+                                    "app_node_executions.finished_time","apps.icon_background", "apps.icon","app_node_executions.need_human_confirm","app_node_executions.user_id"],
+                            conditions=conditions
+                        )
+                        log['file_list'] = []
+                        if app_node_list and app_node_list.get('outputs') and app_node_list.get('node_graph', {}).get('data', {}).get('output'):
+                            file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
+                            log['file_list'] = file_list
+                # agent运行记录 - 状态为2
+                elif log['agent_id'] > 0:
+                    log['show_status'] = 2
+                    log['chat_room_name'] = ''
+                    log['file_list'] = []
+                    log['driver_id'] = 0
+                # 工作流运行记录 - 状态为3
+                elif log['workflow_id'] > 0:
+                    log['show_status'] = 3
+                    log['chat_room_name'] = ''
+                    log['driver_id'] = 0
+                    workflows_id = log['workflow_id']
+                    app_runs_id = log['app_run_id']
+                    app_node_executions = AppNodeExecutions()
+                    conditions = [
+                        {"column": "app_node_executions.workflow_id", "value": workflows_id},
+                        {"column": "app_node_executions.app_run_id", "value": app_runs_id},
+                        {"column": "app_node_executions.correct_output", "value": 0},
+                        {"column": "app_node_executions.node_type", "value": "end"}
+                    ]
+
+                    app_node_list = app_node_executions.select_one(
+                        joins=[
+                            ["inner", "app_runs", 'app_runs.id = app_node_executions.app_run_id'],
+                            ["inner", "apps", 'app_runs.app_id = apps.id']
+                        ],
+                        columns=["app_node_executions.id", "app_node_executions.level", "app_node_executions.child_level",
+                                "app_node_executions.pre_node_id", "app_node_executions.node_id", "app_node_executions.node_name",
+                                "app_node_executions.node_type", "app_node_executions.node_graph", "app_node_executions.inputs",
+                                "app_node_executions.model_data AS mod_data", "app_node_executions.task_id",
+                                "app_node_executions.status",
+                                "app_node_executions.error", "app_node_executions.outputs", "app_node_executions.elapsed_time",
+                                "app_node_executions.created_time", "app_node_executions.updated_time",
+                                "app_node_executions.finished_time","apps.icon_background", "apps.icon","app_node_executions.need_human_confirm","app_node_executions.user_id"],
+                        conditions=conditions
+                    )
+                    log['file_list'] = []
+                    if app_node_list and app_node_list.get('outputs') and app_node_list.get('node_graph', {}).get('data', {}).get('output'):
+                        file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
+                        log['file_list'] = file_list
+                else:
+                    log['show_status'] = 0
+                    log['chat_room_name'] = ''
+                    log['file_list'] = []
+                    log['driver_id'] = 0
+                # 默认状态处理
                 if log['status'] in (1, 2):
                     log['status'] = 1
                 elif log['status'] == 3:
