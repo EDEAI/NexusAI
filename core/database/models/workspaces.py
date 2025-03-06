@@ -430,8 +430,10 @@ class Workspaces(MySQL):
                         )
                         log['file_list'] = []
                         if app_node_list and app_node_list.get('outputs'):
-                            file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
-                            log['file_list'] = file_list
+                            if outputs := app_node_list.get('outputs'):
+                                app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
+                                file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
+                                log['file_list'] = file_list
                 # agent运行记录 - 状态为2
                 elif log['agent_id'] > 0:
                     log['show_status'] = 2
@@ -471,8 +473,10 @@ class Workspaces(MySQL):
                     )
                     log['file_list'] = []
                     if app_node_list and app_node_list.get('outputs'):
-                        file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
-                        log['file_list'] = file_list
+                        if outputs := app_node_list.get('outputs'):
+                            app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
+                            file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
+                            log['file_list'] = file_list
                 else:
                     log['show_status'] = 0
                     log['chat_room_name'] = ''
