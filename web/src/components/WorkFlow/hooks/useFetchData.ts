@@ -1,4 +1,10 @@
-import { getAgentList, getSkillList, getToolsList, getVectorList } from '@/api/workflow';
+import {
+    getAgentList,
+    getModelList,
+    getSkillList,
+    getToolsList,
+    getVectorList,
+} from '@/api/workflow';
 import { useEffect } from 'react';
 import useStore from '../store';
 
@@ -8,6 +14,7 @@ const useFetchData = () => {
     const setToolData = useStore(state => state.setToolData);
     const setDatasetData = useStore(state => state.setDatasetData);
     const setTeamDatasetData = useStore(state => state.setTeamDatasetData);
+    const setModelOptionsData = useStore(state => state.setModelOptionsData);
     useEffect(() => {
         getAgentList(2).then(res => {
             if (res.code === 0) {
@@ -39,6 +46,36 @@ const useFetchData = () => {
                     list: Object.values(res.data),
                 });
             }
+        });
+        getModelList().then(res => {
+            const safeModels = Array.isArray(res?.data?.data) ? res.data.data : [];
+
+            const options = safeModels.map(supplier => ({
+                label: supplier.supplier_name,
+                options: Array.isArray(supplier.model_list)
+                    ? supplier.model_list.map(model => ({
+                          label: model.model_name,
+                          value: model.model_config_id,
+                      }))
+                    : [],
+            }));
+
+            let defaultValue;
+            for (const supplier of safeModels) {
+                if (Array.isArray(supplier.model_list)) {
+                    const defaultModel = supplier.model_list.find(
+                        model => model.model_default_used === 1,
+                    );
+                    if (defaultModel) {
+                        defaultValue = defaultModel.model_config_id;
+                        break;
+                    }
+                }
+            }
+            setModelOptionsData({
+                options,
+                defaultValue,
+            });
         });
         getVectorList().then(res => {
             if (res.code == 0) {
