@@ -13,10 +13,15 @@ class WorkflowProcessLog(BaseModel):
     created_time: Optional[datetime] = None
     elapsed_time: Optional[float] = None
     status: Optional[int] = None
+    show_status: Optional[int] = None
     completed_steps: Optional[int] = None
     total_steps: Optional[int] = None
     icon_background: Optional[str] = None
     icon: Optional[str] = None
+    chat_room_name: Optional[str] = None
+    nickname: Optional[str] = None
+    file_list: Optional[List[Dict[str, Any]]] = None
+    driver_id: Optional[int] = None
 class WorkspaceWorkflowProcessLogResponseData(BaseModel):
     list: Optional[List[WorkflowProcessLog]] = None
     total_count: Optional[int] = None
