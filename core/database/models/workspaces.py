@@ -304,13 +304,13 @@ class Workspaces(MySQL):
             - "page_size": The number of records per page.
         """
 
-        # 构建基础查询条件
+        # Build base query conditions
         where_clause = f"""
         WHERE (app_runs.workflow_id > 0 OR app_runs.agent_id > 0)
         AND (apps.user_id = {uid} OR app_runs.user_id = {uid})
         """
 
-        # 计算总数的查询
+        # Query for total count
         count_sql = f"""
         SELECT COUNT(*) as count
         FROM app_runs
@@ -323,7 +323,7 @@ class Workspaces(MySQL):
         total_count = total_count_result.scalar()
 
         offset = (page - 1) * page_size if page > 0 else 0
-        # 获取列表数据的查询
+        # Query for list data
         list_sql = f"""
         SELECT 
             app_runs.id AS app_run_id,
@@ -355,10 +355,10 @@ class Workspaces(MySQL):
 
         if log_list:
             for log in log_list:
-                # 会议导向 - 状态为1
+                # Meeting-driven record - status 1
                 if log['app_id'] == 0 and log['chatroom_id'] > 0:
                     log['show_status'] = 1
-                    # 获取 driver_id
+                    # Get driver_id from chatroom_driven_records
                     driver_sql = f"""
                     SELECT id as driver_id
                     FROM chatroom_driven_records
@@ -369,7 +369,7 @@ class Workspaces(MySQL):
                     driver_data = driver_result.mappings().first()
                     log['driver_id'] = driver_data['driver_id'] if driver_data else 0
 
-                    # 获取会议室名称
+                    # Get chatroom name
                     backup_sql = f"""
                         SELECT DISTINCT IFNULL(apps.name, '') as chat_room_name
                         FROM app_runs
@@ -381,7 +381,7 @@ class Workspaces(MySQL):
                     chat_room_data = backup_result.mappings().first()
                     log['chat_room_name'] = chat_room_data['chat_room_name'] if chat_room_data else ''
 
-                    # 获取agent或workflow对应的app名称
+                    # Get app name from agent or workflow
                     if log['agent_id'] > 0:
                         agent_sql = f"""
                         SELECT IFNULL(apps.name, '') as apps_name
@@ -434,13 +434,13 @@ class Workspaces(MySQL):
                                 app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
                                 file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
                                 log['file_list'] = file_list
-                # agent运行记录 - 状态为2
+                # Agent execution record - status 2
                 elif log['agent_id'] > 0:
                     log['show_status'] = 2
                     log['chat_room_name'] = ''
                     log['file_list'] = []
                     log['driver_id'] = 0
-                # 工作流运行记录 - 状态为3
+                # Workflow execution record - status 3
                 elif log['workflow_id'] > 0:
                     log['show_status'] = 3
                     log['chat_room_name'] = ''
@@ -482,7 +482,7 @@ class Workspaces(MySQL):
                     log['chat_room_name'] = ''
                     log['file_list'] = []
                     log['driver_id'] = 0
-                # 默认状态处理
+                # Default status handling
                 if log['status'] in (1, 2):
                     log['status'] = 1
                 elif log['status'] == 3:
