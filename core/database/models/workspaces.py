@@ -335,6 +335,7 @@ class Workspaces(MySQL):
             app_runs.status,
             app_runs.completed_steps,
             app_runs.total_steps,
+            apps.mode,
             IFNULL(apps.icon_background, '') AS icon_background,
             IFNULL(apps.icon, '') AS icon,
             IFNULL(app_runs.chatroom_id, 0) AS chatroom_id,
@@ -380,7 +381,8 @@ class Workspaces(MySQL):
                     backup_result = self.execute_query(backup_sql)
                     chat_room_data = backup_result.mappings().first()
                     log['chat_room_name'] = chat_room_data['chat_room_name'] if chat_room_data else ''
-
+                    log['associated_chat_room_name'] = ''
+                    
                     # Get app name from agent or workflow
                     if log['agent_id'] > 0:
                         agent_sql = f"""
@@ -392,6 +394,7 @@ class Workspaces(MySQL):
                         agent_result = self.execute_query(agent_sql)
                         agent_data = agent_result.mappings().first()
                         log['apps_name'] = agent_data['apps_name'] if agent_data else ''
+                        log['mode'] = 1
                     elif log['workflow_id'] > 0:
                         workflow_sql = f"""
                         SELECT IFNULL(apps.name, '') as apps_name
@@ -402,6 +405,7 @@ class Workspaces(MySQL):
                         workflow_result = self.execute_query(workflow_sql)
                         workflow_data = workflow_result.mappings().first()
                         log['apps_name'] = workflow_data['apps_name'] if workflow_data else ''
+                        log['mode'] = 2
 
                         workflows_id = log['workflow_id']
                         app_runs_id = log['app_run_id']
@@ -440,6 +444,28 @@ class Workspaces(MySQL):
                     log['chat_room_name'] = ''
                     log['file_list'] = []
                     log['driver_id'] = 0
+                    find_chatroom_sql = f"""
+                    SELECT chatroom_id
+                    FROM chatroom_driven_records
+                    WHERE data_driven_run_id = {log['app_run_id']}
+                    LIMIT 1
+                    """
+                    find_chatroom = self.execute_query(find_chatroom_sql)
+                    chatroom_data = find_chatroom.mappings().first()
+                    if chatroom_data:
+                    # Get chatroom name from chatrooms and apps tables
+                        chatroom_name_sql = f"""
+                        SELECT IFNULL(apps.name, '') as chat_room_name
+                        FROM chatrooms
+                        INNER JOIN apps ON chatrooms.app_id = apps.id
+                        WHERE chatrooms.id = {chatroom_data['chatroom_id']}
+                        LIMIT 1
+                        """
+                        chatroom_name_result = self.execute_query(chatroom_name_sql)
+                        chatroom_name_data = chatroom_name_result.mappings().first()
+                        log['associated_chat_room_name'] = chatroom_name_data['chat_room_name'] if chatroom_name_data else ''
+                    else:
+                        log['associated_chat_room_name'] = ''
                 # Workflow execution record - status 3
                 elif log['workflow_id'] > 0:
                     log['show_status'] = 3
@@ -447,6 +473,29 @@ class Workspaces(MySQL):
                     log['driver_id'] = 0
                     workflows_id = log['workflow_id']
                     app_runs_id = log['app_run_id']
+                    find_chatroom_sql = f"""
+                    SELECT chatroom_id
+                    FROM chatroom_driven_records
+                    WHERE data_driven_run_id = {log['app_run_id']}
+                    LIMIT 1
+                    """
+                    find_chatroom = self.execute_query(find_chatroom_sql)
+                    chatroom_data = find_chatroom.mappings().first()
+                    if chatroom_data:
+                    # Get chatroom name from chatrooms and apps tables
+                        chatroom_name_sql = f"""
+                        SELECT IFNULL(apps.name, '') as chat_room_name
+                        FROM chatrooms
+                        INNER JOIN apps ON chatrooms.app_id = apps.id
+                        WHERE chatrooms.id = {chatroom_data['chatroom_id']}
+                        LIMIT 1
+                        """
+                        chatroom_name_result = self.execute_query(chatroom_name_sql)
+                        chatroom_name_data = chatroom_name_result.mappings().first()
+                        log['associated_chat_room_name'] = chatroom_name_data['chat_room_name'] if chatroom_name_data else ''
+                    else:
+                        log['associated_chat_room_name'] = ''
+                    
                     app_node_executions = AppNodeExecutions()
                     node_type = 'end'
                     conditions = [
@@ -482,6 +531,7 @@ class Workspaces(MySQL):
                     log['chat_room_name'] = ''
                     log['file_list'] = []
                     log['driver_id'] = 0
+                    log['associated_chat_room_name'] = ''
                 # Default status handling
                 if log['status'] in (1, 2):
                     log['status'] = 1
