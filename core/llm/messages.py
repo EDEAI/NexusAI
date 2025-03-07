@@ -3,7 +3,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 from base64 import b64encode
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, Optional
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -107,7 +107,8 @@ class Messages:
         self,
         model_name: str,
         supplier_name: str,
-        restrict_max_rounds: bool = True
+        restrict_max_rounds: bool = True,
+        input_variables: Optional[Dict[str, Any]] = None
     ) -> List[Union[Tuple[str, str], HumanMessage]]:
         """
         Converts the Messages object to a list of tuples in the LangChain format, respecting the maximum rounds limit.
@@ -123,18 +124,21 @@ class Messages:
                     return result
             if role == "human" and message.type == "file":
                 result.insert(0, self._get_human_message_from_file_variable(message))
-            elif role == "system" and supplier_name == "OpenAI":
-                if model_name in ["o1-preview", "o1-mini"]:
-                    # "o1-preview" and "o1-mini" does not support "developer" nor "system" messages.
-                    for i, (role, result_message) in enumerate(result):
-                        if role == "human":
-                            # Prepend the system message to the human message.
+            elif role == "system" and (supplier_name == "OpenAI" and model_name in ["o1-preview", "o1-mini"]):
+                # "o1-preview" and "o1-mini" does not support "developer" nor "system" messages.
+                for i, (role, result_message) in enumerate(result):
+                    if role == "human":
+                        # Prepend the system message to the human message.
+                        if input_variables:
+                            result[i] = ("human", f"{message.value.format(**input_variables)}\n{result_message}")
+                        else:
                             result[i] = ("human", f"{message.value}\n{result_message}")
-                            break
+                        break
+            else:
+                if input_variables:
+                    result.insert(0, (role, message.value.format(**input_variables)))
                 else:
                     result.insert(0, (role, message.value))
-            else:
-                result.insert(0, (role, message.value))
         return result
     
     def serialize(self) -> List[Dict[str, Dict[str, str]]]:
