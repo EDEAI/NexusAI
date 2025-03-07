@@ -56,6 +56,8 @@ const DnDFlow = () => {
     const { onDnD } = useDnD(screenToFlowPosition);
     const [searchParams] = useSearchParams();
     const publishStatus = searchParams.get('type') == 'true';
+ 
+    const setLoadingWorkflowData = useStore(state => state.setLoadingWorkflowData);
     const nodesInitialized = useNodesInitialized({
         includeHiddenNodes: false,
     });
@@ -91,7 +93,6 @@ const DnDFlow = () => {
             if (runPanelShow) {
                 setToPath(location.location.pathname);
                 setIsModalOpen(true);
-
                 return;
             }
         });
@@ -151,6 +152,7 @@ const DnDFlow = () => {
                 duration: 10,
             });
         }
+        setLoadingWorkflowData(true);
         setAppId(appId);
         getWorkFlowInfo(appId, publishStatus ? 1 : 0).then(res => {
             if (res.code == 0) {
@@ -177,6 +179,9 @@ const DnDFlow = () => {
                 if (views?.viewPort) {
                     // setViewport(views.viewPort);
                 }
+                setTimeout(() => {
+                    setLoadingWorkflowData(false);
+                }, 1000);
             }
         });
         getModelData();

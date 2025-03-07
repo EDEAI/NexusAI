@@ -20,6 +20,7 @@ export default memo(() => {
     const publishStatus = searchParams.get('type') == 'true';
     const saveWorkFlow = useSaveWorkFlow();
     const [messageApi, contextHolder] = message.useMessage();
+    const loadingWorkflowData = useStore(state => state.loadingWorkflowData);
     const publish = async () => {
         await saveWorkFlow()
         const appId = searchParams.get('app_id');
@@ -83,13 +84,13 @@ export default memo(() => {
         <div className="fixed right-2 top-16 flex gap-2">
             {!publishStatus && (
                 <div  className="flex gap-2">
-                    <Button type="primary" onClick={publish}>
+                    <Button type="primary" disabled={loadingWorkflowData} onClick={publish}>
                         {intl.formatMessage({ id: 'workflow.release' })}
                     </Button>
-                    <Button icon={<PlayCircleOutlined />} onClick={runFlow}>
+                    <Button icon={<PlayCircleOutlined />} disabled={loadingWorkflowData} onClick={runFlow}>
                         {intl.formatMessage({ id: 'workflow.run' })}
                     </Button>
-                    <Button icon={<SyncOutlined />} type="dashed" onClick={saveWorkFlow}>
+                    <Button icon={<SyncOutlined />} type="dashed" disabled={loadingWorkflowData} onClick={saveWorkFlow}>
                         {intl.formatMessage({ id: 'workflow.save' })}
                     </Button>
                 </div>
@@ -100,7 +101,7 @@ export default memo(() => {
                 {intl.formatMessage({ id: 'workflow.import', defaultMessage: '' })}
             </Button>
             </Upload> */}
-            <Button icon={<ExportOutlined />} type="dashed" onClick={exportData}>
+            <Button icon={<ExportOutlined />} type="dashed" onClick={exportData} disabled={loadingWorkflowData}>
                 {intl.formatMessage({ id: 'workflow.export', defaultMessage: '' })}
             </Button>
             {contextHolder}
