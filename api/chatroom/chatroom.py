@@ -593,13 +593,16 @@ async def chat_history_message_summary(chatroom_id: int, chat_request: ChatHisto
             correct_prompt=input_messages
         )
     else:
+        chatroom_table_orientation = get_language_content('chatroom_table_orientation')
+        result_name = f"{chatroom_table_orientation}_{start_datetime_str}"
         app_run_id = AppRuns().insert(
             {
                 'user_id': userinfo.uid,
                 'app_id': 0,
                 'type': 2,
                 'chatroom_id': chatroom_id,
-                'name': f'Chat_history_summary_{start_datetime_str}',
+                # 'name': f'Chat_history_summary_{start_datetime_str}',
+                'name': result_name,
                 'status': 1
             }
         )

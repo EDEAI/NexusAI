@@ -7,6 +7,8 @@ from core.database.models.app_node_user_relation import AppNodeUserRelation
 from core.database.models.upload_files import UploadFiles
 from core.database.models.chatroom_messages import ChatroomMessages
 import math, json
+from time import time
+from datetime import datetime
 from sqlalchemy.sql import text
 from core.database.models.app_runs import AppRuns
 from core.workflow.variables import create_variable_from_dict, get_first_variable_value, flatten_variable_with_values
@@ -288,27 +290,71 @@ class Workspaces(MySQL):
             "app_run_data": app_run_info
         }
 
-    def get_workflow_process_log(self, page: int = 0, page_size: int = 0, uid: int = 0):
+    def get_workflow_process_log(self, page: int = 0, page_size: int = 0, show_status: int = 0, uid: int = 0):
         """
-        Get Workflow Process Log.
+        Get workflow process logs with pagination and filtering options.
 
-        :param page: The page number for pagination (default is 0).
-        :param page_size: The number of records per page (default is 0).
-        :param uid: The user ID to filter workflow process logs by (default is 0).
+        Args:
+            page (int): The page number for pagination (default is 0).
+            page_size (int): Number of records per page (default is 0).
+            show_status (int): Filter records by status (default is 0).
+                - 0: All records
+                - 1: Meeting-driven records
+                - 2: Agent execution records
+                - 3: Workflow execution records
+            uid (int): User ID to filter records (default is 0).
 
-        :return: A dictionary containing:
-            - "list": A list of workflow process logs with details such as app_run_id, app name, workflow name, workflow ID, status, steps, and time information.
-            - "total_count": The total number of matching workflow logs.
-            - "total_pages": The total number of pages based on the page size.
-            - "page": The current page number.
-            - "page_size": The number of records per page.
+        Returns:
+            dict: A dictionary containing:
+                - list (list): List of workflow process logs with details including:
+                    - app_run_id: ID of the application run
+                    - apps_name: Name of the application
+                    - workflow_id: ID of the workflow
+                    - status: Current status of the process
+                    - chat_room_name: Name of the associated chatroom
+                    - driver_id: ID of the driver record
+                    - file_list: List of associated files
+                - total_count (int): Total number of records
+                - total_pages (int): Total number of pages
+                - page (int): Current page number
+                - page_size (int): Number of records per page
         """
 
         # Build base query conditions
-        where_clause = f"""
-        WHERE (app_runs.workflow_id > 0 OR app_runs.agent_id > 0)
-        AND (apps.user_id = {uid} OR app_runs.user_id = {uid})
+        base_where = f"""
+        WHERE (apps.user_id = {uid} OR app_runs.user_id = {uid})
         """
+
+        if show_status == 0:
+            # All records
+            where_clause = f"""
+            {base_where}
+            AND (
+                (app_runs.workflow_id > 0 OR app_runs.agent_id > 0)
+                OR (app_runs.app_id = 0 AND app_runs.chatroom_id > 0)
+            )
+            """
+        elif show_status == 1:
+            # Meeting-driven records
+            where_clause = f"""
+            {base_where}
+            AND app_runs.app_id = 0 
+            AND app_runs.chatroom_id > 0
+            """
+        elif show_status == 2:
+            # Agent execution records
+            where_clause = f"""
+            {base_where}
+            AND app_runs.agent_id > 0 
+            AND app_runs.chatroom_id = 0
+            """
+        elif show_status == 3:
+            # Workflow execution records
+            where_clause = f"""
+            {base_where}
+            AND app_runs.workflow_id > 0 
+            AND app_runs.chatroom_id = 0
+            """
 
         # Query for total count
         count_sql = f"""
@@ -438,6 +484,11 @@ class Workspaces(MySQL):
                                 app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
                                 file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
                                 log['file_list'] = file_list
+                        start_time = time()
+                        start_datetime_str = datetime.fromtimestamp(start_time) \
+                            .replace(microsecond=0).isoformat(sep='_')
+                        round_table_orientation_operation = get_language_content('round_table_orientation_operation')
+                        log['app_runs_name'] = f"{round_table_orientation_operation}_{start_datetime_str}"
                 # Agent execution record - status 2
                 elif log['agent_id'] > 0:
                     log['show_status'] = 2
@@ -526,6 +577,11 @@ class Workspaces(MySQL):
                             app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
                             file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
                             log['file_list'] = file_list
+                    start_time = time()
+                    start_datetime_str = datetime.fromtimestamp(start_time) \
+                        .replace(microsecond=0).isoformat(sep='_')
+                    round_table_orientation_operation = get_language_content('round_table_orientation_operation')
+                    log['app_runs_name'] = f"{round_table_orientation_operation}_{start_datetime_str}"
                 else:
                     log['show_status'] = 0
                     log['chat_room_name'] = ''
