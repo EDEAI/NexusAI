@@ -184,3 +184,4 @@ class ReqWorkspaceWorkflowLogInfo(BaseModel):
 class ResWorkspaceWorkflowProcessLog(BaseModel):
     page: int = 1
     page_size: int = 10
+    show_status: Optional[int] = None
