@@ -209,7 +209,7 @@ class ChatroomMessages(MySQL):
                     ],
                     conditions=[
                         {'column': 'id', 'value': agent_id},
-                        {'column': 'status', 'value': 1},
+                        # {'column': 'status', 'value': 1},
                     ]
                 )
                 name = info['name']
