@@ -61,6 +61,8 @@ export type AppState = {
     showChildNode: any;
     teamDatasetData: any;
     modelOptionsData: any;
+    loadingWorkflowData:boolean;
+    setLoadingWorkflowData: (data:boolean) => void;
     setModelOptionsData: (data: any) => void;
     getNode: (nodeId: string) => AppNode;
     setShowChildNode: (value: any) => void;
