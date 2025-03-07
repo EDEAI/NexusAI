@@ -25,6 +25,7 @@ class WorkflowProcessLog(BaseModel):
     mode: Optional[int] = None
     associated_chat_room_name: Optional[str] = None
     app_id: Optional[int] = None
+    chatroom_id: Optional[int] = None
 class WorkspaceWorkflowProcessLogResponseData(BaseModel):
     list: Optional[List[WorkflowProcessLog]] = None
     total_count: Optional[int] = None
