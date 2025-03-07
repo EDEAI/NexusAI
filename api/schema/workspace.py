@@ -22,6 +22,9 @@ class WorkflowProcessLog(BaseModel):
     nickname: Optional[str] = None
     file_list: Optional[List[Dict[str, Any]]] = None
     driver_id: Optional[int] = None
+    mode: Optional[int] = None
+    associated_chat_room_name: Optional[str] = None
+    
 class WorkspaceWorkflowProcessLogResponseData(BaseModel):
     list: Optional[List[WorkflowProcessLog]] = None
     total_count: Optional[int] = None
