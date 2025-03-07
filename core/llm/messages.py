@@ -5,7 +5,7 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 from base64 import b64encode
 from typing import Any, Dict, List, Tuple, Union
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from .prompt import Prompt
 from core.workflow.variables import create_variable_from_dict, Variable
@@ -103,7 +103,12 @@ class Messages:
                             str(var_value).replace('{', '{{').replace('}', '}}')
                         )
     
-    def to_langchain_format(self, restrict_max_rounds: bool = True) -> List[Union[Tuple[str, str], HumanMessage]]:
+    def to_langchain_format(
+        self,
+        model_name: str,
+        supplier_name: str,
+        restrict_max_rounds: bool = True
+    ) -> List[Union[Tuple[str, str], HumanMessage]]:
         """
         Converts the Messages object to a list of tuples in the LangChain format, respecting the maximum rounds limit.
         
@@ -118,6 +123,16 @@ class Messages:
                     return result
             if role == "human" and message.type == "file":
                 result.insert(0, self._get_human_message_from_file_variable(message))
+            elif role == "system" and supplier_name == "OpenAI":
+                if model_name in ["o1-preview", "o1-mini"]:
+                    # "o1-preview" and "o1-mini" does not support "developer" nor "system" messages.
+                    for i, (role, result_message) in enumerate(result):
+                        if role == "human":
+                            # Prepend the system message to the human message.
+                            result[i] = ("human", f"{message.value}\n{result_message}")
+                            break
+                else:
+                    result.insert(0, (role, message.value))
             else:
                 result.insert(0, (role, message.value))
         return result

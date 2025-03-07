@@ -13,10 +13,19 @@ class WorkflowProcessLog(BaseModel):
     created_time: Optional[datetime] = None
     elapsed_time: Optional[float] = None
     status: Optional[int] = None
+    show_status: Optional[int] = None
     completed_steps: Optional[int] = None
     total_steps: Optional[int] = None
     icon_background: Optional[str] = None
     icon: Optional[str] = None
+    chat_room_name: Optional[str] = None
+    nickname: Optional[str] = None
+    file_list: Optional[List[Dict[str, Any]]] = None
+    driver_id: Optional[int] = None
+    mode: Optional[int] = None
+    associated_chat_room_name: Optional[str] = None
+    app_id: Optional[int] = None
+    chatroom_id: Optional[int] = None
 class WorkspaceWorkflowProcessLogResponseData(BaseModel):
     list: Optional[List[WorkflowProcessLog]] = None
     total_count: Optional[int] = None
@@ -175,3 +184,4 @@ class ReqWorkspaceWorkflowLogInfo(BaseModel):
 class ResWorkspaceWorkflowProcessLog(BaseModel):
     page: int = 1
     page_size: int = 10
+    show_status: Optional[int] = None

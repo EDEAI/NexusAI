@@ -1030,6 +1030,8 @@ language_packs = {
         "team_members_not_open": "Not open to team members",
         "app_status_not_normal": "The application status is not normal",
         "skill_not_found": "Skill not found",
+        "chatroom_table_orientation": "round_table_orientation",
+        'round_table_orientation_operation': 'round_table_orientation_operation',
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -1332,6 +1334,8 @@ language_packs = {
         "team_members_not_open": "未向团队成员开放",
         "app_status_not_normal": "应用状态不正常",
         "skill_not_found": "未找到技能",
+        "chatroom_table_orientation": "圆桌导向",
+        'round_table_orientation_operation': '圆桌导向运行',
     }
 }
 

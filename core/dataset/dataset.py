@@ -238,11 +238,11 @@ class DatasetManagement:
         '''
         def get_text_splitter(is_json) -> TextSplitter:
             process_rule = DatasetProcessRules().get_process_rule_by_id(process_rule_id)
-            if is_json:
-                type_ = 'RecursiveJsonSplitter'
-                config = {'max_chunk_size': process_rule['config']['chunk_size']}
-            else:
-                type_, config = convert_to_type_and_config(process_rule['config'])
+            # if is_json:
+            #     type_ = 'RecursiveJsonSplitter'
+            #     config = {'max_chunk_size': process_rule['config']['chunk_size']}
+            # else:
+            type_, config = convert_to_type_and_config(process_rule['config'])
             return TextSplitter(text_splitter_type=type_, **config)
         
         dataset = datasets.get_dataset_by_id(dataset_id, check_is_reindexing=True)
