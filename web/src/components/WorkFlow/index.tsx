@@ -161,6 +161,7 @@ const DnDFlow = () => {
                     isProd: publishStatus,
                 });
                 if (!res.data.workflow.graph) {
+                    setLoadingWorkflowData(false);
                     createNode(BlockEnum.Start);
                     return;
                 }
