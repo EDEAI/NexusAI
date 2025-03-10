@@ -581,7 +581,8 @@ class Workspaces(MySQL):
                     start_datetime_str = datetime.fromtimestamp(start_time) \
                         .replace(microsecond=0).isoformat(sep='_')
                     round_table_orientation_operation = get_language_content('round_table_orientation_operation')
-                    log['app_runs_name'] = f"{round_table_orientation_operation}_{start_datetime_str}"
+                    if log['chatroom_id'] > 0:
+                        log['app_runs_name'] = f"{round_table_orientation_operation}_{start_datetime_str}"
                 else:
                     log['show_status'] = 0
                     log['chat_room_name'] = ''
