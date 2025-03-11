@@ -73,6 +73,7 @@ class Chatroom:
         team_id: int,
         chatroom_id: int,
         app_run_id: int,
+        is_temporary: bool,
         all_agent_ids: Sequence[int],
         absent_agent_ids: Sequence[int],
         max_round: int,
@@ -85,6 +86,7 @@ class Chatroom:
         self._team_id = team_id
         self._chatroom_id = chatroom_id
         self._app_run_id = app_run_id
+        self._is_temporary = is_temporary
         self._all_agents = {}
         # self._model_config_ids: dict
         # keys are IDs of all active agents with the addition of 0 (which is the Speaker Selector)
@@ -352,6 +354,7 @@ class Chatroom:
                     'app_run_id': self._app_run_id,
                     'llm_input': llm_input,
                     'message': manager_message,
+                    'message_type': 1,
                     'model_data': model_data,
                     'is_read': 1 if has_connections else 0,
                     'prompt_tokens': prompt_tokens,
@@ -519,7 +522,69 @@ class Chatroom:
     def load_history_messages(self, messages: List[Dict[str, Union[int, str]]]) -> None:
         self._history_messages.extend(messages)
 
+    async def _generate_title(self):
+        logger.debug('Generating title...')
+        messages, _, _ = self._get_history_messages_list(self._model_config_ids[0])
+        
+        system_prompt = get_language_content(
+            'chatroom_title_system',
+            self._user_id
+        )
+        user_prompt = get_language_content(
+            'chatroom_title_user',
+            self._user_id,
+            append_ret_lang_prompt=False
+        ).format(
+            messages=json.dumps(messages, ensure_ascii=False)
+        )
+
+        llm_node = LLMNode(
+            title='Title Generator',
+            desc='Generate title',
+            model_config_id=self._model_config_ids[0],
+            prompt=Prompt(system_prompt, user_prompt)
+        )
+        result = llm_node.run()
+        assert result['status'] == 'success', result['message']
+        
+        result_data = result['data']
+        title_message_var = create_variable_from_dict(result_data['outputs'])
+        title = title_message_var.value
+        logger.debug('Generated title: %s', title)
+        await self._ws_manager.send_instruction(self._chatroom_id, 'TITLE', title)
+        
+        model_data = result_data['model_data']
+        llm_input_var = model_data['messages']
+        llm_input = []
+        for role, message_var in llm_input_var:
+            llm_input.append((role, create_variable_from_dict(message_var).value))
+            
+        has_connections = self._ws_manager.has_connections(self._chatroom_id)
+        prompt_tokens = result_data['prompt_tokens']
+        completion_tokens = result_data['completion_tokens']
+        total_tokens = result_data['total_tokens']
+        
+        chatroom_messages.insert(
+            {
+                'chatroom_id': self._chatroom_id,
+                'app_run_id': self._app_run_id,
+                'llm_input': llm_input,
+                'message': title,
+                'message_type': 2,
+                'model_data': model_data,
+                'is_read': 1 if has_connections else 0,
+                'prompt_tokens': prompt_tokens,
+                'completion_tokens': completion_tokens,
+                'total_tokens': total_tokens
+            }
+        )
+        app_runs.increment_token_usage(
+            self._app_run_id,
+            prompt_tokens, completion_tokens, total_tokens
+        )
+
     async def chat(self, user_message: Optional[str] = None) -> None:
+        history_messages_count_on_start = len(self._history_messages)
         performed_rounds = 0
         if user_message is None:
             # Resume the unfinished chat
@@ -549,4 +614,7 @@ class Chatroom:
             round_ += 1
 
         logger.debug('Total chat rounds: %d', round_)
-    
+
+        if self._is_temporary and history_messages_count_on_start == 0:
+            # Generate title if the chat is new
+            await self._generate_title()

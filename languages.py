@@ -482,6 +482,25 @@ language_packs = {
         'chatroom_request_sent_successfully': 'Request successful, please wait',
         'chatroom_role_user': 'user',
         'chatroom_role_agent': 'agent',
+        'chatroom_title_system': '''
+            Generate a concise chat title (under 10 words) based on the conversation history.
+
+            The conversation history is in the following JSON format: [message 1, (message 2,) ...]
+            The JSON structure for each message is as follows:
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
+            
+            Requirements:
+            1. Capture core discussion theme
+            2. Reflect key disputes or consensus
+            3. Use neutral wording
+            4. Avoid word repetition
+        ''',
+        'chatroom_title_user': '''
+            Below is the conversation history list:
+            {messages}
+
+            Please generate a chat title according to the requirements.
+        ''',
         # vector
         'api_vector_auth': 'Insufficient permissions',
         'api_vector_file_type': 'The uploaded file information is not matched',
@@ -1372,6 +1391,8 @@ prompt_keys = {
     "chatroom_agent_description_with_no_ability",
     "chatroom_role_user",
     "chatroom_role_agent",
+    "chatroom_title_system",
+    "chatroom_title_user",
     "generate_agent_system_prompt",
     "generate_agent_user",
     "regenerate_agent_system",
