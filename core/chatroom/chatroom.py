@@ -13,6 +13,7 @@ from core.database.models import (
     AgentAbilities,
     Agents,
     AppRuns,
+    Apps,
     ChatroomMessages,
     Chatrooms,
     Models,
@@ -31,6 +32,7 @@ logger = Logger.get_logger('chatroom')
 
 agent_abilities = AgentAbilities()
 app_runs = AppRuns()
+apps = Apps()
 chatrooms = Chatrooms()
 chatroom_messages = ChatroomMessages()
 datasets = Datasets()
@@ -581,6 +583,15 @@ class Chatroom:
         app_runs.increment_token_usage(
             self._app_run_id,
             prompt_tokens, completion_tokens, total_tokens
+        )
+        
+        app_run = app_runs.select_one(
+            columns=['app_id'],
+            conditions={'column': 'id', 'value': self._app_run_id}
+        )
+        apps.update(
+            {'column': 'id', 'value': app_run['app_id']},
+            {'name': title}
         )
 
     async def chat(self, user_message: Optional[str] = None) -> None:
