@@ -231,9 +231,6 @@ def push_workflow_debug_message(
     :param first_task_exec_id: The ID of the first task execution record.
     :param node_exec_data: A dictionary containing the node execution data.
     """
-    if run_type != 1:
-        return
-    
     model_data = node_exec_data.pop('model_data', None)
     prompt_data = []
     if model_data:
