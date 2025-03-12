@@ -211,12 +211,13 @@ export const getWorkFlowProcessList = async params => {
         data: {
             page: params.current,
             page_size: params.pageSize,
+            show_status: params.showStatus || 0,
         },
     });
 };
 
 // Get workflow log information
-// @param {string} id - Log ID
+// @param {string} id - Log IDimage.png
 // @returns {Promise<any>} - Returns a Promise object with the workflow log information
 export const getWorkFlowLogInfo = async (id, run_id) => {
     return await aniRequest<any>(`/v1/workspace/workspace_workflow_log_info`, {

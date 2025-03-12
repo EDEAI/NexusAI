@@ -7,7 +7,7 @@ export default {
 
     'app.workflow.ra.title': '最近活跃',
     'app.workflow.re.empty': '暂无最近活跃',
-    'app.workflow.log.title': '工作流日志',
+    'app.workflow.log.title': '日志',
     'app.workflow.log.empty': '暂无工作流日志',
 
     'app.workflow.title.1': '第',

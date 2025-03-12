@@ -14,7 +14,7 @@ import {
 import { ProCard, ProForm, ProFormDateTimePicker, ProFormText } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Alert, Button, Collapse, Divider, Tag, Tooltip, Typography } from 'antd';
+import { Alert, Button, Collapse, Descriptions, Divider, Tag, Tooltip, Typography } from 'antd';
 import _ from 'lodash';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import CodeEditor from '../components/Editor/CodeEditor';
@@ -136,29 +136,6 @@ export default memo(() => {
         });
     }, [runPanelLogRecord]);
 
-    const ResultContent = memo(() => {
-        if (endRun?.status == 3) {
-            return (
-                <Alert
-                    message={JSON.stringify(
-                        endRun?.error || intl.formatMessage({ id: 'workflow.runError' }),
-                    )}
-                    type="error"
-                    className="break-all"
-                ></Alert>
-            );
-        }
-        return (
-            <>
-                <Alert
-                    message={JSON.stringify(endRun?.node_exec_data?.outputs || {})}
-                    type="success"
-                    className="break-all"
-                ></Alert>
-            </>
-        );
-    });
-
     const TrackContent = memo(props => {
         return (
             <div className="grid gap-2">
@@ -216,7 +193,9 @@ export default memo(() => {
                                                     readOnly
                                                     isJSONStringifyBeauty
                                                     onChange={() => {}}
-                                                    title={``}
+                                                    title={intl.formatMessage({
+                                                        id: 'workflow.inputs',
+                                                    })}
                                                 ></CodeEditor>
                                             </div>
                                         )}
@@ -506,21 +485,21 @@ const DetailContent = memo(({ endRun }: { endRun: any }) => {
         [messageType],
     );
 
-    useEffect(() => {
-        if (endRun) {
-            console.log(endRun);
+    // useEffect(() => {
+    //     if (endRun) {
+    //         console.log(endRun);
 
-            form?.current.setFieldsValue({
-                status: endRun?.status == 3 ? 'fail' : 'success',
-                elapsed_time: endRun?.elapsed_time?.toFixed(4) || 0,
-                completion_tokens: endRun?.completion_tokens || '',
-                created_time: endRun?.created_time || '',
-                total_tokens: endRun?.total_tokens || '',
-                actual_completed_steps: endRun?.actual_completed_steps || '',
-            });
-            setMessageType(endRun?.status == 3 ? 'fail' : 'success');
-        }
-    }, [endRun]);
+    //         // form?.current.setFieldsValue({
+    //         //     status: endRun?.status == 3 ? 'fail' : 'success',
+    //         //     elapsed_time: endRun?.elapsed_time?.toFixed(4) || 0,
+    //         //     completion_tokens: endRun?.completion_tokens || '',
+    //         //     created_time: endRun?.created_time || '',
+    //         //     total_tokens: endRun?.total_tokens || '',
+    //         //     actual_completed_steps: endRun?.actual_completed_steps || '',
+    //         // });
+    //         setMessageType(endRun?.status == 3 ? 'fail' : 'success');
+    //     }
+    // }, [endRun]);
     const Message = () => {
         return (
             <div>
@@ -558,13 +537,42 @@ const DetailContent = memo(({ endRun }: { endRun: any }) => {
             </div>
         );
     };
-
+    const getStatusTag = (status: number) => {
+        const statusMap = {
+            1: { color: 'processing', text: intl.formatMessage({ id: 'workflow.running' }) },
+            2: { color: 'success', text: intl.formatMessage({ id: 'workflow.runSc' }) },
+            3: { color: 'error', text: intl.formatMessage({ id: 'workflow.runF' }) },
+        };
+        const currentStatus = statusMap[status] || { color: 'default', text: 'Unknown' };
+        return <Tag color={currentStatus.color}>{currentStatus.text}</Tag>;
+    };
     const alertType = getMessage('messageType') as 'success' | 'error';
     return (
         <>
             {/* <Badge.Ribbon text='Fail' color='red'> */}
-            <Alert message={<Message></Message>} className="break-all" type={alertType}></Alert>
+            {/* <Alert message={<Message></Message>} className="break-all" type={alertType}></Alert> */}
 
+            <Descriptions column={1} bordered size="small">
+                <Descriptions.Item label={intl.formatMessage({ id: 'workflow.status' })}>
+                    {/* {getMessage('message')} */}
+                    {getStatusTag(endRun?.status)}
+                </Descriptions.Item>
+                <Descriptions.Item label={intl.formatMessage({ id: 'workflow.created_time' })}>
+                    {endRun?.created_time}
+                </Descriptions.Item>
+                <Descriptions.Item label={intl.formatMessage({ id: 'workflow.elapsed_time' })}>
+                    {endRun?.elapsed_time?.toFixed(4) || 0}s
+                </Descriptions.Item>
+                <Descriptions.Item label={intl.formatMessage({ id: 'workflow.completion_tokens' })}>
+                    {endRun?.total_tokens || 0} Tokens
+                </Descriptions.Item>
+
+                <Descriptions.Item
+                    label={intl.formatMessage({ id: 'workflow.actual_completed_steps' })}
+                >
+                    {endRun?.actual_completed_steps}
+                </Descriptions.Item>
+            </Descriptions>
             {endRun?.node_exec_data?.outputs && (
                 <div className="h-80 mt-4">
                     <CodeEditor
@@ -588,11 +596,11 @@ const DetailContent = memo(({ endRun }: { endRun: any }) => {
             {/* <div className='text-sm font-bold mt-4 mb-2'>
 
             </div> */}
-            <Divider orientationMargin="0" orientation="left">
+            {/* <Divider orientationMargin="0" orientation="left">
                 {intl.formatMessage({ id: 'workflow.orcompute' })}
-            </Divider>
+            </Divider> */}
 
-            <ProForm
+            {/* <ProForm
                 layout="horizontal"
                 formRef={form}
                 submitter={false}
@@ -608,14 +616,7 @@ const DetailContent = memo(({ endRun }: { endRun: any }) => {
                     label={intl.formatMessage({ id: 'workflow.status' })}
                     name="status"
                 ></ProFormText>
-                {/* <ProFormText
-                    formItemProps={{
-                        className: '!mb-0',
-                    }}
-                    readonly
-                    label=""
-                    name="status"
-                ></ProFormText> */}
+          
                 <ProFormDateTimePicker
                     formItemProps={{
                         className: '!mb-0',
@@ -648,7 +649,7 @@ const DetailContent = memo(({ endRun }: { endRun: any }) => {
                     label={intl.formatMessage({ id: 'workflow.actual_completed_steps' })}
                     name="actual_completed_steps"
                 ></ProFormText>
-            </ProForm>
+            </ProForm> */}
             {/* </Badge.Ribbon> */}
         </>
     );
