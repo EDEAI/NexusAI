@@ -160,7 +160,7 @@ class Workspaces(MySQL):
                 ["inner", "apps", 'app_runs.app_id = apps.id']
             ],
             columns=["app_node_executions.id", "app_node_executions.level", "app_node_executions.child_level",
-                     "app_node_executions.pre_node_id", "app_node_executions.node_id", "app_node_executions.node_name",
+                     "app_node_executions.edge_id", "app_node_executions.pre_node_id", "app_node_executions.node_id", "app_node_executions.node_name",
                      "app_node_executions.node_type", "app_node_executions.node_graph", "app_node_executions.inputs",
                      "app_node_executions.model_data AS mod_data", "app_node_executions.task_id",
                      "app_node_executions.status",
@@ -175,6 +175,8 @@ class Workspaces(MySQL):
         if app_node_list:
             child_executions_dict = defaultdict(list)
             recursive_task_executions = {}
+            # Dictionary to map edge_id to recursive task execution nodes
+            edge_id_to_recursive_task = {}
 
             for app_node in app_node_list:
                 if app_node['need_human_confirm'] == 1:
@@ -191,8 +193,12 @@ class Workspaces(MySQL):
                 if app_node['child_level'] > 0 and app_node['node_type'] == 'recursive_task_execution':
                     continue
 
+                # Store recursive task execution nodes by edge_id for later reference
                 if app_node['node_type'] == 'recursive_task_execution':
                     recursive_task_executions[f"{app_node['level']}-{app_node['node_id']}"] = app_node
+                    # Also store by edge_id if available
+                    if app_node.get('edge_id'):
+                        edge_id_to_recursive_task[app_node['edge_id']] = app_node
                     continue
 
                 if inputs := app_node.get('inputs'):
@@ -229,8 +235,11 @@ class Workspaces(MySQL):
 
                 app_node['child_executions'] = []
 
-                if app_node['node_type'] != 'recursive_task_execution' and app_node['task_id']:
-                    child_executions_dict[f"{app_node['level']}-{app_node['pre_node_id']}"].append(app_node)
+                # Check if this node should be linked to a recursive task execution node via edge_id
+                if app_node['node_type'] != 'recursive_task_execution' and app_node.get('edge_id') and app_node['edge_id'] in edge_id_to_recursive_task:
+                    parent_node = edge_id_to_recursive_task[app_node['edge_id']]
+                    key = f"{parent_node['level']}-{parent_node['node_id']}"
+                    child_executions_dict[key].append(app_node)
                 else:
                     app_node_result.append(app_node)
 
