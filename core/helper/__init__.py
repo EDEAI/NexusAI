@@ -14,7 +14,9 @@ from Crypto.Cipher import AES
 
 from config import settings
 from core.database import redis
+from core.workflow.variables import *
 
+import os
 import tiktoken
 from typing import List, Dict, Any, Callable, Union
 try:
@@ -284,3 +286,27 @@ def format_iso_time(dt: Union[datetime, None]) -> str:
         return dt.strftime('%Y-%m-%d %H:%M:%S')
     except Exception as e:
         return ""
+    
+def extract_file_list_from_skill_output(outputs: dict, node_data_dict: dict) -> List[Dict[str, Any]]:
+    """
+    Extract the file list from the skill output.
+    """
+    file_list = []
+    # outputs = result['data']['outputs']
+    storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
+    output_vars = create_variable_from_dict(node_data_dict)
+    file_vars = output_vars.extract_file_variables()
+    for var in file_vars.properties.values():
+        if var.name in outputs:
+            file_path = outputs[var.name]
+            if file_path:
+                if not file_path.startswith('/'):
+                    file_path = '/' + file_path
+                file_name = file_path.split('/')[-1]
+                full_path = f"{storage_url}{file_path}"
+                file_list.append({
+                    "file_name": file_name,
+                    "file_path": full_path,
+                    "variable_name": var.name
+                })
+    return file_list

@@ -16,7 +16,8 @@ from core.workflow.nodes import *
 from celery_app import run_workflow_node
 from core.helper import push_to_websocket_queue, get_websocket_queue_length
 from languages import get_language_content
-from api.utils.common import extract_file_list_from_skill_output
+# from api.utils.common import extract_file_list_from_skill_output
+from core.helper import extract_file_list_from_skill_output
 
 logger = Logger.get_logger('workflow_run')
 
