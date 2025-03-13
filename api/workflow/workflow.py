@@ -22,6 +22,7 @@ from core.workflow.nodes import create_node_from_dict
 from fastapi.responses import HTMLResponse
 
 from languages import get_language_content
+from core.helper import extract_file_list_from_skill_output
 
 router = APIRouter()
 

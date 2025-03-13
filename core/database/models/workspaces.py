@@ -15,7 +15,8 @@ from core.workflow.variables import create_variable_from_dict, get_first_variabl
 from core.workflow.recursive_task import create_recursive_task_category_from_dict
 from languages import get_language_content
 import os
-from api.utils.common import extract_file_list_from_skill_output
+# from api.utils.common import extract_file_list_from_skill_output
+from core.helper import extract_file_list_from_skill_output
 
 # Uploaded files are stored in an ArrayVariable, which is in the `input` ObjectVariable
 # And this is the specific key of this ArrayVariable.
