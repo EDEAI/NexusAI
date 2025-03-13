@@ -437,6 +437,8 @@ class Chatroom:
                 context=Context(),
                 user_id=self._user_id,
                 type=2,
+                agent_run_type=3,
+                chatroom_id=self._chatroom_id,
                 override_rag_input=user_message,
                 override_dataset_id=override_dataset['id'] if override_dataset else None
             ):

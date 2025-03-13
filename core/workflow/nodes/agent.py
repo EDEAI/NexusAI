@@ -14,7 +14,7 @@ from ..variables import ObjectVariable, Variable
 from ..recursive_task import RecursiveTaskCategory
 from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
 from core.database.models.agent_chat_messages import AgentChatMessages
-from core.database.models import Apps, AgentAbilities, AgentDatasetRelation, Agents, Workflows, AppRuns, AppNodeExecutions, Models
+from core.database.models import Apps, AgentAbilities, AgentDatasetRelation, Agents, Chatrooms, Workflows, AppRuns, AppNodeExecutions, Models
 from core.dataset import DatasetRetrieval
 from core.llm.messages import Messages
 from core.llm.models import LLMPipeline
@@ -75,7 +75,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             init_kwargs["original_node_id"] = original_node_id
         
         super().__init__(**init_kwargs)
-
+ 
     def validate(self):
         agent_id = self.data['agent_id']
         agent = Agents().get_agent_by_id(agent_id)
@@ -84,6 +84,30 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         abilities = AgentAbilities().get_abilities_by_agent_id(agent_id)
         for ability in abilities:
             assert ability['content'], get_language_content('agent_empty_ability')
+
+    def _get_agent_run_name(
+        self,
+        agent_run_type: int,
+        user_id: int,
+        workflow_id: int,
+        chatroom_id: int,
+        data_source_run_id: Optional[int]
+    ) -> str:
+        match agent_run_type:
+            case 1:
+                return get_language_content('agent_run_type_1', user_id)
+            case 2:
+                workflow = Workflows().get_workflow_app(workflow_id)
+                return get_language_content('agent_run_type_2', user_id).format(app_name=workflow['name'])
+            case 3:
+                chatroom = Chatrooms().get_chatroom_by_id(chatroom_id)
+                return get_language_content('agent_run_type_3', user_id).format(app_name=chatroom['name'])
+            case 4:
+                record = ChatroomDrivenRecords().get_data_by_data_source_run_id(data_source_run_id)
+                chatroom = Chatrooms().get_chatroom_by_id(record['chatroom_id'])
+                return get_language_content('agent_run_type_4', user_id).format(app_name=chatroom['name'])
+            case _:
+                raise Exception(f'Unknown agent run type: {agent_run_type}')
 
     def _prepare_prompt(
         self,
@@ -276,6 +300,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         app_id: int = 0,
         app_run_id: int = 0,
         type: int = 0,
+        agent_run_type: int = 2,
+        chatroom_id: int = 0,
         node_exec_id: int = 0,
         edge_id: str = '',
         level: int = 0,
@@ -295,6 +321,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             now = datetime.now().replace(microsecond=0).isoformat(sep='_')
             agent_id = self.data['agent_id']
             agent = Agents().get_agent_by_id(agent_id)
+            agent_run_name = self._get_agent_run_name(
+                agent_run_type=agent_run_type,
+                user_id=user_id,
+                workflow_id=workflow_id,
+                chatroom_id=chatroom_id,
+                data_source_run_id=data_source_run_id
+            )
             agent_run_id = AppRuns().insert(
                 {
                     # the local variable `app_id` is the APP ID of the workflow when `node_exec_id` is not 0
@@ -303,7 +336,9 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'user_id': user_id,
                     'agent_id': agent_id,
                     'type': type,
-                    'name': f'Agent-{agent_id}_{now}',
+                    'agent_run_type': agent_run_type,
+                    # 'name': f'Agent-{agent_id}_{now}',
+                    'name': agent_run_name,
                     'inputs': self.data['input'].to_dict(),
                     'selected_ability_id': self.data['ability_id'],
                     'auto_match_ability': agent['auto_match_ability'],
@@ -573,6 +608,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         app_id: int = 0,
         app_run_id: int = 0,
         type: int = 0,
+        agent_run_type: int = 2,
+        chatroom_id: int = 0,
         node_exec_id: int = 0,
         edge_id: str = '',
         level: int = 0,
@@ -592,6 +629,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             now = datetime.now().replace(microsecond=0).isoformat(sep='_')
             agent_id = self.data['agent_id']
             agent = Agents().get_agent_by_id(agent_id)
+            agent_run_name = self._get_agent_run_name(
+                agent_run_type=agent_run_type,
+                user_id=user_id,
+                workflow_id=workflow_id,
+                chatroom_id=chatroom_id,
+                data_source_run_id=data_source_run_id
+            )
             agent_run_id = AppRuns().insert(
                 {
                     # the local variable `app_id` is the APP ID of the workflow when `node_exec_id` is not 0
@@ -600,7 +644,9 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'user_id': user_id,
                     'agent_id': agent_id,
                     'type': type,
-                    'name': f'Agent-{agent_id}_{now}',
+                    'agent_run_type': agent_run_type,
+                    # 'name': f'Agent-{agent_id}_{now}',
+                    'name': agent_run_name,
                     'inputs': self.data['input'].to_dict(),
                     'selected_ability_id': self.data['ability_id'],
                     'auto_match_ability': agent['auto_match_ability'],
