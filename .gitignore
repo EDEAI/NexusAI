@@ -19,3 +19,4 @@ scripts/test*.py
 /supervisord.conf
 /docker-compose.yml
 .history
+.cursor
