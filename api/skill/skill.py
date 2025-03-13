@@ -12,8 +12,6 @@ from languages import get_language_content
 from core.database.models.app_runs import AppRuns
 from core.database.models.ai_tool_llm_records import AIToolLLMRecords
 from core.llm.prompt import create_prompt_from_dict, Prompt
-
-from core.helper import extract_file_list_from_skill_output
 from time import time
 import os
 
