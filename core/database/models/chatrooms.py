@@ -167,7 +167,7 @@ class Chatrooms(MySQL):
                 for agent_item in agent_list:
                     if agent_item['agent_id'] > 0:
                         chat_item['agent_list'].append(Agents().select_one(
-                            columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id", "apps.icon", "apps.icon_background", "agents.obligations"],
+                            columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id", "apps.icon", "apps.avatar", "apps.icon_background", "agents.obligations"],
                             conditions=[
                                 {"column": "id", "value": agent_item['agent_id']}
                             ],
@@ -283,7 +283,7 @@ class Chatrooms(MySQL):
                 if rel['agent_id'] > 0:
                     agent_info = Agents().select_one(
                         columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id",
-                                 "apps.icon", "apps.icon_background", "agents.obligations"],
+                                 "apps.icon", "apps.avatar", "apps.icon_background", "agents.obligations"],
                         conditions=[{"column": "id", "value": rel['agent_id']}],
                         joins=[["left", "apps", "apps.id = agents.app_id"]]
                     )

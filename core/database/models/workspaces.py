@@ -74,6 +74,7 @@ class Workspaces(MySQL):
                    app_runs.name AS process_name,
                    apps.name,
                    apps.icon,
+                   apps.avatar,
                    apps.icon_background,
                    app_runs.workflow_id,
                    app_runs.chatroom_id,
@@ -166,7 +167,7 @@ class Workspaces(MySQL):
                      "app_node_executions.status",
                      "app_node_executions.error", "app_node_executions.outputs", "app_node_executions.elapsed_time",
                      "app_node_executions.created_time", "app_node_executions.updated_time",
-                     "app_node_executions.finished_time","apps.icon_background", "apps.icon","app_node_executions.need_human_confirm","app_node_executions.user_id"],
+                     "app_node_executions.finished_time","apps.icon_background", "apps.icon", "apps.avatar","app_node_executions.need_human_confirm","app_node_executions.user_id"],
             conditions=conditions
         )
 
@@ -393,6 +394,7 @@ class Workspaces(MySQL):
             apps.mode,
             IFNULL(apps.icon_background, '') AS icon_background,
             IFNULL(apps.icon, '') AS icon,
+            IFNULL(apps.avatar, '') AS avatar,
             IFNULL(app_runs.chatroom_id, 0) AS chatroom_id,
             IFNULL(app_runs.agent_id, 0) AS agent_id,
             IFNULL(apps.id, 0) AS app_id,
@@ -484,7 +486,7 @@ class Workspaces(MySQL):
                                     "app_node_executions.status",
                                     "app_node_executions.error", "app_node_executions.outputs", "app_node_executions.elapsed_time",
                                     "app_node_executions.created_time", "app_node_executions.updated_time",
-                                    "app_node_executions.finished_time","apps.icon_background", "apps.icon","app_node_executions.need_human_confirm","app_node_executions.user_id"],
+                                    "app_node_executions.finished_time","apps.icon_background", "apps.icon","apps.avatar","app_node_executions.need_human_confirm","app_node_executions.user_id"],
                             conditions=conditions
                         )
                         log['file_list'] = []
@@ -577,7 +579,7 @@ class Workspaces(MySQL):
                                 "app_node_executions.status",
                                 "app_node_executions.error", "app_node_executions.outputs", "app_node_executions.elapsed_time",
                                 "app_node_executions.created_time", "app_node_executions.updated_time",
-                                "app_node_executions.finished_time","apps.icon_background", "apps.icon","app_node_executions.need_human_confirm","app_node_executions.user_id"],
+                                "app_node_executions.finished_time","apps.icon_background", "apps.icon","apps.avatar","app_node_executions.need_human_confirm","app_node_executions.user_id"],
                         conditions=conditions
                     )
                     log['file_list'] = []
@@ -662,7 +664,7 @@ class Workspaces(MySQL):
         )[0]["count_id"]
 
         list = self.select(
-            columns=["apps.user_id", "apps.id AS app_id","apps.icon_background", "apps.icon",
+            columns=["apps.user_id", "apps.id AS app_id","apps.icon_background", "apps.icon","apps.avatar",
                      "apps.name", "app_runs.id AS app_runs_id", "app_runs.name AS app_runs_name",
                      "app_runs.type AS app_runs_type",
                      "app_runs.level AS app_runs_level", "app_runs.created_time", "app_runs.updated_time",

@@ -1055,6 +1055,7 @@ language_packs = {
         "skill_not_found": "Skill not found",
         "chatroom_table_orientation": "round_table_orientation",
         'round_table_orientation_operation': 'round_table_orientation_operation',
+        'avatar_or_icon_required': 'At least one avatar or icon needs to be filled in',
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1364,6 +1365,7 @@ language_packs = {
         "skill_not_found": "未找到技能",
         "chatroom_table_orientation": "圆桌导向",
         'round_table_orientation_operation': '圆桌导向运行',
+        'avatar_or_icon_required': '头像或图标至少需要填写一个',
     }
 }
 
