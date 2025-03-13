@@ -45,7 +45,7 @@ class ChatroomDrivenRecords(MySQL):
         """
         info = self.select_one(
             columns=[
-                'id', 'data_source_run_id', 'data_driven_run_id'
+                'id', 'data_source_run_id', 'data_driven_run_id', 'chatroom_id'
             ],
             conditions=[
                 {"column": "data_source_run_id", "value": data_source_run_id},

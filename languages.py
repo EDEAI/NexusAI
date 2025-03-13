@@ -10,6 +10,10 @@ language_names = {
 # Define the language pack dictionary structure
 language_packs = {
     "en": {
+        "agent_run_type_1": "Agent Debugging",
+        "agent_run_type_2": "Workflow: {app_name} Invocation",
+        "agent_run_type_3": "Round Table: {app_name} Invocation",
+        "agent_run_type_4": "Round Table: {app_name} Guidance Gxecution",
         "requirement_category": {
             "system": """
                 You are a content categorization assistant.
@@ -1053,6 +1057,11 @@ language_packs = {
         'round_table_orientation_operation': 'round_table_orientation_operation',
     },
     "zh": {
+        "agent_run_type_1": "调试运行",
+        "agent_run_type_2": "工作流：{app_name} 调用",
+        "agent_run_type_3": "圆桌：{app_name} 调用",
+        "agent_run_type_4": "圆桌：{app_name} 导向执行",
+
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
         'http_response_content_oversize': 'HTTP响应内容过大！最大不应超过{max_size}字节，而实际为{size}字节',
 

@@ -2,6 +2,7 @@ from core.database import MySQL
 from core.database.models.agents import Agents
 from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
 import math
+from typing import Any, Dict
 
 
 class Chatrooms(MySQL):
@@ -45,6 +46,35 @@ class Chatrooms(MySQL):
             return {'status': 1}
         else:
             return {'status': 0}
+        
+    def get_chatroom_by_id(self, chatroom_id: int) -> Dict[str, Any]:
+        """
+        Retrieves a chatroom record by its ID.
+
+        This function queries the database to find a chatroom with the specified ID.
+        It joins with the apps table to get the chatroom name and checks that the
+        chatroom status is active.
+
+        :param chatroom_id: The ID of the chatroom to retrieve.
+        :type chatroom_id: int
+
+        :return: A dictionary containing the chatroom information.
+        :rtype: Dict[str, Any]
+
+        :raises AssertionError: If no chatroom is found with the given ID.
+        """
+        chatroom = self.select_one(
+            columns=[
+                'apps.name'
+            ],
+            joins=[['inner', 'apps', 'chatrooms.app_id = apps.id']],
+            conditions=[
+                {'column': 'id', 'value': chatroom_id},
+                {'column': 'status', 'value': 1}
+            ]
+        )
+        assert chatroom
+        return chatroom
 
     def search_chatrooms_id(self, chatroom_id: int, user_id: int):
         """
