@@ -5,7 +5,7 @@ import { getWorkFlowProcessList } from '@/api/workflow';
 import FileDownloadList from '@/components/common/FileDownloadList';
 import Headportrait from '@/components/headportrait';
 import ChatRoomLog from '@/components/LogPanel/ChatRoomLog';
-import LogDetail from '@/pages/Creation/Agents/LogDetail';
+import LogDetail from '@/components/LogPanel/LogDetail';
 import useUserStore from '@/store/user';
 import { headportrait } from '@/utils/useUser';
 import {
@@ -123,16 +123,30 @@ export default memo(() => {
             if (item.show_status == 1) {
                 return item.chat_room_name;
             } else if (item.show_status == 3) {
-                return `圆桌:${item.associated_chat_room_name} 导向执行`;
+                return intl.formatMessage(
+                    { id: 'app.workflow.log.roundtable.guidance' },
+                    { name: item.associated_chat_room_name },
+                );
             }
             return item.apps_name;
         };
 
         const RenderSubTitle = () => {
             if (item.show_status == 1 && item.apps_name) {
-                return `导向执行${item.model==1?'智能体':'工作流'}：${item.apps_name}`;
+                return intl.formatMessage(
+                    { id: 'app.workflow.log.guidance.execution' },
+                    {
+                        type:
+                            item.model == 1
+                                ? intl.formatMessage({ id: 'app.workflow.log.type.agent.simple' })
+                                : intl.formatMessage({
+                                      id: 'app.workflow.log.type.workflow.simple',
+                                  }),
+                        name: item.apps_name,
+                    },
+                );
             }
-            return item.apps_name
+            return item.apps_name;
         };
         return (
             <div

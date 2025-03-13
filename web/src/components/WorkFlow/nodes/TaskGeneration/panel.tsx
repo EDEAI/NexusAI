@@ -37,7 +37,7 @@ export default memo(({ node }: { node: AppNode }) => {
     const datasetData = useStore(state => state.datasetData);
     const updateNodeData = useStore(state => state.updateNodeData);
     const getVariables = useStore(state => state.getOutputVariables);
-    const getModelData = useStore(state => state.getModelData);
+
     useMount(() => {
         const reset = resetFormNodes(formRef, node);
         setTimeout(() => {
@@ -45,12 +45,10 @@ export default memo(({ node }: { node: AppNode }) => {
         }, 200);
     });
 
-    // useUpdateEffect(() => {}, [node.id]);
-
     const setNodeChange = (addItem: { [key: string]: any }, allValues) => {
         updateNodeData(node.id, allValues);
     };
-    //
+
     return (
         <>
             <div className="pt-4">
@@ -156,8 +154,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                             })}
                                             title={intl.formatMessage({
                                                 id: 'workflow.tooltip.instruction1',
-                                                defaultMessage:
-                                                    '，、',
+                                                defaultMessage: '，、',
                                             })}
                                         ></Callword>
                                     </div>

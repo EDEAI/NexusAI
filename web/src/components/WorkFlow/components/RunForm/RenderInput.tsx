@@ -18,40 +18,46 @@ export const RenderInput = ({ data }) => {
                     id: 'workflow.title.inputParameters',
                 })}
             </Typography.Title>
-            {Object.values(inputs).map((val: any) => {
-                if (val.type === 'number') {
+            {Object.values(inputs)
+                .sort((a, b) => a.sort_order - b.sort_order)
+                .map((val: any) => {
+                    if (val.type === 'number') {
+                        return (
+                            <ProFormDigit
+                                key={val.name}
+                                required={val.required}
+                                rules={[
+                                    {
+                                        required: val.required,
+                                        message: intl.formatMessage({
+                                            id: 'workflow.form.parameter.required',
+                                        }),
+                                    },
+                                ]}
+                                name={val.name}
+                                initialValue={val.value}
+                                label={val.display_name || val.name}
+                            />
+                        );
+                    }
                     return (
-                        <ProFormDigit
+                        <ProFormTextArea
                             key={val.name}
                             required={val.required}
                             rules={[
                                 {
                                     required: val.required,
-                                    message: intl.formatMessage({ id: 'workflow.form.parameter.required' }),
+                                    message: intl.formatMessage({
+                                        id: 'workflow.form.parameter.required',
+                                    }),
                                 },
                             ]}
                             name={val.name}
                             initialValue={val.value}
-                            label={val.display_name||val.name}
+                            label={val.display_name || val.name}
                         />
                     );
-                }
-                return (
-                    <ProFormTextArea
-                        key={val.name}
-                        required={val.required}
-                        rules={[
-                            {
-                                required: val.required,
-                                message: intl.formatMessage({ id: 'workflow.form.parameter.required' }),
-                            },
-                        ]}
-                        name={val.name}
-                        initialValue={val.value}
-                        label={val.display_name||val.name}
-                    />
-                );
-            })}
+                })}
         </div>
     );
 };

@@ -616,7 +616,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
             >
                 <TextareaRunName name={'run_name'}></TextareaRunName>
                 {nodes[0]?.id &&
-                    getOutputVariables(nodes[0].id).map((item, index) => {
+                    getOutputVariables(nodes[0].id).sort((a,b)=>a.createVar.sort_order - b.createVar.sort_order).map((item, index) => {
                         if (item?.createVar?.type == 'number') {
                             return (
                                 <ProFormDigit

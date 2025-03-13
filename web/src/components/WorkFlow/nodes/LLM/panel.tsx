@@ -1,7 +1,6 @@
 /*
  * @LastEditors: biz
  */
-import { getModelList } from '@/api/workflow';
 import { ProForm, ProFormDependency, ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useMount, useReactive, useUpdateEffect } from 'ahooks';
@@ -13,7 +12,6 @@ import {
     SwitchImportToKnowledgeBase,
     SwitchManualConfirmation,
 } from '../../components/Form/Switch';
-import useNodeIdUpdate from '../../hooks/useNodeIdUpdate';
 import useStore from '../../store';
 import { AppNode } from '../../types';
 import { resetFormNodes } from '../../utils/resetFormNodes';
@@ -43,20 +41,18 @@ export default memo(({ node }: { node: AppNode }) => {
     const updateNodeData = useStore(state => state.updateNodeData);
     const getVariables = useStore(state => state.getOutputVariables);
     const datasetData = useStore(state => state.datasetData);
-    const setSelect = useStore(state => state.setSelect);
+
     const edges = useStore(state => state.edges);
 
     const [systemEditor, setSystemEditor] = useState([]);
     const [userEditor, setUserEditor] = useState([]);
-    const [modelList, setModelList] = useState([]);
+
     const [editorOptions, setEditorOptions] = useState([]);
     const getNode = useStore(state => state.getNode);
 
     // Check if current node is connected to executor_list
     const isConnectedToExecutorList = edges.some(
-        edge => 
-            edge.source === node.id && 
-            edge.targetHandle === 'executor_list'
+        edge => edge.source === node.id && edge.targetHandle === 'executor_list',
     );
 
     useMount(() => {
@@ -79,7 +75,7 @@ export default memo(({ node }: { node: AppNode }) => {
         const vars = getVariables(node.id);
 
         setEditorOptions(vars);
-        getLLMModel();
+
         setTimeout(() => {
             setEditorLoading(false);
         }, 500);
@@ -93,22 +89,6 @@ export default memo(({ node }: { node: AppNode }) => {
             setEditorLoading(false);
         }, 500);
     }, [node?.id]);
-
-    const getLLMModel = () => {
-        getModelList().then(res => {
-            if (res.code == 0) {
-                setModelList(
-                    res.data.data.map(x => {
-                        return {
-                            ...x,
-                            label: x.model_name,
-                            value: x.model_config_id,
-                        };
-                    }),
-                );
-            }
-        });
-    };
 
     const resetNodeInfo = () => {
         try {
