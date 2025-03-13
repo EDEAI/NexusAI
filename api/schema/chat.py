@@ -68,6 +68,7 @@ class AgentInfo(BaseModel):
     description: Optional[str] = None
     agent_id: Optional[int] = None
     app_id: Optional[int] = None
+    avatar: Optional[str] = None
     icon: Optional[str] = None
     icon_background: Optional[str] = None
     obligations: Optional[str] = None
@@ -108,6 +109,7 @@ class ChatRoomDetailAgentBase(BaseModel):
     active: Optional[int] = None
     name: Optional[str] = None
     description: Optional[str] = None
+    avatar: Optional[str] = None
     icon: Optional[str] = None
     icon_background: Optional[str] = None
 

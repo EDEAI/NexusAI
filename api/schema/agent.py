@@ -7,6 +7,7 @@ class AgentListData(BaseModel):
     app_id: Optional[int] = None
     name: Optional[str] = None
     description: Optional[str] = None
+    avatar: Optional[str] = None
     icon: Optional[str] = None
     icon_background: Optional[str] = None
     nickname: Optional[str] = None
@@ -72,6 +73,7 @@ class AgentInfoAppResponseData(BaseModel):
     user_id: Optional[int] = None
     name: Optional[str] = None
     description: Optional[str] = None
+    avatar: Optional[str] = None
     icon: Optional[str] = None
     icon_background: Optional[str] = None
     is_public: Optional[int] = None
