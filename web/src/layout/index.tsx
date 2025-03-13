@@ -5,7 +5,7 @@
 import AgentCreate from '@/components/AgentCreate';
 import SkillCreate from '@/components/SkillCreate';
 import DealtWithForLog from '@/components/WorkFlow/components/DealtWith/DealtWithForLog';
-import RunPanelLog from '@/components/WorkFlow/nodes/RunPanelLog';
+import RunPanelLog from '@/components/LogPanel/RunPanelLog';
 import RunWorkFlow from '@/components/WorkFlow/RunWorkFlow';
 import React from 'react';
 
