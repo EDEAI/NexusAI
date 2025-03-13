@@ -15,8 +15,6 @@ from core.workflow.variables import create_variable_from_dict, get_first_variabl
 from core.workflow.recursive_task import create_recursive_task_category_from_dict
 from languages import get_language_content
 import os
-# from api.utils.common import extract_file_list_from_skill_output
-from core.helper import extract_file_list_from_skill_output
 
 # Uploaded files are stored in an ArrayVariable, which is in the `input` ObjectVariable
 # And this is the specific key of this ArrayVariable.
@@ -179,7 +177,8 @@ class Workspaces(MySQL):
             recursive_task_executions = {}
             # Dictionary to map edge_id to recursive task execution nodes
             edge_id_to_recursive_task = {}
-
+            
+            from api.utils.common import extract_file_list_from_skill_output
             for app_node in app_node_list:
                 if app_node['need_human_confirm'] == 1:
                     users = Users()
@@ -494,6 +493,8 @@ class Workspaces(MySQL):
                         if app_node_list and app_node_list.get('outputs'):
                             if outputs := app_node_list.get('outputs'):
                                 app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
+                                
+                                from api.utils.common import extract_file_list_from_skill_output
                                 file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
                                 log['file_list'] = file_list
                         start_time = time()
@@ -587,6 +588,8 @@ class Workspaces(MySQL):
                     if app_node_list and app_node_list.get('outputs'):
                         if outputs := app_node_list.get('outputs'):
                             app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
+                            
+                            from api.utils.common import extract_file_list_from_skill_output
                             file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
                             log['file_list'] = file_list
                     start_time = time()
