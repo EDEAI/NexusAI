@@ -9,6 +9,9 @@ import { useIntl } from '@umijs/max';
 import { useRequest } from 'ahooks';
 import { Button, Descriptions, Spin, Tag, Timeline, Typography } from 'antd';
 import { memo, useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeHighlight from 'rehype-highlight';
+import CodeEditor from '../WorkFlow/components/Editor/CodeEditor';
 
 export default memo(
     ({ data, onClose }: { data: { app_id: string; app_run_id: string }; onClose?: () => void }) => {
@@ -117,10 +120,30 @@ export default memo(
                                         {intl.formatMessage({ id: 'agent.log.output' })}
                                     </Typography.Title>
                                     {logDetail.outputs ? (
-                                        <div className="bg-gray-50 p-4 rounded mt-2">
-                                            <pre className="whitespace-pre-wrap text-sm">
-                                                {logDetail.outputs?.value || ''}
-                                            </pre>
+                                        <div>
+                                            {logDetail?.outputs?.type == 'json' ? (
+                                                <div className="h-80">
+                                                    <CodeEditor
+                                                        language="python3"
+                                                        value={
+                                                            JSON.parse(logDetail.outputs?.value) ||
+                                                            '{}'
+                                                        }
+                                                        readOnly
+                                                        isJSONStringifyBeauty
+                                                        onChange={() => {}}
+                                                        title={`JSON`}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="bg-gray-50 p-4 rounded mt-2">
+                                                    <ReactMarkdown
+                                                        rehypePlugins={[rehypeHighlight]}
+                                                    >
+                                                        {logDetail.outputs?.value || ''}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            )}
                                         </div>
                                     ) : logDetail.error ? (
                                         <div className="bg-gray-50 p-4 rounded mt-2 border-l-4 border-red-500">

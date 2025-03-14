@@ -259,6 +259,7 @@ const useSocketStore = create(
                             ...state.typedMessages,
                             [type]: [...(state.typedMessages[type] || []), message],
                         },
+                        lastMessage: message,
                         appRunMessages: newAppRunMessages,
                     };
                 });

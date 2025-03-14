@@ -125,10 +125,12 @@ export default memo(() => {
             } else if (item.show_status == 2) {
                 return item.app_runs_name;
             } else if (item.show_status == 3) {
-                return intl.formatMessage(
-                    { id: 'app.workflow.log.roundtable.guidance' },
-                    { name: item.associated_chat_room_name },
-                );
+                if (item.associated_chat_room_name!="") {
+                    return intl.formatMessage(
+                        { id: 'app.workflow.log.roundtable.guidance' },
+                        { name: item.associated_chat_room_name },
+                    );
+                } 
             }
             return item.apps_name;
         };

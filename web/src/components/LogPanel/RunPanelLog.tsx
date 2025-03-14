@@ -12,7 +12,6 @@ import { useLatest, useUpdateEffect } from 'ahooks';
 import { Button, Descriptions, Tag, Tooltip, Typography } from 'antd';
 import { memo, useCallback, useState } from 'react';
 import CodeEditor from '../WorkFlow/components/Editor/CodeEditor';
-import useSaveWorkFlow from '../WorkFlow/saveWorkFlow';
 import { TrackContent } from './components/TrackContent';
 
 interface TodoTagProps {
@@ -118,15 +117,11 @@ export default memo(() => {
     const [tabKey, setTabKey] = useState('4');
     const [endRun, setEndRun] = useState(null);
     const prevConfirmDealtWith = useUserStore(state => state.prevConfirmDealtWith);
-    const saveWorkFlow = useSaveWorkFlow();
-    const userId = JSON.parse(localStorage.getItem('userInfo') || '{}')?.uid;
 
     const [appRunId, setAppRunId] = useState(null);
     const lastAppRunId = useLatest(appRunId);
-    const getAppRunMessages = useSocketStore(state => state.getAppRunMessagesByType)(
-        lastAppRunId.current?.app_run_id,
-        'workflow_run_debug',
-    );
+
+    const getLastRunWorkflow = useSocketStore(state => state.lastMessage);
 
     const [updateCounter, setUpdateCounter] = useState(0);
 
@@ -141,20 +136,24 @@ export default memo(() => {
     }, [prevConfirmDealtWith]);
 
     useUpdateEffect(() => {
-        if (getAppRunMessages?.length) {
-            setLoading(true);
-
-            getDetail(lastAppRunId.current)
-                .then(() => {
-                    setUpdateCounter(prev => prev + 1);
-                    setLoading(false);
-                })
-                .catch(err => {
-                    console.error('Error fetching details:', err);
-                    setLoading(false);
-                });
+        if (
+            getLastRunWorkflow?.type != 'workflow_run_debug' ||
+            getLastRunWorkflow?.data?.app_run_id != lastAppRunId.current?.app_run_id
+        ) {
+            return console.log('pass');
         }
-    }, [getAppRunMessages?.length, runPanelLogRecord]);
+        setLoading(true);
+
+        getDetail(lastAppRunId.current)
+            .then(() => {
+                setUpdateCounter(prev => prev + 1);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error('Error fetching details:', err);
+                setLoading(false);
+            });
+    }, [getLastRunWorkflow]);
 
     const onClose = useCallback(() => {
         setRunPanelLogRecord(null);

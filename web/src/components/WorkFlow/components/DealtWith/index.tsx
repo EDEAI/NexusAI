@@ -367,7 +367,7 @@ export default memo(() => {
                     }}
                     onFinish={submitHuman}
                 >
-                    {inputsArr.map(item => {
+                    {inputsArr.sort((a,b)=>a.sort_order-b.sort_order).map(item => {
                         return (
                             <ProFormTextArea
                                 key={item.name}
