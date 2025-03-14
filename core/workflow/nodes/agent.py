@@ -508,7 +508,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 logger_chat.info(f"Push results generated through AI:{user_id} agent_id:{agent_id} chat_message_id：{chat_message_id} message:{ai_output} status:{1} data:{data}")
             outputs = Variable(
                 name="text",
-                type="json" if output_format == 2 else "string",
+                type="json" if output_format == 2 and not is_chat else "string",
                 value=ai_output
             )
             if (
