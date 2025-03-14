@@ -122,6 +122,8 @@ export default memo(() => {
         const RenderTitle = () => {
             if (item.show_status == 1) {
                 return item.chat_room_name;
+            } else if (item.show_status == 2) {
+                return item.app_runs_name;
             } else if (item.show_status == 3) {
                 return intl.formatMessage(
                     { id: 'app.workflow.log.roundtable.guidance' },
@@ -199,7 +201,7 @@ export default memo(() => {
                             >
                                 <RenderSubTitle></RenderSubTitle>
                             </span>
-                            {item.show_status == 3 && (
+                            {(item.show_status == 3 || item.show_status == 2) && (
                                 <span className="inline-flex items-center ml-2 gap-2">
                                     <span
                                         style={{
