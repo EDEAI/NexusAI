@@ -3,6 +3,8 @@ from core.database.models.agents import Agents
 from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
 import math
 from typing import Any, Dict
+import os
+from config import settings
 
 
 class Chatrooms(MySQL):
@@ -166,15 +168,31 @@ class Chatrooms(MySQL):
             if agent_list:
                 for agent_item in agent_list:
                     if agent_item['agent_id'] > 0:
-                        chat_item['agent_list'].append(Agents().select_one(
-                            columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id", "apps.icon", "apps.avatar", "apps.icon_background", "agents.obligations"],
+                        # chat_item['agent_list'].append(Agents().select_one(
+                        #     columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id", "apps.icon", "apps.avatar", "apps.icon_background", "agents.obligations"],
+                        #     conditions=[
+                        #         {"column": "id", "value": agent_item['agent_id']}
+                        #     ],
+                        #     joins=[
+                        #         ["left", "apps", "apps.id = agents.app_id"],
+                        #     ]
+                        # ))
+                        agent_data = Agents().select_one(
+                            columns=["apps.name", "apps.description", "agents.id AS agent_id", 
+                                   "agents.app_id", "apps.icon", "apps.avatar",
+                                   "apps.icon_background", "agents.obligations"],
                             conditions=[
                                 {"column": "id", "value": agent_item['agent_id']}
                             ],
                             joins=[
                                 ["left", "apps", "apps.id = agents.app_id"],
                             ]
-                        ))
+                        )
+                        
+                        if agent_data and agent_data.get('avatar'):
+                            agent_data['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_data['avatar']}"
+                            
+                        chat_item['agent_list'].append(agent_data)
 
         return {
             "list": list,
