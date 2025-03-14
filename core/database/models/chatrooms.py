@@ -4,6 +4,7 @@ from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
 import math
 from typing import Any, Dict
 import os
+from config import settings
 
 
 class Chatrooms(MySQL):
@@ -189,7 +190,7 @@ class Chatrooms(MySQL):
                         )
                         
                         if agent_data and agent_data.get('avatar'):
-                            agent_data['avatar'] = f"{os.getenv('STORAGE_URL', '')}/upload/{agent_data['avatar']}"
+                            agent_data['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_data['avatar']}"
                             
                         chat_item['agent_list'].append(agent_data)
 

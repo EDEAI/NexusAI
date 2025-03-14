@@ -65,6 +65,7 @@ class Settings(BaseSettings):
     FASTAPI_WORKERS: int = int(os.environ.get('FASTAPI_WORKERS', os.getenv('FASTAPI_WORKERS', 10)))
     CELERY_WORKERS: int = int(os.environ.get('CELERY_WORKERS', os.getenv('CELERY_WORKERS', 20)))
     API_PORT: int = int(os.environ.get('API_PORT', os.getenv('API_PORT', 9472)))
+    STORAGE_URL: str = str(os.environ.get('STORAGE_URL', os.getenv('STORAGE_URL', '')))
 
 
 settings = Settings()
