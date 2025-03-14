@@ -291,7 +291,7 @@ class AgentChatMessage(BaseModel):
 
 
 class ResAgentInfoSchemaUpdate(BaseModel):
-    data: Dict[str, Any]
+    code: Optional[int] = None
     detail: Optional[str] = None
     data: Dict[str, Any]
 
@@ -304,7 +304,7 @@ class AgentChatMessage(BaseModel):
 
 
 class ResAgentRunSchemaReturn(BaseModel):
-    data: Dict[str, Any]
+    code: Optional[int] = None
     detail: Optional[str] = None
     data: Dict[str, Any]
 
