@@ -43,7 +43,7 @@ language_packs = {
             {retrieved_docs_format}
             {reply_requirement}
             Finally, you must return a JSON dictionary in the following format:
-            {{"ability_id": ability ID (integer type), "output": content replied to the user in the corresponding format of the ability}}
+            {{"ability_id": ability ID (integer type), "output": content to reply to the user in the corresponding format of the ability}}
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
             ********************End of identity definition content********************
 
@@ -68,7 +68,6 @@ language_packs = {
 
             {retrieved_docs_format}
             {reply_requirement}
-            Finally, reply in the corresponding format of the ability.
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
             ********************End of identity definition content********************
 
