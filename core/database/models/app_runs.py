@@ -40,7 +40,7 @@ class AppRuns(MySQL):
             columns=['id AS app_run_id', 'user_id', 'app_id', 'workflow_id', 'type', 'name AS run_name', 'graph', 'inputs', 'knowledge_base_mapping',
                 'level', 'context', 'completed_edges', 'skipped_edges', 'status', 'completed_steps', 'actual_completed_steps', 'need_human_confirm', 'outputs', 'elapsed_time', 
                 'prompt_tokens', 'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps', 'created_time', 'finished_time', 
-                'apps.team_id', 'apps.user_id AS app_user_id', 'apps.name AS app_name', 'apps.icon', 'apps.icon_background'],
+                'apps.team_id', 'apps.user_id AS app_user_id', 'apps.name AS app_name', 'apps.icon', "apps.avatar", 'apps.icon_background'],
             joins=[
                 ('inner', 'workflows', 'app_runs.workflow_id = workflows.id'),
                 ('inner', 'apps', 'app_runs.app_id = apps.id')
@@ -131,7 +131,7 @@ class AppRuns(MySQL):
                 'app_node_executions.node_graph', 
                 'app_node_executions.node_name', 
                 'app_node_executions.id AS exec_id', 
-                'app_node_executions.need_human_confirm',
+                'app_node_executions.need_human_confirm', "apps.avatar",
                 'apps.icon', 
                 'apps.icon_background'],
             joins= [
@@ -184,7 +184,7 @@ class AppRuns(MySQL):
         return self.select(
             columns=['app_runs.id AS app_run_id', 'apps.name AS apps_name', 'app_runs.name AS app_runs_name',
                      'app_runs.workflow_id', 'app_runs.created_time', 'app_runs.elapsed_time', 'app_runs.status',
-                     'app_runs.completed_steps', 'app_runs.total_steps', 'app_runs.need_human_confirm', 'apps.icon', 'apps.icon_background'],
+                     'app_runs.completed_steps', 'app_runs.total_steps', 'app_runs.need_human_confirm', 'apps.icon', "apps.avatar", 'apps.icon_background'],
             joins=[('inner', 'apps', 'app_runs.app_id = apps.id')],
             conditions=conditions,
             order_by = "app_runs.id DESC",

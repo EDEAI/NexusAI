@@ -15,7 +15,6 @@ from core.workflow.variables import create_variable_from_dict, get_first_variabl
 from core.workflow.recursive_task import create_recursive_task_category_from_dict
 from languages import get_language_content
 import os
-from api.utils.common import extract_file_list_from_skill_output
 
 # Uploaded files are stored in an ArrayVariable, which is in the `input` ObjectVariable
 # And this is the specific key of this ArrayVariable.
@@ -74,6 +73,7 @@ class Workspaces(MySQL):
                    app_runs.name AS process_name,
                    apps.name,
                    apps.icon,
+                   apps.avatar,
                    apps.icon_background,
                    app_runs.workflow_id,
                    app_runs.chatroom_id,
@@ -166,7 +166,7 @@ class Workspaces(MySQL):
                      "app_node_executions.status",
                      "app_node_executions.error", "app_node_executions.outputs", "app_node_executions.elapsed_time",
                      "app_node_executions.created_time", "app_node_executions.updated_time",
-                     "app_node_executions.finished_time","apps.icon_background", "apps.icon","app_node_executions.need_human_confirm","app_node_executions.user_id"],
+                     "app_node_executions.finished_time","apps.icon_background", "apps.icon", "apps.avatar","app_node_executions.need_human_confirm","app_node_executions.user_id"],
             conditions=conditions
         )
 
@@ -177,7 +177,8 @@ class Workspaces(MySQL):
             recursive_task_executions = {}
             # Dictionary to map edge_id to recursive task execution nodes
             edge_id_to_recursive_task = {}
-
+            
+            from api.utils.common import extract_file_list_from_skill_output
             for app_node in app_node_list:
                 if app_node['need_human_confirm'] == 1:
                     users = Users()
@@ -393,6 +394,7 @@ class Workspaces(MySQL):
             apps.mode,
             IFNULL(apps.icon_background, '') AS icon_background,
             IFNULL(apps.icon, '') AS icon,
+            IFNULL(apps.avatar, '') AS avatar,
             IFNULL(app_runs.chatroom_id, 0) AS chatroom_id,
             IFNULL(app_runs.agent_id, 0) AS agent_id,
             IFNULL(apps.id, 0) AS app_id,
@@ -484,13 +486,15 @@ class Workspaces(MySQL):
                                     "app_node_executions.status",
                                     "app_node_executions.error", "app_node_executions.outputs", "app_node_executions.elapsed_time",
                                     "app_node_executions.created_time", "app_node_executions.updated_time",
-                                    "app_node_executions.finished_time","apps.icon_background", "apps.icon","app_node_executions.need_human_confirm","app_node_executions.user_id"],
+                                    "app_node_executions.finished_time","apps.icon_background", "apps.icon","apps.avatar","app_node_executions.need_human_confirm","app_node_executions.user_id"],
                             conditions=conditions
                         )
                         log['file_list'] = []
                         if app_node_list and app_node_list.get('outputs'):
                             if outputs := app_node_list.get('outputs'):
                                 app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
+                                
+                                from api.utils.common import extract_file_list_from_skill_output
                                 file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
                                 log['file_list'] = file_list
                         start_time = time()
@@ -577,13 +581,15 @@ class Workspaces(MySQL):
                                 "app_node_executions.status",
                                 "app_node_executions.error", "app_node_executions.outputs", "app_node_executions.elapsed_time",
                                 "app_node_executions.created_time", "app_node_executions.updated_time",
-                                "app_node_executions.finished_time","apps.icon_background", "apps.icon","app_node_executions.need_human_confirm","app_node_executions.user_id"],
+                                "app_node_executions.finished_time","apps.icon_background", "apps.icon","apps.avatar","app_node_executions.need_human_confirm","app_node_executions.user_id"],
                         conditions=conditions
                     )
                     log['file_list'] = []
                     if app_node_list and app_node_list.get('outputs'):
                         if outputs := app_node_list.get('outputs'):
                             app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
+                            
+                            from api.utils.common import extract_file_list_from_skill_output
                             file_list = extract_file_list_from_skill_output(app_node_list['outputs'], app_node_list['node_graph']['data']['output'])
                             log['file_list'] = file_list
                     start_time = time()
@@ -662,7 +668,7 @@ class Workspaces(MySQL):
         )[0]["count_id"]
 
         list = self.select(
-            columns=["apps.user_id", "apps.id AS app_id","apps.icon_background", "apps.icon",
+            columns=["apps.user_id", "apps.id AS app_id","apps.icon_background", "apps.icon","apps.avatar",
                      "apps.name", "app_runs.id AS app_runs_id", "app_runs.name AS app_runs_name",
                      "app_runs.type AS app_runs_type",
                      "app_runs.level AS app_runs_level", "app_runs.created_time", "app_runs.updated_time",

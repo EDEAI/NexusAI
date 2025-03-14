@@ -5,6 +5,8 @@ class RealationInfo(BaseModel):
     apps_id:Optional[int] = None
     name:Optional[str] = None
     mode:Optional[int] = None
+    avatar: Optional[str] = None
+    avatar: Optional[str] = None
     icon:Optional[str] = None
     icon_background:Optional[str] = None
 
@@ -17,6 +19,8 @@ class AppsListData(BaseModel):
     name: Optional[str] = None
     mode:Optional[int] = None
     description: Optional[str] = None
+    avatar:Optional[str] = None
+    avatar: Optional[str] = None
     icon:Optional[str] = None
     icon_background:Optional[str] = None
     execution_times: Optional[int] = None
@@ -43,8 +47,10 @@ class ResAppListSchema(BaseModel):
 class ReqAppBaseCreateSchema(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    avatar: Optional[str] = None
     icon: Optional[str] = None
     icon_background: Optional[str] = None
+    avatar: Optional[str] = None
     mode: Optional[int] = None
     temporary_chatroom_id: Optional[int] = 0
 

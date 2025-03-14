@@ -111,7 +111,7 @@ class Apps(MySQL):
 
         all_app = self.select(
             columns=[
-                'apps.id AS app_id', 'apps.name', 'apps.description', 'apps.mode', 'apps.icon', 'apps.icon_background',
+                'apps.id AS app_id', 'apps.name', 'apps.description', 'apps.mode', 'apps.icon', 'apps.avatar', 'apps.icon_background',
                 'apps.execution_times', 'apps.publish_status'
             ],
             conditions=conditions,
@@ -151,7 +151,7 @@ class Apps(MySQL):
         # Query Association Table
         info_workflow = AppWorkflowRelations().select(
             columns=[
-                'apps.id AS apps_id', 'app_id', 'apps.name', 'apps.description', 'apps.mode', 'apps.icon',
+                'apps.id AS apps_id', 'app_id', 'apps.name', 'apps.description', 'apps.mode', 'apps.icon', 'apps.avatar',
                 'apps.icon_background'
             ],
             joins=[
@@ -177,7 +177,7 @@ class Apps(MySQL):
         info_app = self.select(
             columns=[
                 'apps.id AS apps_id', 'apps.name', 'app_workflow_relation.workflow_app_id', 'apps.description',
-                'apps.mode', 'apps.icon',
+                'apps.mode', 'apps.icon', 'apps.avatar',
                 'apps.icon_background'
             ],
             joins=[

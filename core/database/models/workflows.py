@@ -162,7 +162,7 @@ class Workflows(MySQL):
                 "apps.description", 
                 "users.nickname", 
                 "users.avatar", 
-                "apps.icon_background",
+                "apps.icon_background", "apps.avatar",
                 "apps.icon"
                 ],
             joins=[

@@ -247,6 +247,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
     name = data['name']
     mode = data['mode']
     description = data['description']
+    avatar = data['avatar']
     icon = data['icon']
     icon_background = data['icon_background']
     temporary_chatroom_id = data.get('temporary_chatroom_id', 0)
@@ -255,6 +256,8 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
         return response_error(get_language_content("name_is_required"))
     if mode not in [1,2,3,4]:
         return response_error(get_language_content("mode_can_only_input"))
+    if not avatar and not icon:
+        return response_error(get_language_content("avatar_or_icon_required"))
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     team_id = userinfo.team_id
@@ -272,6 +275,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
         "user_id": uid,
         "name": name,
         "icon": icon,
+        "avatar": avatar,
         "icon_background": icon_background,
         "description": description,
         "mode": mode,
@@ -372,6 +376,7 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
     data = data.dict(exclude_unset=True)
     name = data['name']
     description = data['description']
+    avatar = data['avatar']
     icon = data['icon']
     icon_background = data['icon_background']
 
@@ -379,12 +384,15 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
         return response_error(get_language_content("app_id_is_required"))
     if not name:
         return response_error(get_language_content("name_is_required"))
+    if not avatar and not icon:
+        return response_error(get_language_content("avatar_or_icon_required"))
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     apps_data = {
         "name": name,
         "description": description,
         "icon": icon,
+        "avatar": avatar,
         "icon_background":icon_background,
         "updated_time": current_time
     }
