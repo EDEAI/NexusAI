@@ -140,22 +140,23 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             if abilities:
                 if agent['auto_match_ability']:
                     output_format = None
-                    actual_output_format = default_output_format if ability['output_format'] == 0 else ability['output_format']
-                    if task:
-                        actual_output_format = 2
-                    abilities_content_and_output_format = [
-                        (
-                            ability['id'],
-                            ability['content'],
-                            get_language_content(
-                                'agent_output_format_'
-                                f'{actual_output_format}'
-                                f'{"_md" if actual_output_format == 2 and is_chat else ""}',
-                                append_ret_lang_prompt=False
+                    abilities_content_and_output_format = []
+                    for ability in abilities:
+                        actual_output_format = default_output_format if ability['output_format'] == 0 else ability['output_format']
+                        if task:
+                            actual_output_format = 2
+                        abilities_content_and_output_format.append(
+                            (
+                                ability['id'],
+                                ability['content'],
+                                get_language_content(
+                                    'agent_output_format_'
+                                    f'{actual_output_format}'
+                                    f'{"_md" if actual_output_format == 2 and is_chat else ""}',
+                                    append_ret_lang_prompt=False
+                                )
                             )
                         )
-                        for ability in abilities
-                    ]
                     if direct_output:
                         system_prompt = get_language_content('agent_system_prompt_with_auto_match_ability_direct_output', uid=user_id)
                     else:
