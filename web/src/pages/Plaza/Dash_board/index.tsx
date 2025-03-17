@@ -363,14 +363,22 @@ const RunLogs :React.FC<BlockParmas> = parmas =>{
     const setRunId = useUserStore(state => state.setRunId);
     const [runData,setRunData] = useState(data);
     const progressConcat = (progress: any, list: any) => {
-        const map = new Map();
-        list.reverse().forEach((item: any) => {
-            map.set(item.app_run_id, item);
-        });
+        // 创建一个Map来存储progress数据并去重
+        const progressMap = new Map();
+        // 对progress数组内部进行去重
         progress.forEach((item: any) => {
-            map.set(item.app_run_id, item); // Use the key attribute value as the key to store each object in the map
+            progressMap.set(item.app_run_id, item);
         });
-        return Array.from(map.values()).reverse();
+        // 创建结果数组，首先添加去重后的progress数据
+        const result = Array.from(progressMap.values());
+        // 添加list中不与progress重复的数据
+        list.forEach((item: any) => {
+            if (!progressMap.has(item.app_run_id)) {
+                result.push(item);
+            }
+        });
+        
+        return result;
     };
     const setpercentage = (item: any) => {
         if (item.completed_progress) {
