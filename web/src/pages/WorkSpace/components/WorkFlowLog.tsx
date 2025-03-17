@@ -131,6 +131,7 @@ export default memo(() => {
                         { name: item.associated_chat_room_name },
                     );
                 } 
+                return item.app_runs_name;
             }
             return item.apps_name;
         };

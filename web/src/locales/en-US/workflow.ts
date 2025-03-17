@@ -251,8 +251,9 @@ export default {
 
     'workflow.needHumanConfirm': 'Pending',
     'workflow.noHumanConfirm': 'Human confirmation processed',
-    "workflow.label.selectAggregationVariables": "Select aggregation variables (multiple selection allowed)",
-    "workflow.message.setVariablesFirst": "Please set variables first",
+    'workflow.label.selectAggregationVariables':
+        'Select aggregation variables (multiple selection allowed)',
+    'workflow.message.setVariablesFirst': 'Please set variables first',
 
     // Node list related
     'workflow.nodeList': 'Space',
@@ -295,10 +296,10 @@ export default {
 
     'creation.placeholder.selectTags': 'Please select tags',
 
-    'workflow.needHumanConfirm1': 'To-do',
-    'workflow.needHumanConfirm2': 'Others To-do',
-    'workflow.tooltip.confirmer': 'Pending confirmation by: {users}',
-    'workflow.label.confirmer': 'Pending Confirmer',
+    'workflow.needHumanConfirm1': 'Todo',
+    'workflow.needHumanConfirm2': 'Pending Debugger Review',
+    'workflow.tooltip.confirmer': 'Pending Debugger Review: {users}',
+    'workflow.label.confirmer': 'Pending Debugger Review',
 
     'workflow.form.parameter.required': 'Please enter parameter',
     'workflow.form.confirmer.required': 'Please select confirmer',

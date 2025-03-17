@@ -289,9 +289,9 @@ export default {
     'creation.placeholder.selectTags': '请选择标签',
 
     'workflow.needHumanConfirm1': '待办',
-    'workflow.needHumanConfirm2': '有他人待办',
-    'workflow.tooltip.confirmer': '待确认人: {users}',
-    'workflow.label.confirmer': '待确认人',
+    'workflow.needHumanConfirm2': '待调试者处理',
+    'workflow.tooltip.confirmer': '待调试者处理: {users}',
+    'workflow.label.confirmer': '待调试者处理',
 
     'workflow.form.parameter.required': '请填写参数',
     'workflow.form.confirmer.required': '请选择确认人',

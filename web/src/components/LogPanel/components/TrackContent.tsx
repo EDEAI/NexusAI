@@ -173,7 +173,7 @@ export const TrackContent = memo(({ runList = [], updateKey }: TrackContentProps
                         return (
                             <Alert
                                 message={
-                                    item?.data?.error ||
+                                    item?.error ||
                                     intl.formatMessage({ id: 'workflow.nodeRunError' })
                                 }
                                 type="error"
