@@ -30,6 +30,7 @@ class ReqSkillUpdateSchema(BaseModel):
     updated_time: Optional[datetime] = None
     status: Optional[int] = None
     is_public: Optional[int] = None
+    attrs_are_visible: Optional[int] = None
 
 class SkillBaseInfoResponseData(BaseModel):
     id: Optional[int] = None
@@ -53,6 +54,7 @@ class SkillBaseInfoResponseData(BaseModel):
     is_public: Optional[int] = None
     is_creator: Optional[int] = None
     nickname: Optional[str] = None
+    attrs_are_visible: Optional[int] = None
 class ResSkillBaseInfoSchema(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
@@ -96,8 +98,15 @@ class ResSkillPublishSchema(BaseModel):
 class ReqSkillRunSchema(BaseModel):
     skill_id: Optional[int] = None
     input_dict: Optional[Dict[str, Any]] = None
+
+class ResSkillFileUploadData(BaseModel):
+    file_name: Optional[str] = None
+    file_path: Optional[str] = None
+    variable_name: Optional[str] = None
+
 class  ResSkillRunResponseData(BaseModel):
     outputs: Optional[Dict[str, Any]] = None
+    file_list: Optional[List[ResSkillFileUploadData]] = None
 class ResSkillRunSchema(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
@@ -151,3 +160,7 @@ class ReqSkillDebugSchema(BaseModel):
     output_type: int  # 1:text 2:database 3:code 4:document
     output_variables: dict
     test_input: Dict[str, Any]  # Input data for testing
+
+
+
+

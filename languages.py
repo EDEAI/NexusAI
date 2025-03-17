@@ -38,8 +38,8 @@ language_packs = {
 
             {retrieved_docs_format}
             {reply_requirement}
-            Finally, return a JSON formatted dictionary as follows:
-            {{"ability_id": ability ID (integer type), "output": content replied in the corresponding format of the ability}}
+            Finally, you must return a JSON dictionary in the following format:
+            {{"ability_id": ability ID (integer type), "output": content replied to the user in the corresponding format of the ability}}
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
             ********************End of identity definition content********************
 
@@ -128,6 +128,7 @@ language_packs = {
         "agent_output_format_1": "as plain text",
         "agent_output_format_2": "in JSON format",
         "agent_output_format_3": "in code format",
+        "agent_output_format_2_md": "in JSON format contained in Markdown format",
         "agent_user_prompt": '''
             Below is the user's questions or needs:
             ********************Start of the user's questions or needs********************
@@ -196,6 +197,22 @@ language_packs = {
                 Related task content for reference only: {related_content}
             """,
         },
+        "recursive_task_execute_agent_user_subprompt": """
+            You are a task executor. Please perform the current task as detailed as possible according to the requirements and goals of the current task, the current task content I provide, the parent task content for reference only, the subtask list for reference only, and the related task content for reference only.
+            When performing the current task, pay attention to the following points:
+            1. The current task must be performed strictly in accordance with the requirements and goals of the current task.
+            2. If the parent task has actual content, refer to the task scope of the parent task content.
+            3. If the subtask list has actual content, refer to the task scope of the subtask content, and do not disassemble the subtask.
+            4. If the related task has actual content, please note that it is only for related reference.
+            Task json structure description: {{id: task id, name: task name, description: task description, keywords: task keywords, task: task content}}.
+            In the end, only the task content you performed will be returned, and no redundant content will be returned.
+            
+            Requirements and goals of the current task: {requirements_and_goals}
+            Current task content: {current_task}
+            Parent task content for reference only: {parent_task}
+            Subtask list for reference only: {child_tasks}
+            Related task content for reference only: {related_content}
+        """,
 
         # HTTP requeust node
         'http_request_failed': 'HTTP request failed with status code {status_code}',
@@ -251,6 +268,8 @@ language_packs = {
         'switch_the_language_success': 'Switch language success',
         # agent
         'agent_does_not_exist': 'Agent does not exist',
+        'agent_message_does_not_exist': 'Agent Chat Message does not exist',
+        'agent_message_does_not_exist_ok': 'Operation successful',
         'agent_empty_obligation': 'Agent obligation should not be empty!',
         'agent_empty_llm_model': 'Please fill in the LLM model for the Agent!',
         'agent_empty_ability': 'Agent ability should not be empty!',
@@ -279,6 +298,7 @@ language_packs = {
         'api_agent_run_ability_status_not_normal': 'The ability status is not normal',
         'api_agent_base_update_agent_id_required': 'agent_id is required',
         'api_agent_base_update_is_public_error': 'is_public can only input 0 or 1',
+        'api_agent_base_update_attrs_are_visible_error': 'attrs_are_visible can only input 0 or 1',
         'api_agent_base_update_enable_api_error': 'enable_api can only input 0 or 1',
         'api_agent_base_update_input_variables_wrong': 'input_variables data in wrong format',
         'api_agent_base_update_m_config_id_required': 'm_config_id is required',
@@ -332,6 +352,7 @@ language_packs = {
         # meeting room
         'chatroom_name_is_required': 'meeting room name is required',
         'chatroom_max_round_is_required': 'max_round is required',
+        'chatroom_max_round_must_be_greater_than_zero': 'max_round must be greater than zero',
         'chatroom_agent_is_required': 'agent is required',
         'chatroom_agent_item_must_be_a_dictionary': 'agent item must be a dictionary',
         'chatroom_agent_item_missing_keys': 'agent item missing keys',
@@ -361,7 +382,7 @@ language_packs = {
             {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
-            You need to fully analyze and understand every round of the conversation history through its message data structure, analyze the current conversation scene and conversation progress, and combine the user's speech content in the last round to analyze what the agents need to do next and the specific execution rules and requirements. This content then will be passed to the agents as an instruction
+            You need to fully analyze and understand every round of the conversation history through its message data structure, analyze the current conversation scene and conversation progress, and combine the user's speech content in the last round to summarize what the agents need to do next and the specific execution rules and requirements. This summary then will be passed to the agents as an instruction
 
             Then, respond according to the following requirements:
             1. Please only select agents from the provided agent list. Do not select agents that exist in the conversation history but not in the agent list;
@@ -461,6 +482,25 @@ language_packs = {
         'chatroom_request_sent_successfully': 'Request successful, please wait',
         'chatroom_role_user': 'user',
         'chatroom_role_agent': 'agent',
+        'chatroom_title_system': '''
+            Generate a concise chat title (under 10 words) based on the conversation history.
+
+            The conversation history is in the following JSON format: [message 1, (message 2,) ...]
+            The JSON structure for each message is as follows:
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
+            
+            Requirements:
+            1. Capture core discussion theme
+            2. Reflect key disputes or consensus
+            3. Use neutral wording
+            4. Avoid word repetition
+        ''',
+        'chatroom_title_user': '''
+            Below is the conversation history list:
+            {messages}
+
+            Please generate a chat title according to the requirements.
+        ''',
         # vector
         'api_vector_auth': 'Insufficient permissions',
         'api_vector_file_type': 'The uploaded file information is not matched',
@@ -755,26 +795,37 @@ language_packs = {
         'api_agent_record_error': 'record not found',
 
         'chatroom_meeting_summary_system': '''
-            You are a meeting summary assistant. Please summarize the meeting based on the meeting chat history I provided. The meeting summary should be as detailed as possible.
-            Note that only the meeting summary content will be returned in the end, and no redundant content will be returned.
+            You are a roundtable discussion summary assistant. Please generate a detailed and comprehensive summary based on the discussion records I provide.
+            
+            Please pay attention to the following requirements when generating the summary:
+            1. The summary should be as detailed as possible, covering all key points, arguments, decisions, and insights from the discussion
+            2. Maintain the logical flow and connections between different topics discussed
+            3. Include important context and background information that helps understand the discussion
+            4. Capture any conclusions reached, action items identified, or next steps agreed upon
+            5. Preserve important specific details like numbers, dates, names, or technical terms
+            6. Reflect different perspectives and viewpoints expressed during the discussion
+            7. Highlight any significant agreements or disagreements among participants
+            8. Note any questions raised and their answers or unresolved status
+            
+            Note that only the summary content will be returned in the end, and no redundant content will be returned.
         ''',
         'chatroom_meeting_summary_user': '''
-            Meeting chat history:
+            Discussion records:
             {messages}
         ''',
         'chatroom_meeting_summary_system_correct': '''
-            You are a conference content summary assistant. You have made a conference summary through the conference chat history I provided. I provided you with the generated conference summary.
-            Please adjust the generated conference summary through the conference chat history I provided, the generated conference summary, and the conference summary corrections.
-            Note that only the corrected conference summary content will be returned in the end, and no redundant content will be returned.
+            You are a roundtable discussion summary assistant. You have created a summary based on the discussion records I provided. I have provided you with the generated summary.
+            Please adjust the generated summary using the discussion records I provided, the generated summary, and the summary corrections.
+            Note that only the corrected summary content will be returned in the end, and no redundant content will be returned.
         ''',
         'chatroom_meeting_summary_user_correct': '''
-            Conference chat history:
+            Discussion records:
             {messages}
 
-            Generated conference summary:
+            Generated summary:
             {meeting_summary}
 
-            Conference summary corrections:
+            Summary corrections:
             {update_meeting}
         ''',
         'chatroom_generate_meeting_summary_from_a_single_message_system_correct': '''
@@ -782,11 +833,16 @@ language_packs = {
             Please adjust the generated meeting summary based on the generated meeting summary and meeting summary corrections I provided.
             Note that only the corrected meeting summary content will be returned in the end, and no redundant content will be returned.
         ''',
+        'chatroom_generate_meeting_summary_from_a_single_message_system_correct': '''
+            You are a roundtable discussion summary assistant. You have generated a summary for me. I have provided you with the generated summary.
+            Please adjust the generated summary based on the generated summary and summary corrections I provided.
+            Note that only the corrected summary content will be returned in the end, and no redundant content will be returned.
+        ''',
         'chatroom_generate_meeting_summary_from_a_single_message_user_correct': '''
-            Generated meeting summary:
+            Generated summary:
             {meeting_summary}
 
-            Meeting summary corrections:
+            Summary corrections:
             {update_meeting}
         ''',
         'chatroom_conference_orientation_system': '''
@@ -909,6 +965,9 @@ language_packs = {
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
             5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
+            7. File write restrictions: when the code involves file write operations, the target file path must start with "/storage". For example: /storage/my_folder/my_file.txt.
+               File return requirements: if the code needs to return the file path, the return value must start with "file://" so that the system can correctly identify it as a file type. For example: file:///storage/my_folder/my_file.txt.
+
         ''',
         'generate_skill_user': '''
             My requirements:
@@ -960,6 +1019,8 @@ language_packs = {
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
             5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
+            7. File write restrictions: when the code involves file write operations, the target file path must start with "/storage". For example: /storage/my_folder/my_file.txt.
+               File return requirements: if the code needs to return the file path, the return value must start with "file://" so that the system can correctly identify it as a file type. For example: file:///storage/my_folder/my_file.txt.
         ''',
         'correction_skill_user': '''
             Correction suggestion:
@@ -988,6 +1049,8 @@ language_packs = {
         "team_members_not_open": "Not open to team members",
         "app_status_not_normal": "The application status is not normal",
         "skill_not_found": "Skill not found",
+        "chatroom_table_orientation": "round_table_orientation",
+        'round_table_orientation_operation': 'round_table_orientation_operation',
     },
     "zh": {
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
@@ -1042,6 +1105,8 @@ language_packs = {
         'switch_the_language_success': '切换语言成功',
 
         'agent_does_not_exist': '智能体不存在！',
+        'agent_message_does_not_exist': '智能体聊天消息不存在！',
+        'agent_message_does_not_exist_ok': '清除聊天消息成功',
         'agent_empty_obligation': '智能体职能不应为空！',
         'agent_empty_llm_model': '请填写智能体的LLM模型！',
         'agent_empty_ability': '智能体能力不应为空！',
@@ -1070,6 +1135,7 @@ language_packs = {
         'api_agent_run_ability_status_not_normal': '能力状态不正确',
         'api_agent_base_update_agent_id_required': '智能体ID是必传的',
         'api_agent_base_update_is_public_error': '是否团队可见只能输入0或1',
+        'api_agent_base_update_attrs_are_visible_error': '是否属性可见只能输入0或1',
         'api_agent_base_update_enable_api_error': '启用接口只能输入0或1',
         'api_agent_base_update_input_variables_wrong': '输入变量数据格式错误',
         'api_agent_base_update_m_config_id_required': '模型配置ID是必传的',
@@ -1123,6 +1189,7 @@ language_packs = {
 
         'chatroom_name_is_required': '会议室标题不能为空',
         'chatroom_max_round_is_required': '最大回合数不能为空',
+        'chatroom_max_round_must_be_greater_than_zero': '最大回合数必须大于0',
         'chatroom_agent_is_required': '智能体不能为空',
         'chatroom_agent_item_must_be_a_dictionary': '智能体的每个元素必须是一个字典',
         'chatroom_agent_item_missing_keys': '智能体的元素缺少必要的键',
@@ -1286,6 +1353,8 @@ language_packs = {
         "team_members_not_open": "未向团队成员开放",
         "app_status_not_normal": "应用状态不正常",
         "skill_not_found": "未找到技能",
+        "chatroom_table_orientation": "圆桌导向",
+        'round_table_orientation_operation': '圆桌导向运行',
     }
 }
 
@@ -1304,12 +1373,14 @@ prompt_keys = {
     "agent_output_format_1",
     "agent_output_format_2",
     "agent_output_format_3",
+    "agent_output_format_2_md",
     "agent_user_prompt",
     "agent_user_prompt_with_retrieved_docs",
     "llm_reply_requirement_with_task_splitting",
     "recursive_task_generation",
     "recursive_task_assign",
     "recursive_task_execute",
+    "recursive_task_execute_agent_user_subprompt",
     "chatroom_manager_system",
     "chatroom_manager_system_with_optional_selection",
     "chatroom_manager_user_invalid_selection",
@@ -1320,6 +1391,8 @@ prompt_keys = {
     "chatroom_agent_description_with_no_ability",
     "chatroom_role_user",
     "chatroom_role_agent",
+    "chatroom_title_system",
+    "chatroom_title_user",
     "generate_agent_system_prompt",
     "generate_agent_user",
     "regenerate_agent_system",

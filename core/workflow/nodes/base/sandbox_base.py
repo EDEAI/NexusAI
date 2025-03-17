@@ -1,17 +1,18 @@
 import sys
 from pathlib import Path
 import json
+import os
+import uuid
+import shutil
 
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent.parent.parent))
 import traceback
-import uuid
 import ast
 import httpx
 from . import Node
 from ... import Variable, ObjectVariable
 from config import settings
 from log import Logger
-
 
 logger = Logger.get_logger('celery-app')
 
@@ -161,7 +162,8 @@ class SandboxBaseNode(Node):
             type_map = {
                 'string': str,
                 'number': (int, float),
-                'json': (list, dict)
+                'json': (list, dict),
+                'file': str
             }
             return type_map.get(variable_type, (list, dict))
 
@@ -192,8 +194,85 @@ class SandboxBaseNode(Node):
                 if not isinstance(result_value, expected_type):
                     raise ValueError(
                         f"Key '{key}' has incorrect type. Expected {variable.type}, got {type(result_value).__name__} ({result_value})")
-
         return True
+
+    def _get_storage_path(self, source_path: str, target_path: str) -> str:
+        """
+        Copies a file from the source path to the target path.
+
+        Args:
+            source_path (str): The path of the source file.
+            target_path (str): The path where the file should be copied to.
+
+        Returns:
+            str: The full path of the new file, or an error message if the operation failed.
+        """
+        # Convert source and target paths to absolute paths
+        source_path = os.path.abspath(source_path)
+        target_path = os.path.abspath(target_path)
+        print(f'[[[[[[[[[[[[[[{target_path}]]]]]]]]]]]]]]')
+        # Check if the source file exists
+        if not os.path.exists(source_path):
+            return False, f"Source file does not exist: {source_path}"
+        try:
+            print(os.path.dirname(target_path))
+            # Ensure the target directory exists
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+
+            # Change ownership of the target directory to the current user
+            shutil.chown(os.path.dirname(target_path), user=os.getuid(), group=os.getgid())
+
+            # Copy the file
+            shutil.copy2(source_path, target_path)
+
+            # Change ownership of the copied file to the current user
+            shutil.chown(target_path, user=os.getuid(), group=os.getgid())
+
+            # Delete the old file
+            os.remove(source_path)
+
+            # Return the absolute path of the new file
+            return True, target_path
+        except PermissionError as e:
+            return False, f"Permission denied: {str(e)}"
+        except Exception as e:
+            return False, f"Error occurred while copying the file: {str(e)}"
+
+    def skill_file_handler(self, stdout_dict: dict, workflow_id: int = 0, app_run_id: int = 0) -> dict:
+        """
+        Handles skill files by copying them to a secure storage path and updating the dictionary with new paths.
+
+        Args:
+            stdout_dict (dict): Dictionary containing the standard output data.
+            workflow_id (int): Workflow ID (default is 0).
+            app_run_id (int): Application run ID (default is 0).
+
+        Returns:
+            dict: Updated dictionary with new file paths.
+        """
+        try:
+            for key, value in stdout_dict.items():
+                if 'file://' in value:
+                    fixed_directory = 'storage'
+                    original_path = value.split('file:///')[-1]
+                    file_suffix = original_path.split('.')[-1]
+                    print(f"Found skill file path - Key: {key}, Original path: {original_path}")
+                    unique_id = str(uuid.uuid4())
+                    if workflow_id > 0:
+                        relative_path = f"/workflow/wf{workflow_id}/run{app_run_id}/{self.id}/{unique_id}.{file_suffix}"
+                    else:
+                        relative_path = f"/skill/sk{self.data['skill_id']}/{unique_id}.{file_suffix}"
+                    # Get the secure full storage path
+                    target_dirstatus, target_dir = self._get_storage_path(original_path,
+                                                                          fixed_directory + relative_path)
+                    if target_dirstatus:
+                        stdout_dict[key] = target_dir.split(fixed_directory)[-1]
+                    else:
+                        raise ValueError(target_dir)
+            return stdout_dict
+        except Exception as e:
+            logger.exception('ERROR!!')
+            raise ValueError(str(e))
 
     def run_custom_code(self):
         """
@@ -249,6 +328,11 @@ class SandboxBaseNode(Node):
             print(data)
             response = httpx.post(
                 url=f"http://{settings.SANDBOX_HOST}:{settings.SANDBOX_PORT}/run_code", headers=headers, json=data)
+
+            # Check if the response content is empty
+            if not response.content:
+                raise ValueError("Empty response from the server")
+
             print(response.json())
             return response.json()
 

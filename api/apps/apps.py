@@ -86,7 +86,7 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
         skill_model = CustomTools()
         skill_info = skill_model.select(
             columns=[
-                'app_id', 'published_time'
+                'id as skill_id', 'app_id', 'published_time'
             ],
             conditions=[
                 {"column": "status", "op": "in", "value": [1, 2]},
@@ -95,8 +95,10 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
             ]
         )
         skill_publish_time = {}
+        skill_ids = {}
         for skill_item in skill_info:
             skill_publish_time[skill_item['app_id']] = skill_item['published_time']
+            skill_ids[skill_item['app_id']] = skill_item['skill_id']
 
         for item in request['list']:
             if item['mode'] == 1:
@@ -112,7 +114,8 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
                     item['published_time'] = None
             elif item['mode'] == 3:
                 item['published_time'] = None
-            else:
+            elif item['mode'] == 4:
+                item['skill_id'] = skill_ids.get(item['app_id'])
                 if item['publish_status'] == 1:
                     item['published_time'] = skill_publish_time[item['app_id']]
                 else:
@@ -165,7 +168,7 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
         skill_model = CustomTools()
         skill_info = skill_model.select(
             columns=[
-                'app_id', 'published_time', 'users.nickname'
+                'id as skill_id', 'app_id', 'published_time', 'users.nickname'
             ],
             joins=[
                 ["left", "users", "users.id = custom_tools.user_id"],
@@ -178,9 +181,11 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
         )
         skill_publish_time = {}
         skill_publish_creator = {}
+        skill_ids = {}
         for skill_item in skill_info:
             skill_publish_time[skill_item['app_id']] = skill_item['published_time']
             skill_publish_creator[skill_item['app_id']] = skill_item['nickname']
+            skill_ids[skill_item['app_id']] = skill_item['skill_id']
 
         datasets_model = Datasets()
         datasets = datasets_model.select(
@@ -211,9 +216,14 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
             elif item['mode'] == 3:
                 item['published_time'] = None
                 item['published_creator'] = datasets_publish_creator[item['app_id']]
+            elif item['mode'] == 4:
+                item['skill_id'] = skill_ids.get(item['app_id'])
+                item['published_time'] = skill_publish_time.get(item['app_id'])
+                item['published_creator'] = skill_publish_creator.get(item['app_id'])
             else:
                 item['published_time'] = skill_publish_time[item['app_id']]
                 item['published_creator'] = skill_publish_creator[item['app_id']]
+
     return response_success(request)
 
 @router.post("/apps_create", response_model = ResAppsBaseCreateSchema)
@@ -239,6 +249,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
     description = data['description']
     icon = data['icon']
     icon_background = data['icon_background']
+    temporary_chatroom_id = data.get('temporary_chatroom_id', 0)
 
     if not name:
         return response_error(get_language_content("name_is_required"))
@@ -301,7 +312,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
         if not workflow_id:
             return response_error(get_language_content("workflow_insert_error"))
 
-    if mode ==3:
+    if mode == 3:
         try:
             embeddings_config_id = Models().get_model_by_type(2, team_id, 1, uid)['model_config_id']
         except AssertionError as e:
@@ -318,8 +329,10 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
             "collection_name":collection_name,
             "embedding_model_config_id":embeddings_config_id,
             "retriever_config":retriever_config_dict,
+            "temporary_chatroom_id": temporary_chatroom_id,
             "created_time": current_time,
-            "updated_time": current_time
+            "updated_time": current_time,
+            "temporary_chatroom_id": temporary_chatroom_id
         }
 
         datasets_model= Datasets()

@@ -6,6 +6,7 @@ import { useIntl } from '@umijs/max';
 import { Button, Form, Input, message, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
+import FileDownloadList from '@/components/common/FileDownloadList';
 
 //
 const { TextArea, Search } = Input;
@@ -219,30 +220,11 @@ const skillFourthly: React.FC<ChildProps> = ({
                             </div>
 
                             {fileList.length > 0 && (
-                                <div className="mb-4">
-                                    <div className="text-sm font-medium text-gray-700 mb-2">
-                                        {intl.formatMessage({ id: 'skill.downloadFiles' })}
-                                    </div>
-                                    <div className="space-y-2">
-                                        {fileList.map((file: any, index: number) => (
-                                            <div key={index} className="flex items-center justify-between bg-white rounded-md p-2">
-                                                <span className="text-sm text-gray-600">{file.file_name}</span>
-                                                <a
-                                                    href={file.file_path}
-                                                    download={file.file_name}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-center space-x-1 text-blue-600 hover:text-blue-800"
-                                                >
-                                                    <DownloadOutlined className="w-4 h-4" />
-                                                    <span className="text-sm">
-                                                        {intl.formatMessage({ id: 'skill.download' })}
-                                                    </span>
-                                                </a>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                <FileDownloadList 
+                                    files={fileList} 
+                                    title={intl.formatMessage({ id: 'agent.file.output' })}
+                                    className="mb-4"
+                                />
                             )}
 
                             <div className="w-full flex justify-end items-center">

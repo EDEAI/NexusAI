@@ -89,6 +89,7 @@ class Chatrooms(MySQL):
             {"column": "apps.status", "value": 1},
             {"column": "apps.mode", "value": 5},
             {"column": "chatrooms.user_id", "value": uid},
+            {"column": "chatrooms.is_temporary", "value": 0},
         ]
 
         if name:
@@ -194,3 +195,82 @@ class Chatrooms(MySQL):
         except Exception as e:
             print(f"An error occurred: {e}")
             return {"list": []}
+
+    def get_chatrooms_by_agent(self, agent_id: int, page: int = 1, page_size: int = 10, 
+                                show_all: bool = False, current_user_id: int = 0):
+        """
+        Retrieve chat rooms that exclusively contain the specified agent.
+        Only chat rooms where the agent list has exactly one entry and that agent's id equals agent_id are returned.
+        Supports pagination unless show_all is True.
+        """
+        conditions = [
+            {"column": "chatrooms.status", "value": 1},
+            {"column": "apps.status", "value": 1},
+            {"column": "apps.mode", "value": 5},
+            {"column": "chatroom_agent_relation.agent_id", "value": agent_id},
+            {"column": "chatrooms.user_id", "value": current_user_id},
+            {"column": "chatrooms.is_temporary", "value": 1},
+        ]
+        joins = [
+            ["inner", "chatroom_agent_relation", "chatrooms.id = chatroom_agent_relation.chatroom_id"],
+            ["left", "apps", "chatrooms.app_id = apps.id"]
+        ]
+        # Fetch the list based on pagination or all records
+        if show_all:
+            chat_list = self.select(
+                columns=[
+                    "apps.name", "apps.description", "chatrooms.id as chatroom_id", "chatrooms.chat_status",
+                    "chatrooms.active", "chatrooms.status as chatroom_status", "chatrooms.smart_selection",
+                    "apps.id as app_id"
+                ],
+                joins=joins,
+                conditions=conditions,
+                order_by="chatrooms.id DESC"
+            )
+        else:
+            chat_list = self.select(
+                columns=[
+                    "apps.name", "apps.description", "chatrooms.id as chatroom_id", "chatrooms.chat_status",
+                    "chatrooms.active", "chatrooms.status as chatroom_status", "chatrooms.smart_selection",
+                    "apps.id as app_id"
+                ],
+                joins=joins,
+                conditions=conditions,
+                order_by="chatrooms.id DESC",
+                limit=page_size,
+                offset=(page - 1) * page_size
+            )
+
+        # Populate agent list for each chat room
+        for chat_item in chat_list:
+            chat_item['agent_list'] = []
+            agent_relations = ChatroomAgentRelation().select(
+                columns=["agent_id"],
+                conditions=[{"column": "chatroom_id", "value": chat_item['chatroom_id']}],
+                order_by="id DESC"
+            )
+            for rel in agent_relations:
+                if rel['agent_id'] > 0:
+                    agent_info = Agents().select_one(
+                        columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id",
+                                 "apps.icon", "apps.icon_background", "agents.obligations"],
+                        conditions=[{"column": "id", "value": rel['agent_id']}],
+                        joins=[["left", "apps", "apps.id = agents.app_id"]]
+                    )
+                    if agent_info:
+                        chat_item['agent_list'].append(agent_info)
+
+        # Filter: only keep chatrooms where the agent list has exactly one agent and that agent's id equals agent_id.
+        filtered_list = [
+            room for room in chat_list
+            if len(room.get('agent_list', [])) == 1 and room['agent_list'][0]['agent_id'] == agent_id
+        ]
+        total = len(filtered_list)
+        total_pages = 1 if show_all else ((total + page_size - 1) // page_size)
+        return {
+            "list": filtered_list,
+            "total_count": total,
+            "total_pages": total_pages,
+            "page": page,
+            "page_size": page_size
+        }

@@ -13,9 +13,11 @@ from core.database.models import (
     AgentAbilities,
     Agents,
     AppRuns,
+    Apps,
     ChatroomMessages,
     Chatrooms,
-    Models
+    Models,
+    Datasets
 )
 from core.helper import truncate_messages_by_token_limit
 from core.llm import Prompt
@@ -30,8 +32,10 @@ logger = Logger.get_logger('chatroom')
 
 agent_abilities = AgentAbilities()
 app_runs = AppRuns()
+apps = Apps()
 chatrooms = Chatrooms()
 chatroom_messages = ChatroomMessages()
+datasets = Datasets()
 
 
 class Chatroom:
@@ -71,6 +75,7 @@ class Chatroom:
         team_id: int,
         chatroom_id: int,
         app_run_id: int,
+        is_temporary: bool,
         all_agent_ids: Sequence[int],
         absent_agent_ids: Sequence[int],
         max_round: int,
@@ -83,6 +88,7 @@ class Chatroom:
         self._team_id = team_id
         self._chatroom_id = chatroom_id
         self._app_run_id = app_run_id
+        self._is_temporary = is_temporary
         self._all_agents = {}
         # self._model_config_ids: dict
         # keys are IDs of all active agents with the addition of 0 (which is the Speaker Selector)
@@ -253,19 +259,36 @@ class Chatroom:
 
     async def _select_next_speaker(self) -> int:
         agent_id = None
+        last_speaker_id = self._history_messages[-1]['agent_id']
+
         for i in range(5):  # Try 5 times
-            last_speaker_id = self._history_messages[-1]['agent_id']
             if last_speaker_id == 0:
+                # If there is only one agent in the chatroom, handle directly
+                if len(self._model_config_ids) <= 2:  # Including Speaker Selector (id=0) and one agent
+                    # Set user message as topic directly
+                    self._topic = self._history_messages[-1]['message']
+                    logger.debug('Current topic: %s', self._topic)
+                    chatroom_messages.update(
+                        {'column': 'id', 'value': self._user_message_id},
+                        {'topic': self._topic}
+                    )
+                    # Return the ID of the only agent
+                    for agent_id in self._model_config_ids:
+                        if agent_id != 0:
+                            return agent_id
+                    return 0
                 # If the last speaker is the user, the Speaker Selector must choose an agent
-                system_prompt = get_language_content(
-                    'chatroom_manager_system',
-                    self._user_id
-                )
-                user_prompt = get_language_content(
-                    'chatroom_manager_user',
-                    self._user_id,
-                    append_ret_lang_prompt=False
-                )
+                else:
+                    schema_key = "chatroom_manager_system"
+                    system_prompt = get_language_content(
+                        'chatroom_manager_system',
+                        self._user_id
+                    )
+                    user_prompt = get_language_content(
+                        'chatroom_manager_user',
+                        self._user_id,
+                        append_ret_lang_prompt=False
+                    )
             else:
                 # If the last speaker is an agent,
                 if self._smart_selection or len(self._model_config_ids) <= 2:
@@ -273,6 +296,7 @@ class Chatroom:
                     return 0
                 else:
                     # and smart selection is disabled, the Speaker Selector will choose an agent, or stop the chat
+                    schema_key = "chatroom_manager_system_with_optional_selection"
                     system_prompt = get_language_content(
                         'chatroom_manager_system_with_optional_selection',
                         self._user_id
@@ -310,13 +334,15 @@ class Chatroom:
                 model_config_id=self._model_config_ids[0],
                 prompt=Prompt(system_prompt, user_prompt)
             )
+            llm_node.schema_key = schema_key
             result = llm_node.run(return_json=True)
             assert result['status'] == 'success', result['message']
             result_data = result['data']
             manager_message_var = create_variable_from_dict(result_data['outputs'])
             manager_message = manager_message_var.value
             logger.debug('Speaker selector output: %s', manager_message)
-            llm_input_var = result_data['model_data']['messages']
+            model_data = result_data['model_data']
+            llm_input_var = model_data['messages']
             llm_input = []
             for role, message_var in llm_input_var:
                 llm_input.append((role, create_variable_from_dict(message_var).value))
@@ -330,6 +356,8 @@ class Chatroom:
                     'app_run_id': self._app_run_id,
                     'llm_input': llm_input,
                     'message': manager_message,
+                    'message_type': 1,
+                    'model_data': model_data,
                     'is_read': 1 if has_connections else 0,
                     'prompt_tokens': prompt_tokens,
                     'completion_tokens': completion_tokens,
@@ -371,6 +399,15 @@ class Chatroom:
         completion_tokens = 0
         total_tokens = 0
 
+        # Check if there is a temporary dataset for this chatroom
+        override_dataset = datasets.select_one(
+            columns=['id'],
+            conditions=[
+                {'column': 'temporary_chatroom_id', 'value': self._chatroom_id},
+                {'column': 'status', 'value': 1}
+            ]
+        )
+
         messages, messages_in_last_section, user_messages = self._get_history_messages_list_grouped(self._model_config_ids[agent_id])
         user_message = messages_in_last_section[0]['message']
         agent_user_subprompt = get_language_content(
@@ -394,13 +431,18 @@ class Chatroom:
         try:
             self._console_log('Agent message: \033[36m')  # Print the agent message in green
             # Request LLM
+            agent_run_id = 0
             agent_message = ''
             async for chunk in agent_node.run_in_chatroom(
                 context=Context(),
                 user_id=self._user_id,
                 type=2,
-                override_rag_input=user_message
+                override_rag_input=user_message,
+                override_dataset_id=override_dataset['id'] if override_dataset else None
             ):
+                if isinstance(chunk, int):
+                    agent_run_id = chunk
+                    continue
                 if content := chunk.content:
                     self._console_log(content)
                     agent_message += content
@@ -430,6 +472,7 @@ class Chatroom:
                     'chatroom_id': self._chatroom_id,
                     'app_run_id': self._app_run_id,
                     'agent_id': agent_id,
+                    'agent_run_id': agent_run_id,
                     'llm_input': [
                         ['system', prompt.get_system()],
                         ['user', prompt.get_user()]
@@ -481,7 +524,78 @@ class Chatroom:
     def load_history_messages(self, messages: List[Dict[str, Union[int, str]]]) -> None:
         self._history_messages.extend(messages)
 
+    async def _generate_title(self):
+        logger.debug('Generating title...')
+        messages, _, _ = self._get_history_messages_list(self._model_config_ids[0])
+        
+        system_prompt = get_language_content(
+            'chatroom_title_system',
+            self._user_id
+        )
+        user_prompt = get_language_content(
+            'chatroom_title_user',
+            self._user_id,
+            append_ret_lang_prompt=False
+        ).format(
+            messages=json.dumps(messages, ensure_ascii=False)
+        )
+
+        llm_node = LLMNode(
+            title='Title Generator',
+            desc='Generate title',
+            model_config_id=self._model_config_ids[0],
+            prompt=Prompt(system_prompt, user_prompt)
+        )
+        result = llm_node.run()
+        assert result['status'] == 'success', result['message']
+        
+        result_data = result['data']
+        title_message_var = create_variable_from_dict(result_data['outputs'])
+        title = title_message_var.value
+        logger.debug('Generated title: %s', title)
+        await self._ws_manager.send_instruction(self._chatroom_id, 'TITLE', title)
+        
+        model_data = result_data['model_data']
+        llm_input_var = model_data['messages']
+        llm_input = []
+        for role, message_var in llm_input_var:
+            llm_input.append((role, create_variable_from_dict(message_var).value))
+            
+        has_connections = self._ws_manager.has_connections(self._chatroom_id)
+        prompt_tokens = result_data['prompt_tokens']
+        completion_tokens = result_data['completion_tokens']
+        total_tokens = result_data['total_tokens']
+        
+        chatroom_messages.insert(
+            {
+                'chatroom_id': self._chatroom_id,
+                'app_run_id': self._app_run_id,
+                'llm_input': llm_input,
+                'message': title,
+                'message_type': 2,
+                'model_data': model_data,
+                'is_read': 1 if has_connections else 0,
+                'prompt_tokens': prompt_tokens,
+                'completion_tokens': completion_tokens,
+                'total_tokens': total_tokens
+            }
+        )
+        app_runs.increment_token_usage(
+            self._app_run_id,
+            prompt_tokens, completion_tokens, total_tokens
+        )
+        
+        app_run = app_runs.select_one(
+            columns=['app_id'],
+            conditions={'column': 'id', 'value': self._app_run_id}
+        )
+        apps.update(
+            {'column': 'id', 'value': app_run['app_id']},
+            {'name': title}
+        )
+
     async def chat(self, user_message: Optional[str] = None) -> None:
+        history_messages_count_on_start = len(self._history_messages)
         performed_rounds = 0
         if user_message is None:
             # Resume the unfinished chat
@@ -493,7 +607,8 @@ class Chatroom:
         else:
             # Start a new chat
             self._user_speak(user_message)
-            
+        
+        round_ = 0
         for round_ in range(performed_rounds, self._max_round):
             agent_id = await self._select_next_speaker()
             logger.debug('Selected agent: %s', agent_id)
@@ -510,4 +625,7 @@ class Chatroom:
             round_ += 1
 
         logger.debug('Total chat rounds: %d', round_)
-    
+
+        if self._is_temporary and history_messages_count_on_start == 0:
+            # Generate title if the chat is new
+            await self._generate_title()

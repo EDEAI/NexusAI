@@ -99,8 +99,18 @@ const SkillSecond: React.FC<ChildProps> = ({
                         tokenSeparators={[',']}
                     />
                 </Form.Item>
-                <Form.Item
-                >
+                <div className="text-xs text-gray-500 p-3 whitespace-pre-line border-l-4 mb-2 border-gray-300 bg-gray-50">
+                    {`${intl.formatMessage({ id: 'customcode.notice.title' })}:
+
+${intl.formatMessage({ id: 'customcode.notice.file.write' })}：
+${intl.formatMessage({ id: 'customcode.notice.file.write.desc' })}
+${intl.formatMessage({ id: 'customcode.notice.file.write.example' })}
+
+${intl.formatMessage({ id: 'customcode.notice.file.return' })}：
+${intl.formatMessage({ id: 'customcode.notice.file.return.desc' })}
+${intl.formatMessage({ id: 'customcode.notice.file.return.example' })}`}
+                </div>
+                <Form.Item>
                     <div className="">{intl.formatMessage({ id: 'skill.code' })}</div>
                     <div className="h-[345px]">
                         {/*Skillinfo && Skillinfo.code || */}

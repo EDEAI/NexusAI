@@ -18,11 +18,14 @@ import {
 } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
-import { Button, Form, Menu, message, Spin } from 'antd';
+import { Button, Form, Menu, message, Spin, Splitter } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import AgentsFirst from '../components/AgentsFirst';
 import AgentsFourthly from '../components/AgentsFourthly';
 import AgentsSecond from '../components/AgentsSecond';
+import Chat from './Chat';
+import Log from './Log';
+import { history } from 'umi';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -89,11 +92,11 @@ const Agents: React.FC = () => {
                 color: pageKey == '2' ? '#1B64F3' : '#213044',
             },
         },
-         {
-            key: '4',
+        {
+            key: '5',
             disabled: agentmenudisabled.fourthly,
             icon: <FileTextOutlined />,
-            label: intl.formatMessage({ id: 'agent.operationrun' }),
+            label:intl.formatMessage({id:'app.dashboard.run_log'}),
             style: {
                 padding: '15px',
                 width: '100%',
@@ -102,7 +105,7 @@ const Agents: React.FC = () => {
                 fontSize: '16px',
                 lineHeight: '22px',
                 fontWeight: '500',
-                color: pageKey == '4' ? '#1B64F3' : '#213044',
+                color: pageKey == '5' ? '#1B64F3' : '#213044',
             },
         },
     ];
@@ -190,7 +193,6 @@ const Agents: React.FC = () => {
         const newabilitieslist = data.agent_abilities_list.filter((item: any, i: any) => {
             return item.status === 1;
         });
-
 
         setFourthly_abilities_list(
             selectlistdata(newabilitieslist).concat([
@@ -306,16 +308,20 @@ const Agents: React.FC = () => {
     const agentupdata = () => {
         setLoading(true);
         var creationagentid = 0;
+        return new Promise((resolve,reject)=>{
+       
         if (!creationappid) {
             PostappsCreate(createappdata('GET'))
                 .then(res => {
-
                     setcreationappid(res.data.app_id);
                     GetagentInfo(creationappid ? creationappid : res.data.app_id, false)
                         .then(value => {
-
+                            resolve(value)
                             creationagentid = value.data.agent.agent_id;
                             agentfirst(creationagentid);
+                            if (res.data.app_id) {
+                                history.replace(`/Agents?app_id=${res.data.app_id}&type=false`);
+                            }
                             setTimeout(() => {
                                 agentsecond(creationagentid);
                                 message.success(
@@ -332,16 +338,15 @@ const Agents: React.FC = () => {
                             }, 1000);
                             setNewagentid(creationagentid);
                         })
-                        .catch(err => {
-                        });
+                        .catch(err => { resolve('')});
                 })
-                .catch(err => {
-                });
+                .catch(err => {});
         } else {
             GetagentInfo(creationappid, false)
                 .then(value => {
                     creationagentid = value.data.agent.agent_id;
                     agentfirst(creationagentid);
+                    resolve('')
                     setTimeout(() => {
                         agentsecond(creationagentid);
                         message.success(intl.formatMessage({ id: 'skill.conserve.success' }));
@@ -351,23 +356,21 @@ const Agents: React.FC = () => {
                     }, 1000);
                     setNewagentid(creationagentid);
                 })
-                .catch(err => {
-                });
+                .catch(err => { resolve('')});
         }
+    })
     };
-
 
     const agentfirst = (agent_id: any, e?: any) => {
         // debugger;
         Ffromref.validateFields()
             .then(value => {
-
                 const putBasedata = {
                     agent_id: agent_id,
                     data: {
                         is_public: Detaillist.app.is_public,
                         enable_api: Detaillist.app.enable_api,
-                        attrs_are_visible:Detaillist.app.attrs_are_visible,
+                        attrs_are_visible: Detaillist.app.attrs_are_visible,
                         obligations: Detaillist.agent.obligations,
                         input_variables: arraytoobject(Ffromref.getFieldsValue()),
                         dataset_ids: repository,
@@ -393,9 +396,7 @@ const Agents: React.FC = () => {
                     pageKeyfun(e.key);
                 }
             })
-            .catch(err => {
-
-            });
+            .catch(err => {});
     };
 
     const agentsecond = (agent_id: any) => {
@@ -424,13 +425,13 @@ const Agents: React.FC = () => {
                 agent_abilities[0].content == ''
             ) {
                 setAgentmunudisabled({ first: false, second: false, fourthly: false });
-                pageKeyfun('4');
+                // pageKeyfun('4');
             } else {
                 PutagentAbilitiesset(params)
                     .then(res => {
                         if (res.code == 0) {
                             setAgentmunudisabled({ first: false, second: false, fourthly: false });
-                            pageKeyfun('4');
+                            // pageKeyfun('4');
                         }
                     })
                     .catch(err => {});
@@ -478,7 +479,6 @@ const Agents: React.FC = () => {
     };
     return (
         <div className=" flex bg-white" style={{ height: 'calc(100vh - 56px)' }}>
-
             <div className="flex flex-col w-[300px]" style={{ height: 'calc(100vh - 56px)' }}>
                 <div className="flex w-full items-center bg-white px-[30px] pt-[30px] border-[#e5e7eb] border-solid border-r">
                     <Button
@@ -494,7 +494,6 @@ const Agents: React.FC = () => {
                                 ? intl.formatMessage({ id: 'agent.back_meeting' })
                                 : intl.formatMessage({ id: 'agent.back' })}
                         </span>
-
                     </Button>
                 </div>
                 <div className="w-full flex-1 px-[30px] py-[30px] bg-white border-[#e5e7eb] border-solid border-r">
@@ -509,17 +508,28 @@ const Agents: React.FC = () => {
                     {Detaillist &&
                     Detaillist.app.enable_api === 1 &&
                     Detaillist.app.publish_status === 1 ? (
-                        <div className="w-full h-[40px] rounded-lg text-[#000] hover:bg-[#f0f0f0] p-[12px] pl-[16px] cursor-pointer"
-                            onClick={ async () => {
+                        <div
+                            className="w-full h-[40px] rounded-lg text-[#000] hover:bg-[#f0f0f0] p-[12px] pl-[16px] cursor-pointer"
+                            onClick={async () => {
                                 let params = new URLSearchParams(window.location.search);
-                                let res =null;
-                                if(params.get('app_id')){
-                                    res = await GetagentInfo(params.get('app_id'), params.get('type'));
+                                let res = null;
+                                if (params.get('app_id')) {
+                                    res = await GetagentInfo(
+                                        params.get('app_id'),
+                                        params.get('type'),
+                                    );
                                 }
-                                if(res!=null&&res.data.app.enable_api===1&&res.data.app.publish_status === 1){
+                                if (
+                                    res != null &&
+                                    res.data.app.enable_api === 1 &&
+                                    res.data.app.publish_status === 1
+                                ) {
                                     window.open(BASE_URL + Detaillist.app.api_url);
-                                }else{
-                                    message.warning(intl.formatMessage({ id: 'agent.save.and.click' }), 5);
+                                } else {
+                                    message.warning(
+                                        intl.formatMessage({ id: 'agent.save.and.click' }),
+                                        5,
+                                    );
                                 }
                             }}
                         >
@@ -531,118 +541,149 @@ const Agents: React.FC = () => {
                     ) : null}
                 </div>
             </div>
-            <Spin spinning={loading} size="large" className="mt-[112px]">
-                <div
-                    className="flex flex-col"
-                    style={{
-                        height: 'calc(100vh - 56px)',
-                        width: 'calc(100vw - 230px)',
-                        overflowY: 'scroll',
-                        scrollbarWidth: 'none',
-                    }}
-                >
-                    <div
-                        className="px-[30px] "
-                        style={{ overflowX: 'auto', minWidth: '960px', height: '100%' }}
-                    >
-                        <div className="w-full flex justify-center  mt-[30px]">
-                            <div className="flex items-center  w-[900px] ">
-                                <div className="mr-[10px] w-[16px] h-[16px]">
-                                    <img
-                                        src="/icons/flag.svg"
-                                        alt=""
-                                        className="w-[16px] h-[16px]"
-                                    />
-                                </div>
-                                <div className="flex items-center">
-                                    <div className="mr-[6px] text-lg text-[#213044] font-medium">
-                                        {createappdata('GET')?.app_id
-                                            ? intl.formatMessage({ id: 'agent.compile' })
-                                            : intl.formatMessage({ id: 'agent.created' })}
-                                       {intl.formatMessage({ id: 'agent' })}
+            <div className="flex-1 relative w-[calc(100%-300px)]">
+                <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+                    <Splitter.Panel defaultSize="50%" min="40%" max="70%">
+                        <Spin spinning={loading} size="large" className="mt-[112px] mr-4">
+                            <div
+                                className="flex flex-col"
+                                style={{
+                                    height: 'calc(100vh - 56px)',
+                                    // width: 'calc(100vw - 230px)',
+                                    overflowY: 'scroll',
+                                    scrollbarWidth: 'none',
+                                }}
+                            >
+                                <div
+                                    className="px-[30px] "
+                                    style={{ overflowX: 'auto', height: '100%' }}
+                                >
+                                    <div className="w-full flex justify-center  mt-[30px]">
+                                        <div className="flex items-center w-full ">
+                                            <div className="mr-[10px] w-[16px] h-[16px]">
+                                                <img
+                                                    src="/icons/flag.svg"
+                                                    alt=""
+                                                    className="w-[16px] h-[16px]"
+                                                />
+                                            </div>
+                                            <div className="flex items-center">
+                                                <div className="mr-[6px] text-lg text-[#213044] font-medium">
+                                                    {createappdata('GET')?.app_id
+                                                        ? intl.formatMessage({
+                                                              id: 'agent.compile',
+                                                          })
+                                                        : intl.formatMessage({
+                                                              id: 'agent.created',
+                                                          })}
+                                                    {intl.formatMessage({ id: 'agent' })}
+                                                </div>
+                                                {Detaillist?.app?.publish_status === 1 ? (
+                                                    <div className="bg-[#1B64F3] px-[7px] text-[#fff] rounded font-normal text-xs flex items-center justify-center h-[18px]">
+                                                        {intl.formatMessage({
+                                                            id: 'agent.havepublished',
+                                                        })}
+                                                    </div>
+                                                ) : (
+                                                    <div className=" bg-[#EEE] px-[7px]  text-[#999] rounded font-normal text-xs flex items-center justify-center h-[18px]">
+                                                        {intl.formatMessage({
+                                                            id: 'agent.unpublish',
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                    {Detaillist?.app?.publish_status === 1 ? (
-                                        <div className="bg-[#1B64F3] px-[7px] text-[#fff] rounded font-normal text-xs flex items-center justify-center h-[18px]">
-                                            {intl.formatMessage({ id: 'agent.havepublished' })}
-                                        </div>
-                                    ) : (
-                                        <div className=" bg-[#EEE] px-[7px]  text-[#999] rounded font-normal text-xs flex items-center justify-center h-[18px]">
-                                            {intl.formatMessage({ id: 'agent.unpublish' })}
-                                        </div>
-                                    )}
+                                    <div
+                                        style={{
+                                            display: pageKey === '1' ? 'flex' : 'none',
+                                            height: 'calc(100vh - 146px)',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <AgentsFirst
+                                            FirstValue={handleValueFromChid}
+                                            Ffromref={Ffromref}
+                                            Detaillist={Detaillist}
+                                            setDetaillist={setDetaillist}
+                                            repository={repository}
+                                            setRepository={setRepository}
+                                            Newproperties={Newproperties}
+                                            setNewproperties={setNewproperties}
+                                            Operationbentate={Operationbentate}
+                                            Fourthly_config_id={Fourthly_config_id}
+                                            setFourthly_config_id={setFourthly_config_id}
+                                            Fourthly_select_list={Fourthly_select_list}
+                                            pageKeyfun={pageKeyfun}
+                                            firstjudgingcondition={firstjudgingcondition}
+                                            agentmenudisabled={agentmenudisabled}
+                                            setAgentmunudisabled={setAgentmunudisabled}
+                                        />
+                                    </div>
+                                    <div
+                                        style={{
+                                            display: pageKey === '2' ? 'flex' : 'none',
+                                            height: 'calc(100vh - 146px)',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <AgentsSecond
+                                            SecondValue={SecondValue}
+                                            Detaillist={Detaillist}
+                                            setDetaillist={setDetaillist}
+                                            Sformref={Sformref}
+                                            Operationbentate={Operationbentate}
+                                            handleBack={handleBack}
+                                            pageKeyfun={pageKeyfun}
+                                            SkillMenuClick={SkillMenuClick}
+                                            secondjudgingcondition={secondjudgingcondition}
+                                            agentupdata={agentupdata}
+                                        />
+                                    </div>
+                                    <div
+                                        style={{
+                                            display: pageKey === '4' ? 'flex' : 'none',
+                                            height: 'calc(100vh - 146px)',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <AgentsFourthly
+                                            handleBack={handleBack}
+                                            Detaillist={Detaillist}
+                                            setDetaillist={setDetaillist}
+                                            Fourthly_select_list={Fourthly_select_list}
+                                            Fourthly_config_id={Fourthly_config_id}
+                                            setFourthly_config_id={setFourthly_config_id}
+                                            Fourthlyref={Fourthlyref}
+                                            Fourthly_abilities_list={Fourthly_abilities_list}
+                                            Operationbentate={Operationbentate}
+                                            callwordlist={callwordlist}
+                                            newagentid={newagentid}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div
-                            style={{
-                                display: pageKey === '1' ? 'flex' : 'none',
-                                height: 'calc(100vh - 146px)',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <AgentsFirst
-                                FirstValue={handleValueFromChid}
-                                Ffromref={Ffromref}
-                                Detaillist={Detaillist} 
-                                setDetaillist={setDetaillist}
-                                repository={repository}
-                                setRepository={setRepository}
-                                Newproperties={Newproperties}
-                                setNewproperties={setNewproperties}
-                                Operationbentate={Operationbentate}
-                                Fourthly_config_id={Fourthly_config_id}
-                                setFourthly_config_id={setFourthly_config_id}
-                                Fourthly_select_list={Fourthly_select_list}
-                                pageKeyfun={pageKeyfun}
-                                firstjudgingcondition={firstjudgingcondition}
-                                agentmenudisabled={agentmenudisabled}
-                                setAgentmunudisabled={setAgentmunudisabled}
+                        </Spin>
+                    </Splitter.Panel>
+                    <Splitter.Panel>
+                        <div>
+                            <Chat
+                                saveInfo={{firstjudgingcondition,secondjudgingcondition,agentupdata}}
+                                operationbentate={Operationbentate}
+                                data={{
+                                    abilitiesList: Fourthly_abilities_list,
+                                    detailList: Detaillist,
+                                }}
                             />
                         </div>
-                        <div
-                            style={{
-                                display: pageKey === '2' ? 'flex' : 'none',
-                                height: 'calc(100vh - 146px)',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <AgentsSecond
-                                SecondValue={SecondValue}
-                                Detaillist={Detaillist}
-                                setDetaillist={setDetaillist}
-                                Sformref={Sformref}
-                                Operationbentate={Operationbentate}
-                                handleBack={handleBack}
-                                pageKeyfun={pageKeyfun}
-                                SkillMenuClick={SkillMenuClick}
-                                secondjudgingcondition={secondjudgingcondition}
-                                agentupdata={agentupdata}
-                            />
+                    </Splitter.Panel>
+                    {pageKey == '5' && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-slate-50 w-full h-full z-10">
+                            <Log agent_id={Detaillist.agent.agent_id}></Log>
                         </div>
-                        <div
-                            style={{
-                                display: pageKey === '4' ? 'flex' : 'none',
-                                height: 'calc(100vh - 146px)',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <AgentsFourthly
-                                handleBack={handleBack}
-                                Detaillist={Detaillist}
-                                setDetaillist={setDetaillist}
-                                Fourthly_select_list={Fourthly_select_list}
-                                Fourthly_config_id={Fourthly_config_id}
-                                setFourthly_config_id={setFourthly_config_id}
-                                Fourthlyref={Fourthlyref}
-                                Fourthly_abilities_list={Fourthly_abilities_list}
-                                Operationbentate={Operationbentate}
-                                callwordlist={callwordlist}
-                                newagentid={newagentid}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </Spin>
+                    )}
+                </Splitter>
+            </div>
         </div>
     );
 };

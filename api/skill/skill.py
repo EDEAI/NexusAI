@@ -13,6 +13,7 @@ from core.database.models.app_runs import AppRuns
 from core.database.models.ai_tool_llm_records import AIToolLLMRecords
 from core.llm.prompt import create_prompt_from_dict, Prompt
 from time import time
+import os
 
 router = APIRouter()
 tools_db = CustomTools()
@@ -101,6 +102,9 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
     update_data['updated_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if 'is_public' in update_data and update_data['is_public'] not in [0, 1]:
         return response_error(get_language_content("is_public_invalid"))
+
+    if 'attrs_are_visible' in update_data and update_data['attrs_are_visible'] not in [0, 1]:
+        return response_error(get_language_content("api_agent_base_update_attrs_are_visible_error"))
     try:
         if 'is_public' in update_data:
             apps_data = {
@@ -109,6 +113,14 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
             }
             apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
             del update_data['is_public']
+
+        if 'attrs_are_visible' in update_data:
+            apps_data = {
+                "attrs_are_visible": update_data['attrs_are_visible'],
+                "updated_time": update_data['updated_time']
+            }
+            apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
+            del update_data['attrs_are_visible']
         conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
                       {'column': 'publish_status', 'value': 0}]
         tools_db.update(conditions, update_data)
@@ -293,7 +305,16 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
         return response_success({"outputs":{
                 'error': result["message"]
             }})
-    return response_success({"outputs": result["data"]["outputs"]})
+
+    outputs = result["data"]["outputs"]
+    file_list = []
+
+    if skill and skill.get("output_variables"):
+        file_list = extract_file_list_from_skill_output(outputs, skill["output_variables"])
+    return response_success({
+        "outputs": outputs,
+        "file_list": file_list
+    })
 
 
 @router.post("/skill_generate", response_model=ResSkillGenerateSchema)

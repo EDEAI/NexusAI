@@ -42,7 +42,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
         disabled: true,
     };
     return (
-        <div style={{ height: '100%', width: '900px', marginBottom: '30px' }}>
+        <div style={{ height: '100%', width: '100%', marginBottom: '30px' }}>
             <div className="flex align-center justify-between mt-[30px]">
                 <div className="text-base font-medium mb-[30px] text-[#333333]">
                     {intl.formatMessage({ id: 'agent.menu.basicsetup' })}
@@ -51,7 +51,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
             <div className="w-full">
                 <Form
                     name="dynamic_form_nest_item"
-                    style={{ width: 900 }}
+                    style={{ width: '100%' }}
                     autoComplete="off"
                     form={Ffromref}
                 >
@@ -282,7 +282,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                                         placeholder={intl.formatMessage({
                                                                             id: 'agent.variable.name',
                                                                         })}
-                                                                        className="w-[280px] mr-[20px]"
+                                                                        className="mr-[20px]"
                                                                     />
                                                                 </Form.Item>
                                                                 <Form.Item className="m-0">
@@ -292,13 +292,13 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                                         placeholder={intl.formatMessage({
                                                                             id: 'agent.variable.display',
                                                                         })}
-                                                                        className="w-[270px] mr-[20px]"
+                                                                        className="mr-[20px]"
                                                                     />
                                                                 </Form.Item>
                                                                 <Form.Item className="mr-[80px] m-0">
                                                                     <Select
                                                                         {...disabled}
-                                                                        style={{ width: '150px' }}
+                                                                    
                                                                         value={item.type}
                                                                         defaultValue={'string'}
                                                                         options={[
@@ -313,7 +313,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                                         ]}
                                                                     />
                                                                 </Form.Item>
-                                                                <Form.Item className="w-12 mr-14 m-0 ">
+                                                                <Form.Item className="  m-0 ">
                                                                     <Switch
                                                                         checked={item.status}
                                                                         {...disabled}

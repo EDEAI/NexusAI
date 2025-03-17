@@ -16,6 +16,7 @@ from core.workflow.nodes import *
 from celery_app import run_workflow_node
 from core.helper import push_to_websocket_queue, get_websocket_queue_length
 from languages import get_language_content
+from api.utils.common import extract_file_list_from_skill_output
 
 logger = Logger.get_logger('workflow_run')
 
@@ -230,16 +231,12 @@ def push_workflow_debug_message(
     :param first_task_exec_id: The ID of the first task execution record.
     :param node_exec_data: A dictionary containing the node execution data.
     """
-    if run_type != 1:
-        return
-    
     model_data = node_exec_data.pop('model_data', None)
     prompt_data = []
     if model_data:
         for message in model_data["messages"]:
             prompt_data.append({message[0]: message[1]["value"]})
     node_exec_data["prompt_data"] = prompt_data
-
     if inputs := node_exec_data.get('inputs'):
         inputs = create_variable_from_dict(inputs)
         inputs = flatten_variable_with_values(inputs)
@@ -258,6 +255,25 @@ def push_workflow_debug_message(
         elif node.data['type'] in ['recursive_task_generation', 'recursive_task_execution']:
             task_dict = json.loads(get_first_variable_value(create_variable_from_dict(outputs)))
             node_exec_data['outputs_md'] = create_recursive_task_category_from_dict(task_dict).to_markdown()
+        elif node.data['type'] in ['skill', 'custom_code', 'end']:
+            file_list = extract_file_list_from_skill_output(node_exec_data['outputs'], node.data['output'].to_dict())
+            # skill_output = node_exec_data['outputs']
+            # storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
+            # output_vars = create_variable_from_dict(node.data['output'].to_dict())
+            # file_vars = output_vars.extract_file_variables()
+            # for var in file_vars.properties.values():
+            #     if var.name in skill_output:
+            #         file_path = skill_output[var.name]
+            #         if file_path:
+            #             if not file_path.startswith('/'):
+            #                 file_path = '/' + file_path
+            #             file_name = file_path.split('/')[-1]
+            #             full_path = f"{storage_url}{file_path}"
+            #             file_list.append({
+            #                 "file_name": file_name,
+            #                 "file_path": full_path
+            #             })
+            node_exec_data['file_list'] = file_list
     
     queue_data = {
         'user_id': user_id,
@@ -790,7 +806,6 @@ def task_callback_thread():
                             'embedding_tokens': run['embedding_tokens'] + embedding_tokens,
                             'reranking_tokens': run['reranking_tokens'] + reranking_tokens
                         }
-
                         if target_node.data['type'] == 'end':
                             # If the target node is an end node, update the app run record with completion details
                             app_run_data['outputs'] = outputs

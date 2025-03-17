@@ -8,7 +8,7 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 // Progress bar subtitle
-const ProgressContainer: React.FC<{ progressObj: any }> = memo(parmas => {
+export const ProgressContainer: React.FC<{ progressObj: any }> = memo(parmas => {
     let { progressObj } = parmas;
     console.log(progressObj);
 
@@ -50,7 +50,7 @@ const ProgressContainer: React.FC<{ progressObj: any }> = memo(parmas => {
     );
 });
 
-const Redirect: React.FC<{ id: any; message: any }> = memo(parmas => {
+export const Redirect: React.FC<{ id: any; message: any }> = memo(parmas => {
     let { id, message } = parmas;
     let intl = useIntl();
     const setSummaryClick = useChatroomStore(state => state.setSummaryClick);
@@ -80,7 +80,14 @@ const Redirect: React.FC<{ id: any; message: any }> = memo(parmas => {
         </div>
     );
 });
-
+export const getProperties = properties => {
+    let keys = Object.keys(properties);
+    let array = [];
+    keys.forEach(k => {
+        array.push(properties[k]);
+    });
+    return array;
+};
 const SummaryHistoryDom: React.FC<{
     list: any;
     scrollDom: any;
@@ -115,14 +122,7 @@ const SummaryHistoryDom: React.FC<{
             (second < 10 ? '0' + second : second)
         );
     };
-    const getProperties = properties => {
-        let keys = Object.keys(properties);
-        let array = [];
-        keys.forEach(k => {
-            array.push(properties[k]);
-        });
-        return array;
-    };
+    
 
     useEffect(() => {
         if (scrollDom) {

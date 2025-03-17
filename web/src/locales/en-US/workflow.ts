@@ -10,7 +10,7 @@ export default {
 
     'app.workflow.ra.title': 'Recent Activity',
     'app.workflow.re.empty': 'No recent activity',
-    'app.workflow.log.title': 'Workflow Logs',
+    'app.workflow.log.title': 'Logs',
     'app.workflow.log.empty': 'No workflow logs',
 
     'app.workflow.title.1': ' ',

@@ -38,6 +38,7 @@ x-common-environment-backend: &common-environment-backend
   CHATROOM_WEBSOCKET_PORT: 9474
   WEB_URL: http://127.0.0.1:9470
   ICON_URL: http://127.0.0.1:9470
+  STORAGE_URL: http://127.0.0.1:9470
   APP_API_TIMEOUT: 60
   FASTAPI_WORKERS: 2
   CELERY_WORKERS: 4
@@ -56,7 +57,7 @@ x-common-environment-frontend: &common-environment-frontend
 services:
   multi_service:
     container_name: nexusai-docker-multi-service
-    image: edeai/multi_service:0.0.4
+    image: edeai/multi_service:0.0.5
     environment:
       <<: *common-environment-backend
       # <<: [*common-environment-backend, *common-environment-proxy]
@@ -97,7 +98,7 @@ services:
 
   web:
     container_name: nexusai-docker-web
-    image: edeai/web:0.0.3
+    image: edeai/web:0.0.4
     environment:
       <<: *common-environment-frontend
     networks:
@@ -197,6 +198,7 @@ services:
       - ./nginx/websocket_proxy.conf:/etc/nginx/websocket_proxy.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ../assets/tool:/app/tool_icon
+      - ../storage:/app/storage
       - ./volumes/logs/nginx:/var/log/nginx
     ports:
       - "9470:80"

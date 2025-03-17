@@ -78,7 +78,7 @@ class WebSocketManager:
         cmd: str,
         data: Optional[Union[int, str, bool]] = None
     ):
-        instruction = json.dumps([cmd, data])
+        instruction = json.dumps([cmd, data], ensure_ascii=False)
         await connection.send(INSTRUCTION_TEMPLATE.format(instruction=instruction))
         
     async def send_instruction_by_connections(
@@ -87,7 +87,7 @@ class WebSocketManager:
         cmd: str,
         data: Optional[Union[int, str, bool]] = None
     ):
-        instruction = json.dumps([cmd, data])
+        instruction = json.dumps([cmd, data], ensure_ascii=False)
         broadcast(connections, INSTRUCTION_TEMPLATE.format(instruction=instruction))
             
     async def send_instruction(self, chatroom_id: int, cmd: str, data: Optional[Union[int, str, bool]] = None):

@@ -3,9 +3,9 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 from base64 import b64encode
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, Optional
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from .prompt import Prompt
 from core.workflow.variables import create_variable_from_dict, Variable
@@ -50,6 +50,14 @@ class Messages:
                 }
             ],
         )
+
+    def add_system_message(self, system_message: Variable) -> None:
+        """
+        Adds a system message to the list of messages.
+
+        :param message: Variable, the system message to add.
+        """
+        self.messages.append(("system", Variable(name="system", type="string", value=str(system_message.value))))
     
     def add_prompt(self, prompt: Prompt) -> None:
         """
@@ -95,7 +103,13 @@ class Messages:
                             str(var_value).replace('{', '{{').replace('}', '}}')
                         )
     
-    def to_langchain_format(self) -> List[Union[Tuple[str, str], HumanMessage]]:
+    def to_langchain_format(
+        self,
+        model_name: str,
+        supplier_name: str,
+        restrict_max_rounds: bool = True,
+        input_variables: Optional[Dict[str, Any]] = None
+    ) -> List[Union[Tuple[str, str], HumanMessage]]:
         """
         Converts the Messages object to a list of tuples in the LangChain format, respecting the maximum rounds limit.
         
@@ -106,12 +120,25 @@ class Messages:
         for role, message in reversed(self.messages):
             if role == "ai":
                 rounds += 1
-                if rounds > HISTORY_MESSAGES_MAX_ROUNDS:
+                if restrict_max_rounds and rounds > HISTORY_MESSAGES_MAX_ROUNDS:
                     return result
             if role == "human" and message.type == "file":
                 result.insert(0, self._get_human_message_from_file_variable(message))
+            elif role == "system" and (supplier_name == "OpenAI" and model_name in ["o1-preview", "o1-mini"]):
+                # "o1-preview" and "o1-mini" does not support "developer" nor "system" messages.
+                for i, (role, result_message) in enumerate(result):
+                    if role == "human":
+                        # Prepend the system message to the human message.
+                        if input_variables:
+                            result[i] = ("human", f"{message.value.format(**input_variables)}\n{result_message}")
+                        else:
+                            result[i] = ("human", f"{message.value}\n{result_message}")
+                        break
             else:
-                result.insert(0, (role, message.value))
+                if input_variables:
+                    result.insert(0, (role, message.value.format(**input_variables)))
+                else:
+                    result.insert(0, (role, message.value))
         return result
     
     def serialize(self) -> List[Dict[str, Dict[str, str]]]:
@@ -124,6 +151,29 @@ class Messages:
         for role, message in self.messages:
             result.append((role, message.to_dict()))
         return result
+
+    def reorganize_messages(self) -> None:
+        """
+        Reorganizes the messages by:
+        1. Keeping only the last system message
+        2. Moving that system message to the beginning
+        3. Preserving the order of other messages
+        """
+        # Find the last system message
+        last_system_message = None
+        non_system_messages = []
+        
+        for role, message in self.messages:
+            if role == "system":
+                last_system_message = (role, message)
+            else:
+                non_system_messages.append((role, message))
+        
+        # Reconstruct the messages list
+        self.messages = []
+        if last_system_message:
+            self.messages.append(last_system_message)
+        self.messages.extend(non_system_messages)
 
 def create_messages_from_serialized_format(serialized_data: List[Tuple[str, Dict[str, str]]]) -> Messages:
     """

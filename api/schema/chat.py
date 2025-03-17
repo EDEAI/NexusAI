@@ -33,6 +33,7 @@ class ReqChatroomCreateSchema(BaseModel):
     description: str
     max_round: int
     agent: List[AgentModel]
+    is_temporary: int = 0
 
 
 class ReqChatroomUpdateSchema(BaseModel):

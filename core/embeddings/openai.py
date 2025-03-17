@@ -1,16 +1,15 @@
 from typing import cast, List, Optional
 
-from langchain_core.pydantic_v1 import Extra
+
 from langchain_openai import OpenAIEmbeddings as OriginalOpenAIEmbeddings
 from langchain_openai.embeddings.base import _process_batched_chunked_embeddings
 
 
 class OpenAIEmbeddings(OriginalOpenAIEmbeddings):
-    class Config:
-        """Configuration for this pydantic object."""
-
-        extra = Extra.allow
-        arbitrary_types_allowed = True
+    model_config = {
+        "extra": "allow",
+        "arbitrary_types_allowed": True,
+    }
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

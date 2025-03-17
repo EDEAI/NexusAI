@@ -101,6 +101,9 @@ class AppRuns(MySQL):
             {'column': 'app_node_executions.correct_output', 'value': 0},
             {'column': 'app_node_executions.condition_id', 'op': 'is null'},
         ]
+        need_human_confirm = data.get('need_human_confirm', None)
+        if need_human_confirm is not None:
+            conditions.append({"column": "app_node_executions.need_human_confirm", "value": data['need_human_confirm']})
 
         if data['user_id'] > 0:
             conditions.append({"column": "app_node_user_relation.user_id", "value": data['user_id']})
@@ -142,9 +145,21 @@ class AppRuns(MySQL):
             offset = (data['page'] - 1) * data['page_size']
         )
 
+        # Add additional query to count records with need_human_confirm == 1
+        human_confirm_total = self.select(
+            aggregates={"id": "count"},
+            joins=[
+                ["inner", "apps", "app_runs.app_id = apps.id"],
+                ["inner", "app_node_user_relation", "app_node_user_relation.app_run_id = app_runs.id"],
+                ["inner", "app_node_executions", "app_node_executions.node_id = app_node_user_relation.node_id and app_node_executions.app_run_id = app_runs.id"]
+            ],
+            conditions=conditions + [{"column": "app_node_executions.need_human_confirm", "value": 1}]
+        )[0]["count_id"]
+
         return {
             "list": list,
             "total_count": total_count,
+            "human_confirm_total": human_confirm_total,
             "total_pages": math.ceil(total_count / data['page_size']),
             "page": data['page'],
             "page_size": data['page_size']
@@ -252,3 +267,71 @@ class AppRuns(MySQL):
                 {"column": "user_id", "value": user_id}
             ]
         )
+
+    def all_agent_log_list(self, page: int = 1, page_size: int = 10, user_id: int = 0, agent_id: List[int] = None):
+        """
+        Retrieves a list of chat rooms with pagination, filtering by user ID and chat room name.
+
+        :param page: The page number for pagination.
+        :param page_size: The number of items per page.
+        :param agent_id: The ID of the agent (from the agent table) whose messages are to be retrieved.
+        Defaults to 0, which may imply no specific agent is targeted.
+        :type agent_id: int
+
+        :param user_id: The ID of the user whose messages are to be retrieved.
+        Defaults to 0, which may imply no specific user is targeted.
+        :type user_id: int
+        :return: A dictionary containing the list of chat rooms, total count, total pages, current page, and page size.
+        """
+        conditions = [
+            # {"column": "app_runs.user_id", "value": user_id},
+
+            [
+                {"column": "apps.user_id", "value": user_id, 'logic': 'or'},
+                {"column": "app_runs.user_id", "value": user_id}
+            ],
+            # {"column": "app_runs.agent_id", "value": agent_id},
+            {"column": "app_runs.agent_id", 'op': 'in', 'value': agent_id},
+            {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]}
+        ]
+
+        total_count = self.select_one(
+            aggregates={"id": "count"},
+            conditions=conditions,
+            joins=[
+                ["left", "apps", 'apps.id = app_runs.app_id'],
+                ["left", "users", "users.id = app_runs.user_id"]
+            ]
+        )["count_id"]
+
+        app_run_list = []
+        if total_count > 0:
+            app_run_list = self.select(
+                columns=['users.nickname as nickname', 'app_runs.id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.agent_id', 'app_runs.workflow_id', 'app_runs.dataset_id', 'app_runs.tool_id', 'app_runs.chatroom_id', 'app_runs.type', 'app_runs.name', 'app_runs.graph', 'app_runs.inputs', 'app_runs.raw_user_prompt', 'app_runs.knowledge_base_mapping', 'app_runs.level', 'app_runs.context', 'app_runs.completed_edges', 'app_runs.skipped_edges', 'app_runs.status', 'app_runs.completed_steps', 'app_runs.actual_completed_steps', 'app_runs.need_human_confirm', 'app_runs.need_correct_llm', 'app_runs.error', 'app_runs.outputs', 'app_runs.elapsed_time', 'app_runs.prompt_tokens', 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens', 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.updated_time', 'app_runs.finished_time'],
+                joins=[
+                    ["left", "apps", 'apps.id = app_runs.app_id'],
+                    ["left", "users", "users.id = app_runs.user_id"]
+                ],
+                conditions=conditions,
+                order_by="id DESC",
+                limit=page_size,
+                offset=(page - 1) * page_size
+            )
+            if app_run_list:
+                for log in app_run_list:
+                    if 'status' in log:
+                        status = log['status']
+                        if status in (1, 2):
+                            log['status'] = 1
+                        elif status == 3:
+                            log['status'] = 2
+                        elif status == 4:
+                            log['status'] = 3
+
+        return {
+            "list": app_run_list,
+            "total_count": total_count,
+            "total_pages": math.ceil(total_count / page_size),
+            "page": page,
+            "page_size": page_size
+        }

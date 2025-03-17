@@ -9,6 +9,7 @@ from core.database.models.agents import Agents
 from core.database.models.apps import Apps
 from core.database.models.app_runs import AppRuns
 from core.database.models.agent_abilities import AgentAbilities
+from core.database.models.agent_chat_messages import AgentChatMessages
 from core.workflow.nodes import AgentNode
 from core.workflow.variables import create_variable_from_dict
 from core.llm.prompt import create_prompt_from_dict, Prompt
@@ -21,7 +22,7 @@ from core.database.models.ai_tool_llm_records import AIToolLLMRecords
 import traceback
 from core.database.models.models import Models
 from core.helper import truncate_messages_by_token_limit
-
+from core.database.models.chatrooms import Chatrooms  # add import if not present
 
 router = APIRouter()
 
@@ -51,6 +52,7 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
 
     agent_id: int, Agent id
     is_public: int, Is it open to team members? 0: No 1: Yes
+    attrs_are_visible: int, Are attributes of this app visible? 0: No 1: Yes
     enable_api: int, Whether to enable API 0: No 1: Yes
     obligations: str, Agent obligations
     input_variables: dict, Input variables
@@ -59,7 +61,10 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
     allow_upload_file: int, Is it allowed to upload files? 0: No 1: Yes
     default_output_format: int, Default output format 1: text 2: json 3: code
     """
+
+    update_data = data.dict(exclude_unset=True)
     is_public = data.is_public
+    attrs_are_visible = data.attrs_are_visible
     enable_api = data.enable_api
     obligations = data.obligations
     input_variables = data.input_variables
@@ -72,6 +77,10 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
         return response_error(get_language_content("api_agent_base_update_agent_id_required"))
     if is_public not in [0, 1]:
         return response_error(get_language_content("api_agent_base_update_is_public_error"))
+    if 'attrs_are_visible' in update_data and attrs_are_visible not in [0, 1]:
+        return response_error(get_language_content("api_agent_base_update_attrs_are_visible_error"))
+    if 'attrs_are_visible' not in update_data:
+        attrs_are_visible = 1
     if enable_api not in [0, 1]:
         return response_error(get_language_content("api_agent_base_update_enable_api_error"))
     if input_variables:
@@ -89,7 +98,7 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
     agents_model = Agents()
     result = agents_model.agent_base_update(agent_id, userinfo.uid, userinfo.team_id, is_public, enable_api,
                                             obligations, input_variables, dataset_ids, m_config_id, allow_upload_file,
-                                            default_output_format)
+                                            default_output_format, attrs_are_visible)
     if result["status"] != 1:
         return response_error(result["message"])
     app_id = result["data"]["app_id"]
@@ -181,9 +190,10 @@ async def agent_delete(request: Request, app_id: int, userinfo: TokenData = Depe
     return response_success(result["data"], get_language_content("api_agent_success"))
 
 
-@router.get("/agent_info/{app_id}", response_model=ResAgentInfoSchema)
+@router.get("/agent_info/{app_id}", response_model=ResAgentInfoSchemaUpdate)
 async def agent_info(app_id: int, publish_status: int, userinfo: TokenData = Depends(get_current_user)):
     """
+    # ResAgentInfoSchema
     agent info
 
     app_id: int, App id
@@ -938,3 +948,293 @@ async def agent_batch_create(data: ReqAgentBatchCreateSchema, userinfo: TokenDat
         data={"app_ids": app_ids},
         detail=get_language_content("api_agent_success")
     )
+
+
+@router.get("/{agent_id}/agent_message_list", response_model=AgentResponseBase, summary="Retrieve the list of historical messages from the intelligent agent")
+async def agent_message_list(agent_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Retrieve the message list for a specific Agent chat.
+    This endpoint retrieves chat information about agents and provides services for users who need to view chat history and participants.
+    Parameters:
+    -Agent_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
+    -Userinfo (TokenData): Information about the current user is provided through dependency injection. Compulsory.
+
+    Returns:
+    -A response object containing Agent chat messages and a list of joined agents, formatted according to the AgentResponse Base model.
+
+    Raises:
+    -HTTPException: If 'agent_id' is invalid, it indicates that the user has not been authenticated or the agent does not exist.
+    """
+    find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
+    if not find_agent:
+        return response_error(get_language_content("agent_does_not_exist"))
+
+    agent_msg_list = AgentChatMessages().history_agent_messages(
+        agent_id=agent_id,
+        uid=userinfo.uid,
+        page=page,
+        page_size=page_size
+    )
+
+    return response_success(agent_msg_list)
+
+
+@router.get("/{app_id}/agent_log_list", response_model=AgentLogListResponse, summary="Agent log list")
+async def agent_log_list(app_id: int, page: int = 1, page_size: int = 10, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Fetch a list of all chat rooms.
+    This endpoint fetches a paginated list of all available chat rooms, allowing users to optionally filter the results by a name. The pagination is controlled through the page number and page size parameters.
+
+    Parameters:
+    - page (int): The current page number for pagination. Defaults to 1.
+    - page_size (int): The number of chat rooms to return per page. Defaults to 10.
+    -app_id (int): A unique identifier used to retrieve the chat message of the app. Compulsory.
+    - userinfo (TokenData): Information about the current user, provided through dependency injection. Required.
+
+    Returns:
+    The successful response containing the Agent operation log is formatted according to the AgentLogListResponse model.
+
+    Raises:
+    - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
+    """
+    find_agent = Agents().get_app_by_id_agent_info(app_id, userinfo.uid)
+    if not find_agent:
+        return response_error(get_language_content("agent_does_not_exist"))
+    data = AppRuns().all_agent_log_list(
+        page=page,
+        page_size=page_size,
+        user_id=userinfo.uid,
+        agent_id=find_agent)
+    return response_success(data)
+
+
+@router.get("/{app_id}/agent_log_details", response_model=AgentLogDetailResponse, summary="Agent log Details")
+async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Fetch a list of all chat rooms.
+    This endpoint fetches a paginated list of all available chat rooms, allowing users to optionally filter the results by a name. The pagination is controlled through the page number and page size parameters.
+
+    Parameters:
+    - app_id (int): A unique identifier used to retrieve the chat message of the app. Compulsory.
+    - app_run_id (int): A unique identifier used to retrieve the chat message of the agent. Compulsory.
+    - userinfo (TokenData): Information about the current user, provided through dependency injection. Required.
+
+    Returns:
+    The successful response containing the Agent operation log is formatted according to the AgentLogDetailResponse model.
+
+    Raises:
+    - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
+    """
+    find_app = Apps().get_app_by_id(app_id)
+    if find_app is None:
+        return response_error(get_language_content("api_agent_info_app_error"))
+
+    result = AppRuns().select_one(
+        columns=['users.nickname as nickname', 'app_runs.id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.agent_id',
+                 'app_runs.workflow_id', 'app_runs.dataset_id', 'app_runs.tool_id', 'app_runs.chatroom_id',
+                 'app_runs.type', 'app_runs.name', 'app_runs.graph', 'app_runs.inputs', 'app_runs.raw_user_prompt',
+                 'app_runs.knowledge_base_mapping', 'app_runs.level', 'app_runs.context', 'app_runs.completed_edges',
+                 'app_runs.skipped_edges', 'app_runs.status', 'app_runs.completed_steps',
+                 'app_runs.actual_completed_steps', 'app_runs.need_human_confirm', 'app_runs.need_correct_llm',
+                 'app_runs.error', 'app_runs.outputs', 'app_runs.elapsed_time', 'app_runs.prompt_tokens',
+                 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens',
+                 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.updated_time',
+                 'app_runs.finished_time', 'app_runs.model_data'],
+        joins=[
+            ["left", "users", "users.id = app_runs.user_id"]
+        ],
+        conditions=[
+            {"column": "app_runs.app_id", "value": app_id},
+            {"column": "app_runs.user_id", "value": userinfo.uid},
+            {"column": "app_runs.id", "value": app_run_id},
+            {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]}
+        ]
+    )
+
+    if 'status' in result:
+        result_status = result['status']
+        if result_status in (1, 2):
+            result['status'] = 1
+        elif result_status == 3:
+            result['status'] = 2
+        elif result_status == 4:
+            result['status'] = 3
+    if result['model_data'] is not None:
+        find_app_user = Apps().select_one(
+            columns=['id'],
+            conditions=[
+                {'column': 'id', 'value': app_id},
+                {'column': 'status', 'value': 1},
+                {'column': 'user_id', 'value': userinfo.uid}
+            ]
+        )
+        if find_app_user is None:
+            messages = ''
+        else:
+            messages = result['model_data']['messages']
+    else:
+        messages = ''
+    del result['model_data']
+    # result['prompt_data'] = {}
+    # result['prompt_data'] = messages
+    result['prompt_data'] = []
+    if not result:
+        return response_error(get_language_content("app_run_error"))
+    return response_success(result)
+
+
+@router.post("/{agent_id}/clear_agent_chat_memory", response_model=ClearAgentChatMemoryReturn, summary="Clear agent chat memory")
+async def clear_agent_chat_memory(data: ClearAgentChatMemory, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Clear the chat memory for a specific Agent chat.
+    This endpoint allows users to clear the chat history of a specific agent chat room,
+    removing all messages associated with the provided message ID.
+
+    Parameters:
+    - agent_id (int): A unique identifier used to specify the agent whose chat memory needs to be cleared. Compulsory.
+    - message_id (int): A unique identifier used to specify the message or chat session to be cleared. Compulsory.
+    - userinfo (TokenData): Information about the current user is provided through dependency injection. Compulsory.
+
+    Returns:
+    - A response object formatted according to the AgentResponseBase model, indicating the success or failure of the operation.
+
+    Raises:
+    - HTTPException:
+        - If 'agent_id' is invalid, it indicates that the user has not been authenticated or the agent does not exist.
+        - If 'message_id' is invalid, it indicates that the specified message or chat session does not exist.
+    """
+    agent_id = data.agent_id
+    message_id = data.message_id
+
+    find_agent = Agents().get_agent_by_id_info(agent_id, userinfo.uid)
+    if not find_agent:
+        return response_error(get_language_content("agent_does_not_exist"))
+    find_message = AgentChatMessages().select_one(
+        columns=['id'],
+        conditions=[
+            {"column": "agent_id", "value": agent_id},
+            {"column": "user_id", "value": userinfo.uid},
+            {"column": "id", "value": message_id}
+        ]
+    )
+    if not find_message:
+        return response_error(get_language_content("agent_message_does_not_exist"))
+
+    AgentChatMessages().update(
+        {'column': 'id', 'value': message_id},
+        {'history_cleared': 1}
+    )
+
+    return response_success(
+        {"message_id": message_id}
+    )
+
+
+@router.post("/agent_chat_message", response_model=ResAgentRunSchemaReturn)
+async def agent_chat_message(data: AgentChatMessage, userinfo: TokenData = Depends(get_current_user)):
+    """
+    agent run
+
+    agent_id: int, Agent id
+    ability_id: int, Ability id
+    input_dict: dict, Input data
+    prompt: dict, Prompt data
+    """
+    agent_id = data.agent_id
+    ability_id = data.ability_id
+    input_dict = data.input_dict
+    prompt = data.prompt
+    uid = userinfo.uid
+    team_id = userinfo.team_id
+
+    if agent_id <= 0:
+        return response_error(get_language_content("api_agent_run_agent_id_required"))
+    if not input_dict:
+        return response_error(get_language_content("api_agent_run_input_dict_required"))
+    try:
+        create_variable_from_dict(input_dict)
+    except:
+        return response_error(get_language_content("api_agent_run_input_dict_wrong"))
+    if not prompt:
+        return response_error(get_language_content("api_agent_run_prompt_required"))
+    try:
+        create_prompt_from_dict(prompt)
+    except:
+        return response_error(get_language_content("api_agent_run_prompt_wrong"))
+
+    # get agent
+    agents_model = Agents()
+    agent = agents_model.select_one(
+        columns="*",
+        conditions=[
+            {"column": "id", "value": agent_id},
+            {"column": "team_id", "value": team_id},
+            {"column": "status", "op": "in", "value": [1, 2]}
+        ]
+    )
+    if not agent:
+        return response_error(get_language_content("api_agent_run_agent_error"))
+    if agent["user_id"] != uid:
+        if agent["status"] != 1:
+            return response_error(get_language_content("api_agent_run_agent_status_not_normal"))
+        if agent["publish_status"] != 1:
+            return response_error(get_language_content("api_agent_run_not_creators"))
+
+    # get app
+    apps_model = Apps()
+    app = apps_model.select_one(
+        columns="*",
+        conditions=[
+            {"column": "id", "value": agent["app_id"]},
+            {"column": "team_id", "value": team_id},
+            {"column": "mode", "value": 1},
+            {"column": "status", "op": "in", "value": [1, 2]}
+        ]
+    )
+    if not app:
+        return response_error(get_language_content("api_agent_run_app_error"))
+    if app["user_id"] != uid:
+        if app["is_public"] == 0:
+            return response_error(get_language_content("api_agent_run_team_not_open"))
+        if app["status"] != 1:
+            return response_error(get_language_content("api_agent_run_app_status_not_normal"))
+
+    # get agent ability
+    if ability_id != 0:
+        agent_abilities_model = AgentAbilities()
+        ability = agent_abilities_model.select_one(
+            columns="*",
+            conditions=[
+                {"column": "id", "value": ability_id},
+                {"column": "agent_id", "value": agent_id},
+                {"column": "status", "op": "in", "value": [1, 2]}
+            ]
+        )
+        if not ability:
+            return response_error(get_language_content("api_agent_run_ability_error"))
+        if ability["user_id"] != uid and ability["status"] != 1:
+            return response_error(get_language_content("api_agent_run_ability_status_not_normal"))
+
+    # Insert Message
+    message_id = AgentChatMessages().insert({
+        'user_id': userinfo.uid,
+        'agent_id': agent_id,
+        'message': prompt['user']['value']
+    })
+
+    run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id, prompt=prompt, is_chat=True)
+    return response_success({"message_id": message_id, "detail": get_language_content("api_agent_success")})
+
+
+@router.get("/{agent_id}/chatrooms", summary="Get chat rooms for an agent", response_model=ResAgentChatRoomsSchema)
+async def get_agent_chatrooms(agent_id: int, page: int = 1, page_size: int = 10, all: bool = False,
+                              userinfo: TokenData = Depends(get_current_user)):
+    """
+    Retrieve the list of chat rooms in which the specified agent is present.
+    Only returns chat rooms owned by the current user.
+    Supports pagination; if 'all' is True, returns all records.
+    """
+    result = Chatrooms().get_chatrooms_by_agent(agent_id, page, page_size, show_all=all, current_user_id=userinfo.uid)
+    return response_success(result)
+
+

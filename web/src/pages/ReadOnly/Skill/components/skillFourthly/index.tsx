@@ -1,4 +1,5 @@
 import { PostskillRun, PutskillPublish } from '@/api/skill';
+import FileDownloadList from '@/components/common/FileDownloadList';
 import CodeEditor from '@/components/WorkFlow/components/Editor/CodeEditor';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
 import { useIntl } from '@umijs/max';
@@ -63,11 +64,13 @@ const skillFourthly: React.FC<ChildProps> = ({
         }
     };
 
+    const [fileList, setFileList] = useState<any[]>([]);
     const SkillRun = async (param: any) => {
         PostskillRun(param)
             .then(res => {
                 message.success(intl.formatMessage({ id: 'skill.run.success' }));
                 setSkillRun(res.data.outputs);
+                setFileList(res.data.file_list || []);
                 setLoading(false);
             })
             .catch(err => {
@@ -190,6 +193,13 @@ const skillFourthly: React.FC<ChildProps> = ({
                                     />
                                 ) : null}
                             </div>
+                            {fileList.length > 0 && (
+                                <FileDownloadList
+                                    files={fileList}
+                                    title={intl.formatMessage({ id: 'agent.file.output' })}
+                                    className="mb-4"
+                                />
+                            )}
                             <div className="w-full flex justify-end items-center">
                                 <div className=" h-8 bg-[#e8effc] rounded-md">
                                     <Button

@@ -92,7 +92,7 @@ async def workspace_workflow_process_log( tool: ResWorkspaceWorkflowProcessLog,u
     """
     tool_data = tool.dict(exclude_unset=True)
 
-    result = Workspaces().get_workflow_process_log(tool_data['page'],tool_data['page_size'], userinfo.uid)
+    result = Workspaces().get_workflow_process_log(tool_data['page'],tool_data['page_size'],tool_data['show_status'], userinfo.uid)
 
     return response_success(result)
 

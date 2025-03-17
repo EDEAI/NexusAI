@@ -26,6 +26,7 @@ class ResAgentListSchema(BaseModel):
 
 class ReqAgentBaseCreateSchema(BaseModel):
     is_public: Optional[int] = None
+    attrs_are_visible: Optional[int] = None
     enable_api: Optional[int] = None
     obligations: Optional[str] = None
     input_variables: Optional[Dict[str, Any]] = None
@@ -74,6 +75,7 @@ class AgentInfoAppResponseData(BaseModel):
     icon: Optional[str] = None
     icon_background: Optional[str] = None
     is_public: Optional[int] = None
+    attrs_are_visible: Optional[int] = None
     enable_api: Optional[int] = None
     publish_status: Optional[int] = None
     created_time: Optional[datetime] = None
@@ -254,3 +256,79 @@ class ResBatchAgentCreateSchema(BaseModel):
         description="Contains list of created app IDs",
         example={"app_ids": [1, 2, 3]}
     )
+
+
+class AgentResponseBase(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Dict[str, Any]
+
+
+class AgentLogListResponse(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Dict[str, Any]
+
+
+class AgentLogDetailResponse(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Dict[str, Any]
+
+
+class ClearAgentChatMemoryReturn(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Dict[str, Any]
+
+
+class AgentChatMessage(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Dict[str, Any]
+
+
+class ResAgentInfoSchemaUpdate(BaseModel):
+    data: Dict[str, Any]
+    detail: Optional[str] = None
+    data: Dict[str, Any]
+
+
+class AgentChatMessage(BaseModel):
+    agent_id: Optional[int] = None
+    ability_id: Optional[int] = None
+    input_dict: Optional[Dict[str, Any]] = None
+    prompt: Optional[Dict[str, Any]] = None
+
+
+class ResAgentRunSchemaReturn(BaseModel):
+    data: Dict[str, Any]
+    detail: Optional[str] = None
+    data: Dict[str, Any]
+
+class ChatRoomData(BaseModel):
+    chatroom_id: int
+    name: Optional[str] = None
+    description: Optional[str] = None
+    chat_status: Optional[int] = None
+    active: Optional[int] = None
+    chatroom_status: Optional[int] = None
+    smart_selection: Optional[int] = None
+    app_id: int
+    agent_list: Optional[List[Dict[str, Any]]] = []
+
+class AgentChatRoomsResponse(BaseModel):
+    list: List[ChatRoomData]
+    total_count: Optional[int] = None
+    total_pages: Optional[int] = None
+    page: Optional[int] = None
+    page_size: Optional[int] = None
+
+class ResAgentChatRoomsSchema(BaseModel):
+    code: int
+    detail: str
+    data: AgentChatRoomsResponse
+
+class ClearAgentChatMemory(BaseModel):
+    agent_id: Optional[int] = None
+    message_id: Optional[int] = None

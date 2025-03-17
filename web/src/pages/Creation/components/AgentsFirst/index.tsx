@@ -1,5 +1,6 @@
 import { GetdatasetList } from '@/api/agents';
 import Callword from '@/components/callword';
+import { useModelSelect } from '@/store/modelList';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Form, Input, Radio, Select, Switch } from 'antd';
@@ -53,7 +54,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
             obligations: null,
             input_variables: {},
             dataset_ids: [],
-            attrs_are_visible:1
+            attrs_are_visible: 1,
         },
     });
     useEffect(() => {
@@ -108,7 +109,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
             data: { ...AgentsFirstData.data, enable_api: SwitchValue ? 1 : 0 },
         });
     };
-    const attrFirstAPI = (SwitchValue) =>{
+    const attrFirstAPI = SwitchValue => {
         setDetaillist({
             ...Detaillist,
             app: { ...Detaillist.app, attrs_are_visible: SwitchValue ? 1 : 0 },
@@ -117,7 +118,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
             ...AgentsFirstData,
             data: { ...AgentsFirstData.data, attrs_are_visible: SwitchValue ? 1 : 0 },
         });
-    }
+    };
 
     const TPUpload = (checked: boolean) => {
         // AgentengineSet(null, checked ? 1 : 0)
@@ -159,8 +160,11 @@ const AgentsFirst: React.FC<ChildProps> = ({
             agent: { ...Detaillist.agent, default_output_format: e.target.value },
         });
     };
+
+    const { options, defaultValue } = useModelSelect();
+
     return (
-        <div style={{ height: '100%', width: '900px', marginBottom: '30px' }}>
+        <div style={{ height: '100%', width: '100%', marginBottom: '30px' }}>
             <div className="flex align-center justify-between mt-[30px]">
                 <div className="text-base font-medium mb-[30px] text-[#333333]">
                     {intl.formatMessage({ id: 'agent.menu.basicsetup' })}
@@ -170,7 +174,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                 <Form
                     name="dynamic_form_nest_item"
                     // onFinish={nextStep}
-                    style={{ width: '900px' }}
+                    style={{ width: '100%' }}
                     // labelCol={{ span: 24 }}
                     // wrapperCol={{ span: 24 }}
                     autoComplete="off"
@@ -245,7 +249,8 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                 size="small"
                                                 onChange={attrFirstAPI}
                                                 checked={
-                                                    Detaillist && Detaillist.app.attrs_are_visible === 1
+                                                    Detaillist &&
+                                                    Detaillist.app.attrs_are_visible === 1
                                                 }
                                             />
                                         </div>
@@ -298,8 +303,9 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                       })
                                                     : Fourthly_config_id
                                             }
+                                            variant="filled"
                                             onChange={FourthlySelect}
-                                            options={Fourthly_select_list}
+                                            options={options}
                                         />
                                     </div>
                                 </Form.Item>
@@ -354,28 +360,28 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     </div> */}
                                 </div>
                                 <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
-                                    <div className="w-48 mr-5 ml-[10px]">
+                                    <div className="w-[22%] mr-2 ml-[10px]">
                                         {intl.formatMessage({ id: 'agent.variable.name' })}
                                     </div>
-                                    <div className="w-52 mr-5">
+                                    <div className="w-[25%] mr-2">
                                         {intl.formatMessage({ id: 'agent.variable.display' })}
                                     </div>
-                                    <div className="w-36 mr-[100px]">
+                                    <div className="w-[18%] mr-2">
                                         {intl.formatMessage({ id: 'agent.variable.type' })}
                                     </div>
-                                    <div className="w-14 mr-[90px]">
+                                    <div className="w-[15%] mr-2">
                                         {intl.formatMessage({ id: 'agent.variable.required' })}
                                     </div>
-                                    <div>
+                                    <div className="w-[10%]">
                                         {intl.formatMessage({ id: 'agent.variable.operation' })}
                                     </div>
                                 </div>
                                 <div className="mb-[30px]">
                                     {fields.map(({ key, name, ...restField }) => (
                                         // <Space key={key} style={{ width:'100%', display: 'flex', marginBottom: 8, alignItems: 'center' }} align="baseline">
-                                        <div className="w-full h-20 flex justify-start  px-2.5 border-b border-x pt-7 last:rounded-b-lg">
+                                        <div className="w-full h-20 flex justify-start px-2.5 border-b border-x pt-7 last:rounded-b-lg">
                                             <Form.Item
-                                                className="m-0"
+                                                className="m-0 w-[22%] mr-2"
                                                 {...restField}
                                                 name={[name, 'name']}
                                                 rules={[
@@ -397,11 +403,11 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     placeholder={intl.formatMessage({
                                                         id: 'agent.variable.name',
                                                     })}
-                                                    className="w-48 mr-5"
+                                                    className="w-full"
                                                 />
                                             </Form.Item>
                                             <Form.Item
-                                                className="m-0"
+                                                className="m-0 w-[25%] mr-2"
                                                 {...restField}
                                                 name={[name, 'content']}
                                                 rules={[
@@ -417,11 +423,11 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     placeholder={intl.formatMessage({
                                                         id: 'agent.variable.display',
                                                     })}
-                                                    className="w-52 mr-5"
+                                                    className="w-full"
                                                 />
                                             </Form.Item>
                                             <Form.Item
-                                                className="w-36 mr-[110px] m-0"
+                                                className="w-[18%] mr-2 m-0"
                                                 {...restField}
                                                 name={[name, 'type']}
                                             >
@@ -434,7 +440,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                 />
                                             </Form.Item>
                                             <Form.Item
-                                                className="w-12 mr-[100px] m-0"
+                                                className="w-[15%] mr-2 m-0 flex pl-[2%]"
                                                 {...restField}
                                                 name={[name, 'status']}
                                                 // style={{ flex: 1, alignItems: 'center' }}
@@ -444,12 +450,12 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     // style={{ width: 70 }}
                                                 />
                                             </Form.Item>
-                                            {Ffromref &&
-                                            Ffromref.getFieldsValue().users.length > 1 ? (
-                                                <Form.Item className="m-0">
+                                            <Form.Item className="w-[10%] flex pl-[2%]">
+                                                {Ffromref &&
+                                                Ffromref.getFieldsValue().users.length > 1 ? (
                                                     <DeleteOutlined onClick={() => remove(name)} />
-                                                </Form.Item>
-                                            ) : null}
+                                                ) : null}
+                                            </Form.Item>
                                         </div>
                                         // </Space>
                                     ))}
@@ -537,7 +543,6 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 history.back();
                             }}
                         >
-                            {' '}
                             {intl.formatMessage({ id: 'agent.btn.back' })}
                         </Button>
                     </div>

@@ -37,12 +37,20 @@ const useStore = create(
             datasetData: {},
             teamDatasetData: {},
             modelData: {},
+            modelOptionsData:{},
             dealtWithData: null,
             runPanelShow: false,
             runPanelNodeShow: false,
             viewport: { x: 0, y: 0, zoom: 1 },
             handleList: [],
             workflowEditInfo: {},
+            loadingWorkflowData:true,
+            setLoadingWorkflowData:(data:boolean) => {
+                set({ loadingWorkflowData: data });
+            },
+            setModelOptionsData: data => {
+                set({ modelOptionsData: data });
+            },
             getNode(id) {
                 return get().nodes.find(x => x.id == id);
             },

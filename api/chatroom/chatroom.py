@@ -68,6 +68,7 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
     description: str = chat_data['description']
     max_round: int = chat_data['max_round']
     agent = chat_data['agent']
+    is_temporary: int = chat_data.get('is_temporary', 0)
     mode: int = 5
 
     if not name:
@@ -75,6 +76,9 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
 
     if max_round is None or max_round == '':
         return response_error(get_language_content("chatroom_max_round_is_required"))
+
+    if max_round == 0:
+        return response_error(get_language_content("chatroom_max_round_must_be_greater_than_zero"))
 
     if not agent or len(agent) == 0:
         return response_error(get_language_content("chatroom_agent_is_required"))
@@ -104,7 +108,8 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
             'user_id': userinfo.uid,
             'app_id': app_id,
             'max_round': max_round,
-            'status': 1
+            'status': 1,
+            'is_temporary': is_temporary
         }
     )
     ChatroomAgentRelation().insert_agent(
@@ -588,13 +593,16 @@ async def chat_history_message_summary(chatroom_id: int, chat_request: ChatHisto
             correct_prompt=input_messages
         )
     else:
+        chatroom_table_orientation = get_language_content('chatroom_table_orientation')
+        result_name = f"{chatroom_table_orientation}_{start_datetime_str}"
         app_run_id = AppRuns().insert(
             {
                 'user_id': userinfo.uid,
                 'app_id': 0,
                 'type': 2,
                 'chatroom_id': chatroom_id,
-                'name': f'Chat_history_summary_{start_datetime_str}',
+                # 'name': f'Chat_history_summary_{start_datetime_str}',
+                'name': result_name,
                 'status': 1
             }
         )

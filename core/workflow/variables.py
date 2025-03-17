@@ -14,7 +14,8 @@ class Variable:
         display_name: Optional[str] = None, 
         value: Optional[Union[str, int, float]] = None, 
         required: Optional[bool] = None,
-        max_length: Optional[int] = None
+        max_length: Optional[int] = None,
+        sort_order: int = 0
     ):
         """
         Initializes a Variable object.
@@ -26,6 +27,7 @@ class Variable:
         :param value: Union[str, int, float, None], the value of the variable. The type depends on the variable's type.
         :param required: bool, indicates if the variable is required.
         :param max_length: int, the maximum length of the value if the type is 'string'. Default is 0 (no limit).
+        :param sort_order: int, the order in which this variable should be displayed. Default is 0.
         """
         self.name = name
         self.type = type
@@ -34,6 +36,7 @@ class Variable:
         self.value = value
         if required is not None:
             self.required = required
+        self.sort_order = sort_order
         if self.type == "string":
             if max_length is None:
                 self.max_length = 0
@@ -51,7 +54,8 @@ class Variable:
         data = {
             "name": self.name,
             "type": self.type,
-            "value": self.value
+            "value": self.value,
+            "sort_order": self.sort_order
         }
         if hasattr(self, "display_name"):
             data["display_name"] = self.display_name
@@ -80,7 +84,8 @@ class ArrayVariable:
         self, 
         name: str, 
         type: str, 
-        display_name: Optional[str] = None
+        display_name: Optional[str] = None,
+        sort_order: int = 0
     ):
         """
         Initializes an ArrayVariable object with an empty list of values.
@@ -88,11 +93,13 @@ class ArrayVariable:
         :param name: str, the internal name of the array variable.
         :param type: str, the type of the elements in the array. Accepts 'array[string]', 'array[number]', 'array[file]', 'array[object]'.
         :param display_name: str, the display name of the array variable.
+        :param sort_order: int, the order in which this variable should be displayed. Default is 0.
         """
         self.name = name
         self.type = type
         if display_name is not None:
             self.display_name = display_name
+        self.sort_order = sort_order
         self.values: List[Variable] = []
 
     def add_value(self, value: Union[Variable, "ObjectVariable"]):
@@ -118,7 +125,8 @@ class ArrayVariable:
         data = {
             "name": self.name,
             "type": self.type,
-            "values": [value.to_dict() for value in self.values]
+            "values": [value.to_dict() for value in self.values],
+            "sort_order": self.sort_order
         }
         if hasattr(self, 'display_name'):
             data["display_name"] = self.display_name
@@ -141,7 +149,8 @@ class ObjectVariable:
         self, 
         name: str, 
         display_name: Optional[str] = None,
-        to_string_keys: Optional[List[str]] = None
+        to_string_keys: Optional[List[str]] = None,
+        sort_order: int = 0
     ):
         """
         Initializes an ObjectVariable object with no properties.
@@ -149,6 +158,7 @@ class ObjectVariable:
         :param name: str, the name of the object variable used in the backend.
         :param display_name: str, the name of the object variable displayed in the frontend.
         :param to_string_keys: Optional[List[str]], a list of property names to include in the to_string output.
+        :param sort_order: int, the order in which this variable should be displayed. Default is 0.
         """
         self.name = name
         if display_name is not None:
@@ -157,6 +167,7 @@ class ObjectVariable:
         self.properties: Dict[str, Union[Variable, ArrayVariable, ObjectVariable]] = {}
         if to_string_keys is not None:
             self.to_string_keys = to_string_keys
+        self.sort_order = sort_order
 
     def add_property(self, key: str, value: Union[Variable, ArrayVariable, "ObjectVariable"]):
         """
@@ -165,6 +176,15 @@ class ObjectVariable:
         :param key: str, the name of the property.
         :param value: Union[Variable, ArrayVariable, ObjectVariable], the value of the property.
         """
+        # If sort_order not set or zero, assign next available order number
+        if getattr(value, 'sort_order', 0) == 0:
+            # Find the maximum sort_order currently in use
+            current_max = 0
+            for prop in self.properties.values():
+                current_max = max(current_max, getattr(prop, 'sort_order', 0))
+            # Assign next sort_order value
+            value.sort_order = current_max + 1
+        
         self.properties[key] = value
 
     def to_dict(self) -> Dict[str, Any]:
@@ -173,10 +193,17 @@ class ObjectVariable:
 
         :return: Dict[str, Any], a dictionary representation of the ObjectVariable object.
         """
+        # Sort properties by sort_order before generating dict
+        sorted_properties = {k: v for k, v in sorted(
+            self.properties.items(),
+            key=lambda item: getattr(item[1], 'sort_order', 0)
+        )}
+
         data = {
             "name": self.name,
             "type": self.type,
-            "properties": {key: value.to_dict() for key, value in self.properties.items()}
+            "properties": {key: value.to_dict() for key, value in sorted_properties.items()},
+            "sort_order": self.sort_order
         }
         if hasattr(self, 'display_name'):
             data["display_name"] = self.display_name
@@ -197,6 +224,29 @@ class ObjectVariable:
             properties_to_convert = self.properties.values()
         return '\n'.join([value.to_string() for value in properties_to_convert])
         
+    def extract_file_variables(self, new_name: str = "file_variables") -> "ObjectVariable":
+        """
+        Extracts all file-type variables from this object and its nested properties,
+        and returns them in a new ObjectVariable.
+
+        :param new_name: str, the name for the new ObjectVariable (default: "file_variables")
+        :return: ObjectVariable containing only the file-type variables
+        """
+        result = ObjectVariable(name=new_name)
+        
+        def extract_files(var: Union[Variable, ArrayVariable, "ObjectVariable"]):
+            if isinstance(var, Variable) and var.type == "file":
+                result.add_property(var.name, var)
+            elif isinstance(var, ArrayVariable):
+                for value in var.values:
+                    extract_files(value)
+            elif isinstance(var, ObjectVariable):
+                for value in var.properties.values():
+                    extract_files(value)
+        
+        extract_files(self)
+        return result
+        
 VariableTypes = Union[Variable, ArrayVariable, ObjectVariable]
 
 def create_variable_from_dict(data: Dict[str, Any]) -> VariableTypes:
@@ -211,6 +261,8 @@ def create_variable_from_dict(data: Dict[str, Any]) -> VariableTypes:
         kwargs["display_name"] = data["display_name"]
     if "required" in data:
         kwargs["required"] = data["required"]
+    if "sort_order" in data:
+        kwargs["sort_order"] = data["sort_order"]
     if data["type"] == "string" and "max_length" in data:
         kwargs["max_length"] = data["max_length"]
     if data["type"] == "object":
@@ -485,7 +537,8 @@ def create_object_variable_from_list(data: List[Dict[str, Any]], name: str = "ro
             display_name=var_def.get("display_name"),
             value=var_def.get("value"),
             required=var_def.get("required"),
-            max_length=var_def.get("max_length")
+            max_length=var_def.get("max_length"),
+            sort_order=var_def.get("sort_order")
         )
         obj_var.add_property(var_def["name"], variable)
     

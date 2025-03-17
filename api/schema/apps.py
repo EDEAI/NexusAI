@@ -26,6 +26,7 @@ class AppsListData(BaseModel):
     tags:Optional[List[AppListTagsData]] = None
     list:Optional[List[RealationInfo]] = None
     agent_id:Optional[int] = None
+    skill_id:Optional[int] = None
 
 class  ResAppsListData(BaseModel):
     list: Optional[List[AppsListData]] = None
@@ -45,6 +46,7 @@ class ReqAppBaseCreateSchema(BaseModel):
     icon: Optional[str] = None
     icon_background: Optional[str] = None
     mode: Optional[int] = None
+    temporary_chatroom_id: Optional[int] = 0
 
 class ResAppsCreateData(BaseModel):
    app_id: Optional[int] = None

@@ -8,7 +8,6 @@ from langchain_community import cross_encoders
 from langchain_community import document_compressors as lcc_document_compressors
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
-from langchain_core.pydantic_v1 import Extra
 
 _module_lookup = {
     'CrossEncoderReranker': 'core.reranker.cross_encoder_rerank',
@@ -16,11 +15,10 @@ _module_lookup = {
 
 
 class GeneralReranker(BaseDocumentCompressor):
-    class Config:
-        """Configuration for this pydantic object."""
-
-        extra = Extra.allow
-        arbitrary_types_allowed = True
+    model_config = {
+        "extra": "allow",
+        "arbitrary_types_allowed": True,
+    }
     
     def __init__(self, reranker_type: str, *args, **kwargs):
         super().__init__(*args, **kwargs)

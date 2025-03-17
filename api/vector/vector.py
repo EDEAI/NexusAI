@@ -93,6 +93,8 @@ async def dataset_list(is_individual: int, userinfo: TokenData = Depends(get_cur
     Get a list of all datasets
 
     Args:
+        is_individual: int, 1 personage 2 Team visible and individual
+        temporary_chatroom_id: int, temporary chatroom id, default is 0
         userinfo: TokenData, the user information obtained from the token
 
     Returns:
@@ -100,7 +102,6 @@ async def dataset_list(is_individual: int, userinfo: TokenData = Depends(get_cur
             dataset_id: int, indicates dataset id.
             app_id: int, indicates app id.
             name: str, indicates dataset name.
-            is_individual: int, 1 personage 2 Team visible and individual
 
     """
     user_id = userinfo.uid
@@ -148,18 +149,19 @@ async def create_dataset(data: CreateDatasetSchema,userinfo: TokenData = Depends
                 'is_public': is_public,
             }
         )
-        dataset_id = Datasets().insert(
-            {
-                'team_id': team_id,
-                'user_id': user_id,
-                'app_id': app_id,
-                'process_rule_id': process_rule_id,
-                'data_source_type': data_source_type,
-                'collection_name': collection_name,
-                'embedding_model_config_id': embeddings_config_id,
-                'retriever_config': retriever_config_dict
-            }
-        )
+        ds_data = {
+            'team_id': team_id,
+            'user_id': user_id,
+            'app_id': app_id,
+            'process_rule_id': process_rule_id,
+            'data_source_type': data_source_type,
+            'collection_name': collection_name,
+            'embedding_model_config_id': embeddings_config_id,
+            'retriever_config': retriever_config_dict
+        }
+        if data.temporary_chatroom_id != 0:
+            ds_data['temporary_chatroom_id'] = data.temporary_chatroom_id
+        dataset_id = Datasets().insert(ds_data)
     except Exception as e:
         msg = str(e)
         logger.info('create_dataset: %s desc: Request model %s, Current user id %s', msg, user_id)
@@ -747,12 +749,6 @@ async def dataset_set(
         embeddings_config_id = Models().get_model_by_type(2, team_id, mode, user_id)['model_config_id']
 
         if datasets_data['embedding_model_config_id'] != embeddings_config_id:
-            Datasets().update(
-                [
-                    {'column': 'id', 'value': dataset_id},
-                ],
-                {'embedding_model_config_id': embeddings_config_id}
-            )
             reindex_dataset.delay(dataset_id, embeddings_config_id)
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:

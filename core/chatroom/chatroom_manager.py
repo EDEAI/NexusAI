@@ -41,6 +41,7 @@ class ChatroomManager:
             columns=[
                 'id',
                 'app_id',
+                'is_temporary',
                 'max_round',
                 'initial_message_id',
                 'chat_status',
@@ -161,7 +162,7 @@ class ChatroomManager:
                 
                 # Create chatroom
                 chatroom = Chatroom(
-                    user_id, team_id, chatroom_id, app_run_id,
+                    user_id, team_id, chatroom_id, app_run_id, bool(chatroom_info['is_temporary']),
                     all_agent_ids, absent_agent_ids,
                     chatroom_info['max_round'], bool(chatroom_info['smart_selection']),
                     self._ws_manager, user_message_id, topic
@@ -248,6 +249,7 @@ class ChatroomManager:
                                 chatroom_to_truncate = chatroom_id
                             if not chatroom_to_truncate:
                                 assert chatroom_id, 'You should ENTER the chatroom first.'
+                            self._get_chatroom_info(chatroom_to_truncate, user_id, check_chat_status=True)  # Also check if the chatroom is available
                             last_message_id = self._get_last_message_id(chatroom_to_truncate)
                             if last_message_id:
                                 chatrooms.update(
