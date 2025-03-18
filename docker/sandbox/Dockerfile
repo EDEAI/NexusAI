@@ -1,8 +1,8 @@
 FROM python:3.10.13
 
 # Use network proxy as needed
-# ARG HTTP_PROXY=http://192.168.0.241:10809
-# ARG HTTPS_PROXY=http://192.168.0.241:10809
+# ARG HTTP_PROXY=http://192.168.1.5:10809
+# ARG HTTPS_PROXY=http://192.168.1.5:10809
 
 RUN apt-get update && apt-get install -y firejail
 
