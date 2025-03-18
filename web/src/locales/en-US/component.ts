@@ -9,7 +9,7 @@ export default {
     'component.menu.dashboard': 'Home',
     'component.menu.chatRoomList': 'Meeting Room List',
     'component.menu.chatRoom': 'Meeting Room',
-    'component.menu.meeting': 'Round table guide',
+    'component.menu.meeting': 'Roundtable',
     'component.menu.title2': 'Menu Title 2',
     'component.menu.workspace': 'Workspace',
     'component.menu.workflow': 'Workflow',
