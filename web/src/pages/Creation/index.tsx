@@ -40,7 +40,6 @@ const Creation: React.FC = () => {
     const [CreationContent, setCreationContent] = useState('');
     const [CardData, setCardData] = useState(null);
     const [showTab, showTabfun] = useState(false);
-    
 
     const [establishModal, setEstablishModal] = useState(false);
     const [CreationType, setcreationType] = useState({
@@ -142,7 +141,7 @@ const Creation: React.FC = () => {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [lastCheck, setLastCheck] = useState(Date.now());
     const { shouldComponentUpdate, clearUpdateNotification } = useUserStore();
-    const [showModelType, setShowModelType] = useState(false);
+    const [showModelType, setShowModelType] = useState(true);
     const getChatRoomList = async (
         page?: any,
         searchTypedata?: any,
@@ -174,18 +173,18 @@ const Creation: React.FC = () => {
             setHasMore(false);
         }
     };
-    debugger
+
     useEffect(() => {
         getlist();
-      
+
         if (location.pathname == '/knowledgebase') {
             let item = {
                 apps_mode: 3,
                 name: intl.formatMessage({ id: 'creation.repository' }),
                 path: 'Createkb',
             };
-            setShowModelType(true)
-            
+            setShowModelType(false);
+
             appModalChange(item);
         } else {
             showTabfun(true);
@@ -307,7 +306,9 @@ const Creation: React.FC = () => {
         const newtype = optionsModal.filter((value: any) => {
             return value.apps_mode == creationsearchdata('GET').optionsModalId;
         });
-
+        if (location.pathname == '/knowledgebase') {
+            setShowModelType(false);
+        }
         setEstablishModal(true);
         setcreationType(
             newtype[0]?.apps_mode !== 6
