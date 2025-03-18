@@ -23,31 +23,6 @@ interface TodoTagProps {
     onClick?: (e: React.MouseEvent) => void;
 }
 
-const TodoTag = memo(({ humanConfirmInfo, userId, onClick }: TodoTagProps) => {
-    const intl = useIntl();
-    const isSelfTodo = humanConfirmInfo?.some(x => x.user_id == userId);
-
-    return (
-        <Tooltip
-            title={intl.formatMessage(
-                { id: 'workflow.tooltip.confirmer' },
-                {
-                    users: humanConfirmInfo?.map(x => x.nickname).join(','),
-                },
-            )}
-        >
-            <Tag
-                className="flex items-center justify-center"
-                color="blue"
-                onClick={isSelfTodo ? onClick : undefined}
-            >
-                {intl.formatMessage({
-                    id: isSelfTodo ? 'workflow.needHumanConfirm1' : 'workflow.needHumanConfirm2',
-                })}
-            </Tag>
-        </Tooltip>
-    );
-});
 
 const DetailContent = memo(({ endRun }: { endRun: any }) => {
     const intl = useIntl();
@@ -116,6 +91,7 @@ export default memo(() => {
     const [runList, setRunList] = useState([]);
     const [tabKey, setTabKey] = useState('4');
     const [endRun, setEndRun] = useState(null);
+    const [detail, setDetail] = useState(null);
     const prevConfirmDealtWith = useUserStore(state => state.prevConfirmDealtWith);
 
     const [appRunId, setAppRunId] = useState(null);
@@ -202,7 +178,7 @@ export default memo(() => {
                     const list = res?.data?.list || [];
 
                     setRunList(list);
-
+                    setDetail(res?.data?.app_run_data?.[0]);
                     const appRunData = res?.data?.app_run_data?.[0];
                     if (appRunData?.status === 2 || appRunData?.status === 3) {
                         setEndRun({
@@ -223,7 +199,7 @@ export default memo(() => {
     );
 
     const TrackContentWrapper = memo(() => {
-        return <TrackContent runList={runList} onClose={onClose} updateKey={updateCounter} />;
+        return <TrackContent detail={detail} runList={runList} onClose={onClose} updateKey={updateCounter} />;
     });
 
     if (!runPanelShow) {
@@ -238,6 +214,7 @@ export default memo(() => {
             title={
                 <Typography.Title level={5}>
                     {intl.formatMessage({ id: 'workflow.runLogs' })}
+                    {detail?.type === 1 && ` (${intl.formatMessage({ id: 'workflow.debugRun' })})`}
                 </Typography.Title>
             }
             bodyStyle={{

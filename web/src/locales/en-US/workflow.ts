@@ -341,4 +341,6 @@ export default {
     'skill.result.output.type.database': 'Database',
     'skill.result.output.type.code': 'Code',
     'skill.result.output.type.document': 'Document',
+    'workflow.debugRun': 'Debug Run',
+    'workflow.debugTodo': 'Debug Todo',
 };
