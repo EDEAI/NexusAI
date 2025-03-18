@@ -860,7 +860,9 @@ async def chat_single_message_generation(chatroom_id: int, chat_request: ChatSin
             'chatroom_id': chatroom_id,
             'name': f'Chat_single_message_generation_{start_datetime_str}',
             'status': 3,
-            'outputs': outputs
+            'outputs': outputs,
+            'finished_time': start_datetime_str,
+            'updated_time': start_datetime_str
         }
     )
     record_id = AIToolLLMRecords().insert(
