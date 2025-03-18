@@ -4,7 +4,7 @@ import { headportrait } from '@/utils/useUser';
 import { EllipsisOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
-import { Col, Dropdown, Empty, message, Modal, Row, Spin, Switch } from 'antd';
+import { Col, Dropdown, Empty, message, Modal, Row, Spin, Button } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 import CreationChatRoom from '../components/CreationChatRoom/index';
@@ -243,14 +243,14 @@ const MeetingCont = () => {
             >
                 <div className="px-[30px] pt-[30px]">
                     <Row gutter={[20, 20]} style={{ margin: 0 }}>
-                        {closeLoading && (
+                        {meeting && meeting.list.length && closeLoading ? (
                             <AddRoom
                                 setCreateShow={setCreateShow}
                                 isUpdataChatRoom={isUpdataChatRoom}
                                 intl={intl}
                                 upDataId={upDataId}
                             ></AddRoom>
-                        )}
+                        ):<></>}
                         {meeting && meeting.list.length ? (
                             meeting.list.map((item: any, index: number) => (
                                 <Col
@@ -394,14 +394,37 @@ const MeetingCont = () => {
                             ))
                         ) : (
                             <>
-                                {!closeLoading && (
+                                {!closeLoading ? (
                                     <div
                                         className="w-full h-full flex items-center justify-center "
                                         style={{ height: 'calc(100vh - 300px)' }}
                                     >
                                         <Spin size="large" />
                                     </div>
-                                )}
+                                ):<>
+                                    <div className='w-full flex items-center flex-wrap justify-center mt-48'>
+                                        <div className="w-full flex items-center justify-center mb-2.5">
+                                            <img src="/icons/default.svg" alt="" />
+                                        </div>    
+                                        <div className="w-full text-center mb-3 text-[#666] text-sm">
+                                            {intl.formatMessage({ id: 'creation.margindescribe' })} ~
+                                        </div>
+                                        <div className="w-full text-center">
+                                            {' '}
+                                            <Button
+                                                color="primary"
+                                                onClick={() => {
+                                                    setCreateShow(true);
+                                                    isUpdataChatRoom.current = false;
+                                                    upDataId.current = 0;
+                                                }}
+                                            >
+                                                {intl.formatMessage({ id: 'app.chatroom_list.create' })}
+                                            </Button>{' '}
+                                        </div>
+                                    </div>                                
+                                
+                                </>}
                             </>
                         )}
                         {createShow ? (
