@@ -4,6 +4,7 @@ import useUserStore from '@/store/user';
 import useSocketStore from '@/store/websocket';
 import { CheckCircleOutlined, LoadingOutlined, SyncOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
+import { useLatest } from 'ahooks';
 import { Alert, Collapse, message, Tag, Tooltip } from 'antd';
 import _ from 'lodash';
 import { memo, useEffect } from 'react';
@@ -27,6 +28,7 @@ export const TrackContent = memo(
         const flowMessage = useSocketStore(state => state.flowMessage);
         const saveWorkFlow = useSaveWorkFlow();
         const userId = JSON.parse(localStorage.getItem('userInfo') || '{}')?.uid;
+        const lastDetail = useLatest(detail);
 
         useEffect(() => {
             console.log('TrackContent received runList:', runList.length, 'updateKey:', updateKey);
@@ -46,7 +48,9 @@ export const TrackContent = memo(
         // TodoTag 内联定义
         const TodoTag = ({ humanConfirmInfo, userId, onClick }) => {
             const isSelfTodo = humanConfirmInfo?.some(x => x.user_id == userId);
-            if (detail?.type == 1) {
+            console.log(runList, detail);
+            debugger;
+            if (lastDetail?.current?.type == 1) {
                 return (
                     <Tooltip
                         title={intl.formatMessage({
@@ -93,7 +97,12 @@ export const TrackContent = memo(
                         if (!nodeInfo) return null;
 
                         if (item?.child_executions?.length) {
-                            return <TrackContent runList={item?.child_executions} />;
+                            return (
+                                <TrackContent
+                                    detail={lastDetail?.current}
+                                    runList={item?.child_executions}
+                                />
+                            );
                         }
 
                         if (nodeInfo.status === 3 || (nodeInfo.status === 2 && item?.children)) {
@@ -153,7 +162,10 @@ export const TrackContent = memo(
                                         )}
 
                                     {item?.child_executions && (
-                                        <TrackContent runList={item?.child_executions} />
+                                        <TrackContent
+                                            detail={lastDetail?.current}
+                                            runList={item?.child_executions}
+                                        />
                                     )}
 
                                     {nodeInfo.outputs &&
