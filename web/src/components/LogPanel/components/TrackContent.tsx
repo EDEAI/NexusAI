@@ -53,10 +53,7 @@ export const TrackContent = memo(
                             id: 'workflow.debugRunWait',
                         })}
                     >
-                        <Tag
-                            className="flex items-center justify-center"
-                            color="blue"
-                        >
+                        <Tag className="flex items-center justify-center" color="blue">
                             {intl.formatMessage({ id: 'workflow.debugTodo' })}
                         </Tag>
                     </Tooltip>
@@ -64,15 +61,12 @@ export const TrackContent = memo(
             }
             return (
                 <Tooltip
-                    title={
-                      
-                            intl.formatMessage(
-                                  { id: 'workflow.tooltip.confirmer' },
-                                  {
-                                      users: humanConfirmInfo?.map(x => x.nickname).join(','),
-                                  },
-                              )
-                    }
+                    title={intl.formatMessage(
+                        { id: 'workflow.tooltip.confirmer' },
+                        {
+                            users: humanConfirmInfo?.map(x => x.nickname).join(','),
+                        },
+                    )}
                 >
                     <Tag
                         className="flex items-center justify-center"
@@ -105,7 +99,7 @@ export const TrackContent = memo(
                         if (nodeInfo.status === 3 || (nodeInfo.status === 2 && item?.children)) {
                             return (
                                 <div className="flex flex-col gap-2">
-                                    {nodeInfo?.need_human_confirm ? (
+                                    {nodeInfo?.need_human_confirm?.length > 0 ? (
                                         <div>
                                             <Alert
                                                 message={
@@ -307,6 +301,11 @@ export const TrackContent = memo(
                     return (
                         <div className="user-collapse" key={`${item.id || index}-${updateKey}`}>
                             <Collapse
+                                defaultActiveKey={
+                                    item?.child_executions?.length && nodeInfo.status == 2
+                                        ? '1'
+                                        : '2'
+                                }
                                 items={[
                                     {
                                         key: '1',
