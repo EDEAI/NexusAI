@@ -267,9 +267,9 @@ class Workspaces(MySQL):
                             app_node['status'] = task_result['status']
                             app_node['error'] = task_result['error']
                             app_node['outputs'] = flatten_variable_with_values(create_variable_from_dict(task_result['outputs'])) if task_result['outputs'] else {}
-                            if app_node['node_type'] in ['llm', 'agent']:
+                            if app_node['node_type'] in ['llm', 'agent'] and app_node['outputs']:
                                 app_node['outputs_md'] = get_first_variable_value(create_variable_from_dict(task_result['outputs']))
-                            elif app_node['node_type'] in ['recursive_task_generation', 'recursive_task_execution']:
+                            elif app_node['node_type'] in ['recursive_task_generation', 'recursive_task_execution'] and app_node['outputs']:
                                 task_dict = json.loads(get_first_variable_value(create_variable_from_dict(task_result['outputs'])))
                                 app_node['outputs_md'] = create_recursive_task_category_from_dict(task_dict).to_markdown()
                             else:
