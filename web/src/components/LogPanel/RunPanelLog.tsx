@@ -223,7 +223,7 @@ export default memo(() => {
     );
 
     const TrackContentWrapper = memo(() => {
-        return <TrackContent runList={runList} updateKey={updateCounter} />;
+        return <TrackContent runList={runList} onClose={onClose} updateKey={updateCounter} />;
     });
 
     if (!runPanelShow) {

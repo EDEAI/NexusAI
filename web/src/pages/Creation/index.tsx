@@ -15,11 +15,12 @@ import {
 import React, { useEffect, useState } from 'react';
 // import {Ellipsis} from '@ant-design/pro-components';
 import { DeleteCreation, GetChatroom, PutappsUpdate } from '@/api/creation';
-import { bindTag, unBindTag } from '@/api/workflow';
+import { bindTag } from '@/api/workflow';
 import Headportrait from '@/components/headportrait';
 import Scroll from '@/components/InfiniteScroll';
 import TagSearch, { TagSelect } from '@/components/TagSearch';
-import useUserStore from '@/store/user';
+import { useTagStore } from '@/store/tags';
+import useUserStore, { UPDATE_NOTIFICATIONS } from '@/store/user';
 import { createappdata, creationsearchdata, getlist, headportrait } from '@/utils/useUser';
 import { useIntl } from '@umijs/max';
 import moment from 'moment';
@@ -27,10 +28,6 @@ import { history } from 'umi';
 import CreationModal from '../../components/creationModal';
 import AddCreation from './components/AddCreation';
 import Profilephoto from './components/profilephoto';
-import { use } from '@reactuses/core';
-import { useMount, useUpdateEffect } from 'ahooks';
-import { useTagStore } from '@/store/tags';
-import { UPDATE_NOTIFICATIONS } from '@/store/user';
 const { Text, Paragraph } = Typography;
 
 const { TextArea } = Input;
@@ -43,6 +40,7 @@ const Creation: React.FC = () => {
     const [CreationContent, setCreationContent] = useState('');
     const [CardData, setCardData] = useState(null);
     const [showTab, showTabfun] = useState(false);
+    
 
     const [establishModal, setEstablishModal] = useState(false);
     const [CreationType, setcreationType] = useState({
@@ -53,7 +51,7 @@ const Creation: React.FC = () => {
         signicon: '/icons/creation/pitchagent.svg',
         apps_mode: 1,
     }); //1: agent 2: workflow 3: dataset 4: custom tool
-    const optionsModal = [
+    let optionsModal = [
         {
             apps_mode: 6,
             name: intl.formatMessage({ id: 'creation.all' }),
@@ -100,6 +98,19 @@ const Creation: React.FC = () => {
             signicon: '/icons/creation/signskill.svg',
         },
     ];
+    if (location.pathname == '/knowledgebase') {
+        optionsModal = [
+            {
+                apps_mode: 3,
+                name: intl.formatMessage({ id: 'creation.repository' }),
+                path: 'Createkb',
+                icon: '/icons/creation/zhishik1.svg',
+                unselected: '/icons/creation/unselectedrepository.svg',
+                pitchicon: '/icons/creation/pitchzhishik.svg',
+                signicon: '/icons/creation/signzhishik.svg',
+            },
+        ];
+    }
 
     const [optionsModalId, setOptionsModalId] = useState(6);
     const [searchType, setSearchType] = useState(false);
@@ -128,10 +139,10 @@ const Creation: React.FC = () => {
     ]); //1: agent 2: workflow 3: dataset 4: custom tool 5: chatroom
     const [loading, setLoading] = useState(true);
     const [opensetting, setOpensetting] = useState(-1);
-    const [selectedTags, setSelectedTags]=useState<string[]>([]);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [lastCheck, setLastCheck] = useState(Date.now());
     const { shouldComponentUpdate, clearUpdateNotification } = useUserStore();
-
+    const [showModelType, setShowModelType] = useState(false);
     const getChatRoomList = async (
         page?: any,
         searchTypedata?: any,
@@ -147,7 +158,7 @@ const Creation: React.FC = () => {
             search_type: creationsearchdata('GET').searchType == true ? 2 : 1,
             apps_mode: creationsearchdata('GET').optionsModalId,
             apps_name: apps_name || apps_name == '' ? apps_name : fuzzySearchName,
-            tag_ids:tag_ids?tag_ids.join(','):''
+            tag_ids: tag_ids ? tag_ids.join(',') : '',
         };
         setLoading(true);
         let res = await GetChatroom(parameter);
@@ -163,15 +174,18 @@ const Creation: React.FC = () => {
             setHasMore(false);
         }
     };
+    debugger
     useEffect(() => {
         getlist();
-
+      
         if (location.pathname == '/knowledgebase') {
             let item = {
                 apps_mode: 3,
                 name: intl.formatMessage({ id: 'creation.repository' }),
                 path: 'Createkb',
             };
+            setShowModelType(true)
+            
             appModalChange(item);
         } else {
             showTabfun(true);
@@ -198,9 +212,9 @@ const Creation: React.FC = () => {
         setFuzzySearchName(e.target.value);
         getChatRoomList(1, searchType, optionsModalId, e.target.value);
     };
-    useEffect(()=>{
-        getChatRoomList(1, searchType, optionsModalId, fuzzySearchName,null,null,selectedTags);
-    },[selectedTags])
+    useEffect(() => {
+        getChatRoomList(1, searchType, optionsModalId, fuzzySearchName, null, null, selectedTags);
+    }, [selectedTags]);
     const handleCancel = () => {
         setIsModalOpen(false);
     };
@@ -293,9 +307,10 @@ const Creation: React.FC = () => {
         const newtype = optionsModal.filter((value: any) => {
             return value.apps_mode == creationsearchdata('GET').optionsModalId;
         });
+
         setEstablishModal(true);
         setcreationType(
-            newtype[0].apps_mode !== 6
+            newtype[0]?.apps_mode !== 6
                 ? newtype[0]
                 : {
                       name: 'Agent',
@@ -321,48 +336,43 @@ const Creation: React.FC = () => {
     //     },
     // ]);
     const { tags, fetchTags } = useTagStore();
-    
+
     useEffect(() => {}, [optionsModalId]);
 
- 
     useEffect(() => {
         const checkUpdate = () => {
             if (shouldComponentUpdate(UPDATE_NOTIFICATIONS.AGENT_LIST, lastCheck)) {
-          
-                const notification = useUserStore.getState().updateNotifications.get(UPDATE_NOTIFICATIONS.AGENT_LIST);
-                
-           
+                const notification = useUserStore
+                    .getState()
+                    .updateNotifications.get(UPDATE_NOTIFICATIONS.AGENT_LIST);
+
                 if (notification?.payload?.action === 'create') {
-             
                     getChatRoomList(1, null);
                 } else {
-                  
                     getChatRoomList(1, null);
                 }
-            
+
                 setLastCheck(Date.now());
-             
+
                 clearUpdateNotification(UPDATE_NOTIFICATIONS.AGENT_LIST);
             }
             if (shouldComponentUpdate(UPDATE_NOTIFICATIONS.SKILL_LIST, lastCheck)) {
-          
-                const notification = useUserStore.getState().updateNotifications.get(UPDATE_NOTIFICATIONS.SKILL_LIST);
-                
-           
+                const notification = useUserStore
+                    .getState()
+                    .updateNotifications.get(UPDATE_NOTIFICATIONS.SKILL_LIST);
+
                 if (notification?.payload?.action === 'create') {
-             
                     getChatRoomList(4, null);
                 } else {
-                  
                     getChatRoomList(4, null);
                 }
-            
+
                 setLastCheck(Date.now());
-             
+
                 clearUpdateNotification(UPDATE_NOTIFICATIONS.SKILL_LIST);
             }
         };
-    
+
         const timer = setInterval(checkUpdate, 1000);
         return () => clearInterval(timer);
     }, [shouldComponentUpdate, lastCheck]);
@@ -425,14 +435,15 @@ const Creation: React.FC = () => {
                         <TagSearch
                             allowClear
                             modes={creationsearchdata('GET').optionsModalId}
-                            placeholder={intl.formatMessage({ id: 'creation.placeholder.selectTags' })}
+                            placeholder={intl.formatMessage({
+                                id: 'creation.placeholder.selectTags',
+                            })}
                             onTagChange={() => {
                                 fetchTags();
                             }}
-                            onChange={(e)=>{
-                                setSelectedTags(e)
+                            onChange={e => {
+                                setSelectedTags(e);
                             }}
-                            
                         ></TagSearch>
                     </div>
                     <div className=" mr-5">
@@ -606,7 +617,7 @@ const Creation: React.FC = () => {
                                                                                   </div>
                                                                                   <div>
                                                                                       {item.published_time ? (
-                                                                                          <span className='text-[#1B64F3]'>
+                                                                                          <span className="text-[#1B64F3]">
                                                                                               {moment(
                                                                                                   item.published_time,
                                                                                               ).format(
@@ -689,36 +700,36 @@ const Creation: React.FC = () => {
                                                                           /> */}
                                                                           <TagSelect
                                                                               onBlur={e => {
-                                                                                //   const changeList=item.changeTags||(item.tags.map(x=>x.id))
-                                                                                //   const removeList=item.tags.filter(x=>!changeList.some(y=>y==x.id)).map(x=>x.id)
-                                                                                //   if(removeList?.length){
-                                                                                //     unBindTag(removeList,item.app_id).then(res=>{
-                                                                                //         item.tags=item.changeTags
-                                                                                //     })
-                                                                                //   }
-                                                                                //   if(item.changeTags?.length){
-                                                                                    bindTag(item.changeTags, [
-                                                                                        item.app_id,
-                                                                                    ]);
-                                                                                //   }
-                                                                                  
+                                                                                  //   const changeList=item.changeTags||(item.tags.map(x=>x.id))
+                                                                                  //   const removeList=item.tags.filter(x=>!changeList.some(y=>y==x.id)).map(x=>x.id)
+                                                                                  //   if(removeList?.length){
+                                                                                  //     unBindTag(removeList,item.app_id).then(res=>{
+                                                                                  //         item.tags=item.changeTags
+                                                                                  //     })
+                                                                                  //   }
+                                                                                  //   if(item.changeTags?.length){
+                                                                                  bindTag(
+                                                                                      item.changeTags,
+                                                                                      [item.app_id],
+                                                                                  );
+                                                                                  //   }
                                                                               }}
                                                                               listStyle="horizontal"
                                                                               key={item.app_id}
                                                                               onChange={e => {
-                                                                                // const removeList=item.tags.filter(x=>!(e).some(y=>y==x.id)).map(x=>x.id||x)
-                                                                                // if(removeList?.length){
-                                                                                //     unBindTag(removeList,item.app_id).then(res=>{
-                                                                                //         item.tags=e
-                                                                                //     })
-                                                                                // }
-                                                                                item.changeTags=e;
+                                                                                  // const removeList=item.tags.filter(x=>!(e).some(y=>y==x.id)).map(x=>x.id||x)
+                                                                                  // if(removeList?.length){
+                                                                                  //     unBindTag(removeList,item.app_id).then(res=>{
+                                                                                  //         item.tags=e
+                                                                                  //     })
+                                                                                  // }
+                                                                                  item.changeTags =
+                                                                                      e;
 
-                                                                                //   bindTag(e, [
-                                                                                //       item.app_id,
-                                                                                //   ]);
+                                                                                  //   bindTag(e, [
+                                                                                  //       item.app_id,
+                                                                                  //   ]);
                                                                               }}
-                                                                              
                                                                               placeholder={intl.formatMessage(
                                                                                   {
                                                                                       id: 'addTag.addTag',
@@ -1045,7 +1056,7 @@ const Creation: React.FC = () => {
             <CreationModal
                 setIsModalOpen={setEstablishModal} //Toggle modal switch
                 isModalOpen={establishModal} //Toggle modal switch
-                ModalType={true} //Toggle button display
+                ModalType={showModelType} //Toggle button display
                 CreationType={CreationType} //Card creation type { name: "Agent", path: "Agents", id: 1, }
                 setcreationType={setcreationType} //Toggle card button type (optional)
                 transformData={optionsModal.filter((item: any) => {

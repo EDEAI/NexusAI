@@ -68,4 +68,6 @@ export default {
     'agent.log.no.output': '暂无输出',
     'agent.log.corrections': '修正记录',
     'app.workflow.log.title': '应用日志',
+    'workflow.resetRun': '重新运行',
+    'workflow.resetRunSuccess': '重新运行成功',
 };

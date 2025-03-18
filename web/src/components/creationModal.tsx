@@ -36,8 +36,8 @@ const CreationModal: React.FC<ChildProps> = ({
         id: 1,
         icon: '/icons/headportrait/Android.svg',
     });
-    const { setAgentCreateOpen,setSkillCreateOpen } = useUserStore();
-    useEffect(() => {}, []);
+    const { setAgentCreateOpen, setSkillCreateOpen } = useUserStore();
+
 
     const IconName = (e: any) => {
         setCreationName(e.target.value);

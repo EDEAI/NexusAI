@@ -9,7 +9,7 @@ export default {
     'app.workflow.backlogs.empty': 'No backlog items',
 
     'app.workflow.ra.title': 'Recent Activity',
-    'app.workflow.re.empty': 'No recent activity',
+    'app.workflow.ra.empty': 'No recent activity',
     'app.workflow.log.title': 'Logs',
     'app.workflow.log.empty': 'No workflow logs',
 

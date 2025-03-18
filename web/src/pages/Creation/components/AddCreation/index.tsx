@@ -67,7 +67,6 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
             apps_mode: 3,
         })
     }
-
    
     const [isModalOpen, setIsModalOpen] = useState(false); // Create modal
     const [CreationType, setcreationType] = useState({
@@ -329,7 +328,7 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
             <CreationModal
                 setIsModalOpen={setIsModalOpen} // Toggle modal switch
                 isModalOpen={isModalOpen} // Toggle modal switch
-                ModalType={showPopupTop} // Toggle button display
+                ModalType={location.pathname!='/knowledgebase'} // Toggle button display
                 CreationType={CreationType} // Card creation type { name: "Agent", path: "Agents", id: 1, }
                 setcreationType={setcreationType} // Toggle card button type (optional)
                 transformData={transformData} // Button switch type total type (optional)

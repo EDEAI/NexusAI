@@ -17,7 +17,7 @@ import user from './en-US/user';
 import workflow from './en-US/workflow';
 
 export default {
-    'navBar.lang': 'Languages',
+    'navBar.lang': 'Language',
     'layout.user.link.help': 'Help',
     'layout.user.link.privacy': 'Privacy',
     'layout.user.link.terms': 'Terms',
@@ -68,4 +68,6 @@ export default {
     'agent.log.no.output': 'No Output',
     'agent.log.corrections': 'Correction Records',
     'app.workflow.log.title': 'Application Logs',
+    'workflow.resetRun': 'Reset Run',
+    'workflow.resetRunSuccess': 'Reset run successfully',
 };

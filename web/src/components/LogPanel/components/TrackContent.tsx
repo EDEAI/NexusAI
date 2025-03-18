@@ -1,6 +1,6 @@
 import { useIntl } from '@umijs/max';
 import { memo, useEffect } from 'react';
-import { Alert, Collapse, Tag, Tooltip } from 'antd';
+import { Alert, Collapse, message, Tag, Tooltip } from 'antd';
 import _ from 'lodash';
 import { 
     CheckCircleOutlined,
@@ -19,9 +19,10 @@ import useSaveWorkFlow from '../../WorkFlow/saveWorkFlow';
 interface TrackContentProps {
     runList: any[];
     updateKey?: number;
+    onClose?: () => void;
 }
 
-export const TrackContent = memo(({ runList = [], updateKey }: TrackContentProps) => {
+export const TrackContent = memo(({ runList = [], updateKey, onClose }: TrackContentProps) => {
     const intl = useIntl();
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
     const setFlowMessage = useSocketStore(state => state.setFlowMessage);
@@ -45,7 +46,7 @@ export const TrackContent = memo(({ runList = [], updateKey }: TrackContentProps
     
     // TodoTag 内联定义
     const TodoTag = ({ humanConfirmInfo, userId, onClick }) => {
-        const isSelfTodo = humanConfirmInfo?.some(x => x.user_id == userId);
+        const isSelfTodo = humanConfirmInfo?.some(x => x.user_id == userId)||true;
         return (
             <Tooltip
                 title={intl.formatMessage(
@@ -187,49 +188,33 @@ export const TrackContent = memo(({ runList = [], updateKey }: TrackContentProps
 
                 // NodeExtra 组件内联定义
                 const NodeExtra = () => {
-                    if (item.human) {
-                        if (nodeInfo?.status === 4) {
-                            return (
-                                <Tooltip
-                                    title={intl.formatMessage({
-                                        id: 'workflow.nodeRunErrorDes',
-                                    })}
-                                >
-                                    <Tag
-                                        icon={<SyncOutlined spin />}
-                                        color="error"
-                                        className="mr-0"
-                                        onClick={async e => {
-                                            e.stopPropagation();
-                                            await saveWorkFlow();
-                                            const res = await updateDealtWith(
-                                                item.data.node_exec_data.node_exec_id, 
-                                                {}
-                                            );
-                                            if (res.code === 0) {
-                                                delHumanMessage(item.data.node_exec_data.node_exec_id);
-                                            }
-                                        }}
-                                    >
-                                        {intl.formatMessage({ id: 'workflow.resetRun' })}
-                                    </Tag>
-                                </Tooltip>
-                            );
-                        }
+                    if (nodeInfo?.status === 4) {
                         return (
                             <Tooltip
-                                title={intl.formatMessage({ id: 'workflow.clickToBackLogs' })}
+                                title={intl.formatMessage({
+                                    id: 'workflow.nodeRunErrorDes',
+                                })}
                             >
                                 <Tag
                                     icon={<SyncOutlined spin />}
-                                    color="processing"
+                                    color="error"
                                     className="mr-0"
-                                    onClick={e => {
+                                    onClick={async e => {
                                         e.stopPropagation();
-                                        setDealtWithData(item);
+                                        console.log(item);
+                                        
+                                        const res = await updateDealtWith(
+                                            item.id, 
+                                            {}
+                                        );
+                                        if (res.code === 0) {
+                                            message.success(intl.formatMessage({ id: 'workflow.resetRunSuccess' }));
+                                            // delHumanMessage(item.data.node_exec_data.node_exec_id);
+                                            onClose?.()
+                                        }
                                     }}
                                 >
-                                    {intl.formatMessage({ id: 'workflow.backlogs' })}
+                                    {intl.formatMessage({ id: 'workflow.resetRun' })}
                                 </Tag>
                             </Tooltip>
                         );
