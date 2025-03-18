@@ -199,6 +199,7 @@ export default memo(() => {
     );
 
     const TrackContentWrapper = memo(() => {
+        
         return <TrackContent detail={detail} runList={runList} onClose={onClose} updateKey={updateCounter} />;
     });
 
