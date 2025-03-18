@@ -68,6 +68,7 @@ services:
       - ./multi_service/vdb_migrations:/NexusAI/docker/multi_service/vdb_migrations
       - ./volumes/upload_files:/NexusAI/upload_files
       - ../models:/NexusAI/models
+      - ./volumes/storage:/NexusAI/storage
     depends_on:
       - mariadb
       - redis
