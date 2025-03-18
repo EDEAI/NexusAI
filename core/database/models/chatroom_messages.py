@@ -85,7 +85,7 @@ class ChatroomMessages(MySQL):
         if offset != 0:
             if total_count - (page * page_size) < 0:
                 list = self.select(
-                    columns=["apps.name", "apps.description", "apps.icon", "apps.icon_background",
+                    columns=["apps.name", "apps.description", "apps.icon", "apps.avatar", "apps.icon_background",
                              "chatroom_messages.id",
                              "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id",
                              "chatroom_messages.user_id",
@@ -103,7 +103,7 @@ class ChatroomMessages(MySQL):
                 )
             else:
                 list = self.select(
-                    columns=["apps.name", "apps.description", "apps.icon", "apps.icon_background", "chatroom_messages.id",
+                    columns=["apps.name", "apps.description", "apps.icon", "apps.avatar", "apps.icon_background", "chatroom_messages.id",
                              "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id", "chatroom_messages.user_id",
                              "chatroom_messages.agent_id", "chatroom_messages.message", "chatroom_messages.is_read",
                              "chatroom_messages.created_time"],
@@ -128,7 +128,7 @@ class ChatroomMessages(MySQL):
         if offset == 0:
             if total_count > 0:
                 list = self.select(
-                    columns=["apps.name", "apps.description", "apps.icon", "apps.icon_background",
+                    columns=["apps.name", "apps.description", "apps.icon", "apps.avatar", "apps.icon_background",
                              "chatroom_messages.id",
                              "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id",
                              "chatroom_messages.user_id",
@@ -209,7 +209,7 @@ class ChatroomMessages(MySQL):
                     ],
                     conditions=[
                         {'column': 'id', 'value': agent_id},
-                        {'column': 'status', 'value': 1},
+                        # {'column': 'status', 'value': 1},
                     ]
                 )
                 name = info['name']

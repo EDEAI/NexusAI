@@ -189,9 +189,16 @@ type TypedMessageMap = {
     [key: string]: any[];
 };
 
+type AppRunMessageMap = {
+    [app_run_id: number]: {
+        [messageType: string]: any[];
+    };
+};
+
 interface FlowState {
     flowMessage: any[];
     typedMessages: Partial<TypedMessageMap>;
+    appRunMessages: AppRunMessageMap;
     dealtWithData: any;
     lastMessage: any;
     setLastMessage: (message: any) => void;
@@ -203,6 +210,9 @@ interface FlowState {
     getTypedLastMessage: <T extends MessageType>(type: T) => Partial<TypedMessageMap>[T] | null;
     filterMessages: (type: string, filterData?: any) => any[];
     fuzzyFilterMessages: (typePattern: string) => any[];
+
+    getAppRunMessages: (appRunId: number) => Record<string, any[]> | undefined;
+    getAppRunMessagesByType: (appRunId: number, type: string) => any[];
 }
 
 const useSocketStore = create(
@@ -210,6 +220,7 @@ const useSocketStore = create(
         (set, get) => ({
             flowMessage: [],
             typedMessages: {},
+            appRunMessages: {},
             dealtWithData: null,
             lastMessage: null,
             setLastMessage: (message: any) => {
@@ -222,18 +233,40 @@ const useSocketStore = create(
                 set(state => {
                     const newFlowMessage = [...state.flowMessage, message];
                     const type = message.type as MessageType;
-                    console.log('typedMessages222222');
+                    
+                 
+                    const appRunId = message.data?.app_run_id;
+                    const newAppRunMessages = { ...state.appRunMessages };
+                    
+                    if (appRunId !== undefined) {
+                        if (!newAppRunMessages[appRunId]) {
+                            newAppRunMessages[appRunId] = {};
+                        }
+                        
+                        if (!newAppRunMessages[appRunId][type]) {
+                            newAppRunMessages[appRunId][type] = [];
+                        }
+                        
+                        newAppRunMessages[appRunId][type] = [
+                            ...newAppRunMessages[appRunId][type],
+                            message
+                        ];
+                    }
+               
                     return {
                         flowMessage: newFlowMessage,
                         typedMessages: {
                             ...state.typedMessages,
                             [type]: [...(state.typedMessages[type] || []), message],
                         },
+                        lastMessage: message,
+                        appRunMessages: newAppRunMessages,
                     };
                 });
             },
             setFlowMessage: message => {
                 set(state => {
+                  
                     const typedMessages = message.reduce((acc, msg) => {
                         const type = msg.type as MessageType;
                         return {
@@ -241,10 +274,31 @@ const useSocketStore = create(
                             [type]: [...(acc[type] || []), msg],
                         };
                     }, {} as TypedMessageMap);
+                    
+                
+                    const appRunMessages = message.reduce((acc, msg) => {
+                        const appRunId = msg.data?.app_run_id;
+                        const type = msg.type as string;
+                        
+                        if (appRunId !== undefined) {
+                            if (!acc[appRunId]) {
+                                acc[appRunId] = {};
+                            }
+                            
+                            if (!acc[appRunId][type]) {
+                                acc[appRunId][type] = [];
+                            }
+                            
+                            acc[appRunId][type].push(msg);
+                        }
+                        
+                        return acc;
+                    }, {} as AppRunMessageMap);
 
                     return {
                         flowMessage: message,
                         typedMessages,
+                        appRunMessages,
                     };
                 });
             },
@@ -256,6 +310,13 @@ const useSocketStore = create(
             },
             getMessage: () => {
                 return get().flowMessage;
+            },
+         
+            getAppRunMessages: (appRunId) => {
+                return get().appRunMessages[appRunId];
+            },
+            getAppRunMessagesByType: (appRunId, type) => {
+                return get().appRunMessages[appRunId]?.[type] || [];
             },
             filterMessages: (type, filterData) => {
                 let messageList = get().flowMessage.filter(item => item.type === type);

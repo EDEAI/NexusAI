@@ -90,8 +90,7 @@ export const getVarFromData = (node, findKey) => {
 };
 
 const getDefaultModelId = () => {
-    const modelList = useStore?.getState()?.modelData?.list;
-    return modelList[0]?.model_config_id;
+    return useStore?.getState()?.modelOptionsData?.defaultValue;
 };
 export const transformer = {
     [BlockEnum.Start]: {
@@ -156,6 +155,7 @@ export const transformer = {
                 },
                 prompt: {},
             };
+
             getDefaultModelId();
             getVarFromData(node, 'import_to_knowledge_base.')?.forEach(({ key, value, output }) => {
                 if (!value) return;

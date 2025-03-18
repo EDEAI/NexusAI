@@ -4,7 +4,7 @@ import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { useIntl, useSearchParams } from '@umijs/max';
 import { useRef, useState } from 'react';
-import LogDetail from './LogDetail';
+import LogDetail from '../../../components/LogPanel/LogDetail';
 export const waitTimePromise = async (time: number = 100) => {
     return new Promise(resolve => {
         setTimeout(() => {

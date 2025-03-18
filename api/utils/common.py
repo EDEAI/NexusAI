@@ -74,7 +74,7 @@ def extract_file_list_from_skill_output(outputs: dict, node_data_dict: dict) -> 
     """
     file_list = []
     # outputs = result['data']['outputs']
-    storage_url = f"{os.getenv('STORAGE_URL', '')}/file"
+    storage_url = f"{settings.STORAGE_URL}/file"
     output_vars = create_variable_from_dict(node_data_dict)
     file_vars = output_vars.extract_file_variables()
     for var in file_vars.properties.values():

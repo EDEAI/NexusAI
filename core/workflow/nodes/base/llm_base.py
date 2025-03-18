@@ -192,12 +192,12 @@ class LLMBaseNode(Node):
             raise Exception("Model configuration not found.")
         
         llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
-        if return_json:
+        if return_json and not (model_info["supplier_name"] == "OpenAI" and model_info["model_name"] in ["o1-preview", "o1-mini"]):
             llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
         llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config, schema_key=self.schema_key)
 
         messages, input = self._prepare_messages_and_input(
-            app_run_id=app_run_id, 
+            app_run_id=app_run_id,
             edge_id=edge_id,
             context=context,
             retrieval_chain=retrieval_chain,
@@ -213,7 +213,14 @@ class LLMBaseNode(Node):
         if model_info["supplier_name"] == "Anthropic":
             messages.reorganize_messages()
 
-        ai_message = llm_pipeline.invoke(messages.to_langchain_format(not is_chat), input)
+        ai_message = llm_pipeline.invoke(
+            messages.to_langchain_format(
+                model_info["model_name"],
+                model_info["supplier_name"],
+                not is_chat
+            ),
+            input
+        )
         content = ai_message.content
         if return_json:
             content = self.extract_json_from_string(content)
@@ -265,11 +272,11 @@ class LLMBaseNode(Node):
             raise Exception("Model configuration not found.")
         
         llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
-        if return_json:
+        if return_json and not (model_info["supplier_name"] == "OpenAI" and model_info["model_name"] in ["o1-preview", "o1-mini"]):
             llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
         llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config, schema_key=self.schema_key)
         messages, input = self._prepare_messages_and_input(
-            app_run_id=app_run_id, 
+            app_run_id=app_run_id,
             edge_id=edge_id,
             context=context,
             retrieval_chain=retrieval_chain,
@@ -283,7 +290,11 @@ class LLMBaseNode(Node):
             messages.reorganize_messages()
 
         async def ainvoke():
-            llm_input = [(role, message.value.format(**input)) for role, message in messages.messages]
+            llm_input = messages.to_langchain_format(
+                model_info["model_name"],
+                model_info["supplier_name"],
+                False, input
+            )
 
             for _ in range(5):
                 try:

@@ -86,7 +86,7 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
         skill_model = CustomTools()
         skill_info = skill_model.select(
             columns=[
-                'app_id', 'published_time'
+                'id as skill_id', 'app_id', 'published_time'
             ],
             conditions=[
                 {"column": "status", "op": "in", "value": [1, 2]},
@@ -95,8 +95,10 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
             ]
         )
         skill_publish_time = {}
+        skill_ids = {}
         for skill_item in skill_info:
             skill_publish_time[skill_item['app_id']] = skill_item['published_time']
+            skill_ids[skill_item['app_id']] = skill_item['skill_id']
 
         for item in request['list']:
             if item['mode'] == 1:
@@ -112,7 +114,8 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
                     item['published_time'] = None
             elif item['mode'] == 3:
                 item['published_time'] = None
-            else:
+            elif item['mode'] == 4:
+                item['skill_id'] = skill_ids.get(item['app_id'])
                 if item['publish_status'] == 1:
                     item['published_time'] = skill_publish_time[item['app_id']]
                 else:
@@ -165,7 +168,7 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
         skill_model = CustomTools()
         skill_info = skill_model.select(
             columns=[
-                'app_id', 'published_time', 'users.nickname'
+                'id as skill_id', 'app_id', 'published_time', 'users.nickname'
             ],
             joins=[
                 ["left", "users", "users.id = custom_tools.user_id"],
@@ -178,9 +181,11 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
         )
         skill_publish_time = {}
         skill_publish_creator = {}
+        skill_ids = {}
         for skill_item in skill_info:
             skill_publish_time[skill_item['app_id']] = skill_item['published_time']
             skill_publish_creator[skill_item['app_id']] = skill_item['nickname']
+            skill_ids[skill_item['app_id']] = skill_item['skill_id']
 
         datasets_model = Datasets()
         datasets = datasets_model.select(
@@ -211,9 +216,14 @@ async def get_app_list(page: int, page_size: int, search_type: int, apps_name: s
             elif item['mode'] == 3:
                 item['published_time'] = None
                 item['published_creator'] = datasets_publish_creator[item['app_id']]
+            elif item['mode'] == 4:
+                item['skill_id'] = skill_ids.get(item['app_id'])
+                item['published_time'] = skill_publish_time.get(item['app_id'])
+                item['published_creator'] = skill_publish_creator.get(item['app_id'])
             else:
                 item['published_time'] = skill_publish_time[item['app_id']]
                 item['published_creator'] = skill_publish_creator[item['app_id']]
+
     return response_success(request)
 
 @router.post("/apps_create", response_model = ResAppsBaseCreateSchema)
@@ -237,6 +247,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
     name = data['name']
     mode = data['mode']
     description = data['description']
+    avatar = data.get('avatar', None)
     icon = data['icon']
     icon_background = data['icon_background']
     temporary_chatroom_id = data.get('temporary_chatroom_id', 0)
@@ -245,11 +256,15 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
         return response_error(get_language_content("name_is_required"))
     if mode not in [1,2,3,4]:
         return response_error(get_language_content("mode_can_only_input"))
+    if not avatar and not icon:
+        return response_error(get_language_content("avatar_or_icon_required"))
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     team_id = userinfo.team_id
     uid = userinfo.uid
 
+    if avatar and avatar.startswith('upload_files/'):
+        avatar = avatar.split('upload_files/')[-1]
 
     if mode == 3:
         publish_status =1
@@ -262,6 +277,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
         "user_id": uid,
         "name": name,
         "icon": icon,
+        "avatar": avatar,
         "icon_background": icon_background,
         "description": description,
         "mode": mode,
@@ -362,6 +378,7 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
     data = data.dict(exclude_unset=True)
     name = data['name']
     description = data['description']
+    avatar = data.get('avatar', None)
     icon = data['icon']
     icon_background = data['icon_background']
 
@@ -369,12 +386,17 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
         return response_error(get_language_content("app_id_is_required"))
     if not name:
         return response_error(get_language_content("name_is_required"))
+    if not avatar and not icon:
+        return response_error(get_language_content("avatar_or_icon_required"))
+    if avatar and avatar.startswith('upload_files/'):
+        avatar = avatar.split('upload_files/')[-1]
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     apps_data = {
         "name": name,
         "description": description,
         "icon": icon,
+        "avatar": avatar,
         "icon_background":icon_background,
         "updated_time": current_time
     }

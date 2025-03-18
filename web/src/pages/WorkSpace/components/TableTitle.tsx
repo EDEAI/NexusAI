@@ -7,24 +7,25 @@ import { headportrait } from '@/utils/useUser';
 import { useIntl } from '@umijs/max';
 import { Pagination, Typography } from 'antd';
 
-export const Title = ({ iconSrc, titleText, pagination }) => {
+export const Title = ({ iconSrc, titleText, pagination,showTotal=true, titleAfter=null }) => {
     const intl = useIntl();
     return (
         <div className="flex items-center gap-4">
             <img src={iconSrc} alt="" />
             <div>{titleText}</div>
+            
             <div>
                 <Pagination
                     size="small"
                     simple
                     showTotal={(total, range) =>
-                        `${intl.formatMessage({ id: 'app.workflow.title.1' })}${range[0]}-${
+                        showTotal?`${intl.formatMessage({ id: 'app.workflow.title.1' })}${range[0]}-${
                             range[1]
                         }${intl.formatMessage({
                             id: 'app.workflow.title.2',
                         })} / ${intl.formatMessage({
                             id: 'app.workflow.title.3',
-                        })}${total} ${intl.formatMessage({ id: 'app.workflow.title.2' })}`
+                        })}${total} ${intl.formatMessage({ id: 'app.workflow.title.2' })}`:null
                     }
                     current={pagination.current}
                     pageSize={pagination.pageSize}
@@ -33,6 +34,7 @@ export const Title = ({ iconSrc, titleText, pagination }) => {
                     onChange={pagination.onChange}
                 ></Pagination>
             </div>
+            {titleAfter}
         </div>
     );
 };

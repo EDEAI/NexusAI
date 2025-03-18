@@ -139,8 +139,8 @@ class Graph:
                 elif node_type == 'recursive_task_execution':
                     self._validate_task_execution_node(node_metadata)
 
-                # Only validate input config if node has input
-                if 'input' in node_metadata:
+                # Only validate input config if node has input and is not a human node
+                if 'input' in node_metadata and node_metadata['type'] != 'human':
                     self._validate_input_config(node_metadata)
 
         if start_node_count != 1:

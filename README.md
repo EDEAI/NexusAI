@@ -38,8 +38,8 @@ git clone https://github.com/EDEAI/NexusAI.git
 ## Initialize model, storage, and logs directories
 ```bash
 cd NexusAI
-mkdir -p models storage logs
-chmod 777 storage logs
+mkdir -p models storage logs upload_files
+chmod 777 storage logs upload_files
 ```
 
 ## Cloning the Embedding and Reranker models for offline mode
@@ -325,6 +325,16 @@ server {
         }
 
         add_header Content-Disposition "attachment";
+
+        try_files $uri =404;
+    }
+
+    location /upload {
+        alias NexusAI/upload_files; # Fill in the real path of the project
+
+        if ($request_filename ~ "/$|/[^\.]+$") {
+            return 403;
+        }
 
         try_files $uri =404;
     }

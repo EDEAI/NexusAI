@@ -3,7 +3,7 @@ export default {
     'app.dashboard.backlog': 'Backlogs',
     'app.dashboard.myagent': 'My Agent',
     'app.dashboard.workflow': 'Workflow',
-    'app.dashboard.run_log': 'Run Logs',
+    'app.dashboard.run_log': 'WorkflowRun Logs',
     'app.dashboard.team_agent': 'Organization Agents',
     'app.dashboard.team_workflow': 'Organization Workflows',
     'app.dashboard.title_button_1.1': 'Create Agent',

@@ -16,7 +16,6 @@ from core.workflow.nodes import *
 from celery_app import run_workflow_node
 from core.helper import push_to_websocket_queue, get_websocket_queue_length
 from languages import get_language_content
-from api.utils.common import extract_file_list_from_skill_output
 
 logger = Logger.get_logger('workflow_run')
 
@@ -231,9 +230,6 @@ def push_workflow_debug_message(
     :param first_task_exec_id: The ID of the first task execution record.
     :param node_exec_data: A dictionary containing the node execution data.
     """
-    if run_type != 1:
-        return
-    
     model_data = node_exec_data.pop('model_data', None)
     prompt_data = []
     if model_data:
@@ -259,6 +255,7 @@ def push_workflow_debug_message(
             task_dict = json.loads(get_first_variable_value(create_variable_from_dict(outputs)))
             node_exec_data['outputs_md'] = create_recursive_task_category_from_dict(task_dict).to_markdown()
         elif node.data['type'] in ['skill', 'custom_code', 'end']:
+            from api.utils.common import extract_file_list_from_skill_output
             file_list = extract_file_list_from_skill_output(node_exec_data['outputs'], node.data['output'].to_dict())
             # skill_output = node_exec_data['outputs']
             # storage_url = f"{os.getenv('STORAGE_URL', '')}/file"

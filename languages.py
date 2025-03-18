@@ -10,6 +10,10 @@ language_names = {
 # Define the language pack dictionary structure
 language_packs = {
     "en": {
+        "agent_run_type_1": "Agent Debugging",
+        "agent_run_type_2": "Workflow: {app_name} Invocation",
+        "agent_run_type_3": "Round Table: {app_name} Invocation",
+        "agent_run_type_4": "Round Table: {app_name} Guidance Execution",
         "requirement_category": {
             "system": """
                 You are a content categorization assistant.
@@ -39,7 +43,7 @@ language_packs = {
             {retrieved_docs_format}
             {reply_requirement}
             Finally, you must return a JSON dictionary in the following format:
-            {{"ability_id": ability ID (integer type), "output": content replied to the user in the corresponding format of the ability}}
+            {{"ability_id": ability ID (integer type), "output": content to reply to the user in the corresponding format of the ability}}
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
             ********************End of identity definition content********************
 
@@ -64,7 +68,6 @@ language_packs = {
 
             {retrieved_docs_format}
             {reply_requirement}
-            Finally, reply in the corresponding format of the ability.
             Note: The ID I provide to you is only for context recognition. Do not mention anything related to IDs in your response.
             ********************End of identity definition content********************
 
@@ -1049,8 +1052,16 @@ language_packs = {
         "team_members_not_open": "Not open to team members",
         "app_status_not_normal": "The application status is not normal",
         "skill_not_found": "Skill not found",
+        "chatroom_table_orientation": "round_table_orientation",
+        'round_table_orientation_operation': 'round_table_orientation_operation',
+        'avatar_or_icon_required': 'At least one avatar or icon needs to be filled in',
     },
     "zh": {
+        "agent_run_type_1": "调试运行",
+        "agent_run_type_2": "工作流：{app_name} 调用",
+        "agent_run_type_3": "圆桌：{app_name} 调用",
+        "agent_run_type_4": "圆桌：{app_name} 导向执行",
+
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
         'http_response_content_oversize': 'HTTP响应内容过大！最大不应超过{max_size}字节，而实际为{size}字节',
 
@@ -1351,6 +1362,9 @@ language_packs = {
         "team_members_not_open": "未向团队成员开放",
         "app_status_not_normal": "应用状态不正常",
         "skill_not_found": "未找到技能",
+        "chatroom_table_orientation": "圆桌导向",
+        'round_table_orientation_operation': '圆桌导向运行',
+        'avatar_or_icon_required': '头像或图标至少需要填写一个',
     }
 }
 

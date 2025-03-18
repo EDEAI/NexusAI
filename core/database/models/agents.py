@@ -107,7 +107,7 @@ class Agents(MySQL):
         )[0]["count_id"]
 
         list = self.select(
-            columns=["agents.id AS agent_id", "agents.app_id", "apps.name", "apps.description", "apps.icon",
+            columns=["agents.id AS agent_id", "agents.app_id", "apps.name", "apps.description", "apps.icon", "apps.avatar",
                      "apps.icon_background", "users.nickname", "users.avatar"],
             joins=[
                 ["left", "apps", "agents.app_id = apps.id"],

@@ -23,7 +23,7 @@ async def upload_file(file: UploadFile = File(...), userinfo: TokenData = Depend
     Returns:
         The ID of the newly created file.
     """
-    extensions_all = {'.txt', '.md', '.pdf', '.html', '.xlsx', '.xls', '.docx', '.csv'}
+    extensions_all = {'.txt', '.md', '.pdf', '.html', '.xlsx', '.xls', '.docx', '.csv', '.png', '.jpg', '.jpeg'}
     max_file_size = 15 * 1024 * 1024
     user_id = userinfo.uid
     filename = file.filename

@@ -71,6 +71,7 @@ def run_app(
             app_id = agent['app_id']
             run_type = 1 if agent['publish_status'] == 0 else 2
             app = Apps().get_app_by_id(app_id)
+            data_source_run_id = kwargs.get('data_source_run_id', 0)
             node = AgentNode(
                 title=app['name'],
                 desc=app['description'],
@@ -78,8 +79,9 @@ def run_app(
                 agent_id=id_,
                 ability_id=kwargs['ability_id'],
                 prompt=create_prompt_from_dict(kwargs['prompt']),
-                data_source_run_id=kwargs.get('data_source_run_id', 0)
+                data_source_run_id=data_source_run_id
             )
+            kwargs['agent_run_type'] = 1 if data_source_run_id == 0 else 4
         case 'skill':
             if 'custom_data' in kwargs:
                 app_id = 0

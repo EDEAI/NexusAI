@@ -4,15 +4,15 @@
 import useUserStore from '@/store/user';
 import { ProForm, ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { NodeProps, Position, Connection } from '@xyflow/react';
+import { Connection, NodeProps, Position } from '@xyflow/react';
 import { useHover, useMemoizedFn, useMount, useUpdateEffect } from 'ahooks';
 import _ from 'lodash';
-import { memo, useRef, useState, useCallback } from 'react';
+import { memo, useRef, useState } from 'react';
 import { NODE_COLOR } from '../../config';
 import useStore from '../../store';
+import { BlockEnum } from '../../types';
 import { resetFormNodes } from '../../utils/resetFormNodes';
 import CustomHandle from '../CustomHandle';
-import { BlockEnum } from '../../types';
 
 export default memo((props: NodeProps) => {
     const intl = useIntl();
@@ -20,7 +20,7 @@ export default memo((props: NodeProps) => {
 
     const isValidConnection = (connection: Connection) => {
         if (!connection.source) return false;
-        debugger
+
         const sourceNode = nodes.find(node => node.id === connection.source);
         return sourceNode?.type === BlockEnum.LLM || sourceNode?.type === BlockEnum.Agent;
     };
@@ -154,7 +154,6 @@ export default memo((props: NodeProps) => {
                 connectionCount={1}
                 className="!top-6"
                 position={Position.Left}
-              
             ></CustomHandle>
 
             {/* <CreateNodesToolbar {...props} position="left"></CreateNodesToolbar> */}

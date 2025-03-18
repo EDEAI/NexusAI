@@ -6,7 +6,7 @@ from core.database.models.tag_bindings import TagBindings
 from core.helper import generate_api_token
 from languages import get_language_content
 from core.database.models.datasets import Datasets
-
+from config import settings
 
 class Apps(MySQL):
     """
@@ -111,7 +111,7 @@ class Apps(MySQL):
 
         all_app = self.select(
             columns=[
-                'apps.id AS app_id', 'apps.name', 'apps.description', 'apps.mode', 'apps.icon', 'apps.icon_background',
+                'apps.id AS app_id', 'apps.name', 'apps.description', 'apps.mode', 'apps.icon', 'apps.avatar', 'apps.icon_background',
                 'apps.execution_times', 'apps.publish_status'
             ],
             conditions=conditions,
@@ -151,7 +151,7 @@ class Apps(MySQL):
         # Query Association Table
         info_workflow = AppWorkflowRelations().select(
             columns=[
-                'apps.id AS apps_id', 'app_id', 'apps.name', 'apps.description', 'apps.mode', 'apps.icon',
+                'apps.id AS apps_id', 'app_id', 'apps.name', 'apps.description', 'apps.mode', 'apps.icon', 'apps.avatar',
                 'apps.icon_background'
             ],
             joins=[
@@ -177,7 +177,7 @@ class Apps(MySQL):
         info_app = self.select(
             columns=[
                 'apps.id AS apps_id', 'apps.name', 'app_workflow_relation.workflow_app_id', 'apps.description',
-                'apps.mode', 'apps.icon',
+                'apps.mode', 'apps.icon', 'apps.avatar',
                 'apps.icon_background'
             ],
             joins=[
@@ -194,6 +194,9 @@ class Apps(MySQL):
                 workflow_dict[app_item['workflow_app_id']].append(app_item)
 
         for data_item in all_app:
+            if data_item['avatar']:
+                # data_item['avatar'] = f"{os.getenv('STORAGE_URL', '')}/upload/{data_item['avatar']}"
+                data_item['avatar'] = f"{settings.STORAGE_URL}/upload/{data_item['avatar']}"
             if data_item['mode'] == 2:
                 data_item['list'] = workflow_dict[data_item['app_id']]
             else:

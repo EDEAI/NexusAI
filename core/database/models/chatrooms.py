@@ -2,6 +2,9 @@ from core.database import MySQL
 from core.database.models.agents import Agents
 from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
 import math
+from typing import Any, Dict
+import os
+from config import settings
 
 
 class Chatrooms(MySQL):
@@ -45,6 +48,35 @@ class Chatrooms(MySQL):
             return {'status': 1}
         else:
             return {'status': 0}
+        
+    def get_chatroom_by_id(self, chatroom_id: int) -> Dict[str, Any]:
+        """
+        Retrieves a chatroom record by its ID.
+
+        This function queries the database to find a chatroom with the specified ID.
+        It joins with the apps table to get the chatroom name and checks that the
+        chatroom status is active.
+
+        :param chatroom_id: The ID of the chatroom to retrieve.
+        :type chatroom_id: int
+
+        :return: A dictionary containing the chatroom information.
+        :rtype: Dict[str, Any]
+
+        :raises AssertionError: If no chatroom is found with the given ID.
+        """
+        chatroom = self.select_one(
+            columns=[
+                'apps.name'
+            ],
+            joins=[['inner', 'apps', 'chatrooms.app_id = apps.id']],
+            conditions=[
+                {'column': 'id', 'value': chatroom_id},
+                {'column': 'status', 'value': 1}
+            ]
+        )
+        assert chatroom
+        return chatroom
 
     def search_chatrooms_id(self, chatroom_id: int, user_id: int):
         """
@@ -136,15 +168,31 @@ class Chatrooms(MySQL):
             if agent_list:
                 for agent_item in agent_list:
                     if agent_item['agent_id'] > 0:
-                        chat_item['agent_list'].append(Agents().select_one(
-                            columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id", "apps.icon", "apps.icon_background", "agents.obligations"],
+                        # chat_item['agent_list'].append(Agents().select_one(
+                        #     columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id", "apps.icon", "apps.avatar", "apps.icon_background", "agents.obligations"],
+                        #     conditions=[
+                        #         {"column": "id", "value": agent_item['agent_id']}
+                        #     ],
+                        #     joins=[
+                        #         ["left", "apps", "apps.id = agents.app_id"],
+                        #     ]
+                        # ))
+                        agent_data = Agents().select_one(
+                            columns=["apps.name", "apps.description", "agents.id AS agent_id", 
+                                   "agents.app_id", "apps.icon", "apps.avatar",
+                                   "apps.icon_background", "agents.obligations"],
                             conditions=[
                                 {"column": "id", "value": agent_item['agent_id']}
                             ],
                             joins=[
                                 ["left", "apps", "apps.id = agents.app_id"],
                             ]
-                        ))
+                        )
+                        
+                        if agent_data and agent_data.get('avatar'):
+                            agent_data['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_data['avatar']}"
+                            
+                        chat_item['agent_list'].append(agent_data)
 
         return {
             "list": list,
@@ -253,7 +301,7 @@ class Chatrooms(MySQL):
                 if rel['agent_id'] > 0:
                     agent_info = Agents().select_one(
                         columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id",
-                                 "apps.icon", "apps.icon_background", "agents.obligations"],
+                                 "apps.icon", "apps.avatar", "apps.icon_background", "agents.obligations"],
                         conditions=[{"column": "id", "value": rel['agent_id']}],
                         joins=[["left", "apps", "apps.id = agents.app_id"]]
                     )

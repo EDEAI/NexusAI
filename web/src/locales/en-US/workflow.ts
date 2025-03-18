@@ -9,8 +9,8 @@ export default {
     'app.workflow.backlogs.empty': 'No backlog items',
 
     'app.workflow.ra.title': 'Recent Activity',
-    'app.workflow.re.empty': 'No recent activity',
-    'app.workflow.log.title': 'Workflow Logs',
+    'app.workflow.ra.empty': 'No recent activity',
+    'app.workflow.log.title': 'Logs',
     'app.workflow.log.empty': 'No workflow logs',
 
     'app.workflow.title.1': ' ',
@@ -251,8 +251,9 @@ export default {
 
     'workflow.needHumanConfirm': 'Pending',
     'workflow.noHumanConfirm': 'Human confirmation processed',
-    "workflow.label.selectAggregationVariables": "Select aggregation variables (multiple selection allowed)",
-    "workflow.message.setVariablesFirst": "Please set variables first",
+    'workflow.label.selectAggregationVariables':
+        'Select aggregation variables (multiple selection allowed)',
+    'workflow.message.setVariablesFirst': 'Please set variables first',
 
     // Node list related
     'workflow.nodeList': 'Space',
@@ -295,10 +296,10 @@ export default {
 
     'creation.placeholder.selectTags': 'Please select tags',
 
-    'workflow.needHumanConfirm1': 'To-do',
-    'workflow.needHumanConfirm2': 'Others To-do',
-    'workflow.tooltip.confirmer': 'Pending confirmation by: {users}',
-    'workflow.label.confirmer': 'Pending Confirmer',
+    'workflow.needHumanConfirm1': 'Todo',
+    'workflow.needHumanConfirm2': 'Pending Debugger Review',
+    'workflow.tooltip.confirmer': 'Pending Debugger Review: {users}',
+    'workflow.label.confirmer': 'Pending Debugger Review',
 
     'workflow.form.parameter.required': 'Please enter parameter',
     'workflow.form.confirmer.required': 'Please select confirmer',
@@ -340,4 +341,6 @@ export default {
     'skill.result.output.type.database': 'Database',
     'skill.result.output.type.code': 'Code',
     'skill.result.output.type.document': 'Document',
+    'workflow.debugRun': 'Debug Run',
+    'workflow.debugTodo': 'Debug Todo',
 };

@@ -140,7 +140,7 @@ class CustomTools(MySQL):
         )[0]["count_id"]
 
         list = self.select(
-            columns=["custom_tools.id AS skill_id", "custom_tools.app_id", "apps.name", "apps.description", "apps.icon",
+            columns=["custom_tools.id AS skill_id", "custom_tools.app_id", "apps.name", "apps.description", "apps.icon", "apps.avatar",
                      "apps.icon_background", "users.nickname", "users.avatar"],
             joins=[
                 ["left", "apps", "custom_tools.app_id = apps.id"],

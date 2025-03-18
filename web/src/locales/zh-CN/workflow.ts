@@ -7,7 +7,7 @@ export default {
 
     'app.workflow.ra.title': '最近活跃',
     'app.workflow.re.empty': '暂无最近活跃',
-    'app.workflow.log.title': '工作流日志',
+    'app.workflow.log.title': '日志',
     'app.workflow.log.empty': '暂无工作流日志',
 
     'app.workflow.title.1': '第',
@@ -292,6 +292,7 @@ export default {
     'workflow.needHumanConfirm2': '有他人待办',
     'workflow.tooltip.confirmer': '待确认人: {users}',
     'workflow.label.confirmer': '待确认人',
+    'workflow.debugRunWait': '待调试者处理',
 
     'workflow.form.parameter.required': '请填写参数',
     'workflow.form.confirmer.required': '请选择确认人',
@@ -332,4 +333,6 @@ export default {
     'skill.result.output.type.database': '数据库',
     'skill.result.output.type.code': '代码',
     'skill.result.output.type.document': '文档',
+    'workflow.debugRun': '调试运行',
+    'workflow.debugTodo': '调试待办',
 };
