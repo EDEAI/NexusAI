@@ -1,8 +1,8 @@
 FROM continuumio/anaconda3:2024.02-1
 
 # Use network proxy as needed
-# ARG HTTP_PROXY=http://192.168.0.241:10809
-# ARG HTTPS_PROXY=http://192.168.0.241:10809
+ARG HTTP_PROXY=http://192.168.1.5:10809
+ARG HTTPS_PROXY=http://192.168.1.5:10809
 
 COPY conda/nexus_ai.yml /tmp/nexus_ai.yml
 RUN conda env create -f /tmp/nexus_ai.yml --verbose && conda clean -afy && rm -rf /tmp/*
