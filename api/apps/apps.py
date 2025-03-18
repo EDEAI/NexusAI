@@ -247,7 +247,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
     name = data['name']
     mode = data['mode']
     description = data['description']
-    avatar = data['avatar']
+    avatar = data.get('avatar', None)
     icon = data['icon']
     icon_background = data['icon_background']
     temporary_chatroom_id = data.get('temporary_chatroom_id', 0)
@@ -378,7 +378,7 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
     data = data.dict(exclude_unset=True)
     name = data['name']
     description = data['description']
-    avatar = data['avatar']
+    avatar = data.get('avatar', None)
     icon = data['icon']
     icon_background = data['icon_background']
 
