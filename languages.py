@@ -13,7 +13,7 @@ language_packs = {
         "agent_run_type_1": "Agent Debugging",
         "agent_run_type_2": "Workflow: {app_name} Invocation",
         "agent_run_type_3": "Round Table: {app_name} Invocation",
-        "agent_run_type_4": "Round Table: {app_name} Guidance Execution",
+        "agent_run_type_4": "Round Table: {app_name} Orientation",
         "requirement_category": {
             "system": """
                 You are a content categorization assistant.
