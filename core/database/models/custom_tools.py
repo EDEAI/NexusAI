@@ -74,7 +74,13 @@ class CustomTools(MySQL):
                 "nickname": user_data['nickname'],
                 "publish_status": skill_publish_status,
                 "is_creator": 0 if app["user_id"] != user_id else 1,
-                "input_variables": input_variables
+                "input_variables": input_variables,
+                "app_publish_status": app["app_publish_status"],
+                "created_time": skill["created_time"],
+                "id": skill["id"],
+                "published_time": skill["published_time"],
+                "status": skill["status"],
+                "updated_time": skill["updated_time"]
             }
             return {'status': 1, 'message': 'ok', 'data': skill}
         else:

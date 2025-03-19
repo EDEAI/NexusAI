@@ -534,11 +534,11 @@ def create_object_variable_from_list(data: List[Dict[str, Any]], name: str = "ro
         variable = Variable(
             name=var_def["name"],
             type=var_def["type"],
-            display_name=var_def.get("display_name"),
+            display_name=var_def.get("display_name", ""),
             value=var_def.get("value"),
-            required=var_def.get("required"),
-            max_length=var_def.get("max_length"),
-            sort_order=var_def.get("sort_order")
+            required=var_def.get("required", False),
+            max_length=var_def.get("max_length", 0),
+            sort_order=var_def.get("sort_order", 0)
         )
         obj_var.add_property(var_def["name"], variable)
     
