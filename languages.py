@@ -1456,7 +1456,7 @@ def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = 
             else:
                 return None
         if append_ret_lang_prompt:
-            return_language_prompt = f"\n\nPlease note that the language of the returned content must be {language_names[current_language]}."
+            return_language_prompt = f"\n\nPlease note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction."
             if isinstance(content, str):
                 content += return_language_prompt
             elif isinstance(content, dict):
