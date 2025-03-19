@@ -161,7 +161,15 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                 </div>
                                                 <div className="mb-[30px]  font-medium">
                                                     <div className="mb-[15px] text-[#555555] text-xs">
-                                                        {intl.formatMessage({ id: 'agent.attrVisible' })}
+                                                        <Callword
+                                                            className="font-medium"
+                                                            name={intl.formatMessage({
+                                                                id: 'agent.attrVisible',
+                                                            })}
+                                                            title={intl.formatMessage({
+                                                                id: 'agent.explain.attrVisible',
+                                                            })}
+                                                        />
                                                     </div>
                                                     <Switch
                                                         {...disabled}

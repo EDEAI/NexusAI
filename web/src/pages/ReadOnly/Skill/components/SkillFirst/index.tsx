@@ -105,7 +105,15 @@ const SkillFirst: React.FC<ChildProps> = ({
                         </Form.Item>
                         <Form.Item className="mb-[30px]">
                             <div className="mb-[15px] text-[#555555] text-xs">
-                                {intl.formatMessage({ id: 'agent.attrVisible' })}
+                                <Callword
+                                    className="font-medium"
+                                    name={intl.formatMessage({
+                                        id: 'agent.attrVisible',
+                                    })}
+                                    title={intl.formatMessage({
+                                        id: 'agent.explain.attrVisible',
+                                    })}
+                                />
                             </div>
                             <Switch
                                 {...disabled}

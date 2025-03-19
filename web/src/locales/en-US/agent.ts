@@ -33,7 +33,7 @@ export default {
     'agent.cannotmodify': '(You are viewing published version data, which cannot be modified)',
     'agent.appdescription': 'Agent Description',
     'agent.teamvisibility': 'Team Visibility',
-    'agent.attrVisible':'attribute Visible',
+    'agent.attrVisible':'Attribute Visible',
     'agent.APIswitch': 'Enable API',
     'agent.filesupload': 'Allow File Upload',
     'agent.LLMmodel': 'LLM Model',
@@ -82,6 +82,8 @@ export default {
 
     'agent.explain.teamvisibility':
         'Once the agent is published, other members within the team can also use it',
+    'agent.explain.attrVisible':
+        'If attributes are set to not visible, others cannot view agent details, and capabilities cannot be manually selected at runtime',
     'agent.explain.function':
         'Specific functional scope of the agent, used as a prompt to help the language model better handle tasks or answer questions',
     'agent.explain.inputvariable':
