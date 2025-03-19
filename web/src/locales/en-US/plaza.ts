@@ -102,7 +102,7 @@ export default {
 
     "app.summary.title":"Discussion summary",
     "app.summary.submitText":"Submit revisions",
-    "app.summary.next":"Next step",
+    "app.summary.next":"Next Step",
     "app.summary.placeholder":"Please enter your correction suggestion... .",
     "app.summary.Runapp":"Select Run App",
     "app.summary.SelectAgent":"Select Agent",

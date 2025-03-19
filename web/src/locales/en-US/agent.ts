@@ -75,8 +75,8 @@ export default {
     'agent.compile': 'Edit',
     'agent.agents': "'s Agents",
     'agent.created': 'Create ',
-    'agent.btn.nextstep': 'next Step',
-    'agent.btn.back': 'cancel',
+    'agent.btn.nextstep': 'Next Step',
+    'agent.btn.back': 'Cancel',
     'agent.btn.savedebug': 'Save',
     'agent.save.and.click': 'Please save the agent first',
 

@@ -67,7 +67,7 @@ export default {
     'skill.havepublished': 'Released',
     'skill.unpublish': 'Unpublished',
     'skill.skills': "'s Skills",
-    'skill.btn.nextstep': 'next Step',
-    'skill.btn.back': 'cancel',
+    'skill.btn.nextstep': 'Next Step',
+    'skill.btn.back': 'Cancel',
     'skill.btn.savedebug': 'Save and debug',
 };
