@@ -125,7 +125,7 @@ const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: Messag
     const ability = abilitiesList?.find(item => item.value === message.ability_id);
     return (
         <div className="flex justify-start pb-4">
-            <div className='max-w-full'>
+            <div className="max-w-full">
                 <div className="text-sm font-bold mb-2">
                     {detailList?.app?.name}{' '}
                     {ability?.label && (
@@ -167,7 +167,7 @@ const LoadingMessage = memo(({ detailList }: { detailList: MessageProps['detailL
     const intl = useIntl();
     return (
         <div className="flex justify-start pb-4 max-w-[90%] min-w-[70%]">
-            <div className='max-w-full'>
+            <div className="max-w-full">
                 <div className="text-sm font-bold mb-2">{detailList?.app?.name}</div>
                 <div className="max-w-[90%] min-w-[200px] rounded-lg relative bg-white text-gray-900 border border-gray-200 p-4">
                     <div className="flex items-center gap-2 pr-4">
@@ -202,16 +202,16 @@ export default memo((props: Props) => {
     const lastMessage = useSocketStore(state =>
         (state as unknown as WebSocketStore).getTypedLastMessage('chat_message_llm_return'),
     );
-    console.log(props.data);
+   
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
     const handleSaveInfo = async () => {
         if (props?.saveInfo?.firstjudgingcondition()) {
-            return true
+            return true;
         } else if (props?.saveInfo?.secondjudgingcondition()) {
-            return true
+            return true;
         } else {
             return await props?.saveInfo?.agentupdata();
         }
@@ -219,6 +219,9 @@ export default memo((props: Props) => {
     useUpdateEffect(() => {
         const messageData = lastMessage?.data;
         if (!messageData) return;
+        if (messageData?.agent_id !== props.data?.detailList?.agent?.agent_id) {
+            return;
+        }
 
         const newMessage: Message = {
             ...messageData,
@@ -444,7 +447,7 @@ export default memo((props: Props) => {
                                 disabled={props.operationbentate == 'false' ? false : true}
                                 onClick={agentPublish}
                                 className="min-w-24"
-                            >  
+                            >
                                 {intl.formatMessage({ id: 'agent.publish' })}
                             </Button>
                         </>

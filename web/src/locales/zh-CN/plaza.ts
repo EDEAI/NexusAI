@@ -4,6 +4,7 @@ export default {
     'app.dashboard.myagent': '我的 智能体',
     'app.dashboard.workflow': '工作流',
     'app.dashboard.run_log': '工作流日志',
+    'app.dashboard.run_log_agent': '智能体日志',
     'app.dashboard.team_agent': '组织内 智能体',
     'app.dashboard.team_workflow': '组织内工作流',
     'app.dashboard.title_button_1.1': '创建智能体',

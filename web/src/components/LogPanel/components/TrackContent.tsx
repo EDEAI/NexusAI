@@ -49,7 +49,7 @@ export const TrackContent = memo(
         const TodoTag = ({ humanConfirmInfo, userId, onClick }) => {
             const isSelfTodo = humanConfirmInfo?.some(x => x.user_id == userId);
             console.log(runList, detail);
-            debugger;
+    
             if (lastDetail?.current?.type == 1) {
                 return (
                     <Tooltip

@@ -9,7 +9,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { ProCard } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useLatest, useUpdateEffect } from 'ahooks';
-import { Button, Descriptions, Tag, Tooltip, Typography } from 'antd';
+import { Button, Descriptions, Skeleton, Tag, Typography } from 'antd';
 import { memo, useCallback, useState } from 'react';
 import CodeEditor from '../WorkFlow/components/Editor/CodeEditor';
 import { TrackContent } from './components/TrackContent';
@@ -22,7 +22,6 @@ interface TodoTagProps {
     userId: string | number;
     onClick?: (e: React.MouseEvent) => void;
 }
-
 
 const DetailContent = memo(({ endRun }: { endRun: any }) => {
     const intl = useIntl();
@@ -141,7 +140,6 @@ export default memo(() => {
 
     useUpdateEffect(() => {
         if (!runPanelLogRecord) {
-            onClose();
             return;
         }
 
@@ -151,6 +149,7 @@ export default memo(() => {
         setEndRun(null);
         setRunList([]);
         setAppRunId(runPanelLogRecord);
+        setRunPanelShow(true);
 
         getDetail(runPanelLogRecord)
             .then(() => {
@@ -199,8 +198,21 @@ export default memo(() => {
     );
 
     const TrackContentWrapper = memo(() => {
-        
-        return <TrackContent detail={detail} runList={runList} onClose={onClose} updateKey={updateCounter} />;
+        if (loading) {
+            return (
+                <div className="w-full space-y-4 p-4">
+                    <Skeleton active paragraph={{ rows: 3 }} />
+                </div>
+            );
+        }
+        return (
+            <TrackContent
+                detail={detail}
+                runList={runList}
+                onClose={onClose}
+                updateKey={updateCounter}
+            />
+        );
     });
 
     if (!runPanelShow) {

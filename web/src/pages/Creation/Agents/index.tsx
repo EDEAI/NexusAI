@@ -96,7 +96,7 @@ const Agents: React.FC = () => {
             key: '5',
             disabled: agentmenudisabled.fourthly,
             icon: <FileTextOutlined />,
-            label:intl.formatMessage({id:'app.dashboard.run_log'}),
+            label:intl.formatMessage({id:'app.dashboard.run_log_agent'}),
             style: {
                 padding: '15px',
                 width: '100%',
