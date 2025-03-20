@@ -1,3 +1,6 @@
+/*
+ * @LastEditors: biz
+ */
 export default {
     skill: 'Skill',
     'skill.menu.input': 'Input Settings',
@@ -66,7 +69,7 @@ export default {
     'skill.publish': 'Publish',
     'skill.havepublished': 'Released',
     'skill.unpublish': 'Unpublished',
-    'skill.skills': "'s Skills",
+    'skill.skills': "'s Skill",
     'skill.btn.nextstep': 'Next Step',
     'skill.btn.back': 'Cancel',
     'skill.btn.savedebug': 'Save and debug',

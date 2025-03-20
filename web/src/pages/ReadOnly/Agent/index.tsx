@@ -275,7 +275,7 @@ const Agents: React.FC = () => {
                                 <img src="/icons/flag.svg" alt="" className="w-[16px] h-[16px]" />
                             </div>
                             <div className="mr-[6px] text-lg text-[#213044] font-medium">
-                                {Detaillist ? Detaillist.creator_nickname : ''}
+                                {Detaillist ? Detaillist.creator_nickname : ''}{' '}
                                 {intl.formatMessage({ id: 'agent.agents' })}
                             </div>
                         </div>

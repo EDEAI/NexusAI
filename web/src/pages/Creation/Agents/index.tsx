@@ -575,7 +575,7 @@ const Agents: React.FC = () => {
                                                           })
                                                         : intl.formatMessage({
                                                               id: 'agent.created',
-                                                          })}
+                                                          })}{' '}
                                                     {intl.formatMessage({ id: 'agent' })}
                                                 </div>
                                                 {Detaillist?.app?.publish_status === 1 ? (

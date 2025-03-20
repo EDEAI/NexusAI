@@ -73,7 +73,7 @@ export default {
     'agent.havepublished': 'Released',
     'agent.unpublish': 'Unpublished',
     'agent.compile': 'Edit',
-    'agent.agents': "'s Agents",
+    'agent.agents': "'s Agent",
     'agent.created': 'Create ',
     'agent.btn.nextstep': 'Next Step',
     'agent.btn.back': 'Cancel',
