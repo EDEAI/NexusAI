@@ -252,7 +252,7 @@ class SandboxBaseNode(Node):
         """
         try:
             for key, value in stdout_dict.items():
-                if 'file://' in value:
+                if isinstance(value, str) and 'file://' in value:
                     fixed_directory = 'storage'
                     original_path = value.split('file:///')[-1]
                     file_suffix = original_path.split('.')[-1]
