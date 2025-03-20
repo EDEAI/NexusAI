@@ -269,7 +269,7 @@ class Chatrooms(MySQL):
                 columns=[
                     "apps.name", "apps.description", "chatrooms.id as chatroom_id", "chatrooms.chat_status",
                     "chatrooms.active", "chatrooms.status as chatroom_status", "chatrooms.smart_selection",
-                    "apps.id as app_id"
+                    "apps.id as app_id", "chatrooms.created_time"
                 ],
                 joins=joins,
                 conditions=conditions,
@@ -280,7 +280,7 @@ class Chatrooms(MySQL):
                 columns=[
                     "apps.name", "apps.description", "chatrooms.id as chatroom_id", "chatrooms.chat_status",
                     "chatrooms.active", "chatrooms.status as chatroom_status", "chatrooms.smart_selection",
-                    "apps.id as app_id"
+                    "apps.id as app_id", "chatrooms.created_time"
                 ],
                 joins=joins,
                 conditions=conditions,
