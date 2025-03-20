@@ -81,7 +81,7 @@ export default {
     'agent.save.and.click': '请先保存agent',
 
     'agent.explain.teamvisibility': 'agent发布后团队内其他成员也可以使用',
-    'agent.explain.attrVisible': '如果设置属性不可见，他人无法查看应用体详细信息，并且运行时将无法手动选择能力',
+    'agent.explain.attrVisible': '如果设置属性不可见，他人无法查看应用详细信息，并且运行时将无法手动选择能力',
     'agent.explain.function':
         'agent自身具体的职能范围，作为提示词，让大语言模型更好的处理任务或回答问题',
     'agent.explain.inputvariable':

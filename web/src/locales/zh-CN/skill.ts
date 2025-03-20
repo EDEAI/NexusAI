@@ -1,3 +1,6 @@
+/*
+ * @LastEditors: biz
+ */
 export default {
     skill: 'skill',
     'skill.menu.input': '输入设置',
@@ -67,4 +70,5 @@ export default {
     'skill.btn.nextstep': '下一步',
     'skill.btn.back': '取消',
     'skill.btn.savedebug': '保存并调试',
+    'skill.explain.attrVisible': '如果设置属性不可见，他人无法查看应用详细信息',
 };

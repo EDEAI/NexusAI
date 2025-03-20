@@ -73,4 +73,6 @@ export default {
     'skill.btn.nextstep': 'Next Step',
     'skill.btn.back': 'Cancel',
     'skill.btn.savedebug': 'Save and debug',
+    'skill.explain.attrVisible':
+        'If attributes are set to not visible, others cannot view application details',
 };

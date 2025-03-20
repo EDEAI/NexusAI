@@ -83,8 +83,9 @@ export default {
     'agent.explain.teamvisibility':
         'Once the agent is published, other members within the team can also use it',
     'agent.explain.attrVisible':
-        'If attributes are set to not visible, others cannot view agent details, and capabilities cannot be manually selected at runtime',
-    'agent.explain.function':
+        'If attributes are set to not visible, others cannot view application details, and capabilities cannot be manually selected at runtime',
+    
+        'agent.explain.function':
         'Specific functional scope of the agent, used as a prompt to help the language model better handle tasks or answer questions',
     'agent.explain.inputvariable':
         'Variables can be filled in as a form or introduced (upstream node output variables can be introduced in workflows), and will automatically replace variables in prompts during runtime',

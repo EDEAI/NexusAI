@@ -111,7 +111,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                                         id: 'agent.attrVisible',
                                     })}
                                     title={intl.formatMessage({
-                                        id: 'agent.explain.attrVisible',
+                                        id: 'skill.explain.attrVisible',
                                     })}
                                 />
                             </div>
