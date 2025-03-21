@@ -12,6 +12,7 @@ from datetime import datetime
 from core.helper import generate_api_token, encrypt_id
 from languages import get_language_content
 import math
+from config import settings
 
 
 class Agents(MySQL):
@@ -118,6 +119,11 @@ class Agents(MySQL):
             limit=page_size,
             offset=(page - 1) * page_size
         )
+
+        if list:
+            for item in list:
+                if item.get('avatar'):
+                    item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
 
         return {
             "list": list,
