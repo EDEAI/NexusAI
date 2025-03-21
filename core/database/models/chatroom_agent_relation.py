@@ -1,7 +1,7 @@
 from typing import Any, Dict
 from core.database import MySQL
 import math
-
+from config import settings
 
 class ChatroomAgentRelation(MySQL):
     """
@@ -174,5 +174,9 @@ class ChatroomAgentRelation(MySQL):
             conditions=conditions,
             order_by="chatroom_agent_relation.id DESC",
         )
+
+        for item in list:
+            if item.get('avatar'):
+                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
 
         return list

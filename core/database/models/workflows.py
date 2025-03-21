@@ -18,6 +18,7 @@ from core.helper import generate_api_token, encrypt_id, format_iso_time
 from hashlib import md5
 
 from languages import get_language_content
+from config import settings
 
 
 class Workflows(MySQL):
@@ -176,6 +177,8 @@ class Workflows(MySQL):
         )
 
         for item in list:
+            if item.get('avatar'):
+                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             if item['publish_status'] == 1:
                 workflow_info = self.select_one(
                     columns=["published_time"],

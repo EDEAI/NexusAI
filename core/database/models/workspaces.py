@@ -15,6 +15,7 @@ from core.workflow.variables import create_variable_from_dict, get_first_variabl
 from core.workflow.recursive_task import create_recursive_task_category_from_dict
 from languages import get_language_content
 import os
+from config import settings
 
 # Uploaded files are stored in an ArrayVariable, which is in the `input` ObjectVariable
 # And this is the specific key of this ArrayVariable.
@@ -99,6 +100,8 @@ class Workspaces(MySQL):
             app_list = [dict(app) for app in app_list]
 
             for app in app_list:
+                if app.get('avatar'):
+                    app['avatar'] = f"{settings.STORAGE_URL}/upload/{app['avatar']}"
                 app['last_agent_name'] = ''
                 if app["workflow_id"] > 0:
                     app["type"] = 3
@@ -180,6 +183,8 @@ class Workspaces(MySQL):
             
             from api.utils.common import extract_file_list_from_skill_output
             for app_node in app_node_list:
+                if app_node.get('avatar'):
+                    app_node['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node['avatar']}"
                 if app_node['need_human_confirm'] == 1:
                     users = Users()
                     app_node_user = AppNodeUserRelation()
@@ -413,6 +418,8 @@ class Workspaces(MySQL):
 
         if log_list:
             for log in log_list:
+                if log.get('avatar'):
+                    log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
                 # Meeting-driven record - status 1
                 if log['app_id'] == 0 and log['chatroom_id'] > 0:
                     log['show_status'] = 1
@@ -491,6 +498,9 @@ class Workspaces(MySQL):
                         )
                         log['file_list'] = []
                         if app_node_list and app_node_list.get('outputs'):
+                            
+                            if app_node_list.get('avatar'):
+                                app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
                             if outputs := app_node_list.get('outputs'):
                                 app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
                                 
@@ -586,6 +596,8 @@ class Workspaces(MySQL):
                     )
                     log['file_list'] = []
                     if app_node_list and app_node_list.get('outputs'):
+                        if app_node_list.get('avatar'):
+                            app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
                         if outputs := app_node_list.get('outputs'):
                             app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
                             
@@ -689,6 +701,8 @@ class Workspaces(MySQL):
 
         if list:
             for log in list:
+                if log.get('avatar'):
+                    log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
                 if 'app_runs_status' in log:
                     status = log['app_runs_status']
                     if status in (1, 2):
