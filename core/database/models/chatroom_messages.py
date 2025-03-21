@@ -5,6 +5,7 @@ from core.database.models.apps import Apps
 from core.database.models.agents import Agents
 from languages import get_language_content
 from collections import deque
+from config import settings
 
 
 class ChatroomMessages(MySQL):
@@ -125,6 +126,9 @@ class ChatroomMessages(MySQL):
                         item['is_agent'] = 0
                     item['content'] = item['message']
 
+                    if item.get('avatar'):
+                        item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+
         if offset == 0:
             if total_count > 0:
                 list = self.select(
@@ -151,6 +155,9 @@ class ChatroomMessages(MySQL):
                         else:
                             item['is_agent'] = 0
                         item['content'] = item['message']
+
+                        if item.get('avatar'):
+                            item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             else:
                 list = []
 
