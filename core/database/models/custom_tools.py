@@ -6,6 +6,7 @@ from core.database.models import Users
 import math
 from datetime import datetime
 from languages import get_language_content
+from config import settings
 
 
 class CustomTools(MySQL):
@@ -157,6 +158,10 @@ class CustomTools(MySQL):
             limit=page_size,
             offset=(page - 1) * page_size
         )
+        if list:
+            for item in list:
+                if item.get('avatar'):
+                    item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
 
         return {
             "list": list,
