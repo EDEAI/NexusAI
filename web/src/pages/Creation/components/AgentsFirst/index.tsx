@@ -1,7 +1,7 @@
 import { GetdatasetList } from '@/api/agents';
 import Callword from '@/components/callword';
+import Variable from '@/components/WorkFlow/components/Variable';
 import { useModelSelect } from '@/store/modelList';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Form, Input, Radio, Select, Switch } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -161,6 +161,13 @@ const AgentsFirst: React.FC<ChildProps> = ({
         });
     };
 
+    const handleVariableChange = (value: any) => {
+        setDetaillist({
+            ...Detaillist,
+            agent: { ...Detaillist.agent, input_variables: value.free },
+        });
+    };
+
     const { options, defaultValue } = useModelSelect();
 
     return (
@@ -180,195 +187,197 @@ const AgentsFirst: React.FC<ChildProps> = ({
                     autoComplete="off"
                     form={Ffromref}
                 >
-                    <Form.List name="users">
-                        {(fields, { add, remove }) => (
-                            <>
-                                <Form.Item className="mb-[30px]">
-                                    <div className="text-[#555555] text-xs">
-                                        <div className="font-medium  mb-[15px]">
-                                            {intl.formatMessage({ id: 'agent.appname' })}
-                                        </div>
-                                        <div className="w-full p-[15px] flex font-normal items-center bg-[#F7F7F7] rounded-lg">
-                                            <div>
-                                                {Detaillist &&
-                                                    Detaillist.app &&
-                                                    Detaillist.app.name}
-                                                &nbsp;
-                                            </div>
-                                            <div className="">
-                                                {Operationbentate === 'true'
-                                                    ? intl.formatMessage({
-                                                          id: 'agent.cannotmodify',
-                                                      })
-                                                    : ''}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Form.Item>
-                                <Form.Item className="mb-[30px]">
-                                    <div className="text-[#555555] text-xs">
-                                        <div className="font-medium  mb-[15px]">
-                                            {intl.formatMessage({ id: 'agent.appdescription' })}
-                                        </div>
-                                        <div className="w-full p-[15px] flex font-normal items-center bg-[#F7F7F7] rounded-lg">
-                                            {Detaillist &&
-                                                Detaillist.app &&
-                                                Detaillist.app.description}
-                                        </div>
-                                    </div>
-                                </Form.Item>
-                                <Form.Item className="mb-[30px]">
-                                    <div>
-                                        <div className="mb-[30px]">
-                                            <div className="mb-[15px] text-[#555555] text-xs">
-                                                <Callword
-                                                    className="font-medium"
-                                                    name={intl.formatMessage({
-                                                        id: 'agent.teamvisibility',
-                                                    })}
-                                                    title={intl.formatMessage({
-                                                        id: 'agent.explain.teamvisibility',
-                                                    })}
-                                                />
-                                            </div>
-                                            <Switch
-                                                size="small"
-                                                onChange={FirstTeam}
-                                                checked={
-                                                    Detaillist && Detaillist.app.is_public === 1
-                                                        ? true
-                                                        : false
-                                                }
-                                            />
-                                        </div>
-                                        <div className="mb-[30px]  font-medium">
-                                            <div className="mb-[15px] text-[#555555] text-xs">
-                                              
-                                                <Callword
-                                                    className="font-medium"
-                                                    name={intl.formatMessage({
-                                                        id: 'agent.attrVisible',
-                                                    })}
-                                                    title={intl.formatMessage({
-                                                        id: 'agent.explain.attrVisible',
-                                                    })}
-                                                />
-                                            </div>
-                                            <Switch
-                                                size="small"
-                                                onChange={attrFirstAPI}
-                                                checked={
-                                                    Detaillist &&
-                                                    Detaillist.app.attrs_are_visible === 1
-                                                }
-                                            />
-                                        </div>
-                                        <div className="mb-[30px]  font-medium">
-                                            <div className="mb-[15px] text-[#555555] text-xs">
-                                                {intl.formatMessage({ id: 'agent.APIswitch' })}
-                                            </div>
-                                            <Switch
-                                                size="small"
-                                                onChange={FirstAPI}
-                                                checked={
-                                                    Detaillist && Detaillist.app.enable_api === 1
-                                                }
-                                                disabled={Detaillist?.app?.publish_status !== 1}
-                                            />
-                                        </div>
-                                        <div className="font-medium">
-                                            <div className="mb-[15px] text-[#555555] text-xs">
-                                                {intl.formatMessage({ id: 'agent.filesupload' })}
-                                            </div>
-                                            <Switch
-                                                size="small"
-                                                onChange={TPUpload}
-                                                checked={
-                                                    Detaillist &&
-                                                    Detaillist.agent.allow_upload_file == 1
-                                                        ? true
-                                                        : false
-                                                }
-                                            />
-                                        </div>
-                                    </div>
-                                </Form.Item>
-                                <Form.Item className="mb-[30px]">
-                                    <div>
-                                        <div className="mb-[15px] text-[#555555] text-xs font-medium">
-                                            <span className="text-[#E80000]">* </span>
-                                            {intl.formatMessage({ id: 'agent.LLMmodel' })}
-                                        </div>
-                                        <Select
-                                            placeholder={intl.formatMessage({
-                                                id: 'agent.pleaseselect',
-                                            })}
-                                            // defaultValue="jack"
-                                            style={{ width: 270 }}
-                                            value={
-                                                Fourthly_config_id == 0
-                                                    ? intl.formatMessage({
-                                                          id: 'agent.pleaseselect',
-                                                      })
-                                                    : Fourthly_config_id
-                                            }
-                                            variant="filled"
-                                            onChange={FourthlySelect}
-                                            options={options}
-                                        />
-                                    </div>
-                                </Form.Item>
-                                <Form.Item className="mb-[30px]" name={'obligations'}>
-                                    <div className="w-full">
-                                        <div className="mb-[15px] text-[#555555] text-xs">
-                                            <Callword
-                                                className="font-medium"
-                                                required={true}
-                                                name={intl.formatMessage({
-                                                    id: 'agent.functiondescription',
-                                                })}
-                                                title={intl.formatMessage({
-                                                    id: 'agent.explain.function',
-                                                })}
-                                            />
-                                        </div>
-                                        <TextArea
-                                            onChange={obligations}
-                                            value={
-                                                Detaillist &&
-                                                Detaillist.agent &&
-                                                Detaillist.agent.obligations
-                                            }
-                                            placeholder={`Agent${intl.formatMessage({
-                                                id: 'agent.functiondescription',
-                                            })}`}
-                                            autoSize={{ minRows: 8, maxRows: 10 }}
-                                        />
-                                    </div>
-                                </Form.Item>
-                                <div className="mb-[11px] text-xs font-bold flex justify-between items-center">
+                    <Form.Item className="mb-[30px]">
+                        <div className="text-[#555555] text-xs">
+                            <div className="font-medium  mb-[15px]">
+                                {intl.formatMessage({ id: 'agent.appname' })}
+                            </div>
+                            <div className="w-full p-[15px] flex font-normal items-center bg-[#F7F7F7] rounded-lg">
+                                <div>
+                                    {Detaillist && Detaillist.app && Detaillist.app.name}
+                                    &nbsp;
+                                </div>
+                                <div className="">
+                                    {Operationbentate === 'true'
+                                        ? intl.formatMessage({
+                                              id: 'agent.cannotmodify',
+                                          })
+                                        : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </Form.Item>
+                    <Form.Item className="mb-[30px]">
+                        <div className="text-[#555555] text-xs">
+                            <div className="font-medium  mb-[15px]">
+                                {intl.formatMessage({ id: 'agent.appdescription' })}
+                            </div>
+                            <div className="w-full p-[15px] flex font-normal items-center bg-[#F7F7F7] rounded-lg">
+                                {Detaillist && Detaillist.app && Detaillist.app.description}
+                            </div>
+                        </div>
+                    </Form.Item>
+                    <Form.Item className="mb-[30px]">
+                        <div>
+                            <div className="mb-[30px]">
+                                <div className="mb-[15px] text-[#555555] text-xs">
+                                    <Callword
+                                        className="font-medium"
+                                        name={intl.formatMessage({
+                                            id: 'agent.teamvisibility',
+                                        })}
+                                        title={intl.formatMessage({
+                                            id: 'agent.explain.teamvisibility',
+                                        })}
+                                    />
+                                </div>
+                                <Switch
+                                    size="small"
+                                    onChange={FirstTeam}
+                                    checked={
+                                        Detaillist && Detaillist.app.is_public === 1 ? true : false
+                                    }
+                                />
+                            </div>
+                            <div className="mb-[30px]  font-medium">
+                                <div className="mb-[15px] text-[#555555] text-xs">
+                                    <Callword
+                                        className="font-medium"
+                                        name={intl.formatMessage({
+                                            id: 'agent.attrVisible',
+                                        })}
+                                        title={intl.formatMessage({
+                                            id: 'agent.explain.attrVisible',
+                                        })}
+                                    />
+                                </div>
+                                <Switch
+                                    size="small"
+                                    onChange={attrFirstAPI}
+                                    checked={Detaillist && Detaillist.app.attrs_are_visible === 1}
+                                />
+                            </div>
+                            <div className="mb-[30px]  font-medium">
+                                <div className="mb-[15px] text-[#555555] text-xs">
+                                    {intl.formatMessage({ id: 'agent.APIswitch' })}
+                                </div>
+                                <Switch
+                                    size="small"
+                                    onChange={FirstAPI}
+                                    checked={Detaillist && Detaillist.app.enable_api === 1}
+                                    disabled={Detaillist?.app?.publish_status !== 1}
+                                />
+                            </div>
+                            <div className="font-medium">
+                                <div className="mb-[15px] text-[#555555] text-xs">
+                                    {intl.formatMessage({ id: 'agent.filesupload' })}
+                                </div>
+                                <Switch
+                                    size="small"
+                                    onChange={TPUpload}
+                                    checked={
+                                        Detaillist && Detaillist.agent.allow_upload_file == 1
+                                            ? true
+                                            : false
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </Form.Item>
+                    <Form.Item className="mb-[30px]">
+                        <div>
+                            <div className="mb-[15px] text-[#555555] text-xs font-medium">
+                                <span className="text-[#E80000]">* </span>
+                                {intl.formatMessage({ id: 'agent.LLMmodel' })}
+                            </div>
+                            <Select
+                                placeholder={intl.formatMessage({
+                                    id: 'agent.pleaseselect',
+                                })}
+                                // defaultValue="jack"
+                                style={{ width: 270 }}
+                                value={
+                                    Fourthly_config_id == 0
+                                        ? intl.formatMessage({
+                                              id: 'agent.pleaseselect',
+                                          })
+                                        : Fourthly_config_id
+                                }
+                                variant="filled"
+                                onChange={FourthlySelect}
+                                options={options}
+                            />
+                        </div>
+                    </Form.Item>
+                    <Form.Item className="mb-[30px]" name={'obligations'}>
+                        <div className="w-full">
+                            <div className="mb-[15px] text-[#555555] text-xs">
+                                <Callword
+                                    className="font-medium"
+                                    required={true}
+                                    name={intl.formatMessage({
+                                        id: 'agent.functiondescription',
+                                    })}
+                                    title={intl.formatMessage({
+                                        id: 'agent.explain.function',
+                                    })}
+                                />
+                            </div>
+                            <TextArea
+                                onChange={obligations}
+                                value={
+                                    Detaillist && Detaillist.agent && Detaillist.agent.obligations
+                                }
+                                placeholder={`Agent${intl.formatMessage({
+                                    id: 'agent.functiondescription',
+                                })}`}
+                                autoSize={{ minRows: 8, maxRows: 10 }}
+                            />
+                        </div>
+                    </Form.Item>
+                    {Detaillist?.agent?.input_variables && (
+                        <div className="mb-[30px]">
+                            <Variable
+                                title={
                                     <div className="text-[#555555] text-xs">
                                         <Callword
                                             className="font-medium"
                                             required={true}
-                                            name={intl.formatMessage({ id: 'agent.inputvariable' })}
+                                            name={intl.formatMessage({
+                                                id: 'agent.inputvariable',
+                                            })}
                                             title={intl.formatMessage({
                                                 id: 'agent.explain.inputvariable',
                                             })}
                                         />
                                     </div>
-                                    {/* <div>
-                                        <Button
-                                            type="link"
-                                            onClick={() => add()}
-                                            block
-                                            icon={<PlusOutlined />}
-                                        >
-                                            {intl.formatMessage({ id: 'agent.add' })}
-                                        </Button>
-                                    </div> */}
-                                </div>
-                                <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
+                                }
+                                variables={Object.values(
+                                    Detaillist?.agent?.input_variables?.properties || {},
+                                )}
+                                onChange={handleVariableChange}
+                            />
+                        </div>
+                    )}
+
+                    {/* <div className="mb-[11px] text-xs font-bold flex justify-between items-center">
+                        <div className="text-[#555555] text-xs">
+                            <Callword
+                                className="font-medium"
+                                required={true}
+                                name={intl.formatMessage({ id: 'agent.inputvariable' })}
+                                title={intl.formatMessage({
+                                    id: 'agent.explain.inputvariable',
+                                })}
+                            />
+                        </div>
+              
+                    </div> */}
+
+                    <Form.List name="users">
+                        {(fields, { add, remove }) => (
+                            <>
+                                {/* <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
                                     <div className="w-[22%] mr-2 ml-[10px]">
                                         {intl.formatMessage({ id: 'agent.variable.name' })}
                                     </div>
@@ -384,10 +393,10 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     <div className="w-[10%]">
                                         {intl.formatMessage({ id: 'agent.variable.operation' })}
                                     </div>
-                                </div>
-                                <div className="mb-[30px]">
+                                </div> */}
+                                {/* <div className="mb-[30px]">
                                     {fields.map(({ key, name, ...restField }) => (
-                                        // <Space key={key} style={{ width:'100%', display: 'flex', marginBottom: 8, alignItems: 'center' }} align="baseline">
+                                       
                                         <div className="w-full h-20 flex justify-start px-2.5 border-b border-x pt-7 last:rounded-b-lg">
                                             <Form.Item
                                                 className="m-0 w-[22%] mr-2"
@@ -452,11 +461,11 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                 className="w-[15%] mr-2 m-0 flex pl-[2%]"
                                                 {...restField}
                                                 name={[name, 'status']}
-                                                // style={{ flex: 1, alignItems: 'center' }}
+                                             
                                             >
                                                 <Switch
                                                     size="small"
-                                                    // style={{ width: 70 }}
+                                                 
                                                 />
                                             </Form.Item>
                                             <Form.Item className="w-[10%] flex pl-[2%]">
@@ -466,7 +475,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                 ) : null}
                                             </Form.Item>
                                         </div>
-                                        // </Space>
+                                      
                                     ))}
                                     <div
                                         onClick={() => add()}
@@ -474,7 +483,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     >
                                         <PlusOutlined /> {intl.formatMessage({ id: 'agent.add' })}
                                     </div>
-                                </div>
+                                </div> */}
 
                                 <Form.Item className="mb-[30px]">
                                     <div className="text-[#555555] text-xs mb-[15px]">

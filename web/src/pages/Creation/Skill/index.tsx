@@ -173,6 +173,7 @@ const Skill: React.FC = () => {
 
     const Skill_update = async (value: any, newappId?: any) => {
         // if (Operationbentate === 'false') {
+        
         const param = {
             app_id: newappId ? newappId : app_id,
             data: value,
@@ -198,8 +199,11 @@ const Skill: React.FC = () => {
     };
 
     const FirstValue = (value: any, newappId?: any) => {
+        debugger
         Skill_update(value, newappId);
+        debugger
         const param = objecttoarray(value.input_variables);
+        debugger
         Fourthlyref.setFieldsValue(param);
     };
 
@@ -225,6 +229,7 @@ const Skill: React.FC = () => {
     };
     //
     const skillupdata = () => {
+        
         setLoading(true);
         if (!app_id) {
             PostappsCreate(createappdata('GET'))
@@ -235,7 +240,7 @@ const Skill: React.FC = () => {
                             setSkillid(newres.data.id);
                             var data = {};
                             data = {
-                                input_variables: arraytoobject(FirstSkillref.getFieldsValue()),
+                                input_variables:Skillinfo.input_variables ? Skillinfo.input_variables : arraytoobject(FirstSkillref.getFieldsValue()),
                                 is_public: Skillinfo.is_public,
                                 attrs_are_visible:Skillinfo.attrs_are_visible,
                                 dependencies: { python3: !!SkillRelyOn ? SkillRelyOn : [] },
@@ -250,7 +255,7 @@ const Skill: React.FC = () => {
     }`,
                                       }),
                                 output_type: Skillinfo.output_type,
-                                output_variables: arraytoobject(Thirdlyref.getFieldsValue()),
+                                output_variables:Skillinfo.output_variables ? Skillinfo.output_variables : arraytoobject(Thirdlyref.getFieldsValue()),
                             };
                             const param = objecttoarray(
                                 arraytoobject(FirstSkillref.getFieldsValue()),
@@ -271,7 +276,7 @@ const Skill: React.FC = () => {
                 });
         } else {
             const data = {
-                input_variables: arraytoobject(FirstSkillref.getFieldsValue()),
+                input_variables:Skillinfo.input_variables ? Skillinfo.input_variables : arraytoobject(FirstSkillref.getFieldsValue()),
                 is_public: Skillinfo.is_public,
                 attrs_are_visible:Skillinfo.attrs_are_visible,
                 dependencies: { python3: !!SkillRelyOn ? SkillRelyOn : [] },
@@ -286,7 +291,7 @@ const Skill: React.FC = () => {
     }`,
                       }),
                 output_type: Skillinfo.output_type,
-                output_variables: arraytoobject(Thirdlyref.getFieldsValue()),
+                output_variables: Skillinfo.output_variables ? Skillinfo.output_variables : arraytoobject(Thirdlyref.getFieldsValue()),
             };
             const param = objecttoarray(arraytoobject(FirstSkillref.getFieldsValue()));
             Fourthlyref.setFieldsValue(param);

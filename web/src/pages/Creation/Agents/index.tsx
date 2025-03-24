@@ -211,6 +211,7 @@ const Agents: React.FC = () => {
                               type: item.type,
                               content: item.display_name,
                               status: item.required,
+                              ...item,
                           };
                       })
                     : [
@@ -309,10 +310,11 @@ const Agents: React.FC = () => {
         setLoading(true);
         var creationagentid = 0;
         return new Promise((resolve,reject)=>{
-       
+            
         if (!creationappid) {
             PostappsCreate(createappdata('GET'))
                 .then(res => {
+               
                     setcreationappid(res.data.app_id);
                     GetagentInfo(creationappid ? creationappid : res.data.app_id, false)
                         .then(value => {
@@ -340,12 +342,17 @@ const Agents: React.FC = () => {
                         })
                         .catch(err => { resolve('')});
                 })
-                .catch(err => {});
+                .catch(err => {
+                
+                    console.log(err)
+                });
         } else {
+            
             GetagentInfo(creationappid, false)
                 .then(value => {
                     creationagentid = value.data.agent.agent_id;
                     agentfirst(creationagentid);
+            
                     resolve('')
                     setTimeout(() => {
                         agentsecond(creationagentid);
@@ -372,7 +379,7 @@ const Agents: React.FC = () => {
                         enable_api: Detaillist.app.enable_api,
                         attrs_are_visible: Detaillist.app.attrs_are_visible,
                         obligations: Detaillist.agent.obligations,
-                        input_variables: arraytoobject(Ffromref.getFieldsValue()),
+                        input_variables:Detaillist.agent.input_variables ? Detaillist.agent.input_variables : arraytoobject(Ffromref.getFieldsValue()),
                         dataset_ids: repository,
                         m_config_id: Fourthly_config_id,
                         allow_upload_file: Detaillist.agent.allow_upload_file,
@@ -625,6 +632,8 @@ const Agents: React.FC = () => {
                                             display: pageKey === '2' ? 'flex' : 'none',
                                             height: 'calc(100vh - 146px)',
                                             justifyContent: 'center',
+                                            position: 'sticky',
+                                            top: '-150px',
                                         }}
                                     >
                                         <AgentsSecond
