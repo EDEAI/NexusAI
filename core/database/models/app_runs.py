@@ -1,6 +1,7 @@
 from core.database import MySQL
 from typing import Any, Dict, List
 import math
+from config import settings
 
 class AppRuns(MySQL):
     """
@@ -36,7 +37,7 @@ class AppRuns(MySQL):
 
         :return: A list of dictionaries, each representing a runnable workflow run along with its associated workflow details.
         """
-        return self.select(
+        list = self.select(
             columns=['id AS app_run_id', 'user_id', 'app_id', 'workflow_id', 'type', 'name AS run_name', 'graph', 'inputs', 'knowledge_base_mapping',
                 'level', 'context', 'completed_edges', 'skipped_edges', 'status', 'completed_steps', 'actual_completed_steps', 'need_human_confirm', 'outputs', 'elapsed_time', 
                 'prompt_tokens', 'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps', 'created_time', 'finished_time', 
@@ -55,6 +56,12 @@ class AppRuns(MySQL):
                 ]
             ],
         )
+
+        for item in list:
+            if item.get('avatar'):
+                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+
+        return list
 
     def get_running_app_run(self, app_run_id: int) -> Dict[str, Any]:
         """
@@ -145,6 +152,10 @@ class AppRuns(MySQL):
             offset = (data['page'] - 1) * data['page_size']
         )
 
+        for item in list:
+            if item.get('avatar'):
+                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+
         # Add additional query to count records with need_human_confirm == 1
         human_confirm_total = self.select(
             aggregates={"id": "count"},
@@ -181,7 +192,7 @@ class AppRuns(MySQL):
                 {"column": "app_runs.user_id", "value": data['user_id']}
             ])
 
-        return self.select(
+        list = self.select(
             columns=['app_runs.id AS app_run_id', 'apps.name AS apps_name', 'app_runs.name AS app_runs_name',
                      'app_runs.workflow_id', 'app_runs.created_time', 'app_runs.elapsed_time', 'app_runs.status',
                      'app_runs.completed_steps', 'app_runs.total_steps', 'app_runs.need_human_confirm', 'apps.icon', "apps.avatar", 'apps.icon_background'],
@@ -190,6 +201,12 @@ class AppRuns(MySQL):
             order_by = "app_runs.id DESC",
             limit=data['page_size']
         )
+
+        for item in list:
+            if item.get('avatar'):
+                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+
+        return list
 
     def increment_steps(self, app_run_id: int) -> bool:
         """
