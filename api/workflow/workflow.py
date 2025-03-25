@@ -213,18 +213,27 @@ async def workflow_app_update(request: Request, app_id: int, data: ReqWorkflowsA
     # verify params
     
     if is_public not in [0, 1]:
-        return response_error(get_language_content("is_public can only input 0 or 1"))
+        return response_error(get_language_content("api_agent_base_update_is_public_error"))
     if enable_api not in [0, 1]:
-        return response_error(get_language_content("enable_api can only input 0 or 1"))
+        return response_error(get_language_content("api_agent_base_update_enable_api_error"))
     if graph:
-
         try:
             graph_res = create_graph_from_dict(graph)
             if graph_res:
+                # Check if the graph contains a start node
+                has_start_node = False
+                for node in graph_res.nodes.nodes:
+                    if node.data.get('type') == 'start':
+                        has_start_node = True
+                        break
+                
+                if not has_start_node:
+                    return response_error(get_language_content("graph_data_in_wrong_format"))
+                
                 graph = graph_res.to_dict()
 
         except:
-            return response_error(get_language_content("graph data in wrong format"))
+            return response_error(get_language_content("graph_data_in_wrong_format"))
 
     workflows_model = Workflows()
     result = workflows_model.workflow_app_update(app_id, userinfo.uid, is_public, enable_api, graph)

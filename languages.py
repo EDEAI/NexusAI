@@ -1055,6 +1055,7 @@ language_packs = {
         "chatroom_table_orientation": "round_table_orientation",
         'round_table_orientation_operation': 'round_table_orientation_operation',
         'avatar_or_icon_required': 'At least one avatar or icon needs to be filled in',
+        "graph_data_in_wrong_format": "Graph data is in the wrong format",
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1365,6 +1366,7 @@ language_packs = {
         "chatroom_table_orientation": "圆桌导向",
         'round_table_orientation_operation': '圆桌导向运行',
         'avatar_or_icon_required': '头像或图标至少需要填写一个',
+        "graph_data_in_wrong_format": "图数据格式错误",
     }
 }
 

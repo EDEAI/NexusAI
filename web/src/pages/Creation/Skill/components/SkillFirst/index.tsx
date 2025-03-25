@@ -1,4 +1,5 @@
 import Callword from '@/components/callword';
+import Variable from '@/components/WorkFlow/components/Variable';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
@@ -36,6 +37,9 @@ const SkillFirst: React.FC<ChildProps> = ({
     };
     const attrFirstAPI = (checked: any) => {
         setSkillInfo({ ...Skillinfo, attrs_are_visible: checked ? 1 : 0 });
+    };
+    const handleVariableChange = (value: any) => {
+        setSkillInfo({ ...Skillinfo, input_variables: value.free });
     };
     //
     const nextStep = (value: any, type: any) => {
@@ -139,7 +143,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                                     checked={Skillinfo && Skillinfo.attrs_are_visible == 1 ? true : false}
                                 />
                             </Form.Item>
-                            <div className="mb-[11px] text-xs font-bold flex justify-between items-center">
+                            {/* <div className="mb-[11px] text-xs font-bold flex justify-between items-center">
                                 <div className="text-[#555555] text-xs font-medium">
                                     <Callword
                                         required={true}
@@ -159,8 +163,34 @@ const SkillFirst: React.FC<ChildProps> = ({
                                         {intl.formatMessage({ id: 'skill.add' })}
                                     </Button>
                                 </div>
-                            </div>
-                            <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
+                            </div> */}
+                            {Skillinfo?.input_variables && (
+                                <div className="mb-[30px]">
+                                    <Variable
+                                        title={
+                                            <div className="text-[#555555] text-xs">
+                                                <Callword
+                                                    className="font-medium"
+                                                    required={true}
+                                                    name={intl.formatMessage({
+                                                        id: 'skill.inputvariable',
+                                                    })}
+                                                    title={intl.formatMessage({
+                                                        id: 'skill.Callword.inputvariable',
+                                                    })}
+                                                />
+                                            </div>
+                                        }
+                                        variableTypes={['string', 'number', 'json']}
+                                        variables={Object.values(
+                                            Skillinfo?.input_variables?.properties || {},
+                                        )}
+                                        onChange={handleVariableChange}
+                                    />
+                                </div>
+                            )}
+
+                            {/* <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
                                 <div className="w-48 mr-5 ml-[10px]">
                                     {intl.formatMessage({ id: 'skill.variable.name' })}
                                 </div>
@@ -177,7 +207,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                             </div>
                             <div>
                                 {fields.map(({ key, name, ...restField }) => (
-                                    // <Space key={key} style={{ display: 'flex', marginBottom: 8, alignItems: 'center' }} align="baseline">
+                                
                                     <div
                                         className="w-full h-20 flex justify-start  px-2.5 border-b border-x pt-7 last:rounded-b-lg"
                                         key={key}
@@ -234,7 +264,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                                             name={[name, 'type']}
                                         >
                                             <Select
-                                                // style={{ width: 120 }}
+                                              
                                                 defaultValue={'string'}
                                                 options={[
                                                     { value: 'string', label: 'String' },
@@ -247,7 +277,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                                             className="w-12 mr-[100px] m-0"
                                             {...restField}
                                             name={[name, 'status']}
-                                            // style={{ flex: 1, alignItems: 'center', }}
+                                          
                                         >
                                             <Switch size="small" />
                                         </Form.Item>
@@ -258,9 +288,9 @@ const SkillFirst: React.FC<ChildProps> = ({
                                             ) : null}
                                         </Form.Item>
                                     </div>
-                                    // </Space>
+                              
                                 ))}
-                            </div>
+                            </div> */}
                         </>
                     )}
                 </Form.List>
