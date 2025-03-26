@@ -2,7 +2,7 @@ import Callword from '@/components/callword';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Form, Input, message, Radio, Switch } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 const { TextArea } = Input;
 
 interface ChildProps {
@@ -32,7 +32,6 @@ const AgentsSecond: React.FC<ChildProps> = ({
 }) => {
     const intl = useIntl();
     const [messageApi, contextHolder] = message.useMessage();
-    const containerRef = useRef<HTMLDivElement>(null);
     const [agentAbilities, setAgentAbilities] = useState({
         auto_match_ability: 0,
         agent_abilities: [
@@ -98,20 +97,8 @@ const AgentsSecond: React.FC<ChildProps> = ({
             agent: { ...Detaillist.agent, auto_match_ability: checked ? 1 : 0 },
         });
     };
-
-    const scrollToBottom = () => {
-        setTimeout(() => {
-            if (containerRef.current) {
-                containerRef.current.scrollTo({
-                    top: containerRef.current.scrollHeight,
-                    behavior: 'smooth',
-                });
-            }
-        }, 100);
-    };
-
     return (
-        <div style={{ height: '100%' }} className="w-full flex-1 sticky top-0">
+        <div style={{ height: '100%' }} className='w-full flex-1'>
             <div className="text-base font-medium text-[#333333] my-[30px]">
                 {intl.formatMessage({ id: 'agent.Applicationcapabilitysetting' })}
             </div>
@@ -145,170 +132,147 @@ const AgentsSecond: React.FC<ChildProps> = ({
                                     <div className=" text-[#555555] text-xs font-medium">
                                         {intl.formatMessage({ id: 'agent.capability' })}
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <Button
                                             type="link"
-                                            onClick={() => {
-                                                add();
-                                                scrollToBottom();
-                                            }}
+                                            onClick={() => add()}
                                             block
                                             icon={<PlusOutlined />}
                                         >
                                             {intl.formatMessage({ id: 'agent.add' })}
                                         </Button>
-                                    </div>
+                                    </div> */}
                                 </div>
-                                <div
-                                    style={{ height: 'calc(100vh - 206px)', overflowY: 'auto' }}
-                                    className="overflow-y-auto"
-                                    ref={containerRef}
-                                >
-                                    {fields.map(({ key, name, ...restField }) => (
-                                        <div className="bg-[#F7F7F7] p-[15px] rounded-lg mb-[20px]">
-                                            <Form.Item className="mb-0">
-                                                <div className="w-full flex justify-between items-center mb-[15px]">
-                                                    <div className="text-[#555555] text-xs font-medium">
-                                                        {intl.formatMessage({
-                                                            id: 'agent.capabilityname',
-                                                        })}
-                                                    </div>
-                                                    <div>
-                                                        {' '}
-                                                        <DeleteOutlined
-                                                            onClick={() => remove(name)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </Form.Item>
-                                            <Form.Item
-                                                className="mb-[20px]"
-                                                {...restField}
-                                                name={[name, 'name']}
-                                                rules={[
-                                                    {
-                                                        required: fields.length !== 1,
-                                                        message: intl.formatMessage({
-                                                            id: 'agent.capabilityname',
-                                                        }),
-                                                    },
-                                                ]}
-                                            >
-                                                <Input
-                                                    placeholder={intl.formatMessage({
+                                {fields.map(({ key, name, ...restField }) => (
+                                    <div className="bg-[#F7F7F7] p-[15px] rounded-lg mb-[20px]">
+                                        <Form.Item className="mb-0">
+                                            <div className="w-full flex justify-between items-center mb-[15px]">
+                                                <div className="text-[#555555] text-xs font-medium">
+                                                    {intl.formatMessage({
                                                         id: 'agent.capabilityname',
                                                     })}
-                                                    maxLength={50}
-                                                    className="w-full"
-                                                />
-                                            </Form.Item>
-                                            {/* </Space> */}
-                                            <div className="mb-[15px]">
-                                                <Callword
-                                                    className="text-[#555555] text-xs font-medium"
-                                                    name={intl.formatMessage({
-                                                        id: 'agent.capabilitydescription',
-                                                    })}
-                                                    title={intl.formatMessage({
-                                                        id: 'agent.explain.capabilitydescription',
-                                                    })}
-                                                />
+                                                </div>
+                                                <div>
+                                                    {' '}
+                                                    <DeleteOutlined onClick={() => remove(name)} />
+                                                </div>
                                             </div>
-                                            <Form.Item
-                                                className="w-full mb-[20px]"
-                                                {...restField}
-                                                name={[name, 'content']}
-                                                rules={[
-                                                    {
-                                                        required: fields.length !== 1,
-                                                        message: intl.formatMessage({
-                                                            id: 'agent.capabilitydescription',
-                                                        }),
-                                                    },
-                                                ]}
-                                            >
-                                                <TextArea
-                                                    placeholder={intl.formatMessage({
-                                                        id: 'agent.capabilitydescription',
-                                                    })}
-                                                    autoSize={{ minRows: 3, maxRows: 10 }}
-                                                    className="w-full"
-                                                />
-                                            </Form.Item>
-                                            <div className="text-[#555555] text-xs font-medium mb-[15px]">
-                                                {intl.formatMessage({
-                                                    id: 'agent.capabilitystatus',
+                                        </Form.Item>
+                                        <Form.Item
+                                            className="mb-[20px]"
+                                            {...restField}
+                                            name={[name, 'name']}
+                                            rules={[
+                                                {
+                                                    required: fields.length !== 1,
+                                                    message: intl.formatMessage({
+                                                        id: 'agent.capabilityname',
+                                                    }),
+                                                },
+                                            ]}
+                                        >
+                                            <Input
+                                                placeholder={intl.formatMessage({
+                                                    id: 'agent.capabilityname',
                                                 })}
-                                            </div>
-                                            <Form.Item
-                                                className="mb-[20px]"
-                                                {...restField}
-                                                name={[name, 'status']}
-                                                // label={''}
-                                            >
-                                                <Radio.Group
-                                                    optionType="button"
-                                                    buttonStyle="solid"
-                                                    defaultValue={true}
-                                                >
-                                                    <Radio value={true}>
-                                                        {intl.formatMessage({
-                                                            id: 'agent.capabilitystatus.enable',
-                                                        })}
-                                                    </Radio>
-                                                    <Radio value={false}>
-                                                        {intl.formatMessage({
-                                                            id: 'agent.capabilitystatus.disable',
-                                                        })}
-                                                    </Radio>
-                                                </Radio.Group>
-                                            </Form.Item>
-                                            <div className="text-[#555555] text-xs font-medium mb-[11px]">
-                                                {intl.formatMessage({ id: 'agent.enableall' })}
-                                            </div>
-                                            <Form.Item
-                                                className="mb-0"
-                                                name={[name, 'output_format']}
-                                            >
-                                                <Radio.Group defaultValue={0}>
-                                                    <Radio value={0}>
-                                                        <div className="text-[#555555] text-xs font-normal">
-                                                            {intl.formatMessage({
-                                                                id: 'agent.menu',
-                                                            })}
-                                                        </div>
-                                                    </Radio>
-                                                    <Radio value={1}>
-                                                        <div className="text-[#555555] text-xs font-normal">
-                                                            text string
-                                                        </div>
-                                                    </Radio>
-                                                    <Radio value={2}>
-                                                        <div className="text-[#555555] text-xs font-normal">
-                                                            format json
-                                                        </div>
-                                                    </Radio>
-                                                    <Radio value={3}>
-                                                        <div className="text-[#555555] text-xs font-normal">
-                                                            code
-                                                        </div>
-                                                    </Radio>
-                                                </Radio.Group>
-                                            </Form.Item>
+                                                maxLength={50}
+                                                className="w-full"
+                                            />
+                                        </Form.Item>
+                                        {/* </Space> */}
+                                        <div className="mb-[15px]">
+                                            <Callword
+                                                className="text-[#555555] text-xs font-medium"
+                                                name={intl.formatMessage({
+                                                    id: 'agent.capabilitydescription',
+                                                })}
+                                                title={intl.formatMessage({
+                                                    id: 'agent.explain.capabilitydescription',
+                                                })}
+                                            />
                                         </div>
-                                    ))}
-                                </div>
-
-                                {/* <div
-                                    onClick={() => {
-                                        add();
-                                        scrollToBottom();
-                                    }}
-                                    className="w-full p-6 mt-5 flex items-center gap-1 justify-center border  border-transparent  hover:border-dashed  hover:border-[#1B64F3] hover:text-[#1B64F3] cursor-pointer bg-[#F7F7F7] rounded-lg mb-4"
+                                        <Form.Item
+                                            className="w-full mb-[20px]"
+                                            {...restField}
+                                            name={[name, 'content']}
+                                            rules={[
+                                                {
+                                                    required: fields.length !== 1,
+                                                    message: intl.formatMessage({
+                                                        id: 'agent.capabilitydescription',
+                                                    }),
+                                                },
+                                            ]}
+                                        >
+                                            <TextArea
+                                                placeholder={intl.formatMessage({
+                                                    id: 'agent.capabilitydescription',
+                                                })}
+                                                autoSize={{ minRows: 3, maxRows: 10 }}
+                                                className="w-full"
+                                            />
+                                        </Form.Item>
+                                        <div className="text-[#555555] text-xs font-medium mb-[15px]">
+                                            {intl.formatMessage({ id: 'agent.capabilitystatus' })}
+                                        </div>
+                                        <Form.Item
+                                            className="mb-[20px]"
+                                            {...restField}
+                                            name={[name, 'status']}
+                                            // label={''}
+                                        >
+                                            <Radio.Group
+                                                optionType="button"
+                                                buttonStyle="solid"
+                                                defaultValue={true}
+                                            >
+                                                <Radio value={true}>
+                                                    {intl.formatMessage({
+                                                        id: 'agent.capabilitystatus.enable',
+                                                    })}
+                                                </Radio>
+                                                <Radio value={false}>
+                                                    {intl.formatMessage({
+                                                        id: 'agent.capabilitystatus.disable',
+                                                    })}
+                                                </Radio>
+                                            </Radio.Group>
+                                        </Form.Item>
+                                        <div className="text-[#555555] text-xs font-medium mb-[11px]">
+                                            {intl.formatMessage({ id: 'agent.enableall' })}
+                                        </div>
+                                        <Form.Item className="mb-0" name={[name, 'output_format']}>
+                                            <Radio.Group defaultValue={0}>
+                                                <Radio value={0}>
+                                                    <div className="text-[#555555] text-xs font-normal">
+                                                        {intl.formatMessage({ id: 'agent.menu' })}
+                                                    </div>
+                                                </Radio>
+                                                <Radio value={1}>
+                                                    <div className="text-[#555555] text-xs font-normal">
+                                                        text string
+                                                    </div>
+                                                </Radio>
+                                                <Radio value={2}>
+                                                    <div className="text-[#555555] text-xs font-normal">
+                                                        format json
+                                                    </div>
+                                                </Radio>
+                                                <Radio value={3}>
+                                                    <div className="text-[#555555] text-xs font-normal">
+                                                        code
+                                                    </div>
+                                                </Radio>
+                                            </Radio.Group>
+                                        </Form.Item>
+                                    </div>
+                                ))}
+                                <div
+                                    onClick={() => add()}
+                                    className="w-full p-6  flex items-center gap-1 justify-center border  border-transparent  hover:border-dashed  hover:border-[#1B64F3] hover:text-[#1B64F3] cursor-pointer bg-[#F7F7F7] rounded-lg mb-4"
                                 >
-                                    <PlusOutlined />{' '}
-                                    {intl.formatMessage({ id: 'agent.addAbility' })}
-                                </div> */}
+                                    <PlusOutlined /> {intl.formatMessage({ id: 'agent.addAbility' })}
+                                </div>
                             </>
                         )}
                     </Form.List>

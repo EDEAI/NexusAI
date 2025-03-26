@@ -14,7 +14,7 @@ interface VariableItem {
     name: string;
     display_name: string;
     max_length?: number;
-    required: boolean|0|1;
+    required: boolean;
     type: string;
 }
 
@@ -23,14 +23,12 @@ interface VariableList {
     onChange?: (obj: { value: VariableItem[]; free: ObjectVariable }) => void;
     title?: React.ReactNode;
     variableTypes?: string[];
-    readonly?: boolean;
 }
 
 type VariableProps = VariableItem & {
     onEdit: () => void;
     onDel: () => void;
     key: number;
-    readonly?: boolean;
 };
 
 const Variable = memo((props: VariableProps) => {
@@ -46,7 +44,7 @@ const Variable = memo((props: VariableProps) => {
     return (
         <div
             ref={ref}
-            className={`flex bg-white gap-2 justify-between truncate h-10 items-center p-2 border border-slate-300 ${props.readonly ? 'border-slate-200' : 'hover:border-blue-400'} rounded-md mt-2 cursor-pointer`}
+            className="flex bg-white gap-2 justify-between truncate h-10 items-center p-2 border border-slate-300 hover:border-blue-400 rounded-md mt-2 cursor-pointer"
         >
             <div className="flex items-center gap-1 truncate">
                 <div>
@@ -57,7 +55,7 @@ const Variable = memo((props: VariableProps) => {
                 <div className="max-w-20 truncate text-gray-500">{props.display_name}</div>
             </div>
             <div className="shrink-0">
-                {isHovering && !props.readonly ? (
+                {isHovering ? (
                     <div className="flex gap-1 ">
                         <Button type="text" icon={<EditOutlined />} onClick={props.onEdit}></Button>
                         <Button
@@ -68,8 +66,8 @@ const Variable = memo((props: VariableProps) => {
                     </div>
                 ) : (
                     <div className="flex items-center gap-2 ">
-                        {(props.required||props.required==1 ) && <div className="text-slate-500 text-xs">{intl.formatMessage({ id: 'workflow.vars.required',defaultMessage:'' })}</div>}
-                        <div>{typeObject[props.type]||props.type}</div>
+                        {props.required && <div className="text-slate-500 text-xs">{intl.formatMessage({ id: 'workflow.vars.required',defaultMessage:'' })}</div>}
+                        <div>{typeObject[props.type]}</div>
                     </div>
                 )}
             </div>
@@ -92,7 +90,6 @@ export default memo((props: VariableList) => {
     const [variables, setVariables] = useControllableValue(props?.variables || [], {
         defaultValue: [],
     });
-    const readonly = props.readonly || false;
 
     useMount(() => {
         props?.variables && setVariables(props.variables);
@@ -116,7 +113,7 @@ export default memo((props: VariableList) => {
 
     useUpdateEffect(() => {
         objectTransformFlow();
-        props?.onChange?.({
+        props.onChange?.({
             value: variables,
             free: objectTransformFlow(),
         });
@@ -156,26 +153,23 @@ export default memo((props: VariableList) => {
             <div>
                 <div className="flex justify-between items-center pt-4">
                     {props.title || <div>{intl.formatMessage({ id: 'workflow.vars.inputFields' })}</div>}
-                    {!readonly && (
-                        <Button
-                            onClick={() => {
-                                formRef.current?.resetFields();
-                                resetFormDefault();
-                                setEditIndex(-1);
-                                setIsModalOpen(true);
-                            }}
-                            type="text"
-                            shape="default"
-                            icon={<PlusOutlined />}
-                        />
-                    )}
+                    <Button
+                        onClick={() => {
+                            formRef.current?.resetFields();
+                            resetFormDefault();
+                            setEditIndex(-1);
+                            setIsModalOpen(true);
+                        }}
+                        type="text"
+                        shape="default"
+                        icon={<PlusOutlined />}
+                    />
                 </div>
                 <div>
                     {variables.map((item, index) => (
                         <Variable
                             {...item}
                             key={index}
-                            readonly={readonly}
                             onEdit={() => editVariable(index)}
                             onDel={() => delVariable(index)}
                         ></Variable>

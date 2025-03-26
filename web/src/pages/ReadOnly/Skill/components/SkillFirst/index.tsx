@@ -1,5 +1,4 @@
 import Callword from '@/components/callword';
-import Variable from '@/components/WorkFlow/components/Variable';
 import { useIntl } from '@umijs/max';
 import { Form, Input, Select, Switch } from 'antd';
 import React, { useEffect } from 'react';
@@ -124,33 +123,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                                 }
                             />
                         </Form.Item>
-                        {Skillinfo?.input_variables && (
-                                <div className="mb-[30px]">
-                                    <Variable
-                                    readonly
-                                        title={
-                                            <div className="text-[#555555] text-xs">
-                                                <Callword
-                                                    className="font-medium"
-                                                    required={true}
-                                                    name={intl.formatMessage({
-                                                        id: 'skill.inputvariable',
-                                                    })}
-                                                    title={intl.formatMessage({
-                                                        id: 'skill.Callword.inputvariable',
-                                                    })}
-                                                />
-                                            </div>
-                                        }
-                                        variableTypes={['string', 'number', 'json']}
-                                        variables={Object.values(
-                                            Skillinfo?.input_variables?.properties || {},
-                                        )}
-                                        // onChange={handleVariableChange}
-                                    />
-                                </div>
-                            )}
-                        {/* <div className="mb-[15px] text-xs font-bold flex justify-between items-center">
+                        <div className="mb-[15px] text-xs font-bold flex justify-between items-center">
                             <div className="text-[#555555] text-xs font-medium">
                                 <Callword
                                     name={intl.formatMessage({ id: 'skill.inputvariable' })}
@@ -159,8 +132,8 @@ const SkillFirst: React.FC<ChildProps> = ({
                                     })}
                                 />
                             </div>
-                        </div> */}
-                        {/* <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7]  rounded-t-lg">
+                        </div>
+                        <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7]  rounded-t-lg">
                             <div className="w-[300px] ml-2.5">
                                 {intl.formatMessage({ id: 'skill.variable.name' })}
                             </div>
@@ -173,8 +146,8 @@ const SkillFirst: React.FC<ChildProps> = ({
                             <div className="w-[70px]">
                                 {intl.formatMessage({ id: 'skill.variable.required' })}
                             </div>
-                        </div> */}
-                        {/* <div>
+                        </div>
+                        <div>
                             {FirstSkillref &&
                                 FirstSkillref.getFieldValue().users &&
                                 FirstSkillref.getFieldValue().users.map(
@@ -234,7 +207,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                                         );
                                     },
                                 )}
-                        </div> */}
+                        </div>
                         <div className="h-[30px] w-1"></div>
                     </>
                 )}
