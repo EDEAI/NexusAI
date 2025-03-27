@@ -397,7 +397,7 @@ const Creation: React.FC = () => {
                                       onClick={() => {
                                           appModalChange(item);
                                       }}
-                                      className="flex justify-center items-center h-8 rounded-lg mr-4 cursor-pointer px-[10px]"
+                                      className="flex justify-center items-center h-8 rounded-lg mr-4 cursor-pointer hover:bg-white px-[10px]"
                                       style={
                                           creationsearchdata('GET').optionsModalId == item.apps_mode
                                               ? { color: '#1B64F3', backgroundColor: '#ffffff' }
@@ -758,7 +758,7 @@ const Creation: React.FC = () => {
                                                                   <Popover
                                                                       placement="bottomLeft"
                                                                       content={
-                                                                          <div className=" overflow-auto">
+                                                                          <div className=" overflow-auto max-h-[300px]">
                                                                               {item.list.map(
                                                                                   (
                                                                                       value: any,

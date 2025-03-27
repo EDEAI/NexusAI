@@ -8,6 +8,7 @@ import React, { useEffect } from 'react';
 
 const { TextArea } = Input;
 interface ChildProps {
+    loading: boolean;
     FirstValue: (value: any) => void;
     FirstSkillref: any;
     Skillinfo: any;
@@ -19,6 +20,7 @@ interface ChildProps {
     setskillmenudisabled: any;
 }
 const SkillFirst: React.FC<ChildProps> = ({
+    loading,
     FirstValue,
     FirstSkillref,
     Skillinfo,
@@ -164,7 +166,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                                     </Button>
                                 </div>
                             </div> */}
-                            {Skillinfo?.input_variables && (
+                            {!loading && (
                                 <div className="mb-[30px]">
                                     <Variable
                                         title={

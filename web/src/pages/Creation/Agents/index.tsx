@@ -20,12 +20,13 @@ import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
 import { Button, Form, Menu, message, Spin, Splitter } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
+import { history } from 'umi';
 import AgentsFirst from '../components/AgentsFirst';
 import AgentsFourthly from '../components/AgentsFourthly';
 import AgentsSecond from '../components/AgentsSecond';
 import Chat from './Chat';
 import Log from './Log';
-import { history } from 'umi';
+import _ from 'lodash';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -53,7 +54,7 @@ const Agents: React.FC = () => {
     const [fromdata, setFromdata] = useState(null);
     const [newagentid, setNewagentid] = useState(null);
     const [creationappid, setcreationappid] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [agentmenudisabled, setAgentmunudisabled] = useState({
         first: false,
         second: false,
@@ -96,7 +97,7 @@ const Agents: React.FC = () => {
             key: '5',
             disabled: agentmenudisabled.fourthly,
             icon: <FileTextOutlined />,
-            label:intl.formatMessage({id:'app.dashboard.run_log_agent'}),
+            label: intl.formatMessage({ id: 'app.dashboard.run_log_agent' }),
             style: {
                 padding: '15px',
                 width: '100%',
@@ -118,6 +119,7 @@ const Agents: React.FC = () => {
                 second: true,
                 fourthly: true,
             });
+            setLoading(false);
         }
         getAgent();
     }, []);
@@ -199,6 +201,7 @@ const Agents: React.FC = () => {
                 { value: 0, label: intl.formatMessage({ id: 'agent.allability' }) },
             ]),
         );
+        setLoading(false);
     };
 
     const objecttoarray = (obj?: any) => {
@@ -251,25 +254,38 @@ const Agents: React.FC = () => {
     };
 
     const firstjudgingcondition = () => {
-        const firstusers = Ffromref.getFieldsValue().users.filter((item: any) => {
-            return !item || !item.name || !item.content;
-        });
-        if (!Ffromref.getFieldsValue().users[0]) {
+        // const firstusers = Ffromref.getFieldsValue().users.filter((item: any) => {
+        //     return !item || !item.name || !item.content;
+        // });
+        // if (!Ffromref.getFieldsValue().users[0]) {
+        //     message.warning(intl.formatMessage({ id: 'agent.message.warning.variable' }));
+        //     return true;
+        // } 
+        // else
+        if (!Detaillist.agent.input_variables) {
             message.warning(intl.formatMessage({ id: 'agent.message.warning.variable' }));
             return true;
-        } else if (!Fourthly_config_id) {
+        }
+        if(_.isEmpty(Detaillist.agent.input_variables.properties)){
+            message.warning(intl.formatMessage({ id: 'agent.message.warning.variable' }));
+            return true;
+        }
+        
+         if (!Fourthly_config_id) {
             message.warning(intl.formatMessage({ id: 'agent.message.warning.LLM' }));
             return true;
         } else if (!Detaillist.agent.obligations) {
             message.warning(intl.formatMessage({ id: 'agent.message.warning.functiondescribe' }));
             return true;
-        } else if (firstusers.length !== 0) {
-            message.warning(intl.formatMessage({ id: 'agent.message.warning.completevariable' }));
-            return true;
-        } else if (hasDuplicateField(Ffromref.getFieldsValue().users, 'name')) {
+        }else if (hasDuplicateField(Ffromref.getFieldsValue().users, 'name')) {
             message.warning(intl.formatMessage({ id: 'agent.message.warning.repetition' }));
             return true;
         }
+
+        // else if (firstusers.length !== 0) {
+        //     message.warning(intl.formatMessage({ id: 'agent.message.warning.completevariable' }));
+        //     return true;
+        // } 
         return false;
     };
 
@@ -309,63 +325,63 @@ const Agents: React.FC = () => {
     const agentupdata = () => {
         setLoading(true);
         var creationagentid = 0;
-        return new Promise((resolve,reject)=>{
-            
-        if (!creationappid) {
-            PostappsCreate(createappdata('GET'))
-                .then(res => {
-               
-                    setcreationappid(res.data.app_id);
-                    GetagentInfo(creationappid ? creationappid : res.data.app_id, false)
-                        .then(value => {
-                            resolve(value)
-                            creationagentid = value.data.agent.agent_id;
-                            agentfirst(creationagentid);
-                            if (res.data.app_id) {
-                                history.replace(`/Agents?app_id=${res.data.app_id}&type=false`);
-                            }
-                            setTimeout(() => {
-                                agentsecond(creationagentid);
-                                message.success(
-                                    intl.formatMessage({ id: 'skill.conserve.success' }),
-                                );
-                            }, 500);
-                            setTimeout(() => {
-                                getAgent(res.data.app_id);
-                                const createdData = {
-                                    ...createappdata('GET'),
-                                    app_id: res.data.app_id,
-                                };
-                                createappdata('SET', createdData);
-                            }, 1000);
-                            setNewagentid(creationagentid);
-                        })
-                        .catch(err => { resolve('')});
-                })
-                .catch(err => {
-                
-                    console.log(err)
-                });
-        } else {
-            
-            GetagentInfo(creationappid, false)
-                .then(value => {
-                    creationagentid = value.data.agent.agent_id;
-                    agentfirst(creationagentid);
-            
-                    resolve('')
-                    setTimeout(() => {
-                        agentsecond(creationagentid);
-                        message.success(intl.formatMessage({ id: 'skill.conserve.success' }));
-                    }, 500);
-                    setTimeout(() => {
-                        getAgent(creationappid);
-                    }, 1000);
-                    setNewagentid(creationagentid);
-                })
-                .catch(err => { resolve('')});
-        }
-    })
+        return new Promise((resolve, reject) => {
+            if (!creationappid) {
+                PostappsCreate(createappdata('GET'))
+                    .then(res => {
+                        setcreationappid(res.data.app_id);
+                        GetagentInfo(creationappid ? creationappid : res.data.app_id, false)
+                            .then(value => {
+                                resolve(value);
+                                creationagentid = value.data.agent.agent_id;
+                                agentfirst(creationagentid);
+                                if (res.data.app_id) {
+                                    history.replace(`/Agents?app_id=${res.data.app_id}&type=false`);
+                                }
+                                setTimeout(() => {
+                                    agentsecond(creationagentid);
+                                    message.success(
+                                        intl.formatMessage({ id: 'skill.conserve.success' }),
+                                    );
+                                }, 500);
+                                setTimeout(() => {
+                                    getAgent(res.data.app_id);
+                                    const createdData = {
+                                        ...createappdata('GET'),
+                                        app_id: res.data.app_id,
+                                    };
+                                    createappdata('SET', createdData);
+                                }, 1000);
+                                setNewagentid(creationagentid);
+                            })
+                            .catch(err => {
+                                resolve('');
+                            });
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+            } else {
+                GetagentInfo(creationappid, false)
+                    .then(value => {
+                        creationagentid = value.data.agent.agent_id;
+                        agentfirst(creationagentid);
+
+                        resolve('');
+                        setTimeout(() => {
+                            agentsecond(creationagentid);
+                            message.success(intl.formatMessage({ id: 'skill.conserve.success' }));
+                        }, 500);
+                        setTimeout(() => {
+                            getAgent(creationappid);
+                        }, 1000);
+                        setNewagentid(creationagentid);
+                    })
+                    .catch(err => {
+                        resolve('');
+                    });
+            }
+        });
     };
 
     const agentfirst = (agent_id: any, e?: any) => {
@@ -379,7 +395,9 @@ const Agents: React.FC = () => {
                         enable_api: Detaillist.app.enable_api,
                         attrs_are_visible: Detaillist.app.attrs_are_visible,
                         obligations: Detaillist.agent.obligations,
-                        input_variables:Detaillist.agent.input_variables ? Detaillist.agent.input_variables : arraytoobject(Ffromref.getFieldsValue()),
+                        input_variables: Detaillist.agent.input_variables
+                            ? Detaillist.agent.input_variables
+                            : arraytoobject(Ffromref.getFieldsValue()),
                         dataset_ids: repository,
                         m_config_id: Fourthly_config_id,
                         allow_upload_file: Detaillist.agent.allow_upload_file,
@@ -513,8 +531,8 @@ const Agents: React.FC = () => {
                         items={items}
                     />
                     {Detaillist &&
-                    Detaillist.app.enable_api === 1 &&
-                    Detaillist.app.publish_status === 1 ? (
+                    Detaillist.app?.enable_api === 1 &&
+                    Detaillist.app?.publish_status === 1 ? (
                         <div
                             className="w-full h-[40px] rounded-lg text-[#000] hover:bg-[#f0f0f0] p-[12px] pl-[16px] cursor-pointer"
                             onClick={async () => {
@@ -608,24 +626,26 @@ const Agents: React.FC = () => {
                                             justifyContent: 'center',
                                         }}
                                     >
-                                        <AgentsFirst
-                                            FirstValue={handleValueFromChid}
-                                            Ffromref={Ffromref}
-                                            Detaillist={Detaillist}
-                                            setDetaillist={setDetaillist}
-                                            repository={repository}
-                                            setRepository={setRepository}
-                                            Newproperties={Newproperties}
-                                            setNewproperties={setNewproperties}
-                                            Operationbentate={Operationbentate}
-                                            Fourthly_config_id={Fourthly_config_id}
-                                            setFourthly_config_id={setFourthly_config_id}
-                                            Fourthly_select_list={Fourthly_select_list}
-                                            pageKeyfun={pageKeyfun}
-                                            firstjudgingcondition={firstjudgingcondition}
-                                            agentmenudisabled={agentmenudisabled}
-                                            setAgentmunudisabled={setAgentmunudisabled}
-                                        />
+                                        {!loading && (
+                                            <AgentsFirst
+                                                FirstValue={handleValueFromChid}
+                                                Ffromref={Ffromref}
+                                                Detaillist={Detaillist}
+                                                setDetaillist={setDetaillist}
+                                                repository={repository}
+                                                setRepository={setRepository}
+                                                Newproperties={Newproperties}
+                                                setNewproperties={setNewproperties}
+                                                Operationbentate={Operationbentate}
+                                                Fourthly_config_id={Fourthly_config_id}
+                                                setFourthly_config_id={setFourthly_config_id}
+                                                Fourthly_select_list={Fourthly_select_list}
+                                                pageKeyfun={pageKeyfun}
+                                                firstjudgingcondition={firstjudgingcondition}
+                                                agentmenudisabled={agentmenudisabled}
+                                                setAgentmunudisabled={setAgentmunudisabled}
+                                            />
+                                        )}
                                     </div>
                                     <div
                                         style={{
@@ -677,7 +697,11 @@ const Agents: React.FC = () => {
                     <Splitter.Panel>
                         <div>
                             <Chat
-                                saveInfo={{firstjudgingcondition,secondjudgingcondition,agentupdata}}
+                                saveInfo={{
+                                    firstjudgingcondition,
+                                    secondjudgingcondition,
+                                    agentupdata,
+                                }}
                                 operationbentate={Operationbentate}
                                 data={{
                                     abilitiesList: Fourthly_abilities_list,

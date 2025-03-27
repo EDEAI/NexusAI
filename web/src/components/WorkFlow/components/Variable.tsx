@@ -14,7 +14,7 @@ interface VariableItem {
     name: string;
     display_name: string;
     max_length?: number;
-    required: boolean|0|1;
+    required: boolean | 0 | 1;
     type: string;
 }
 
@@ -38,15 +38,17 @@ const Variable = memo((props: VariableProps) => {
     const isHovering = useHover(ref);
     const intl = useIntl();
     const typeObject = {
-        string: <img src="/icons/text.svg" className='size-4' />,
+        string: <img src="/icons/text.svg" className="size-4" />,
         long_string: intl.formatMessage({ id: 'workflow.vars.paragraph', defaultMessage: '' }),
-        number:  <img src="/icons/number.svg" className='size-4' />,
-        json: <img src="/icons/json.svg" className='size-4' />
+        number: <img src="/icons/number.svg" className="size-4" />,
+        json: <img src="/icons/json.svg" className="size-4" />,
     };
     return (
         <div
             ref={ref}
-            className={`flex bg-white gap-2 justify-between truncate h-10 items-center p-2 border border-slate-300 ${props.readonly ? 'border-slate-200' : 'hover:border-blue-400'} rounded-md mt-2 cursor-pointer`}
+            className={`flex bg-white gap-2 justify-between truncate h-10 items-center p-2 border border-slate-300 ${
+                props.readonly ? 'border-slate-200' : 'hover:border-blue-400'
+            } rounded-md mt-2 cursor-pointer`}
         >
             <div className="flex items-center gap-1 truncate">
                 <div>
@@ -68,8 +70,15 @@ const Variable = memo((props: VariableProps) => {
                     </div>
                 ) : (
                     <div className="flex items-center gap-2 ">
-                        {(props.required||props.required==1 ) && <div className="text-slate-500 text-xs">{intl.formatMessage({ id: 'workflow.vars.required',defaultMessage:'' })}</div>}
-                        <div>{typeObject[props.type]||props.type}</div>
+                        {(props.required || props.required == 1) && (
+                            <div className="text-slate-500 text-xs">
+                                {intl.formatMessage({
+                                    id: 'workflow.vars.required',
+                                    defaultMessage: '',
+                                })}
+                            </div>
+                        )}
+                        <div>{typeObject[props.type] || props.type}</div>
                     </div>
                 )}
             </div>
@@ -155,7 +164,9 @@ export default memo((props: VariableList) => {
         <>
             <div>
                 <div className="flex justify-between items-center pt-4">
-                    {props.title || <div>{intl.formatMessage({ id: 'workflow.vars.inputFields' })}</div>}
+                    {props.title || (
+                        <div>{intl.formatMessage({ id: 'workflow.vars.inputFields' })}</div>
+                    )}
                     {!readonly && (
                         <Button
                             onClick={() => {
@@ -171,15 +182,31 @@ export default memo((props: VariableList) => {
                     )}
                 </div>
                 <div>
-                    {variables.map((item, index) => (
-                        <Variable
-                            {...item}
-                            key={index}
-                            readonly={readonly}
-                            onEdit={() => editVariable(index)}
-                            onDel={() => delVariable(index)}
-                        ></Variable>
-                    ))}
+                    {variables.length === 0 ? (
+                        <Button
+                            onClick={() => {
+                                formRef.current?.resetFields();
+                                resetFormDefault();
+                                setEditIndex(-1);
+                                setIsModalOpen(true);
+                            }}
+                            className='w-full mt-2'
+                            type="dashed"
+                            icon={<PlusOutlined />}
+                        >
+                            {intl.formatMessage({ id: 'workflow.vars.addVariable' })}
+                        </Button>
+                    ) : (
+                        variables.map((item, index) => (
+                            <Variable
+                                {...item}
+                                key={index}
+                                readonly={readonly}
+                                onEdit={() => editVariable(index)}
+                                onDel={() => delVariable(index)}
+                            ></Variable>
+                        ))
+                    )}
                 </div>
             </div>
 
@@ -209,19 +236,21 @@ export default memo((props: VariableList) => {
                             buttonStyle: 'solid',
                             onChange: e => setType(e.target.value),
                         }}
-                        options={props.variableTypes?.map(type => ({
-                            label: intl.formatMessage({ id: `workflow.vars.${type}` }),
-                            value: type,
-                        })) || [
-                            {
-                                label: intl.formatMessage({ id: 'workflow.vars.string' }),
-                                value: 'string',
-                            },
-                            {
-                                label: intl.formatMessage({ id: 'workflow.vars.number' }),
-                                value: 'number',
-                            },
-                        ]}
+                        options={
+                            props.variableTypes?.map(type => ({
+                                label: intl.formatMessage({ id: `workflow.vars.${type}` }),
+                                value: type,
+                            })) || [
+                                {
+                                    label: intl.formatMessage({ id: 'workflow.vars.string' }),
+                                    value: 'string',
+                                },
+                                {
+                                    label: intl.formatMessage({ id: 'workflow.vars.number' }),
+                                    value: 'number',
+                                },
+                            ]
+                        }
                     />
                     <ProFormText
                         name={'name'}
@@ -230,10 +259,17 @@ export default memo((props: VariableList) => {
                             autoComplete: 'off',
                         }}
                         rules={[
-                            { required: true, message:  intl.formatMessage({ id: 'workflow.vars.enterVariableName' })  },
+                            {
+                                required: true,
+                                message: intl.formatMessage({
+                                    id: 'workflow.vars.enterVariableName',
+                                }),
+                            },
                             {
                                 pattern: /^[a-zA-Z0-9_]+$/,
-                                message:intl.formatMessage({ id: 'workflow.vars.variableNamePattern' }),
+                                message: intl.formatMessage({
+                                    id: 'workflow.vars.variableNamePattern',
+                                }),
                             },
                             {
                                 validator: (rule, value) => {
@@ -241,18 +277,28 @@ export default memo((props: VariableList) => {
                                         variables.some(item => item.name === value) &&
                                         editIndex === -1
                                     ) {
-                                        return Promise.reject(intl.formatMessage({ id: 'workflow.vars.variableNameExists' }));
+                                        return Promise.reject(
+                                            intl.formatMessage({
+                                                id: 'workflow.vars.variableNameExists',
+                                            }),
+                                        );
                                     }
                                     return Promise.resolve();
                                 },
                             },
                         ]}
                     ></ProFormText>
-                    <ProFormText name={'display_name'}label={intl.formatMessage({ id: 'workflow.vars.displayName' })}></ProFormText>
+                    <ProFormText
+                        name={'display_name'}
+                        label={intl.formatMessage({ id: 'workflow.vars.displayName' })}
+                    ></ProFormText>
                     {/* {type !== 'number' && (
                         <ProFormDigit name={'max_length'} label=""></ProFormDigit>
                     )} */}
-                    <ProFormSwitch name={'required'} label={intl.formatMessage({ id: 'workflow.vars.isRequired' })}></ProFormSwitch>
+                    <ProFormSwitch
+                        name={'required'}
+                        label={intl.formatMessage({ id: 'workflow.vars.isRequired' })}
+                    ></ProFormSwitch>
                 </ProForm>
             </Modal>
         </>

@@ -43,7 +43,7 @@ export default {
     'skill.code': 'Code',
     'skill.run': 'operate and debug',
     'skill.variable.name': 'Variable Name',
-    'skill.variable.display': 'Display Name',
+    'skill.variable.display': 'Variable Value',
     'skill.variable.type': 'Type',
     'skill.variable.required': 'Required',
     'skill.variable.operation': 'Operation',

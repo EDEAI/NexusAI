@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 const { TextArea, Search } = Input;
 
 interface ChildProps {
+    loading: boolean;
     ThirdlyValue: (value: any) => void;
     handleBack: (value: any) => void;
     Thirdlyref: any;
@@ -22,6 +23,7 @@ interface ChildProps {
     skillupdata: any;
 }
 const SkillThirdly: React.FC<ChildProps> = ({
+    loading,
     ThirdlyValue,
     Thirdlyref,
     handleBack,
@@ -130,7 +132,7 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                     </Radio>
                                 </Radio.Group>
                             </Form.Item>
-                            {Skillinfo?.output_variables && (
+                            {!loading && (
                                 <div className="">
                                     <Variable
                                         title={

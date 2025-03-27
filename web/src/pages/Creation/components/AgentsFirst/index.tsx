@@ -24,9 +24,11 @@ interface ChildProps {
     firstjudgingcondition: any;
     setAgentmunudisabled: any;
     agentmenudisabled: any;
+    loading:boolean
 }
 
 const AgentsFirst: React.FC<ChildProps> = ({
+    loading,
     FirstValue,
     Detaillist,
     setDetaillist,
@@ -164,7 +166,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
     const handleVariableChange = (value: any) => {
         setDetaillist({
             ...Detaillist,
-            agent: { ...Detaillist.agent, input_variables: value.free },
+            agent: { ...Detaillist?.agent, input_variables: value.free },
         });
     };
 
@@ -235,7 +237,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     size="small"
                                     onChange={FirstTeam}
                                     checked={
-                                        Detaillist && Detaillist.app.is_public === 1 ? true : false
+                                        Detaillist && Detaillist.app?.is_public === 1 ? true : false
                                     }
                                 />
                             </div>
@@ -335,7 +337,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                             />
                         </div>
                     </Form.Item>
-                    {Detaillist?.agent?.input_variables && (
+                    {!loading && (
                         <div className="mb-[30px]">
                             <Variable
                                 title={
