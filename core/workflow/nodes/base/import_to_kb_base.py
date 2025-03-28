@@ -232,10 +232,10 @@ class ImportToKBBaseNode(Node):
                         raise Exception('Unsupported value type!')
                     if file_path.suffix not in ['.jpg', 'jpeg', '.png', '.gif', '.webp']:
                         string_var = Variable(name=var_name, type='string', value=md.convert(file_path).text_content)
-                        self.data['input'].add_property(var_name, string_var)
+                        self.data['output'].add_property(var_name, string_var)
                 else:
                     string_var = Variable(name=var_name, type='string', value='')
-                    self.data['input'].add_property(var_name, string_var)
+                    self.data['output'].add_property(var_name, string_var)
 
         return file_list
     
