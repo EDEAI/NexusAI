@@ -58,24 +58,24 @@ class ImportToKBBaseNode(Node):
                     source=source_string_for_kb
                 )
             case 'file':
-                var_value = variable.value
-                if isinstance(var_value, int):
-                    # Upload file ID
-                    file_data = UploadFiles().get_file_by_id(var_value)
-                    file_path = project_root.joinpath(file_data['path'])
-                elif isinstance(var_value, str):
-                    if var_value[0] == '/':
-                        var_value = var_value[1:]
-                    file_path = project_root.joinpath('storage').joinpath(var_value)
-                else:
-                    # This should never happen
-                    raise Exception('Unsupported value type!')
-                result = DatasetManagement.add_document_to_dataset(
-                    document_id=document_id,
-                    dataset_id=dataset_id,
-                    process_rule_id=process_rule_id,
-                    file_path=str(file_path)
-                )
+                if var_value := variable.value:
+                    if isinstance(var_value, int):
+                        # Upload file ID
+                        file_data = UploadFiles().get_file_by_id(var_value)
+                        file_path = project_root.joinpath(file_data['path'])
+                    elif isinstance(var_value, str):
+                        if var_value[0] == '/':
+                            var_value = var_value[1:]
+                        file_path = project_root.joinpath('storage').joinpath(var_value)
+                    else:
+                        # This should never happen
+                        raise Exception('Unsupported value type!')
+                    result = DatasetManagement.add_document_to_dataset(
+                        document_id=document_id,
+                        dataset_id=dataset_id,
+                        process_rule_id=process_rule_id,
+                        file_path=str(file_path)
+                    )
             case 'json':
                 result = DatasetManagement.add_document_to_dataset(
                     document_id=document_id,
@@ -151,27 +151,27 @@ class ImportToKBBaseNode(Node):
                         user_id, dataset_id, node_exec_id, is_input
                     )
                 else:
-                    var_value = variable.value
-                    if isinstance(var_value, int):
-                        # Upload file ID
-                        file_id = var_value
-                        file_data = UploadFiles().get_file_by_id(file_id)
-                        source_string_for_db = file_data['name'] + file_data['extension']
-                        source_string_for_kb = str(project_root.joinpath(file_data['path']))
-                    elif isinstance(var_value, str):
-                        file_id = 0
-                        if var_value[0] == '/':
-                            var_value = var_value[1:]
-                        file_path = project_root.joinpath('storage').joinpath(var_value)
-                        source_string_for_db = file_path.name
-                        source_string_for_kb = str(file_path)
-                    else:
-                        # This should never happen
-                        raise Exception('Unsupported value type!')
-                    self.import_variable_to_knowledge_base(
-                        variable, file_id, source_string_for_db, source_string_for_kb,
-                        user_id, dataset_id, node_exec_id, is_input
-                    )
+                    if var_value := variable.value:
+                        if isinstance(var_value, int):
+                            # Upload file ID
+                            file_id = var_value
+                            file_data = UploadFiles().get_file_by_id(file_id)
+                            source_string_for_db = file_data['name'] + file_data['extension']
+                            source_string_for_kb = str(project_root.joinpath(file_data['path']))
+                        elif isinstance(var_value, str):
+                            file_id = 0
+                            if var_value[0] == '/':
+                                var_value = var_value[1:]
+                            file_path = project_root.joinpath('storage').joinpath(var_value)
+                            source_string_for_db = file_path.name
+                            source_string_for_kb = str(file_path)
+                        else:
+                            # This should never happen
+                            raise Exception('Unsupported value type!')
+                        self.import_variable_to_knowledge_base(
+                            variable, file_id, source_string_for_db, source_string_for_kb,
+                            user_id, dataset_id, node_exec_id, is_input
+                        )
             elif isinstance(variable, ArrayVariable):
                 for value in variable.values:
                     if value.name == variable_name:
@@ -218,22 +218,23 @@ class ImportToKBBaseNode(Node):
         file_list = ArrayVariable(name='file_list', type='array[file]')
         for var_name, variable in self.data['input'].properties.items():
             if variable.type == 'file':
-                var_value = variable.value
-                if isinstance(var_value, int):
-                    # Upload file ID
-                    file_data = UploadFiles().get_file_by_id(var_value)
-                    file_path = project_root.joinpath(file_data['path'])
-                elif isinstance(var_value, str):
-                    if var_value[0] == '/':
-                        var_value = var_value[1:]
-                    file_path = project_root.joinpath('storage').joinpath(var_value)
+                if var_value := variable.value:
+                    if isinstance(var_value, int):
+                        # Upload file ID
+                        file_data = UploadFiles().get_file_by_id(var_value)
+                        file_path = project_root.joinpath(file_data['path'])
+                    elif isinstance(var_value, str):
+                        if var_value[0] == '/':
+                            var_value = var_value[1:]
+                        file_path = project_root.joinpath('storage').joinpath(var_value)
+                    else:
+                        # This should never happen
+                        raise Exception('Unsupported value type!')
+                    if file_path.suffix not in ['.jpg', 'jpeg', '.png', '.gif', '.webp']:
+                        string_var = Variable(name=var_name, type='string', value=md.convert(file_path).text_content)
+                        self.data['input'].add_property(var_name, string_var)
                 else:
-                    # This should never happen
-                    raise Exception('Unsupported value type!')
-                if file_path.suffix in ['.jpg', 'jpeg', '.png', '.gif', '.webp']:
-                    file_list.add_value(variable)
-                else:
-                    string_var = Variable(name=var_name, type='string', value=md.convert(file_path).text_content)
+                    string_var = Variable(name=var_name, type='string', value='')
                     self.data['input'].add_property(var_name, string_var)
 
         return file_list

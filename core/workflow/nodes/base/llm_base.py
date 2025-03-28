@@ -97,22 +97,22 @@ class LLMBaseNode(Node):
                 messages.add_prompt(self.data["prompt"])
                 if file_list:
                     for file_var in file_list.values:
-                        var_value = file_var.value
-                        if isinstance(var_value, int):
-                            # Upload file ID
-                            file_data = UploadFiles().get_file_by_id(var_value)
-                            file_path = project_root.joinpath(file_data['path'])
-                        elif isinstance(var_value, str):
-                            if var_value[0] == '/':
-                                var_value = var_value[1:]
-                            file_path = project_root.joinpath('storage').joinpath(var_value)
-                        else:
-                            # This should never happen
-                            raise Exception('Unsupported value type!')
-                        messages.add_human_message(
-                            Variable(name=file_var.name, type='file', value=str(file_path)),
-                            "file"
-                        )
+                        if var_value := file_var.value:
+                            if isinstance(var_value, int):
+                                # Upload file ID
+                                file_data = UploadFiles().get_file_by_id(var_value)
+                                file_path = project_root.joinpath(file_data['path'])
+                            elif isinstance(var_value, str):
+                                if var_value[0] == '/':
+                                    var_value = var_value[1:]
+                                file_path = project_root.joinpath('storage').joinpath(var_value)
+                            else:
+                                # This should never happen
+                                raise Exception('Unsupported value type!')
+                            messages.add_human_message(
+                                Variable(name=file_var.name, type='file', value=str(file_path)),
+                                "file"
+                            )
         else:
             if context:
                 replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)
