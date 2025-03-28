@@ -1,6 +1,10 @@
 from typing import Union, List, Dict, Tuple, Any, Optional, Type
+from pathlib import Path
 from pydantic import BaseModel, Field, create_model
 import json
+
+
+project_root = Path(__file__).absolute().parent.parent.parent
 
 class Variable:
     """
@@ -435,11 +439,26 @@ def flatten_variable_with_values(variable: VariableTypes) -> Dict:
     :param variable: VariableTypes, the variable object to flatten.
     :return: Dict[str, Any], a dictionary representation of the variable object.
     """
+    from core.database.models import UploadFiles
 
     def _flatten(var: VariableTypes) -> Any:
         if isinstance(var, Variable):
             if var.type == 'json':
                 var.value = json.loads(var.value)
+            elif var.type == 'file':
+                var_value = var.value
+                if isinstance(var_value, int):
+                    # Upload file ID
+                    file_data = UploadFiles().get_file_by_id(var_value)
+                    var.value = file_data['name'] + file_data['extension']
+                elif isinstance(var_value, str):
+                    if var_value[0] == '/':
+                        var_value = var_value[1:]
+                    file_path = project_root.joinpath('storage').joinpath(var_value)
+                    var.value = file_path.name
+                else:
+                    # This should never happen
+                    raise Exception('Unsupported value type!')
             return var.value
         elif isinstance(var, ArrayVariable):
             flat_dict = {}
@@ -455,6 +474,20 @@ def flatten_variable_with_values(variable: VariableTypes) -> Dict:
     if isinstance(variable, Variable):
         if variable.type == 'json':
             variable.value = json.loads(variable.value)
+        elif variable.type == 'file':
+            var_value = variable.value
+            if isinstance(var_value, int):
+                # Upload file ID
+                file_data = UploadFiles().get_file_by_id(var_value)
+                variable.value = file_data['name'] + file_data['extension']
+            elif isinstance(var_value, str):
+                if var_value[0] == '/':
+                    var_value = var_value[1:]
+                file_path = project_root.joinpath('storage').joinpath(var_value)
+                variable.value = file_path.name
+            else:
+                # This should never happen
+                raise Exception('Unsupported value type!')
         return {variable.name: variable.value}
     else:
         return _flatten(variable)

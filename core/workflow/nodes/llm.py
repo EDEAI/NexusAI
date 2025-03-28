@@ -52,7 +52,6 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             "model_config_id": model_config_id,
             "prompt": prompt,
             "retrieval_task_datasets": retrieval_task_datasets,
-            "requires_upload": requires_upload,
             "wait_for_all_predecessors": wait_for_all_predecessors,
             "task_splitting": task_splitting,
             "manual_confirmation": manual_confirmation,
@@ -89,7 +88,7 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             self.data['task_splitting'] = False
 
             file_list = self.import_inputs_to_knowledge_base_and_get_file_list(
-                app_run_id, node_exec_id, self.data['requires_upload'],
+                app_run_id, node_exec_id,
                 (
                     not correct_llm_output
                     # NOT running the node separately,

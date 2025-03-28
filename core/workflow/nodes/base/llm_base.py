@@ -14,13 +14,16 @@ from core.database.models.agent_chat_messages import AgentChatMessages
 from . import Node
 from ...variables import ArrayVariable, Variable
 from ...context import Context
-from database.models import Models, AppNodeExecutions, DocumentSegments, Documents, AIToolLLMRecords
+from database.models import Models, AppNodeExecutions, DocumentSegments, Documents, AIToolLLMRecords, UploadFiles
 from llm.models import LLMPipeline
 from llm.prompt import create_prompt_from_dict, replace_prompt_with_context
 from llm.messages import Messages, create_messages_from_serialized_format
 
 from core.helper import truncate_agent_messages_by_token_limit
 from core.database.models import (Models, Users)
+
+
+project_root = Path(__file__).absolute().parent.parent.parent.parent.parent
 document_segments = DocumentSegments()
 documents = Documents()
 models = Models()
@@ -94,7 +97,22 @@ class LLMBaseNode(Node):
                 messages.add_prompt(self.data["prompt"])
                 if file_list:
                     for file_var in file_list.values:
-                        messages.add_human_message(file_var)
+                        var_value = file_var.value
+                        if isinstance(var_value, int):
+                            # Upload file ID
+                            file_data = UploadFiles().get_file_by_id(var_value)
+                            file_path = project_root.joinpath(file_data['path'])
+                        elif isinstance(var_value, str):
+                            if var_value[0] == '/':
+                                var_value = var_value[1:]
+                            file_path = project_root.joinpath('storage').joinpath(var_value)
+                        else:
+                            # This should never happen
+                            raise Exception('Unsupported value type!')
+                        messages.add_human_message(
+                            Variable(name=file_var.name, type='file', value=str(file_path)),
+                            "file"
+                        )
         else:
             if context:
                 replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)

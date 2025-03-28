@@ -239,13 +239,6 @@ def push_workflow_debug_message(
     if inputs := node_exec_data.get('inputs'):
         inputs = create_variable_from_dict(inputs)
         inputs = flatten_variable_with_values(inputs)
-        if upload_files := inputs.pop(UPLOAD_FILES_KEY, None):
-            upload_files_ids = upload_files.values()
-            upload_files_names = []
-            for file_id in upload_files_ids:
-                file_data = UploadFiles().get_file_by_id(file_id)
-                upload_files_names.append(file_data['name'] + file_data['extension'])
-            inputs[get_language_content('upload_files')] = upload_files_names
         node_exec_data['inputs'] = inputs
     if outputs := node_exec_data.get('outputs'):
         node_exec_data['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
@@ -532,12 +525,6 @@ def task_delay_thread():
 
                     # Update target node with input variable
                     target_node.data['input'] = target_node.data['output'] = create_variable_from_dict(run['inputs'])
-                    if (
-                        (knowledge_base_mapping := run['knowledge_base_mapping'])
-                        and (knowledge_base_mapping_for_input := knowledge_base_mapping.get('input'))
-                        and (knowledge_base_mapping_for_upload_files := knowledge_base_mapping_for_input.get(UPLOAD_FILES_KEY))
-                    ):
-                        target_node.data['knowledge_base_mapping']['input'][UPLOAD_FILES_KEY] = knowledge_base_mapping_for_upload_files
 
                     # Execute the node asynchronously using Celery
                     create_celery_task(team_id, app_id, run['app_name'], run['icon'], run['icon_background'], workflow_id, app_user_id, user_id, app_run_id, run_type, run['run_name'], exec_id, None, target_node)

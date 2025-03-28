@@ -38,7 +38,6 @@ class HumanNode(ImportToKBBaseNode):
             "desc": desc,
             "input": input,
             "output": output,
-            "requires_upload": requires_upload,
             "wait_for_all_predecessors": wait_for_all_predecessors,
             "manual_confirmation": manual_confirmation,
             "import_to_knowledge_base": import_to_knowledge_base,
@@ -65,7 +64,7 @@ class HumanNode(ImportToKBBaseNode):
             validate_required_variable(self.data['input'])
 
             self.import_inputs_to_knowledge_base_and_get_file_list(
-                app_run_id, node_exec_id, self.data['requires_upload'],
+                app_run_id, node_exec_id,
                 (
                     # NOT running the node separately,
                     # which means running in the execution of the workflow

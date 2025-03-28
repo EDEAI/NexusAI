@@ -5,10 +5,6 @@ from ...variables import VariableTypes
 # Current node id, used when the node references its own input variables
 CURRENT_NODE_ID = '536f6e67-bcab-cbd9-cfc0-4d6172637573'
 
-# Uploaded files are stored in an ArrayVariable, which is in the `input` ObjectVariable
-# And this is the specific key of this ArrayVariable.
-UPLOAD_FILES_KEY = '4d6f7265-cde2-d0c7-c8cb-636f6d696e67'
-
 
 class Node:
     """

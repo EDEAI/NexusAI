@@ -17,10 +17,6 @@ from languages import get_language_content
 import os
 from config import settings
 
-# Uploaded files are stored in an ArrayVariable, which is in the `input` ObjectVariable
-# And this is the specific key of this ArrayVariable.
-UPLOAD_FILES_KEY = '4d6f7265-cde2-d0c7-c8cb-636f6d696e67'
-
 
 class Workspaces(MySQL):
     """
@@ -210,13 +206,6 @@ class Workspaces(MySQL):
                 if inputs := app_node.get('inputs'):
                     inputs = create_variable_from_dict(inputs)
                     inputs = flatten_variable_with_values(inputs)
-                    if upload_files := inputs.pop(UPLOAD_FILES_KEY, None):
-                        upload_files_ids = upload_files.values()
-                        upload_files_names = []
-                        for file_id in upload_files_ids:
-                            file_data = UploadFiles().get_file_by_id(file_id)
-                            upload_files_names.append(file_data['name'] + file_data['extension'])
-                        inputs[get_language_content('upload_files')] = upload_files_names
                     app_node['inputs'] = inputs
                 if outputs := app_node.get('outputs'):
                     app_node['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
