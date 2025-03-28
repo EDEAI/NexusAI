@@ -758,15 +758,15 @@ def task_callback_thread():
                         embedding_tokens = result['data'].get('embedding_tokens', 0)
                         reranking_tokens = result['data'].get('reranking_tokens', 0)
 
+                        if inputs:
+                            # Create input variable from input dictionary
+                            input = create_variable_from_dict(inputs)
+                            target_node.data['input'] = input  # Update target node with input variable
+                        if outputs:
+                            # Create output variable from result dictionary
+                            output = create_variable_from_dict(outputs)
+                            target_node.data['output'] = output  # Update target node with output variable
                         if edge:
-                            if inputs:
-                                # Create input variable from input dictionary
-                                input = create_variable_from_dict(inputs)
-                                target_node.data['input'] = input  # Update target node with input variable
-                            if outputs:
-                                # Create output variable from result dictionary
-                                output = create_variable_from_dict(outputs)
-                                target_node.data['output'] = output  # Update target node with output variable
                             if not task_operation or (task_operation == 'assign_task' and not task_id):
                                 completed_edges.append(edge.id)  # Add edge to completed edges
                                 completed_steps += 1  # Increment completed steps
