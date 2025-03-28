@@ -32,33 +32,33 @@ class ImportToKBBaseNode(Node):
         node_exec_id: int,
         is_input: bool
     ) -> None:
-        dataset = Datasets().get_dataset_by_id(dataset_id)
-        process_rule_id = dataset['process_rule_id']
-        document_id = Documents().insert(
-            {
-                'user_id': user_id,
-                'dataset_id': dataset_id,
-                'name': source_string_for_db,
-                'data_source_type': 4 if is_input else 3,
-                'dataset_process_rule_id': process_rule_id,
-                'upload_file_id': upload_file_id,
-                'node_exec_id': node_exec_id,
-                'word_count': 0,
-                'tokens': 0
-            }
-        )
-        match variable.type:
-            case 'string':
-                result = DatasetManagement.add_document_to_dataset(
-                    document_id=document_id,
-                    dataset_id=dataset_id,
-                    process_rule_id=process_rule_id,
-                    text=variable.value,
-                    is_json=False,
-                    source=source_string_for_kb
-                )
-            case 'file':
-                if var_value := variable.value:
+        if var_value := variable.value:
+            dataset = Datasets().get_dataset_by_id(dataset_id)
+            process_rule_id = dataset['process_rule_id']
+            document_id = Documents().insert(
+                {
+                    'user_id': user_id,
+                    'dataset_id': dataset_id,
+                    'name': source_string_for_db,
+                    'data_source_type': 4 if is_input else 3,
+                    'dataset_process_rule_id': process_rule_id,
+                    'upload_file_id': upload_file_id,
+                    'node_exec_id': node_exec_id,
+                    'word_count': 0,
+                    'tokens': 0
+                }
+            )
+            match variable.type:
+                case 'string':
+                    result = DatasetManagement.add_document_to_dataset(
+                        document_id=document_id,
+                        dataset_id=dataset_id,
+                        process_rule_id=process_rule_id,
+                        text=var_value,
+                        is_json=False,
+                        source=source_string_for_kb
+                    )
+                case 'file':
                     if isinstance(var_value, int):
                         # Upload file ID
                         file_data = UploadFiles().get_file_by_id(var_value)
@@ -76,30 +76,30 @@ class ImportToKBBaseNode(Node):
                         process_rule_id=process_rule_id,
                         file_path=str(file_path)
                     )
-            case 'json':
-                result = DatasetManagement.add_document_to_dataset(
-                    document_id=document_id,
-                    dataset_id=dataset_id,
-                    process_rule_id=process_rule_id,
-                    text=variable.value,
-                    is_json=True,
-                    source=source_string_for_kb
-                )
-            case _:
-                # This should never happen
-                raise Exception('Invalid variable type!')
-        word_count, num_tokens, indexing_latency = result
-        Documents().update(
-            [
-                {'column': 'id', 'value': document_id},
-                {'column': 'status', 'value': 1}
-            ],
-            {
-                'word_count': word_count,
-                'tokens': num_tokens,
-                'indexing_latency': indexing_latency
-            }
-        )
+                case 'json':
+                    result = DatasetManagement.add_document_to_dataset(
+                        document_id=document_id,
+                        dataset_id=dataset_id,
+                        process_rule_id=process_rule_id,
+                        text=var_value,
+                        is_json=True,
+                        source=source_string_for_kb
+                    )
+                case _:
+                    # This should never happen
+                    raise Exception('Invalid variable type!')
+            word_count, num_tokens, indexing_latency = result
+            Documents().update(
+                [
+                    {'column': 'id', 'value': document_id},
+                    {'column': 'status', 'value': 1}
+                ],
+                {
+                    'word_count': word_count,
+                    'tokens': num_tokens,
+                    'indexing_latency': indexing_latency
+                }
+            )
 
     @classmethod
     def delete_documents_by_node_exec_id(cls, node_exec_id: int) -> None:
