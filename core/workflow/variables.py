@@ -19,7 +19,8 @@ class Variable:
         value: Optional[Union[str, int, float]] = None, 
         required: Optional[bool] = None,
         max_length: Optional[int] = None,
-        sort_order: int = 0
+        sort_order: int = 0,
+        sub_type: Optional[str] = None
     ):
         """
         Initializes a Variable object.
@@ -32,6 +33,8 @@ class Variable:
         :param required: bool, indicates if the variable is required.
         :param max_length: int, the maximum length of the value if the type is 'string'. Default is 0 (no limit).
         :param sort_order: int, the order in which this variable should be displayed. Default is 0.
+        :param sub_type: Optional[str], the sub-type of the variable. Only applicable when type is 'file'.
+            Values can be 'image' or 'document'. Default is None.
         """
         self.name = name
         self.type = type
@@ -41,6 +44,13 @@ class Variable:
         if required is not None:
             self.required = required
         self.sort_order = sort_order
+        # Only set sub_type if type is 'file'
+        # For other types, sub_type is not applicable
+        if self.type == "file":
+            self.sub_type = sub_type
+        else:
+            self.sub_type = None
+        
         if self.type == "string":
             if max_length is None:
                 self.max_length = 0
@@ -67,6 +77,8 @@ class Variable:
             data["required"] = self.required
         if hasattr(self, "max_length"):
             data["max_length"] = self.max_length
+        if hasattr(self, "sub_type"):
+            data["sub_type"] = self.sub_type
         return data
         
     def to_string(self) -> str:
@@ -269,6 +281,8 @@ def create_variable_from_dict(data: Dict[str, Any]) -> VariableTypes:
         kwargs["sort_order"] = data["sort_order"]
     if data["type"] == "string" and "max_length" in data:
         kwargs["max_length"] = data["max_length"]
+    if data["type"] == "file" and "sub_type" in data:
+        kwargs["sub_type"] = data["sub_type"]
     if data["type"] == "object":
         if "to_string_keys" in data:
             kwargs["to_string_keys"] = data["to_string_keys"]
@@ -416,7 +430,7 @@ def flatten_variable(variable: VariableTypes) -> Dict[str, Tuple[str, str, bool]
 
     def _flatten(var: VariableTypes):
         if isinstance(var, Variable):
-            flat_dict[var.name] = (
+            [var.name] = (
                 'number' if var.type == 'number' else 'string', 
                 getattr(var, 'display_name', ''),
                 getattr(var, 'required', False)
@@ -571,7 +585,8 @@ def create_object_variable_from_list(data: List[Dict[str, Any]], name: str = "ro
             value=var_def.get("value"),
             required=var_def.get("required", False),
             max_length=var_def.get("max_length", 0),
-            sort_order=var_def.get("sort_order", 0)
+            sort_order=var_def.get("sort_order", 0),
+            sub_type=var_def.get("sub_type")
         )
         obj_var.add_property(var_def["name"], variable)
     
