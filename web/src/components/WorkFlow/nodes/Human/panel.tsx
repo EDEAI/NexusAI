@@ -50,6 +50,7 @@ export default memo(({ node }: { node: AppNode }) => {
                 <Variable
                     variables={nodeInfo.data['variables']?.value || []}
                     onChange={variableChange}
+                    variableTypes={['string', 'number', 'file']}
                 ></Variable>
 
                 <ProForm

@@ -21,6 +21,7 @@ import useNodeIdUpdate from '../hooks/useNodeIdUpdate';
 import useSaveWorkFlow from '../saveWorkFlow';
 import useStore from '../store';
 import FileDownloadList from '@/components/common/FileDownloadList';
+import { UploadDragger } from '../components/Form/Upload';
 
 export default memo(() => {
     const intl = useIntl();
@@ -411,6 +412,20 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
                                     ></ProFormDigit>
                                 );
                             }
+                            if (item.type === 'file') {
+                                return (
+                                  <div key={item.name}>
+                                    <Typography.Title level={5}>
+                                      {item.display_name || item.name}
+                                      {item.required && <span className="text-red-500 ml-1">*</span>}
+                                    </Typography.Title>
+                                    <UploadDragger
+                                      name={`inputs.${item.name}`}
+                                      multiple={false}
+                                    />
+                                  </div>
+                                );
+                              }
                             return (
                                 <ProFormTextArea
                                     key={index}

@@ -36,6 +36,7 @@ export default {
     'workflow.tool': 'Tool',
     'workflow.skill': 'Skill',
     'workflow.agent': 'Agent',
+    'workflow.noRunData': 'No run data available',
 
     'workflow.orcompute': 'Metadata',
     'workflow.checkedBackLogs': 'Processed',

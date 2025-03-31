@@ -22,7 +22,7 @@ interface VariableList {
     variables?: VariableItem[];
     onChange?: (obj: { value: VariableItem[]; free: ObjectVariable }) => void;
     title?: React.ReactNode;
-    variableTypes?: string[];
+    variableTypes?: ('string' | 'number' | 'json' | 'file')[];
     readonly?: boolean;
 }
 

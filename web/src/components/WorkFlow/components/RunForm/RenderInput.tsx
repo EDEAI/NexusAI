@@ -5,6 +5,7 @@ import { ProFormDigit, ProFormTextArea } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Typography } from 'antd';
 import _ from 'lodash';
+import { UploadDragger } from '../Form/Upload';
 
 export const RenderInput = ({ data }) => {
     const intl = useIntl();
@@ -40,6 +41,20 @@ export const RenderInput = ({ data }) => {
                             />
                         );
                     }
+                    if (val.type === 'file') {
+                        return (
+                          <div key={val.name}>
+                            <Typography.Title level={5}>
+                              {val.display_name || val.name}
+                              {val.required && <span className="text-red-500 ml-1">*</span>}
+                            </Typography.Title>
+                            <UploadDragger
+                              name={val.name}
+                              multiple={false}
+                            />
+                          </div>
+                        );
+                      }
                     return (
                         <ProFormTextArea
                             key={val.name}

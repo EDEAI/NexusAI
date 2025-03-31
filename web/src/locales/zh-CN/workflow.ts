@@ -33,6 +33,7 @@ export default {
     'workflow.tool': '工具',
     'workflow.skill': '技能',
     'workflow.agent': '智能体',
+    'workflow.noRunData': '暂无运行数据',
 
     'workflow.orcompute': '元数据',
     'workflow.checkedBackLogs': '已处理',
