@@ -366,7 +366,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             self.data['task_splitting'] = False
             
             file_list = self.import_inputs_to_knowledge_base_and_get_file_list(
-                app_run_id, node_exec_id, agent['allow_upload_file'],
+                app_run_id, node_exec_id,
                 (
                     not correct_llm_output
                     # NOT running the app separately
@@ -674,7 +674,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             self.data['task_splitting'] = False
             
             file_list = self.import_inputs_to_knowledge_base_and_get_file_list(
-                app_run_id, node_exec_id, agent['allow_upload_file'],
+                app_run_id, node_exec_id,
                 (
                     not correct_llm_output
                     # NOT running the app separately

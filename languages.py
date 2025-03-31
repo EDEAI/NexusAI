@@ -594,9 +594,8 @@ language_packs = {
             "node_incoming_outgoing_edges": "Node {node_id} must have at least one incoming and one outgoing edge.",
             "exactly_one_start_node": "There must be exactly one start node.",
             "exactly_one_end_node": "There must be exactly one end node.",
-            # properties
+            "node_missing_input": "Node [{node_title}] has no input variables configured.",
             "required_field_empty": "Required field '{field_name}' in node '{node_title}' must not be empty",
-            "required_properties_empty": "Input properties in node '{node_title}' must be configured",
             "prompt_params_required": "In node '{node_title}', either system prompt or user prompt must be specified",
             "input_config_required": "Input configuration in node '{node_title}' is required and must not be empty",
             "prompt_user_parser_required": "User parser prompt in node '{node_title}' is required and must not be empty",
@@ -606,7 +605,7 @@ language_packs = {
             "executor_agent_prompt_required": "Missing [user] prompt in executor [{executor_title}] of node [{node_title}]",
             "input_config_missing": "Input properties not configured for node [{node_title}]",
             "required_param_missing": "Required parameter [{param_name}] not filled in node [{node_title}]",
-            "input_config_no_properties": "No input properties configured in [{node_title}]. Please add the required input properties for data processing."
+            "node_missing_output": "Node [{node_title}] has no output variables configured.",
         },
         'tag_id_not_found': 'Tag ID not found',
         'tag_update_success': 'Tag update success',
@@ -1306,8 +1305,8 @@ language_packs = {
             "node_incoming_outgoing_edges": "节点 {node_id} 必须至少有一个传入edge和一个传出edge。",
             "exactly_one_start_node": "必须有且只有一个开始节点。",
             "exactly_one_end_node": "必须有且只有一个结束节点。",
+            "node_missing_input": "节点[{node_title}]未配置输入变量。",
             "required_field_empty": "节点 '{node_title}' 中的必填字段 '{field_name}' 不能为空",
-            "required_properties_empty": "节点 '{node_title}' 的输入属性配置不能为空",
             "prompt_params_required": "节点 '{node_title}' 中的系统提示词或用户提示词必须指定其中之一",
             "input_config_required": "节点 '{node_title}' 的输入配置为必填项且不能为空",
             "prompt_user_parser_required": "节点 '{node_title}' 的用户提示词解析器为必填项且不能为空",
@@ -1317,7 +1316,7 @@ language_packs = {
             "executor_agent_prompt_required": "未填写[{node_title}]下执行器[{executor_title}]的[user]部分提示词",
             "input_config_missing": "未配置[{node_title}]的输入属性",
             "required_param_missing": "未填写[{node_title}]的必填参数[{param_name}]",
-            "input_config_no_properties": "节点[{node_title}]未配置任何输入属性。请添加必要的输入属性以进行数据处理。"
+            "node_missing_output": "节点[{node_title}]未配置输出变量。",
         },
         'tag_id_not_found': '标签ID不存在',
         'tag_update_success': '标签更新成功',

@@ -30,7 +30,7 @@ class Messages:
         """
         Gets a HumanMessage object from a file variable.
         """
-        file_path = project_root.joinpath(file.value)
+        file_path = file.value
         suffix_to_mime_subtype = {
             '.png': 'png',
             '.jpg': 'jpeg',
@@ -70,13 +70,13 @@ class Messages:
         if prompt.user:
             self.messages.append(("human", Variable(name="user", type="string", value=str(prompt.user.value))))
             
-    def add_human_message(self, human_message: Variable) -> None:
+    def add_human_message(self, human_message: Variable, type: str = "string") -> None:
         """
         Adds a human message to the list of messages.
 
         :param message: Variable, the human message to add.
         """
-        self.messages.append(("human", Variable(name="user", type="string", value=str(human_message.value))))
+        self.messages.append(("human", Variable(name="user", type=type, value=str(human_message.value))))
             
     def add_ai_message(self, ai_message: Variable) -> None:
         """

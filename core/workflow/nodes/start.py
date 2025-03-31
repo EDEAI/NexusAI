@@ -33,7 +33,6 @@ class StartNode(ImportToKBBaseNode):
             "desc": desc,
             "input": input,
             "output": output,
-            "requires_upload": requires_upload,
             "import_to_knowledge_base": import_to_knowledge_base,
             "knowledge_base_mapping": knowledge_base_mapping,
             "flow_data": flow_data
@@ -53,7 +52,7 @@ class StartNode(ImportToKBBaseNode):
             app_run_id = kwargs.get('app_run_id', 0)
             node_exec_id = kwargs.get('node_exec_id', 0)
             self.import_inputs_to_knowledge_base_and_get_file_list(
-                app_run_id, node_exec_id, self.data['requires_upload'],
+                app_run_id, node_exec_id,
                 (
                     # NOT running the node separately,
                     # which means running in the execution of the workflow

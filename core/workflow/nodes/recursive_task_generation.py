@@ -45,7 +45,6 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
             "input": input,
             "model_config_id": model_config_id,
             "prompt": prompt,
-            "requires_upload": requires_upload,
             "manual_confirmation": manual_confirmation,
             "import_to_knowledge_base": import_to_knowledge_base,
             "knowledge_base_mapping": knowledge_base_mapping,
@@ -76,7 +75,7 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
             replace_variable_value_with_context(input, context)
             
             file_list = self.import_inputs_to_knowledge_base_and_get_file_list(
-                app_run_id, node_exec_id, self.data['requires_upload'],
+                app_run_id, node_exec_id,
                 (
                     not correct_llm_output
                     # NOT running the node separately,

@@ -18,7 +18,7 @@ from core.workflow import (
     flatten_variable_with_values,
     get_first_variable_value
 )
-from core.workflow.nodes import AgentNode, LLMNode, SkillNode, create_node_from_dict, UPLOAD_FILES_KEY
+from core.workflow.nodes import AgentNode, LLMNode, SkillNode, create_node_from_dict
 from core.workflow.nodes.base.import_to_kb_base import ImportToKBBaseNode
 from core.llm.prompt import create_prompt_from_dict
 from languages import get_language_content
@@ -228,13 +228,6 @@ def run_node(
         if inputs := result['data'].get('inputs'):
             inputs = create_variable_from_dict(inputs)
             inputs = flatten_variable_with_values(inputs)
-            if upload_files := inputs.pop(UPLOAD_FILES_KEY, None):
-                upload_files_ids = upload_files.values()
-                upload_files_names = []
-                for file_id in upload_files_ids:
-                    file_data = UploadFiles().get_file_by_id(file_id)
-                    upload_files_names.append(file_data['name'] + file_data['extension'])
-                inputs[get_language_content('upload_files')] = upload_files_names
             result['data']['inputs'] = inputs
         if outputs := result['data'].get('outputs'):
             result['data']['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))

@@ -44,6 +44,7 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
             unique_suppliers[supplier_id]['models'].append({
                 'model_id': supplier['model_id'],
                 'model_name': supplier['model_name'],
+                'support_image': supplier['support_image'],
                 'model_type': supplier['model_type'],
                 'model_default_used': supplier['model_default_used'],
                 'sort_order': supplier['sort_order']
@@ -87,6 +88,7 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
                 model_data = {
                     'model_id': model['model_id'],
                     'model_name': model['model_name'],
+                    'support_image': model['support_image'],
                     'model_type': model['model_type'],
                     'model_type_name': model_type[model['model_type']]['type'],
                     'model_default_used': model['model_default_used']
@@ -113,6 +115,7 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
                     'models': [{
                         'model_id': model['model_id'],
                         'model_name': model['model_name'],
+                        'support_image': model['support_image'],
                         'model_default_used': model['model_default_used']
                     }]
                 }

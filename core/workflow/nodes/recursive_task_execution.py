@@ -49,7 +49,6 @@ class RecursiveTaskExecutionNode(ImportToKBBaseNode, LLMBaseNode):
             "model_config_id": model_config_id,
             "executor_list": executor_list,
             "prompt": prompt,
-            "requires_upload": requires_upload,
             "manual_confirmation": manual_confirmation,
             "import_to_knowledge_base": import_to_knowledge_base,
             "knowledge_base_mapping": knowledge_base_mapping,
@@ -194,7 +193,7 @@ class RecursiveTaskExecutionNode(ImportToKBBaseNode, LLMBaseNode):
                     })
             else:
                 self.import_inputs_to_knowledge_base_and_get_file_list(
-                    app_run_id, node_exec_id, self.data['requires_upload'],
+                    app_run_id, node_exec_id,
                     (
                         # NOT running the node separately,
                         # which means running in the execution of the workflow

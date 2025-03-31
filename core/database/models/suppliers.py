@@ -40,6 +40,7 @@ class Suppliers(MySQL):
             'suppliers.status AS supplier_status',
             'models.id AS model_id',
             'models.name AS model_name',
+            'models.support_image AS support_image',
             'models.type AS model_type',
             'model_configurations.default_used AS model_default_used',
             'model_configurations.sort_order AS sort_order'
