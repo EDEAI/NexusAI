@@ -347,14 +347,13 @@ def replace_value_in_variable(
     Returns:
     None. The function directly modifies the original_variable's value.
     """
-    if file_list is None:
-        file_list = []
     if var_name == context_variable.name:
         if original_variable.type in ["string", "file", "json"]:
             if replace_type and context_variable.type in ["file", "json"]:
                 original_variable.type = context_variable.type
             if context_variable.type == "file":
-                file_list.append(context_variable)
+                if isinstance(file_list, List):
+                    file_list.append(context_variable)
                 variable_string = ""
             else:
                 variable_string = context_variable.to_string()

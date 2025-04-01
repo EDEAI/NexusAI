@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent.parent))
 
 from typing import Dict, Any, List
-from .base import CURRENT_NODE_ID, Node, Nodes, LLMBaseNode, SandboxBaseNode
+from .base import CURRENT_NODE_ID, FileOutputBaseNode, Node, Nodes, LLMBaseNode, SandboxBaseNode
 from .start import StartNode
 from .human import HumanNode
 from .agent import AgentNode
@@ -134,6 +134,7 @@ def create_nodes_from_dict(nodes_dict: List[Dict[str, Any]]) -> Nodes:
 
 __all__ = [
     "CURRENT_NODE_ID",
+    "FileOutputBaseNode",
     "Node",
     "Nodes",
     "LLMBaseNode",
