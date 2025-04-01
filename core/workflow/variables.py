@@ -89,7 +89,11 @@ class Variable:
         """
         if self.value is None:
             return ""
-        return str(self.value) if self.type == "number" else self.value
+        if self.type == "number":
+            return str(self.value)
+        elif self.type == "file":
+            return ""
+        return self.value
         
 class ArrayVariable:
     """
@@ -324,7 +328,8 @@ def replace_value_in_variable(
     source: str,
     var_name: str,
     duplicate_braces: bool = False,
-    replace_type: bool = True
+    replace_type: bool = True,
+    file_list: Optional[List[Variable]] = None
 ):
     """
     Replaces the value of the original variable with the value from the context variable
@@ -342,11 +347,17 @@ def replace_value_in_variable(
     Returns:
     None. The function directly modifies the original_variable's value.
     """
+    if file_list is None:
+        file_list = []
     if var_name == context_variable.name:
         if original_variable.type in ["string", "file", "json"]:
             if replace_type and context_variable.type in ["file", "json"]:
                 original_variable.type = context_variable.type
-            variable_string = context_variable.to_string()
+            if context_variable.type == "file":
+                file_list.append(context_variable)
+                variable_string = ""
+            else:
+                variable_string = context_variable.to_string()
             if duplicate_braces:
                 variable_string = variable_string.replace("{", "{{").replace("}", "}}")
             original_variable.value = original_variable.value.replace(
@@ -360,7 +371,7 @@ def replace_value_in_variable(
                 raise ValueError(f"Variable '{original_variable.name}' type '{original_variable.type}' does not match the replacement variable '{context_variable.name}' type '{context_variable.type}'")
     elif isinstance(context_variable, ArrayVariable) or isinstance(context_variable, ObjectVariable):
         for value in (context_variable.values if isinstance(context_variable, ArrayVariable) else context_variable.properties.values()):
-            replace_value_in_variable(original_variable, value, node_id, source, var_name, duplicate_braces, replace_type)
+            replace_value_in_variable(original_variable, value, node_id, source, var_name, duplicate_braces, replace_type, file_list)
 
 def replace_value_in_variable_with_new_value(
     variable: Union[Variable, ArrayVariable, ObjectVariable],

@@ -74,7 +74,7 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
             input = self.data['input']
             replace_variable_value_with_context(input, context)
             
-            file_list = self.import_inputs_to_knowledge_base_and_get_file_list(
+            self.import_inputs_to_knowledge_base(
                 app_run_id, node_exec_id,
                 (
                     not correct_llm_output
@@ -98,7 +98,6 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
                 edge_id=edge_id,
                 context=context, 
                 input=invoke_input,
-                file_list=file_list,
                 return_json=True,
                 correct_llm_output=correct_llm_output
             )

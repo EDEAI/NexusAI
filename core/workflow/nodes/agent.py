@@ -365,7 +365,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             # Task splitting is disabled in current version. 2024-10-22
             self.data['task_splitting'] = False
             
-            file_list = self.import_inputs_to_knowledge_base_and_get_file_list(
+            self.import_inputs_to_knowledge_base(
                 app_run_id, node_exec_id,
                 (
                     not correct_llm_output
@@ -386,7 +386,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             current_node.id = CURRENT_NODE_ID
             context.add_node(level, current_node)
             
-            replace_prompt_with_context(self.data['prompt'], context)
+            file_list = replace_prompt_with_context(self.data['prompt'], context)
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
                 {'raw_user_prompt': self.data['prompt'].get_user()}
@@ -673,7 +673,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             # Task splitting is disabled in current version. 2024-10-22
             self.data['task_splitting'] = False
             
-            file_list = self.import_inputs_to_knowledge_base_and_get_file_list(
+            self.import_inputs_to_knowledge_base(
                 app_run_id, node_exec_id,
                 (
                     not correct_llm_output
@@ -694,7 +694,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             current_node.id = CURRENT_NODE_ID
             context.add_node(level, current_node)
             
-            replace_prompt_with_context(self.data['prompt'], context)
+            file_list = replace_prompt_with_context(self.data['prompt'], context)
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
                 {'raw_user_prompt': self.data['prompt'].get_user()}

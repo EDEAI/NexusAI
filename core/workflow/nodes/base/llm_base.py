@@ -61,7 +61,7 @@ class LLMBaseNode(Node):
         context: Context,
         retrieval_chain: Optional[Runnable[Input, Output]] = None,
         input: Dict[str, Any] = {},
-        file_list: Optional[ArrayVariable] = None,
+        file_list: Optional[List[Variable]] = None,
         correct_llm_output: bool = False,
         override_rag_input: Optional[str] = None,
         is_chat: bool = False,
@@ -96,23 +96,8 @@ class LLMBaseNode(Node):
                 messages = Messages()
                 messages.add_prompt(self.data["prompt"])
                 if file_list:
-                    for file_var in file_list.values:
-                        if var_value := file_var.value:
-                            if isinstance(var_value, int):
-                                # Upload file ID
-                                file_data = UploadFiles().get_file_by_id(var_value)
-                                file_path = project_root.joinpath(file_data['path'])
-                            elif isinstance(var_value, str):
-                                if var_value[0] == '/':
-                                    var_value = var_value[1:]
-                                file_path = project_root.joinpath('storage').joinpath(var_value)
-                            else:
-                                # This should never happen
-                                raise Exception('Unsupported value type!')
-                            messages.add_human_message(
-                                Variable(name=file_var.name, type='file', value=str(file_path)),
-                                "file"
-                            )
+                    for file_var in file_list:
+                        messages.add_human_message(file_var, "file")
         else:
             if context:
                 replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)
@@ -141,8 +126,8 @@ class LLMBaseNode(Node):
             else:
                 messages.add_prompt(self.data["prompt"])
             if file_list:
-                for file_var in file_list.values:
-                    messages.add_human_message(file_var)
+                for file_var in file_list:
+                    messages.add_human_message(file_var, "file")
         
         if retrieval_chain:
             def format_docs(segments: List[Document]) -> str:
@@ -177,7 +162,7 @@ class LLMBaseNode(Node):
         context: Context,
         retrieval_chain: Optional[Runnable[Input, Output]] = None,
         input: Dict[str, Any] = {},
-        file_list: Optional[ArrayVariable] = None,
+        file_list: Optional[List[Variable]] = None,
         return_json: bool = False,
         correct_llm_output: bool = False,
         override_rag_input: Optional[str] = None,
@@ -194,7 +179,7 @@ class LLMBaseNode(Node):
             context (Context): The context object containing all variables.
             retrieval_chain (Optional[Runnable[Input, Output]]): The retrieval chain to be used for the model.
             input (Dict[str, Any]): The input data to be passed to the model.
-            file_list (Optional[ArrayVariable]): The list of files to be uploaded to the model.
+            file_list (Optional[List[Variable]]): The list of files to be uploaded to the model.
             return_json (bool): Indicates whether to return the output in JSON format.
             correct_llm_output (bool): Indicates whether to correct the LLM output using the correct prompt.
             override_rag_input (Optional[str]): The input to be used for the retrieval chain.
