@@ -327,7 +327,7 @@ class SandboxBaseNode(Node):
             # Send the POST request to the API endpoint
             print(data)
             response = httpx.post(
-                url=f"http://{settings.SANDBOX_HOST}:{settings.SANDBOX_PORT}/run_code", headers=headers, json=data)
+                url=f"http://{settings.SANDBOX_HOST}:{settings.SANDBOX_PORT}/run_code", headers=headers, json=data, timeout=600)
 
             # Check if the response content is empty
             if not response.content:
