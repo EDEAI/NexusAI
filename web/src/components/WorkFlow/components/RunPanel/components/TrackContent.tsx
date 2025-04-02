@@ -237,7 +237,7 @@ const TrackContent = memo(({ runList, flowMessage, setDealtWithData, setFlowMess
               999999,
             ).toFixed(5)}
             S
-          </span>
+          </span>{' '}
           <CheckCircleOutlined className="text-green-400" />
         </>
       );

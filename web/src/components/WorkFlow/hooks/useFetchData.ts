@@ -54,6 +54,7 @@ const useFetchData = () => {
                 label: supplier.supplier_name,
                 options: Array.isArray(supplier.model_list)
                     ? supplier.model_list.map(model => ({
+                          ...model,
                           label: model.model_name,
                           value: model.model_config_id,
                       }))

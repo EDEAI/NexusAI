@@ -8,6 +8,7 @@ import { useMount, useUpdateEffect } from 'ahooks';
 import { Button } from 'antd';
 import { memo, useRef } from 'react';
 import CodeEditor from '../../components/Editor/CodeEditor';
+import { SelectVariable } from '../../components/Form/Select';
 import {
     SwitchManualConfirmation,
     SwitchWaitForAllPredecessors,
@@ -135,15 +136,14 @@ export default memo(({ node }: { node: AppNode }) => {
                                 className="w-28"
                             />
                             <div className="flex-1">
-                                <ProFormSelect
+                                <SelectVariable
                                     placeholder={intl.formatMessage({
                                         id: 'workflow.placeholder.selectVariable',
                                         defaultMessage: '',
                                     })}
-                                    colSize={12}
-                                    options={getVariables(node.id) || []}
                                     name="variable"
-                                ></ProFormSelect>
+                                    node={node}
+                                ></SelectVariable>
                             </div>
                         </div>
                     </ProFormList>

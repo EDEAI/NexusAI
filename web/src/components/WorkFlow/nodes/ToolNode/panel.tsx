@@ -27,19 +27,6 @@ interface Prompt {
     assistant: PromptItem;
 }
 
-const transformSelectOptions = options => {
-    return options.map(group => {
-        return {
-            label: <span>{group.label}</span>,
-            title: group.value,
-            options:
-                group.options?.map(item => ({
-                    label: <span>{item.label}</span>,
-                    value: item.value,
-                })) || [],
-        };
-    });
-};
 
 export default memo(({ node }: { node: AppNode }) => {
     const formRef = useRef(null);

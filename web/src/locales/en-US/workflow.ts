@@ -60,6 +60,11 @@ export default {
     'workflow.checkBackLogs': 'Confirm Todo',
     'workflow.manual_confirmation': 'Manual Confirmation',
 
+    'workflow.autoLayout': 'Auto Layout',
+    'workflow.autoLayoutSuccess': 'Nodes arranged successfully',
+    'workflow.autoLayoutVertical': 'Vertical Layout',
+    'workflow.autoLayoutHorizontal': 'Horizontal Layout',
+
     'workflow.agentSkill': 'Agent Skill',
     'workflow.historyPrompt': 'History Prompt',
     'workflow.completion_tokens': 'Total Token Count',
@@ -345,4 +350,6 @@ export default {
     'skill.result.output.type.document': 'Document',
     'workflow.debugRun': 'Debug Run',
     'workflow.debugTodo': 'Debug Todo',
+
+    'workflow.tag.imageUnderstanding': 'Image Understanding',
 };

@@ -6,6 +6,7 @@ import { useIntl } from '@umijs/max';
 import { useMount, useUpdateEffect } from 'ahooks';
 import { Tag } from 'antd';
 import { memo, useRef } from 'react';
+import { SelectVariable } from '../../components/Form/Select';
 import useStore from '../../store';
 import { AppNode } from '../../types';
 import { resetFormNodes } from '../../utils/resetFormNodes';
@@ -66,7 +67,7 @@ export default memo(({ node }: { node: AppNode }) => {
                     autoFocusFirstInput={false}
                     onValuesChange={setNodeChange}
                 >
-                    <ProFormSelect
+                    <SelectVariable
                         name="variables_list"
                         allowClear={false}
                         fieldProps={{
@@ -77,8 +78,8 @@ export default memo(({ node }: { node: AppNode }) => {
                             defaultMessage: '',
                         })}
                         mode="multiple"
-                        options={getVariables(node.id) || []}
-                    ></ProFormSelect>
+                        node={node}
+                    ></SelectVariable>
 
                     {!getVariables(node.id)?.length && (
                         <div className="-mt-10">

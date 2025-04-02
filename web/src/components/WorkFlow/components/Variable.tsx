@@ -2,7 +2,7 @@
  * @LastEditors: biz
  */
 import { Variable as FlowVariable, ObjectVariable } from '@/py2js/variables.js';
-import { DeleteOutlined, EditOutlined, FunctionOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, FileOutlined, FunctionOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm, ProFormRadio, ProFormSwitch, ProFormText } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
@@ -42,6 +42,7 @@ const Variable = memo((props: VariableProps) => {
         long_string: intl.formatMessage({ id: 'workflow.vars.paragraph', defaultMessage: '' }),
         number: <img src="/icons/number.svg" className="size-4" />,
         json: <img src="/icons/json.svg" className="size-4" />,
+        file:<FileOutlined />
     };
     return (
         <div

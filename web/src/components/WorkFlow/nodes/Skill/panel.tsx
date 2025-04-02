@@ -13,6 +13,7 @@ import {
     SwitchManualConfirmation,
     SwitchWaitForAllPredecessors,
 } from '../../components/Form/Switch';
+import { SelectVariable } from '../../components/Form/Select';
 import useNodeIdUpdate from '../../hooks/useNodeIdUpdate';
 import useStore from '../../store';
 import { AppNode } from '../../types';
@@ -43,12 +44,9 @@ export default memo(({ node }: { node: AppNode }) => {
         setTimeout(() => {
             rest();
         }, 100);
-        const vars = getVariables(upNode.id);
+        const vars = getVariables(upNode.id).filter(item=>item.createVar.type!= 'file');
         setEditorOptions(vars);
     });
-    const variableChange = (e: any) => {
-        setNodeChange({ ['variables']: e });
-    };
 
     const skillInfo = async () => {
         if (!node.data['baseData']?.app_id) return;
@@ -102,14 +100,15 @@ export default memo(({ node }: { node: AppNode }) => {
                 >
                     {inputList.map((item, index) => {
                         return (
-                            <ProFormSelect
+                            <SelectVariable
                                 key={index}
                                 name={`variable.${item.name}`}
                                 label={item.name}
                                 showSearch
                                 allowClear={false}
-                                request={async () => editorOptions}
-                            ></ProFormSelect>
+                                node={node}
+                                options={editorOptions}
+                            ></SelectVariable>
                         );
                     })}
                     <div className="user-form">

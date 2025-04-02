@@ -57,6 +57,11 @@ export default {
     'workflow.checkBackLogs': '确认待办',
     'workflow.manual_confirmation': '人工确认',
 
+    'workflow.autoLayout': '节点整理',
+    'workflow.autoLayoutSuccess': '节点整理成功',
+    'workflow.autoLayoutVertical': '纵向排列',
+    'workflow.autoLayoutHorizontal': '横向排列',
+
     'workflow.agentSkill': '智能体能力',
     'workflow.historyPrompt': '历史prompt',
     'workflow.completion_tokens': '总token数',
@@ -338,4 +343,6 @@ export default {
     'skill.result.output.type.document': '文档',
     'workflow.debugRun': '调试运行',
     'workflow.debugTodo': '调试待办',
+
+    'workflow.tag.imageUnderstanding': '图片理解',
 };

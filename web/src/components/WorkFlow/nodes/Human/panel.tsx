@@ -83,10 +83,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                                     key={index}
                                                     name={`import_to_knowledge_base.${item.name}`}
                                                     label={
-                                                        intl.formatMessage({
-                                                            id: 'workflow.label.variable',
-                                                            defaultMessage: '',
-                                                        }) + item.name
+                                                        item.name
                                                     }
                                                     options={datasetData?.list || []}
                                                 ></ProFormSelect>
