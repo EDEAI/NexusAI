@@ -12,6 +12,7 @@ import {
     SwitchImportToKnowledgeBase,
     SwitchManualConfirmation,
 } from '../../components/Form/Switch';
+import { SelectVariable } from '../../components/Form/Select';
 import useStore from '../../store';
 import { AppNode } from '../../types';
 import { resetFormNodes } from '../../utils/resetFormNodes';
@@ -266,14 +267,15 @@ export default memo(({ node }: { node: AppNode }) => {
                 >
                     {inputList.map((item, index) => {
                         return (
-                            <ProFormSelect
+                            <SelectVariable
                                 key={index}
                                 name={`variable.${item.name}`}
                                 label={item.name}
                                 showSearch
                                 allowClear={false}
-                                request={async () => editorOptions}
-                            ></ProFormSelect>
+                                node={node}
+                                options={editorOptions}
+                            ></SelectVariable>
                         );
                     })}
 
