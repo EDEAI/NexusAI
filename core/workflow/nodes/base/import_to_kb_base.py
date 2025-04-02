@@ -4,14 +4,10 @@ sys.path.append(str(Path(__file__).absolute().parent.parent.parent.parent))
 
 from typing import Dict, List, Optional, Tuple, Union
 
-from markitdown import MarkItDown
-
 from . import Node
 from ...variables import Variable, ArrayVariable, ObjectVariable, VariableTypes
 from core.database.models import AppNodeExecutions, AppRuns, Apps, Datasets, Documents, UploadFiles
 from core.dataset import DatasetManagement
-
-md = MarkItDown(enable_plugins=False)
 
 project_root = Path(__file__).absolute().parent.parent.parent.parent.parent
 
@@ -33,6 +29,27 @@ class ImportToKBBaseNode(Node):
         is_input: bool
     ) -> None:
         if var_value := variable.value:
+            if variable.type == 'file':
+                if isinstance(var_value, int):
+                    # Upload file ID
+                    file_id = var_value
+                    file_data = UploadFiles().get_file_by_id(file_id)
+                    if file_data['extension'] in ['.jpg', '.jpeg', '.gif', '.png', '.webp']:
+                        return
+                    source_string_for_db = file_data['name'] + file_data['extension']
+                    source_string_for_kb = str(project_root.joinpath(file_data['path']))
+                elif isinstance(var_value, str):
+                    file_id = 0
+                    if var_value[0] == '/':
+                        var_value = var_value[1:]
+                    file_path = project_root.joinpath('storage').joinpath(var_value)
+                    if file_path.suffix in ['.jpg', '.jpeg', '.gif', '.png', '.webp']:
+                        return
+                    source_string_for_db = file_path.name
+                    source_string_for_kb = str(file_path)
+                else:
+                    # This should never happen
+                    raise Exception('Unsupported value type!')
             dataset = Datasets().get_dataset_by_id(dataset_id)
             process_rule_id = dataset['process_rule_id']
             document_id = Documents().insert(
@@ -59,22 +76,11 @@ class ImportToKBBaseNode(Node):
                         source=source_string_for_kb
                     )
                 case 'file':
-                    if isinstance(var_value, int):
-                        # Upload file ID
-                        file_data = UploadFiles().get_file_by_id(var_value)
-                        file_path = project_root.joinpath(file_data['path'])
-                    elif isinstance(var_value, str):
-                        if var_value[0] == '/':
-                            var_value = var_value[1:]
-                        file_path = project_root.joinpath('storage').joinpath(var_value)
-                    else:
-                        # This should never happen
-                        raise Exception('Unsupported value type!')
                     result = DatasetManagement.add_document_to_dataset(
                         document_id=document_id,
                         dataset_id=dataset_id,
                         process_rule_id=process_rule_id,
-                        file_path=str(file_path)
+                        file_path=source_string_for_kb
                     )
                 case 'json':
                     result = DatasetManagement.add_document_to_dataset(
@@ -154,20 +160,9 @@ class ImportToKBBaseNode(Node):
                     if var_value := variable.value:
                         if isinstance(var_value, int):
                             # Upload file ID
-                            file_id = var_value
-                            file_data = UploadFiles().get_file_by_id(file_id)
-                            source_string_for_db = file_data['name'] + file_data['extension']
-                            source_string_for_kb = str(project_root.joinpath(file_data['path']))
+                            file_id = variable.value
                         elif isinstance(var_value, str):
                             file_id = 0
-                            if var_value[0] == '/':
-                                var_value = var_value[1:]
-                            file_path = project_root.joinpath('storage').joinpath(var_value)
-                            source_string_for_db = file_path.name
-                            source_string_for_kb = str(file_path)
-                        else:
-                            # This should never happen
-                            raise Exception('Unsupported value type!')
                         self.import_variable_to_knowledge_base(
                             variable, file_id, source_string_for_db, source_string_for_kb,
                             user_id, dataset_id, node_exec_id, is_input
@@ -199,12 +194,12 @@ class ImportToKBBaseNode(Node):
         if prev_node_exec:
             self.delete_documents_by_node_exec_id(prev_node_exec['id'])
 
-    def import_inputs_to_knowledge_base_and_get_file_list(
+    def import_inputs_to_knowledge_base(
         self,
         app_run_id: int,
         node_exec_id: int,
         import_to_knowledge_base: bool
-    ) -> ArrayVariable:
+    ) -> None:
         # Generate file lists for both importing to knowledge base and uploading the LLM model
         input_kb_mapping: Dict[str, Union[int, Dict[str, int]]] = self.data['knowledge_base_mapping'].get('input', {})
         
@@ -214,28 +209,4 @@ class ImportToKBBaseNode(Node):
                 self.data['input'], input_kb_mapping,
                 app_run_id, node_exec_id, True
             )
-
-        file_list = ArrayVariable(name='file_list', type='array[file]')
-        for var_name, variable in self.data['input'].properties.items():
-            if variable.type == 'file':
-                if var_value := variable.value:
-                    if isinstance(var_value, int):
-                        # Upload file ID
-                        file_data = UploadFiles().get_file_by_id(var_value)
-                        file_path = project_root.joinpath(file_data['path'])
-                    elif isinstance(var_value, str):
-                        if var_value[0] == '/':
-                            var_value = var_value[1:]
-                        file_path = project_root.joinpath('storage').joinpath(var_value)
-                    else:
-                        # This should never happen
-                        raise Exception('Unsupported value type!')
-                    if file_path.suffix not in ['.jpg', 'jpeg', '.png', '.gif', '.webp']:
-                        string_var = Variable(name=var_name, type='string', value=md.convert(file_path).text_content)
-                        self.data['output'].add_property(var_name, string_var)
-                else:
-                    string_var = Variable(name=var_name, type='string', value='')
-                    self.data['output'].add_property(var_name, string_var)
-
-        return file_list
     

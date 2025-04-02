@@ -1,7 +1,7 @@
 from time import monotonic
 from typing import Any, Dict, Optional
 
-from .base import ImportToKBBaseNode
+from .base import FileOutputBaseNode, ImportToKBBaseNode
 from ..context import Context
 from ..variables import ObjectVariable, validate_required_variable
 from log import Logger
@@ -10,7 +10,7 @@ from log import Logger
 logger = Logger.get_logger('celery-app')
 
 
-class HumanNode(ImportToKBBaseNode):
+class HumanNode(FileOutputBaseNode, ImportToKBBaseNode):
     """
     A HumanNode object is used to create manual confirmation tasks in a workflow.
     """
@@ -63,7 +63,7 @@ class HumanNode(ImportToKBBaseNode):
             start_time = monotonic()
             validate_required_variable(self.data['input'])
 
-            self.import_inputs_to_knowledge_base_and_get_file_list(
+            self.import_inputs_to_knowledge_base(
                 app_run_id, node_exec_id,
                 (
                     # NOT running the node separately,
@@ -72,6 +72,7 @@ class HumanNode(ImportToKBBaseNode):
                     and self.data['import_to_knowledge_base'].get('input', False)
                 )
             )
+            outputs_in_context = self.replace_documents_with_strvars_in_context(self.data['output'])
             
             return {
                 'status': 'success',
@@ -81,6 +82,7 @@ class HumanNode(ImportToKBBaseNode):
                     'inputs':self.data['input'].to_dict(),
                     'output_type' : 1,
                     'outputs': self.data['output'].to_dict(),
+                    'outputs_in_context': outputs_in_context.to_dict()
                 }
             }
         except Exception as e:

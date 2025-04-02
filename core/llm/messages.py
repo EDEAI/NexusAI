@@ -3,6 +3,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 from base64 import b64encode
+from copy import deepcopy
 from typing import Any, Dict, List, Tuple, Union, Optional
 
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -26,30 +27,44 @@ class Messages:
         """
         self.messages: List[Tuple[str, Variable]] = []
         
-    def _get_human_message_from_file_variable(self, file: Variable) -> HumanMessage:
+    def _get_human_message_from_file_variable(self, file: Variable) -> Union[HumanMessage, Tuple[str, str]]:
         """
         Gets a HumanMessage object from a file variable.
         """
-        file_path = file.value
-        suffix_to_mime_subtype = {
-            '.png': 'png',
-            '.jpg': 'jpeg',
-            '.jpeg': 'jpeg',
-            '.webp': 'webp',
-            '.gif': 'gif',
-        }
-        if file_path.suffix not in suffix_to_mime_subtype:
-            raise ValueError(f"Unsupported file type: {file_path.suffix}")
-        mime_subtype = suffix_to_mime_subtype[file_path.suffix]
-        image_data = b64encode(file_path.read_bytes()).decode("utf-8")
-        return HumanMessage(
-            content=[
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/{mime_subtype};base64,{image_data}"},
-                }
-            ],
-        )
+        from core.database.models import UploadFiles
+        
+        if var_value := file.value:
+            if isinstance(var_value, int):
+                # Upload file ID
+                file_data = UploadFiles().get_file_by_id(var_value)
+                file_path = project_root.joinpath(file_data['path'])
+            elif isinstance(var_value, str):
+                if var_value[0] == '/':
+                    var_value = var_value[1:]
+                file_path = project_root.joinpath('storage').joinpath(var_value)
+            else:
+                # This should never happen
+                raise Exception('Unsupported value type!')
+            suffix_to_mime_subtype = {
+                '.png': 'png',
+                '.jpg': 'jpeg',
+                '.jpeg': 'jpeg',
+                '.webp': 'webp',
+                '.gif': 'gif',
+            }
+            if file_path.suffix not in suffix_to_mime_subtype:
+                raise ValueError(f"Unsupported file type: {file_path.suffix}")
+            mime_subtype = suffix_to_mime_subtype[file_path.suffix]
+            image_data = b64encode(file_path.read_bytes()).decode("utf-8")
+            return HumanMessage(
+                content=[
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/{mime_subtype};base64,{image_data}"},
+                    }
+                ],
+            )
+        return ("human", "")
 
     def add_system_message(self, system_message: Variable) -> None:
         """
@@ -76,7 +91,11 @@ class Messages:
 
         :param message: Variable, the human message to add.
         """
-        self.messages.append(("human", Variable(name="user", type=type, value=str(human_message.value))))
+        if type == "file":
+            variable = deepcopy(human_message)
+        else:
+            variable = Variable(name="user", type=type, value=str(human_message.value))
+        self.messages.append(("human", variable))
             
     def add_ai_message(self, ai_message: Variable) -> None:
         """

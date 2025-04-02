@@ -56,6 +56,8 @@ async def get_node_by_id(exec_id: int, userinfo: TokenData = Depends(get_current
     node info
 
     """
+    from core.llm import get_serialized_prompt_from_messages
+    
     uid = userinfo.uid
     team_id = userinfo.team_id
 
@@ -79,8 +81,7 @@ async def get_node_by_id(exec_id: int, userinfo: TokenData = Depends(get_current
     prompt_data = []
     if result["data"]["model_data"]:
         messages = result["data"]["model_data"]["messages"]
-        for message in messages:
-            prompt_data.append({message[0]: message[1]["value"]})
+        prompt_data = get_serialized_prompt_from_messages(messages)
     result["data"]["prompt_data"] = prompt_data
     result["data"].pop("model_data")
 

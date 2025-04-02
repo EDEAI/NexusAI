@@ -933,7 +933,7 @@ language_packs = {
                 "input_variables": [
                     {{
                         "name":"variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
-                        "type":"Variable type, including ['string', 'number'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python",
+                        "type":"Variable type, including ['string', 'number', 'json'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python",
                         "required":"(bool type), whether the variable is required: True means required, False means non-required",
                         "display_name":"variable display name, which can be used as a description of the function and purpose of the variable"
                     }}
@@ -948,7 +948,7 @@ language_packs = {
                 "output_variables":[
                     {{
                         "name": "variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
-                        "type": "Variable type, including ['string', 'number', 'json'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python",
+                        "type": "Variable type, including ['string', 'number', 'json', 'file'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python, 'file' is used when the variable contains a file path. If a Python function returns a file path, this variable must be set to 'file' type",
                         "display_name": "Variable display name, can be used as a description of the function and purpose of the variable"
                     }}
                 ]
@@ -965,7 +965,7 @@ language_packs = {
                 3.5 The return data type of the function must be specified
                 3.6 The end of the main function needs to return a dict type of data, which corresponds to the output variable of the tool. The key name of the dict data is the output variable name. The variable name and variable type must be consistent with the definition in "output_variables"
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
-            5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
+            5. Note the type of each output variable in "output_variables". The type of each output variable MUST match the corresponding data type in the return data of the python3 code: If the python3 code returns a "dict" or "list", the corresponding output variable type must be set to "json"; if it returns a file path, the corresponding output variable type must be set to "file"; otherwise (for strings, integers, floats, etc.) it should be set to "string" or "number" accordingly. Each key in the return dictionary must correspond to an output variable with a matching type.
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
             7. File write restrictions: when the code involves file write operations, the target file path must start with "/storage". For example: /storage/my_folder/my_file.txt.
                File return requirements: if the code needs to return the file path, the return value must start with "file://" so that the system can correctly identify it as a file type. For example: file:///storage/my_folder/my_file.txt.
@@ -987,7 +987,7 @@ language_packs = {
                 "input_variables": [
                     {{
                         "name":"variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
-                        "type":"Variable type, including ['string', 'number'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python",
+                        "type":"Variable type, including ['string', 'number', 'json'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python",
                         "required":"(bool type), whether the variable is required: True means required, False means non-required",
                         "display_name":"variable display name, which can be used as a description of the function and purpose of the variable"
                     }}
@@ -1002,7 +1002,7 @@ language_packs = {
                 "output_variables":[
                     {{
                         "name": "variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
-                        "type": "Variable type, including ['string', 'number', 'json'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python",
+                        "type": "Variable type, including ['string', 'number', 'json', 'file'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python, 'file' is used when the variable contains a file path. If a Python function returns a file path, this variable must be set to 'file' type",
                         "display_name": "Variable display name, can be used as a description of the function and purpose of the variable"
                     }}
                 ]
@@ -1019,7 +1019,7 @@ language_packs = {
                 3.5 The return data type of the function must be specified
                 3.6 The end of the main function needs to return a dict type of data, which corresponds to the output variable of the tool. The key name of the dict data is the output variable name. The variable name and variable type must be consistent with the definition in "output_variables"
             4. "output_variables" is the output variable after the tool is run. The overall structure is list type. Each element in the list is an input variable, and a single input variable is dict type
-            5. Note the type of each output variable in "output_variables". If the corresponding variable type in the return data in the python3 code is "dict" or "list", the corresponding output variable type is "json", otherwise it is "string" or "number".
+            5. Note the type of each output variable in "output_variables". The type of each output variable MUST match the corresponding data type in the return data of the python3 code: If the python3 code returns a "dict" or "list", the corresponding output variable type must be set to "json"; if it returns a file path, the corresponding output variable type must be set to "file"; otherwise (for strings, integers, floats, etc.) it should be set to "string" or "number" accordingly. Each key in the return dictionary must correspond to an output variable with a matching type.
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
             7. File write restrictions: when the code involves file write operations, the target file path must start with "/storage". For example: /storage/my_folder/my_file.txt.
                File return requirements: if the code needs to return the file path, the return value must start with "file://" so that the system can correctly identify it as a file type. For example: file:///storage/my_folder/my_file.txt.

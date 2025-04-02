@@ -192,7 +192,7 @@ class RecursiveTaskExecutionNode(ImportToKBBaseNode, LLMBaseNode):
                         'total_tokens': total_tokens
                     })
             else:
-                self.import_inputs_to_knowledge_base_and_get_file_list(
+                self.import_inputs_to_knowledge_base(
                     app_run_id, node_exec_id,
                     (
                         # NOT running the node separately,

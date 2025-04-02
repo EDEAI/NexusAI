@@ -1,13 +1,13 @@
 from typing import Any, Dict, Optional
 from datetime import datetime
-from .base import ImportToKBBaseNode
+from .base import FileOutputBaseNode, ImportToKBBaseNode
 from ..variables import ObjectVariable, validate_required_variable
 from log import Logger
 
 
 logger = Logger.get_logger('celery-app')
 
-class StartNode(ImportToKBBaseNode):
+class StartNode(FileOutputBaseNode, ImportToKBBaseNode):
     """
     A StartNode object is used to mark the start of the workflow.
     """
@@ -51,7 +51,7 @@ class StartNode(ImportToKBBaseNode):
             validate_required_variable(self.data['input'])
             app_run_id = kwargs.get('app_run_id', 0)
             node_exec_id = kwargs.get('node_exec_id', 0)
-            self.import_inputs_to_knowledge_base_and_get_file_list(
+            self.import_inputs_to_knowledge_base(
                 app_run_id, node_exec_id,
                 (
                     # NOT running the node separately,
@@ -60,6 +60,7 @@ class StartNode(ImportToKBBaseNode):
                     and self.data['import_to_knowledge_base'].get('input', False)
                 )
             )
+            outputs_in_context = self.replace_documents_with_strvars_in_context(self.data['output'])
                 
             end_time = datetime.now()
             return {
@@ -70,6 +71,7 @@ class StartNode(ImportToKBBaseNode):
                     'inputs': self.data['input'].to_dict(),
                     'output_type' : 1,
                     'outputs': self.data['output'].to_dict(),
+                    'outputs_in_context': outputs_in_context.to_dict()
                 }
             }
         except Exception as e:

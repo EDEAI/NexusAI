@@ -87,7 +87,7 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             # Task splitting is disabled in current version. 2024-10-22
             self.data['task_splitting'] = False
 
-            file_list = self.import_inputs_to_knowledge_base_and_get_file_list(
+            self.import_inputs_to_knowledge_base(
                 app_run_id, node_exec_id,
                 (
                     not correct_llm_output
@@ -99,8 +99,9 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             )
             
             prompt: Prompt = self.data["prompt"]
+            file_list = None
             if context:
-                replace_prompt_with_context(prompt, context)
+                file_list = replace_prompt_with_context(prompt, context)
             
             # Escape braces in the prompt
             if system_prompt := prompt.get_system():

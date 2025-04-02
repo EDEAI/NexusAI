@@ -146,6 +146,8 @@ class Workspaces(MySQL):
             - "list": A list of node execution logs with details such as node name, graph, inputs, status, error, and execution times.
             - "app_run_data": A list of application run details including workflow ID, run status, completed steps, error info, token counts, and timestamps.
         """
+        from core.llm import get_serialized_prompt_from_messages
+        
         app_node_executions = AppNodeExecutions()
         conditions = [
             {"column": "app_node_executions.workflow_id", "value": workflows_id},
@@ -223,8 +225,7 @@ class Workspaces(MySQL):
                 prompt_data = []
                 if app_node["mod_data"] is not None:
                     messages = app_node["mod_data"]["messages"]
-                    for message in messages:
-                        prompt_data.append({message[0]: message[1]["value"]})
+                    prompt_data = get_serialized_prompt_from_messages(messages)
                 app_node["prompt_data"] = prompt_data
                 app_node.pop("mod_data")
 

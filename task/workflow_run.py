@@ -230,11 +230,12 @@ def push_workflow_debug_message(
     :param first_task_exec_id: The ID of the first task execution record.
     :param node_exec_data: A dictionary containing the node execution data.
     """
+    from core.llm import get_serialized_prompt_from_messages
+
     model_data = node_exec_data.pop('model_data', None)
     prompt_data = []
     if model_data:
-        for message in model_data["messages"]:
-            prompt_data.append({message[0]: message[1]["value"]})
+        prompt_data = get_serialized_prompt_from_messages(model_data["messages"])
     node_exec_data["prompt_data"] = prompt_data
     if inputs := node_exec_data.get('inputs'):
         inputs = create_variable_from_dict(inputs)
@@ -751,6 +752,7 @@ def task_callback_thread():
                         inputs = result['data'].get('inputs', None)
                         task_id = result['data'].get('task_id', None)
                         outputs = result['data'].get('outputs', None)
+                        outputs_in_context = result['data'].get('outputs_in_context', None)
                         elapsed_time = float(result['data'].get('elapsed_time', 0))
                         prompt_tokens = result['data'].get('prompt_tokens', 0)
                         completion_tokens = result['data'].get('completion_tokens', 0)
@@ -762,6 +764,10 @@ def task_callback_thread():
                             # Create input variable from input dictionary
                             input = create_variable_from_dict(inputs)
                             target_node.data['input'] = input  # Update target node with input variable
+                        if outputs_in_context:
+                            # Create output variable from result dictionary
+                            output_in_context = create_variable_from_dict(outputs_in_context)
+                            target_node.data['output_in_context'] = output_in_context  # Update target node with output variable
                         if outputs:
                             # Create output variable from result dictionary
                             output = create_variable_from_dict(outputs)
@@ -778,6 +784,7 @@ def task_callback_thread():
                         need_human_confirm = 1 if target_node.data['type'] != 'human' and \
                             not (task_operation == 'assign_task' and task_id) and \
                             target_node.data.get('manual_confirmation', False) else 0
+                        result['data'].pop('outputs_in_context', None)
                         node_exec_data = {'status': 3, 'error': None, 'need_human_confirm': need_human_confirm, 'finished_time': current_time, **result['data']}
                         app_run_data = {
                             'context': context.to_dict(),

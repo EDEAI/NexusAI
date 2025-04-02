@@ -2,9 +2,11 @@ import sys, re
 from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
-from typing import Dict, Any
-from core.workflow.variables import Variable, replace_value_in_variable
+from typing import Dict, Any, List, Union
+from core.workflow.variables import Variable, replace_value_in_variable, ObjectVariable, VariableTypes
 from core.workflow.context import Context
+
+project_root = Path(__file__).absolute().parent.parent.parent
 
 class Prompt:
     """
@@ -74,20 +76,25 @@ def create_prompt_from_dict(prompt_dict: Dict[str, Any]) -> Prompt:
         assistant=prompt_dict["assistant"]["value"] if prompt_dict["assistant"] else ""
     )
 
-def replace_prompt_with_context(prompt: Prompt, context: Context, duplicate_braces: bool = False):
+def replace_prompt_with_context(prompt: Prompt, context: Context, duplicate_braces: bool = False) -> List[Variable]:
     """
     Searches for placeholders in the prompt's attributes and replaces them with actual values from the context.
+    For file-type variables, adds them to a list and removes their placeholders from the string.
 
     :param prompt: The Prompt object containing placeholders to be replaced.
     :param context: The Context object containing variables that may replace the placeholders.
     :param duplicate_braces: bool, whether to duplicate braces in variables in the context.
+    :return: list containing all file-type variables found in the context.
     """
+    file_variables = []
+    
     def replace_in_attribute(original_variable: Variable):
         placeholders = re.findall(r'<<([0-9a-fA-F\-]+)\.(inputs|outputs)\.([^>]+)>>', original_variable.value)
         for node_id, source, var_name in placeholders:
             for record in context.records:
                 if record['node_id'] == node_id:
-                    replace_value_in_variable(original_variable, record[source], node_id, source, var_name, duplicate_braces, False)
+                    # Check if the variable is a file type
+                    replace_value_in_variable(original_variable, record[source], node_id, source, var_name, duplicate_braces, False, file_variables)
                     break
 
     if prompt.system:
@@ -96,3 +103,31 @@ def replace_prompt_with_context(prompt: Prompt, context: Context, duplicate_brac
         replace_in_attribute(prompt.user)
     if prompt.assistant:
         replace_in_attribute(prompt.assistant)
+        
+    return file_variables
+
+def get_serialized_prompt_from_messages(messages: List[List[Union[str, Dict]]]) -> List[Dict[str, str]]:
+    from core.database.models import UploadFiles
+
+    prompt_data = []
+    for message in messages:
+        message_var = message[1]
+        if message_var["type"] == "file":
+            message_value = ""
+            if var_value := message_var["value"]:
+                if isinstance(var_value, int):
+                    # Upload file ID
+                    file_data = UploadFiles().get_file_by_id(var_value)
+                    message_value = file_data['name'] + file_data['extension']
+                elif isinstance(var_value, str):
+                    if var_value[0] == '/':
+                        var_value = var_value[1:]
+                    file_path = project_root.joinpath('storage').joinpath(var_value)
+                    message_value = file_path.name
+                else:
+                    # This should never happen
+                    raise Exception('Unsupported value type!')
+        else:
+            message_value = message_var["value"]
+        prompt_data.append({message[0]: message_value})
+    return prompt_data
