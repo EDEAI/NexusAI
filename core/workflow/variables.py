@@ -440,8 +440,8 @@ def flatten_variable(variable: VariableTypes) -> Dict[str, Tuple[str, str, bool]
 
     def _flatten(var: VariableTypes):
         if isinstance(var, Variable):
-            [var.name] = (
-                'number' if var.type == 'number' else 'string', 
+            flat_dict[var.name] = (
+                var.type, 
                 getattr(var, 'display_name', ''),
                 getattr(var, 'required', False)
             )
@@ -516,22 +516,6 @@ def flatten_variable_with_values(variable: VariableTypes) -> Dict:
     else:
         return _flatten(variable)
 
-def unflatten_dict_with_values(input_data: Dict[str, Union[int, float, str]], name: str) -> ObjectVariable:
-    """
-    Unflattens a one-dimensional dictionary into a ObjectVariable 
-
-    :param input_data: Dict[str, Union[int, float, str]]), a dictionary representation of the variable object.
-    :return: ObjectVariable, the variable object after unflattening.
-    """
-    object_variable = ObjectVariable(name=name)
-    for key, value in input_data.items():
-        if isinstance(value, str):
-            variable = Variable(name=key, type='string', value=value)
-        else:
-            variable = Variable(name=key, type='number', value=value)
-        object_variable.add_property(key, variable)
-    return object_variable
-
 def convert_to_fastapi_model(model_name: str, variable: VariableTypes) -> Type[BaseModel]:
     """
     Converts a Variable, ArrayVariable, or ObjectVariable to a FastAPI parameter model using Pydantic.
@@ -547,6 +531,8 @@ def convert_to_fastapi_model(model_name: str, variable: VariableTypes) -> Type[B
         field_info = Field(... if required else None, title=display_name, description=f"{display_name} ({var_type})")
         if var_type == 'number':
             input_data_fields[var_name] = (Union[int | float], field_info)
+        elif var_type == 'file':
+            input_data_fields[var_name] = (int, field_info)
         else:
             input_data_fields[var_name] = (str, field_info)
     
