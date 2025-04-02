@@ -274,7 +274,6 @@ export default memo(({ node }: { node: AppNode }) => {
                                 showSearch
                                 allowClear={false}
                                 node={node}
-                                options={editorOptions}
                             ></SelectVariable>
                         );
                     })}

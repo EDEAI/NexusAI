@@ -139,7 +139,7 @@ export const SelectVariable = ({
         const variables = await getVariables(node.id);
         return variables.filter(filterFn);
     };
-
+   
     return (
         <ProFormSelect
             placeholder={intl.formatMessage({
@@ -157,8 +157,7 @@ export const SelectVariable = ({
             }}
             colSize={12}
             name={name}
-            options={options}
-            request={customRequest || (options ? undefined : defaultRequest)}
+            request={customRequest || defaultRequest}
             {...restProps}
         ></ProFormSelect>
     );
