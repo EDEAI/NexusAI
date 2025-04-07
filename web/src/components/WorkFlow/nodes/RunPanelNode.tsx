@@ -342,8 +342,18 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
             const output = new ObjectVariable('output');
             x.list.forEach(item => {
                 const name = `contexts.${x.id}.${item.name}`;
-                const val = value[name];
-                const variable = new Variable(item.name, item.type || 'string', val || '');
+                let val = value[name];
+
+                if (item.createVar?.type == 'file') {
+                    val = val[0]?.response?.data?.file_id;
+                }
+
+                const variable = new Variable(
+                    item.name,
+                    item.createVar?.type || 'string',
+                    val || '',
+                );
+
                 output.addProperty(item.name, variable);
             });
             node.outputs = output;
@@ -364,7 +374,6 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
         runNode(app_id, params)
             .then(res => {
                 console.log(res);
-
                 onRunResult?.(res);
             })
             .catch(err => {
