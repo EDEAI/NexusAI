@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
 
+from copy import deepcopy
 from datetime import datetime
 from hashlib import md5
 from typing import Annotated, Any, Dict, Optional
@@ -27,7 +28,6 @@ from core.workflow import (
     create_graph_from_dict,
     convert_to_fastapi_model,
     flatten_variable_with_values,
-    unflatten_dict_with_values,
     validate_required_variable
 )
 
@@ -117,19 +117,23 @@ async def run(
             if not workflow:
                 return response_error('No available workflow, or the workflow is not published.')
             
+            graph = create_graph_from_dict(workflow['graph'])
+            graph.validate()
+
+            input_of_start_node: ObjectVariable = graph.nodes.nodes[0].data['input']
+            input_obj = deepcopy(input_of_start_node)
+
             # Get workflow input
             try:
                 input_data: Dict[str, Union[int | float | str]] = kwargs['input_data']
-                if not isinstance(input_data, dict):
+                if not isinstance(input_data, Dict):
                     raise Exception('Field "input_data" must be a dictionary')
-                input_obj = unflatten_dict_with_values(input_data, 'input_var')
+                for k, v in input_data.items():
+                    if var := input_obj.properties.get(k):
+                        var.value = v
                 validate_required_variable(input_obj)
             except Exception as e:
                 return response_error(str(e))
-
-            # Check the input
-            graph = create_graph_from_dict(workflow['graph'])
-            graph.validate()
             
             # Create app run record
             start_datetime_str = datetime.now().replace(microsecond=0).isoformat(sep='_')
