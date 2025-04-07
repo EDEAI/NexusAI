@@ -109,7 +109,7 @@ export default {
     'workflow.uploadFileText': '拖拽文件至此，或者选择文件',
     'workflow.uploadFileErrorText': '上传的文件不能大于15M',
     'workflow.uploadFileDes':
-        '已支持 TXT、 MARKDOWN、 PDF、 HTML、 XLSX、 XLS、 DOCX、 CSV，每个文件不超过 15MB。',
+        '已支持 TXT、 MARKDOWN、 PDF、 HTML、 XLSX、 XLS、 DOCX、 CSV、JPG、PNG、JPEG，每个文件不超过 15MB。',
     'workflow.label.variable': '变量',
     'workflow.title.runWorkflow': '运行工作流',
     'workflow.button.run': '运行',
@@ -345,4 +345,6 @@ export default {
     'workflow.debugTodo': '调试待办',
 
     'workflow.tag.imageUnderstanding': '图片理解',
+
+    'workflow.context': '上下文',
 };

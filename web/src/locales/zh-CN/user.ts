@@ -18,8 +18,8 @@ export default {
     'user.inviteAsMemberUser': '邀请为成员用户',
     'user.member': '成员',
     'user.sendInvitation': '发送邀请',
-    'user.invitationSent': '邀请已发送',
-    'user.invitationSentLoginNexusAI': '邀请已发送，对方登录 NEXUS AI',
+    'user.invitationSent': '邀请',
+    'user.invitationSentLoginNexusAI': '请对方登录 NEXUS AI',
     'user.invitationLink': '邀请链接',
     'user.ok': '好的',
 

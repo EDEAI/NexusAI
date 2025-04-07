@@ -631,7 +631,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                         <UploadDragger 
                             name="file"
                             multiple={true}
-                            accept=".txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv"
+                          
                         />
 
                         <ProFormDependency name={['file']}>

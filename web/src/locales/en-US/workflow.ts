@@ -114,7 +114,7 @@ export default {
     'workflow.uploadFileText': 'Drag files here, or select files',
     'workflow.uploadFileErrorText': 'Uploaded files cannot exceed 15MB',
     'workflow.uploadFileDes':
-        'ReviseSupported formats: TXT, MARKDOWN, PDF, HTML, XLSX, XLS, DOCX, CSV, Each file should not exceed 15MB.',
+        'ReviseSupported formats: TXT, MARKDOWN, PDF, HTML, XLSX, XLS, DOCX, CSV,JPG,PNG,JPEG, Each file should not exceed 15MB.',
     'workflow.label.variable': 'Variable',
     'workflow.title.runWorkflow': 'Run Workflow',
     'workflow.button.run': 'Run',
@@ -352,4 +352,6 @@ export default {
     'workflow.debugTodo': 'Debug Todo',
 
     'workflow.tag.imageUnderstanding': 'Image Understanding',
+
+    'workflow.context': 'Context',
 };

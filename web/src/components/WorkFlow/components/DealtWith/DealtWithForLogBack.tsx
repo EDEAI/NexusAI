@@ -26,6 +26,7 @@ import { NOT_SHOW_INPUT_RESULT_NODE, UPLOAD_FILES_KEY } from '../../config';
 import useStore from '../../store';
 import { BlockEnum } from '../../types';
 import CodeEditor from '../Editor/CodeEditor';
+import { UploadDragger } from '../Form/Upload';
 
 import useSaveWorkFlow from '../../saveWorkFlow';
 const { Text } = Typography;
@@ -396,7 +397,12 @@ export default memo((props: any) => {
                         );
                     })}
                     {requires_upload && (
-                        <ProFormUploadDragger name="file" {...uploadProps}></ProFormUploadDragger>
+                        <UploadDragger
+                            name="file"
+                            multiple={true}
+                          
+                            maxSize={15}
+                        />
                     )}
                     <ProFormDependency name={['file']}>
                         {({ file }) =>
