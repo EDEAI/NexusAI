@@ -551,3 +551,7 @@ async def skill_debug(data: ReqSkillDebugSchema, userinfo: TokenData = Depends(g
         return response_success({"outputs": result["data"]["outputs"]})
     except Exception as e:
         return response_error(str(e))
+
+
+async def demo():
+    pass
