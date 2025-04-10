@@ -64,6 +64,6 @@ async def upload_file(file: UploadFile = File(...), userinfo: TokenData = Depend
     file_id = UploadFiles().insert(row)
     row['file_id'] = file_id
     if row['path'] and row['path'].startswith('upload_files/'):
-        row['path'] = row['path'].split('upload_files/')[-1]
-        row['path'] = f"{settings.STORAGE_URL}/upload/{row['path']}"
+        row['path_show'] = row['path'].split('upload_files/')[-1]
+        row['path_show'] = f"{settings.STORAGE_URL}/upload/{row['path_show']}"
     return response_success(row, get_language_content("api_vector_success"))
