@@ -8,6 +8,7 @@ from api.utils.common import *
 from api.utils.jwt import *
 from api.schema.vector import *
 from languages import get_language_content
+from config import settings
 
 router = APIRouter()
 
@@ -62,4 +63,7 @@ async def upload_file(file: UploadFile = File(...), userinfo: TokenData = Depend
     }
     file_id = UploadFiles().insert(row)
     row['file_id'] = file_id
+    if row['path'] and row['path'].startswith('upload_files/'):
+        row['path'] = row['path'].split('upload_files/')[-1]
+        row['path'] = f"{settings.STORAGE_URL}/upload/{row['path']}"
     return response_success(row, get_language_content("api_vector_success"))
