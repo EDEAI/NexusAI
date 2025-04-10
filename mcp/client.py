@@ -288,8 +288,8 @@ class ChatSession:
                     logging.info("\nExiting...")
                     break
 
-    finally:
-            await self.cleanup_servers()
+        finally:
+                await self.cleanup_servers()
 
 
 async def main() -> None:
