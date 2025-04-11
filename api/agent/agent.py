@@ -9,6 +9,7 @@ from core.database.models.apps import Apps
 from core.database.models.app_runs import AppRuns
 from core.database.models.agent_abilities import AgentAbilities
 from core.database.models.agent_chat_messages import AgentChatMessages
+from core.database.models.agent_callable_items import AgentCallableItems
 from core.workflow.nodes import AgentNode
 from core.workflow.variables import create_variable_from_dict
 from core.llm.prompt import create_prompt_from_dict, Prompt
@@ -70,8 +71,66 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
     dataset_ids = data.dataset_ids
     m_config_id = data.m_config_id
     allow_upload_file = data.allow_upload_file
+    # dapeng 2025/4/11 apend
     default_output_format = data.default_output_format
+    new_callableList: List[CallableList] = data.callable_list if data.callable_list is not None else []
+    if new_callableList:
+        for item in new_callableList:
+            if item.app_id <= 0:
+                return response_error(get_language_content("api_agent_base_update_app_id_required"))
+            if item.item_type not in [1, 2]:
+                return response_error(get_language_content("api_agent_base_update_item_type_error"))
+            callable_items = AgentCallableItems().get_callable_items_by_agent_id(agent_id)
 
+        # Get existing callable items
+        existing_items = AgentCallableItems().get_callable_items_by_agent_id(agent_id)
+        
+        # Create sets for comparison using composite key (app_id, item_type)
+        existing_items_set = {(item['app_id'], item['item_type']) for item in existing_items}
+        new_items_set = {(item.app_id, item.item_type) for item in new_callableList}
+
+        # Find items to delete, add, and update
+        items_to_delete = [(app_id, item_type) for app_id, item_type in existing_items_set if (app_id, item_type) not in new_items_set]
+        items_to_add = [item for item in new_callableList if (item.app_id, item.item_type) not in existing_items_set]
+        items_to_update = [item for item in new_callableList if (item.app_id, item.item_type) in existing_items_set]
+
+        # Delete items that are no longer in new_callableList
+        for app_id, item_type in items_to_delete:
+            AgentCallableItems().delete(
+                conditions=[
+                    {"column": "agent_id", "value": agent_id},
+                    {"column": "app_id", "value": app_id},
+                    {"column": "item_type", "value": item_type}
+                ]
+            )
+
+        # Add new items
+        if items_to_add:
+            for item in items_to_add:
+                AgentCallableItems().insert(
+                    data={
+                        'agent_id': agent_id,
+                        'app_id': item.app_id,
+                        'item_type': item.item_type
+                    }
+                )
+
+        # Update existing items
+        if items_to_update:
+            for item in items_to_update:
+                AgentCallableItems().update(
+                    data={
+                        'app_id': item.app_id,
+                        'item_type': item.item_type
+                    },
+                    conditions=[
+                        {"column": "agent_id", "value": agent_id},
+                        {"column": "app_id", "value": item.app_id},
+                        {"column": "item_type", "value": item.item_type}
+                    ]
+                )
+
+    # dapeng 2025/4/11 end
     if agent_id <= 0:
         return response_error(get_language_content("api_agent_base_update_agent_id_required"))
     if is_public not in [0, 1]:
@@ -101,7 +160,6 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
     if result["status"] != 1:
         return response_error(result["message"])
     app_id = result["data"]["app_id"]
-
     return response_success(result["data"], get_language_content("api_agent_success"))
 
 

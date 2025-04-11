@@ -6,6 +6,7 @@ from core.database.models.agent_dataset_relation import AgentDatasetRelation
 from core.database.models.agent_abilities import AgentAbilities
 from core.database.models.model_configurations import ModelConfigurations
 from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
+from core.database.models.agent_callable_items import AgentCallableItems
 from core.database.models.tag_bindings import TagBindings
 from core.database.models.users import Users
 from datetime import datetime
@@ -630,6 +631,9 @@ class Agents(MySQL):
             order_by="model_configurations.id ASC"
         )
 
+        
+        callable_items = AgentCallableItems().get_callable_items_by_agent_id(agent["agent_id"])
+
         # get user
         users_model = Users()
         user = users_model.select_one(
@@ -648,6 +652,7 @@ class Agents(MySQL):
             data = {
                 "app": app,
                 "agent": input_variables,
+                "callable_items": callable_items,
                 "agent_dataset_relation_list": '',
                 "agent_abilities_list": '',
                 "m_configurations_list": '',
@@ -658,6 +663,7 @@ class Agents(MySQL):
             data = {
                 "app": app,
                 "agent": agent,
+                "callable_items": callable_items,
                 "agent_dataset_relation_list": agent_dataset_relation_list,
                 "agent_abilities_list": agent_abilities_list,
                 "m_configurations_list": m_configurations_list,
