@@ -15,6 +15,7 @@ from .app_node_user_relation import AppNodeUserRelation
 from .agents import Agents
 from .agent_abilities import AgentAbilities
 from .agent_dataset_relation import AgentDatasetRelation
+from .agent_callable_items import AgentCallableItems
 
 from .workflows import Workflows
 
@@ -61,6 +62,7 @@ __all__ = [
     'Agents',
     'AgentAbilities',
     'AgentDatasetRelation',
+    'AgentCallableItems',
     
     'Workflows',
     
