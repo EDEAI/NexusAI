@@ -1,4 +1,3 @@
-
 from .teams import Teams
 from .users import Users
 
@@ -42,6 +41,7 @@ from .workspaces import Workspaces
 from .ai_tool_llm_records import AIToolLLMRecords
 from .chatroom_driven_records import ChatroomDrivenRecords
 
+from .mcp_servers import MCPServers
 
 
 __all__ = [
@@ -80,5 +80,6 @@ __all__ = [
     
     'UploadFiles',
     'Workspaces',
-    'AIToolLLMRecords'
+    'AIToolLLMRecords',
+    'MCPServers'
 ]
