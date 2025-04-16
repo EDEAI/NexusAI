@@ -103,7 +103,7 @@ dependencies:
       - annotated-types==0.7.0
       - anthropic==0.45.2
       - antlr4-python3-runtime==4.9.3
-      - anyio==4.4.0
+      - anyio==4.9.0
       - asttokens==3.0.0
       - async-timeout==4.0.3
       - attrs==23.2.0
