@@ -197,7 +197,7 @@ async def skill_run(skill_id: int, input_dict: Dict[str, Any], user_id: int, tea
         conditions=[
             {"column": "id", "value": skill_id},
             {"column": "team_id", "value": team_id},
-            {"column": "status", "op": "in", "value": [1, 2]}
+            {"column": "status", "value": 1}
         ])
     if not skill:
         raise ValueError(get_language_content("skill_error"))
@@ -216,7 +216,7 @@ async def skill_run(skill_id: int, input_dict: Dict[str, Any], user_id: int, tea
             {"column": "id", "value": skill["app_id"]},
             {"column": "team_id", "value": team_id},
             {"column": "mode", "value": 4},
-            {"column": "status", "op": "in", "value": [1, 2]}
+            {"column": "status", "value": 1}
         ]
     )
 
