@@ -267,6 +267,58 @@ class ChatSession:
 
                     messages.append({"role": "user", "content": user_input})
                     print(messages)
+                    # 示例客户端调用
+                    # 使用第一个服务器的 session 来调用工具
+                    print(111111111111111111111111111111111111)
+                    # result = await self.servers[0].execute_tool("skill_run", {
+                    if not self.servers:
+                        raise RuntimeError("没有可用的服务器")
+                    server = next((s for s in self.servers if s.name == "skill_runner"), None)
+                    if not server:
+                        raise RuntimeError("找不到 skill_runner 服务器")
+                    
+                    if not server.session:
+                        raise RuntimeError("服务器未初始化")
+
+                    # result = await server.execute_tool("skill_run", {
+                    #     "user_id": 1,
+                    #     "team_id": 1,
+                    #     "skill_id": 377,
+                    #     "input_dict": {
+                    #         "name": "output",
+                    #         "type": "object",
+                    #         "properties": {
+                    #             "arg1": {
+                    #                 "name": "arg1",
+                    #                 "type": "number",
+                    #                 "value": 89,
+                    #                 "required": True,
+                    #                 "max_length": 0,
+                    #                 "sort_order": 1,
+                    #                 "display_name": "2423434424"
+                    #             }
+                    #         },
+                    #         "sort_order": 0,
+                    #         "display_name": "",
+                    #         "to_string_keys": ""
+                    #     }
+                    # })
+                    result = await server.execute_tool("workflow_run", 
+                        {
+                            "user_id": 2,
+                            "team_id": 1,
+                            "app_id": 892,
+                            "input_data": {
+                                "shop_name_str": "123"
+                            },
+                            "node_confirm_users": {},
+                            "knowledge_base_mapping": {
+                                "input": {},
+                                "output": {}
+                            }
+                        }
+                    )
+                    print(result)
                     # llm_response = self.llm_client.get_response(messages)
                     # logging.info("\nAssistant: %s", llm_response)
 

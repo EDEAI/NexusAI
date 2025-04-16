@@ -1,3 +1,9 @@
 {
-    "mcpServers": {}
+    "mcpServers": {
+        "skill_runner": {
+            "command": "python",
+            "args": ["/home/lhp/mcpNexusAI/NexusAI/mcp/server.py"],
+            "env": {}
+        }
+    }
 }
