@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import AsyncGenerator
+from typing import AsyncGenerator, List, Tuple
 import sys
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 from typing import Any, Dict, Optional, List
@@ -35,6 +35,54 @@ appRuns_db = AppRuns()
 appNodeUserRelation_db = AppNodeUserRelation()
 chatroomDrivenRecords_db = ChatroomDrivenRecords()
 mcp = FastMCP("skill_runner")
+
+@mcp.tool()
+async def list_tools() -> List[Tuple[str, List[Dict[str, Any]]]]:
+    """List available tools from the server.
+
+    Returns:
+        A list of tuples containing tool information.
+        Each tuple contains:
+        - tool name (str)
+        - list of tool details (Dict)
+    """
+    tools = []
+    # Add workflow_run tool
+    tools.append({
+        "name": "workflow_run",
+        "description": "Run the specified workflow",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "app_id": {"type": "integer"},
+                "input_data": {"type": "object"},
+                "user_id": {"type": "integer"},
+                "team_id": {"type": "integer"},
+                "knowledge_base_mapping": {"type": "object", "optional": True},
+                "node_confirm_users": {"type": "object", "optional": True},
+                "data_source_run_id": {"type": "integer", "optional": True}
+            },
+            "required": ["app_id", "input_data", "user_id", "team_id"]
+        }
+    })
+    
+    # Add skill_run tool
+    tools.append({
+        "name": "skill_run",
+        "description": "Run the specified skill",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "skill_id": {"type": "integer"},
+                "input_dict": {"type": "object"},
+                "user_id": {"type": "integer"},
+                "team_id": {"type": "integer"}
+            },
+            "required": ["skill_id", "input_dict", "user_id", "team_id"]
+        }
+    })
+    
+    return [("tools", tools)]
 
 @mcp.tool()
 async def workflow_run(
