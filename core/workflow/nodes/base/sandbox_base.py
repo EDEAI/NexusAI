@@ -60,7 +60,8 @@ class SandboxBaseNode(Node):
             type_map = {
                 'string': str,
                 'number': (int, float),  # Support both int and float for 'number' type
-                'json': (list, dict)  # Both list and dict are valid for 'json' type
+                'json': (list, dict),  # Both list and dict are valid for 'json' type
+                'file': (str, int)  # File type's value is actually a str or int
             }
             for param_name, param_props in input_params.items():
                 # Skip validation if the parameter has a default value and no value is provided
@@ -68,10 +69,7 @@ class SandboxBaseNode(Node):
                     continue
 
                 expected_type_name = param_props.type
-                if expected_type_name not in type_map:
-                    expected_type = 'json'
-                else:
-                    expected_type = type_map[expected_type_name]
+                expected_type = type_map[expected_type_name]
                 if expected_type_name == 'json':
                     params_value = json.loads(param_props.value)
                 else:
@@ -85,11 +83,7 @@ class SandboxBaseNode(Node):
 
         # Helper function to generate code for assigning input parameters
         def generate_input_assignments(input_params):
-            return "\n".join(
-                [f"{key} = {val.value!r}" for key, val in input_params.items() if val.type != 'json'] +
-                [f"{key} = {val.value!r}" for key,
-                                              val in input_params.items() if val.type == 'json']
-            )
+            return "\n".join([f"{key} = {val.value!r}" for key, val in input_params.items()])
 
         def validate_return_type_and_fields(func_def, expected_output_params):
             return_annotation = func_def.returns
