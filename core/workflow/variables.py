@@ -349,20 +349,24 @@ def replace_value_in_variable(
     """
     if var_name == context_variable.name:
         if original_variable.type in ["string", "file", "json"]:
-            if replace_type and context_variable.type in ["file", "json"]:
-                original_variable.type = context_variable.type
-            if context_variable.type == "file":
-                if isinstance(file_list, List):
-                    file_list.append(context_variable)
-                variable_string = ""
+            if context_variable.type == "file" and isinstance(file_list, List):
+                file_list.append(context_variable)
+            
+            if replace_type:
+                if context_variable.type in ["file", "json"]:
+                    original_variable.type = context_variable.type
+                original_variable.value = context_variable.value
             else:
-                variable_string = context_variable.to_string()
-            if duplicate_braces:
-                variable_string = variable_string.replace("{", "{{").replace("}", "}}")
-            original_variable.value = original_variable.value.replace(
-                f"<<{node_id}.{source}.{var_name}>>",
-                variable_string
-            )
+                if context_variable.type == "file":
+                    variable_string = ""
+                else:
+                    variable_string = context_variable.to_string()
+                if duplicate_braces:
+                    variable_string = variable_string.replace("{", "{{").replace("}", "}}")
+                original_variable.value = original_variable.value.replace(
+                    f"<<{node_id}.{source}.{var_name}>>",
+                    variable_string
+                )
         elif original_variable.type == "number":
             if context_variable.type == "number":
                 original_variable.value = context_variable.value
