@@ -111,7 +111,7 @@ class ArrayVariable:
         Initializes an ArrayVariable object with an empty list of values.
 
         :param name: str, the internal name of the array variable.
-        :param type: str, the type of the elements in the array. Accepts 'array[string]', 'array[number]', 'array[file]', 'array[object]'.
+        :param type: str, the type of the elements in the array. Accepts 'array[string]', 'array[number]', 'array[file]', 'array[object]', 'array[any]'.
         :param display_name: str, the display name of the array variable.
         :param sort_order: int, the order in which this variable should be displayed. Default is 0.
         """
@@ -131,7 +131,7 @@ class ArrayVariable:
         # Extract the type of the array elements from type (e.g., 'array[string]' -> 'string')
         element_type = self.type.split('[')[-1].split(']')[0]
         
-        if value.type == element_type:
+        if element_type == 'any' or value.type == element_type:
             self.values.append(value)
         else:
             raise ValueError(f"Value must be of type {element_type} as specified in type")
@@ -475,14 +475,6 @@ def flatten_variable_with_values(variable: VariableTypes) -> Dict:
                         # Upload file ID
                         file_data = UploadFiles().get_file_by_id(var_value)
                         var.value = file_data['name'] + file_data['extension']
-                    elif isinstance(var_value, str):
-                        if var_value[0] == '/':
-                            var_value = var_value[1:]
-                        file_path = project_root.joinpath('storage').joinpath(var_value)
-                        var.value = file_path.name
-                    else:
-                        # This should never happen
-                        raise Exception('Unsupported value type!')
             return var.value
         elif isinstance(var, ArrayVariable):
             flat_dict = {}
