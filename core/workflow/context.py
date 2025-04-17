@@ -28,10 +28,7 @@ class Context:
         """
         for record in self.records:
             if record["level"] == level and record["node_id"] == node.id:
-                if output := node.data.get("output_in_context"):
-                    outputs = output
-                else:
-                    outputs = node.data.get("output", None)
+                outputs = node.data.get("output", None)
                 record.update({
                     "node_title": node.data["title"],
                     "node_type": node.data["type"],
@@ -39,11 +36,8 @@ class Context:
                     "outputs": outputs
                 })
                 return
-
-        if output := node.data.get("output_in_context"):
-            outputs = output
-        else:
-            outputs = node.data.get("output", None)
+            
+        outputs = node.data.get("output", None)
         self.records.append({
             "level": level,
             "node_id": node.id,

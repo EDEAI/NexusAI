@@ -764,10 +764,6 @@ def task_callback_thread():
                             # Create input variable from input dictionary
                             input = create_variable_from_dict(inputs)
                             target_node.data['input'] = input  # Update target node with input variable
-                        if outputs_in_context:
-                            # Create output variable from result dictionary
-                            output_in_context = create_variable_from_dict(outputs_in_context)
-                            target_node.data['output_in_context'] = output_in_context  # Update target node with output variable
                         if outputs:
                             # Create output variable from result dictionary
                             output = create_variable_from_dict(outputs)
