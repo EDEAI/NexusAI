@@ -93,15 +93,15 @@ class SandboxBaseNode(Node):
                     if isinstance(var_value, int):
                         # Upload file ID
                         file_data = UploadFiles().get_file_by_id(var_value)
-                        file_path = project_root.joinpath(file_data['path'])
+                        file_path = '/' + file_data['path']
                     elif isinstance(var_value, str):
                         if var_value[0] == '/':
                             var_value = var_value[1:]
-                        file_path = project_root.joinpath('storage').joinpath(var_value)
+                        file_path = '/storage/' + var_value
                     else:
                         # This should never happen
                         raise Exception('Unsupported value type!')
-                    var_value = str(file_path)
+                    var_value = file_path
                 elif val.type == 'json':
                     # Parse JSON string to Python object
                     try:
