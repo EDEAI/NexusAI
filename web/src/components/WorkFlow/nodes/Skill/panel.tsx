@@ -107,6 +107,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                 showSearch
                                 allowClear={false}
                                 node={node}
+                                filterFn={()=>true}
                                 options={editorOptions}
                             ></SelectVariable>
                         );
