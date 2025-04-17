@@ -14,6 +14,7 @@ from ... import Variable, ObjectVariable
 from config import settings
 from log import Logger
 
+project_root = Path(__file__).absolute().parent.parent.parent.parent.parent
 logger = Logger.get_logger('celery-app')
 
 
@@ -83,7 +84,26 @@ class SandboxBaseNode(Node):
 
         # Helper function to generate code for assigning input parameters
         def generate_input_assignments(input_params):
-            return "\n".join([f"{key} = {val.value!r}" for key, val in input_params.items()])
+            from core.database.models import UploadFiles
+            kv = []
+            for key, val in input_params.items():
+                var_value = val.value
+                if val.type == 'file':
+                    # Get file path
+                    if isinstance(var_value, int):
+                        # Upload file ID
+                        file_data = UploadFiles().get_file_by_id(var_value)
+                        file_path = project_root.joinpath(file_data['path'])
+                    elif isinstance(var_value, str):
+                        if var_value[0] == '/':
+                            var_value = var_value[1:]
+                        file_path = project_root.joinpath('storage').joinpath(var_value)
+                    else:
+                        # This should never happen
+                        raise Exception('Unsupported value type!')
+                    var_value = str(file_path)
+                kv.append(f"{key} = {var_value!r}")
+            return "\n".join(kv)
 
         def validate_return_type_and_fields(func_def, expected_output_params):
             return_annotation = func_def.returns
