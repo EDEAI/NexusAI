@@ -91,6 +91,7 @@ services:
       <<: *common-environment-backend
     volumes:
       - ./volumes/storage:/storage
+      - ./volumes/upload_files:/upload_files
     ports:
       - "9464:8001"
     networks:
