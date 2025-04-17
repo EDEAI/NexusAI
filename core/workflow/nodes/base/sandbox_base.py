@@ -102,6 +102,14 @@ class SandboxBaseNode(Node):
                         # This should never happen
                         raise Exception('Unsupported value type!')
                     var_value = str(file_path)
+                elif val.type == 'json':
+                    # Parse JSON string to Python object
+                    try:
+                        parsed_value = json.loads(var_value)
+                        kv.append(f"{key} = {parsed_value}")
+                        continue  # Skip the default append
+                    except json.JSONDecodeError:
+                        raise ValueError(f"Invalid JSON format for parameter '{key}': {var_value}")
                 kv.append(f"{key} = {var_value!r}")
             return "\n".join(kv)
 
