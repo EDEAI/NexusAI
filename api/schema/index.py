@@ -15,6 +15,7 @@ class BackLogsData(BaseModel):
     need_human_confirm: Optional[int] = None
     icon_background: Optional[str] = None
     icon: Optional[str] = None
+    avatar: Optional[str] = None
 
 
 class MyAgentData(BaseModel):
