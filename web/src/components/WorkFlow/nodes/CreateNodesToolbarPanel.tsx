@@ -14,6 +14,7 @@ import useOutsideClick from '../hooks/useOutsideClick';
 import useStore from '../store';
 import { BlockEnum } from '../types';
 import { getBaseNode } from './nodeDisperse';
+import NodePanelContent from '../components/NodePanel/components/NodePanelContent';
 interface CreateNodesToolbarProps {
     position: 'right' | 'left';
     className?: string;
@@ -237,6 +238,9 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     ref={tools}
                     className="p-2 w-[240px] pt-4 bg-white rounded-md cursor-pointer border border-blue-100"
                 >
+                    {/* <NodePanelContent onItemClick={(e)=>{
+                        console.log('onItemClick',e);
+                    }}></NodePanelContent> */}
                     <Input
                         onChange={search}
                         allowClear
@@ -246,7 +250,7 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                         })}
                         prefix={<SearchOutlined />}
                     />
-                    {/* {useNodeId()} */}
+               
                     <Tabs
                         defaultActiveKey={tabIndex}
                         onChange={e => onTabChange(e)}
@@ -311,17 +315,7 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                                                               }
                                                               icon={item?.identity?.icon}
                                                           ></UserCon>
-                                                          {/* <div className="p-1  rounded-md flex justify-center items-center shrink-0">
-                                                              <img
-                                                                  className="size-6"
-                                                                  src={item?.identity?.icon}
-                                                                  alt=""
-                                                              />
-                                                          </div>
-                                                          <div>
-                                                              {tool?.identity?.label?.zh_Hans ||
-                                                                  ''}
-                                                          </div> */}
+                                                   
                                                       </div>
                                                   );
                                               })}

@@ -2,11 +2,12 @@
  * @LastEditors: biz
  */
 import { DeleteOutlined } from '@ant-design/icons';
-import { ProForm, ProFormList, ProFormSelect, ProFormText } from '@ant-design/pro-components';
+import { ProForm, ProFormList, ProFormText } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useMount, useReactive, useUpdateEffect } from 'ahooks';
-import { Button, Tooltip } from 'antd';
+import { Button } from 'antd';
 import { memo, useRef, useState } from 'react';
+import { SelectVariable } from '../../components/Form/Select';
 import useStore from '../../store';
 import { AppNode } from '../../types';
 import { resetFormNodes } from '../../utils/resetFormNodes';
@@ -65,6 +66,11 @@ export default memo(({ node }: { node: AppNode }) => {
     const setNodeChange = (addItem: { [key: string]: any }, allVals) => {
         updateNodeData(node.id, allVals);
     };
+
+    const customFilterFn = (item: any) => {
+        return true;
+    };
+
     return (
         <>
             <div className="pt-4">
@@ -124,24 +130,11 @@ export default memo(({ node }: { node: AppNode }) => {
                                 className="w-28"
                             />
                             <div className="flex-1">
-                                <ProFormSelect
-                                    placeholder={intl.formatMessage({
-                                        id: 'workflow.placeholder.selectVariable',
-                                        defaultMessage: '',
-                                    })}
-                                    fieldProps={{
-                                        optionRender: e => {
-                                            return (
-                                                <Tooltip title={e.label}>
-                                                    <div title="">{e.label}</div>
-                                                </Tooltip>
-                                            );
-                                        },
-                                    }}
-                                    colSize={12}
+                                <SelectVariable
                                     name="variable"
-                                    request={async () => await getVariables(node.id)}
-                                ></ProFormSelect>
+                                    node={node}
+                                    filterFn={customFilterFn}
+                                />
                             </div>
                         </div>
                     </ProFormList>

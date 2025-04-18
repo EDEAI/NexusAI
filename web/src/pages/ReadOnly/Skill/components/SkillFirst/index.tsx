@@ -1,6 +1,6 @@
 import Callword from '@/components/callword';
 import { useIntl } from '@umijs/max';
-import { Form, Input, Select, Switch } from 'antd';
+import { Form, Input, Switch } from 'antd';
 import React, { useEffect } from 'react';
 
 const { TextArea } = Input;
@@ -123,7 +123,33 @@ const SkillFirst: React.FC<ChildProps> = ({
                                 }
                             />
                         </Form.Item>
-                        <div className="mb-[15px] text-xs font-bold flex justify-between items-center">
+                        {Skillinfo?.input_variables && (
+                            <div className="mb-[30px]">
+                                <Variable
+                                    readonly
+                                    title={
+                                        <div className="text-[#555555] text-xs">
+                                            <Callword
+                                                className="font-medium"
+                                                required={true}
+                                                name={intl.formatMessage({
+                                                    id: 'skill.inputvariable',
+                                                })}
+                                                title={intl.formatMessage({
+                                                    id: 'skill.Callword.inputvariable',
+                                                })}
+                                            />
+                                        </div>
+                                    }
+                                    variableTypes={['string', 'number', 'json']}
+                                    variables={Object.values(
+                                        Skillinfo?.input_variables?.properties || {},
+                                    )}
+                                    // onChange={handleVariableChange}
+                                />
+                            </div>
+                        )}
+                        {/* <div className="mb-[15px] text-xs font-bold flex justify-between items-center">
                             <div className="text-[#555555] text-xs font-medium">
                                 <Callword
                                     name={intl.formatMessage({ id: 'skill.inputvariable' })}

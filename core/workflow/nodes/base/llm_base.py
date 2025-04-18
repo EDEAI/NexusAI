@@ -14,13 +14,16 @@ from core.database.models.agent_chat_messages import AgentChatMessages
 from . import Node
 from ...variables import ArrayVariable, Variable
 from ...context import Context
-from database.models import Models, AppNodeExecutions, DocumentSegments, Documents, AIToolLLMRecords
+from database.models import Models, AppNodeExecutions, DocumentSegments, Documents, AIToolLLMRecords, UploadFiles
 from llm.models import LLMPipeline
 from llm.prompt import create_prompt_from_dict, replace_prompt_with_context
 from llm.messages import Messages, create_messages_from_serialized_format
 
 from core.helper import truncate_agent_messages_by_token_limit
 from core.database.models import (Models, Users)
+
+
+project_root = Path(__file__).absolute().parent.parent.parent.parent.parent
 document_segments = DocumentSegments()
 documents = Documents()
 models = Models()
@@ -58,7 +61,7 @@ class LLMBaseNode(Node):
         context: Context,
         retrieval_chain: Optional[Runnable[Input, Output]] = None,
         input: Dict[str, Any] = {},
-        file_list: Optional[ArrayVariable] = None,
+        file_list: Optional[List[Variable]] = None,
         correct_llm_output: bool = False,
         override_rag_input: Optional[str] = None,
         is_chat: bool = False,
@@ -93,8 +96,8 @@ class LLMBaseNode(Node):
                 messages = Messages()
                 messages.add_prompt(self.data["prompt"])
                 if file_list:
-                    for file_var in file_list.values:
-                        messages.add_human_message(file_var)
+                    for file_var in file_list:
+                        messages.add_human_message(file_var, "file")
         else:
             if context:
                 replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)
@@ -123,8 +126,8 @@ class LLMBaseNode(Node):
             else:
                 messages.add_prompt(self.data["prompt"])
             if file_list:
-                for file_var in file_list.values:
-                    messages.add_human_message(file_var)
+                for file_var in file_list:
+                    messages.add_human_message(file_var, "file")
         
         if retrieval_chain:
             def format_docs(segments: List[Document]) -> str:
@@ -159,7 +162,7 @@ class LLMBaseNode(Node):
         context: Context,
         retrieval_chain: Optional[Runnable[Input, Output]] = None,
         input: Dict[str, Any] = {},
-        file_list: Optional[ArrayVariable] = None,
+        file_list: Optional[List[Variable]] = None,
         return_json: bool = False,
         correct_llm_output: bool = False,
         override_rag_input: Optional[str] = None,
@@ -176,7 +179,7 @@ class LLMBaseNode(Node):
             context (Context): The context object containing all variables.
             retrieval_chain (Optional[Runnable[Input, Output]]): The retrieval chain to be used for the model.
             input (Dict[str, Any]): The input data to be passed to the model.
-            file_list (Optional[ArrayVariable]): The list of files to be uploaded to the model.
+            file_list (Optional[List[Variable]]): The list of files to be uploaded to the model.
             return_json (bool): Indicates whether to return the output in JSON format.
             correct_llm_output (bool): Indicates whether to correct the LLM output using the correct prompt.
             override_rag_input (Optional[str]): The input to be used for the retrieval chain.

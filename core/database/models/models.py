@@ -85,6 +85,7 @@ class Models(MySQL):
             columns=[
                 'model_configurations.id AS model_config_id',
                 'models.name AS model_name',
+                'models.support_image AS support_image',
                 'model_configurations.default_used AS model_default_used',
                 'model_configurations.sort_order AS sort_order',
                 'suppliers.id AS supplier_id',
@@ -116,7 +117,8 @@ class Models(MySQL):
                 'model_config_id': r['model_config_id'],
                 'model_name': r['model_name'],
                 'model_default_used': r['model_default_used'],
-                'sort_order': r['sort_order']
+                'sort_order': r['sort_order'],
+                'support_image': r['support_image']
             })
         # For each supplier, sort model_list so that model_default_used==1 comes first, then by sort_order ascending
         for supplier in grouped.values():

@@ -52,7 +52,6 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             "model_config_id": model_config_id,
             "prompt": prompt,
             "retrieval_task_datasets": retrieval_task_datasets,
-            "requires_upload": requires_upload,
             "wait_for_all_predecessors": wait_for_all_predecessors,
             "task_splitting": task_splitting,
             "manual_confirmation": manual_confirmation,
@@ -88,8 +87,8 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             # Task splitting is disabled in current version. 2024-10-22
             self.data['task_splitting'] = False
 
-            file_list = self.import_inputs_to_knowledge_base_and_get_file_list(
-                app_run_id, node_exec_id, self.data['requires_upload'],
+            self.import_inputs_to_knowledge_base(
+                app_run_id, node_exec_id,
                 (
                     not correct_llm_output
                     # NOT running the node separately,
@@ -100,8 +99,9 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             )
             
             prompt: Prompt = self.data["prompt"]
+            file_list = None
             if context:
-                replace_prompt_with_context(prompt, context)
+                file_list = replace_prompt_with_context(prompt, context)
             
             # Escape braces in the prompt
             if system_prompt := prompt.get_system():

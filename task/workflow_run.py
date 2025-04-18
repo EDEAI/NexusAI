@@ -230,22 +230,16 @@ def push_workflow_debug_message(
     :param first_task_exec_id: The ID of the first task execution record.
     :param node_exec_data: A dictionary containing the node execution data.
     """
+    from core.llm import get_serialized_prompt_from_messages
+
     model_data = node_exec_data.pop('model_data', None)
     prompt_data = []
     if model_data:
-        for message in model_data["messages"]:
-            prompt_data.append({message[0]: message[1]["value"]})
+        prompt_data = get_serialized_prompt_from_messages(model_data["messages"])
     node_exec_data["prompt_data"] = prompt_data
     if inputs := node_exec_data.get('inputs'):
         inputs = create_variable_from_dict(inputs)
         inputs = flatten_variable_with_values(inputs)
-        if upload_files := inputs.pop(UPLOAD_FILES_KEY, None):
-            upload_files_ids = upload_files.values()
-            upload_files_names = []
-            for file_id in upload_files_ids:
-                file_data = UploadFiles().get_file_by_id(file_id)
-                upload_files_names.append(file_data['name'] + file_data['extension'])
-            inputs[get_language_content('upload_files')] = upload_files_names
         node_exec_data['inputs'] = inputs
     if outputs := node_exec_data.get('outputs'):
         node_exec_data['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
@@ -532,12 +526,6 @@ def task_delay_thread():
 
                     # Update target node with input variable
                     target_node.data['input'] = target_node.data['output'] = create_variable_from_dict(run['inputs'])
-                    if (
-                        (knowledge_base_mapping := run['knowledge_base_mapping'])
-                        and (knowledge_base_mapping_for_input := knowledge_base_mapping.get('input'))
-                        and (knowledge_base_mapping_for_upload_files := knowledge_base_mapping_for_input.get(UPLOAD_FILES_KEY))
-                    ):
-                        target_node.data['knowledge_base_mapping']['input'][UPLOAD_FILES_KEY] = knowledge_base_mapping_for_upload_files
 
                     # Execute the node asynchronously using Celery
                     create_celery_task(team_id, app_id, run['app_name'], run['icon'], run['icon_background'], workflow_id, app_user_id, user_id, app_run_id, run_type, run['run_name'], exec_id, None, target_node)
@@ -764,6 +752,7 @@ def task_callback_thread():
                         inputs = result['data'].get('inputs', None)
                         task_id = result['data'].get('task_id', None)
                         outputs = result['data'].get('outputs', None)
+                        outputs_in_context = result['data'].get('outputs_in_context', None)
                         elapsed_time = float(result['data'].get('elapsed_time', 0))
                         prompt_tokens = result['data'].get('prompt_tokens', 0)
                         completion_tokens = result['data'].get('completion_tokens', 0)
@@ -771,15 +760,15 @@ def task_callback_thread():
                         embedding_tokens = result['data'].get('embedding_tokens', 0)
                         reranking_tokens = result['data'].get('reranking_tokens', 0)
 
+                        if inputs:
+                            # Create input variable from input dictionary
+                            input = create_variable_from_dict(inputs)
+                            target_node.data['input'] = input  # Update target node with input variable
+                        if outputs:
+                            # Create output variable from result dictionary
+                            output = create_variable_from_dict(outputs)
+                            target_node.data['output'] = output  # Update target node with output variable
                         if edge:
-                            if inputs:
-                                # Create input variable from input dictionary
-                                input = create_variable_from_dict(inputs)
-                                target_node.data['input'] = input  # Update target node with input variable
-                            if outputs:
-                                # Create output variable from result dictionary
-                                output = create_variable_from_dict(outputs)
-                                target_node.data['output'] = output  # Update target node with output variable
                             if not task_operation or (task_operation == 'assign_task' and not task_id):
                                 completed_edges.append(edge.id)  # Add edge to completed edges
                                 completed_steps += 1  # Increment completed steps
@@ -791,6 +780,7 @@ def task_callback_thread():
                         need_human_confirm = 1 if target_node.data['type'] != 'human' and \
                             not (task_operation == 'assign_task' and task_id) and \
                             target_node.data.get('manual_confirmation', False) else 0
+                        result['data'].pop('outputs_in_context', None)
                         node_exec_data = {'status': 3, 'error': None, 'need_human_confirm': need_human_confirm, 'finished_time': current_time, **result['data']}
                         app_run_data = {
                             'context': context.to_dict(),

@@ -1,6 +1,10 @@
 from typing import Union, List, Dict, Tuple, Any, Optional, Type
+from pathlib import Path
 from pydantic import BaseModel, Field, create_model
 import json
+
+
+project_root = Path(__file__).absolute().parent.parent.parent
 
 class Variable:
     """
@@ -15,7 +19,8 @@ class Variable:
         value: Optional[Union[str, int, float]] = None, 
         required: Optional[bool] = None,
         max_length: Optional[int] = None,
-        sort_order: int = 0
+        sort_order: int = 0,
+        sub_type: Optional[str] = None
     ):
         """
         Initializes a Variable object.
@@ -28,6 +33,8 @@ class Variable:
         :param required: bool, indicates if the variable is required.
         :param max_length: int, the maximum length of the value if the type is 'string'. Default is 0 (no limit).
         :param sort_order: int, the order in which this variable should be displayed. Default is 0.
+        :param sub_type: Optional[str], the sub-type of the variable. Only applicable when type is 'file'.
+            Values can be 'image' or 'document'. Default is None.
         """
         self.name = name
         self.type = type
@@ -37,6 +44,13 @@ class Variable:
         if required is not None:
             self.required = required
         self.sort_order = sort_order
+        # Only set sub_type if type is 'file'
+        # For other types, sub_type is not applicable
+        if self.type == "file":
+            self.sub_type = sub_type
+        else:
+            self.sub_type = None
+        
         if self.type == "string":
             if max_length is None:
                 self.max_length = 0
@@ -63,6 +77,8 @@ class Variable:
             data["required"] = self.required
         if hasattr(self, "max_length"):
             data["max_length"] = self.max_length
+        if hasattr(self, "sub_type"):
+            data["sub_type"] = self.sub_type
         return data
         
     def to_string(self) -> str:
@@ -73,7 +89,11 @@ class Variable:
         """
         if self.value is None:
             return ""
-        return str(self.value) if self.type == "number" else self.value
+        if self.type == "number":
+            return str(self.value)
+        elif self.type == "file":
+            return ""
+        return self.value
         
 class ArrayVariable:
     """
@@ -91,7 +111,7 @@ class ArrayVariable:
         Initializes an ArrayVariable object with an empty list of values.
 
         :param name: str, the internal name of the array variable.
-        :param type: str, the type of the elements in the array. Accepts 'array[string]', 'array[number]', 'array[file]', 'array[object]'.
+        :param type: str, the type of the elements in the array. Accepts 'array[string]', 'array[number]', 'array[file]', 'array[object]', 'array[any]'.
         :param display_name: str, the display name of the array variable.
         :param sort_order: int, the order in which this variable should be displayed. Default is 0.
         """
@@ -111,7 +131,7 @@ class ArrayVariable:
         # Extract the type of the array elements from type (e.g., 'array[string]' -> 'string')
         element_type = self.type.split('[')[-1].split(']')[0]
         
-        if value.type == element_type:
+        if element_type == 'any' or value.type == element_type:
             self.values.append(value)
         else:
             raise ValueError(f"Value must be of type {element_type} as specified in type")
@@ -265,6 +285,8 @@ def create_variable_from_dict(data: Dict[str, Any]) -> VariableTypes:
         kwargs["sort_order"] = data["sort_order"]
     if data["type"] == "string" and "max_length" in data:
         kwargs["max_length"] = data["max_length"]
+    if data["type"] == "file" and "sub_type" in data:
+        kwargs["sub_type"] = data["sub_type"]
     if data["type"] == "object":
         if "to_string_keys" in data:
             kwargs["to_string_keys"] = data["to_string_keys"]
@@ -306,7 +328,8 @@ def replace_value_in_variable(
     source: str,
     var_name: str,
     duplicate_braces: bool = False,
-    replace_type: bool = True
+    replace_type: bool = True,
+    file_list: Optional[List[Variable]] = None
 ):
     """
     Replaces the value of the original variable with the value from the context variable
@@ -326,15 +349,24 @@ def replace_value_in_variable(
     """
     if var_name == context_variable.name:
         if original_variable.type in ["string", "file", "json"]:
-            if replace_type and context_variable.type in ["file", "json"]:
-                original_variable.type = context_variable.type
-            variable_string = context_variable.to_string()
-            if duplicate_braces:
-                variable_string = variable_string.replace("{", "{{").replace("}", "}}")
-            original_variable.value = original_variable.value.replace(
-                f"<<{node_id}.{source}.{var_name}>>",
-                variable_string
-            )
+            if context_variable.type == "file" and isinstance(file_list, List):
+                file_list.append(context_variable)
+            
+            if replace_type:
+                if context_variable.type in ["file", "json"]:
+                    original_variable.type = context_variable.type
+                original_variable.value = context_variable.value
+            else:
+                if context_variable.type == "file":
+                    variable_string = ""
+                else:
+                    variable_string = context_variable.to_string()
+                if duplicate_braces:
+                    variable_string = variable_string.replace("{", "{{").replace("}", "}}")
+                original_variable.value = original_variable.value.replace(
+                    f"<<{node_id}.{source}.{var_name}>>",
+                    variable_string
+                )
         elif original_variable.type == "number":
             if context_variable.type == "number":
                 original_variable.value = context_variable.value
@@ -342,7 +374,7 @@ def replace_value_in_variable(
                 raise ValueError(f"Variable '{original_variable.name}' type '{original_variable.type}' does not match the replacement variable '{context_variable.name}' type '{context_variable.type}'")
     elif isinstance(context_variable, ArrayVariable) or isinstance(context_variable, ObjectVariable):
         for value in (context_variable.values if isinstance(context_variable, ArrayVariable) else context_variable.properties.values()):
-            replace_value_in_variable(original_variable, value, node_id, source, var_name, duplicate_braces, replace_type)
+            replace_value_in_variable(original_variable, value, node_id, source, var_name, duplicate_braces, replace_type, file_list)
 
 def replace_value_in_variable_with_new_value(
     variable: Union[Variable, ArrayVariable, ObjectVariable],
@@ -413,7 +445,7 @@ def flatten_variable(variable: VariableTypes) -> Dict[str, Tuple[str, str, bool]
     def _flatten(var: VariableTypes):
         if isinstance(var, Variable):
             flat_dict[var.name] = (
-                'number' if var.type == 'number' else 'string', 
+                var.type, 
                 getattr(var, 'display_name', ''),
                 getattr(var, 'required', False)
             )
@@ -435,11 +467,18 @@ def flatten_variable_with_values(variable: VariableTypes) -> Dict:
     :param variable: VariableTypes, the variable object to flatten.
     :return: Dict[str, Any], a dictionary representation of the variable object.
     """
+    from core.database.models import UploadFiles
 
     def _flatten(var: VariableTypes) -> Any:
         if isinstance(var, Variable):
             if var.type == 'json':
                 var.value = json.loads(var.value)
+            elif var.type == 'file':
+                if var_value := var.value:
+                    if isinstance(var_value, int):
+                        # Upload file ID
+                        file_data = UploadFiles().get_file_by_id(var_value)
+                        var.value = file_data['name'] + file_data['extension']
             return var.value
         elif isinstance(var, ArrayVariable):
             flat_dict = {}
@@ -455,25 +494,23 @@ def flatten_variable_with_values(variable: VariableTypes) -> Dict:
     if isinstance(variable, Variable):
         if variable.type == 'json':
             variable.value = json.loads(variable.value)
+        elif variable.type == 'file':
+            if var_value := variable.value:
+                if isinstance(var_value, int):
+                    # Upload file ID
+                    file_data = UploadFiles().get_file_by_id(var_value)
+                    variable.value = file_data['name'] + file_data['extension']
+                elif isinstance(var_value, str):
+                    if var_value[0] == '/':
+                        var_value = var_value[1:]
+                    file_path = project_root.joinpath('storage').joinpath(var_value)
+                    variable.value = file_path.name
+                else:
+                    # This should never happen
+                    raise Exception('Unsupported value type!')
         return {variable.name: variable.value}
     else:
         return _flatten(variable)
-
-def unflatten_dict_with_values(input_data: Dict[str, Union[int, float, str]], name: str) -> ObjectVariable:
-    """
-    Unflattens a one-dimensional dictionary into a ObjectVariable 
-
-    :param input_data: Dict[str, Union[int, float, str]]), a dictionary representation of the variable object.
-    :return: ObjectVariable, the variable object after unflattening.
-    """
-    object_variable = ObjectVariable(name=name)
-    for key, value in input_data.items():
-        if isinstance(value, str):
-            variable = Variable(name=key, type='string', value=value)
-        else:
-            variable = Variable(name=key, type='number', value=value)
-        object_variable.add_property(key, variable)
-    return object_variable
 
 def convert_to_fastapi_model(model_name: str, variable: VariableTypes) -> Type[BaseModel]:
     """
@@ -490,6 +527,8 @@ def convert_to_fastapi_model(model_name: str, variable: VariableTypes) -> Type[B
         field_info = Field(... if required else None, title=display_name, description=f"{display_name} ({var_type})")
         if var_type == 'number':
             input_data_fields[var_name] = (Union[int | float], field_info)
+        elif var_type == 'file':
+            input_data_fields[var_name] = (int, field_info)
         else:
             input_data_fields[var_name] = (str, field_info)
     
@@ -538,7 +577,8 @@ def create_object_variable_from_list(data: List[Dict[str, Any]], name: str = "ro
             value=var_def.get("value"),
             required=var_def.get("required", False),
             max_length=var_def.get("max_length", 0),
-            sort_order=var_def.get("sort_order", 0)
+            sort_order=var_def.get("sort_order", 0),
+            sub_type=var_def.get("sub_type")
         )
         obj_var.add_property(var_def["name"], variable)
     

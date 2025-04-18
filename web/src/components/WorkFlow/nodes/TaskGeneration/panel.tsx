@@ -11,7 +11,7 @@ import {
 import { useIntl } from '@umijs/max';
 import { useMount } from 'ahooks';
 import { memo, useRef } from 'react';
-import { SelectModelConfigId } from '../../components/Form/Select';
+import { SelectModelConfigId, SelectVariable } from '../../components/Form/Select';
 import {
     SwitchImportToKnowledgeBase,
     SwitchManualConfirmation,
@@ -67,16 +67,16 @@ export default memo(({ node }: { node: AppNode }) => {
                     }
                     onValuesChange={setNodeChange}
                 >
-                    <ProFormSelect
-                        name="variable"
+                    <SelectVariable 
+                        name="variable" 
+                        node={node}
                         label={intl.formatMessage({
                             id: 'workflow.label.selectVariable',
                             defaultMessage: '',
                         })}
                         showSearch
                         allowClear={false}
-                        request={async () => getVariables(node.id)}
-                    ></ProFormSelect>
+                    />
                     <SelectModelConfigId form={formRef} name={`model`}></SelectModelConfigId>
                     {/* <ProFormSelect
                         name="model"

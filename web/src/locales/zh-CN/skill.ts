@@ -40,7 +40,7 @@ export default {
     'skill.code': '代码',
     'skill.run': '运行调试',
     'skill.variable.name': '变量名',
-    'skill.variable.display': '显示名',
+    'skill.variable.display': '变量值',
     'skill.variable.type': '类型',
     'skill.variable.required': '是否必填',
     'skill.variable.operation': '操作',

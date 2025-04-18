@@ -431,7 +431,7 @@ export const transformer = {
             console.log(node);
             const params = {
                 ...transformOrigData(node),
-                input: node.data['variables']?.free || {},
+                input: node.data['variables']?.free || new ObjectVariable('input'),
                 output: node.data['variables']?.free || {},
                 requires_upload: node.data['requires_upload'] || false,
                 wait_for_all_predecessors: node.data['wait_for_all_predecessors'] || false,

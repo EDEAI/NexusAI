@@ -5,6 +5,7 @@ import { ProForm, ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useMount, useUpdateEffect } from 'ahooks';
 import { memo, useRef } from 'react';
+import { SelectVariable } from '../../components/Form/Select';
 import useStore from '../../store';
 import { AppNode } from '../../types';
 import { resetFormNodes } from '../../utils/resetFormNodes';
@@ -19,19 +20,6 @@ interface Prompt {
     assistant: PromptItem;
 }
 
-const transformSelectOptions = options => {
-    return options.map(group => {
-        return {
-            label: <span>{group.label}</span>,
-            title: group.value,
-            options:
-                group.options?.map(item => ({
-                    label: <span>{item.label}</span>,
-                    value: item.value,
-                })) || [],
-        };
-    });
-};
 
 export default memo(({ node }: { node: AppNode }) => {
     const formRef = useRef(null);
@@ -65,7 +53,7 @@ export default memo(({ node }: { node: AppNode }) => {
                     autoFocusFirstInput={false}
                     onValuesChange={setNodeChange}
                 >
-                    <ProFormSelect
+                    <SelectVariable
                         name="variable"
                         label={intl.formatMessage({
                             id: 'workflow.label.selectVariable',
@@ -73,8 +61,8 @@ export default memo(({ node }: { node: AppNode }) => {
                         })}
                         showSearch
                         allowClear={false}
-                        request={async () => getVariables(node.id)}
-                    ></ProFormSelect>
+                        node={node}
+                    ></SelectVariable>
                     <ProFormSelect
                         name="datasets"
                         label={intl.formatMessage({

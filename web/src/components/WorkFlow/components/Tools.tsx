@@ -3,24 +3,27 @@
  */
 import { BASE_URL } from '@/api/request';
 import { exportWorkflow, importWorkflow, publishWorkFlow } from '@/api/workflow';
-import { ExportOutlined, PlayCircleOutlined, SyncOutlined } from '@ant-design/icons';
+import { ExportOutlined, PlayCircleOutlined, SyncOutlined, NodeIndexOutlined } from '@ant-design/icons';
 import { useIntl, useSearchParams } from '@umijs/max';
-import { Button, message, UploadProps } from 'antd';
+import { Button, message, Dropdown, Menu, UploadProps } from 'antd';
 import moment from 'moment';
 import { memo } from 'react';
 import useSaveWorkFlow from '../saveWorkFlow';
 import useStore from '../store';
+import useAutoLayout from '../hooks/useAutoLayout';
 
 export default memo(() => {
     const intl = useIntl();
     const [searchParams] = useSearchParams();
     const setWorkFlowInfo = useStore(state => state.setWorkFlowInfo);
-    const workFlowInfo = useStore(state => state.workFlowInfo);
+    const workFlowInfo = useStore(state => state.workFlowInfo) as any;
     const setRunPanelShow = useStore(state => state.setRunPanelShow);
     const publishStatus = searchParams.get('type') == 'true';
     const saveWorkFlow = useSaveWorkFlow();
+    const { autoLayout } = useAutoLayout();
     const [messageApi, contextHolder] = message.useMessage();
     const loadingWorkflowData = useStore(state => state.loadingWorkflowData);
+    
     const publish = async () => {
         await saveWorkFlow()
         const appId = searchParams.get('app_id');
@@ -58,7 +61,8 @@ export default memo(() => {
         const fileName = workFlowInfo?.app?.name || 'workflow';
         const formattedTime = moment().format('YYYY_MM_DD-HH_mm_ss');
         exportWorkflow(appId, publishStatus == true ? 1 : 0).then(res => {
-            const blob = new Blob([res], { type: 'text/yaml' });
+            const resData = res as unknown as BlobPart;
+            const blob = new Blob([resData], { type: 'text/yaml' });
 
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -70,6 +74,31 @@ export default memo(() => {
             URL.revokeObjectURL(url);
         });
     };
+    
+    const handleAutoLayout = (direction: 'TB' | 'LR') => {
+        autoLayout(direction);
+        messageApi.open({
+            type: 'success',
+            content: intl.formatMessage({
+                id: 'workflow.autoLayoutSuccess',
+                defaultMessage: 'Nodes arranged successfully',
+            }),
+        });
+    };
+    
+    const layoutMenuItems = [
+        {
+            key: 'TB',
+            label: intl.formatMessage({ id: 'workflow.autoLayoutVertical', defaultMessage: 'Vertical Layout' }),
+            onClick: () => handleAutoLayout('TB'),
+        },
+        {
+            key: 'LR',
+            label: intl.formatMessage({ id: 'workflow.autoLayoutHorizontal', defaultMessage: 'Horizontal Layout' }),
+            onClick: () => handleAutoLayout('LR'),
+        },
+    ];
+    
     const props: UploadProps = {
         name: 'file',
         fileList: null,
@@ -93,6 +122,15 @@ export default memo(() => {
                     <Button icon={<SyncOutlined />} type="dashed" disabled={loadingWorkflowData} onClick={saveWorkFlow}>
                         {intl.formatMessage({ id: 'workflow.save' })}
                     </Button>
+                    {/* <Dropdown menu={{ items: layoutMenuItems }} placement="bottomRight">
+                        <Button 
+                            icon={<NodeIndexOutlined />} 
+                            type="dashed" 
+                            disabled={loadingWorkflowData}
+                        >
+                            {intl.formatMessage({ id: 'workflow.autoLayout', defaultMessage: 'Auto Layout' })}
+                        </Button>
+                    </Dropdown> */}
                 </div>
             )}
 

@@ -125,9 +125,11 @@ class Graph:
                 if outgoing_edges[current_node.id] > 1:
                     raise ValueError(get_language_content("graph_validation_errors.start_node_outgoing_edges"))
                 connected_node_ids = self.find_related_nodes(current_node.id)
+                self._validate_node_has_input_properties(node_metadata)
 
             if current_node.id in connected_node_ids:
                 if node_metadata['type'] == 'end':
+                    self._validate_node_has_output_properties(node_metadata)
                     continue
 
                 # Validate nodes based on their types
@@ -138,6 +140,8 @@ class Graph:
                     self._validate_agent_node(node_metadata)
                 elif node_type == 'recursive_task_execution':
                     self._validate_task_execution_node(node_metadata)
+                elif node_type == 'human':
+                    self._validate_node_has_input_properties(node_metadata)
 
                 # Only validate input config if node has input and is not a human node
                 if 'input' in node_metadata and node_metadata['type'] != 'human':
@@ -147,6 +151,40 @@ class Graph:
             raise ValueError(get_language_content("graph_validation_errors.exactly_one_start_node"))
         # if end_node_count != 1:
         #     raise ValueError(get_language_content("graph_validation_errors.exactly_one_end_node"))
+
+    def _validate_node_has_input_properties(self, node_metadata):
+        """
+        Validates that a node (specifically start and human nodes) has input properties.
+        
+        Args:
+            node_metadata (dict): Node configuration data
+            
+        Raises:
+            ValueError: When the node doesn't have input properties
+        """
+        if 'input' not in node_metadata or not hasattr(node_metadata['input'], 'properties') or not node_metadata['input'].properties:
+            raise ValueError(
+                get_language_content("graph_validation_errors.node_missing_input").format(
+                    node_title=node_metadata['title']
+                )
+            )
+
+    def _validate_node_has_output_properties(self, node_metadata):
+        """
+        Validates that a node (specifically end node) has output properties.
+        
+        Args:
+            node_metadata (dict): Node configuration data
+            
+        Raises:
+            ValueError: When the node doesn't have output properties
+        """
+        if 'output' not in node_metadata or not hasattr(node_metadata['output'], 'properties') or not node_metadata['output'].properties:
+            raise ValueError(
+                get_language_content("graph_validation_errors.node_missing_output").format(
+                    node_title=node_metadata['title']
+                )
+            )
 
     def _validate_llm_node(self, node_metadata):
         """

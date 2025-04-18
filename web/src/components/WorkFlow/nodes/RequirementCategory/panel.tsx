@@ -6,7 +6,7 @@ import { ProForm, ProFormList, ProFormSelect, ProFormTextArea } from '@ant-desig
 import { useIntl } from '@umijs/max';
 import { useMount } from 'ahooks';
 import { memo, useRef } from 'react';
-import { SelectModelConfigId } from '../../components/Form/Select';
+import { SelectModelConfigId, SelectVariable } from '../../components/Form/Select';
 import useStore from '../../store';
 import { AppNode } from '../../types';
 import { Tooltip } from 'antd';
@@ -60,7 +60,7 @@ export default memo(({ node }: { node: AppNode }) => {
                     autoFocusFirstInput={false}
                     onValuesChange={setNodeChange}
                 >
-                    <ProFormSelect
+                    <SelectVariable
                         name="variable"
                         label={intl.formatMessage({
                             id: 'workflow.label.selectVariable',
@@ -75,8 +75,8 @@ export default memo(({ node }: { node: AppNode }) => {
                         }}
                         showSearch
                         allowClear={false}
-                        request={async () => getVariables(node.id)}
-                    ></ProFormSelect>
+                        node={node}
+                    ></SelectVariable>
                     <SelectModelConfigId form={formRef} name={`model`}></SelectModelConfigId>
                     {/* <ProFormSelect
                         name="model"

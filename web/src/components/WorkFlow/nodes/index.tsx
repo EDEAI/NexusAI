@@ -7,7 +7,7 @@ import { NodeProps } from 'reactflow';
 import useNodeIdUpdate from '../hooks/useNodeIdUpdate';
 import useStore from '../store';
 import { NodeCustom } from './nodeDisperse';
-import RunPanel from './RunPanel';
+import RunPanel from '../components/RunPanel/RunPanel';
 import WrapNode from './WrapNode';
 import WrapPanel from './WrapNode/panel';
 const empty = (props: NodeProps) => <> {props.type}</>;

@@ -9,7 +9,6 @@ import {
     CheckCircleOutlined,
     CloseOutlined,
     DownloadOutlined,
-    InboxOutlined,
     LoadingOutlined,
     SyncOutlined,
 } from '@ant-design/icons';
@@ -22,24 +21,23 @@ import {
     ProFormSelect,
     ProFormText,
     ProFormTextArea,
-    ProFormUploadDragger,
-    ProFormUploadDraggerProps,
 } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useMount, useUpdateEffect } from 'ahooks';
 import { Alert, Button, Collapse, Divider, message, Tag, Tooltip, Typography } from 'antd';
 import _ from 'lodash';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import CodeEditor from '../components/Editor/CodeEditor';
-import { TextareaRunName } from '../components/Form/Input';
+import CodeEditor from '../Editor/CodeEditor';
+import { TextareaRunName } from '../Form/Input';
+import { UploadDragger } from '../Form/Upload';
 import {
     NOT_SHOW_INPUT_RESULT_NODE,
     NOT_SHOW_OUTPUT_RESULT_NODE,
     UPLOAD_FILES_KEY,
-} from '../config';
-import useSaveWorkFlow from '../saveWorkFlow';
-import useStore from '../store';
-import { BlockEnum } from '../types';
+} from '../../config';
+import useSaveWorkFlow from '../../saveWorkFlow';
+import useStore from '../../store';
+import { BlockEnum } from '../../types';
 import FileDownloadList from '@/components/common/FileDownloadList';
 const { Text } = Typography;
 const { ErrorBoundary } = Alert;
@@ -571,31 +569,6 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                 console.log(err);
             });
     };
-    const uploadProps: ProFormUploadDraggerProps = {
-        icon: <InboxOutlined></InboxOutlined>,
-        title: intl.formatMessage({ id: 'workflow.uploadFileText' }),
-        description: intl.formatMessage({ id: 'workflow.uploadFileText' }),
-
-        accept: '.txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv',
-
-        fieldProps: {
-            listType: 'picture',
-            name: 'file',
-            multiple: true,
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-            action: getUploadUrl,
-            beforeUpload(file) {
-                const isLt15M = file.size / 1024 / 1024 < 15;
-                if (!isLt15M) {
-                    message.error(intl.formatMessage({ id: 'workflow.uploadFileErrorText' }));
-                }
-
-                return isLt15M;
-            },
-        },
-    };
     return (
         <>
             <ProForm
@@ -655,12 +628,11 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                         <Typography.Title level={5}>
                             {intl.formatMessage({ id: 'workflow.uploadFile' })}
                         </Typography.Title>
-                        <ProFormUploadDragger
-                            // required={true}
-                            // rules={[{ required: true, message: '' }]}
+                        <UploadDragger 
                             name="file"
-                            {...uploadProps}
-                        ></ProFormUploadDragger>
+                            multiple={true}
+                          
+                        />
 
                         <ProFormDependency name={['file']}>
                             {({ file }) => {

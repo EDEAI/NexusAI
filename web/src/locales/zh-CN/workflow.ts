@@ -33,6 +33,7 @@ export default {
     'workflow.tool': '工具',
     'workflow.skill': '技能',
     'workflow.agent': '智能体',
+    'workflow.noRunData': '暂无运行数据',
 
     'workflow.orcompute': '元数据',
     'workflow.checkedBackLogs': '已处理',
@@ -55,6 +56,11 @@ export default {
     'workflow.checkSc': '确认成功',
     'workflow.checkBackLogs': '确认待办',
     'workflow.manual_confirmation': '人工确认',
+
+    'workflow.autoLayout': '节点整理',
+    'workflow.autoLayoutSuccess': '节点整理成功',
+    'workflow.autoLayoutVertical': '纵向排列',
+    'workflow.autoLayoutHorizontal': '横向排列',
 
     'workflow.agentSkill': '智能体能力',
     'workflow.historyPrompt': '历史prompt',
@@ -103,7 +109,7 @@ export default {
     'workflow.uploadFileText': '拖拽文件至此，或者选择文件',
     'workflow.uploadFileErrorText': '上传的文件不能大于15M',
     'workflow.uploadFileDes':
-        '已支持 TXT、 MARKDOWN、 PDF、 HTML、 XLSX、 XLS、 DOCX、 CSV，每个文件不超过 15MB。',
+        '已支持 TXT、 MARKDOWN、 PDF、 HTML、 XLSX、 XLS、 DOCX、 CSV、JPG、PNG、JPEG，每个文件不超过 15MB。',
     'workflow.label.variable': '变量',
     'workflow.title.runWorkflow': '运行工作流',
     'workflow.button.run': '运行',
@@ -240,6 +246,8 @@ export default {
     "workflow.vars.variableNameExists": "变量名称已存在",
     "workflow.vars.displayName": "显示名称",
     "workflow.vars.isRequired": "是否必填",
+    "workflow.vars.noVariables": "暂无变量",
+    "workflow.vars.addVariable": "添加变量",
 
     "workflow.needHumanConfirm":"需要人工确认",
     "workflow.noHumanConfirm":"已处理人工确认",
@@ -335,4 +343,8 @@ export default {
     'skill.result.output.type.document': '文档',
     'workflow.debugRun': '调试运行',
     'workflow.debugTodo': '调试待办',
+
+    'workflow.tag.imageUnderstanding': '图片理解',
+
+    'workflow.context': '上下文',
 };

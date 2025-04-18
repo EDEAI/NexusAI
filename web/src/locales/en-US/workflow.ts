@@ -36,6 +36,7 @@ export default {
     'workflow.tool': 'Tool',
     'workflow.skill': 'Skill',
     'workflow.agent': 'Agent',
+    'workflow.noRunData': 'No run data available',
 
     'workflow.orcompute': 'Metadata',
     'workflow.checkedBackLogs': 'Processed',
@@ -58,6 +59,11 @@ export default {
     'workflow.checkSc': 'Confirmation Successful',
     'workflow.checkBackLogs': 'Confirm Todo',
     'workflow.manual_confirmation': 'Manual Confirmation',
+
+    'workflow.autoLayout': 'Auto Layout',
+    'workflow.autoLayoutSuccess': 'Nodes arranged successfully',
+    'workflow.autoLayoutVertical': 'Vertical Layout',
+    'workflow.autoLayoutHorizontal': 'Horizontal Layout',
 
     'workflow.agentSkill': 'Agent Skill',
     'workflow.historyPrompt': 'History Prompt',
@@ -108,7 +114,7 @@ export default {
     'workflow.uploadFileText': 'Drag files here, or select files',
     'workflow.uploadFileErrorText': 'Uploaded files cannot exceed 15MB',
     'workflow.uploadFileDes':
-        'ReviseSupported formats: TXT, MARKDOWN, PDF, HTML, XLSX, XLS, DOCX, CSV, Each file should not exceed 15MB.',
+        'ReviseSupported formats: TXT, MARKDOWN, PDF, HTML, XLSX, XLS, DOCX, CSV,JPG,PNG,JPEG, Each file should not exceed 15MB.',
     'workflow.label.variable': 'Variable',
     'workflow.title.runWorkflow': 'Run Workflow',
     'workflow.button.run': 'Run',
@@ -239,7 +245,6 @@ export default {
     'workflow.vars.required': 'Required',
     'workflow.vars.inputFields': 'Input Fields',
     'workflow.vars.createVariable': 'Create Variable',
-    'workflow.vars.variableType': 'Variable Type',
 
     'workflow.vars.variableName': 'Variable Name',
     'workflow.vars.enterVariableName': 'Please enter the variable name',
@@ -248,6 +253,8 @@ export default {
     'workflow.vars.variableNameExists': 'Variable name already exists',
     'workflow.vars.displayName': 'Display Name',
     'workflow.vars.isRequired': 'Is Required',
+    'workflow.vars.noVariables': 'No Variables',
+    'workflow.vars.addVariable': 'Add Variable',
 
     'workflow.needHumanConfirm': 'Pending',
     'workflow.noHumanConfirm': 'Human confirmation processed',
@@ -343,4 +350,8 @@ export default {
     'skill.result.output.type.document': 'Document',
     'workflow.debugRun': 'Debug Run',
     'workflow.debugTodo': 'Debug Todo',
+
+    'workflow.tag.imageUnderstanding': 'Image Understanding',
+
+    'workflow.context': 'Context',
 };

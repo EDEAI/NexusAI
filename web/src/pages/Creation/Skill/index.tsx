@@ -12,6 +12,7 @@ import {
 import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
 import { Button, Form, Menu, message, Spin } from 'antd';
+import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import SkillFirst from './components/SkillFirst';
 import SkillSecond from './components/SkillSecond';
@@ -33,7 +34,7 @@ const Skill: React.FC = () => {
     const [Newcode, setNewcode] = useState<any>(null);
     const [app_id, setApp_id] = useState<any>(null);
     const [skillid, setSkillid] = useState<any>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [skillmenudisabled, setskillmenudisabled] = useState({
         first: false,
         second: false,
@@ -125,6 +126,7 @@ const Skill: React.FC = () => {
     //Skill
     const getSkill = async (app_id?: any) => {
         let params = new URLSearchParams(window.location.search);
+        setLoading(true);
         let res = null;
         if (!!params.get('app_id') || !!app_id) {
             res = await GetskillInfo(app_id ? app_id : params.get('app_id'), params.get('type'));
@@ -198,8 +200,11 @@ const Skill: React.FC = () => {
     };
 
     const FirstValue = (value: any, newappId?: any) => {
+        debugger;
         Skill_update(value, newappId);
+        debugger;
         const param = objecttoarray(value.input_variables);
+        debugger;
         Fourthlyref.setFieldsValue(param);
     };
 
@@ -219,13 +224,12 @@ const Skill: React.FC = () => {
         setProcedure(id);
     };
 
-
     const SkillMenuClick: MenuProps['onClick'] = e => {
         pageKeyfun(e.key);
     };
     //
     const skillupdata = () => {
-        setLoading(true);
+        // setLoading(true);
         if (!app_id) {
             PostappsCreate(createappdata('GET'))
                 .then(res => {
@@ -235,9 +239,11 @@ const Skill: React.FC = () => {
                             setSkillid(newres.data.id);
                             var data = {};
                             data = {
-                                input_variables: arraytoobject(FirstSkillref.getFieldsValue()),
+                                input_variables: Skillinfo.input_variables
+                                    ? Skillinfo.input_variables
+                                    : arraytoobject(FirstSkillref.getFieldsValue()),
                                 is_public: Skillinfo.is_public,
-                                attrs_are_visible:Skillinfo.attrs_are_visible,
+                                attrs_are_visible: Skillinfo.attrs_are_visible,
                                 dependencies: { python3: !!SkillRelyOn ? SkillRelyOn : [] },
                                 code: Newcode
                                     ? Newcode
@@ -250,7 +256,9 @@ const Skill: React.FC = () => {
     }`,
                                       }),
                                 output_type: Skillinfo.output_type,
-                                output_variables: arraytoobject(Thirdlyref.getFieldsValue()),
+                                output_variables: Skillinfo.output_variables
+                                    ? Skillinfo.output_variables
+                                    : arraytoobject(Thirdlyref.getFieldsValue()),
                             };
                             const param = objecttoarray(
                                 arraytoobject(FirstSkillref.getFieldsValue()),
@@ -262,18 +270,25 @@ const Skill: React.FC = () => {
                                 app_id: res.data.app_id,
                             };
                             createappdata('SET', createdData);
+                        
                             pageKeyfun('4');
                             setskillmenudisabled({ ...skillmenudisabled, fourthly: false });
+                            
                         })
-                        .catch(err => {});
+                        .catch(err => {
+                            setLoading(false);
+                        });
                 })
                 .catch(err => {
+                    setLoading(false);
                 });
         } else {
             const data = {
-                input_variables: arraytoobject(FirstSkillref.getFieldsValue()),
+                input_variables: Skillinfo.input_variables
+                    ? Skillinfo.input_variables
+                    : arraytoobject(FirstSkillref.getFieldsValue()),
                 is_public: Skillinfo.is_public,
-                attrs_are_visible:Skillinfo.attrs_are_visible,
+                attrs_are_visible: Skillinfo.attrs_are_visible,
                 dependencies: { python3: !!SkillRelyOn ? SkillRelyOn : [] },
                 code: Newcode
                     ? Newcode
@@ -286,37 +301,64 @@ const Skill: React.FC = () => {
     }`,
                       }),
                 output_type: Skillinfo.output_type,
-                output_variables: arraytoobject(Thirdlyref.getFieldsValue()),
+                output_variables: Skillinfo.output_variables
+                    ? Skillinfo.output_variables
+                    : arraytoobject(Thirdlyref.getFieldsValue()),
             };
             const param = objecttoarray(arraytoobject(FirstSkillref.getFieldsValue()));
             Fourthlyref.setFieldsValue(param);
             Skill_update(data, app_id);
+            setLoading(false);
+            debugger
             pageKeyfun('4');
             setskillmenudisabled({ ...skillmenudisabled, fourthly: false });
+        
         }
     };
     const firstjudgingcondition = (users: any, id?: Number) => {
-        const firstusers = users.filter((item: any) => {
-            return !item || !item.name || !item.content;
-        });
-        if (!users[0]) {
-            message.warning(
-                `${
-                    id === 1
-                        ? intl.formatMessage({ id: 'skill.message.inputerror1' })
-                        : intl.formatMessage({ id: 'skill.message.inputerror2' })
-                }`,
-            );
-            return true;
-        } else if (firstusers.length !== 0) {
-            message.warning(
-                `${
-                    id === 1
-                        ? intl.formatMessage({ id: 'skill.message.inputerror3' })
-                        : intl.formatMessage({ id: 'skill.message.inputerror4' })
-                }`,
-            );
-            return true;
+        // const firstusers = users.filter((item: any) => {
+        //     return !item || !item.name || !item.content;
+        // });
+        // if (!users[0]) {
+        //     message.warning(
+        //         `${
+        //             id === 1
+        //                 ? intl.formatMessage({ id: 'skill.message.inputerror1' })
+        //                 : intl.formatMessage({ id: 'skill.message.inputerror2' })
+        //         }`,
+        //     );
+        //     return true;
+        // } else if (firstusers.length !== 0) {
+        //     message.warning(
+        //         `${
+        //             id === 1
+        //                 ? intl.formatMessage({ id: 'skill.message.inputerror3' })
+        //                 : intl.formatMessage({ id: 'skill.message.inputerror4' })
+        //         }`,
+        //     );
+        //     return true;
+        // }
+        console.log(id);
+        
+        if (id == 1) {
+            if (!Skillinfo.input_variables) {
+                message.warning(intl.formatMessage({ id: 'skill.message.inputerror1' }));
+                return true;
+            }
+            if (_.isEmpty(Skillinfo.input_variables.properties)) {
+                message.warning(intl.formatMessage({ id: 'skill.message.inputerror1' }));
+                return true;
+            }
+        }
+        if (id == 2) {
+            if (!Skillinfo.output_variables) {
+                message.warning(intl.formatMessage({ id: 'skill.message.inputerror2' }));
+                return true;
+            }
+            if (_.isEmpty(Skillinfo.output_variables.properties)) {
+                message.warning(intl.formatMessage({ id: 'skill.message.inputerror2' }));
+                return true;
+            }
         }
         if (hasDuplicateField(users, 'name')) {
             message.warning(intl.formatMessage({ id: 'skill.message.inputerror5' }));
@@ -423,17 +465,20 @@ const Skill: React.FC = () => {
                                 justifyContent: 'center',
                             }}
                         >
-                            <SkillFirst
-                                FirstValue={FirstValue}
-                                Skillinfo={Skillinfo}
-                                setSkillInfo={setSkillInfo}
-                                FirstSkillref={FirstSkillref}
-                                Operationbentate={Operationbentate}
-                                firstjudgingcondition={firstjudgingcondition}
-                                pageKeyfun={pageKeyfun}
-                                skillmenudisabled={skillmenudisabled}
-                                setskillmenudisabled={setskillmenudisabled}
-                            />
+                            {!loading && (
+                                <SkillFirst
+                                    loading={loading}
+                                    FirstValue={FirstValue}
+                                    Skillinfo={Skillinfo}
+                                    setSkillInfo={setSkillInfo}
+                                    FirstSkillref={FirstSkillref}
+                                    Operationbentate={Operationbentate}
+                                    firstjudgingcondition={firstjudgingcondition}
+                                    pageKeyfun={pageKeyfun}
+                                    skillmenudisabled={skillmenudisabled}
+                                    setskillmenudisabled={setskillmenudisabled}
+                                />
+                            )}
                         </div>
                         <div
                             style={{
@@ -464,19 +509,22 @@ const Skill: React.FC = () => {
                                 justifyContent: 'center',
                             }}
                         >
-                            <SkillThirdly
-                                ThirdlyValue={ThirdlyValue}
-                                handleBack={handleBack}
-                                Thirdlyref={Thirdlyref}
-                                Skillinfo={Skillinfo}
-                                setSkillInfo={setSkillInfo}
-                                Operationbentate={Operationbentate}
-                                firstjudgingcondition={firstjudgingcondition}
-                                pageKeyfun={pageKeyfun}
-                                skillmenudisabled={skillmenudisabled}
-                                setskillmenudisabled={setskillmenudisabled}
-                                skillupdata={skillupdata}
-                            />
+                            {!loading && (
+                                <SkillThirdly
+                                    loading={loading}
+                                    ThirdlyValue={ThirdlyValue}
+                                    handleBack={handleBack}
+                                    Thirdlyref={Thirdlyref}
+                                    Skillinfo={Skillinfo}
+                                    setSkillInfo={setSkillInfo}
+                                    Operationbentate={Operationbentate}
+                                    firstjudgingcondition={firstjudgingcondition}
+                                    pageKeyfun={pageKeyfun}
+                                    skillmenudisabled={skillmenudisabled}
+                                    setskillmenudisabled={setskillmenudisabled}
+                                    skillupdata={skillupdata}
+                                />
+                            )}
                         </div>
                         <div
                             style={{

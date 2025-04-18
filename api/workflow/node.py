@@ -9,7 +9,7 @@ from core.workflow import (
     flatten_variable_with_values,
     replace_value_in_variable_with_new_value
 )
-from core.workflow.nodes import create_node_from_dict, llm_correctable_node_types, UPLOAD_FILES_KEY
+from core.workflow.nodes import create_node_from_dict, llm_correctable_node_types
 from languages import get_language_content
 from datetime import datetime
 import json
@@ -56,6 +56,8 @@ async def get_node_by_id(exec_id: int, userinfo: TokenData = Depends(get_current
     node info
 
     """
+    from core.llm import get_serialized_prompt_from_messages
+    
     uid = userinfo.uid
     team_id = userinfo.team_id
 
@@ -66,13 +68,6 @@ async def get_node_by_id(exec_id: int, userinfo: TokenData = Depends(get_current
     if inputs := result['data'].get('inputs'):
         inputs = create_variable_from_dict(inputs)
         inputs = flatten_variable_with_values(inputs)
-        if upload_files := inputs.pop(UPLOAD_FILES_KEY, None):
-            upload_files_ids = upload_files.values()
-            upload_files_names = []
-            for file_id in upload_files_ids:
-                file_data = UploadFiles().get_file_by_id(file_id)
-                upload_files_names.append(file_data['name'] + file_data['extension'])
-            inputs[get_language_content('upload_files')] = upload_files_names
         result['data']['inputs'] = inputs
     if outputs := result['data'].get('outputs'):
         outputs = create_variable_from_dict(outputs)
@@ -86,8 +81,7 @@ async def get_node_by_id(exec_id: int, userinfo: TokenData = Depends(get_current
     prompt_data = []
     if result["data"]["model_data"]:
         messages = result["data"]["model_data"]["messages"]
-        for message in messages:
-            prompt_data.append({message[0]: message[1]["value"]})
+        prompt_data = get_serialized_prompt_from_messages(messages)
     result["data"]["prompt_data"] = prompt_data
     result["data"].pop("model_data")
 

@@ -194,7 +194,7 @@ const ConditionBranch = memo(
                 reset();
             }, 200);
             setNodeId(id);
-            const vars = getVariables(node.id);
+            const vars = getVariables(node.id).filter(item=>item.createVar.type!= 'file');
             setEditorOptions(vars);
         }, []);
 
@@ -398,11 +398,11 @@ const ConditionBranch = memo(
                                 />
                                 <ProFormDependency name={['variable']}>
                                     {({ variable }) => {
-                                        const vars = getVariables(nodeId)?.find(
+                                        const vars = getVariables(nodeId)?.filter(item=>item.createVar.type!= 'file')?.find(
                                             x => x.value == variable,
                                         );
                                         const type = vars?.createVar?.type;
-                                        console.log(type);
+                                      
                                         return (
                                             <ProFormSelect
                                                 name="count"

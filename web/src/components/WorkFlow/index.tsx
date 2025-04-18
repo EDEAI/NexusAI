@@ -228,7 +228,7 @@ const DnDFlow = () => {
                 </CustomWorkflowContextProvider>
             </div>
             <NodePanel
-                visibleTabs={['node', 'agent', 'skill', 'tool']}
+                // visibleTabs={['node', 'agent', 'skill', 'tool']}
                 workflowName={workFlowInfo?.app?.name}
                 workflowDesc={workFlowInfo?.app?.description}
                 publishStatus={publishStatus}

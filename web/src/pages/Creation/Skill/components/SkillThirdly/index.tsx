@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react';
 const { TextArea, Search } = Input;
 
 interface ChildProps {
+    loading: boolean;
     ThirdlyValue: (value: any) => void;
     handleBack: (value: any) => void;
     Thirdlyref: any;
@@ -21,6 +22,7 @@ interface ChildProps {
     skillupdata: any;
 }
 const SkillThirdly: React.FC<ChildProps> = ({
+    loading,
     ThirdlyValue,
     Thirdlyref,
     handleBack,
@@ -126,7 +128,32 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                     </Radio>
                                 </Radio.Group>
                             </Form.Item>
-                            <div className="mb-[11px] text-[#555555] text-xs font-medium flex justify-between items-center">
+                            {!loading && (
+                                <div className="">
+                                    <Variable
+                                        title={
+                                            <div className="text-[#555555] text-xs">
+                                                <Callword
+                                                    className="font-medium"
+                                                    required={true}
+                                                    name={intl.formatMessage({
+                                                        id: 'skill.outputv',
+                                                    })}
+                                                    title={intl.formatMessage({
+                                                        id: 'skill.Callword.outputv',
+                                                    })}
+                                                />
+                                            </div>
+                                        }
+                                        variableTypes={['string', 'number', 'json','file']}
+                                        variables={Object.values(
+                                            Skillinfo?.output_variables?.properties || {},
+                                        )}
+                                        onChange={handleVariableChange}
+                                    />
+                                </div>
+                            )}
+                            {/* <div className="mb-[11px] text-[#555555] text-xs font-medium flex justify-between items-center">
                                 <div>
                                     <Callword
                                         required={true}

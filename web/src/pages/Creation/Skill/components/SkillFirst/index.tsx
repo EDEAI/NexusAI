@@ -7,6 +7,7 @@ import React, { useEffect } from 'react';
 
 const { TextArea } = Input;
 interface ChildProps {
+    loading: boolean;
     FirstValue: (value: any) => void;
     FirstSkillref: any;
     Skillinfo: any;
@@ -18,6 +19,7 @@ interface ChildProps {
     setskillmenudisabled: any;
 }
 const SkillFirst: React.FC<ChildProps> = ({
+    loading,
     FirstValue,
     FirstSkillref,
     Skillinfo,
@@ -159,8 +161,34 @@ const SkillFirst: React.FC<ChildProps> = ({
                                         {intl.formatMessage({ id: 'skill.add' })}
                                     </Button>
                                 </div>
-                            </div>
-                            <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
+                            </div> */}
+                            {!loading && (
+                                <div className="mb-[30px]">
+                                    <Variable
+                                        title={
+                                            <div className="text-[#555555] text-xs">
+                                                <Callword
+                                                    className="font-medium"
+                                                    required={true}
+                                                    name={intl.formatMessage({
+                                                        id: 'skill.inputvariable',
+                                                    })}
+                                                    title={intl.formatMessage({
+                                                        id: 'skill.Callword.inputvariable',
+                                                    })}
+                                                />
+                                            </div>
+                                        }
+                                        variableTypes={['string', 'number', 'json']}
+                                        variables={Object.values(
+                                            Skillinfo?.input_variables?.properties || {},
+                                        )}
+                                        onChange={handleVariableChange}
+                                    />
+                                </div>
+                            )}
+
+                            {/* <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
                                 <div className="w-48 mr-5 ml-[10px]">
                                     {intl.formatMessage({ id: 'skill.variable.name' })}
                                 </div>

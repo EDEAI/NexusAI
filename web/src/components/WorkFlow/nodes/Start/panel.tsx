@@ -48,6 +48,7 @@ export default memo(({ node }: { node: AppNode }) => {
             <div>
                 <Variable
                     variables={nodeInfo.data['variables']?.value || []}
+                    variableTypes={['string', 'number', 'file']}
                     onChange={variableChange}
                 ></Variable>
 
@@ -62,7 +63,7 @@ export default memo(({ node }: { node: AppNode }) => {
                     onValuesChange={setNodeChange}
                 >
                     <SwitchGroup
-                        fields={['requires_upload', 'import_to_knowledge_base']}
+                        fields={['import_to_knowledge_base']}
                     ></SwitchGroup>
 
                     <ProFormDependency name={['import_to_knowledge_base']}>
@@ -76,10 +77,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                                     key={index}
                                                     name={`import_to_knowledge_base.${item.name}`}
                                                     label={
-                                                        intl.formatMessage({
-                                                            id: 'workflow.label.variable',
-                                                            defaultMessage: '',
-                                                        }) + item.name
+                                                        item.name
                                                     }
                                                     options={datasetData?.list || []}
                                                 ></ProFormSelect>

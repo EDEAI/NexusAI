@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
-import { Button, Form, Menu, message } from 'antd';
+import { Button, Form, Menu, message, Spin } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import AgentsFirst from './components/AgentsFirst';
 import AgentsFourthly from './components/AgentsFourthly';
@@ -27,6 +27,7 @@ const Agents: React.FC = () => {
     const [Tformref] = Form.useForm();
     const [Sformref] = Form.useForm();
     const [Fourthlyref] = Form.useForm();
+    const [loading, setLoading] = useState(false);
 
     const [Detaillist, setDetaillist] = useState(null); // Agent detail information
     const [repository, setRepository] = useState(null); // Step one repository selected list id
@@ -90,66 +91,74 @@ const Agents: React.FC = () => {
     }, []);
 
     const getAgent = async () => {
-        let params = new URLSearchParams(window.location.search);
-        console.log(params.get('type'));
-        const res = await GetagentInfo(params.get('app_id'), params.get('type'));
-        const data = res.data;
-        if (res.data.agent_dataset_relation_list && res.data.agent_dataset_relation_list.length) {
-            const repositoryID = res.data.agent_dataset_relation_list.map((item: any) => {
-                return item.dataset_id;
-            });
-            setRepository(repositoryID);
-        }
-        setDetaillist(res.data);
-        setOperationbentate(
-            res.data.agent.publish_status === 0 && res.data.is_creator === 1 ? 'false' : 'true',
-        );
-        if (res.data.agent.publish_status === 1) {
-            message.warning(intl.formatMessage({ id: 'agent.message.listwarning' }), 5);
-        }
-
-        Ffromref.setFieldsValue(objecttoarray(data.agent.input_variables));
-
-        if (res.data.agent_abilities_list) {
-            const user = res.data.agent_abilities_list.map((item: any) => {
-                return item.status == 1 ? { ...item, status: true } : { ...item, status: false };
-            });
-            Sformref.setFieldsValue({
-                users: !user[0]
-                    ? [{ agent_ability_id: 0, name: '', content: '', status: true }]
-                    : user,
-            });
-
-            const list = data.agent_abilities_list.filter((item: any) => {
-                return item.output_format !== 0;
-            });
-            Tformref.setFieldsValue({
-                users: list.map((item: any) => {
-                    return {
-                        agent_ability_id: item.agent_ability_id,
-                        output_format: item.output_format,
-                    };
-                }),
-            });
-        }
-        if (data.m_configurations_list) {
-            setFourthly_select_list(
-                data.m_configurations_list.map((item: any) => {
-                    return { value: item.m_config_id, label: item.m_name };
-                }),
+        setLoading(true);
+        try {
+            let params = new URLSearchParams(window.location.search);
+            console.log(params.get('type'));
+            const res = await GetagentInfo(params.get('app_id'), params.get('type'));
+            const data = res.data;
+            if (res.data.agent_dataset_relation_list && res.data.agent_dataset_relation_list.length) {
+                const repositoryID = res.data.agent_dataset_relation_list.map((item: any) => {
+                    return item.dataset_id;
+                });
+                setRepository(repositoryID);
+            }
+            setDetaillist(res.data);
+            setOperationbentate(
+                res.data.agent.publish_status === 0 && res.data.is_creator === 1 ? 'false' : 'true',
             );
-        }
+            if (res.data.agent.publish_status === 1) {
+                message.warning(intl.formatMessage({ id: 'agent.message.listwarning' }), 5);
+            }
 
-        setFourthly_config_id(data.agent.m_config_id);
-        if (data.agent_abilities_list) {
-            const newabilitieslist = data.agent_abilities_list.filter((item: any, i: any) => {
-                return item.status === 1;
-            });
-            setFourthly_abilities_list(
-                selectlistdata(newabilitieslist).concat([
-                    { value: 0, label: intl.formatMessage({ id: 'agent.allability' }) },
-                ]),
-            );
+            Ffromref.setFieldsValue(objecttoarray(data.agent.input_variables));
+
+            if (res.data.agent_abilities_list) {
+                const user = res.data.agent_abilities_list.map((item: any) => {
+                    return item.status == 1 ? { ...item, status: true } : { ...item, status: false };
+                });
+                Sformref.setFieldsValue({
+                    users: !user[0]
+                        ? [{ agent_ability_id: 0, name: '', content: '', status: true }]
+                        : user,
+                });
+
+                const list = data.agent_abilities_list.filter((item: any) => {
+                    return item.output_format !== 0;
+                });
+                Tformref.setFieldsValue({
+                    users: list.map((item: any) => {
+                        return {
+                            agent_ability_id: item.agent_ability_id,
+                            output_format: item.output_format,
+                        };
+                    }),
+                });
+            }
+            if (data.m_configurations_list) {
+                setFourthly_select_list(
+                    data.m_configurations_list.map((item: any) => {
+                        return { value: item.m_config_id, label: item.m_name };
+                    }),
+                );
+            }
+
+            setFourthly_config_id(data.agent.m_config_id);
+            if (data.agent_abilities_list) {
+                const newabilitieslist = data.agent_abilities_list.filter((item: any, i: any) => {
+                    return item.status === 1;
+                });
+                setFourthly_abilities_list(
+                    selectlistdata(newabilitieslist).concat([
+                        { value: 0, label: intl.formatMessage({ id: 'agent.allability' }) },
+                    ]),
+                );
+            }
+        } catch (error) {
+            console.error('Failed to fetch agent details:', error);
+            message.error(intl.formatMessage({ id: 'agent.message.error' }));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -256,76 +265,79 @@ const Agents: React.FC = () => {
                 </div>
             </div>
            <div  className="flex-1 grid grid-cols-2 relative">
-             <div
-                className="flex flex-col  "
-                style={{
-                    height: 'calc(100vh - 56px)',
-                
-                    overflowY: 'scroll',
-                    scrollbarWidth: 'none',
-                }}
-            >
+             <Spin spinning={loading} className="h-full">
                 <div
-                    className="px-[30px] "
-                    style={{ overflowX: 'auto',  height: '100%' }}
+                    className="flex flex-col  "
+                    style={{
+                        height: 'calc(100vh - 56px)',
+                    
+                        overflowY: 'scroll',
+                        scrollbarWidth: 'none',
+                    }}
                 >
-                    <div className="w-full flex justify-center mt-[30px]">
-                        <div className="flex items-center  w-full">
-                            <div className="mr-[10px] w-[16px] h-[16px]">
-                                <img src="/icons/flag.svg" alt="" className="w-[16px] h-[16px]" />
-                            </div>
-                            <div className="mr-[6px] text-lg text-[#213044] font-medium">
-                                {Detaillist ? Detaillist.creator_nickname : ''}{' '}
-                                {intl.formatMessage({ id: 'agent.agents' })}
+                    <div
+                        className="px-[30px] "
+                        style={{ overflowX: 'auto',  height: '100%' }}
+                    >
+                        <div className="w-full flex justify-center mt-[30px]">
+                            <div className="flex items-center  w-full">
+                                <div className="mr-[10px] w-[16px] h-[16px]">
+                                    <img src="/icons/flag.svg" alt="" className="w-[16px] h-[16px]" />
+                                </div>
+                                <div className="mr-[6px] text-lg text-[#213044] font-medium">
+                                    {Detaillist ? Detaillist.creator_nickname : ''}{' '}
+                                    {intl.formatMessage({ id: 'agent.agents' })}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div
-                        style={{
-                            display: pageKey === '1' ? 'flex' : 'none',
-                            height: 'calc(100vh - 146px)',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <AgentsFirst
-                            Ffromref={Ffromref}
-                            Detaillist={Detaillist}
-                            repository={repository}
-                            Operationbentate={Operationbentate}
-                            Fourthly_config_id={Fourthly_config_id}
-                            Fourthly_select_list={Fourthly_select_list}
-                        />
-                    </div>
-                    <div
-                        style={{
-                            display: pageKey === '2' ? 'flex' : 'none',
-                            height: 'calc(100vh - 146px)',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <AgentsSecond Detaillist={Detaillist} Sformref={Sformref} />
-                    </div>
-                    <div
-                        style={{
-                            display: pageKey === '4' ? 'flex' : 'none',
-                            height: 'calc(100vh - 146px)',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <AgentsFourthly
-                            Detaillist={Detaillist}
-                            setDetaillist={setDetaillist}
-                            Fourthly_select_list={Fourthly_select_list}
-                            Fourthly_config_id={Fourthly_config_id}
-                            setFourthly_config_id={setFourthly_config_id}
-                            Fourthlyref={Fourthlyref}
-                            Fourthly_abilities_list={Fourthly_abilities_list}
-                            Operationbentate={Operationbentate}
-                            callwordlist={callwordlist}
-                        />
+                        <div
+                            style={{
+                                display: pageKey === '1' ? 'flex' : 'none',
+                                height: 'calc(100vh - 146px)',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <AgentsFirst
+                                Ffromref={Ffromref}
+                                loading={loading}
+                                Detaillist={Detaillist}
+                                repository={repository}
+                                Operationbentate={Operationbentate}
+                                Fourthly_config_id={Fourthly_config_id}
+                                Fourthly_select_list={Fourthly_select_list}
+                            />
+                        </div>
+                        <div
+                            style={{
+                                display: pageKey === '2' ? 'flex' : 'none',
+                                height: 'calc(100vh - 146px)',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <AgentsSecond Detaillist={Detaillist} Sformref={Sformref} />
+                        </div>
+                        <div
+                            style={{
+                                display: pageKey === '4' ? 'flex' : 'none',
+                                height: 'calc(100vh - 146px)',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <AgentsFourthly
+                                Detaillist={Detaillist}
+                                setDetaillist={setDetaillist}
+                                Fourthly_select_list={Fourthly_select_list}
+                                Fourthly_config_id={Fourthly_config_id}
+                                setFourthly_config_id={setFourthly_config_id}
+                                Fourthlyref={Fourthlyref}
+                                Fourthly_abilities_list={Fourthly_abilities_list}
+                                Operationbentate={Operationbentate}
+                                callwordlist={callwordlist}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
+             </Spin>
             <div>
                 <Chat
                     operationbentate={Operationbentate}

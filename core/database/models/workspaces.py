@@ -17,10 +17,6 @@ from languages import get_language_content
 import os
 from config import settings
 
-# Uploaded files are stored in an ArrayVariable, which is in the `input` ObjectVariable
-# And this is the specific key of this ArrayVariable.
-UPLOAD_FILES_KEY = '4d6f7265-cde2-d0c7-c8cb-636f6d696e67'
-
 
 class Workspaces(MySQL):
     """
@@ -150,6 +146,8 @@ class Workspaces(MySQL):
             - "list": A list of node execution logs with details such as node name, graph, inputs, status, error, and execution times.
             - "app_run_data": A list of application run details including workflow ID, run status, completed steps, error info, token counts, and timestamps.
         """
+        from core.llm import get_serialized_prompt_from_messages
+        
         app_node_executions = AppNodeExecutions()
         conditions = [
             {"column": "app_node_executions.workflow_id", "value": workflows_id},
@@ -210,13 +208,6 @@ class Workspaces(MySQL):
                 if inputs := app_node.get('inputs'):
                     inputs = create_variable_from_dict(inputs)
                     inputs = flatten_variable_with_values(inputs)
-                    if upload_files := inputs.pop(UPLOAD_FILES_KEY, None):
-                        upload_files_ids = upload_files.values()
-                        upload_files_names = []
-                        for file_id in upload_files_ids:
-                            file_data = UploadFiles().get_file_by_id(file_id)
-                            upload_files_names.append(file_data['name'] + file_data['extension'])
-                        inputs[get_language_content('upload_files')] = upload_files_names
                     app_node['inputs'] = inputs
                 if outputs := app_node.get('outputs'):
                     app_node['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
@@ -234,8 +225,7 @@ class Workspaces(MySQL):
                 prompt_data = []
                 if app_node["mod_data"] is not None:
                     messages = app_node["mod_data"]["messages"]
-                    for message in messages:
-                        prompt_data.append({message[0]: message[1]["value"]})
+                    prompt_data = get_serialized_prompt_from_messages(messages)
                 app_node["prompt_data"] = prompt_data
                 app_node.pop("mod_data")
 

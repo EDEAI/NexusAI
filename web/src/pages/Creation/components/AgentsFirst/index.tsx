@@ -24,9 +24,11 @@ interface ChildProps {
     firstjudgingcondition: any;
     setAgentmunudisabled: any;
     agentmenudisabled: any;
+    loading:boolean
 }
 
 const AgentsFirst: React.FC<ChildProps> = ({
+    loading,
     FirstValue,
     Detaillist,
     setDetaillist,
@@ -161,6 +163,13 @@ const AgentsFirst: React.FC<ChildProps> = ({
         });
     };
 
+    const handleVariableChange = (value: any) => {
+        setDetaillist({
+            ...Detaillist,
+            agent: { ...Detaillist?.agent, input_variables: value.free },
+        });
+    };
+
     const { options, defaultValue } = useModelSelect();
 
     return (
@@ -180,173 +189,158 @@ const AgentsFirst: React.FC<ChildProps> = ({
                     autoComplete="off"
                     form={Ffromref}
                 >
-                    <Form.List name="users">
-                        {(fields, { add, remove }) => (
-                            <>
-                                <Form.Item className="mb-[30px]">
-                                    <div className="text-[#555555] text-xs">
-                                        <div className="font-medium  mb-[15px]">
-                                            {intl.formatMessage({ id: 'agent.appname' })}
-                                        </div>
-                                        <div className="w-full p-[15px] flex font-normal items-center bg-[#F7F7F7] rounded-lg">
-                                            <div>
-                                                {Detaillist &&
-                                                    Detaillist.app &&
-                                                    Detaillist.app.name}
-                                                &nbsp;
-                                            </div>
-                                            <div className="">
-                                                {Operationbentate === 'true'
-                                                    ? intl.formatMessage({
-                                                          id: 'agent.cannotmodify',
-                                                      })
-                                                    : ''}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Form.Item>
-                                <Form.Item className="mb-[30px]">
-                                    <div className="text-[#555555] text-xs">
-                                        <div className="font-medium  mb-[15px]">
-                                            {intl.formatMessage({ id: 'agent.appdescription' })}
-                                        </div>
-                                        <div className="w-full p-[15px] flex font-normal items-center bg-[#F7F7F7] rounded-lg">
-                                            {Detaillist &&
-                                                Detaillist.app &&
-                                                Detaillist.app.description}
-                                        </div>
-                                    </div>
-                                </Form.Item>
-                                <Form.Item className="mb-[30px]">
-                                    <div>
-                                        <div className="mb-[30px]">
-                                            <div className="mb-[15px] text-[#555555] text-xs">
-                                                <Callword
-                                                    className="font-medium"
-                                                    name={intl.formatMessage({
-                                                        id: 'agent.teamvisibility',
-                                                    })}
-                                                    title={intl.formatMessage({
-                                                        id: 'agent.explain.teamvisibility',
-                                                    })}
-                                                />
-                                            </div>
-                                            <Switch
-                                                size="small"
-                                                onChange={FirstTeam}
-                                                checked={
-                                                    Detaillist && Detaillist.app.is_public === 1
-                                                        ? true
-                                                        : false
-                                                }
-                                            />
-                                        </div>
-                                        <div className="mb-[30px]  font-medium">
-                                            <div className="mb-[15px] text-[#555555] text-xs">
-                                              
-                                                <Callword
-                                                    className="font-medium"
-                                                    name={intl.formatMessage({
-                                                        id: 'agent.attrVisible',
-                                                    })}
-                                                    title={intl.formatMessage({
-                                                        id: 'agent.explain.attrVisible',
-                                                    })}
-                                                />
-                                            </div>
-                                            <Switch
-                                                size="small"
-                                                onChange={attrFirstAPI}
-                                                checked={
-                                                    Detaillist &&
-                                                    Detaillist.app.attrs_are_visible === 1
-                                                }
-                                            />
-                                        </div>
-                                        <div className="mb-[30px]  font-medium">
-                                            <div className="mb-[15px] text-[#555555] text-xs">
-                                                {intl.formatMessage({ id: 'agent.APIswitch' })}
-                                            </div>
-                                            <Switch
-                                                size="small"
-                                                onChange={FirstAPI}
-                                                checked={
-                                                    Detaillist && Detaillist.app.enable_api === 1
-                                                }
-                                                disabled={Detaillist?.app?.publish_status !== 1}
-                                            />
-                                        </div>
-                                        <div className="font-medium">
-                                            <div className="mb-[15px] text-[#555555] text-xs">
-                                                {intl.formatMessage({ id: 'agent.filesupload' })}
-                                            </div>
-                                            <Switch
-                                                size="small"
-                                                onChange={TPUpload}
-                                                checked={
-                                                    Detaillist &&
-                                                    Detaillist.agent.allow_upload_file == 1
-                                                        ? true
-                                                        : false
-                                                }
-                                            />
-                                        </div>
-                                    </div>
-                                </Form.Item>
-                                <Form.Item className="mb-[30px]">
-                                    <div>
-                                        <div className="mb-[15px] text-[#555555] text-xs font-medium">
-                                            <span className="text-[#E80000]">* </span>
-                                            {intl.formatMessage({ id: 'agent.LLMmodel' })}
-                                        </div>
-                                        <Select
-                                            placeholder={intl.formatMessage({
-                                                id: 'agent.pleaseselect',
-                                            })}
-                                            // defaultValue="jack"
-                                            style={{ width: 270 }}
-                                            value={
-                                                Fourthly_config_id == 0
-                                                    ? intl.formatMessage({
-                                                          id: 'agent.pleaseselect',
-                                                      })
-                                                    : Fourthly_config_id
-                                            }
-                                            variant="filled"
-                                            onChange={FourthlySelect}
-                                            options={options}
-                                        />
-                                    </div>
-                                </Form.Item>
-                                <Form.Item className="mb-[30px]" name={'obligations'}>
-                                    <div className="w-full">
-                                        <div className="mb-[15px] text-[#555555] text-xs">
-                                            <Callword
-                                                className="font-medium"
-                                                required={true}
-                                                name={intl.formatMessage({
-                                                    id: 'agent.functiondescription',
-                                                })}
-                                                title={intl.formatMessage({
-                                                    id: 'agent.explain.function',
-                                                })}
-                                            />
-                                        </div>
-                                        <TextArea
-                                            onChange={obligations}
-                                            value={
-                                                Detaillist &&
-                                                Detaillist.agent &&
-                                                Detaillist.agent.obligations
-                                            }
-                                            placeholder={`Agent${intl.formatMessage({
-                                                id: 'agent.functiondescription',
-                                            })}`}
-                                            autoSize={{ minRows: 8, maxRows: 10 }}
-                                        />
-                                    </div>
-                                </Form.Item>
-                                <div className="mb-[11px] text-xs font-bold flex justify-between items-center">
+                    <Form.Item className="mb-[30px]">
+                        <div className="text-[#555555] text-xs">
+                            <div className="font-medium  mb-[15px]">
+                                {intl.formatMessage({ id: 'agent.appname' })}
+                            </div>
+                            <div className="w-full p-[15px] flex font-normal items-center bg-[#F7F7F7] rounded-lg">
+                                <div>
+                                    {Detaillist && Detaillist.app && Detaillist.app.name}
+                                    &nbsp;
+                                </div>
+                                <div className="">
+                                    {Operationbentate === 'true'
+                                        ? intl.formatMessage({
+                                              id: 'agent.cannotmodify',
+                                          })
+                                        : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </Form.Item>
+                    <Form.Item className="mb-[30px]">
+                        <div className="text-[#555555] text-xs">
+                            <div className="font-medium  mb-[15px]">
+                                {intl.formatMessage({ id: 'agent.appdescription' })}
+                            </div>
+                            <div className="w-full p-[15px] flex font-normal items-center bg-[#F7F7F7] rounded-lg">
+                                {Detaillist && Detaillist.app && Detaillist.app.description}
+                            </div>
+                        </div>
+                    </Form.Item>
+                    <Form.Item className="mb-[30px]">
+                        <div>
+                            <div className="mb-[30px]">
+                                <div className="mb-[15px] text-[#555555] text-xs">
+                                    <Callword
+                                        className="font-medium"
+                                        name={intl.formatMessage({
+                                            id: 'agent.teamvisibility',
+                                        })}
+                                        title={intl.formatMessage({
+                                            id: 'agent.explain.teamvisibility',
+                                        })}
+                                    />
+                                </div>
+                                <Switch
+                                    size="small"
+                                    onChange={FirstTeam}
+                                    checked={
+                                        Detaillist && Detaillist.app?.is_public === 1 ? true : false
+                                    }
+                                />
+                            </div>
+                            <div className="mb-[30px]  font-medium">
+                                <div className="mb-[15px] text-[#555555] text-xs">
+                                    <Callword
+                                        className="font-medium"
+                                        name={intl.formatMessage({
+                                            id: 'agent.attrVisible',
+                                        })}
+                                        title={intl.formatMessage({
+                                            id: 'agent.explain.attrVisible',
+                                        })}
+                                    />
+                                </div>
+                                <Switch
+                                    size="small"
+                                    onChange={attrFirstAPI}
+                                    checked={Detaillist && Detaillist.app.attrs_are_visible === 1}
+                                />
+                            </div>
+                            <div className="mb-[30px]  font-medium">
+                                <div className="mb-[15px] text-[#555555] text-xs">
+                                    {intl.formatMessage({ id: 'agent.APIswitch' })}
+                                </div>
+                                <Switch
+                                    size="small"
+                                    onChange={FirstAPI}
+                                    checked={Detaillist && Detaillist.app.enable_api === 1}
+                                    disabled={Detaillist?.app?.publish_status !== 1}
+                                />
+                            </div>
+                            <div className="font-medium">
+                                <div className="mb-[15px] text-[#555555] text-xs">
+                                    {intl.formatMessage({ id: 'agent.filesupload' })}
+                                </div>
+                                <Switch
+                                    size="small"
+                                    onChange={TPUpload}
+                                    checked={
+                                        Detaillist && Detaillist.agent.allow_upload_file == 1
+                                            ? true
+                                            : false
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </Form.Item>
+                    <Form.Item className="mb-[30px]">
+                        <div>
+                            <div className="mb-[15px] text-[#555555] text-xs font-medium">
+                                <span className="text-[#E80000]">* </span>
+                                {intl.formatMessage({ id: 'agent.LLMmodel' })}
+                            </div>
+                            <Select
+                                placeholder={intl.formatMessage({
+                                    id: 'agent.pleaseselect',
+                                })}
+                                // defaultValue="jack"
+                                style={{ width: 270 }}
+                                value={
+                                    Fourthly_config_id == 0
+                                        ? intl.formatMessage({
+                                              id: 'agent.pleaseselect',
+                                          })
+                                        : Fourthly_config_id
+                                }
+                                variant="filled"
+                                onChange={FourthlySelect}
+                                options={options}
+                            />
+                        </div>
+                    </Form.Item>
+                    <Form.Item className="mb-[30px]" name={'obligations'}>
+                        <div className="w-full">
+                            <div className="mb-[15px] text-[#555555] text-xs">
+                                <Callword
+                                    className="font-medium"
+                                    required={true}
+                                    name={intl.formatMessage({
+                                        id: 'agent.functiondescription',
+                                    })}
+                                    title={intl.formatMessage({
+                                        id: 'agent.explain.function',
+                                    })}
+                                />
+                            </div>
+                            <TextArea
+                                onChange={obligations}
+                                value={
+                                    Detaillist && Detaillist.agent && Detaillist.agent.obligations
+                                }
+                                placeholder={`Agent${intl.formatMessage({
+                                    id: 'agent.functiondescription',
+                                })}`}
+                                autoSize={{ minRows: 8, maxRows: 10 }}
+                            />
+                        </div>
+                    </Form.Item>
+                    {!loading && (
+                        <div className="mb-[30px]">
+                            <Variable
+                                title={
                                     <div className="text-[#555555] text-xs">
                                         <Callword
                                             className="font-medium"

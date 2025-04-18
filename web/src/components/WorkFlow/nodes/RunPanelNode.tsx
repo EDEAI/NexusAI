@@ -2,8 +2,9 @@
  * @LastEditors: biz
  */
 import { runNode } from '@/api/workflow';
+import FileDownloadList from '@/components/common/FileDownloadList';
 import { ObjectVariable, Variable } from '@/py2js/variables.js';
-import { CloseOutlined, DownloadOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import {
     ProCard,
     ProForm,
@@ -17,10 +18,10 @@ import { Alert, Button, Divider, Typography } from 'antd';
 import _ from 'lodash';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import CodeEditor from '../components/Editor/CodeEditor';
+import { UploadDragger } from '../components/Form/Upload';
 import useNodeIdUpdate from '../hooks/useNodeIdUpdate';
 import useSaveWorkFlow from '../saveWorkFlow';
 import useStore from '../store';
-import FileDownloadList from '@/components/common/FileDownloadList';
 
 export default memo(() => {
     const intl = useIntl();
@@ -158,8 +159,8 @@ export default memo(() => {
                 )}
 
                 {result?.data?.file_list?.length > 0 && (
-                    <FileDownloadList 
-                        files={result.data.file_list} 
+                    <FileDownloadList
+                        files={result.data.file_list}
                         title={intl.formatMessage({ id: 'skill.downloadFiles' })}
                         className="mt-4"
                     />
@@ -303,6 +304,7 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
                 }
                 varGroup[x.identifier].list.push({
                     ...x,
+                    ...varItem,
                     name: x.fieldName,
                 });
             });
@@ -340,8 +342,18 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
             const output = new ObjectVariable('output');
             x.list.forEach(item => {
                 const name = `contexts.${x.id}.${item.name}`;
-                const val = value[name];
-                const variable = new Variable(item.name, item.type || 'string', val || '');
+                let val = value[name];
+
+                if (item.createVar?.type == 'file') {
+                    val = val[0]?.response?.data?.file_id;
+                }
+
+                const variable = new Variable(
+                    item.name,
+                    item.createVar?.type || 'string',
+                    val || '',
+                );
+
                 output.addProperty(item.name, variable);
             });
             node.outputs = output;
@@ -362,7 +374,6 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
         runNode(app_id, params)
             .then(res => {
                 console.log(res);
-
                 onRunResult?.(res);
             })
             .catch(err => {
@@ -377,7 +388,7 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
         <>
             <ProForm
                 loading={submitLoading}
-                layout="horizontal"
+                layout="vertical"
                 submitter={{
                     resetButtonProps: false,
                     submitButtonProps: {
@@ -391,13 +402,18 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
             >
                 {inputs.length > 0 && (
                     <div>
-                        <div className="font-bold text-base mb-2">Inputs</div>
+                        <div className="font-bold text-base mb-2">
+                            {intl.formatMessage({
+                                id: 'workflow.inputs',
+                                defaultMessage: 'Inputs',
+                            })}
+                        </div>
                         {inputs.map((item, index) => {
                             if (item?.type == 'number') {
                                 return (
                                     <ProFormDigit
                                         key={index}
-                                        label={item.name}
+                                        label={item.display_name || item.name}
                                         name={`inputs.${item.name}`}
                                         required={item.required}
                                         rules={[
@@ -411,10 +427,26 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
                                     ></ProFormDigit>
                                 );
                             }
+                            if (item.type === 'file') {
+                                return (
+                                    <div key={item.name}>
+                                        <Typography.Title level={5}>
+                                            {item.display_name || item.name}
+                                            {item.required && (
+                                                <span className="text-red-500 ml-1">*</span>
+                                            )}
+                                        </Typography.Title>
+                                        <UploadDragger
+                                            name={`inputs.${item.name}`}
+                                            multiple={false}
+                                        />
+                                    </div>
+                                );
+                            }
                             return (
                                 <ProFormTextArea
                                     key={index}
-                                    label={item.name}
+                                    label={item.display_name || item.name}
                                     name={`inputs.${item.name}`}
                                     required={item.required}
                                     rules={[
@@ -433,17 +465,29 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
 
                 {contexts.length > 0 && (
                     <div>
-                        <div className="font-bold text-base mb-2">Context</div>
+                        <div className="font-bold text-base mb-2">
+                            {intl.formatMessage({
+                                id: 'workflow.context',
+                                defaultMessage: 'Context',
+                            })}
+                        </div>
                         {contexts.map((x, index) => {
+                            console.log(x);
+
                             return (
                                 <div className="mb-2" key={index}>
                                     <ProCard title={x.name} ghost>
                                         {x.list.map((item, i) => {
-                                            if (item?.type == 'number') {
+                                            if (item?.createVar?.type == 'number') {
                                                 return (
                                                     <ProFormDigit
                                                         key={i}
-                                                        label={<div>{item.name} </div>}
+                                                        label={
+                                                            <div>
+                                                                {item?.createVar?.display_name ||
+                                                                    item.name}{' '}
+                                                            </div>
+                                                        }
                                                         name={`contexts.${item.identifier}.${item.name}`}
                                                         required={item.required}
                                                         rules={[
@@ -457,10 +501,30 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
                                                     ></ProFormDigit>
                                                 );
                                             }
+                                            if (item?.createVar?.type === 'file') {
+                                                return (
+                                                    <div key={item.name}>
+                                                        <UploadDragger
+                                                            name={`contexts.${item.identifier}.${item.name}`}
+                                                            multiple={false}
+                                                            label={
+                                                                item?.createVar?.display_name ||
+                                                                item.name
+                                                            }
+                                                        />
+                                                    </div>
+                                                );
+                                            }
+
                                             return (
                                                 <ProFormTextArea
                                                     key={i}
-                                                    label={<div>{item.name} </div>}
+                                                    label={
+                                                        <div>
+                                                            {item?.createVar?.display_name ||
+                                                                item.name}{' '}
+                                                        </div>
+                                                    }
                                                     name={`contexts.${item.identifier}.${item.name}`}
                                                     required={item.required}
                                                     rules={[
@@ -480,39 +544,6 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
                         })}
                     </div>
                 )}
-                {/* {nodes[0]?.id &&
-                    getOutputVariables(nodes[0].id).map((item,index) => {
-                        if (item?.createVar?.type == 'number') {
-                            return (
-                                <ProFormDigit
-                                    key={index}
-                                    label={item.createVar.name}
-                                    name={item.createVar.name}
-                                    required={item.createVar.required}
-                                    rules={[
-                                        {
-                                            required: item.createVar.required,
-                                            message: '',
-                                        },
-                                    ]}
-                                ></ProFormDigit>
-                            );
-                        }
-                        return (
-                            <ProFormText
-                                key={index}
-                                label={item.createVar.name}
-                                name={item.createVar.name}
-                                required={item.createVar.required}
-                                rules={[
-                                    {
-                                        required: item.createVar.required,
-                                        message: '',
-                                    },
-                                ]}
-                            ></ProFormText>
-                        );
-                    })} */}
             </ProForm>
         </>
     );

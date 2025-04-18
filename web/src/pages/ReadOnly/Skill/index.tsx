@@ -201,39 +201,7 @@ const Skill: React.FC = () => {
         pageKeyfun(e.key);
     };
 
-    const firstjudgingcondition = (users: any, id?: Number) => {
-        console.log(users, 'users');
-        const firstusers = users.filter((item: any) => {
-            return !item || !item.name || !item.content;
-        });
-        console.log('firstusers', firstusers, !users[0]);
-        if (!users[0]) {
-            message.warning(
-                `${
-                    id === 1
-                        ? intl.formatMessage({ id: 'skill.message.inputerror1' })
-                        : intl.formatMessage({ id: 'skill.message.inputerror2' })
-                }`,
-            );
-            return true;
-        } else if (firstusers.length !== 0) {
-            message.warning(
-                `${
-                    id === 1
-                        ? intl.formatMessage({ id: 'skill.message.inputerror3' })
-                        : intl.formatMessage({ id: 'skill.message.inputerror4' })
-                }`,
-            );
-            return true;
-        }
-        if (hasDuplicateField(users, 'name')) {
-            message.warning(intl.formatMessage({ id: 'skill.message.inputerror5' }));
-            return true;
-        } else {
-            return false;
-        }
-    };
-
+  
     const hasDuplicateField = (array: any[], field: string) => {
         const uniqueValues = new Set();
         return array.some(item => {
