@@ -58,6 +58,7 @@ class BackListData(BaseModel):
     need_human_confirm: Optional[int] = None
     icon: Optional[str] = None
     icon_background: Optional[str] = None
+    avatar: Optional[str] = None
 
 class BackListResponseData(BaseModel):
     list: Optional[List[BackListData]] = None

@@ -24,11 +24,22 @@ class GeneralTextSplitter(TextSplitter):
         self, texts: List[str], metadatas: Optional[List[dict]] = None, **kwargs
     ) -> List[Document]:
         """Create documents from a list of texts."""
-        return self._text_splitter.create_documents(
-            texts=texts,
-            metadatas=metadatas,
-            **kwargs
-        )
+        try:
+            return self._text_splitter.create_documents(
+                texts=texts,
+                metadatas=metadatas,
+                **kwargs
+            )
+        except AttributeError:
+            results = []
+            for index, text in enumerate(texts):
+                result = self._text_splitter.split_text(text)
+                for document in result:
+                    if isinstance(document, str):
+                        results.append(Document(page_content=document, metadata=metadatas[index]))
+                    else:
+                        results.append(document)
+            return results
         
     def split_documents(self, documents: Iterable[Document]) -> List[Document]:
         """Split documents."""
