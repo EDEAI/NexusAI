@@ -162,7 +162,7 @@ class Workflows(MySQL):
                 "apps.name", 
                 "apps.description", 
                 "users.nickname", 
-                "users.avatar", 
+                "apps.avatar", 
                 "apps.icon_background", "apps.avatar",
                 "apps.icon"
                 ],
