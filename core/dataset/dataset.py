@@ -333,7 +333,7 @@ class DatasetManagement:
             # else:
             if document_type == 'markdown':
                 type_ = 'ExperimentalMarkdownSyntaxTextSplitter'
-                config = {}
+                config = {'strip_headers': False}
             else:
                 type_, config = convert_to_type_and_config(process_rule['config'])
             return TextSplitter(text_splitter_type=type_, **config)
