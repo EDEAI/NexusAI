@@ -398,7 +398,7 @@ export default memo((props: Props) => {
         }, 500);
     };
     return (
-        <div className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border">
+        <div className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border" style={{height: 'calc(100vh - 65px)'}}>
             <ProForm
                 formRef={formRef}
                 submitter={false}

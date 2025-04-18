@@ -1,7 +1,8 @@
 import Callword from '@/components/callword';
+import Variable from '@/components/WorkFlow/components/Variable';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
 import { useIntl } from '@umijs/max';
-import { Form, Input, Radio, Select } from 'antd';
+import { Form, Input, Radio } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 //
@@ -72,10 +73,7 @@ const SkillThirdly: React.FC<ChildProps> = ({
                 <Form.List name="users">
                     {(fields, { add, remove }) => (
                         <>
-                            <Form.Item
-                                className="mb-[30px]"
-
-                            >
+                            <Form.Item className="mb-[30px]">
                                 <div className="text-[#555555] text-xs mb-[15px] font-medium">
                                     <Callword
                                         name={intl.formatMessage({ id: 'skill.outputvariable' })}
@@ -110,15 +108,41 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                     </Radio>
                                 </Radio.Group>
                             </Form.Item>
-                            <div className="mb-[15px] text-[#555555] text-xs font-medium flex justify-between items-center">
+                            {Skillinfo?.output_variables && (
+                                <div className="">
+                                    <Variable
+                                        readonly
+                                        title={
+                                            <div className="text-[#555555] text-xs">
+                                                <Callword
+                                                    className="font-medium"
+                                                    required={true}
+                                                    name={intl.formatMessage({
+                                                        id: 'skill.outputv',
+                                                    })}
+                                                    title={intl.formatMessage({
+                                                        id: 'skill.Callword.outputv',
+                                                    })}
+                                                />
+                                            </div>
+                                        }
+                                        variableTypes={['string', 'number', 'json', 'file']}
+                                        variables={Object.values(
+                                            Skillinfo?.output_variables?.properties || {},
+                                        )}
+                                        // onChange={handleVariableChange}
+                                    />
+                                </div>
+                            )}
+                            {/* <div className="mb-[15px] text-[#555555] text-xs font-medium flex justify-between items-center">
                                 <div>
                                     <Callword
                                         name={intl.formatMessage({ id: 'skill.outputv' })}
                                         title={intl.formatMessage({ id: 'skill.Callword.outputv' })}
                                     />
                                 </div>
-                            </div>
-                            <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
+                            </div> */}
+                            {/* <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
                                 <div className="w-[300px] mr-[60px] ml-2.5">
                                     {intl.formatMessage({ id: 'skill.variable.name' })}
                                 </div>
@@ -184,7 +208,7 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                             </div>
                                         );
                                     },
-                                )}
+                                )} */}
                         </>
                     )}
                 </Form.List>

@@ -1,7 +1,7 @@
 import { GetdatasetList } from '@/api/agents';
 import Callword from '@/components/callword';
+import Variable from '@/components/WorkFlow/components/Variable';
 import { useModelSelect } from '@/store/modelList';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Form, Input, Radio, Select, Switch } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -345,24 +345,41 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         <Callword
                                             className="font-medium"
                                             required={true}
-                                            name={intl.formatMessage({ id: 'agent.inputvariable' })}
+                                            name={intl.formatMessage({
+                                                id: 'agent.inputvariable',
+                                            })}
                                             title={intl.formatMessage({
                                                 id: 'agent.explain.inputvariable',
                                             })}
                                         />
                                     </div>
-                                    {/* <div>
-                                        <Button
-                                            type="link"
-                                            onClick={() => add()}
-                                            block
-                                            icon={<PlusOutlined />}
-                                        >
-                                            {intl.formatMessage({ id: 'agent.add' })}
-                                        </Button>
-                                    </div> */}
-                                </div>
-                                <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
+                                }
+                                variables={Object.values(
+                                    Detaillist?.agent?.input_variables?.properties || {},
+                                )}
+                                onChange={handleVariableChange}
+                            />
+                        </div>
+                    )}
+
+                    {/* <div className="mb-[11px] text-xs font-bold flex justify-between items-center">
+                        <div className="text-[#555555] text-xs">
+                            <Callword
+                                className="font-medium"
+                                required={true}
+                                name={intl.formatMessage({ id: 'agent.inputvariable' })}
+                                title={intl.formatMessage({
+                                    id: 'agent.explain.inputvariable',
+                                })}
+                            />
+                        </div>
+              
+                    </div> */}
+
+                    <Form.List name="users">
+                        {(fields, { add, remove }) => (
+                            <>
+                                {/* <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
                                     <div className="w-[22%] mr-2 ml-[10px]">
                                         {intl.formatMessage({ id: 'agent.variable.name' })}
                                     </div>
@@ -378,10 +395,10 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     <div className="w-[10%]">
                                         {intl.formatMessage({ id: 'agent.variable.operation' })}
                                     </div>
-                                </div>
-                                <div className="mb-[30px]">
+                                </div> */}
+                                {/* <div className="mb-[30px]">
                                     {fields.map(({ key, name, ...restField }) => (
-                                        // <Space key={key} style={{ width:'100%', display: 'flex', marginBottom: 8, alignItems: 'center' }} align="baseline">
+                                       
                                         <div className="w-full h-20 flex justify-start px-2.5 border-b border-x pt-7 last:rounded-b-lg">
                                             <Form.Item
                                                 className="m-0 w-[22%] mr-2"
@@ -446,11 +463,11 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                 className="w-[15%] mr-2 m-0 flex pl-[2%]"
                                                 {...restField}
                                                 name={[name, 'status']}
-                                                // style={{ flex: 1, alignItems: 'center' }}
+                                             
                                             >
                                                 <Switch
                                                     size="small"
-                                                    // style={{ width: 70 }}
+                                                 
                                                 />
                                             </Form.Item>
                                             <Form.Item className="w-[10%] flex pl-[2%]">
@@ -460,7 +477,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                 ) : null}
                                             </Form.Item>
                                         </div>
-                                        // </Space>
+                                      
                                     ))}
                                     <div
                                         onClick={() => add()}
@@ -468,7 +485,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     >
                                         <PlusOutlined /> {intl.formatMessage({ id: 'agent.add' })}
                                     </div>
-                                </div>
+                                </div> */}
 
                                 <Form.Item className="mb-[30px]">
                                     <div className="text-[#555555] text-xs mb-[15px]">

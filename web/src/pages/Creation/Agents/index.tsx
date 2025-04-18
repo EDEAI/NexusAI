@@ -214,6 +214,7 @@ const Agents: React.FC = () => {
                               type: item.type,
                               content: item.display_name,
                               status: item.required,
+                              ...item,
                           };
                       })
                     : [
@@ -651,6 +652,8 @@ const Agents: React.FC = () => {
                                             display: pageKey === '2' ? 'flex' : 'none',
                                             height: 'calc(100vh - 146px)',
                                             justifyContent: 'center',
+                                            position: 'sticky',
+                                            top: '-150px',
                                         }}
                                     >
                                         <AgentsSecond

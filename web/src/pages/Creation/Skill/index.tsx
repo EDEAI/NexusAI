@@ -175,6 +175,7 @@ const Skill: React.FC = () => {
 
     const Skill_update = async (value: any, newappId?: any) => {
         // if (Operationbentate === 'false') {
+
         const param = {
             app_id: newappId ? newappId : app_id,
             data: value,

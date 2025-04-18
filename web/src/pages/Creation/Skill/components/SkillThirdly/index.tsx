@@ -1,4 +1,5 @@
 import Callword from '@/components/callword';
+import Variable from '@/components/WorkFlow/components/Variable';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
@@ -42,6 +43,9 @@ const SkillThirdly: React.FC<ChildProps> = ({
     const SkillRadioType = (e: any) => {
         // setSkill_Radio_Type(e.target.value);
         setSkillInfo({ ...Skillinfo, output_type: e.target.value });
+    };
+    const handleVariableChange = (value: any) => {
+        setSkillInfo({ ...Skillinfo, output_variables: value.free });
     };
     const ThirdlyChange = (value: any) => {
         const input_variables = new ObjectVariable('output', '', '');
@@ -171,8 +175,8 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                         {intl.formatMessage({ id: 'skill.add' })}
                                     </Button>
                                 </div>
-                            </div>
-                            <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
+                            </div> */}
+                            {/* <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7] rounded-t-lg">
                                 <div className="w-[290px] ml-2.5">
                                     {intl.formatMessage({ id: 'skill.variable.name' })}
                                 </div>
@@ -185,8 +189,8 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                 <div className="">
                                     {intl.formatMessage({ id: 'skill.variable.operation' })}
                                 </div>
-                            </div>
-                            {fields.map(({ key, name, ...restField }) => (
+                            </div> */}
+                            {/* {fields.map(({ key, name, ...restField }) => (
                                 <div className="w-full h-20 flex justify-start  px-2.5 border-b border-x pt-7 last:rounded-b-lg">
                                     <Form.Item
                                         {...restField}
@@ -235,7 +239,7 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                         />
                                     </Form.Item>
                                     <Form.Item
-                                        // className='w-[290] m-0'
+                                   
                                         {...restField}
                                         name={[name, 'type']}
                                     >
@@ -258,7 +262,7 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                         ) : null}
                                     </Form.Item>
                                 </div>
-                            ))}
+                            ))} */}
                         </>
                     )}
                 </Form.List>

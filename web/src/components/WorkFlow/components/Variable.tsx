@@ -30,6 +30,7 @@ type VariableProps = VariableItem & {
     onEdit: () => void;
     onDel: () => void;
     key: number;
+    readonly?: boolean;
 };
 
 const Variable = memo((props: VariableProps) => {
@@ -59,7 +60,7 @@ const Variable = memo((props: VariableProps) => {
                 <div className="max-w-20 truncate text-gray-500">{props.display_name}</div>
             </div>
             <div className="shrink-0">
-                {isHovering ? (
+                {isHovering && !props.readonly ? (
                     <div className="flex gap-1 ">
                         <Button type="text" icon={<EditOutlined />} onClick={props.onEdit}></Button>
                         <Button
@@ -101,6 +102,7 @@ export default memo((props: VariableList) => {
     const [variables, setVariables] = useControllableValue(props?.variables || [], {
         defaultValue: [],
     });
+    const readonly = props.readonly || false;
 
     useMount(() => {
         props?.variables && setVariables(props.variables);
@@ -124,7 +126,7 @@ export default memo((props: VariableList) => {
 
     useUpdateEffect(() => {
         objectTransformFlow();
-        props.onChange?.({
+        props?.onChange?.({
             value: variables,
             free: objectTransformFlow(),
         });

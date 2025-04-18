@@ -1,4 +1,5 @@
 import Callword from '@/components/callword';
+import Variable from '@/components/WorkFlow/components/Variable';
 import { useIntl } from '@umijs/max';
 import { Form, Input, Switch } from 'antd';
 import React, { useEffect } from 'react';
@@ -158,8 +159,8 @@ const SkillFirst: React.FC<ChildProps> = ({
                                     })}
                                 />
                             </div>
-                        </div>
-                        <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7]  rounded-t-lg">
+                        </div> */}
+                        {/* <div className="w-full flex justify-start items-center text-xs font-medium px-2.5 text-[#555555] h-12 bg-[#F7F7F7]  rounded-t-lg">
                             <div className="w-[300px] ml-2.5">
                                 {intl.formatMessage({ id: 'skill.variable.name' })}
                             </div>
@@ -172,8 +173,8 @@ const SkillFirst: React.FC<ChildProps> = ({
                             <div className="w-[70px]">
                                 {intl.formatMessage({ id: 'skill.variable.required' })}
                             </div>
-                        </div>
-                        <div>
+                        </div> */}
+                        {/* <div>
                             {FirstSkillref &&
                                 FirstSkillref.getFieldValue().users &&
                                 FirstSkillref.getFieldValue().users.map(
@@ -233,7 +234,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                                         );
                                     },
                                 )}
-                        </div>
+                        </div> */}
                         <div className="h-[30px] w-1"></div>
                     </>
                 )}
