@@ -312,6 +312,7 @@ const SummaryHistoryDom: React.FC<{
                                                             status={item?.target_run?.status}
                                                             icon={item?.target_run?.icon}
                                                             title={item?.target_run?.name}
+                                                            avatar={item?.target_run?.avatar}
                                                             textDetails={
                                                                 <ProgressContainer
                                                                     progressObj={{
