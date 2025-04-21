@@ -256,7 +256,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 <Switch
                                     size="small"
                                     onChange={attrFirstAPI}
-                                    checked={Detaillist && Detaillist.app.attrs_are_visible === 1}
+                                    checked={Detaillist && Detaillist.app?.attrs_are_visible === 1}
                                 />
                             </div>
                             <div className="mb-[30px]  font-medium">
