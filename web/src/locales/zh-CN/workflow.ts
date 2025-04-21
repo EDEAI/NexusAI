@@ -110,6 +110,11 @@ export default {
     'workflow.uploadFileErrorText': '上传的文件不能大于15M',
     'workflow.uploadFileDes':
         '已支持 TXT、 MARKDOWN、 PDF、 HTML、 XLSX、 XLS、 DOCX、 CSV、JPG、PNG、JPEG，每个文件不超过 15MB。',
+    'workflow.uploadFileErrorType': '请只上传图片文件',
+    'workflow.uploadAvatar': '上传头像',
+    'workflow.cropAvatar': '裁剪头像',
+    'workflow.uploadSuccess': '上传成功',
+    'workflow.uploadError': '上传失败',
     'workflow.label.variable': '变量',
     'workflow.title.runWorkflow': '运行工作流',
     'workflow.button.run': '运行',

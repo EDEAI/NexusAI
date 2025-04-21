@@ -138,6 +138,7 @@ export default () => {
 
                                 <Headportrait
                                     Image={headportrait('single', item.icon)}
+                                    avatar={item.avatar}
                                     // icon={`/icons/creation/${WORKFLOW_ICON.WorkFlow}.svg`}
                                 ></Headportrait>
 

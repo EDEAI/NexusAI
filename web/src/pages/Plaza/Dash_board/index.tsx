@@ -245,6 +245,7 @@ const Backlogs :React.FC<BlockParmas> = parmas =>{
                             <Col key={index} className="graphicHoverbox" span="24">
                                 <Graphic
                                     icon={item.icon}
+                                    avatar={item.avatar}
                                     title={ item.node_name && <SubTitle subtitle={{app_name:item.app_name,node_name:item.node_name}} /> }
                                     textDetails={item.app_run_name}
                                     handleClick={() => {
@@ -297,6 +298,7 @@ const Agent :React.FC<BlockParmas> = parmas =>{
                     <Col key={index} className="graphicHoverbox" span="12">
                         <Graphic
                             icon={item.icon}
+                            avatar={item.avatar}
                             title={item.name}
                             textDetails={item.description}
                             handleClick={() => {
@@ -329,6 +331,7 @@ const Workflow :React.FC<BlockParmas> = parmas =>{
                     <Col key={index} className="graphicHoverbox" span="12">
                             <Graphic
                                 icon={item.icon}
+                                avatar={item.avatar}
                                 title={item.name}
                                 textDetails={item.description}
                                 handleClick={() => {
@@ -410,6 +413,7 @@ const RunLogs :React.FC<BlockParmas> = parmas =>{
                                     <Graphic
                                         status={item.status}
                                         icon={item.icon}
+                                        avatar={item.avatar}
                                         title={
                                             <div className='items-center gap-x-[8px] inline-flex justify-end w-full'>
                                                 <span className='flex-1 truncate'>{item.app_runs_name || item.run_name}</span>

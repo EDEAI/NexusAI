@@ -49,20 +49,7 @@ const SkillSecond: React.FC<ChildProps> = ({
         setNewcode(JSON.stringify({ python3: e }));
     };
     //
-    const nextStep = (value: any) => {
-        const data = {
-            dependencies: { python3: !!SkillRelyOn ? SkillRelyOn.split(',') : [] },
-            code: Skillinfo.code
-                ? Skillinfo.code
-                : JSON.stringify({
-                      python3: `def main(arg1: int) -> dict:
-    return {
-        "result": (arg1 + 2) * 3,
-    }`,
-                  }),
-        };
-        SecondValue(data);
-    };
+  
 
     //
     const updata = () => {

@@ -14,6 +14,7 @@ interface GraphicProps {
     progress?: any;
     status?: any;
     backlogTips?:any;
+    avatar?:any;
 }
 
 const Graphic: React.FC<GraphicProps> = (props: GraphicProps) => {
@@ -29,6 +30,7 @@ const Graphic: React.FC<GraphicProps> = (props: GraphicProps) => {
         progress,
         status,
         backlogTips,
+        avatar
     } = props;
     const [progressVal, setProgressVal] = useState(0);
     // const [progressEase,setProgressEase] = useState('')
@@ -78,7 +80,9 @@ const Graphic: React.FC<GraphicProps> = (props: GraphicProps) => {
                     {/* <Avatar size={40} className='w-[40px] h-[40px] rounded-[6px]' style={{background:'#eee',}} icon={<div className='text-[22px]'>{icon?icon:<UserOutlined />}</div>} /> */}
                     {/* {status!==undefined&&<div className={`${status==1?'bg-[#1B64F3]':status==2?'bg-[#52C41C]':'bg-[#F04444]'} w-[4px] h-[62px] absolute top-0 left-0`}></div>} */}
                     <div className="w-[40px] h-[40px] rounded-[6px] flex items-center justify-center bg-[#F4F8F1] relative">
-                        <img src={headportrait('single', icon)} className="w-[22px] h-[22px]" />
+                        {
+                            avatar?<img src={avatar} className='w-[40px] h-[40px] rounded-[6px]'  />:<img src={headportrait('single', icon)} className="w-[22px] h-[22px]" />
+                        }
                         {iconType && (
                             <div
                                 className="w-[16px] h-[16px] absolute top-[28px] left-[28px] flex items-center justify-center bg-[#fff] rounded-[3px]"
