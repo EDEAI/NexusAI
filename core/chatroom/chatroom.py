@@ -266,7 +266,7 @@ class Chatroom:
                     else:
                         raise Exception('Unsupported value type!')
                     for file_content in file_content_list:
-                        if file_content[attr] == value:
+                        if file_content[attr] == value and file_content['type'] == 'image':
                             self._image_list.append(file_var_value)
         self._user_message_id = chatroom_messages.insert(
             {
@@ -373,14 +373,19 @@ class Chatroom:
             )
             assert result['status'] == 'success', result['message']
             result_data = result['data']
-            manager_message_var = create_variable_from_dict(result_data['outputs'])
-            manager_message = manager_message_var.value
+            manager_message = result_data['outputs']['value']
             logger.debug('Speaker selector output: %s', manager_message)
             model_data = result_data['model_data']
             llm_input_var = model_data['messages']
             llm_input = []
             for role, message_var in llm_input_var:
-                llm_input.append((role, create_variable_from_dict(message_var).value))
+                if message_var['type'].startswith('array'):
+                    message_values = []
+                    for message_value in message_var['values']:
+                        message_values.append(message_value['value'])
+                    llm_input.append([role, message_values])
+                else:
+                    llm_input.append([role, message_var['value']])
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
             prompt_tokens = result_data['prompt_tokens']
             completion_tokens = result_data['completion_tokens']
@@ -615,8 +620,7 @@ class Chatroom:
         assert result['status'] == 'success', result['message']
         
         result_data = result['data']
-        title_message_var = create_variable_from_dict(result_data['outputs'])
-        title = title_message_var.value
+        title = result_data['outputs']['value']
         logger.debug('Generated title: %s', title)
         await self._ws_manager.send_instruction(self._chatroom_id, 'TITLE', title)
         
@@ -624,7 +628,7 @@ class Chatroom:
         llm_input_var = model_data['messages']
         llm_input = []
         for role, message_var in llm_input_var:
-            llm_input.append((role, create_variable_from_dict(message_var).value))
+            llm_input.append([role, message_var['value']])
             
         has_connections = self._ws_manager.has_connections(self._chatroom_id)
         prompt_tokens = result_data['prompt_tokens']

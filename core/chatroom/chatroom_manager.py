@@ -280,6 +280,7 @@ class ChatroomManager:
                                     # File list
                                     assert isinstance(data, list), 'File list should be a list.'
                                     self._file_lists[chatroom_id] = data
+                                    await self._ws_manager.send_instruction(chatroom_id, 'FILELISTOK')
                                 case 'INPUT':
                                     # User input
                                     assert isinstance(data, str), 'User input should be a string.'
