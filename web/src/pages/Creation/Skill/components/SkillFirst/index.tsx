@@ -1,9 +1,8 @@
 import Callword from '@/components/callword';
 import Variable from '@/components/WorkFlow/components/Variable';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Form, Input, Select, Switch } from 'antd';
+import { Button, Form, Input, Switch } from 'antd';
 import React, { useEffect } from 'react';
 
 const { TextArea } = Input;
@@ -59,7 +58,7 @@ const SkillFirst: React.FC<ChildProps> = ({
         const data = {
             input_variables: input_variables,
             is_public: Skillinfo.is_public,
-            attrs_are_visible:Skillinfo.attrs_are_visible
+            attrs_are_visible: Skillinfo.attrs_are_visible,
         };
         FirstValue(data);
     };
@@ -73,8 +72,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                     pageKeyfun('2');
                     setskillmenudisabled({ ...skillmenudisabled, second: false });
                 })
-                .catch(err => {
-                });
+                .catch(err => {});
         }
     };
     return (
@@ -142,7 +140,9 @@ const SkillFirst: React.FC<ChildProps> = ({
                                 <Switch
                                     size="small"
                                     onChange={attrFirstAPI}
-                                    checked={Skillinfo && Skillinfo.attrs_are_visible == 1 ? true : false}
+                                    checked={
+                                        Skillinfo && Skillinfo.attrs_are_visible == 1 ? true : false
+                                    }
                                 />
                             </Form.Item>
                             {/* <div className="mb-[11px] text-xs font-bold flex justify-between items-center">

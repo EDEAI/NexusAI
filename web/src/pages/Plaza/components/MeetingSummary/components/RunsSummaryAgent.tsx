@@ -108,10 +108,12 @@ const RunsAgent:FC<params>=(params) =>{
                     setcurrentVariateArray(newArr)
                 }
                 setinputShow(false)
-                setBoxLoading(false)
+                setBoxLoading(false) 
             }
         }  
     },[flowMessage])
+    console.log(selectApp);
+    
     return (
         <div>
             <div className='py-[6px]'>
@@ -120,6 +122,7 @@ const RunsAgent:FC<params>=(params) =>{
                     title={selectApp?.checkItem[0]?.name}
                     textDetails={selectApp?.checkItem[0]?.description}
                     iconType='robot_icon'
+                    avatar={selectApp?.checkItem[0]?.avatar}
                     handleClick={() => {}}
                 />
             </div>

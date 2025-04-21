@@ -183,6 +183,7 @@ const RunsWorkFlow:FC<params>=(params) =>{
                     title={selectApp?.checkItem[0]?.name}
                     textDetails={selectApp?.checkItem[0]?.description}
                     iconType='workflow_icon'
+                    avatar={selectApp?.checkItem[0]?.avatar}
                     handleClick={() => {}}
                 />
             </div>

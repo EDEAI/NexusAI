@@ -76,6 +76,7 @@ export const ItemHeader = ({ item }) => {
                     Image={
                         item.type == 2 ? `/icons/chat_room.svg` : headportrait('single', item.icon)
                     }
+                    avatar={item.avatar}
                     icon={`${root}.svg`}
                 ></Headportrait>
             </div>
