@@ -801,6 +801,8 @@ def task_callback_thread():
                             app_run_data['outputs'] = outputs
                             app_run_data['status'] = 3  # Status indicating the app run has completed successfully
                             app_run_data['finished_time'] = current_time
+                            # Set completed_steps to total_steps when workflow ends
+                            app_run_data['completed_steps'] = run['total_steps']
                             redis.lpush(f'app_run_{app_run_id}_result', json.dumps({'status': 'success', 'data': outputs}))
                             redis.expire(f'app_run_{app_run_id}_result', 1)
                         elif run['status'] == 2 and len(level_tasks[app_run_id][level]) == 1:  # Check if all tasks for the level have completed
