@@ -303,10 +303,10 @@ class AppRuns(MySQL):
         conditions = [
             # {"column": "app_runs.user_id", "value": user_id},
 
-            # [
-            #     {"column": "apps.user_id", "value": user_id, 'logic': 'or'},
-            #     {"column": "app_runs.user_id", "value": user_id}
-            # ],
+            [
+                {"column": "apps.user_id", "value": user_id, 'logic': 'or'},
+                {"column": "app_runs.user_id", "value": user_id}
+            ],
             # {"column": "app_runs.agent_id", "value": agent_id},
             {"column": "app_runs.agent_id", 'op': 'in', 'value': agent_id},
             {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]},
