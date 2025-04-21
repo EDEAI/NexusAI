@@ -24,7 +24,7 @@ interface ChildProps {
     firstjudgingcondition: any;
     setAgentmunudisabled: any;
     agentmenudisabled: any;
-    loading:boolean
+    loading: boolean;
 }
 
 const AgentsFirst: React.FC<ChildProps> = ({
@@ -266,7 +266,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 <Switch
                                     size="small"
                                     onChange={FirstAPI}
-                                    checked={Detaillist && Detaillist.app.enable_api === 1}
+                                    checked={Detaillist && Detaillist.app?.enable_api === 1}
                                     disabled={Detaillist?.app?.publish_status !== 1}
                                 />
                             </div>
@@ -278,7 +278,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     size="small"
                                     onChange={TPUpload}
                                     checked={
-                                        Detaillist && Detaillist.agent.allow_upload_file == 1
+                                        Detaillist && Detaillist.agent?.allow_upload_file == 1
                                             ? true
                                             : false
                                     }
