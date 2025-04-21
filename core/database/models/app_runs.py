@@ -309,7 +309,8 @@ class AppRuns(MySQL):
             ],
             # {"column": "app_runs.agent_id", "value": agent_id},
             {"column": "app_runs.agent_id", 'op': 'in', 'value': agent_id},
-            {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]}
+            {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]},
+            {'column': 'app_runs.app_id', 'op': '>', 'value': 0}
         ]
 
         total_count = self.select_one(
