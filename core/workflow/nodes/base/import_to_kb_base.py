@@ -68,6 +68,7 @@ class ImportToKBBaseNode(Node):
             match variable.type:
                 case 'string':
                     result = DatasetManagement.add_document_to_dataset(
+                        user_id=user_id,
                         document_id=document_id,
                         dataset_id=dataset_id,
                         process_rule_id=process_rule_id,
@@ -77,6 +78,7 @@ class ImportToKBBaseNode(Node):
                     )
                 case 'file':
                     result = DatasetManagement.add_document_to_dataset(
+                        user_id=user_id,
                         document_id=document_id,
                         dataset_id=dataset_id,
                         process_rule_id=process_rule_id,
@@ -84,6 +86,7 @@ class ImportToKBBaseNode(Node):
                     )
                 case 'json':
                     result = DatasetManagement.add_document_to_dataset(
+                        user_id=user_id,
                         document_id=document_id,
                         dataset_id=dataset_id,
                         process_rule_id=process_rule_id,

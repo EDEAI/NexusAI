@@ -58,6 +58,7 @@ class Datasets(MySQL):
         dataset = self.select_one(
             columns=[
                 'id',
+                'user_id',
                 'app_id',
                 'process_rule_id',
                 'collection_name',

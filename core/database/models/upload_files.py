@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Dict, List
 from core.database import MySQL
 
@@ -45,3 +46,25 @@ class UploadFiles(MySQL):
             group_by = 'upload_files.id'
         )
         return result
+
+    def insert_file(self, user_id: int, name: str, path: str, size: int, extension: str, mime_type: str) -> int:
+        """
+        Inserts a new file record into the upload_files table.
+
+        :param user_id: The ID of the user who uploaded the file.
+        :param name: The name of the file.
+        :param path: The relative path of the file.
+        :param size: The size of the file.
+        :param extension: The extension of the file.
+        :param mime_type: The MIME type of the file.
+        :return: The ID of the newly inserted record.
+        """
+        
+        return self.insert({
+            'user_id': user_id,
+            'name': name,
+            'path': path,
+            'size': size,
+            'extension': extension,
+            'mime_type': mime_type
+        })

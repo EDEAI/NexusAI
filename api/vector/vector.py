@@ -164,7 +164,7 @@ async def create_dataset(data: CreateDatasetSchema,userinfo: TokenData = Depends
         dataset_id = Datasets().insert(ds_data)
     except Exception as e:
         msg = str(e)
-        logger.info('create_dataset: %s desc: Request model %s, Current user id %s', msg, user_id)
+        logger.exception('create_dataset: %s desc: Request model %s, Current user id %s', msg, user_id)
         return response_error(msg)
     return response_success({'dataset_id': dataset_id}, get_language_content("api_vector_success"))
 
@@ -208,6 +208,7 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
                 }
             )
             result = DatasetManagement.add_document_to_dataset(
+                user_id=user_id,
                 document_id=document_id,
                 dataset_id=dataset_id,
                 process_rule_id=process_rule_id,
@@ -227,7 +228,7 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
             )
     except Exception as e:
         msg = str(e)
-        logger.info('add_document: %s desc: Current user id %s',
+        logger.exception('add_document: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
     return response_success({}, get_language_content("api_vector_success"))
@@ -258,7 +259,7 @@ async def enable_segment(segment_id: int, userinfo: TokenData = Depends(get_curr
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('enable_segment: %s desc: Current user id %s',
+        logger.exception('enable_segment: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -290,7 +291,7 @@ async def disable_segment(segment_id: int, userinfo: TokenData = Depends(get_cur
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('disable_segment: %s desc: Current user id %s',
+        logger.exception('disable_segment: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -323,7 +324,7 @@ async def delete_document(document_id: int, userinfo: TokenData = Depends(get_cu
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('delete_document: %s desc: Current user id %s',
+        logger.exception('delete_document: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -359,7 +360,7 @@ async def delete_dataset(app_id: int, userinfo: TokenData = Depends(get_current_
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('delete_dataset: %s desc: Current user id %s',
+        logger.exception('delete_dataset: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -442,7 +443,7 @@ async def documents_list(
         return response_success(response, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('documents_list: %s desc: Current user id %s',
+        logger.exception('documents_list: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -541,7 +542,7 @@ async def document_segments_list(
         return response_success(response, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('document_segments_list: %s desc: Current user id %s',
+        logger.exception('document_segments_list: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -579,7 +580,7 @@ async def disable_document(documents_id: int, userinfo: TokenData = Depends(get_
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('disable_document: %s desc: Current user id %s',
+        logger.exception('disable_document: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -618,7 +619,7 @@ async def enable_document(documents_id: int, userinfo: TokenData = Depends(get_c
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('enable_document: %s desc: Current user id %s',
+        logger.exception('enable_document: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -658,7 +659,7 @@ async def archive_document(document_id: int, userinfo: TokenData = Depends(get_c
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('archive_document: %s desc: Current user id %s',
+        logger.exception('archive_document: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -699,7 +700,7 @@ async def cancel_archive_document(document_id: int, userinfo: TokenData = Depend
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('cancel_archive_document: %s desc: Current user id %s',
+        logger.exception('cancel_archive_document: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -753,7 +754,7 @@ async def dataset_set(
         return response_success({}, get_language_content("api_vector_success"))
     except Exception as e:
         msg = str(e)
-        logger.info('dataset_set: %s desc: Current user id %s', msg, user_id)
+        logger.exception('dataset_set: %s desc: Current user id %s', msg, user_id)
         return response_error(msg)
 
 
@@ -807,7 +808,7 @@ async def retrieval_test(
 
     except Exception as e:
         msg = str(e)
-        logger.info('recall_test: %s desc: Current user id %s',
+        logger.exception('recall_test: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -868,7 +869,7 @@ async def retrieval_history_list(
 
     except Exception as e:
         msg = str(e)
-        logger.info('retrieval_history: %s desc: Current user id %s',
+        logger.exception('retrieval_history: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
 
@@ -946,6 +947,6 @@ async def retrieval_history_detail(
 
     except Exception as e:
         msg = str(e)
-        logger.info('recall_test: %s desc: Current user id %s',
+        logger.exception('recall_test: %s desc: Current user id %s',
                     msg, user_id)
         return response_error(msg)
