@@ -7,6 +7,7 @@ import { throttle } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'umi';
 import Agent from './selectApp';
+import ChatAvatar from '@/components/ChatAvatar';
 const { TextArea } = Input;
 interface CreationChatRoom {
     show?: any;
@@ -356,19 +357,22 @@ const ChatroomDetial: React.FC<CreationChatRoom> = param => {
                                                                 <div
                                                                     className={`bg-[#fff] flex gap-x-[20px] p-[10px] cursor-pointer border-solid border-[1px] rounded-[4px] border-[#eee]`}
                                                                 >
-                                                                    <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] relative flex items-center justify-center shrink-0">
-                                                                        <img
+                                                                    <ChatAvatar data={item} imgWidth={'20px'}/>
+                                                                    {/* <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] relative flex items-center justify-center shrink-0">
+                                                                        {/* <img
                                                                             src={headportrait(
                                                                                 'single',
                                                                                 item.icon,
                                                                             )}
                                                                             alt=""
                                                                             className="w-[20px]  h-[20px]"
-                                                                        />
+                                                                        /> */}
+                                                                        
+
                                                                         {/* <div className='w-[16px]  h-[16px] bg-[#fff] absolute bottom-[-2px] right-[-2px]'>
                                                                                 <img src="/icons/robot_icon.svg" alt="" className='w-[12px]  h-[12px]'/>
                                                                             </div> */}
-                                                                    </div>
+                                                                            
                                                                     <div className="flex flex-col gap-y-[5px] justify-center flex-1 min-w-[0]">
                                                                         <div className="text-[#213044] text-[12px] font-[500] w-full truncate">
                                                                             {item.name}

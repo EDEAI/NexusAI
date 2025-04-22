@@ -18,6 +18,7 @@ class WorkflowProcessLog(BaseModel):
     total_steps: Optional[int] = None
     icon_background: Optional[str] = None
     icon: Optional[str] = None
+    avatar: Optional[str] = None
     chat_room_name: Optional[str] = None
     nickname: Optional[str] = None
     file_list: Optional[List[Dict[str, Any]]] = None
@@ -42,6 +43,7 @@ class ResWorkspaceWorkflowProcessLogSchema(BaseModel):
 class WorkspaceList(BaseModel):
     app_id: Optional[int] = None
     name: Optional[str] = None
+    avatar: Optional[str] = None
     process_name: Optional[str] = None
     type: Optional[int] = None
     chatroom_id: Optional[int] = None

@@ -1,6 +1,7 @@
 // import Scroll from '@/components/InfiniteScroll';
 import { roomDetails, roomRecent, upAgentStatus, updataRoom, upRoomStatus } from '@/api/plaza';
 import { headportrait } from '@/utils/useUser';
+import Avatar from '@/components/ChatAvatar';
 import { ArrowLeftOutlined, EllipsisOutlined, QuestionCircleOutlined,ExclamationCircleFilled } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Empty, Spin, Switch, Tooltip,Modal,message} from 'antd';
@@ -281,7 +282,7 @@ const Sider: React.FC<siderPm> = porpos => {
                                                         key={i.agent_id}
                                                     >
                                                         <div className="flex gap-x-[15px] flex-1 min-w-[0]">
-                                                            <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
+                                                            {/* <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
                                                                 <img
                                                                     src={headportrait(
                                                                         'single',
@@ -290,7 +291,8 @@ const Sider: React.FC<siderPm> = porpos => {
                                                                     alt=""
                                                                     className="w-[18px]  h-[18px]"
                                                                 />
-                                                            </div>
+                                                            </div> */}
+                                                            <Avatar data={i}/>
                                                             <div className="flex flex-col gap-y-[5px] justify-center flex-1 min-w-[0]">
                                                                 <span className="text-[#213044] text-[12px] font-[500] truncate w-full">
                                                                     {i.name}
@@ -440,7 +442,7 @@ const Sider: React.FC<siderPm> = porpos => {
                                                                             className="flex"
                                                                             key={index}
                                                                         >
-                                                                            <div className="w-[30px] h-[30px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center">
+                                                                            {/* <div className="w-[30px] h-[30px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center">
                                                                                 <img
                                                                                     src={headportrait(
                                                                                         'single',
@@ -449,7 +451,8 @@ const Sider: React.FC<siderPm> = porpos => {
                                                                                     alt=""
                                                                                     className="w-[18px]  h-[18px]"
                                                                                 />
-                                                                            </div>
+                                                                            </div> */}
+                                                                            <Avatar data={i} width={'30px'}/>
                                                                         </div>
                                                                     ),
                                                                 )}

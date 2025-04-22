@@ -1102,10 +1102,11 @@ async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = 
         ],
         conditions=[
             {"column": "app_runs.app_id", "value": app_id},
-            {"column": "app_runs.user_id", "value": userinfo.uid},
+            # {"column": "app_runs.user_id", "value": userinfo.uid},
             {"column": "app_runs.id", "value": app_run_id},
             {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]}
         ]
+        
     )
 
     if 'status' in result:

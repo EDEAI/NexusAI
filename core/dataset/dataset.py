@@ -1,16 +1,19 @@
+import base64
 import json
 import re
 
 from datetime import datetime
 from pathlib import Path
 from time import monotonic
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
+from uuid import uuid4
 
 import tiktoken
 
 from langchain_core.documents import Document
 from langchain_core.runnables import chain, Runnable
 from langchain_core.runnables.utils import Input, Output
+from markitdown import MarkItDown
 
 from config import enable_reranking_on_single_retrival, settings
 from core.database.models import (
@@ -50,6 +53,8 @@ models = Models()
 rag_records = RagRecords()
 upload_files = UploadFiles()
 users = Users()
+
+md = MarkItDown(enable_plugins=False)
 
 all_embeddings = {}
 all_rerankers = {}
@@ -163,6 +168,89 @@ class DatasetManagement:
         return dl.load_and_split(text_splitter=ts)
 
     @classmethod
+    def process_document_with_files(
+        cls,
+        file_path: str,
+        user_id: int,
+        keep_data_uris: bool = True
+    ) -> str:
+        '''
+        Process a document using markitdown and handle embedded files.
+        
+        :param file_path: Path to the document file
+        :param user_id: ID of the user processing the document
+        :param keep_data_uris: Whether to keep data URIs for embedded files
+        :return: Processed markdown text with file references
+        '''
+
+        # Initialize markitdown
+        md = MarkItDown(enable_plugins=False)
+        
+        # Convert document to markdown
+        markdown_text = md.convert(file_path, keep_data_uris=keep_data_uris).text_content
+        
+        if not keep_data_uris:
+            return markdown_text
+            
+        # Create upload_files directory structure
+        current_time = datetime.now()
+
+        today_path = project_root.joinpath(
+            'upload_files',
+            str(current_time.year),
+            str(current_time.month),
+            str(current_time.day)
+        )
+        today_path.mkdir(parents=True, exist_ok=True)
+        
+        # Find all base64 encoded files
+        file_pattern = r'!\[.*?\]\(data:([^/]+)/([^;]+);base64,(.+?)\)'
+        file_matches = re.finditer(file_pattern, markdown_text)
+        
+        # Process each file
+        for match in file_matches:
+            mime_type = f"{match.group(1)}/{match.group(2)}"
+            file_type = match.group(2)
+            base64_data = match.group(3)
+
+            if mime_type == 'image/x-emf':
+                file_type = 'emf'
+            
+            # Generate unique filename
+            timestamp = current_time.strftime('%Y%m%d%H%M%S%f')
+            filename = f'file_{timestamp}'
+            file_path_obj = today_path / f'{uuid4().hex}.{file_type}'
+            
+            # Save file
+            with file_path_obj.open('wb') as f:
+                f.write(base64.b64decode(base64_data))
+            
+            # Get file size
+            file_size = file_path_obj.stat().st_size
+            
+            # Insert into database
+            relative_path = str(file_path_obj.relative_to(project_root)).replace("\\", "/")
+            upload_files.insert_file(
+                user_id=user_id,
+                name=filename,
+                path=relative_path,
+                size=file_size,
+                extension=f'.{file_type}',
+                mime_type=mime_type
+            )
+            
+            # Replace base64 with path in markdown (only once)
+            file_path_relative_to_upload_files = file_path_obj.relative_to(project_root / 'upload_files')
+            file_path_str = f"{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}"
+            markdown_text = markdown_text.replace(
+                match.group(0),
+                f'![{relative_path}]({file_path_str})',
+                1  # Only replace the first occurrence
+            )
+        
+        return markdown_text
+
+    @classmethod
     def get_num_tokens(
         cls, team_id: int, segments: List[Document]
     ) -> Tuple[int, float, str]:
@@ -223,6 +311,7 @@ class DatasetManagement:
     @classmethod
     def add_document_to_dataset(
         cls,
+        user_id: int,
         document_id: int,
         dataset_id: int,
         process_rule_id: int,
@@ -236,26 +325,33 @@ class DatasetManagement:
         
         Return: Tuple of (total_word_count, total_num_tokens, indexing_latency)
         '''
-        def get_text_splitter(is_json) -> TextSplitter:
+        def get_text_splitter(document_type: Literal['markdown', 'text', 'json']) -> TextSplitter:
             process_rule = DatasetProcessRules().get_process_rule_by_id(process_rule_id)
-            # if is_json:
+            # if document_type == 'json':
             #     type_ = 'RecursiveJsonSplitter'
             #     config = {'max_chunk_size': process_rule['config']['chunk_size']}
             # else:
-            type_, config = convert_to_type_and_config(process_rule['config'])
+            if document_type == 'markdown':
+                type_ = 'ExperimentalMarkdownSyntaxTextSplitter'
+                config = {'strip_headers': False}
+            else:
+                type_, config = convert_to_type_and_config(process_rule['config'])
             return TextSplitter(text_splitter_type=type_, **config)
         
         dataset = datasets.get_dataset_by_id(dataset_id, check_is_reindexing=True)
         collection_name = dataset['collection_name']
         embeddings_config_id = dataset['embedding_model_config_id']
         _, vdb = get_embeddings_and_vector_database(embeddings_config_id, collection_name)
-        ts = get_text_splitter(is_json=is_json)
         if file_path:
-            dl = DocumentLoader(file_path=file_path)
-            segments = dl.load_and_split(text_splitter=ts)
+            # dl = DocumentLoader(file_path=file_path)
+            # segments = dl.load_and_split(text_splitter=ts)
+            ts = get_text_splitter(document_type='markdown')
+            text = cls.process_document_with_files(file_path, user_id)
+            segments = ts.create_documents([text], [{'source': file_path}])
         elif text:
             if is_json:
                 try:
+                    ts = get_text_splitter(document_type='json')
                     text_obj = json.loads(text)
                     segments = ts.create_documents(
                         [text_obj],
@@ -263,9 +359,10 @@ class DatasetManagement:
                         ensure_ascii=False
                     )
                 except:
-                    ts = get_text_splitter(is_json=False)
+                    ts = get_text_splitter(document_type='text')
                     segments = ts.create_documents([text], [{'source': source}])
             else:
+                ts = get_text_splitter(document_type='text')
                 segments = ts.create_documents([text], [{'source': source}])
         else:
             raise ValueError('Either file_path or text must be provided!')
@@ -273,6 +370,11 @@ class DatasetManagement:
         total_num_tokens = 0
         overall_indexing_start_time = monotonic()
         for segment in segments:
+            if not segment.metadata:
+                segment.metadata = {}
+            if 'source' not in segment.metadata:
+                segment.metadata['source'] = source
+            source = segment.metadata['source']
             page_content = segment.page_content
             word_count = len(page_content)
             total_word_count += word_count

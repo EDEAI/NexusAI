@@ -115,6 +115,11 @@ export default {
     'workflow.uploadFileErrorText': 'Uploaded files cannot exceed 15MB',
     'workflow.uploadFileDes':
         'ReviseSupported formats: TXT, MARKDOWN, PDF, HTML, XLSX, XLS, DOCX, CSV,JPG,PNG,JPEG, Each file should not exceed 15MB.',
+    'workflow.uploadFileErrorType': 'Please upload image files only',
+    'workflow.uploadAvatar': 'Upload Avatar',
+    'workflow.cropAvatar': 'Crop Avatar',
+    'workflow.uploadSuccess': 'Upload successful',
+    'workflow.uploadError': 'Upload failed',
     'workflow.label.variable': 'Variable',
     'workflow.title.runWorkflow': 'Run Workflow',
     'workflow.button.run': 'Run',

@@ -2,7 +2,7 @@
  * @LastEditors: biz
  */
 import { useReactFlow } from '@xyflow/react';
-import dagre from 'dagre';
+import * as dagre from 'dagre';
 import { AppNode } from '../types';
 
 const NODE_WIDTH = 200;

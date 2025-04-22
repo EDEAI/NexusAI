@@ -226,6 +226,7 @@ const Creation: React.FC = () => {
             mode: CardData.mode,
             icon: CardData.id ? JSON.stringify(CardData.id) : CardData.icon,
             icon_background: '',
+            avatar:CardData?.avatar||null
         };
 
         let res = await PutappsUpdate(param);
@@ -397,7 +398,7 @@ const Creation: React.FC = () => {
                                       onClick={() => {
                                           appModalChange(item);
                                       }}
-                                      className="flex justify-center items-center h-8 rounded-lg mr-4 cursor-pointer hover:bg-white px-[10px]"
+                                      className="flex justify-center items-center h-8 rounded-lg mr-4 cursor-pointer px-[10px]"
                                       style={
                                           creationsearchdata('GET').optionsModalId == item.apps_mode
                                               ? { color: '#1B64F3', backgroundColor: '#ffffff' }
@@ -528,6 +529,7 @@ const Creation: React.FC = () => {
                                                                                   'single',
                                                                                   item.icon,
                                                                               )}
+                                                                              avatar={item.avatar}
                                                                               icon={
                                                                                   creationsearchdata(
                                                                                       'GET',
@@ -693,7 +695,7 @@ const Creation: React.FC = () => {
                                                                               )}
                                                                               maxTagCount="responsive"
                                                                               onChange={e => {}}
-                                                                          
+
                                                                               style={{
                                                                                   width: '100%',
                                                                               }}
@@ -758,7 +760,7 @@ const Creation: React.FC = () => {
                                                                   <Popover
                                                                       placement="bottomLeft"
                                                                       content={
-                                                                          <div className=" overflow-auto max-h-[300px]">
+                                                                          <div className=" overflow-auto">
                                                                               {item.list.map(
                                                                                   (
                                                                                       value: any,

@@ -1,10 +1,11 @@
-import { delChatroom, getChatroom, upRoomStatus } from '@/api/plaza';
+import { delChatroom, getChatroom } from '@/api/plaza';
+import Headportrait from '@/components/headportrait';
 import Scroll from '@/components/InfiniteScroll';
 import { headportrait } from '@/utils/useUser';
 import { EllipsisOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
-import { Col, Dropdown, Empty, message, Modal, Row, Spin, Button } from 'antd';
+import { Button, Col, Dropdown, Empty, message, Modal, Row, Spin } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 import CreationChatRoom from '../components/CreationChatRoom/index';
@@ -48,7 +49,7 @@ const Operation = ({ item, resetList, setCreateShow, isUpdataChatRoom, upDataId,
             },
         });
     };
-// Delete room
+    // Delete room
     const delRoom = async () => {
         let res = await delChatroom({
             id: item.chatroom_id,
@@ -63,13 +64,13 @@ const Operation = ({ item, resetList, setCreateShow, isUpdataChatRoom, upDataId,
             resetList(item.chatroom_id);
         }
     };
-// Edit room
+    // Edit room
     const editRoom = async () => {
         setCreateShow(true);
         isUpdataChatRoom.current = true;
         upDataId.current = item.chatroom_id;
     };
-// Menu options
+    // Menu options
     const items: MenuProps['items'] = [
         {
             key: '1',
@@ -250,7 +251,9 @@ const MeetingCont = () => {
                                 intl={intl}
                                 upDataId={upDataId}
                             ></AddRoom>
-                        ):<></>}
+                        ) : (
+                            <></>
+                        )}
                         {meeting && meeting.list.length ? (
                             meeting.list.map((item: any, index: number) => (
                                 <Col
@@ -276,6 +279,12 @@ const MeetingCont = () => {
                                             }}
                                         >
                                             <div className="flex pt-[20px] pb-[15px] px-[20px] text-[#213044] text-[14px] font-[500] gap-x-[6px]">
+                                                <Headportrait
+                                                    avatar={item.avatar}
+                                                    Image={headportrait('single', item.icon)}
+                                                    icon={item.icon}
+                                                ></Headportrait>
+
                                                 <span className="flex-1 min-w-[0px] truncate">
                                                     {item.name}
                                                 </span>
@@ -310,9 +319,12 @@ const MeetingCont = () => {
                                                     <div style={{ borderBottom: '1px solid #eee' }}>
                                                         {
                                                             <div className="text-[#666666] text-[12px] font-[400] w-full truncate min-h-[14px]">
-                                                               { item.description ? item.description : <></>}
-                                                           </div>
-                                                          
+                                                                {item.description ? (
+                                                                    item.description
+                                                                ) : (
+                                                                    <></>
+                                                                )}
+                                                            </div>
                                                         }
                                                         <div className="py-[20px] h-[115px] overflow-hidden">
                                                             {item.agent_list &&
@@ -401,30 +413,36 @@ const MeetingCont = () => {
                                     >
                                         <Spin size="large" />
                                     </div>
-                                ):<>
-                                    <div className='w-full flex items-center flex-wrap justify-center mt-48'>
-                                        <div className="w-full flex items-center justify-center mb-2.5">
-                                            <img src="/icons/default.svg" alt="" />
-                                        </div>    
-                                        <div className="w-full text-center mb-3 text-[#666] text-sm">
-                                            {intl.formatMessage({ id: 'creation.margindescribe' })} ~
+                                ) : (
+                                    <>
+                                        <div className="w-full flex items-center flex-wrap justify-center mt-48">
+                                            <div className="w-full flex items-center justify-center mb-2.5">
+                                                <img src="/icons/default.svg" alt="" />
+                                            </div>
+                                            <div className="w-full text-center mb-3 text-[#666] text-sm">
+                                                {intl.formatMessage({
+                                                    id: 'creation.margindescribe',
+                                                })}{' '}
+                                                ~
+                                            </div>
+                                            <div className="w-full text-center">
+                                                {' '}
+                                                <Button
+                                                    color="primary"
+                                                    onClick={() => {
+                                                        setCreateShow(true);
+                                                        isUpdataChatRoom.current = false;
+                                                        upDataId.current = 0;
+                                                    }}
+                                                >
+                                                    {intl.formatMessage({
+                                                        id: 'app.chatroom_list.create',
+                                                    })}
+                                                </Button>{' '}
+                                            </div>
                                         </div>
-                                        <div className="w-full text-center">
-                                            {' '}
-                                            <Button
-                                                color="primary"
-                                                onClick={() => {
-                                                    setCreateShow(true);
-                                                    isUpdataChatRoom.current = false;
-                                                    upDataId.current = 0;
-                                                }}
-                                            >
-                                                {intl.formatMessage({ id: 'app.chatroom_list.create' })}
-                                            </Button>{' '}
-                                        </div>
-                                    </div>                                
-                                
-                                </>}
+                                    </>
+                                )}
                             </>
                         )}
                         {createShow ? (

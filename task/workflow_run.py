@@ -764,10 +764,6 @@ def task_callback_thread():
                             # Create input variable from input dictionary
                             input = create_variable_from_dict(inputs)
                             target_node.data['input'] = input  # Update target node with input variable
-                        if outputs_in_context:
-                            # Create output variable from result dictionary
-                            output_in_context = create_variable_from_dict(outputs_in_context)
-                            target_node.data['output_in_context'] = output_in_context  # Update target node with output variable
                         if outputs:
                             # Create output variable from result dictionary
                             output = create_variable_from_dict(outputs)
@@ -805,6 +801,8 @@ def task_callback_thread():
                             app_run_data['outputs'] = outputs
                             app_run_data['status'] = 3  # Status indicating the app run has completed successfully
                             app_run_data['finished_time'] = current_time
+                            # Set completed_steps to total_steps when workflow ends
+                            app_run_data['completed_steps'] = run['total_steps']
                             redis.lpush(f'app_run_{app_run_id}_result', json.dumps({'status': 'success', 'data': outputs}))
                             redis.expire(f'app_run_{app_run_id}_result', 1)
                         elif run['status'] == 2 and len(level_tasks[app_run_id][level]) == 1:  # Check if all tasks for the level have completed

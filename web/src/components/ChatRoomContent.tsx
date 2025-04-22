@@ -2,6 +2,7 @@ import useWebSocketManager from '@//hooks/useSocket';
 import { getRoomMessage } from '@/api/plaza';
 import useChatroomStore from '@/store/chatroomstate';
 import { headportrait, userinfodata } from '@/utils/useUser';
+import Avatar from '@/components/ChatAvatar';
 import {
     ArrowDownOutlined,
     FileDoneOutlined,
@@ -500,7 +501,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                     }`}
                 >
                     {/* <div className='h-[30px]'><Avatar size={30} className='bg-[#ddd]' icon={currentMessage.icon?currentMessage.icon:<UserOutlined />}/></div> */}
-                    <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
+                    {/*<div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
                         {currentMessage.is_agent == 1 ? (
                             <img
                                 src={headportrait('single', currentMessage.icon)}
@@ -510,7 +511,12 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                         ) : (
                             <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
                         )}
-                    </div>
+                    </div>*/}
+                    {currentMessage.is_agent == 1 ? (
+                        <Avatar data={currentMessage} />
+                    ):(
+                        <Avatar data={{avatar:"/icons/user_header.svg"}}/>
+                    )}
                     <div className="flex1 max-w-[560px] text-right" id={`addcontent`}>
                         <div
                             className={`${
@@ -605,7 +611,7 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                         }`}
                     >
                         {/* <div className='h-[30px]'><Avatar size={30} className='bg-[#ddd]' icon={item.icon?item.icon:<UserOutlined />}/></div> */}
-                        <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
+                        {/*<div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
                             {item.is_agent == 1 ? (
                                 <img
                                     src={headportrait('single', item.icon)}
@@ -615,7 +621,12 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                             ) : (
                                 <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
                             )}
-                        </div>
+                        </div>*/}
+                         {item.is_agent == 1 ? (
+                                <Avatar data={item}/>
+                            ):(
+                                <Avatar data={{avatar:"/icons/user_header.svg"}}/>
+                         )}
                         <div
                             className="flex1 max-w-[560px] text-right"
                             id={`currentContent${index}`}
@@ -828,7 +839,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                 item.is_agent != 1 ? 'flex-row-reverse' : ''
                                             }`}
                                         >
-                                            <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
+                                            {/* <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
                                                 {item.is_agent == 1 ? (
                                                     <img
                                                         src={headportrait('single', item.icon)}
@@ -841,7 +852,12 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                         className="w-[18px]  h-[18px]"
                                                     />
                                                 )}
-                                            </div>
+                                            </div> */}
+                                            {item.is_agent == 1 ? (
+                                                    <Avatar data={item}/>
+                                                ):(
+                                                    <Avatar data={{avatar:"/icons/user_header.svg"}}/>
+                                            )}
                                             <div
                                                 className="flex1 max-w-[560px] text-right"
                                                 id={`content${index}`}

@@ -185,6 +185,7 @@ export default memo(() => {
                 <div className="ml-5">
                     <Headportrait
                         Image={headportrait('single', item.icon)}
+                        avatar={item.avatar}
                         // icon={`/icons/creation/${WORKFLOW_ICON.WorkFlow}.svg`}
                     ></Headportrait>
                 </div>

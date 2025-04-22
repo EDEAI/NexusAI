@@ -55,10 +55,11 @@ const skillFourthly: React.FC<ChildProps> = ({
                 const variable = new SkillVariable(
                     item.name,
                     item.type,
-                    item.type == 'string' ? item.value : Number(item.value),
+                    item.type == 'string' ? item.value : (item.type == 'number' ? Number(item.value) : item.value),
                     item.content,
                     item.status,
                 );
+                debugger
                 input_variables.addProperty(item.name, variable);
             });
             const param = {
@@ -92,28 +93,7 @@ const skillFourthly: React.FC<ChildProps> = ({
         location.reload();
     };
 
-    const handleSaveOutline = async (outlineData: any) => {
-        try {
-            const response = await fetch(`/api/novel/${novelId}/outline`, {
-                method: 'POST',  // 改用 POST 方法
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(outlineData)
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            message.success('保存成功');
-        } catch (error) {
-            console.error('Error saving outline:', error);
-            message.error('保存失败');
-        }
-    };
-
+   
     return (
         <div style={{ height: '100%' }}>
             <div className="flex align-center justify-between mt-[30px]">

@@ -6,10 +6,10 @@ from base64 import b64encode
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple, Union, Optional
 
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage
 
 from .prompt import Prompt
-from core.workflow.variables import create_variable_from_dict, Variable
+from core.workflow.variables import create_variable_from_dict, Variable, ArrayVariable
 
 
 project_root = Path(__file__).absolute().parent.parent.parent
@@ -25,11 +25,14 @@ class Messages:
         """
         Initializes a Messages object with an optional list of messages.
         """
-        self.messages: List[Tuple[str, Variable]] = []
+        self.messages: List[Tuple[str, Union[Variable, ArrayVariable]]] = []
         
-    def _get_human_message_from_file_variable(self, file: Variable) -> Union[HumanMessage, Tuple[str, str]]:
+    def convert_file_to_message_content(self, file: Variable) -> Dict:
         """
-        Gets a HumanMessage object from a file variable.
+        Converts a file variable to a message content dictionary.
+        
+        :param file: Variable, the file variable containing image information.
+        :return: Dict, a dictionary representing the image content for LangChain format.
         """
         from core.database.models import UploadFiles
         
@@ -56,15 +59,11 @@ class Messages:
                 raise ValueError(f"Unsupported file type: {file_path.suffix}")
             mime_subtype = suffix_to_mime_subtype[file_path.suffix]
             image_data = b64encode(file_path.read_bytes()).decode("utf-8")
-            return HumanMessage(
-                content=[
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/{mime_subtype};base64,{image_data}"},
-                    }
-                ],
-            )
-        return ("human", "")
+            return {
+                "type": "image_url",
+                "image_url": {"url": f"data:image/{mime_subtype};base64,{image_data}"},
+            }
+        raise ValueError("File variable has no value")
 
     def add_system_message(self, system_message: Variable) -> None:
         """
@@ -85,16 +84,18 @@ class Messages:
         if prompt.user:
             self.messages.append(("human", Variable(name="user", type="string", value=str(prompt.user.value))))
             
-    def add_human_message(self, human_message: Variable, type: str = "string") -> None:
+    def add_human_message(self, human_message: Union[Variable, ArrayVariable]) -> None:
         """
         Adds a human message to the list of messages.
 
-        :param message: Variable, the human message to add.
+        :param human_message: Union[Variable, ArrayVariable], the human message to add.
         """
-        if type == "file":
+        if isinstance(human_message, ArrayVariable):
             variable = deepcopy(human_message)
+            variable.name = "user"
         else:
-            variable = Variable(name="user", type=type, value=str(human_message.value))
+            variable = Variable(name="user", type="string", value=str(human_message.value))
+        
         self.messages.append(("human", variable))
             
     def add_ai_message(self, ai_message: Variable) -> None:
@@ -115,12 +116,20 @@ class Messages:
             return
         for role, message in self.messages:
             if role != "ai":
-                for var_name, var_value in variables.items():
-                    if message.type == "string":
+                if isinstance(message, Variable) and message.type == "string":
+                    for var_name, var_value in variables.items():
                         message.value = message.value.replace(
                             f'{{{var_name}}}',
                             str(var_value).replace('{', '{{').replace('}', '}}')
                         )
+                elif isinstance(message, ArrayVariable):
+                    for var in message.values:
+                        if var.type == "string":
+                            for var_name, var_value in variables.items():
+                                var.value = var.value.replace(
+                                    f'{{{var_name}}}',
+                                    str(var_value).replace('{', '{{').replace('}', '}}')
+                                )
     
     def to_langchain_format(
         self,
@@ -132,7 +141,7 @@ class Messages:
         """
         Converts the Messages object to a list of tuples in the LangChain format, respecting the maximum rounds limit.
         
-        :return: list, a list of tuples in the LangChain format.
+        :return: list, a list of tuples or message objects in the LangChain format.
         """
         rounds = 0
         result = []
@@ -141,30 +150,71 @@ class Messages:
                 rounds += 1
                 if restrict_max_rounds and rounds > HISTORY_MESSAGES_MAX_ROUNDS:
                     return result
-            if role == "human" and message.type == "file":
-                result.insert(0, self._get_human_message_from_file_variable(message))
+            
+            # Handle ArrayVariable for human messages
+            if role == "human" and isinstance(message, ArrayVariable):
+                content = []
+                text_content = ""
+                
+                # Process each variable in the array
+                for var in message.values:
+                    if var.type == "string":
+                        if input_variables:
+                            text_content += var.value.format(**input_variables) + "\n"
+                        else:
+                            text_content += var.value + "\n"
+                    elif var.type == "file" and getattr(var, "sub_type", None) == "image":
+                        content.append(self.convert_file_to_message_content(var))
+                
+                # Add text content if present
+                if text_content.strip():
+                    content.insert(0, {"type": "text", "text": text_content.strip()})
+                
+                # Create a HumanMessage object with multimodal content
+                if content:
+                    result.insert(0, HumanMessage(content=content))
             elif role == "system" and (supplier_name == "OpenAI" and model_name in ["o1-preview", "o1-mini"]):
                 # "o1-preview" and "o1-mini" does not support "developer" nor "system" messages.
-                for i, (role, result_message) in enumerate(result):
-                    if role == "human":
+                for i, item in enumerate(result):
+                    if isinstance(item, tuple) and item[0] == "human":
                         # Prepend the system message to the human message.
                         if input_variables:
-                            result[i] = ("human", f"{message.value.format(**input_variables)}\n{result_message}")
+                            result[i] = ("human", f"{message.value.format(**input_variables)}\n{item[1]}")
                         else:
-                            result[i] = ("human", f"{message.value}\n{result_message}")
+                            result[i] = ("human", f"{message.value}\n{item[1]}")
+                        break
+                    elif isinstance(item, HumanMessage):
+                        # For HumanMessage objects with content list
+                        content_list = item.content
+                        # Find text content if exists
+                        for j, content_item in enumerate(content_list):
+                            if content_item.get("type") == "text":
+                                if input_variables:
+                                    sys_message = message.value.format(**input_variables)
+                                else:
+                                    sys_message = message.value
+                                content_list[j]["text"] = f"{sys_message}\n{content_item['text']}"
+                                break
+                        else:
+                            # If no text content found, add it at the beginning
+                            if input_variables:
+                                sys_message = message.value.format(**input_variables)
+                            else:
+                                sys_message = message.value
+                            content_list.insert(0, {"type": "text", "text": sys_message})
                         break
             else:
-                if input_variables:
+                if input_variables and isinstance(message, Variable) and message.type == "string":
                     result.insert(0, (role, message.value.format(**input_variables)))
                 else:
                     result.insert(0, (role, message.value))
         return result
     
-    def serialize(self) -> List[Dict[str, Dict[str, str]]]:
+    def serialize(self) -> List[Tuple[str, Dict[str, Any]]]:
         """
         Serializes the Messages object to a list of dictionaries.
         
-        :return: list, a list of dictionaries.
+        :return: list, a list of tuples with role and message dictionary.
         """
         result = []
         for role, message in self.messages:
@@ -194,11 +244,11 @@ class Messages:
             self.messages.append(last_system_message)
         self.messages.extend(non_system_messages)
 
-def create_messages_from_serialized_format(serialized_data: List[Tuple[str, Dict[str, str]]]) -> Messages:
+def create_messages_from_serialized_format(serialized_data: List[Tuple[str, Dict[str, Any]]]) -> Messages:
     """
     Converts a list of dictionaries to a Messages object.
     
-    :param serialized_data: List[Dict[str, Dict[str, str]]], a list of dictionaries.
+    :param serialized_data: List[Tuple[str, Dict[str, Any]]], a list of tuples with role and message dictionary.
     :return: Messages, a Messages object containing the converted data.
     """
     messages = Messages()

@@ -23,7 +23,7 @@ export default memo(() => {
     const { autoLayout } = useAutoLayout();
     const [messageApi, contextHolder] = message.useMessage();
     const loadingWorkflowData = useStore(state => state.loadingWorkflowData);
-    
+
     const publish = async () => {
         await saveWorkFlow()
         const appId = searchParams.get('app_id');
@@ -74,7 +74,7 @@ export default memo(() => {
             URL.revokeObjectURL(url);
         });
     };
-    
+
     const handleAutoLayout = (direction: 'TB' | 'LR') => {
         autoLayout(direction);
         messageApi.open({
@@ -85,7 +85,7 @@ export default memo(() => {
             }),
         });
     };
-    
+
     const layoutMenuItems = [
         {
             key: 'TB',
@@ -98,7 +98,7 @@ export default memo(() => {
             onClick: () => handleAutoLayout('LR'),
         },
     ];
-    
+
     const props: UploadProps = {
         name: 'file',
         fileList: null,
@@ -123,9 +123,9 @@ export default memo(() => {
                         {intl.formatMessage({ id: 'workflow.save' })}
                     </Button>
                     {/* <Dropdown menu={{ items: layoutMenuItems }} placement="bottomRight">
-                        <Button 
-                            icon={<NodeIndexOutlined />} 
-                            type="dashed" 
+                        <Button
+                            icon={<NodeIndexOutlined />}
+                            type="dashed"
                             disabled={loadingWorkflowData}
                         >
                             {intl.formatMessage({ id: 'workflow.autoLayout', defaultMessage: 'Auto Layout' })}

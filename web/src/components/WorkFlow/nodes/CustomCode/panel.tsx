@@ -161,6 +161,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                     })}
                                     colSize={12}
                                     name="veriable"
+                                    filterFn={()=>true}
                                     node={node}
                                 ></SelectVariable>
                             </div>
