@@ -64,17 +64,6 @@ async def workflow_run(
 
         if not input_data:
             raise ValueError(get_language_content("input_data_required"))
-        
-        # Check if workflow exists without status conditions
-        basic_workflow = workflows_db.select_one(
-            columns=['id', 'user_id', 'graph', 'app_id', 'status', 'publish_status'],
-            conditions=[
-                {'column': 'app_id', 'value': app_id}
-            ]
-        )
-
-        if not basic_workflow:
-            raise ValueError("Workflow not found")
 
         # Get workflow with all conditions
         workflow = workflows_db.select_one(
@@ -87,11 +76,7 @@ async def workflow_run(
         )
 
         if not workflow:
-            if basic_workflow:
-                error_msg = f"Workflow found but with invalid status: status={basic_workflow.get('status')}, publish_status={basic_workflow.get('publish_status')}"
-                raise ValueError(error_msg)
-            else:
-                raise ValueError(f"No workflow found for app_id={app_id}")
+            raise ValueError(f"No workflow found for app_id={app_id}")
 
         # Validate graph and prepare input
         graph = create_graph_from_dict(workflow['graph'])
