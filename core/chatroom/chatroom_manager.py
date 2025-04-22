@@ -1,6 +1,7 @@
 import asyncio
 
 from datetime import datetime
+from pathlib import Path
 from time import time
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -17,17 +18,20 @@ from core.database.models import (
     ChatroomAgentRelation,
     ChatroomMessages,
     Chatrooms,
+    UploadFiles,
     Users
 )
 from languages import get_language_content
 from log import Logger
 
 
+project_root = Path(__file__).parent.parent.parent
 logger = Logger.get_logger('chatroom')
 
 app_runs = AppRuns()
 chatrooms = Chatrooms()
 chatroom_messages = ChatroomMessages()
+upload_files = UploadFiles()
 users = Users()
 
 
@@ -107,9 +111,23 @@ class ChatroomManager:
             user_message_id, topic = self._get_user_message_id_and_topic(chatroom_id)
         else:
             # Start a new chatroom
-
-            # TODO: format of file list to send to the client
-            await self._ws_manager.send_instruction(chatroom_id, 'WITHFILELIST', file_list)
+            file_name_list = []
+            for file_value in file_list:
+                if file_value:
+                    if isinstance(file_value, int):
+                        # Upload file ID
+                        file_data = upload_files.get_file_by_id(file_value)
+                        file_name = file_data['name'] + file_data['extension']
+                    elif isinstance(file_value, str):
+                        if file_value[0] == '/':
+                            file_value = file_value[1:]
+                        file_path = project_root.joinpath('storage').joinpath(file_value)
+                        file_name = file_path.name
+                    else:
+                        # This should never happen
+                        raise Exception('Unsupported value type!')
+                    file_name_list.append(file_name)
+            await self._ws_manager.send_instruction(chatroom_id, 'WITHFILELIST', file_name_list)
             await self._ws_manager.send_instruction(chatroom_id, 'CHAT', user_input)
             
             chatrooms.update(
