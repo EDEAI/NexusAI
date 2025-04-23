@@ -1,8 +1,9 @@
 {
     "mcpServers": {
         "skill_runner": {
-            "command": "python",
-            "args": ["/home/lhp/mcpNexusAI/NexusAI/mcp/server.py"],
+            // "command": "python",
+            // "args": ["/home/lhp/mcpNexusAI/NexusAI/mcp/server.py"],
+            "url": "http://localhost:9486/sse",
             "env": {}
         }
     }

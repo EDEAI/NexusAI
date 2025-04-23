@@ -34,7 +34,7 @@ workflows_db = Workflows()
 appRuns_db = AppRuns()
 appNodeUserRelation_db = AppNodeUserRelation()
 chatroomDrivenRecords_db = ChatroomDrivenRecords()
-mcp = FastMCP("skill_runner")
+mcp = FastMCP("skill_runner",port = 9486)
 
 @mcp.tool()
 async def workflow_run(
@@ -239,4 +239,4 @@ async def skill_run(skill_id: int, input_dict: Dict[str, Any], user_id: int, tea
 if __name__ == "__main__":
     # Initialize and run server
     print("Server starting...")
-    mcp.run(transport='stdio')
+    mcp.run(transport='sse')
