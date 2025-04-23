@@ -301,6 +301,7 @@ class AgentChatMessage(BaseModel):
     ability_id: Optional[int] = None
     input_dict: Optional[Dict[str, Any]] = None
     prompt: Optional[Dict[str, Any]] = None
+    file_list: Optional[List[Union[int, str]]] = None
 
 
 class ResAgentRunSchemaReturn(BaseModel):

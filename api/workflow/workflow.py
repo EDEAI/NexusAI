@@ -142,8 +142,6 @@ async def node_run(data: WorkflowsNodeRunSchema,
             if not node_data:
                 raise ValueError(get_language_content('executor_not_exist'))
         context = create_context_from_dict(data.context)
-        for record in context.records:
-            record['outputs'] = replace_documents_with_strvars_in_context(record['outputs'])
 
         inputs = data.inputs
         if inputs:

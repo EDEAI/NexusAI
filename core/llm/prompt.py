@@ -94,7 +94,7 @@ def replace_prompt_with_context(prompt: Prompt, context: Context, duplicate_brac
             for record in context.records:
                 if record['node_id'] == node_id:
                     # Check if the variable is a file type
-                    replace_value_in_variable(original_variable, record[source], node_id, source, var_name, duplicate_braces, False, file_variables)
+                    replace_value_in_variable(original_variable, record[source], node_id, source, var_name, duplicate_braces, True, file_variables)
                     break
 
     if prompt.system:
@@ -109,25 +109,36 @@ def replace_prompt_with_context(prompt: Prompt, context: Context, duplicate_brac
 def get_serialized_prompt_from_messages(messages: List[List[Union[str, Dict]]]) -> List[Dict[str, str]]:
     from core.database.models import UploadFiles
 
-    prompt_data = []
-    for message in messages:
-        message_var = message[1]
-        if message_var["type"] == "file":
-            message_value = ""
-            if var_value := message_var["value"]:
+    def get_var_value(var: Dict[str, Any]) -> str:
+        if var["type"] == "file":
+            value = ""
+            if var_value := var["value"]:
                 if isinstance(var_value, int):
                     # Upload file ID
                     file_data = UploadFiles().get_file_by_id(var_value)
-                    message_value = file_data['name'] + file_data['extension']
+                    value = file_data['name'] + file_data['extension']
                 elif isinstance(var_value, str):
                     if var_value[0] == '/':
                         var_value = var_value[1:]
                     file_path = project_root.joinpath('storage').joinpath(var_value)
-                    message_value = file_path.name
+                    value = file_path.name
                 else:
                     # This should never happen
                     raise Exception('Unsupported value type!')
         else:
-            message_value = message_var["value"]
-        prompt_data.append({message[0]: message_value})
+            value = var["value"]
+        return value
+    
+    prompt_data = []
+    for message in messages:
+        message_var = message[1]
+        if message_var["type"].startswith("array"):
+            message_values = []
+            for var in message_var["values"]:
+                message_value = get_var_value(var)
+                message_values.append(message_value)
+            prompt_data.append({message[0]: message_values})
+        else:
+            message_value = get_var_value(message_var)
+            prompt_data.append({message[0]: message_value})
     return prompt_data

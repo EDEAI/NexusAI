@@ -321,6 +321,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         override_rag_input: Optional[str] = None,
         override_dataset_id: Optional[int] = None,
         is_chat: bool = False,
+        override_file_list: Optional[List[Union[int, str]]] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -387,6 +388,16 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             context.add_node(level, current_node)
             
             file_list = replace_prompt_with_context(self.data['prompt'], context)
+            if override_file_list:
+                file_list = []
+                for index, file_var_value in enumerate(override_file_list):
+                    file_list.append(Variable(
+                        name=f"file_{index}",
+                        type="file",
+                        sub_type="image",
+                        value=file_var_value
+                    ))
+            
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
                 {'raw_user_prompt': self.data['prompt'].get_user()}
@@ -628,6 +639,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         data_source_run_id : Optional[int] = 0,
         override_rag_input: Optional[str] = None,
         override_dataset_id: Optional[int] = None,
+        override_file_list: Optional[List[Union[int, str]]] = None,
         **kwargs
     ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
@@ -695,6 +707,15 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             context.add_node(level, current_node)
             
             file_list = replace_prompt_with_context(self.data['prompt'], context)
+            if override_file_list:
+                file_list = []
+                for index, file_var_value in enumerate(override_file_list):
+                    file_list.append(Variable(
+                        name=f"file_{index}",
+                        type="file",
+                        sub_type="image",
+                        value=file_var_value
+                    ))
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
                 {'raw_user_prompt': self.data['prompt'].get_user()}

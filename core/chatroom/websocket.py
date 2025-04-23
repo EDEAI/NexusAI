@@ -47,7 +47,7 @@ class WebSocketManager:
         assert (user_id := payload.get('uid')), 'Invalid user ID'
         return user_id
             
-    def parse_instruction(self, instruction_str: str) -> Tuple[str, Optional[Union[int, str, bool]]]:
+    def parse_instruction(self, instruction_str: str) -> Tuple[str, Optional[Union[int, str, bool, List[Union[int, str]]]]]:
         try:
             cmd, data = json.loads(instruction_str)
             return cmd, data
@@ -76,7 +76,7 @@ class WebSocketManager:
         self,
         connection: WebSocketServerProtocol,
         cmd: str,
-        data: Optional[Union[int, str, bool]] = None
+        data: Optional[Union[int, str, bool, List[Union[int, str]]]] = None
     ):
         instruction = json.dumps([cmd, data], ensure_ascii=False)
         await connection.send(INSTRUCTION_TEMPLATE.format(instruction=instruction))
@@ -85,12 +85,12 @@ class WebSocketManager:
         self,
         connections: Iterable[WebSocketServerProtocol],
         cmd: str,
-        data: Optional[Union[int, str, bool]] = None
+        data: Optional[Union[int, str, bool, List[Union[int, str]]]] = None
     ):
         instruction = json.dumps([cmd, data], ensure_ascii=False)
         broadcast(connections, INSTRUCTION_TEMPLATE.format(instruction=instruction))
             
-    async def send_instruction(self, chatroom_id: int, cmd: str, data: Optional[Union[int, str, bool]] = None):
+    async def send_instruction(self, chatroom_id: int, cmd: str, data: Optional[Union[int, str, bool, List[Union[int, str]]]] = None):
         if connections := self._connections_by_chatroom_id.get(chatroom_id):
             await self.send_instruction_by_connections(connections, cmd, data)
             
