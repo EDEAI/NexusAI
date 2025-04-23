@@ -126,26 +126,27 @@ async def workflow_run(
         apps_db.commit()
 
         # Run workflow and wait for result
-        loop = asyncio.get_running_loop()
-        result = await loop.run_in_executor(
-            None,
-            redis_client.blpop,
-            [f'app_run_{app_run_id}_result'],
-            settings.APP_API_TIMEOUT
-        )
+        # loop = asyncio.get_running_loop()
+        # result = await loop.run_in_executor(
+        #     None,
+        #     redis_client.blpop,
+        #     [f'app_run_{app_run_id}_result'],
+        #     settings.APP_API_TIMEOUT
+        # )
         
-        if result is None:
-            raise ValueError('Timeout waiting for the workflow to complete')
+        # if result is None:
+        #     raise ValueError('Timeout waiting for the workflow to complete')
             
-        result = json.loads(result[1])
-        if result['status'] != 'success':
-            raise ValueError(result['message'])
+        # result = json.loads(result[1])
+        # if result['status'] != 'success':
+        #     raise ValueError(result['message'])
             
-        outputs = create_variable_from_dict(result['data'])
+        # outputs = create_variable_from_dict(result['data'])
         
-        return {
-            "outputs": flatten_variable_with_values(outputs)
-        }
+        # return {
+        #     "outputs": flatten_variable_with_values(outputs)
+        # }
+        return {'app_id': app_id, 'workflow_id': workflow['id'], 'app_run_id': app_run_id}
     except ValueError as e:
         raise ValueError(str(e))
     except Exception as e:
