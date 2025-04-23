@@ -43,8 +43,8 @@ const IconRenderer = memo(({ icon, title, typeBadge }: Pick<UserConProps, 'icon'
     const renderIcon = () => {
         if (icon?.startsWith('http:') || icon?.startsWith('https:')) {
             return (
-                <div className={baseClasses}>
-                    <img src={icon} className="w-full" alt={title} />
+                <div className={`${baseClasses} !p-0`}>
+                    <img src={icon} className="w-full rounded" alt={title} />
                     {typeBadge && <TypeBadge {...typeBadge} />}
                 </div>
             );

@@ -9,6 +9,7 @@ import { Button, Col, Dropdown, Empty, message, Modal, Row, Spin } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 import CreationChatRoom from '../components/CreationChatRoom/index';
+import ChatRoomAvatar from '@/components/ChatRoomAvatar';
 // import Menus from '../components/Menus/index';
 
 // Add new application
@@ -165,11 +166,17 @@ const MeetingCont = () => {
                 res.data.list = meeting.list.concat(res.data.list);
             }
             if (res.data.list && res.data.list.length) {
+             
                 res.data.list.forEach((item: any) => {
+                    item.old_agent_list=JSON.parse(JSON.stringify(item.agent_list||[]))
                     if (item.agent_list && item.agent_list.length) {
                         item.agent_list.length =
                             item.agent_list.length > 6 ? 6 : item.agent_list.length;
+                        item.old_agent_list.length =
+                            item.old_agent_list.length > 9 ? 9 : item.old_agent_list.length;
                     }
+
+
                 });
             }
             setMeeting(res.data);
@@ -279,12 +286,8 @@ const MeetingCont = () => {
                                             }}
                                         >
                                             <div className="flex pt-[20px] pb-[15px] px-[20px] text-[#213044] text-[14px] font-[500] gap-x-[6px]">
-                                                <Headportrait
-                                                    avatar={item.avatar}
-                                                    Image={headportrait('single', item.icon)}
-                                                    icon={item.icon}
-                                                ></Headportrait>
-
+                                                
+                                                <ChatRoomAvatar agentList={item.old_agent_list}></ChatRoomAvatar>
                                                 <span className="flex-1 min-w-[0px] truncate">
                                                     {item.name}
                                                 </span>
@@ -340,17 +343,16 @@ const MeetingCont = () => {
                                                                                 xxl={8}
                                                                             >
                                                                                 <div className="flex gap-x-[10px] items-center">
-                                                                                    <div className="w-[30px] h-[30px] shrink-0 flex items-center rounded-[6px] justify-center bg-[#F4F8F1]">
-                                                                                        {/* <img src="/icons/gandUp.svg" alt="" className='w-[18px]  h-[18px]'/> */}
-                                                                                        <img
-                                                                                            src={headportrait(
-                                                                                                'single',
-                                                                                                item.icon,
-                                                                                            )}
-                                                                                            alt=""
-                                                                                            className="w-[18px]  h-[18px]"
-                                                                                        />
-                                                                                    </div>
+                                                                                    <Headportrait
+                                                                                        Image={headportrait(
+                                                                                            'single',
+                                                                                            item.icon,
+                                                                                        )}
+                                                                                        size="30"
+                                                                                        avatar={
+                                                                                            item.avatar
+                                                                                        }
+                                                                                    ></Headportrait>
                                                                                     <div className="text-[#666] text-[12px] truncate">
                                                                                         {item.name}
                                                                                     </div>

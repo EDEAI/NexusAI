@@ -53,6 +53,7 @@ const CreationModal: React.FC<ChildProps> = ({
             mode: CreationType.apps_mode,
             description: DescribeValue,
             icon: JSON.stringify(PitchOnPhone.id),
+            avatar: PitchOnPhone.avatar||null,
             icon_background: '',
         }; /* || CreationType.apps_mode == 4 */
         if (CreationType.apps_mode == 2) {
