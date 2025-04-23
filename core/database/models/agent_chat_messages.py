@@ -4,6 +4,11 @@ from typing import List, Dict, Any
 
 from core.database import MySQL
 
+from core.database.models.upload_files import UploadFiles
+from pathlib import Path
+upload_files = UploadFiles()
+project_root = Path(__file__).parent.parent.parent
+
 
 class AgentChatMessages(MySQL):
     """
@@ -71,7 +76,7 @@ class AgentChatMessages(MySQL):
         if offset != 0:
             if total_count - (page * page_size) < 0:
                 message_list = self.select(
-                    columns=['id', 'user_id', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
+                    columns=['id', 'user_id', 'file_list', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
                     conditions=conditions,
                     limit=page_size,
                     offset=0,
@@ -79,7 +84,7 @@ class AgentChatMessages(MySQL):
                 )
             else:
                 message_list = self.select(
-                    columns=['id', 'user_id', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
+                    columns=['id', 'user_id', 'file_list', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
                     conditions=conditions,
                     limit=page_size,
                     offset=offset,
@@ -89,13 +94,31 @@ class AgentChatMessages(MySQL):
         if offset == 0:
             if total_count > 0:
                 message_list = self.select(
-                    columns=['id', 'user_id', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
+                    columns=['id', 'user_id', 'file_list', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
                     conditions=conditions,
                     limit=page_size,
                     offset=0,
                     order_by="id ASC",
                 )
-
+        if message_list:
+            for item in message_list:
+                item['file_name_list'] = []
+                if item['file_list']:
+                    for file_value in item['file_list']:
+                        if file_value:
+                            if isinstance(file_value, int):
+                                # Upload file ID
+                                file_data = upload_files.get_file_by_id(file_value)
+                                file_name = file_data['name'] + file_data['extension']
+                            elif isinstance(file_value, str):
+                                if file_value[0] == '/':
+                                    file_value = file_value[1:]
+                                file_path = project_root.joinpath('storage').joinpath(file_value)
+                                file_name = file_path.name
+                            else:
+                                # This should never happen
+                                raise Exception('Unsupported value type!')
+                            item['file_name_list'].append(file_name)
         return {
             "list": message_list,
             "total_count": total_count,
