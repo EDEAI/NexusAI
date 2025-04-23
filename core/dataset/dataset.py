@@ -232,7 +232,7 @@ class DatasetManagement:
             relative_path = str(file_path_obj.relative_to(project_root)).replace("\\", "/")
             upload_files.insert_file(
                 user_id=user_id,
-                name=filename,
+                name=file_path_obj.stem,
                 path=relative_path,
                 size=file_size,
                 extension=f'.{file_type}',

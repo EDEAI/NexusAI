@@ -16,12 +16,16 @@ from config import settings
 from core.database import redis
 
 import tiktoken
+from markitdown import MarkItDown
 from typing import List, Dict, Any, Callable, Union
 try:
     from anthropic import Anthropic
     ANTHROPIC_AVAILABLE = True
 except ImportError:
     ANTHROPIC_AVAILABLE = False
+
+project_root = Path(__file__).absolute().parent.parent.parent
+md = MarkItDown(enable_plugins=False)
 
 def convert_json_to_basic_types(data):
     """
@@ -284,3 +288,43 @@ def format_iso_time(dt: Union[datetime, None]) -> str:
         return dt.strftime('%Y-%m-%d %H:%M:%S')
     except Exception as e:
         return ""
+    
+def get_file_content_list(file_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    from core.database.models import UploadFiles
+    from core.document import DocumentLoader
+    
+    file_content_list = []
+    for file_var_value in file_list:
+        if file_var_value:
+            if isinstance(file_var_value, int):
+                # Upload file ID
+                file_id = file_var_value
+                file_data = UploadFiles().get_file_by_id(file_var_value)
+                file_path = project_root.joinpath(file_data['path'])
+                file_name = file_data['name'] + file_data['extension']
+            elif isinstance(file_var_value, str):
+                file_id = 0
+                if file_var_value[0] == '/':
+                    file_var_value = file_var_value[1:]
+                file_path = project_root.joinpath('storage').joinpath(file_var_value)
+                file_name = file_path.name
+            else:
+                # This should never happen
+                raise Exception('Unsupported value type!')
+            if file_path.suffix in ['.jpg', 'jpeg', '.png', '.gif', '.webp']:
+                # Use OCR for image files
+                file_type = 'image'
+                dl = DocumentLoader(file_path=str(file_path))
+                file_content = '\n'.join([doc.page_content for doc in dl.load()])
+            else:
+                # Use Markdown for document files
+                file_type = 'document'
+                file_content = md.convert(file_path).text_content
+            file_content_list.append({
+                'id': file_id,
+                'name': file_name,
+                'type': file_type,
+                'path': str(file_path),
+                'content': file_content
+            })
+    return file_content_list

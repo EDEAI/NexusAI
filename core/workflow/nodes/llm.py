@@ -2,7 +2,7 @@ import sys, json
 from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent.parent))
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from datetime import datetime
 from langchain_core.documents import Document
 
@@ -76,6 +76,7 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
         level: int = 0,
         task: Optional[Dict[str, RecursiveTaskCategory]] = None,
         correct_llm_output: bool = False,
+        override_file_list: Optional[List[Union[int, str]]] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -102,6 +103,16 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             file_list = None
             if context:
                 file_list = replace_prompt_with_context(prompt, context)
+            
+            if override_file_list:
+                file_list = []
+                for index, file_var_value in enumerate(override_file_list):
+                    file_list.append(Variable(
+                        name=f"file_{index}",
+                        type="file",
+                        sub_type="image",
+                        value=file_var_value
+                    ))
             
             # Escape braces in the prompt
             if system_prompt := prompt.get_system():

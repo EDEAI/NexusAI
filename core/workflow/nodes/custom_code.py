@@ -1,15 +1,15 @@
-from . import FileOutputBaseNode, SandboxBaseNode
+from . import SandboxBaseNode
 from typing import Dict, Optional, Any, List
 from datetime import datetime
 from ..context import Context, replace_variable_value_with_context
 import json
-from ..variables import Variable, ObjectVariable, validate_required_variable
+from ..variables import ObjectVariable, validate_required_variable
 from log import Logger
 
 
 logger = Logger.get_logger('celery-app')
 
-class CustomCodeNode(FileOutputBaseNode, SandboxBaseNode):
+class CustomCodeNode(SandboxBaseNode):
     """
     A node representing custom python3 code execution in a workflow.
     """
@@ -85,7 +85,7 @@ class CustomCodeNode(FileOutputBaseNode, SandboxBaseNode):
                     'status': 'failed',
                     'message': response['msg']
                 }
-            outputs_in_context = self.replace_documents_with_strvars_in_context(self.data['output'])
+            
             end_time = datetime.now()
             return {
                 'status': 'success',
@@ -94,8 +94,7 @@ class CustomCodeNode(FileOutputBaseNode, SandboxBaseNode):
                     'elapsed_time': end_time.timestamp() - start_time.timestamp(),
                     'inputs': input.to_dict(),
                     'output_type': 1,
-                    'outputs': self.data['output'].to_dict(),
-                    'outputs_in_context': outputs_in_context.to_dict()
+                    'outputs': self.data['output'].to_dict()
                 }
             }
         except Exception as e:

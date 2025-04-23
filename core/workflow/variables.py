@@ -1,10 +1,13 @@
 from typing import Union, List, Dict, Tuple, Any, Optional, Type
 from pathlib import Path
+
+from markitdown import MarkItDown
 from pydantic import BaseModel, Field, create_model
 import json
 
 
 project_root = Path(__file__).absolute().parent.parent.parent
+md = MarkItDown(enable_plugins=False)
 
 class Variable:
     """
@@ -328,8 +331,8 @@ def replace_value_in_variable(
     source: str,
     var_name: str,
     duplicate_braces: bool = False,
-    replace_type: bool = True,
-    file_list: Optional[List[Variable]] = None
+    is_prompt: bool = False,
+    image_list: Optional[List[Variable]] = None
 ):
     """
     Replaces the value of the original variable with the value from the context variable
@@ -342,23 +345,44 @@ def replace_value_in_variable(
     - source: The source of the variable value in the node (inputs|outputs).
     - var_name: The name of the variable whose value is to be replaced.
     - duplicate_braces: Whether to duplicate braces in the variable value.
-    - replace_type: Whether to replace the type of the original variable with the context variable's type.
+    - is_prompt: Whether the original variable is from a prompt.
+    - image_list: A list of image file variables to be passed to LLM.
 
     Returns:
     None. The function directly modifies the original_variable's value.
     """
+    from core.database.models import UploadFiles
+    
     if var_name == context_variable.name:
         if original_variable.type in ["string", "file", "json"]:
-            if context_variable.type == "file" and isinstance(file_list, List):
-                file_list.append(context_variable)
-            
-            if replace_type:
-                if context_variable.type in ["file", "json"]:
-                    original_variable.type = context_variable.type
-                original_variable.value = context_variable.value
-            else:
+            if is_prompt:
+                # Keep the original variable type and replace the variable placeholder with the context variable value
                 if context_variable.type == "file":
                     variable_string = ""
+                    if file_var_value := context_variable.value:
+                        if isinstance(file_var_value, int):
+                            # Upload file ID
+                            file_data = UploadFiles().get_file_by_id(file_var_value)
+                            file_path = project_root.joinpath(file_data['path'])
+                        elif isinstance(file_var_value, str):
+                            if file_var_value[0] == '/':
+                                file_var_value = file_var_value[1:]
+                            file_path = project_root.joinpath('storage').joinpath(file_var_value)
+                        else:
+                            # This should never happen
+                            raise Exception('Unsupported value type!')
+                        if file_path.suffix in ['.jpg', 'jpeg', '.png', '.gif', '.webp']:
+                            context_variable.sub_type = 'image'
+                            # Add the file variable to the image_list
+                            if isinstance(image_list, List):
+                                image_list.append(context_variable)
+                        else:
+                            # Use Markdown for document files
+                            variable_string = (
+                                f'\n******Start of {file_path.name}******\n'
+                                f'{md.convert(file_path).text_content}\n'
+                                f'******End of {file_path.name}******\n'
+                            )
                 else:
                     variable_string = context_variable.to_string()
                 if duplicate_braces:
@@ -367,6 +391,11 @@ def replace_value_in_variable(
                     f"<<{node_id}.{source}.{var_name}>>",
                     variable_string
                 )
+            else:
+                # Replace the type and value of the original variable with the context variable's
+                if context_variable.type in ["file", "json"]:
+                    original_variable.type = context_variable.type
+                original_variable.value = context_variable.value
         elif original_variable.type == "number":
             if context_variable.type == "number":
                 original_variable.value = context_variable.value
@@ -374,7 +403,7 @@ def replace_value_in_variable(
                 raise ValueError(f"Variable '{original_variable.name}' type '{original_variable.type}' does not match the replacement variable '{context_variable.name}' type '{context_variable.type}'")
     elif isinstance(context_variable, ArrayVariable) or isinstance(context_variable, ObjectVariable):
         for value in (context_variable.values if isinstance(context_variable, ArrayVariable) else context_variable.properties.values()):
-            replace_value_in_variable(original_variable, value, node_id, source, var_name, duplicate_braces, replace_type, file_list)
+            replace_value_in_variable(original_variable, value, node_id, source, var_name, duplicate_braces, is_prompt, image_list)
 
 def replace_value_in_variable_with_new_value(
     variable: Union[Variable, ArrayVariable, ObjectVariable],

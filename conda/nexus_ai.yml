@@ -86,6 +86,7 @@ dependencies:
   - supervisor=4.2.5
   - sympy=1.12
   - tbb=2021.8.0
+  - tesseract=5.2.0
   - tk=8.6.14
   - torchaudio=2.3.1
   - torchtriton=2.3.1
@@ -183,6 +184,7 @@ dependencies:
       - grpcio==1.63.0
       - grpcio-status==1.62.2
       - h11==0.14.0
+      - html5lib==1.1
       - httpcore==1.0.5
       - httplib2==0.22.0
       - httptools==0.6.1
@@ -267,6 +269,7 @@ dependencies:
       - pdfminer-six==20231228
       - pdfplumber==0.11.4
       - pexpect==4.9.0
+      - pi-heif==0.22.0
       - pickleshare==0.7.5
       - pikepdf==9.4.0
       - pillow-heif==0.20.0
@@ -315,7 +318,7 @@ dependencies:
       - python-magic==0.4.27
       - python-multipart==0.0.9
       - python-oxmsg==0.0.1
-      - python-pptx==0.6.23
+      - python-pptx==1.0.2
       - python3-xlib==0.15
       - pytweening==1.2.0
       - pytz==2024.1
@@ -362,9 +365,9 @@ dependencies:
       - typing-inspect==0.9.0
       - tzdata==2024.1
       - ujson==5.10.0
-      - unstructured==0.15.0
+      - unstructured[all-docs]==0.17.2
       - unstructured-client==0.25.1
-      - unstructured-inference==0.7.36
+      - unstructured-inference==0.8.10
       - unstructured-pytesseract==0.3.13
       - uritemplate==4.1.1
       - uvicorn==0.30.1

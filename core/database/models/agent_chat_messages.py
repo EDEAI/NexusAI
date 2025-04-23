@@ -1,5 +1,8 @@
-from core.database import MySQL
 import math
+
+from typing import List, Dict, Any
+
+from core.database import MySQL
 
 
 class AgentChatMessages(MySQL):
@@ -135,8 +138,20 @@ class AgentChatMessages(MySQL):
             {"column": "agent_id", "value": agent_id}
         ]
         messages = self.select(
-            columns=["message", "agent_run_id"],
+            columns=["id", "message", "agent_run_id", "file_list", "file_content_list"],
             conditions=conditions,
             order_by='id ASC'
         )
         return messages
+
+    def update_file_content_list_by_id(self, id_: int, file_content_list: List[Dict[str, Any]]):
+        """
+        Update the file content list for a message by its ID.
+
+        :param id_: The ID of the message to update.
+        :param file_content_list: The new file content list to set for the message.
+        """
+        self.update(
+            {"column": "id", "value": id_},
+            {"file_content_list": file_content_list}
+        )
