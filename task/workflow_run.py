@@ -755,7 +755,6 @@ def task_callback_thread():
                         inputs = result['data'].get('inputs', None)
                         task_id = result['data'].get('task_id', None)
                         outputs = result['data'].get('outputs', None)
-                        outputs_in_context = result['data'].get('outputs_in_context', None)
                         elapsed_time = float(result['data'].get('elapsed_time', 0))
                         prompt_tokens = result['data'].get('prompt_tokens', 0)
                         completion_tokens = result['data'].get('completion_tokens', 0)
@@ -783,7 +782,6 @@ def task_callback_thread():
                         need_human_confirm = 1 if target_node.data['type'] != 'human' and \
                             not (task_operation == 'assign_task' and task_id) and \
                             target_node.data.get('manual_confirmation', False) else 0
-                        result['data'].pop('outputs_in_context', None)
                         node_exec_data = {'status': 3, 'error': None, 'need_human_confirm': need_human_confirm, 'finished_time': current_time, **result['data']}
                         app_run_data = {
                             'context': context.to_dict(),

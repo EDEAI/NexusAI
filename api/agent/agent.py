@@ -1145,6 +1145,7 @@ async def agent_chat_message(data: AgentChatMessage, userinfo: TokenData = Depen
     ability_id = data.ability_id
     input_dict = data.input_dict
     prompt = data.prompt
+    file_list = data.file_list
     uid = userinfo.uid
     team_id = userinfo.team_id
 
@@ -1220,7 +1221,8 @@ async def agent_chat_message(data: AgentChatMessage, userinfo: TokenData = Depen
     message_id = AgentChatMessages().insert({
         'user_id': userinfo.uid,
         'agent_id': agent_id,
-        'message': prompt['user']['value']
+        'message': prompt['user']['value'],
+        'file_list': file_list
     })
 
     run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id, prompt=prompt, is_chat=True)

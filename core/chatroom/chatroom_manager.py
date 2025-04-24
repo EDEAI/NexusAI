@@ -1,8 +1,9 @@
 import asyncio
 
 from datetime import datetime
+from pathlib import Path
 from time import time
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from websockets import (
     ConnectionClosed,
@@ -17,17 +18,20 @@ from core.database.models import (
     ChatroomAgentRelation,
     ChatroomMessages,
     Chatrooms,
+    UploadFiles,
     Users
 )
 from languages import get_language_content
 from log import Logger
 
 
+project_root = Path(__file__).parent.parent.parent
 logger = Logger.get_logger('chatroom')
 
 app_runs = AppRuns()
 chatrooms = Chatrooms()
 chatroom_messages = ChatroomMessages()
+upload_files = UploadFiles()
 users = Users()
 
 
@@ -35,6 +39,7 @@ class ChatroomManager:
     def __init__(self, event_loop: asyncio.BaseEventLoop):
         self._event_loop = event_loop
         self._ws_manager = WebSocketManager(event_loop)
+        self._file_lists: Dict[int, List[Union[int, str]]] = {}
         
     def _get_chatroom_info(self, chatroom_id: int, user_id: int, check_chat_status: bool) -> Dict[str, int]:
         chatroom_info = chatrooms.select_one(
@@ -84,7 +89,8 @@ class ChatroomManager:
         chatroom_info: Dict[str, int],
         user_id: int,
         team_id: int,
-        user_input: Optional[str] = None
+        user_input: Optional[str] = None,
+        file_list: Optional[List[Union[int, str]]] = None
     ):
         chatroom_id = chatroom_info['id']
         app_id = chatroom_info['app_id']
@@ -105,6 +111,24 @@ class ChatroomManager:
             user_message_id, topic = self._get_user_message_id_and_topic(chatroom_id)
         else:
             # Start a new chatroom
+            file_name_list = []
+            if file_list:
+                for file_value in file_list:
+                    if file_value:
+                        if isinstance(file_value, int):
+                            # Upload file ID
+                            file_data = upload_files.get_file_by_id(file_value)
+                            file_name = file_data['name'] + file_data['extension']
+                        elif isinstance(file_value, str):
+                            if file_value[0] == '/':
+                                file_value = file_value[1:]
+                            file_path = project_root.joinpath('storage').joinpath(file_value)
+                            file_name = file_path.name
+                        else:
+                            # This should never happen
+                            raise Exception('Unsupported value type!')
+                        file_name_list.append(file_name)
+            await self._ws_manager.send_instruction(chatroom_id, 'WITHFILELIST', file_name_list)
             await self._ws_manager.send_instruction(chatroom_id, 'CHAT', user_input)
             
             chatrooms.update(
@@ -139,7 +163,7 @@ class ChatroomManager:
                 for relation in agent_relations
             )
             history_messages = chatroom_messages.select(
-                columns=['agent_id', 'message', 'topic'],
+                columns=['id', 'agent_id', 'message', 'file_list', 'file_content_list', 'topic'],
                 conditions=[
                     {'column': 'chatroom_id', 'value': chatroom_id},
                     {'column': 'id', 'op': '>', 'value': chatroom_info['initial_message_id']},
@@ -147,7 +171,8 @@ class ChatroomManager:
                         {'column': 'chatroom_messages.agent_id', 'op': '!=', 'value': 0, 'logic': 'or'},
                         {'column': 'chatroom_messages.user_id', 'op': '!=', 'value': 0}
                     ]
-                ]
+                ],
+                order_by='id ASC'
             )
             if user_input is None and not history_messages:
                 # Chat history has been cleared, then end the chat directly
@@ -168,7 +193,7 @@ class ChatroomManager:
                     self._ws_manager, user_message_id, topic
                 )
                 chatroom.load_history_messages(history_messages)
-                await chatroom.chat(user_input)
+                await chatroom.chat(user_input, file_list)
             end_time = time()
             app_runs.update(
                 {'column': 'id', 'value': app_run_id},
@@ -198,14 +223,21 @@ class ChatroomManager:
                 {'chat_status': 0}
             )
         
-    async def _handle_data_and_start_chatroom(self, chatroom_id: int, user_id: int, team_id: int, user_input: Optional[str] = None) -> None:
+    async def _handle_data_and_start_chatroom(
+        self,
+        chatroom_id: int,
+        user_id: int,
+        team_id: int,
+        user_input: Optional[str] = None,
+        file_list: Optional[List[Union[int, str]]] = None
+    ) -> None:
         try:
             chatroom_info = self._get_chatroom_info(
                 chatroom_id,
                 user_id,
                 check_chat_status = user_input is not None 
             )
-            await self._start_chatroom(chatroom_info, user_id, team_id, user_input)
+            await self._start_chatroom(chatroom_info, user_id, team_id, user_input, file_list)
         except Exception as e:
             logger.exception('ERROR!!')
             await self._ws_manager.send_instruction(chatroom_id, 'ERROR', str(e))
@@ -263,12 +295,18 @@ class ChatroomManager:
                             # Other commands
                             assert chatroom_id, get_language_content('chatroom_does_not_exist', user_id)
                             match cmd:
+                                case 'FILELIST':
+                                    # File list
+                                    assert isinstance(data, list), 'File list should be a list.'
+                                    self._file_lists[chatroom_id] = data
+                                    await self._ws_manager.send_instruction(chatroom_id, 'FILELISTOK')
                                 case 'INPUT':
                                     # User input
                                     assert isinstance(data, str), 'User input should be a string.'
                                     user_input = data
                                     logger.info('Starting chatroom %s...', chatroom_id)
-                                    coro = self._handle_data_and_start_chatroom(chatroom_id, user_id, team_id, user_input)
+                                    file_list = self._file_lists.pop(chatroom_id, None)
+                                    coro = self._handle_data_and_start_chatroom(chatroom_id, user_id, team_id, user_input, file_list)
                                     self._event_loop.create_task(coro)
                                 case 'STOP':
                                     # Stop the chatroom
