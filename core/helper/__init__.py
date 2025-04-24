@@ -315,7 +315,11 @@ def get_file_content_list(file_list: List[Dict[str, Any]]) -> List[Dict[str, Any
                 # Use OCR for image files
                 file_type = 'image'
                 dl = DocumentLoader(file_path=str(file_path))
-                file_content = '\n'.join([doc.page_content for doc in dl.load()])
+                try:
+                    file_content = '\n'.join([doc.page_content for doc in dl.load()])
+                except TypeError:
+                    # TypeError occurs when using Unstructured to OCR an image without text
+                    file_content = ''
             else:
                 # Use Markdown for document files
                 file_type = 'document'
