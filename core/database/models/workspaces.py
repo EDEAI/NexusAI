@@ -16,6 +16,8 @@ from core.workflow.recursive_task import create_recursive_task_category_from_dic
 from languages import get_language_content
 import os
 from config import settings
+from core.database.models.agents import Agents
+from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
 
 
 class Workspaces(MySQL):
@@ -437,6 +439,41 @@ class Workspaces(MySQL):
                     log['chat_room_name'] = chat_room_data['chat_room_name'] if chat_room_data else ''
                     log['associated_chat_room_name'] = ''
                     
+                    agent_relations = ChatroomAgentRelation().select(
+                        columns=["agent_id"],
+                        conditions=[
+                            {"column": "chatroom_id", "value": log['chatroom_id']}
+                        ],
+                        order_by="id DESC"
+                    )
+                    
+
+                    agent_ids = [rel['agent_id'] for rel in agent_relations if rel['agent_id'] > 0]
+                    
+                    
+                    log['agents_data'] = []
+                    if agent_ids:
+                        agents = Agents().select(
+                            columns=["apps.avatar"],
+                            conditions=[
+                                {"column": "id", "op": "in", "value": agent_ids}
+                            ],
+                            joins=[
+                                ["left", "apps", "apps.id = agents.app_id"],
+                            ]
+                        )
+                        
+                        # Build a mapping from agent_id to agent information
+                        for agent in agents:
+                            if agent.get('avatar'):
+                                avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                                log['agents_data'].append({"avatar": avatar_url}) 
+                        # for agent in agents:
+                        #     if agent.get('avatar'):
+                        #         agent['avatar'] = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                        #     log['agents_data'].append(agent['avatar'])
+                    
+                    
                     # Get app name from agent or workflow
                     if log['agent_id'] > 0:
                         agent_sql = f"""
@@ -507,6 +544,7 @@ class Workspaces(MySQL):
                     log['show_status'] = 2
                     log['chat_room_name'] = ''
                     log['file_list'] = []
+                    log['agents_data'] = []
                     log['driver_id'] = 0
                     find_chatroom_sql = f"""
                     SELECT chatroom_id
@@ -535,6 +573,7 @@ class Workspaces(MySQL):
                     log['show_status'] = 3
                     log['chat_room_name'] = ''
                     log['driver_id'] = 0
+                    log['agents_data'] = []
                     workflows_id = log['workflow_id']
                     app_runs_id = log['app_run_id']
                     find_chatroom_sql = f"""
@@ -604,6 +643,7 @@ class Workspaces(MySQL):
                     log['show_status'] = 0
                     log['chat_room_name'] = ''
                     log['file_list'] = []
+                    log['agents_data'] = []
                     log['driver_id'] = 0
                     log['associated_chat_room_name'] = ''
                 # Default status handling

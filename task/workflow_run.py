@@ -316,6 +316,7 @@ def push_workflow_progress_message(
     app_name: str, 
     icon: str, 
     icon_background: str, 
+    avatar: str,
     workflow_id: int, 
     app_run_id: int, 
     run_type: int, 
@@ -336,6 +337,7 @@ def push_workflow_progress_message(
         app_name (str): The name of the application.
         icon (str): The icon URL of the application.
         icon_background (str): The background color of the icon.
+        avatar (str) : The avatar URL of the user.
         workflow_id (int): The ID of the workflow.
         app_run_id (int): The ID of the application run.
         run_type (int): The type of the run.
@@ -358,6 +360,7 @@ def push_workflow_progress_message(
                 'app_name': app_name,
                 'icon': icon,
                 'icon_background': icon_background,
+                'avatar': avatar,
                 'workflow_id': workflow_id,
                 'app_run_id': app_run_id,
                 'type': run_type,
@@ -843,7 +846,7 @@ def task_callback_thread():
 
                         # if not task_operation or (task_operation == 'assign_task' and not task_id):
                         # Push workflow progress websocket message
-                        push_workflow_progress_message(app_user_id, run['user_id'], run['app_id'], app_name, icon, icon_background, run['workflow_id'], app_run_id, run['type'], run_name,
+                        push_workflow_progress_message(app_user_id, run['user_id'], run['app_id'], app_name, icon, icon_background, run['avatar'], run['workflow_id'], app_run_id, run['type'], run_name,
                             run_status, run['created_time'], run['total_steps'], app_run_data.get('elapsed_time', run['elapsed_time']), app_run_data.get('completed_steps', completed_steps),app_run_data['need_human_confirm'])
 
                         # Push a workflow need human confirm message to the WebSocket message queue
