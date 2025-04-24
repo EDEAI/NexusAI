@@ -224,7 +224,7 @@ const Creation: React.FC = () => {
             description: CreationContent,
             app_id: CardData.app_id,
             mode: CardData.mode,
-            icon: CardData.id ? JSON.stringify(CardData.id) : CardData.icon,
+            icon: (CardData.id ? JSON.stringify(CardData.id) : CardData.icon)||"0",
             icon_background: '',
             avatar:CardData?.avatar||null
         };

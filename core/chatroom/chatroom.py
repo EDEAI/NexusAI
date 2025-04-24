@@ -496,9 +496,9 @@ class Chatroom:
                         agent_message
                     )
                 if usage_metadata := chunk.usage_metadata:
-                    prompt_tokens = usage_metadata['input_tokens']
-                    completion_tokens = usage_metadata['output_tokens']
-                    total_tokens = usage_metadata['total_tokens']
+                    prompt_tokens += usage_metadata['input_tokens']
+                    completion_tokens += usage_metadata['output_tokens']
+                    total_tokens += usage_metadata['total_tokens']
             await self._ws_manager.end_agent_reply(
                 self._chatroom_id,
                 agent_id,

@@ -134,23 +134,30 @@ class ChatroomMessages(MySQL):
                     if item.get('avatar'):
                         item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
 
-                    item['file_name_list'] = []
                     if item['file_list']:
+                        file_list = []
                         for file_value in item['file_list']:
                             if file_value:
                                 if isinstance(file_value, int):
                                     # Upload file ID
                                     file_data = upload_files.get_file_by_id(file_value)
                                     file_name = file_data['name'] + file_data['extension']
+                                    file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
+                                    file_url = f"{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}"
                                 elif isinstance(file_value, str):
                                     if file_value[0] == '/':
                                         file_value = file_value[1:]
                                     file_path = project_root.joinpath('storage').joinpath(file_value)
                                     file_name = file_path.name
+                                    file_url = f"{settings.STORAGE_URL}/storage/{file_value}"
                                 else:
                                     # This should never happen
                                     raise Exception('Unsupported value type!')
-                                item['file_name_list'].append(file_name)
+                                file_list.append({
+                                    'name': file_name,
+                                    'url': file_url
+                                })
+                        item['file_list'] = file_list
 
         if offset == 0:
             if total_count > 0:
@@ -182,23 +189,30 @@ class ChatroomMessages(MySQL):
                         if item.get('avatar'):
                             item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                         
-                        item['file_name_list'] = []
                         if item['file_list']:
+                            file_list = []
                             for file_value in item['file_list']:
                                 if file_value:
                                     if isinstance(file_value, int):
                                         # Upload file ID
                                         file_data = upload_files.get_file_by_id(file_value)
                                         file_name = file_data['name'] + file_data['extension']
+                                        file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
+                                        file_url = f"{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}"
                                     elif isinstance(file_value, str):
                                         if file_value[0] == '/':
                                             file_value = file_value[1:]
                                         file_path = project_root.joinpath('storage').joinpath(file_value)
                                         file_name = file_path.name
+                                        file_url = f"{settings.STORAGE_URL}/storage/{file_value}"
                                     else:
                                         # This should never happen
                                         raise Exception('Unsupported value type!')
-                                    item['file_name_list'].append(file_name)
+                                    file_list.append({
+                                        'name': file_name,
+                                        'url': file_url
+                                    })
+                            item['file_list'] = file_list
             else:
                 list = []
 
