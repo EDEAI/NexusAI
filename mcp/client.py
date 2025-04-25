@@ -299,36 +299,39 @@ class ChatSession:
                     if not server.session:
                         raise RuntimeError("服务器未初始化")
 
-                    # result = await server.execute_tool("skill_run", {
-                    #     "user_id": 1,
-                    #     "team_id": 1,
-                    #     "skill_id": 377,
-                    #     "input_dict": {
-                    #         "name": "output",
-                    #         "type": "object",
-                    #         "properties": {
-                    #             "arg1": {
-                    #                 "name": "arg1",
-                    #                 "type": "number",
-                    #                 "value": 89,
-                    #                 "required": True,
-                    #                 "max_length": 0,
-                    #                 "sort_order": 1,
-                    #                 "display_name": "2423434424"
-                    #             }
-                    #         },
-                    #         "sort_order": 0,
-                    #         "display_name": "",
-                    #         "to_string_keys": ""
-                    #     }
-                    # })
+                    result = await server.execute_tool("skill_run", {
+                        "user_id": 1,
+                        "team_id": 1,
+                        "skill_id": 377,
+                        "input_dict": {
+                            "name": "output",
+                            "type": "object",
+                            "properties": {
+                                "arg1": {
+                                    "name": "arg1",
+                                    "type": "number",
+                                    "value": 89,
+                                    "required": True,
+                                    "max_length": 0,
+                                    "sort_order": 1,
+                                    "display_name": "2423434424"
+                                }
+                            },
+                            "sort_order": 0,
+                            "display_name": "",
+                            "to_string_keys": ""
+                        }
+                    })
+
                     # result = await server.execute_tool("workflow_run", 
                     #     {
                     #         "user_id": 2,
                     #         "team_id": 1,
-                    #         "app_id": 892,
+                    #         "app_id": 2975,
                     #         "input_data": {
-                    #             "shop_name_str": "123"
+                    #             "num1": 80,
+                    #             "operator": "/",
+                    #             "num2": 20
                     #         },
                     #         "node_confirm_users": {},
                     #         "knowledge_base_mapping": {
@@ -337,67 +340,6 @@ class ChatSession:
                     #         }
                     #     }
                     # )
-
-                    result = await server.execute_tool("workflow_run", 
-                        {
-                            "user_id": 2,
-                            "team_id": 1,
-                            "app_id": 2975,
-                            "input_data": {
-                                "num1": 80,
-                                "operator": "/",
-                                "num2": 20
-                            },
-                            "node_confirm_users": {},
-                            "knowledge_base_mapping": {
-                                "input": {},
-                                "output": {}
-                            }
-                        }
-                    )
-
-                    # {
-                    #     "app_id": "2975",
-                    #     "run_type": 0,
-                    #     "run_name": "测试结果",
-                    #     "inputs": {
-                    #         "name": "input_var",
-                    #         "type": "object",
-                    #         "properties": {
-                    #             "num1": {
-                    #                 "name": "num1",
-                    #                 "type": "number",
-                    #                 "value": 80,
-                    #                 "sort_order": 1
-                    #             },
-                    #             "operator": {
-                    #                 "name": "operator",
-                    #                 "type": "string",
-                    #                 "value": "+",
-                    #                 "sort_order": 2,
-                    #                 "max_length": 0
-                    #             },
-                    #             "num2": {
-                    #                 "name": "num2",
-                    #                 "type": "number",
-                    #                 "value": 20,
-                    #                 "sort_order": 3
-                    #             }
-                    #         },
-                    #         "sort_order": 0
-                    #     },
-                    #     "node_confirm_users": {
-                            
-                    #     },
-                    #     "knowledge_base_mapping": {
-                    #         "input": {
-                                
-                    #         },
-                    #         "output": {
-                                
-                    #         }
-                    #     }
-                    # }
                     print(result)
                     # llm_response = self.llm_client.get_response(messages)
                     # logging.info("\nAssistant: %s", llm_response)
