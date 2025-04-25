@@ -272,20 +272,14 @@ class LLMBaseNode(Node):
             not is_chat,
             input_variables=input
         )
-        ai_message = llm_pipeline.llm.invoke(messages_as_langchain_format)
+        ai_message = llm_pipeline.invoke_llm(messages_as_langchain_format)
         content = ai_message.content
         if return_json:
             content = self.extract_json_from_string(content)
-        if model_info["supplier_name"] == "Anthropic":
-            token_usage = ai_message.response_metadata["usage"]
-            prompt_tokens = token_usage["input_tokens"]
-            completion_tokens = token_usage["output_tokens"]
-            total_tokens = prompt_tokens + completion_tokens
-        else:
-            token_usage = ai_message.response_metadata["token_usage"]
-            prompt_tokens = token_usage["prompt_tokens"]
-            completion_tokens = token_usage["completion_tokens"]
-            total_tokens = token_usage["total_tokens"]
+        token_usage = ai_message.response_metadata["token_usage"]
+        prompt_tokens = token_usage["prompt_tokens"]
+        completion_tokens = token_usage["completion_tokens"]
+        total_tokens = token_usage["total_tokens"]
         
         messages.replace_variables(input)
         model_data = {
@@ -357,9 +351,9 @@ class LLMBaseNode(Node):
             for _ in range(5):
                 try:
                     if model_info["supplier_name"] == "Anthropic":
-                        llm_aiter = llm_pipeline.llm.astream(llm_input)
+                        llm_aiter = llm_pipeline.astream_llm(llm_input)
                     else:
-                        llm_aiter = llm_pipeline.llm.astream(llm_input, stream_usage=True)
+                        llm_aiter = llm_pipeline.astream_llm(llm_input, stream_usage=True)
                     while True:
                         try:
                             yield await asyncio.wait_for(anext(llm_aiter), timeout=20)

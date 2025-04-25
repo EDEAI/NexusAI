@@ -612,9 +612,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     }
                 }
                 push_to_websocket_queue(data)
-                logger_chat.info("----------------------------------------------------------------------------")
-                logger_chat.exception(f"Push results generated through AI ERROR:{user_id} error:{str(e)} status:{4} data:{data}")
-                logger_chat.info("----------------------------------------------------------------------------")
+                logger_chat.info(f"Push results generated through AI ERROR:{user_id} error:{str(e)} status:{4} data:{data}")
 
             return {
                 'status': 'failed',

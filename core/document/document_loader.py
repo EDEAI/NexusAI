@@ -8,14 +8,6 @@ from langchain_text_splitters import TextSplitter
 
 from languages import get_language_content
 
-
-if os.environ.get('CONDA_PREFIX'):
-    os.environ['TESSDATA_PREFIX'] = os.environ['CONDA_PREFIX'] + '/share/tessdata'
-    
-import nltk
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-
 class GeneralDocumentLoader(BaseLoader):
     file_type_to_document_loader_type = {
         'csv': 'CSVLoader',

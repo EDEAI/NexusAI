@@ -318,7 +318,8 @@ class DatasetManagement:
         file_path: str = '',
         text: str = '',
         is_json: bool = False,
-        source: str = ''
+        source: str = '',
+        text_split_config: Optional[Dict[str, Any]] = None
     ) -> Tuple[int, int, float]:
         '''
         `text`, `is_json` and `source` is only used when `file_path` is empty
@@ -326,16 +327,28 @@ class DatasetManagement:
         Return: Tuple of (total_word_count, total_num_tokens, indexing_latency)
         '''
         def get_text_splitter(document_type: Literal['markdown', 'text', 'json']) -> TextSplitter:
-            process_rule = DatasetProcessRules().get_process_rule_by_id(process_rule_id)
+            process_rule = DatasetProcessRules().get_process_rule_by_id(process_rule_id)['config']
             # if document_type == 'json':
             #     type_ = 'RecursiveJsonSplitter'
             #     config = {'max_chunk_size': process_rule['config']['chunk_size']}
             # else:
-            if document_type == 'markdown':
-                type_ = 'ExperimentalMarkdownSyntaxTextSplitter'
-                config = {'strip_headers': False}
+            if text_split_config is None:
+                if document_type == 'markdown':
+                    type_ = 'ExperimentalMarkdownSyntaxTextSplitter'
+                    config = {'strip_headers': False}
+                else:
+                    type_, config = convert_to_type_and_config(process_rule)
             else:
-                type_, config = convert_to_type_and_config(process_rule['config'])
+                match text_split_config['split_mode']:
+                    case 'text':
+                        process_rule['chunk_size'] = text_split_config['chunk_size']
+                        process_rule['chunk_overlap'] = text_split_config['chunk_overlap']
+                        type_, config = convert_to_type_and_config(process_rule)
+                    case 'markdown':
+                        type_ = 'ExperimentalMarkdownSyntaxTextSplitter'
+                        config = {'strip_headers': False}
+                    case _:
+                        raise ValueError('Invalid text split mode')
             return TextSplitter(text_splitter_type=type_, **config)
         
         dataset = datasets.get_dataset_by_id(dataset_id, check_is_reindexing=True)
@@ -345,25 +358,31 @@ class DatasetManagement:
         if file_path:
             # dl = DocumentLoader(file_path=file_path)
             # segments = dl.load_and_split(text_splitter=ts)
-            ts = get_text_splitter(document_type='markdown')
             text = cls.process_document_with_files(file_path, user_id)
-            segments = ts.create_documents([text], [{'source': file_path}])
+            if text_split_config and not text_split_config['split']:
+                segments = [Document(page_content=text, metadata={'source': file_path})]
+            else:
+                ts = get_text_splitter(document_type='markdown')
+                segments = ts.create_documents([text], [{'source': file_path}])
         elif text:
-            if is_json:
-                try:
-                    ts = get_text_splitter(document_type='json')
-                    text_obj = json.loads(text)
-                    segments = ts.create_documents(
-                        [text_obj],
-                        [{'source': source}],
-                        ensure_ascii=False
-                    )
-                except:
+            if text_split_config and not text_split_config['split']:
+                segments = [Document(page_content=text, metadata={'source': source})]
+            else:
+                if is_json:
+                    try:
+                        ts = get_text_splitter(document_type='json')
+                        text_obj = json.loads(text)
+                        segments = ts.create_documents(
+                            [text_obj],
+                            [{'source': source}],
+                            ensure_ascii=False
+                        )
+                    except:
+                        ts = get_text_splitter(document_type='text')
+                        segments = ts.create_documents([text], [{'source': source}])
+                else:
                     ts = get_text_splitter(document_type='text')
                     segments = ts.create_documents([text], [{'source': source}])
-            else:
-                ts = get_text_splitter(document_type='text')
-                segments = ts.create_documents([text], [{'source': source}])
         else:
             raise ValueError('Either file_path or text must be provided!')
         total_word_count = 0
