@@ -282,7 +282,6 @@ export default memo(
                                                         status={logDetail?.target_run?.status}
                                                         icon={logDetail?.target_run?.icon}
                                                         title={logDetail?.target_run?.name}
-                                                        avatar={logDetail?.target_run?.avatar}
                                                         textDetails={
                                                             <ProgressContainer
                                                                 progressObj={{

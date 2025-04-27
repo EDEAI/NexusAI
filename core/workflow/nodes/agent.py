@@ -757,13 +757,16 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             )
 
             full_chunk: Optional[AIMessageChunk] = None
+            prompt_tokens = 0
+            completion_tokens = 0
+            total_tokens = 0
             async for chunk in ainvoke():
                 full_chunk = chunk if full_chunk is None else full_chunk + chunk
                 # Get token usage
                 if usage_metadata := chunk.usage_metadata:
-                    prompt_tokens = usage_metadata['input_tokens']
-                    completion_tokens = usage_metadata['output_tokens']
-                    total_tokens = usage_metadata['total_tokens']
+                    prompt_tokens += usage_metadata['input_tokens']
+                    completion_tokens += usage_metadata['output_tokens']
+                    total_tokens += usage_metadata['total_tokens']
                 yield chunk
                 
             if retrieval_token_counter:

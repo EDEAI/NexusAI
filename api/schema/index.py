@@ -80,6 +80,7 @@ class WorkflowLogData(BaseModel):
     percentage: Optional[int] = None
     icon_background: Optional[str] = None
     icon: Optional[str] = None
+    avatar: Optional[str] = None
 
 
 class ListResponseData(BaseModel):

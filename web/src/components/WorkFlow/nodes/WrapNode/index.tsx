@@ -71,7 +71,7 @@ export default memo(
                             </div>
                         )}
                     <div>
-                        <UserCon title={title} icon={data?.baseData?.icon || data.icon || icon}></UserCon>
+                        <UserCon title={title} icon={data?.baseData?.avatar||data?.baseData?.icon || data.icon || icon}></UserCon>
 
                         {desc && (
                             <div className="px-1 py-2">

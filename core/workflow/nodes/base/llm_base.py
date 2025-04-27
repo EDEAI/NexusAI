@@ -276,10 +276,16 @@ class LLMBaseNode(Node):
         content = ai_message.content
         if return_json:
             content = self.extract_json_from_string(content)
-        token_usage = ai_message.response_metadata["token_usage"]
-        prompt_tokens = token_usage["prompt_tokens"]
-        completion_tokens = token_usage["completion_tokens"]
-        total_tokens = token_usage["total_tokens"]
+        if model_info["supplier_name"] == "Anthropic":
+            token_usage = ai_message.response_metadata["usage"]
+            prompt_tokens = token_usage["input_tokens"]
+            completion_tokens = token_usage["output_tokens"]
+            total_tokens = prompt_tokens + completion_tokens
+        else:
+            token_usage = ai_message.response_metadata["token_usage"]
+            prompt_tokens = token_usage["prompt_tokens"]
+            completion_tokens = token_usage["completion_tokens"]
+            total_tokens = token_usage["total_tokens"]
         
         messages.replace_variables(input)
         model_data = {

@@ -10,15 +10,16 @@ import {
 import InfiniteScroll from '@/components/common/InfiniteScroll';
 import { createPromptFromObject } from '@/py2js/prompt.js';
 import useSocketStore from '@/store/websocket';
-import { DeleteOutlined, ExclamationCircleFilled, SendOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ExclamationCircleFilled, FileOutlined, PaperClipOutlined, SendOutlined, UploadOutlined } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm, ProFormSelect, ProFormTextArea } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Button, message, Modal, Spin } from 'antd';
+import { Button, message, Modal, Spin, Tag, Tooltip, Upload } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
+import { getUploadUrl } from '@/api/createkb';
 
 interface ApiResponse<T> {
     code: number;
@@ -34,6 +35,7 @@ interface SocketMessageData {
     error?: string;
     created_time?: string;
     total_tokens?: number;
+    agent_id?: number;
 }
 
 interface SocketMessage {
@@ -110,6 +112,13 @@ interface Props {
 interface HistoryResponse {
     list: Message[];
     total_pages: number;
+}
+
+interface UploadedFile {
+    name: string;
+    url: string;
+    uid: string;
+    isImage?: boolean;
 }
 
 const UserMessageComponent = memo(({ message }: MessageProps) => (
@@ -190,6 +199,9 @@ export default memo((props: Props) => {
     const [clearingMemory, setClearingMemory] = useState(false);
     const [initialLoading, setInitialLoading] = useState(false);
     const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+    const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [previewVisible, setPreviewVisible] = useState(false);
     const formRef = useRef<ProFormInstance>();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -397,6 +409,125 @@ export default memo((props: Props) => {
             }
         }, 500);
     };
+
+    const handleRemoveFile = (uid: string) => {
+        setUploadedFiles(prev => prev.filter(file => file.uid !== uid));
+    };
+
+    const isImageFile = (fileName: string) => {
+        const extension = fileName.split('.').pop()?.toLowerCase();
+        return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(extension || '');
+    };
+
+    const handleUpload = () => {
+        if (!props.data?.detailList?.agent?.agent_id) {
+            message.error(intl.formatMessage({ id: 'agent.chat.error.message' }));
+            return;
+        }
+        
+        // 触发文件选择对话框
+        const uploadInput = document.createElement('input');
+        uploadInput.type = 'file';
+        uploadInput.accept = '.txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv,.jpg,.png,.jpeg';
+        uploadInput.multiple = true; // 支持多文件上传
+        
+        uploadInput.onchange = async (e) => {
+            const target = e.target as HTMLInputElement;
+            if (target.files && target.files.length > 0) {
+                const files = Array.from(target.files);
+                
+                // 检查文件大小
+                const oversizedFiles = files.filter(file => file.size / 1024 / 1024 > 15);
+                if (oversizedFiles.length > 0) {
+                    message.error(`${oversizedFiles.map(f => f.name).join(', ')} ${intl.formatMessage({ id: 'workflow.uploadFileErrorText' })}`);
+                    return;
+                }
+                
+                // 上传所有文件
+                for (const file of files) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    try {
+                        const url = await getUploadUrl();
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                            },
+                            body: formData,
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.code === 0) {
+                            message.success(`${file.name} ${intl.formatMessage({ id: 'workflow.uploadSuccess' })}`);
+                            
+                            // 将文件添加到上传文件列表
+                            if (result.data?.file_url) {
+                                const isImage = isImageFile(file.name);
+                                setUploadedFiles(prev => [
+                                    ...prev, 
+                                    { 
+                                        name: file.name, 
+                                        url: result.data.file_url,
+                                        uid: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                                        isImage
+                                    }
+                                ]);
+                            }
+                        } else {
+                            message.error(`${file.name} ${intl.formatMessage({ id: 'workflow.uploadFailed' })}`);
+                        }
+                    } catch (error) {
+                        console.error('Upload error:', error);
+                        message.error(`${file.name} ${intl.formatMessage({ id: 'workflow.uploadFailed' })}`);
+                    }
+                }
+            }
+        };
+        
+        uploadInput.click();
+    };
+
+    const handleSendMessage = async () => {
+        const content = formRef.current?.getFieldValue('content') || '';
+        
+        // 合并文件链接和文本内容
+        let messageContent = content;
+        
+        if (uploadedFiles.length > 0) {
+            const fileLinks = uploadedFiles.map(file => {
+                if (file.isImage) {
+                    // 对于图片文件，使用Markdown图片语法
+                    return `![${file.name}](${file.url})`;
+                } else {
+                    // 对于其他文件，使用普通链接语法
+                    return `[${file.name}](${file.url})`;
+                }
+            }).join('\n');
+            messageContent = fileLinks + (content ? '\n\n' + content : '');
+        }
+        
+        // 更新表单内容
+        formRef.current?.setFieldsValue({ content: messageContent });
+        
+        // 提交表单
+        await formRef.current?.submit();
+        
+        // 清空文件列表
+        setUploadedFiles([]);
+    };
+
+    const handlePreviewImage = (url: string) => {
+        setPreviewImage(url);
+        setPreviewVisible(true);
+    };
+
+    const handlePreviewClose = () => {
+        setPreviewVisible(false);
+    };
+
     return (
         <div className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border" style={{height: 'calc(100vh - 65px)'}}>
             <ProForm
@@ -484,7 +615,49 @@ export default memo((props: Props) => {
                         </InfiniteScroll>
                     </div>
 
-                    <div className="border-t border-gray-200 bg-white  px-4 py-2 relative">
+                    <div className="border-t border-gray-200 bg-white px-4 py-2 relative">
+                        {/* 文件列表 */}
+                        {JSON.stringify(uploadedFiles)}
+                        {uploadedFiles.length > 0 && (
+                            <div className="p-2 border-b border-gray-200">
+                                <div className="flex items-center mb-1">
+                                    <PaperClipOutlined className="mr-2 text-gray-500" />
+                                    <span className="text-gray-700 text-sm">{intl.formatMessage({ id: 'agent.file.output' })} ({uploadedFiles.length})</span>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {uploadedFiles.map(file => (
+                                        <Tag 
+                                            key={file.uid}
+                                            closable
+                                            onClose={() => handleRemoveFile(file.uid)}
+                                            className={`flex items-center ${file.isImage ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-blue-50 text-blue-600'}`}
+                                        >
+                                            <Tooltip title={file.name}>
+                                                <div className="flex items-center max-w-[150px]">
+                                                    {file.isImage ? (
+                                                        <div className="mr-1 flex items-center">
+                                                            <img 
+                                                                src={file.url} 
+                                                                alt={file.name} 
+                                                                className="w-6 h-6 object-cover mr-1 rounded-sm cursor-pointer" 
+                                                                onClick={() => handlePreviewImage(file.url)}
+                                                            />
+                                                            <span className="truncate">{file.name}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center">
+                                                            <FileOutlined className="mr-1" />
+                                                            <span className="truncate">{file.name}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </Tooltip>
+                                        </Tag>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        
                         <div className="flex items-center p-[8px] gap-[10px] box-border border bg-white rounded-[8px]">
                             <div className="flex-1">
                                 <ProFormTextArea
@@ -499,7 +672,7 @@ export default memo((props: Props) => {
                                         onPressEnter: e => {
                                             if (!e.shiftKey) {
                                                 e.preventDefault();
-                                                formRef.current?.submit();
+                                                handleSendMessage();
                                             }
                                         },
                                         size: 'small',
@@ -514,8 +687,9 @@ export default memo((props: Props) => {
                                     className="mb-0"
                                 />
                             </div>
+
                             <Button
-                                onClick={() => formRef.current?.submit()}
+                                onClick={handleSendMessage}
                                 type="primary"
                                 disabled={props?.data?.detailList?.agent?.agent_id == 0}
                                 className="min-w-[30px] h-[30px] flex items-center justify-center cursor-pointer rounded-[6px]"
@@ -556,10 +730,30 @@ export default memo((props: Props) => {
                             >
                                 {intl.formatMessage({ id: 'agent.chat.clear.memory' })}
                             </Button>
+                            <Button
+                                icon={<UploadOutlined />}
+                                disabled={props?.data?.detailList?.agent?.agent_id == 0}
+                                onClick={handleUpload}
+                                size="small"
+                            >
+                                {intl.formatMessage({ id: 'agent.chat.upload.file' })}
+                            </Button>
                         </div>
                     </div>
                 </div>
             </ProForm>
+            {previewVisible && previewImage && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="max-w-full max-h-full">
+                        <img 
+                            src={previewImage} 
+                            alt="Preview" 
+                            className="max-w-full max-h-full object-contain"
+                            onClick={handlePreviewClose}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 });

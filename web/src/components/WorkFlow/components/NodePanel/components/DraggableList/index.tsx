@@ -2,7 +2,7 @@
  * @Author: wnagchi 1305bcd@gmail.com
  * @Date: 2024-12-30 17:31:04
  * @LastEditors: biz
- * @LastEditTime: 2025-02-08 14:14:00
+ * @LastEditTime: 2025-04-22 13:57:35
  * @FilePath: \NexusAI_GITHUB\web\src\components\WorkFlow\components\DraggableList\index.tsx
  */
 import { getBaseNode } from '@/components/WorkFlow/nodes/nodeDisperse';
@@ -146,9 +146,10 @@ const BaseNodeItem = memo(
                     item={item}
                     onClick={() => onItemClick?.(item)}
                 >
+                 
                     <UserCon
                         title={item.data.title}
-                        icon={item?.baseData?.icon || item.type}
+                        icon={item?.baseData?.avatar||item?.baseData?.icon || item.type}
                         typeBadge={typeBadge}
                     />
                 </NodeWrapper>

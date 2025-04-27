@@ -16,6 +16,7 @@ import useNodeIdUpdate from '../../hooks/useNodeIdUpdate';
 import useStore from '../../store';
 import { AppNode, BlockEnum } from '../../types';
 import RunPanelNode from '../RunPanelNode';
+import { headportrait } from '@/utils/useUser';
 const { Paragraph } = Typography;
 
 type NodeFormParams = {
@@ -84,7 +85,20 @@ const NodeForm = memo(({ node, updateNodeData }: NodeFormParams) => {
                         <img src={node?.data?.baseData?.icon} className="size-6" alt="" />
                     </div>
                 );
+            }else{
+                return (
+                    <div className=" !bg-gray-100 size-8 rounded-md flex justify-center items-center"  style={{backgroundColor:NODE_COLOR[node?.type]}}>
+                        <img src={headportrait('single',node?.data?.baseData?.icon)} className="size-6" alt="" />
+                    </div>
+                );
             }
+        }
+        if (node?.data?.baseData?.avatar) {
+            return (
+                <div className=" !bg-gray-100 size-8 rounded-md flex justify-center items-center"  style={{backgroundColor:NODE_COLOR[node?.type]}}>
+                    <img src={node?.data?.baseData?.avatar} className="size-8 rounded" alt="" />
+                </div>
+            );
         }
         return (
             <div className=" bg-gray-300 size-8 rounded-md flex justify-center items-center"  style={{backgroundColor:NODE_COLOR[node?.type]}}>

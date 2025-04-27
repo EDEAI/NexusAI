@@ -112,21 +112,22 @@ class ChatroomManager:
         else:
             # Start a new chatroom
             file_name_list = []
-            for file_value in file_list:
-                if file_value:
-                    if isinstance(file_value, int):
-                        # Upload file ID
-                        file_data = upload_files.get_file_by_id(file_value)
-                        file_name = file_data['name'] + file_data['extension']
-                    elif isinstance(file_value, str):
-                        if file_value[0] == '/':
-                            file_value = file_value[1:]
-                        file_path = project_root.joinpath('storage').joinpath(file_value)
-                        file_name = file_path.name
-                    else:
-                        # This should never happen
-                        raise Exception('Unsupported value type!')
-                    file_name_list.append(file_name)
+            if file_list:
+                for file_value in file_list:
+                    if file_value:
+                        if isinstance(file_value, int):
+                            # Upload file ID
+                            file_data = upload_files.get_file_by_id(file_value)
+                            file_name = file_data['name'] + file_data['extension']
+                        elif isinstance(file_value, str):
+                            if file_value[0] == '/':
+                                file_value = file_value[1:]
+                            file_path = project_root.joinpath('storage').joinpath(file_value)
+                            file_name = file_path.name
+                        else:
+                            # This should never happen
+                            raise Exception('Unsupported value type!')
+                        file_name_list.append(file_name)
             await self._ws_manager.send_instruction(chatroom_id, 'WITHFILELIST', file_name_list)
             await self._ws_manager.send_instruction(chatroom_id, 'CHAT', user_input)
             
