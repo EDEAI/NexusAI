@@ -34,7 +34,7 @@ workflows_db = Workflows()
 appRuns_db = AppRuns()
 appNodeUserRelation_db = AppNodeUserRelation()
 chatroomDrivenRecords_db = ChatroomDrivenRecords()
-mcp = FastMCP("skill_runner",port = 9486)
+mcp = FastMCP("skill_runner",port = settings.MCP_SERVER_PORT)
 
 @mcp.tool()
 async def workflow_run(
