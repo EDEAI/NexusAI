@@ -7,6 +7,11 @@ from languages import get_language_content
 from collections import deque
 from config import settings
 
+from core.database.models.upload_files import UploadFiles
+from pathlib import Path
+upload_files = UploadFiles()
+project_root = Path(__file__).parent.parent.parent
+
 
 class ChatroomMessages(MySQL):
     """
@@ -89,7 +94,7 @@ class ChatroomMessages(MySQL):
                     columns=["apps.name", "apps.description", "apps.icon", "apps.avatar", "apps.icon_background",
                              "chatroom_messages.id",
                              "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id",
-                             "chatroom_messages.user_id",
+                             "chatroom_messages.user_id", 'chatroom_messages.file_list',
                              "chatroom_messages.agent_id", "chatroom_messages.message", "chatroom_messages.is_read",
                              "chatroom_messages.created_time"],
                     joins=[
@@ -105,7 +110,7 @@ class ChatroomMessages(MySQL):
             else:
                 list = self.select(
                     columns=["apps.name", "apps.description", "apps.icon", "apps.avatar", "apps.icon_background", "chatroom_messages.id",
-                             "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id", "chatroom_messages.user_id",
+                             "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id", "chatroom_messages.user_id", 'chatroom_messages.file_list',
                              "chatroom_messages.agent_id", "chatroom_messages.message", "chatroom_messages.is_read",
                              "chatroom_messages.created_time"],
                     joins=[
@@ -129,13 +134,38 @@ class ChatroomMessages(MySQL):
                     if item.get('avatar'):
                         item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
 
+                    if item['file_list']:
+                        file_list = []
+                        for file_value in item['file_list']:
+                            if file_value:
+                                if isinstance(file_value, int):
+                                    # Upload file ID
+                                    file_data = upload_files.get_file_by_id(file_value)
+                                    file_name = file_data['name'] + file_data['extension']
+                                    file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
+                                    file_url = f"{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}"
+                                elif isinstance(file_value, str):
+                                    if file_value[0] == '/':
+                                        file_value = file_value[1:]
+                                    file_path = project_root.joinpath('storage').joinpath(file_value)
+                                    file_name = file_path.name
+                                    file_url = f"{settings.STORAGE_URL}/storage/{file_value}"
+                                else:
+                                    # This should never happen
+                                    raise Exception('Unsupported value type!')
+                                file_list.append({
+                                    'name': file_name,
+                                    'url': file_url
+                                })
+                        item['file_list'] = file_list
+
         if offset == 0:
             if total_count > 0:
                 list = self.select(
                     columns=["apps.name", "apps.description", "apps.icon", "apps.avatar", "apps.icon_background",
                              "chatroom_messages.id",
                              "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id",
-                             "chatroom_messages.user_id",
+                             "chatroom_messages.user_id", 'chatroom_messages.file_list',
                              "chatroom_messages.agent_id", "chatroom_messages.message", "chatroom_messages.is_read",
                              "chatroom_messages.created_time"],
                     joins=[
@@ -158,6 +188,31 @@ class ChatroomMessages(MySQL):
 
                         if item.get('avatar'):
                             item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                        
+                        if item['file_list']:
+                            file_list = []
+                            for file_value in item['file_list']:
+                                if file_value:
+                                    if isinstance(file_value, int):
+                                        # Upload file ID
+                                        file_data = upload_files.get_file_by_id(file_value)
+                                        file_name = file_data['name'] + file_data['extension']
+                                        file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
+                                        file_url = f"{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}"
+                                    elif isinstance(file_value, str):
+                                        if file_value[0] == '/':
+                                            file_value = file_value[1:]
+                                        file_path = project_root.joinpath('storage').joinpath(file_value)
+                                        file_name = file_path.name
+                                        file_url = f"{settings.STORAGE_URL}/storage/{file_value}"
+                                    else:
+                                        # This should never happen
+                                        raise Exception('Unsupported value type!')
+                                    file_list.append({
+                                        'name': file_name,
+                                        'url': file_url
+                                    })
+                            item['file_list'] = file_list
             else:
                 list = []
 

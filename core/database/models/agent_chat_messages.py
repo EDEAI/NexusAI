@@ -1,5 +1,14 @@
-from core.database import MySQL
 import math
+
+from typing import List, Dict, Any
+
+from config import settings
+from core.database import MySQL
+
+from core.database.models.upload_files import UploadFiles
+from pathlib import Path
+upload_files = UploadFiles()
+project_root = Path(__file__).parent.parent.parent
 
 
 class AgentChatMessages(MySQL):
@@ -68,7 +77,7 @@ class AgentChatMessages(MySQL):
         if offset != 0:
             if total_count - (page * page_size) < 0:
                 message_list = self.select(
-                    columns=['id', 'user_id', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
+                    columns=['id', 'user_id', 'file_list', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
                     conditions=conditions,
                     limit=page_size,
                     offset=0,
@@ -76,7 +85,7 @@ class AgentChatMessages(MySQL):
                 )
             else:
                 message_list = self.select(
-                    columns=['id', 'user_id', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
+                    columns=['id', 'user_id', 'file_list', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
                     conditions=conditions,
                     limit=page_size,
                     offset=offset,
@@ -86,13 +95,38 @@ class AgentChatMessages(MySQL):
         if offset == 0:
             if total_count > 0:
                 message_list = self.select(
-                    columns=['id', 'user_id', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
+                    columns=['id', 'user_id', 'file_list', 'agent_id', 'ability_id', 'agent_run_id', 'message', 'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_time'],
                     conditions=conditions,
                     limit=page_size,
                     offset=0,
                     order_by="id ASC",
                 )
-
+        if message_list:
+            for item in message_list:
+                if item['file_list']:
+                    file_list = []
+                    for file_value in item['file_list']:
+                        if file_value:
+                            if isinstance(file_value, int):
+                                # Upload file ID
+                                file_data = upload_files.get_file_by_id(file_value)
+                                file_name = file_data['name'] + file_data['extension']
+                                file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
+                                file_url = f"{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}"
+                            elif isinstance(file_value, str):
+                                if file_value[0] == '/':
+                                    file_value = file_value[1:]
+                                file_path = project_root.joinpath('storage').joinpath(file_value)
+                                file_name = file_path.name
+                                file_url = f"{settings.STORAGE_URL}/storage/{file_value}"
+                            else:
+                                # This should never happen
+                                raise Exception('Unsupported value type!')
+                            file_list.append({
+                                'name': file_name,
+                                'url': file_url
+                            })
+                    item['file_list'] = file_list
         return {
             "list": message_list,
             "total_count": total_count,
@@ -135,8 +169,20 @@ class AgentChatMessages(MySQL):
             {"column": "agent_id", "value": agent_id}
         ]
         messages = self.select(
-            columns=["message", "agent_run_id"],
+            columns=["id", "message", "agent_run_id", "file_list", "file_content_list"],
             conditions=conditions,
             order_by='id ASC'
         )
         return messages
+
+    def update_file_content_list_by_id(self, id_: int, file_content_list: List[Dict[str, Any]]):
+        """
+        Update the file content list for a message by its ID.
+
+        :param id_: The ID of the message to update.
+        :param file_content_list: The new file content list to set for the message.
+        """
+        self.update(
+            {"column": "id", "value": id_},
+            {"file_content_list": file_content_list}
+        )

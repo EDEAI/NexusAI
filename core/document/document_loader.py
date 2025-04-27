@@ -1,3 +1,4 @@
+import os
 from typing import AsyncIterator, Iterator, List, Optional
 
 from langchain_community import document_loaders
@@ -6,7 +7,6 @@ from langchain_core.documents import Document
 from langchain_text_splitters import TextSplitter
 
 from languages import get_language_content
-
 
 class GeneralDocumentLoader(BaseLoader):
     file_type_to_document_loader_type = {
@@ -36,6 +36,8 @@ class GeneralDocumentLoader(BaseLoader):
             if file_type in self.file_type_to_document_loader_type:
                 document_loader_type = self.file_type_to_document_loader_type[file_type]
         assert document_loader_type, get_language_content('api_vector_document_loader_type')
+        if document_loader_type == 'UnstructuredImageLoader':
+            kwargs['languages'] = ['eng', 'chi_sim', 'chi_sim_vert']
         document_loader_class = getattr(document_loaders, document_loader_type)
         self._document_loader: BaseLoader = document_loader_class(*args, **kwargs)
         

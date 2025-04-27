@@ -172,6 +172,8 @@ class Apps(MySQL):
 
         for info_item in info_workflow:
             if info_item['app_id'] in other_dict:
+                if info_item['avatar']:
+                    info_item['avatar'] = f"{settings.STORAGE_URL}/upload/{info_item['avatar']}"
                 other_dict[info_item['app_id']].append(info_item)
 
         info_app = self.select(
@@ -191,6 +193,8 @@ class Apps(MySQL):
 
         for app_item in info_app:
             if app_item['workflow_app_id'] in workflow_dict:
+                if app_item['avatar']:
+                    app_item['avatar'] = f"{settings.STORAGE_URL}/upload/{app_item['avatar']}"
                 workflow_dict[app_item['workflow_app_id']].append(app_item)
 
         for data_item in all_app:

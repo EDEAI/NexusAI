@@ -313,6 +313,15 @@ celery_app.conf.update(
 )
 
 if __name__ == '__main__':
+
+    if os.environ.get('CONDA_PREFIX'):
+        os.environ['TESSDATA_PREFIX'] = os.environ['CONDA_PREFIX'] + '/share/tessdata'
+        
+    import nltk
+    nltk.download('punkt')
+    nltk.download('averaged_perceptron_tagger')
+
+
     celery_app.worker_main(
         argv=[
             'worker',

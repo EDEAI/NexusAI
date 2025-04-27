@@ -70,11 +70,17 @@ class AppRuns(MySQL):
         :param app_run_id: The ID of the running app run.
         :return: A dictionary representing the running app run.
         """
-        return self.select_one(
-            columns=['id AS app_run_id', 'user_id', 'app_id', 'workflow_id', 'type', 'level', 'context', 'completed_steps', 'actual_completed_steps', 'completed_edges', 'status', 'elapsed_time',
-                'prompt_tokens', 'completion_tokens', 'total_tokens', 'embedding_tokens', 'reranking_tokens', 'total_steps', 'created_time', 'finished_time'],
-            conditions=[{"column": "id", "value": app_run_id}, {"column": "status", "op": "in", "value": [2, 4]}]
+        data = self.select_one(
+            columns=['app_runs.id AS app_run_id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.workflow_id', 'app_runs.type', 'app_runs.level', 'app_runs.context', 'app_runs.completed_steps', 'app_runs.actual_completed_steps', 'app_runs.completed_edges', 'app_runs.status', 'app_runs.elapsed_time',
+                'app_runs.prompt_tokens', 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens', 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.finished_time' ,'apps.avatar'],
+            conditions=[{"column": "id", "value": app_run_id}, {"column": "status", "op": "in", "value": [2, 4]}],
+            joins=[
+                ["left", "apps", "app_runs.app_id = apps.id"]
+            ]
         )
+        if data and data.get('avatar'):
+            data['avatar'] = f"{settings.STORAGE_URL}/upload/{data['avatar']}"
+        return data
 
     def get_running_app_run_ai(self, app_run_id: int) -> Dict[str, Any]:
         """

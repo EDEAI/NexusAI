@@ -154,6 +154,7 @@ class AddDocumentSchema(BaseModel):
     process_rule_id: int
     data_source_type: int
     file_ids: List[int]
+    text_split_config: Optional[Dict[str, Any]] = None
 
     model_config = {
         "json_schema_extra": {
@@ -163,6 +164,12 @@ class AddDocumentSchema(BaseModel):
                     "process_rule_id" : 1,
                     "data_source_type": 1,
                     "file_ids": [45,46],
+                    "text_split_config": {
+                        'split': True,
+                        'split_mode': 'text',
+                        'chunk_size': 4000,
+                        'chunk_overlap': 200
+                    }
                 }
             ]
         }

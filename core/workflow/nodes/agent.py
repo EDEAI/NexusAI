@@ -321,6 +321,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         override_rag_input: Optional[str] = None,
         override_dataset_id: Optional[int] = None,
         is_chat: bool = False,
+        override_file_list: Optional[List[Union[int, str]]] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -387,6 +388,16 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             context.add_node(level, current_node)
             
             file_list = replace_prompt_with_context(self.data['prompt'], context)
+            if override_file_list:
+                file_list = []
+                for index, file_var_value in enumerate(override_file_list):
+                    file_list.append(Variable(
+                        name=f"file_{index}",
+                        type="file",
+                        sub_type="image",
+                        value=file_var_value
+                    ))
+            
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
                 {'raw_user_prompt': self.data['prompt'].get_user()}
@@ -601,9 +612,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     }
                 }
                 push_to_websocket_queue(data)
-                logger_chat.info("----------------------------------------------------------------------------")
-                logger_chat.exception(f"Push results generated through AI ERROR:{user_id} error:{str(e)} status:{4} data:{data}")
-                logger_chat.info("----------------------------------------------------------------------------")
+                logger_chat.info(f"Push results generated through AI ERROR:{user_id} error:{str(e)} status:{4} data:{data}")
 
             return {
                 'status': 'failed',
@@ -628,6 +637,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         data_source_run_id : Optional[int] = 0,
         override_rag_input: Optional[str] = None,
         override_dataset_id: Optional[int] = None,
+        override_file_list: Optional[List[Union[int, str]]] = None,
         **kwargs
     ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
@@ -695,6 +705,15 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             context.add_node(level, current_node)
             
             file_list = replace_prompt_with_context(self.data['prompt'], context)
+            if override_file_list:
+                file_list = []
+                for index, file_var_value in enumerate(override_file_list):
+                    file_list.append(Variable(
+                        name=f"file_{index}",
+                        type="file",
+                        sub_type="image",
+                        value=file_var_value
+                    ))
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
                 {'raw_user_prompt': self.data['prompt'].get_user()}
@@ -736,13 +755,16 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             )
 
             full_chunk: Optional[AIMessageChunk] = None
+            prompt_tokens = 0
+            completion_tokens = 0
+            total_tokens = 0
             async for chunk in ainvoke():
                 full_chunk = chunk if full_chunk is None else full_chunk + chunk
                 # Get token usage
                 if usage_metadata := chunk.usage_metadata:
-                    prompt_tokens = usage_metadata['input_tokens']
-                    completion_tokens = usage_metadata['output_tokens']
-                    total_tokens = usage_metadata['total_tokens']
+                    prompt_tokens += usage_metadata['input_tokens']
+                    completion_tokens += usage_metadata['output_tokens']
+                    total_tokens += usage_metadata['total_tokens']
                 yield chunk
                 
             if retrieval_token_counter:

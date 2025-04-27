@@ -3,8 +3,9 @@ import sys
 
 from collections import deque
 from datetime import datetime
+from pathlib import Path
 from time import monotonic
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 from langchain_core.messages import AIMessageChunk
 
@@ -19,7 +20,7 @@ from core.database.models import (
     Models,
     Datasets
 )
-from core.helper import truncate_messages_by_token_limit
+from core.helper import truncate_messages_by_token_limit, get_file_content_list
 from core.llm import Prompt
 from core.workflow.context import Context
 from core.workflow.nodes import AgentNode, LLMNode
@@ -27,7 +28,7 @@ from core.workflow.variables import create_variable_from_dict, ObjectVariable
 from languages import get_language_content
 from log import Logger
 
-
+project_root = Path(__file__).parent.parent.parent
 logger = Logger.get_logger('chatroom')
 
 agent_abilities = AgentAbilities()
@@ -107,6 +108,8 @@ class Chatroom:
         # - message: str
         # - topic: str
         self._history_messages: List[Dict[str, Union[int, str]]] = []
+        self._image_list: Optional[List[Union[int, str]]] = None
+        self._current_round = 0
         self._last_speaker_id = 0
 
     def _get_agents_info(self) -> str:
@@ -238,23 +241,52 @@ class Chatroom:
             user_messages
         )
     
-    def _user_speak(self, user_message: str) -> None:
+    def _user_speak(self, user_message: str, file_list: Optional[List[Union[int, str]]] = None) -> None:
         '''
         Append a user message to the history messages and insert it into the database.
         '''
         self._console_log(f'User message: \033[91m{user_message}\033[0m\n')
         # self._history_messages.append({'agent_id': 0, 'message': user_message, 'topic': self._topic})
         self._last_speaker_id = 0
-        self._history_messages.append({'agent_id': 0, 'message': user_message})
+        file_content_list = None
+        if file_list:
+            file_content_list = get_file_content_list(file_list)
+            if file_content_list:
+                self._image_list = []
+                for file_var_value in file_list:
+                    if isinstance(file_var_value, int):
+                        attr = 'id'
+                        value = file_var_value
+                    elif isinstance(file_var_value, str):
+                        attr = 'path'
+                        if file_var_value[0] == '/':
+                            value = file_var_value[1:]
+                        file_path = project_root.joinpath('storage').joinpath(value)
+                        value = str(file_path)
+                    else:
+                        raise Exception('Unsupported value type!')
+                    for file_content in file_content_list:
+                        if file_content[attr] == value and file_content['type'] == 'image':
+                            self._image_list.append(file_var_value)
         self._user_message_id = chatroom_messages.insert(
             {
                 'chatroom_id': self._chatroom_id,
                 'app_run_id': self._app_run_id,
                 'user_id': self._user_id,
                 'message': user_message,
+                'file_list': file_list,
+                'file_content_list': file_content_list,
                 'is_read': 1 if self._ws_manager.has_connections(self._chatroom_id) else 0
             }
         )
+        self._history_messages.append({
+            'id': self._user_message_id,
+            'agent_id': 0,
+            'message': user_message,
+            'file_list': file_list,
+            'file_content_list': file_content_list
+        })
+        self._add_file_content_to_message(self._history_messages[-1], 'document_only')
         app_runs.increment_steps(self._app_run_id)
 
     async def _select_next_speaker(self) -> int:
@@ -335,17 +367,25 @@ class Chatroom:
                 prompt=Prompt(system_prompt, user_prompt)
             )
             llm_node.schema_key = schema_key
-            result = llm_node.run(return_json=True)
+            result = llm_node.run(
+                return_json=True,
+                override_file_list=self._image_list if self._current_round == 0 else None
+            )
             assert result['status'] == 'success', result['message']
             result_data = result['data']
-            manager_message_var = create_variable_from_dict(result_data['outputs'])
-            manager_message = manager_message_var.value
+            manager_message = result_data['outputs']['value']
             logger.debug('Speaker selector output: %s', manager_message)
             model_data = result_data['model_data']
             llm_input_var = model_data['messages']
             llm_input = []
             for role, message_var in llm_input_var:
-                llm_input.append((role, create_variable_from_dict(message_var).value))
+                if message_var['type'].startswith('array'):
+                    message_values = []
+                    for message_value in message_var['values']:
+                        message_values.append(message_value['value'])
+                    llm_input.append([role, message_values])
+                else:
+                    llm_input.append([role, message_var['value']])
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
             prompt_tokens = result_data['prompt_tokens']
             completion_tokens = result_data['completion_tokens']
@@ -440,7 +480,8 @@ class Chatroom:
                 agent_run_type=3,
                 chatroom_id=self._chatroom_id,
                 override_rag_input=user_message,
-                override_dataset_id=override_dataset['id'] if override_dataset else None
+                override_dataset_id=override_dataset['id'] if override_dataset else None,
+                override_file_list=self._image_list if self._current_round == 0 else None
             ):
                 if isinstance(chunk, int):
                     agent_run_id = chunk
@@ -455,9 +496,9 @@ class Chatroom:
                         agent_message
                     )
                 if usage_metadata := chunk.usage_metadata:
-                    prompt_tokens = usage_metadata['input_tokens']
-                    completion_tokens = usage_metadata['output_tokens']
-                    total_tokens = usage_metadata['total_tokens']
+                    prompt_tokens += usage_metadata['input_tokens']
+                    completion_tokens += usage_metadata['output_tokens']
+                    total_tokens += usage_metadata['total_tokens']
             await self._ws_manager.end_agent_reply(
                 self._chatroom_id,
                 agent_id,
@@ -522,8 +563,35 @@ class Chatroom:
             logger.debug('Chatroom is no longer available. The chat will terminate soon')
             return True
         return False
+    
+    def _add_file_content_to_message(
+        self,
+        message: Dict[str, Any],
+        mode: Literal['all', 'image_only', 'document_only'] = 'all'
+    ) -> None:
+        if message['file_list'] and message['file_content_list']:
+            for file_var_value in message['file_list']:
+                if isinstance(file_var_value, int):
+                    attr = 'id'
+                    value = file_var_value
+                elif isinstance(file_var_value, str):
+                    attr = 'path'
+                    if file_var_value[0] == '/':
+                        value = file_var_value[1:]
+                    file_path = project_root.joinpath('storage').joinpath(value)
+                    value = str(file_path)
+                else:
+                    raise Exception('Unsupported value type!')
+                for file_content in message['file_content_list']:
+                    if (mode == 'image_only' and file_content['type'] != 'image') or (mode == 'document_only' and file_content['type'] != 'document'):
+                        continue
+                    if file_content[attr] == value:
+                        message['message'] += f'\n******Start of {file_content["name"]}******\n{file_content["content"]}\n******End of {file_content["name"]}******\n'
 
-    def load_history_messages(self, messages: List[Dict[str, Union[int, str]]]) -> None:
+    def load_history_messages(self, messages: List[Dict[str, Any]]) -> None:
+        # Add file content to the message content
+        for message in messages:
+            self._add_file_content_to_message(message, 'all')
         self._history_messages.extend(messages)
 
     async def _generate_title(self):
@@ -552,8 +620,7 @@ class Chatroom:
         assert result['status'] == 'success', result['message']
         
         result_data = result['data']
-        title_message_var = create_variable_from_dict(result_data['outputs'])
-        title = title_message_var.value
+        title = result_data['outputs']['value']
         logger.debug('Generated title: %s', title)
         await self._ws_manager.send_instruction(self._chatroom_id, 'TITLE', title)
         
@@ -561,7 +628,7 @@ class Chatroom:
         llm_input_var = model_data['messages']
         llm_input = []
         for role, message_var in llm_input_var:
-            llm_input.append((role, create_variable_from_dict(message_var).value))
+            llm_input.append([role, message_var['value']])
             
         has_connections = self._ws_manager.has_connections(self._chatroom_id)
         prompt_tokens = result_data['prompt_tokens']
@@ -596,7 +663,7 @@ class Chatroom:
             {'name': title}
         )
 
-    async def chat(self, user_message: Optional[str] = None) -> None:
+    async def chat(self, user_message: Optional[str] = None, file_list: Optional[List[Union[int, str]]] = None) -> None:
         history_messages_count_on_start = len(self._history_messages)
         performed_rounds = 0
         if user_message is None:
@@ -608,10 +675,9 @@ class Chatroom:
                     performed_rounds += 1
         else:
             # Start a new chat
-            self._user_speak(user_message)
+            self._user_speak(user_message, file_list)
         
-        round_ = 0
-        for round_ in range(performed_rounds, self._max_round):
+        for self._current_round in range(performed_rounds, self._max_round):
             agent_id = await self._select_next_speaker()
             logger.debug('Selected agent: %s', agent_id)
             if agent_id == 0:
@@ -620,13 +686,20 @@ class Chatroom:
 
             await self._talk_to_agent(agent_id)
 
+            if self._current_round == 0:
+                # Add image content to current user message content
+                for message in reversed(self._history_messages):
+                    if message['agent_id'] == 0:
+                        self._add_file_content_to_message(message, 'image_only')
+                        break
+
             if self._terminate():
-                round_ += 1
+                self._current_round += 1
                 break
         else:
-            round_ += 1
+            self._current_round += 1
 
-        logger.debug('Total chat rounds: %d', round_)
+        logger.debug('Total chat rounds: %d', self._current_round)
 
         if self._is_temporary and history_messages_count_on_start == 0:
             # Generate title if the chat is new

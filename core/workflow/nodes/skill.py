@@ -1,4 +1,4 @@
-from . import FileOutputBaseNode, SandboxBaseNode
+from . import SandboxBaseNode
 from core.database.models import AppRuns, Apps, CustomTools
 from typing import Dict, Optional, Any
 from datetime import datetime
@@ -12,7 +12,7 @@ from log import Logger
 logger = Logger.get_logger('celery-app')
 
 
-class SkillNode(FileOutputBaseNode, SandboxBaseNode):
+class SkillNode(SandboxBaseNode):
     """
     A SkillNode object is used to integrate external skills into the workflow.
     """
@@ -140,7 +140,6 @@ class SkillNode(FileOutputBaseNode, SandboxBaseNode):
                 }
             end_time = datetime.now()
             elapsed_time = end_time.timestamp() - start_time.timestamp()
-            outputs_in_context = self.replace_documents_with_strvars_in_context(self.data['output']).to_dict()
             outputs = self.data['output'].to_dict()
             AppRuns().update(
                 {'column': 'id', 'value': skill_run_id},
@@ -158,8 +157,7 @@ class SkillNode(FileOutputBaseNode, SandboxBaseNode):
                     'elapsed_time': elapsed_time,
                     'inputs': input.to_dict(),
                     'output_type': 1,
-                    'outputs': outputs,
-                    'outputs_in_context': outputs_in_context
+                    'outputs': outputs
                 }
             }
         except Exception as e:

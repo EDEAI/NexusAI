@@ -9,7 +9,9 @@ from langchain_core.documents import Document
 from langchain_core.messages import AIMessageChunk
 from langchain_core.runnables import Runnable, RunnableParallel, RunnablePassthrough
 from langchain_core.runnables.utils import Input, Output
+
 from core.database.models.agent_chat_messages import AgentChatMessages
+from core.document import DocumentLoader
 
 from . import Node
 from ...variables import ArrayVariable, Variable
@@ -19,11 +21,12 @@ from llm.models import LLMPipeline
 from llm.prompt import create_prompt_from_dict, replace_prompt_with_context
 from llm.messages import Messages, create_messages_from_serialized_format
 
-from core.helper import truncate_agent_messages_by_token_limit
+from core.helper import truncate_agent_messages_by_token_limit, get_file_content_list
 from core.database.models import (Models, Users)
 
 
 project_root = Path(__file__).absolute().parent.parent.parent.parent.parent
+
 document_segments = DocumentSegments()
 documents = Documents()
 models = Models()
@@ -94,40 +97,87 @@ class LLMBaseNode(Node):
                 if context:
                     replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)
                 messages = Messages()
-                messages.add_prompt(self.data["prompt"])
+                messages.add_system_message(Variable(name="system", type="string", value=self.data["prompt"].get_system()))
+                human_message = ArrayVariable(name="human", type="array[any]")
+                human_message.add_value(Variable(name="text", type="string", value=self.data["prompt"].get_user()))
                 if file_list:
                     for file_var in file_list:
-                        messages.add_human_message(file_var, "file")
+                        human_message.add_value(file_var)
+                messages.add_human_message(human_message)
         else:
             if context:
                 replace_prompt_with_context(self.data["prompt"], context, duplicate_braces=True)
             messages = Messages()
             if is_chat:
                 chat_history = AgentChatMessages().get_chat_agent_history(agent_id=agent_id, user_id=user_id)
+                assert chat_history, 'Chat history not found.'
+
+                # Get content of each file in the user message and fill into database
+                last_user_message = chat_history[-1]
+                if last_user_message['agent_run_id'] == 0 and last_user_message['file_list']:
+                    file_content_list = get_file_content_list(last_user_message['file_list'])
+                    last_user_message['file_content_list'] = file_content_list
+                    AgentChatMessages().update_file_content_list_by_id(last_user_message['id'], file_content_list)
+
+                # Add file content to the message content
+                image_list = []
+                for index, message in enumerate(chat_history):
+                    if message['file_list'] and message['file_content_list']:
+                        for file_var_value in message['file_list']:
+                            if isinstance(file_var_value, int):
+                                attr = 'id'
+                                value = file_var_value
+                            elif isinstance(file_var_value, str):
+                                attr = 'path'
+                                if file_var_value[0] == '/':
+                                    value = file_var_value[1:]
+                                    file_path = project_root.joinpath('storage').joinpath(value)
+                                    value = str(file_path)
+                            else:
+                                raise Exception('Unsupported value type!')
+                            for file_content in message['file_content_list']:
+                                if file_content[attr] == value:
+                                    if index == len(chat_history) - 1 and file_content['type'] == 'image':
+                                        image_list.append(file_var_value)
+                                        continue
+                                    message['message'] += f'\n******Start of {file_content["name"]}******\n{file_content["content"]}\n******End of {file_content["name"]}******\n'
 
                 # Truncate Messages By Token Limit
                 userinfo = users.get_user_by_id(user_id)
                 model_info = models.get_model_by_type(1, userinfo['team_id'], uid=user_id)
                 model_info = models.get_model_by_config_id(model_info['model_config_id'])
-                chatMessageList = truncate_agent_messages_by_token_limit(chat_history, model_info)
+                chat_message_list = truncate_agent_messages_by_token_limit(chat_history, model_info)
                 
                 messages.add_system_message(Variable(name="text", type="string", value=self.data["prompt"].get_system()))
+                human_message = ArrayVariable(name="human", type="array[any]")
 
-                for index, chat in enumerate(chatMessageList):
+                for index, chat in enumerate(chat_message_list):
                     chat_message = self.duplicate_braces(chat['message'])
                     if chat['agent_run_id'] > 0:
                         messages.add_ai_message(Variable(name="text", type="string", value=chat_message))
                     else:
                         # Determine if it is the last message
-                        if index == len(chatMessageList) - 1:
-                            messages.add_human_message(Variable(name="text", type="string", value=self.data["prompt"].get_user()))
+                        if index == len(chat_message_list) - 1:
+                            human_message.add_value(Variable(name="text", type="string", value=self.data["prompt"].get_user()))
                         else:
                             messages.add_human_message(Variable(name="text", type="string", value=chat_message))
+                if image_list:
+                    for index, file_var_value in enumerate(image_list):
+                        human_message.add_value(Variable(
+                            name=f"file_{index}",
+                            type="file",
+                            sub_type="image",
+                            value=file_var_value
+                        ))
+                messages.add_human_message(human_message)
             else:
-                messages.add_prompt(self.data["prompt"])
-            if file_list:
-                for file_var in file_list:
-                    messages.add_human_message(file_var, "file")
+                messages.add_system_message(Variable(name="system", type="string", value=self.data["prompt"].get_system()))
+                human_message = ArrayVariable(name="human", type="array[any]")
+                human_message.add_value(Variable(name="text", type="string", value=self.data["prompt"].get_user()))
+                if file_list:
+                    for file_var in file_list:
+                        human_message.add_value(file_var)
+                messages.add_human_message(human_message)
         
         if retrieval_chain:
             def format_docs(segments: List[Document]) -> str:
@@ -216,15 +266,15 @@ class LLMBaseNode(Node):
         if model_info["supplier_name"] == "Anthropic":
             messages.reorganize_messages()
 
-        ai_message = llm_pipeline.invoke(
-            messages.to_langchain_format(
-                model_info["model_name"],
-                model_info["supplier_name"],
-                not is_chat
-            ),
-            input
+        messages_as_langchain_format = messages.to_langchain_format(
+            model_info["model_name"],
+            model_info["supplier_name"],
+            not is_chat,
+            input_variables=input
         )
+        ai_message = llm_pipeline.invoke_llm(messages_as_langchain_format)
         content = ai_message.content
+        print('AI Message:', content)
         if return_json:
             content = self.extract_json_from_string(content)
         token_usage = ai_message.response_metadata["token_usage"]
@@ -302,9 +352,9 @@ class LLMBaseNode(Node):
             for _ in range(5):
                 try:
                     if model_info["supplier_name"] == "Anthropic":
-                        llm_aiter = llm_pipeline.llm.astream(llm_input)
+                        llm_aiter = llm_pipeline.astream_llm(llm_input)
                     else:
-                        llm_aiter = llm_pipeline.llm.astream(llm_input, stream_usage=True)
+                        llm_aiter = llm_pipeline.astream_llm(llm_input, stream_usage=True)
                     while True:
                         try:
                             yield await asyncio.wait_for(anext(llm_aiter), timeout=20)
