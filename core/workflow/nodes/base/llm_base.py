@@ -289,9 +289,11 @@ class LLMBaseNode(Node):
         )
         ai_message = llm_pipeline.invoke_llm(messages_as_langchain_format)
         content = ai_message.content
-        print('AI Message:', content)
         if return_json:
-            content = self.extract_json_from_string(content)
+            try:
+                content = self.extract_json_from_string(content)
+            except Exception:
+                raise Exception(f"AI response format error.\nAI message: {ai_message}")
         token_usage = ai_message.response_metadata["token_usage"]
         prompt_tokens = token_usage["prompt_tokens"]
         completion_tokens = token_usage["completion_tokens"]
