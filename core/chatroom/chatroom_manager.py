@@ -135,8 +135,8 @@ class ChatroomManager:
                             'name': file_name,
                             'url': file_url
                         })
-            await self._ws_manager.send_instruction(chatroom_id, 'WITHFILELIST', file_info_list)
             await self._ws_manager.send_instruction(chatroom_id, 'CHAT', user_input)
+            await self._ws_manager.send_instruction(chatroom_id, 'WITHFILELIST', file_info_list)
             
             chatrooms.update(
                 {'column': 'id', 'value': chatroom_id},
