@@ -10,10 +10,12 @@ import {
     Modal,
     Popconfirm,
     Select,
+    Tag,
     Typography,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { getSuppliersList, postSuppliersAuthorize, postSwitchingModels } from '../api/setting';
+import { findOption } from './WorkFlow/components/Form/Select';
 const { TextArea } = Input;
 const { Paragraph, Text } = Typography;
 
@@ -176,6 +178,26 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                                 <div>
                                     {modelslist
                                         ? modelslist.map((item: any, index: any) => {
+                                            const modelOptions= item.suppliers.map(
+                                                (item: any, index: any) => {
+                                                    return {
+                                                        label:item.supplier_name,
+                                                        options: item.models.map(
+                                                            (
+                                                                item: any,
+                                                                index: any,
+                                                            ) => {
+                                                                return {
+                                                                    label: item.model_name,
+                                                                    value: item.model_id,
+                                                                    ...item
+                                                                };
+                                                            },
+                                                        ),
+                                                       
+                                                    };
+                                                },
+                                            )
                                               return (
                                                   <div className="mb-5">
                                                       <div className="mb-2.5">
@@ -199,41 +221,39 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                                                           style={{ width: 330 }}
                                                           variant="filled"
                                                           onChange={e => changemodal(item, e)}
+                                                          optionRender={option => {
+                                                            return (
+                                                                <div >
+                                                                    {option.label}{' '}
+                                                                    {option?.data?.support_image == 1 && (
+                                                                        <Tag color="blue" className="text-xs">
+                                                                            {intl.formatMessage({
+                                                                                id: 'workflow.tag.imageUnderstanding',
+                                                                                defaultMessage: 'Image Understanding',
+                                                                            })}
+                                                                        </Tag>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        }}
+                                                        labelRender={props => {
+                                                            return (
+                                                                <div title={JSON.stringify(item.suppliers)}>
+                                                                    {props?.label}{' '}
+                                                                    {findOption(props?.value, { options:modelOptions })?.support_image ==
+                                                                        1 && (
+                                                                        <Tag color="blue" className="text-xs">
+                                                                            {intl.formatMessage({
+                                                                                id: 'workflow.tag.imageUnderstanding',
+                                                                                defaultMessage: 'Image Understanding',
+                                                                            })}
+                                                                        </Tag>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        }}
                                                           options={
-                                                              item.suppliers.map(
-                                                                  (item: any, index: any) => {
-                                                                      return {
-                                                                          label: (
-                                                                              <span>
-                                                                                  {
-                                                                                      item.supplier_name
-                                                                                  }
-                                                                              </span>
-                                                                          ),
-                                                                          options: item.models.map(
-                                                                              (
-                                                                                  item: any,
-                                                                                  index: any,
-                                                                              ) => {
-                                                                                  return {
-                                                                                      label: (
-                                                                                          <span>
-                                                                                              {
-                                                                                                  item.model_name
-                                                                                              }
-                                                                                          </span>
-                                                                                      ),
-                                                                                      value: item.model_id,
-                                                                                  };
-                                                                              },
-                                                                          ),
-                                                                          // [
-                                                                          //     { label: <span>Jack</span>, value: 'Jack' },
-                                                                          //     { label: <span>Lucy</span>, value: 'Lucy' },
-                                                                          // ],
-                                                                      };
-                                                                  },
-                                                              )
+                                                            modelOptions
 
                                                               // [
                                                               //     {
@@ -376,6 +396,15 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                                                                 } */}
                                                                   {item.model_type_name}
                                                               </Text>
+                                                              {
+                                                                item.support_image == 1 && (
+                                                                    <Tag color="blue" className="text-xs ml-2">
+                                                                        {intl.formatMessage({
+                                                                            id: 'workflow.tag.imageUnderstanding',
+                                                                            defaultMessage: 'Image Understanding',
+                                                                        })}
+                                                                    </Tag>
+                                                                )}
                                                           </div>
                                                           <div>
                                                               <Badge
