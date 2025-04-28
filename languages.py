@@ -48,9 +48,10 @@ language_packs = {
             ********************End of identity definition content********************
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
-            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
+            1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
+            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
         ''',
         "agent_system_prompt_with_auto_match_ability_direct_output": '''
             You are an AI agent.
@@ -72,9 +73,10 @@ language_packs = {
             ********************End of identity definition content********************
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
-            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
+            1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
+            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
         ''',
         "agent_system_prompt_with_abilities": '''
             You are an AI agent.
@@ -97,9 +99,10 @@ language_packs = {
             ********************End of identity definition content********************
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
-            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
+            1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
+            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
         ''',
         "agent_system_prompt_with_no_ability": '''
             You are an AI agent.
@@ -119,12 +122,12 @@ language_packs = {
             ********************End of identity definition content********************
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
-            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
+            1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
+            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
         ''',
-        "agent_retrieved_docs_format": '''I will provide the information retrieved from the knowledge base based on the user input text in the following JSON format: [{'content': content, 'source': source document name}, ...]
-            Note: The files of the content retrieved from the knowledge base are not uploaded by the user in the current request.\n''',
+        "agent_retrieved_docs_format": '''I will provide the information retrieved from the knowledge base based on the user input text in the following JSON format: [{'content': content, 'source': source document name}, ...]\n''',
         "agent_reply_requirement_with_auto_match_ability": "Please match one corresponding ability based on the user input information and reply in the format corresponding to the ability.",
         "agent_reply_requirement_with_task_splitting_and_auto_match_ability": "Please match one corresponding ability based on the user input information, and based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it, and reply in the format corresponding to the ability.",
         "agent_reply_requirement_with_task_splitting_and_abilities": "Based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it.",
