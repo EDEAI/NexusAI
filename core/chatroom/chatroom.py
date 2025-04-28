@@ -83,6 +83,7 @@ class Chatroom:
         max_round: int,
         smart_selection: bool,
         ws_manager: WebSocketManager,
+        user_message: str,
         user_message_id: int = 0,
         topic: Optional[str] = None
     ) -> None:
@@ -101,6 +102,7 @@ class Chatroom:
         self._max_round = max_round
         self._smart_selection = smart_selection
         self._ws_manager = ws_manager
+        self._user_message = user_message
         self._user_message_id = user_message_id
         self._topic = topic
         # self._history_messages: list
@@ -481,7 +483,7 @@ class Chatroom:
                 type=2,
                 agent_run_type=3,
                 chatroom_id=self._chatroom_id,
-                override_rag_input=user_message,
+                override_rag_input=self._user_message,
                 override_dataset_id=override_dataset['id'] if override_dataset else None,
                 override_file_list=self._image_list if self._current_round == 0 else None
             ):
@@ -665,10 +667,10 @@ class Chatroom:
             {'name': title}
         )
 
-    async def chat(self, user_message: Optional[str] = None, file_list: Optional[List[Union[int, str]]] = None) -> None:
+    async def chat(self, resume: bool, file_list: Optional[List[Union[int, str]]] = None) -> None:
         history_messages_count_on_start = len(self._history_messages)
         performed_rounds = 0
-        if user_message is None:
+        if resume:
             # Resume the unfinished chat
             for message in reversed(self._history_messages):
                 if message['agent_id'] == 0:
@@ -677,7 +679,7 @@ class Chatroom:
                     performed_rounds += 1
         else:
             # Start a new chat
-            self._user_speak(user_message, file_list)
+            self._user_speak(self._user_message, file_list)
         
         for self._current_round in range(performed_rounds, self._max_round):
             agent_id = await self._select_next_speaker()
