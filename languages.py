@@ -385,6 +385,7 @@ language_packs = {
             {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
+            If an image is uploaded in the current request (note that it is not an image in the conversation history), please fully understand and analyze the image content, as the image content is also an important part of the latest round of conversation content.
             You need to fully analyze and understand every round of the conversation history through its message data structure, analyze the current conversation scene and conversation progress, and combine the user's speech content in the last round to summarize what the agents need to do next and the specific execution rules and requirements. This summary then will be passed to the agents as an instruction
 
             Then, respond according to the following requirements:
@@ -450,10 +451,11 @@ language_packs = {
             You are an AI agent in a meeting room, where there is one user and at least one AI agent.
             You should adapt your identity and role according to the context of the conversation.
             You need to reply to the user's instructions. Please pay attention to the following requirements when responding:
-            1. You need to fully analyze and understand the conversation records, analyze the current conversation scene and progress through the last round of the conversation, focus on what the user wants, and provide enough details
-            2. You need to fully analyze and understand the user's command intention through the current conversation scene and progress, as well as the user's instructions, focus on what the user wants, and do not miss important information, rules or requirements in the instructions
-            3. You need to reply based on the current conversation scene and progress, as well as the user's command intention
-            4. Don't copy the viewpoints of other agents in the meeting room.
+            1. If an image is uploaded in the current request (note that it is not an image in the conversation history), please fully understand and analyze the image content, as the image content is also an important part of the latest round of conversation content
+            2. You need to fully analyze and understand the conversation records, analyze the current conversation scene and progress through the last round of the conversation, focus on what the user wants, and provide enough details
+            3. You need to fully analyze and understand the user's command intention through the current conversation scene and progress, as well as the user's instructions, focus on what the user wants, and do not miss important information, rules or requirements in the instructions
+            4. You need to reply based on the current conversation scene and progress, as well as the user's command intention
+            5. Don't copy the viewpoints of other agents in the meeting room.
 
             The JSON format of the conversation history is as follows: [round 1, (round 2,) ...]
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
