@@ -10,6 +10,15 @@ from core.chatroom import ChatroomManager
 
         
 if __name__ == '__main__':
+
+    if os.environ.get('CONDA_PREFIX'):
+        os.environ['TESSDATA_PREFIX'] = os.environ['CONDA_PREFIX'] + '/share/tessdata'
+        
+    import nltk
+    nltk.download('punkt')
+    nltk.download('averaged_perceptron_tagger')
+
+    
     event_loop = asyncio.new_event_loop()
     asyncio.set_event_loop(event_loop)
     manager = ChatroomManager(event_loop)

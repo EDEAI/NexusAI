@@ -593,3 +593,18 @@ class LLMPipeline:
         response = self.chain(messages).invoke(input)
         print("Model response:", response)
         return self.standardize_response(response)
+    
+    def invoke_llm(self, messages, **kwargs):
+        """
+        Invoke the LLM model with the provided prompt.
+        """
+        response = self.llm.invoke(messages, **kwargs)
+        return self.standardize_response(response)
+
+    def astream_llm(self, messages, **kwargs):
+        """
+        Stream the LLM model with the provided prompt.
+        """
+        response = self.llm.astream(messages, **kwargs)
+        return response
+

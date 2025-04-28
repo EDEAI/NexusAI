@@ -212,5 +212,6 @@ export default {
     'agent.chat.copy.failed': '复制失败',
     'agent.chat.scroll.bottom': '滚动到底部',
     'agent.chat.new.message': '有新消息',
+    'agent.chat.upload.file': '上传文件',
 };
 // {intl.formatMessage({ id: 'agent.btn.back' })}

@@ -215,4 +215,5 @@ export default {
     'agent.chat.copy.failed': 'Copy failed',
     'agent.chat.scroll.bottom': 'Scroll to bottom',
     'agent.chat.new.message': 'New message',
+    'agent.chat.upload.file': 'Upload File',
 };

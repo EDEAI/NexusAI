@@ -12,6 +12,7 @@ from websockets import (
 
 from .chatroom import Chatroom
 from .websocket import WebSocketManager
+from config import settings
 from core.database.models import (
     AppRuns,
     Apps,
@@ -72,9 +73,9 @@ class ChatroomManager:
             return None
         return last_message['id']
     
-    def _get_user_message_id_and_topic(self, chatroom_id: int) -> Tuple[int, Optional[str]]:
+    def _get_user_message_info(self, chatroom_id: int) -> Tuple[int, str, Optional[str]]:
         user_message = chatroom_messages.select_one(
-            columns=['id', 'topic'],
+            columns=['id', 'message', 'topic'],
             conditions=[
                 {'column': 'chatroom_id', 'value': chatroom_id},
                 {'column': 'user_id', 'op': '!=', 'value': 0}
@@ -82,7 +83,7 @@ class ChatroomManager:
             order_by='id DESC'
         )
         assert user_message, 'Chatroom has not been started yet.'
-        return user_message['id'], user_message['topic']
+        return user_message['id'], user_message['message'], user_message['topic']
     
     async def _start_chatroom(
         self,
@@ -108,10 +109,10 @@ class ChatroomManager:
                 ]
             )
             app_run_id = app_run['id']
-            user_message_id, topic = self._get_user_message_id_and_topic(chatroom_id)
+            user_message_id, user_message, topic = self._get_user_message_info(chatroom_id)
         else:
             # Start a new chatroom
-            file_name_list = []
+            file_info_list = []
             if file_list:
                 for file_value in file_list:
                     if file_value:
@@ -119,17 +120,23 @@ class ChatroomManager:
                             # Upload file ID
                             file_data = upload_files.get_file_by_id(file_value)
                             file_name = file_data['name'] + file_data['extension']
+                            file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
+                            file_url = f"{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}"
                         elif isinstance(file_value, str):
                             if file_value[0] == '/':
                                 file_value = file_value[1:]
                             file_path = project_root.joinpath('storage').joinpath(file_value)
                             file_name = file_path.name
+                            file_url = f"{settings.STORAGE_URL}/storage/{file_value}"
                         else:
                             # This should never happen
                             raise Exception('Unsupported value type!')
-                        file_name_list.append(file_name)
-            await self._ws_manager.send_instruction(chatroom_id, 'WITHFILELIST', file_name_list)
+                        file_info_list.append({
+                            'name': file_name,
+                            'url': file_url
+                        })
             await self._ws_manager.send_instruction(chatroom_id, 'CHAT', user_input)
+            await self._ws_manager.send_instruction(chatroom_id, 'WITHFILELIST', file_info_list)
             
             chatrooms.update(
                 {'column': 'id', 'value': chatroom_id},
@@ -148,7 +155,7 @@ class ChatroomManager:
                     'status': 2
                 }
             )
-            user_message_id, topic = 0, None
+            user_message_id, user_message, topic = 0, user_input, None
         try:
             # Get related agents
             agent_relations = ChatroomAgentRelation().select(
@@ -190,10 +197,10 @@ class ChatroomManager:
                     user_id, team_id, chatroom_id, app_run_id, bool(chatroom_info['is_temporary']),
                     all_agent_ids, absent_agent_ids,
                     chatroom_info['max_round'], bool(chatroom_info['smart_selection']),
-                    self._ws_manager, user_message_id, topic
+                    self._ws_manager, user_message, user_message_id, topic
                 )
                 chatroom.load_history_messages(history_messages)
-                await chatroom.chat(user_input, file_list)
+                await chatroom.chat(user_input is None, file_list)
             end_time = time()
             app_runs.update(
                 {'column': 'id', 'value': app_run_id},
@@ -299,7 +306,7 @@ class ChatroomManager:
                                     # File list
                                     assert isinstance(data, list), 'File list should be a list.'
                                     self._file_lists[chatroom_id] = data
-                                    await self._ws_manager.send_instruction(chatroom_id, 'FILELISTOK')
+                                    await self._ws_manager.send_instruction(chatroom_id, 'OK')
                                 case 'INPUT':
                                     # User input
                                     assert isinstance(data, str), 'User input should be a string.'

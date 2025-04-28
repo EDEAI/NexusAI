@@ -1028,7 +1028,7 @@ const Creation: React.FC = () => {
                         <Profilephoto CardData={CardData} setCardData={setCardData} />
                         <Input
                             showCount
-                            maxLength={20}
+                            maxLength={50}
                             placeholder={intl.formatMessage({ id: 'creation.placeholder.appname' })}
                             onChange={IconName}
                             value={CreationName}
@@ -1048,7 +1048,7 @@ const Creation: React.FC = () => {
                     </div>
                     <TextArea
                         showCount
-                        maxLength={100}
+                        maxLength={1000}
                         rows={4}
                         placeholder={intl.formatMessage({ id: 'creation.placeholder.appdescribe' })}
                         onChange={CreationContents}

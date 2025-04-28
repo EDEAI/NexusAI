@@ -188,6 +188,7 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
     data_source_type = data.data_source_type
     file_ids = data.file_ids
     user_id = userinfo.uid
+    text_split_config = data.text_split_config
     try:
         dataset_id = Datasets().get_dataset_id(
             app_id, user_id, 'api_vector_auth',
@@ -203,6 +204,7 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
                     'data_source_type': data_source_type,
                     'dataset_process_rule_id': process_rule_id,
                     'upload_file_id': file_id,
+                    'text_split_config': text_split_config,
                     'word_count': 0,
                     'tokens': 0
                 }
@@ -212,7 +214,8 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
                 document_id=document_id,
                 dataset_id=dataset_id,
                 process_rule_id=process_rule_id,
-                file_path=str(project_root.joinpath(file['path']))
+                file_path=str(project_root.joinpath(file['path'])),
+                text_split_config=text_split_config
             )
             word_count, num_tokens, indexing_latency = result
             Documents().update(

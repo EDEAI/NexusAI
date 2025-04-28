@@ -41,6 +41,7 @@ export const useModelListStore = create<ModelListState>((set) => ({
         try {
             set({ loading: true });
             const res = await getModelList();
+            
             if (res.code === 0) {
                 set({ models: Array.isArray(res.data.data) ? res.data.data : [], initialized: true });
             } else {
@@ -75,9 +76,10 @@ export const useModelSelect = () => {
             options: Array.isArray(supplier.model_list) ? supplier.model_list.map(model => ({
                 label: model.model_name,
                 value: model.model_config_id,
+                ...model
             })) : []
         }));
-
+        
         let defaultValue: number | undefined;
         for (const supplier of safeModels) {
             if (Array.isArray(supplier.model_list)) {

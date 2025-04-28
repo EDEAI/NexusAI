@@ -1,0 +1,6 @@
+-- Add text-embedding-3-small and text-embedding-3-large models
+INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (28, 1, 'text-embedding-3-small', 2, 1, 0, 0, 0, CURRENT_TIMESTAMP, NULL, 1);
+INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (29, 1, 'text-embedding-3-large', 2, 1, 0, 0, 0, CURRENT_TIMESTAMP, NULL, 1);
+
+INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) VALUES (28, 1, 28, '{"type": "OpenAIEmbeddings", "model": "text-embedding-3-small", "max_retries": null, "input_pricing": 0.00000002, "request_timeout": null, "pricing_currency": "USD"}', 0, 99, CURRENT_TIMESTAMP, NULL, 1);
+INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) VALUES (29, 1, 29, '{"type": "OpenAIEmbeddings", "model": "text-embedding-3-large", "max_retries": null, "input_pricing": 0.00000013, "request_timeout": null, "pricing_currency": "USD"}', 0, 98, CURRENT_TIMESTAMP, NULL, 1);
