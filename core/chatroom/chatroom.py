@@ -1,5 +1,6 @@
 import json
 import sys
+import asyncio
 
 from collections import deque
 from datetime import datetime
@@ -367,7 +368,8 @@ class Chatroom:
                 prompt=Prompt(system_prompt, user_prompt)
             )
             llm_node.schema_key = schema_key
-            result = llm_node.run(
+            result = await asyncio.to_thread(
+                llm_node.run,
                 return_json=True,
                 override_file_list=self._image_list if self._current_round == 0 else None
             )
@@ -679,6 +681,9 @@ class Chatroom:
         
         for self._current_round in range(performed_rounds, self._max_round):
             agent_id = await self._select_next_speaker()
+            if self._terminate():
+                break
+            
             logger.debug('Selected agent: %s', agent_id)
             if agent_id == 0:
                 logger.debug('Terminating chat...')
