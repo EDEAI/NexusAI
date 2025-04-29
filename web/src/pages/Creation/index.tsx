@@ -224,9 +224,9 @@ const Creation: React.FC = () => {
             description: CreationContent,
             app_id: CardData.app_id,
             mode: CardData.mode,
-            icon: (CardData.id ? JSON.stringify(CardData.id) : CardData.icon)||"0",
+            icon: (CardData.id ? JSON.stringify(CardData.id) : CardData.icon) || '0',
             icon_background: '',
-            avatar:CardData?.avatar||null
+            avatar: CardData?.avatar || null,
         };
 
         let res = await PutappsUpdate(param);
@@ -848,16 +848,28 @@ const Creation: React.FC = () => {
                                                                                               key={
                                                                                                   i
                                                                                               }
+                                                                                              className='ml-1.5'
                                                                                           >
-                                                                                              <div className="w-8 h-8 bg-[#EDF3FE] rounded-lg ml-1.5 flex items-center justify-center ">
-                                                                                                  <img
+                                                                                              {/* <div className="w-8 h-8 rounded-lg ml-1.5 flex items-center justify-center "> */}
+                                                                                                  {/* <img
                                                                                                       src={headportrait(
                                                                                                           'single',
                                                                                                           data.icon,
                                                                                                       )}
                                                                                                       alt=""
-                                                                                                  />
-                                                                                              </div>
+                                                                                                  /> */}
+                                                                                                  <Headportrait
+                                                                                                      Image={headportrait(
+                                                                                                          'single',
+                                                                                                          data.icon,
+                                                                                                      )}
+                                                                                                      avatar={
+                                                                                                          data.avatar
+                                                                                                      }
+                                                                                                      size='24'
+                                                                                                      // icon={`/icons/creation/${WORKFLOW_ICON.WorkFlow}.svg`}
+                                                                                                  ></Headportrait>
+                                                                                              {/* </div> */}
                                                                                           </div>
                                                                                       );
                                                                                   },

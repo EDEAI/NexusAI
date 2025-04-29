@@ -35,8 +35,7 @@ const downloadFile = (url: string, filename: string) => {
         link.click();
         document.body.removeChild(link);
     } catch (e) {
-        console.error('下载文件失败', e);
-        message.error('下载文件失败');
+     
     }
 };
 
@@ -131,70 +130,12 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
 
                 {uploadedFiles.length > 0 && (
                     <div className="p-2 border-b border-gray-200 bg-white rounded-t-md mb-0">
-                        <Image.PreviewGroup>
-                            <div className="flex flex-wrap gap-2">
-                                {uploadedFiles.map(file => (
-                                    <Tag
-                                        key={file.uid}
-                                        closable
-                                        onClose={() => handleRemoveFile(file.uid)}
-                                        className={`flex items-center ${
-                                            file.isImage
-                                                ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-                                                : 'bg-blue-50 text-blue-600'
-                                        }`}
-                                    >
-                                        <Tooltip title={file.name}>
-                                            <div className="flex items-center">
-                                                {file.isImage ? (
-                                                    <div className="mr-1 flex items-center">
-                                                        <Image
-                                                            src={file.path_show || file.url}
-                                                            alt={file.name}
-                                                            className="w-6 h-6 max-w-6 max-h-6 object-cover mr-1 rounded-sm cursor-pointer"
-                                                            preview={{
-                                                                src: file.path_show || file.url,
-                                                                mask: false,
-                                                            }}
-                                                        />
-                                                        <span className="truncate mr-1">
-                                                            {file.name}
-                                                        </span>
-                                                        <DownloadOutlined
-                                                            className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
-                                                            onClick={e => {
-                                                                e.stopPropagation();
-                                                                downloadFile(
-                                                                    file.path_show || file.url,
-                                                                    file.name,
-                                                                );
-                                                            }}
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex items-center">
-                                                        <FileOutlined className="mr-1" />
-                                                        <span className="truncate mr-1">
-                                                            {file.name}
-                                                        </span>
-                                                        <DownloadOutlined
-                                                            className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
-                                                            onClick={e => {
-                                                                e.stopPropagation();
-                                                                downloadFile(
-                                                                    file.path_show || file.url,
-                                                                    file.name,
-                                                                );
-                                                            }}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </Tooltip>
-                                    </Tag>
-                                ))}
-                            </div>
-                        </Image.PreviewGroup>
+                        <FileListDisplay 
+                            fileList={uploadedFiles} 
+                            onDownload={downloadFile} 
+                            onClearAll={clearFiles}
+                            editable={true}
+                        />
                     </div>
                 )}
 
@@ -339,6 +280,26 @@ const renderers = (index: any, intl: any) => {
                 return <code {...props}>{children}</code>;
             }
         },
+        img: ({node, ...props}) => (
+            <div className="relative group">
+                <Image 
+                    src={props.src} 
+                    alt={props.alt} 
+                    className="max-w-full max-h-40 h-auto rounded-md"
+                />
+                <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button 
+                        type="primary" 
+                        size="small" 
+                        icon={<DownloadOutlined />} 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            downloadFile(props.src || '', props.alt || 'image.png');
+                        }}
+                    />
+                </div>
+            </div>
+        )
     };
 };
 // Copy entire chat
@@ -1011,7 +972,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                     }`}
                                                 >
                                                     <div
-                                                        className={`text-left markdown-container inline-block text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
+                                                        className={`text-left inline-block markdown-container text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
                                                         style={
                                                             item.is_agent == 1
                                                                 ? {

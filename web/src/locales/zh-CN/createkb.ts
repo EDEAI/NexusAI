@@ -73,4 +73,13 @@ export default {
     'createkb.no.data.available': '暂无数据',
     'createkb.deleteOperation': '删除操作',
     'createkb.confirmDelete': '您确定要删除吗',
+    
+    // 新增的国际化内容
+    'createkb.uploadToKnowledgeBase': '上传到知识库',
+    'createkb.splitContent': '是否分段',
+    'createkb.splitType': '分段类型',
+    'createkb.chunkSize': '分段长度',
+    'createkb.chunkOverlap': '分段重叠长度',
+    'createkb.fileList': '文件列表：',
+    'createkb.deleteFile': '删除文件'
 };

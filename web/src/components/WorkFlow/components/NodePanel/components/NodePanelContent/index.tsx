@@ -204,6 +204,7 @@ export default memo(({
 
     const getAppsData = useCallback(
         async (nodeType: BlockEnum.Agent | BlockEnum.Skill | 'workflow') => {
+
             const cacheKey = `${nodeType}-${filterData.team}-${filterData.keyword}-${filterData.tag.join(',')}`;
             const cachedItem = dataCache.current[cacheKey];
             
@@ -225,7 +226,7 @@ export default memo(({
                 
                 if (resData?.code === 0 && resData?.data && Array.isArray((resData.data as any).list) && (resData.data as any).list.length > 0) {
                     const dataList = (resData.data as any).list;
-                    const list = dataList.map((item: any) => ({
+                    const list = dataList.filter(item=>item.publish_status==1).map((item: any) => ({
                         ...originNodes[nodeType]?.base,
                         data: {
                             ...originNodes[nodeType]?.base.data,
@@ -375,7 +376,7 @@ export default memo(({
             }, []);
 
             useEffect(() => {
-                // 重置数据获取标志
+          
                 return () => {
                     dataFetchedRef.current = false;
                 };
@@ -383,7 +384,7 @@ export default memo(({
 
             useEffect(() => {
                 const fetchData = async () => {
-                    // 如果已经获取过数据并且过滤条件没变，则不再重复获取
+               
                     if (dataFetchedRef.current && !filterData.keyword && filterData.tag.length === 0) {
                         return;
                     }
@@ -397,6 +398,7 @@ export default memo(({
                                 ...item,
                                 id: `${currentConfig.tabKey}-${index}`,
                             })) || [];
+                            
                         setList(processedData);
                         setDisplayList(processedData.slice(0, pageSize));
                         dataFetchedRef.current = true;

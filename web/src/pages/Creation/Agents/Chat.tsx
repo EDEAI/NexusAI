@@ -123,7 +123,6 @@ interface HistoryResponse {
     total_pages: number;
 }
 
-// 添加下载文件的辅助函数
 const downloadFile = (url: string, filename: string) => {
     try {
         const link = document.createElement('a');
@@ -134,8 +133,8 @@ const downloadFile = (url: string, filename: string) => {
         link.click();
         document.body.removeChild(link);
     } catch (e) {
-        console.error('下载文件失败', e);
-        message.error('下载文件失败');
+        // console.error('下载文件失败', e);
+        // message.error('下载文件失败');
     }
 };
 
@@ -272,6 +271,7 @@ const LoadingMessage = memo(({ detailList }: { detailList: MessageProps['detailL
 });
 
 export default memo((props: Props) => {
+   
     const [messages, setMessages] = useState<Message[]>([]);
     const [hasMoreHistory, setHasMoreHistory] = useState(true);
     const [page, setPage] = useState(1);
@@ -283,7 +283,14 @@ export default memo((props: Props) => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const intl = useIntl();
+    const listenMessage = useSocketStore(state =>
+        (state as unknown as WebSocketStore).getTypedMessages('chat_message_llm_return'),
+    );
+    const [fileDisplayLayout, setFileDisplayLayout] = useState('list');
 
+    const lastMessage = useSocketStore(state =>
+        (state as unknown as WebSocketStore).getTypedLastMessage('chat_message_llm_return'),
+    );
     // 使用自定义的 hook
     const {
         uploadedFiles,
@@ -293,14 +300,8 @@ export default memo((props: Props) => {
         clearFiles,
         isUploading
     } = useFileUpload();
-
-    const listenMessage = useSocketStore(state =>
-        (state as unknown as WebSocketStore).getTypedMessages('chat_message_llm_return'),
-    );
-
-    const lastMessage = useSocketStore(state =>
-        (state as unknown as WebSocketStore).getTypedLastMessage('chat_message_llm_return'),
-    );
+   
+    
    
 
     const scrollToBottom = () => {
@@ -335,7 +336,19 @@ export default memo((props: Props) => {
             setTimeout(scrollToBottom, 100);
         }
     }, [listenMessage]);
+    
+    useEffect(() => {
+        if (props.data?.detailList?.agent?.agent_id) {
+            getMessageHistory();
+        }
+    }, [props.data?.detailList?.agent?.agent_id]);
 
+    useEffect(() => {
+        if (!initialLoading && messages.length > 0) {
+            scrollToBottom();
+        }
+    }, [initialLoading]);
+   
     const handleSubmit = async (values: { content: string,file_list:string[] }) => {
         console.log(values);
         const val = formRef.current?.getFieldsValue();
@@ -413,7 +426,7 @@ export default memo((props: Props) => {
             setInitialLoading(false);
         }
     };
-
+   
     const fetchHistoryMessages = async () => {
         if (loading || !props.data?.detailList?.agent?.agent_id) return;
 
@@ -439,7 +452,7 @@ export default memo((props: Props) => {
             setLoading(false);
         }
     };
-
+   
     const handleClearMemory = async () => {
         if (!props.data?.detailList?.agent?.agent_id || clearingMemory || !messages.length) return;
 
@@ -467,17 +480,6 @@ export default memo((props: Props) => {
         });
     };
 
-    useEffect(() => {
-        if (props.data?.detailList?.agent?.agent_id) {
-            getMessageHistory();
-        }
-    }, [props.data?.detailList?.agent?.agent_id]);
-
-    useEffect(() => {
-        if (!initialLoading && messages.length > 0) {
-            scrollToBottom();
-        }
-    }, [initialLoading]);
 
     const LoadingIndicator = () => (
         <div className="flex items-center justify-center py-2 bg-white/80">
@@ -487,7 +489,7 @@ export default memo((props: Props) => {
             </span>
         </div>
     );
-
+   
     if (initialLoading) {
         return (
             <div className="flex items-center justify-center h-full">
@@ -508,7 +510,7 @@ export default memo((props: Props) => {
             }
         }, 500);
     };
-
+   
     const handleUpload = () => {
         if (!props.data?.detailList?.agent?.agent_id) {
             message.error(intl.formatMessage({ id: 'agent.chat.error.message' }));
@@ -517,7 +519,7 @@ export default memo((props: Props) => {
         
         triggerUpload();
     };
-
+    
     const handleSendMessage = async () => {
         const content = formRef.current?.getFieldValue('content') || '';
         
@@ -527,7 +529,8 @@ export default memo((props: Props) => {
         
         await formRef.current?.submit();
     };
-
+  
+    
     return (
         <div className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border" style={{height: 'calc(100vh - 65px)'}}>
             <ProForm
@@ -617,61 +620,17 @@ export default memo((props: Props) => {
 
                     <div className="border-t border-gray-200 bg-white px-4 py-2 relative">
                         {/* 文件列表 */}
-                        <Image.PreviewGroup>
-                            {uploadedFiles.length > 0 && (
-                                <div className="p-2 border-b border-gray-200">
-                                  
-                                    <div className="flex flex-wrap gap-2">
-                                        {uploadedFiles.map(file => (
-                                            <Tag 
-                                                key={file.uid}
-                                                closable
-                                                onClose={() => handleRemoveFile(file.uid)}
-                                                className={`flex items-center ${file.isImage ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-blue-50 text-blue-600'}`}
-                                            >
-                                                <Tooltip title={file.name}>
-                                                    <div className="flex items-center">
-                                                        {file.isImage ? (
-                                                            <div className="mr-1 flex items-center">
-                                                                <Image 
-                                                                    src={file.path_show || file.url} 
-                                                                    alt={file.name} 
-                                                                    className="w-6 h-6 max-w-6 max-h-6 object-cover mr-1 rounded-sm cursor-pointer" 
-                                                                    preview={{
-                                                                        src: file.path_show || file.url,
-                                                                        mask: false
-                                                                    }}
-                                                                />
-                                                                <span className="truncate mr-1">{file.name}</span>
-                                                                <DownloadOutlined 
-                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        downloadFile(file.path_show || file.url, file.name);
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        ) : (
-                                                            <div className="flex items-center">
-                                                                <FileOutlined className="mr-1" />
-                                                                <span className="truncate mr-1">{file.name}</span>
-                                                                <DownloadOutlined 
-                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        downloadFile(file.path_show || file.url, file.name);
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </Tooltip>
-                                            </Tag>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </Image.PreviewGroup>
+                        {uploadedFiles.length > 0 && (
+                            <div className="p-2 border-b border-gray-200">
+                                <FileListDisplay 
+                                    fileList={uploadedFiles} 
+                                    onDownload={downloadFile} 
+                                    onClearAll={clearFiles}
+                                    editable={true}
+                                    showInGrid={fileDisplayLayout === 'grid'}
+                                />
+                            </div>
+                        )}
                         
                         <div className="flex items-center p-[8px] gap-[10px] box-border border bg-white rounded-[8px]">
                             <div className="flex-1">

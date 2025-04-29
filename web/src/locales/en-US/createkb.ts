@@ -72,4 +72,13 @@ export default {
     'createkb.no.data.available': 'No Data Available',
     'createkb.deleteOperation': 'Delete Operation',
     'createkb.confirmDelete': 'Are you sure you want to delete?',
+    
+    // New internationalization content
+    'createkb.uploadToKnowledgeBase': 'Upload to Knowledge Base',
+    'createkb.splitContent': 'Split Content',
+    'createkb.splitType': 'Split Type',
+    'createkb.chunkSize': 'Chunk Size',
+    'createkb.chunkOverlap': 'Chunk Overlap',
+    'createkb.fileList': 'File List:',
+    'createkb.deleteFile': 'Delete File'
 };

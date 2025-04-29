@@ -2,6 +2,7 @@
  * @LastEditors: biz
  */
 import { getWorkFlowProcessList } from '@/api/workflow';
+import ChatRoomAvatar from '@/components/ChatRoomAvatar';
 import FileDownloadList from '@/components/common/FileDownloadList';
 import Headportrait from '@/components/headportrait';
 import ChatRoomLog from '@/components/LogPanel/ChatRoomLog';
@@ -125,12 +126,12 @@ export default memo(() => {
             } else if (item.show_status == 2) {
                 return item.app_runs_name;
             } else if (item.show_status == 3) {
-                if (item.associated_chat_room_name!="") {
+                if (item.associated_chat_room_name != '') {
                     return intl.formatMessage(
                         { id: 'app.workflow.log.roundtable.guidance' },
                         { name: item.associated_chat_room_name },
                     );
-                } 
+                }
                 return item.app_runs_name;
             }
             return item.apps_name;
@@ -183,11 +184,21 @@ export default memo(() => {
                 ></div>
 
                 <div className="ml-5">
-                    <Headportrait
-                        Image={headportrait('single', item.icon)}
-                        avatar={item.avatar}
-                        // icon={`/icons/creation/${WORKFLOW_ICON.WorkFlow}.svg`}
-                    ></Headportrait>
+                    {item.agents_data?.length > 0 ? (
+                        <div className='ml-2'>
+                            <ChatRoomAvatar
+                            agentList={item.agents_data}
+                            size="sm"
+                            // rounded={true}
+                        ></ChatRoomAvatar>
+                        </div>
+                    ) : (
+                        <Headportrait
+                            Image={headportrait('single', item.icon)}
+                            avatar={item.avatar}
+                            // icon={`/icons/creation/${WORKFLOW_ICON.WorkFlow}.svg`}
+                        ></Headportrait>
+                    )}
                 </div>
                 <div className="flex flex-col gap-1 truncate flex-1  z-10">
                     <div>
