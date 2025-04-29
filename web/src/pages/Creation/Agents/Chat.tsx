@@ -620,17 +620,61 @@ export default memo((props: Props) => {
 
                     <div className="border-t border-gray-200 bg-white px-4 py-2 relative">
                         {/* 文件列表 */}
+                        <Image.PreviewGroup>
                         {uploadedFiles.length > 0 && (
                             <div className="p-2 border-b border-gray-200">
-                                <FileListDisplay 
-                                    fileList={uploadedFiles} 
-                                    onDownload={downloadFile} 
-                                    onClearAll={clearFiles}
-                                    editable={true}
-                                    showInGrid={fileDisplayLayout === 'grid'}
+                                  
+                                    <div className="flex flex-wrap gap-2">
+                                        {uploadedFiles.map(file => (
+                                            <Tag 
+                                                key={file.uid}
+                                                closable
+                                                onClose={() => handleRemoveFile(file.uid)}
+                                                className={`flex items-center ${file.isImage ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-blue-50 text-blue-600'}`}
+                                            >
+                                                <Tooltip title={file.name}>
+                                                    <div className="flex items-center">
+                                                        {file.isImage ? (
+                                                            <div className="mr-1 flex items-center">
+                                                                <Image 
+                                                                    src={file.path_show || file.url} 
+                                                                    alt={file.name} 
+                                                                    className="w-6 h-6 max-w-6 max-h-6 object-cover mr-1 rounded-sm cursor-pointer" 
+                                                                    preview={{
+                                                                        src: file.path_show || file.url,
+                                                                        mask: false
+                                                                    }}
+                                                                />
+                                                                <span className="truncate mr-1">{file.name}</span>
+                                                                <DownloadOutlined 
+                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        downloadFile(file.path_show || file.url, file.name);
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center">
+                                                                <FileOutlined className="mr-1" />
+                                                                <span className="truncate mr-1">{file.name}</span>
+                                                                <DownloadOutlined 
+                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        downloadFile(file.path_show || file.url, file.name);
+                                                                    }}
                                 />
                             </div>
                         )}
+                                                    </div>
+                                                </Tooltip>
+                                            </Tag>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </Image.PreviewGroup>
                         
                         <div className="flex items-center p-[8px] gap-[10px] box-border border bg-white rounded-[8px]">
                             <div className="flex-1">
