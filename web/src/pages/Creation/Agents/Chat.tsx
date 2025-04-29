@@ -9,18 +9,25 @@ import {
 } from '@/api/agents';
 import InfiniteScroll from '@/components/common/InfiniteScroll';
 import FileListDisplay from '@/components/FileListDisplay';
+import useFileUpload from '@/hooks/useFileUpload';
 import { createPromptFromObject } from '@/py2js/prompt.js';
 import useSocketStore from '@/store/websocket';
-import { DeleteOutlined, ExclamationCircleFilled, FileOutlined, PaperClipOutlined, SendOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
+import {
+    DeleteOutlined,
+    DownloadOutlined,
+    ExclamationCircleFilled,
+    FileOutlined,
+    SendOutlined,
+    UploadOutlined,
+} from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm, ProFormSelect, ProFormTextArea } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Button, message, Modal, Spin, Tag, Tooltip, Image } from 'antd';
+import { Button, Image, message, Modal, Spin, Tag, Tooltip } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
-import useFileUpload, { isImageFile, UploadedFile } from '@/hooks/useFileUpload';
 
 interface ApiResponse<T> {
     code: number;
@@ -144,29 +151,29 @@ const UserMessageComponent = memo(({ message }: MessageProps) => (
             {message.file_list && message.file_list.length > 0 && (
                 <FileListDisplay fileList={message.file_list} onDownload={downloadFile} />
             )}
-            <ReactMarkdown 
+            <ReactMarkdown
                 components={{
-                    img: ({node, ...props}) => (
+                    img: ({ node, ...props }) => (
                         <div className="relative group">
-                            <Image 
-                                src={props.src} 
-                                alt={props.alt} 
+                            <Image
+                                src={props.src}
+                                alt={props.alt}
                                 className="max-w-full max-h-40 h-auto rounded-md"
                             />
                             <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button 
-                                    type="primary" 
-                                    size="small" 
-                                    icon={<DownloadOutlined />} 
-                                    onClick={(e) => {
+                                <Button
+                                    type="primary"
+                                    size="small"
+                                    icon={<DownloadOutlined />}
+                                    onClick={e => {
                                         e.stopPropagation();
                                         downloadFile(props.src || '', props.alt || 'image.png');
                                     }}
                                 />
                             </div>
                         </div>
-                    )
-                }} 
+                    ),
+                }}
                 rehypePlugins={[rehypeHighlight]}
             >
                 {message.message}
@@ -178,8 +185,7 @@ const UserMessageComponent = memo(({ message }: MessageProps) => (
 const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: MessageProps) => {
     const intl = useIntl();
     const ability = abilitiesList?.find(item => item.value === message.ability_id);
-  
-    
+
     return (
         <div className="flex justify-start pb-4">
             <div className="max-w-full">
@@ -194,35 +200,41 @@ const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: Messag
                 <div className="max-w-[90%] rounded-lg  relative bg-white text-gray-900 border border-gray-200">
                     {message.file_list && message.file_list.length > 0 && (
                         <div className="p-3 border-b border-gray-100">
-                            <FileListDisplay fileList={message.file_list} onDownload={downloadFile} />
+                            <FileListDisplay
+                                fileList={message.file_list}
+                                onDownload={downloadFile}
+                            />
                         </div>
                     )}
                     {message.message && (
                         <div className="p-3 child  max-w-full [&_p]:mb-0 [&_div]:max-w-full break-words">
                             <Image.PreviewGroup>
-                                <ReactMarkdown 
+                                <ReactMarkdown
                                     components={{
-                                        img: ({node, ...props}) => (
+                                        img: ({ node, ...props }) => (
                                             <div className="relative group">
-                                                <Image 
-                                                    src={props.src} 
-                                                    alt={props.alt} 
+                                                <Image
+                                                    src={props.src}
+                                                    alt={props.alt}
                                                     className="max-w-full max-h-40 h-auto rounded-md"
                                                 />
                                                 <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Button 
-                                                        type="primary" 
-                                                        size="small" 
-                                                        icon={<DownloadOutlined />} 
-                                                        onClick={(e) => {
+                                                    <Button
+                                                        type="primary"
+                                                        size="small"
+                                                        icon={<DownloadOutlined />}
+                                                        onClick={e => {
                                                             e.stopPropagation();
-                                                            downloadFile(props.src || '', props.alt || 'image.png');
+                                                            downloadFile(
+                                                                props.src || '',
+                                                                props.alt || 'image.png',
+                                                            );
                                                         }}
                                                     />
                                                 </div>
                                             </div>
-                                        )
-                                    }} 
+                                        ),
+                                    }}
                                     rehypePlugins={[rehypeHighlight]}
                                 >
                                     {message.message}
@@ -271,7 +283,6 @@ const LoadingMessage = memo(({ detailList }: { detailList: MessageProps['detailL
 });
 
 export default memo((props: Props) => {
-   
     const [messages, setMessages] = useState<Message[]>([]);
     const [hasMoreHistory, setHasMoreHistory] = useState(true);
     const [page, setPage] = useState(1);
@@ -298,11 +309,8 @@ export default memo((props: Props) => {
         handleUpload: triggerUpload,
         removeFile: handleRemoveFile,
         clearFiles,
-        isUploading
+        isUploading,
     } = useFileUpload();
-   
-    
-   
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -318,9 +326,9 @@ export default memo((props: Props) => {
     };
     useUpdateEffect(() => {
         const messageData = lastMessage?.data;
-        
+
         if (!messageData) return;
-        if (messageData?.agent_id !== props.data?.detailList?.agent?.agent_id &&!message.error) {
+        if (messageData?.agent_id !== props.data?.detailList?.agent?.agent_id && !message.error) {
             return;
         }
 
@@ -332,11 +340,11 @@ export default memo((props: Props) => {
         if (listenMessage && listenMessage.length > 0) {
             setIsWaitingForResponse(false);
             setMessages(prev => [...prev, newMessage]);
-            
+
             setTimeout(scrollToBottom, 100);
         }
     }, [listenMessage]);
-    
+
     useEffect(() => {
         if (props.data?.detailList?.agent?.agent_id) {
             getMessageHistory();
@@ -348,8 +356,8 @@ export default memo((props: Props) => {
             scrollToBottom();
         }
     }, [initialLoading]);
-   
-    const handleSubmit = async (values: { content: string,file_list:string[] }) => {
+
+    const handleSubmit = async (values: { content: string; file_list: string[] }) => {
         console.log(values);
         const val = formRef.current?.getFieldsValue();
         if (!val || !values.content?.trim()) return;
@@ -366,7 +374,7 @@ export default memo((props: Props) => {
         // 处理当前的上传文件
         const currentFiles = uploadedFiles.map(file => ({
             name: file.name,
-            url: file.url || file.path_show || ''
+            url: file.url || file.path_show || '',
         }));
 
         const newMessage: Message = {
@@ -381,13 +389,13 @@ export default memo((props: Props) => {
             message: val.content,
             prompt_tokens: 0,
             total_tokens: 0,
-            file_list: currentFiles.length > 0 ? currentFiles : undefined
+            file_list: currentFiles.length > 0 ? currentFiles : undefined,
         };
 
         setIsWaitingForResponse(true);
         setMessages(prev => [...prev, newMessage]);
         formRef.current?.resetFields(['content']);
-        
+
         try {
             await postAgentChatMessage({
                 agent_id,
@@ -402,7 +410,7 @@ export default memo((props: Props) => {
             setIsWaitingForResponse(false);
             message.error('发送消息失败，请重试');
         }
-    
+
         setTimeout(scrollToBottom, 100);
     };
 
@@ -426,7 +434,7 @@ export default memo((props: Props) => {
             setInitialLoading(false);
         }
     };
-   
+
     const fetchHistoryMessages = async () => {
         if (loading || !props.data?.detailList?.agent?.agent_id) return;
 
@@ -452,7 +460,7 @@ export default memo((props: Props) => {
             setLoading(false);
         }
     };
-   
+
     const handleClearMemory = async () => {
         if (!props.data?.detailList?.agent?.agent_id || clearingMemory || !messages.length) return;
 
@@ -480,7 +488,6 @@ export default memo((props: Props) => {
         });
     };
 
-
     const LoadingIndicator = () => (
         <div className="flex items-center justify-center py-2 bg-white/80">
             <Spin size="small" />
@@ -489,7 +496,7 @@ export default memo((props: Props) => {
             </span>
         </div>
     );
-   
+
     if (initialLoading) {
         return (
             <div className="flex items-center justify-center h-full">
@@ -510,29 +517,31 @@ export default memo((props: Props) => {
             }
         }, 500);
     };
-   
+
     const handleUpload = () => {
         if (!props.data?.detailList?.agent?.agent_id) {
             message.error(intl.formatMessage({ id: 'agent.chat.error.message' }));
             return;
         }
-        
+
         triggerUpload();
     };
-    
+
     const handleSendMessage = async () => {
         const content = formRef.current?.getFieldValue('content') || '';
-        
+
         let messageContent = content;
-      
-        formRef.current?.setFieldsValue({ content: messageContent});
-        
+
+        formRef.current?.setFieldsValue({ content: messageContent });
+
         await formRef.current?.submit();
     };
-  
-    
+
     return (
-        <div className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border" style={{height: 'calc(100vh - 65px)'}}>
+        <div
+            className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border"
+            style={{ height: 'calc(100vh - 65px)' }}
+        >
             <ProForm
                 formRef={formRef}
                 submitter={false}
@@ -619,54 +628,71 @@ export default memo((props: Props) => {
                     </div>
 
                     <div className="border-t border-gray-200 bg-white px-4 py-2 relative">
-                        {/* 文件列表 */}
+                       
                         <Image.PreviewGroup>
-                        {uploadedFiles.length > 0 && (
-                            <div className="p-2 border-b border-gray-200">
-                                  
+                            {uploadedFiles.length > 0 && (
+                                <div className="p-2 border-b border-gray-200">
                                     <div className="flex flex-wrap gap-2">
                                         {uploadedFiles.map(file => (
-                                            <Tag 
+                                            <Tag
                                                 key={file.uid}
                                                 closable
                                                 onClose={() => handleRemoveFile(file.uid)}
-                                                className={`flex items-center ${file.isImage ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-blue-50 text-blue-600'}`}
+                                                className={`flex items-center ${
+                                                    file.isImage
+                                                        ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                                                        : 'bg-blue-50 text-blue-600'
+                                                }`}
                                             >
                                                 <Tooltip title={file.name}>
                                                     <div className="flex items-center">
                                                         {file.isImage ? (
                                                             <div className="mr-1 flex items-center">
-                                                                <Image 
-                                                                    src={file.path_show || file.url} 
-                                                                    alt={file.name} 
-                                                                    className="w-6 h-6 max-w-6 max-h-6 object-cover mr-1 rounded-sm cursor-pointer" 
+                                                                <Image
+                                                                    src={file.path_show || file.url}
+                                                                    alt={file.name}
+                                                                    className="w-6 h-6 max-w-6 max-h-6 object-cover mr-1 rounded-sm cursor-pointer"
                                                                     preview={{
-                                                                        src: file.path_show || file.url,
-                                                                        mask: false
+                                                                        src:
+                                                                            file.path_show ||
+                                                                            file.url,
+                                                                        mask: false,
                                                                     }}
                                                                 />
-                                                                <span className="truncate mr-1">{file.name}</span>
-                                                                <DownloadOutlined 
+                                                                <span className="truncate mr-1">
+                                                                    {file.name}
+                                                                </span>
+                                                                <DownloadOutlined
                                                                     className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
-                                                                    onClick={(e) => {
+                                                                    onClick={e => {
                                                                         e.stopPropagation();
-                                                                        downloadFile(file.path_show || file.url, file.name);
+                                                                        downloadFile(
+                                                                            file.path_show ||
+                                                                                file.url,
+                                                                            file.name,
+                                                                        );
                                                                     }}
                                                                 />
                                                             </div>
                                                         ) : (
                                                             <div className="flex items-center">
                                                                 <FileOutlined className="mr-1" />
-                                                                <span className="truncate mr-1">{file.name}</span>
-                                                                <DownloadOutlined 
+                                                                <span className="truncate mr-1">
+                                                                    {file.name}
+                                                                </span>
+                                                                <DownloadOutlined
                                                                     className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
-                                                                    onClick={(e) => {
+                                                                    onClick={e => {
                                                                         e.stopPropagation();
-                                                                        downloadFile(file.path_show || file.url, file.name);
+                                                                        downloadFile(
+                                                                            file.path_show ||
+                                                                                file.url,
+                                                                            file.name,
+                                                                        );
                                                                     }}
-                                />
-                            </div>
-                        )}
+                                                                />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </Tooltip>
                                             </Tag>
@@ -675,7 +701,7 @@ export default memo((props: Props) => {
                                 </div>
                             )}
                         </Image.PreviewGroup>
-                        
+
                         <div className="flex items-center p-[8px] gap-[10px] box-border border bg-white rounded-[8px]">
                             <div className="flex-1">
                                 <ProFormTextArea
