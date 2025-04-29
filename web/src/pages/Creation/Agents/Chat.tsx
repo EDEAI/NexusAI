@@ -140,8 +140,7 @@ const downloadFile = (url: string, filename: string) => {
         link.click();
         document.body.removeChild(link);
     } catch (e) {
-        // console.error('下载文件失败', e);
-        // message.error('下载文件失败');
+
     }
 };
 
