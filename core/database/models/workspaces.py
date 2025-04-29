@@ -125,6 +125,32 @@ class Workspaces(MySQL):
                     if last_agent:
                         app['last_agent_name'] = f"{get_language_content('recently_active_agent')}【{last_agent['name']}】"
 
+                    agent_relations = ChatroomAgentRelation().select(
+                        columns=["agent_id"],
+                        conditions=[
+                            {"column": "chatroom_id", "value": app['chatroom_id']}
+                        ],
+                        order_by="id DESC"
+                    )
+                    agent_ids = [rel['agent_id'] for rel in agent_relations if rel['agent_id'] > 0]
+                    app['agents_data'] = []
+                    if agent_ids:
+                        agents = Agents().select(
+                            columns=["apps.avatar","apps.icon"],
+                            conditions=[
+                                {"column": "id", "op": "in", "value": agent_ids}
+                            ],
+                            joins=[
+                                ["left", "apps", "apps.id = agents.app_id"],
+                            ]
+                        )
+                        # Build a mapping from agent_id to agent information
+                        for agent in agents:
+                            if agent.get('avatar'):
+                                avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                            else:
+                                avatar_url = ''
+                            app['agents_data'].append({"avatar": avatar_url,"icon": agent.get("icon")})
                 if app["agent_id"] > 0:
                     app["type"] = 1
 
@@ -454,7 +480,7 @@ class Workspaces(MySQL):
                     log['agents_data'] = []
                     if agent_ids:
                         agents = Agents().select(
-                            columns=["apps.avatar"],
+                            columns=["apps.avatar","apps.icon"],
                             conditions=[
                                 {"column": "id", "op": "in", "value": agent_ids}
                             ],
@@ -467,7 +493,9 @@ class Workspaces(MySQL):
                         for agent in agents:
                             if agent.get('avatar'):
                                 avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
-                                log['agents_data'].append({"avatar": avatar_url}) 
+                            else:
+                                avatar_url = ''
+                            log['agents_data'].append({"avatar": avatar_url,"icon": agent.get("icon")})
                         # for agent in agents:
                         #     if agent.get('avatar'):
                         #         agent['avatar'] = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"

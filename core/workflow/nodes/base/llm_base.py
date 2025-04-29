@@ -71,6 +71,7 @@ class LLMBaseNode(Node):
         user_id: int = 0,
         agent_id: int = 0
     ) -> Tuple[Messages, Dict[str, Any]]:
+        new_user_prompt = None
         if correct_llm_output:
             if edge_id:
                 history = AppNodeExecutions().get_node_history(app_run_id, edge_id)
@@ -120,6 +121,7 @@ class LLMBaseNode(Node):
                     AgentChatMessages().update_file_content_list_by_id(last_user_message['id'], file_content_list)
 
                 # Add file content to the message content
+                new_user_prompt = input['user_prompt']
                 image_list = []
                 for index, message in enumerate(chat_history):
                     if message['file_list'] and message['file_content_list']:
@@ -137,10 +139,21 @@ class LLMBaseNode(Node):
                                 raise Exception('Unsupported value type!')
                             for file_content in message['file_content_list']:
                                 if file_content[attr] == value:
-                                    if index == len(chat_history) - 1 and file_content['type'] == 'image':
-                                        image_list.append(file_var_value)
-                                        continue
-                                    message['message'] += f'\n******Start of {file_content["name"]}******\n{file_content["content"]}\n******End of {file_content["name"]}******\n'
+                                    if index == len(chat_history) - 1:
+                                        if file_content['type'] == 'image':
+                                            image_list.append(file_var_value)
+                                        else:
+                                            new_user_prompt += (
+                                                f'\n******Start of {file_content["name"]}******\n'
+                                                f'{file_content["content"]}\n'
+                                                f'******End of {file_content["name"]}******\n'
+                                            )
+                                    else:
+                                        message['message'] += (
+                                            f'\n******Start of {file_content["name"]}******\n'
+                                            f'{file_content["content"]}\n'
+                                            f'******End of {file_content["name"]}******\n'
+                                        )
 
                 # Truncate Messages By Token Limit
                 userinfo = users.get_user_by_id(user_id)
@@ -199,9 +212,11 @@ class LLMBaseNode(Node):
                 return json.dumps(formatted_docs_list, ensure_ascii=False)
             
             user_prompt = input['user_prompt'] if override_rag_input is None else override_rag_input
-            rag_result = retrieval_chain.invoke(user_prompt if override_rag_input is None else override_rag_input)
+            rag_result = retrieval_chain.invoke(user_prompt)
             formatted_docs = format_docs(rag_result)
             input['formatted_docs'] = formatted_docs
+        if new_user_prompt is not None:
+            input["user_prompt"] = new_user_prompt
 
         return messages, input
         
@@ -274,9 +289,11 @@ class LLMBaseNode(Node):
         )
         ai_message = llm_pipeline.invoke_llm(messages_as_langchain_format)
         content = ai_message.content
-        print('AI Message:', content)
         if return_json:
-            content = self.extract_json_from_string(content)
+            try:
+                content = self.extract_json_from_string(content)
+            except Exception:
+                raise Exception(f"AI response format error.\nAI message: {ai_message}")
         token_usage = ai_message.response_metadata["token_usage"]
         prompt_tokens = token_usage["prompt_tokens"]
         completion_tokens = token_usage["completion_tokens"]

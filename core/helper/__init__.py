@@ -311,7 +311,7 @@ def get_file_content_list(file_list: List[Dict[str, Any]]) -> List[Dict[str, Any
             else:
                 # This should never happen
                 raise Exception('Unsupported value type!')
-            if file_path.suffix in ['.jpg', 'jpeg', '.png', '.gif', '.webp']:
+            if file_path.suffix in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
                 # Use OCR for image files
                 file_type = 'image'
                 dl = DocumentLoader(file_path=str(file_path))

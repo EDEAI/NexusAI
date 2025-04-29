@@ -73,9 +73,9 @@ class ChatroomManager:
             return None
         return last_message['id']
     
-    def _get_user_message_id_and_topic(self, chatroom_id: int) -> Tuple[int, Optional[str]]:
+    def _get_user_message_info(self, chatroom_id: int) -> Tuple[int, str, Optional[str]]:
         user_message = chatroom_messages.select_one(
-            columns=['id', 'topic'],
+            columns=['id', 'message', 'topic'],
             conditions=[
                 {'column': 'chatroom_id', 'value': chatroom_id},
                 {'column': 'user_id', 'op': '!=', 'value': 0}
@@ -83,7 +83,7 @@ class ChatroomManager:
             order_by='id DESC'
         )
         assert user_message, 'Chatroom has not been started yet.'
-        return user_message['id'], user_message['topic']
+        return user_message['id'], user_message['message'], user_message['topic']
     
     async def _start_chatroom(
         self,
@@ -109,7 +109,7 @@ class ChatroomManager:
                 ]
             )
             app_run_id = app_run['id']
-            user_message_id, topic = self._get_user_message_id_and_topic(chatroom_id)
+            user_message_id, user_message, topic = self._get_user_message_info(chatroom_id)
         else:
             # Start a new chatroom
             file_info_list = []
@@ -155,7 +155,7 @@ class ChatroomManager:
                     'status': 2
                 }
             )
-            user_message_id, topic = 0, None
+            user_message_id, user_message, topic = 0, user_input, None
         try:
             # Get related agents
             agent_relations = ChatroomAgentRelation().select(
@@ -197,10 +197,10 @@ class ChatroomManager:
                     user_id, team_id, chatroom_id, app_run_id, bool(chatroom_info['is_temporary']),
                     all_agent_ids, absent_agent_ids,
                     chatroom_info['max_round'], bool(chatroom_info['smart_selection']),
-                    self._ws_manager, user_message_id, topic
+                    self._ws_manager, user_message, user_message_id, topic
                 )
                 chatroom.load_history_messages(history_messages)
-                await chatroom.chat(user_input, file_list)
+                await chatroom.chat(user_input is None, file_list)
             end_time = time()
             app_runs.update(
                 {'column': 'id', 'value': app_run_id},
