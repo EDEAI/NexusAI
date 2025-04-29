@@ -166,8 +166,10 @@ def get_tokenizer(model_name: str, api_key: str) -> Union[tiktoken.Encoding, Ant
             ).input_tokens
         return anthropic_token_counter
     else:
-        # Use cl100k_base encoder as default
-        return tiktoken.encoding_for_model(model_name)
+        try:
+            return tiktoken.encoding_for_model(model_name)
+        except:
+            return tiktoken.get_encoding("cl100k_base")
 
 def count_tokens(tokenizer: Union[tiktoken.Encoding, Callable[[str], int]], text: str) -> int:
     """
