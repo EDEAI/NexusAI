@@ -87,7 +87,7 @@ class Documents(MySQL):
         :return: A dictionary containing the document information.
         """
         data = self.select_one(
-            columns=['documents.indexing_latency', 'documents.tokens', 'dataset_process_rules.config'],
+            columns=['documents.indexing_latency', 'documents.tokens', 'documents.text_split_config', 'dataset_process_rules.config'],
             joins=[
                 ['left', 'dataset_process_rules', 'documents.dataset_process_rule_id = dataset_process_rules.id'],
             ],
