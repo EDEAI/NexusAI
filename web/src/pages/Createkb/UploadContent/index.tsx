@@ -239,7 +239,7 @@ const UploadList = ({ fun, createkbInfo }: any) => {
     ];
 
     const getList = async e => {
-        loadingfun(true);
+        // loadingfun(true);
         
         if (e.file.status == 'done') {
             setUploadFileList(prev=>{

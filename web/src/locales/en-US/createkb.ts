@@ -1,3 +1,6 @@
+/*
+ * @LastEditors: biz
+ */
 export default {
     'createkb.create': 'createkb',
     'createkb.back': 'Back to Create',
@@ -76,9 +79,12 @@ export default {
     // New internationalization content
     'createkb.uploadToKnowledgeBase': 'Upload to Knowledge Base',
     'createkb.splitContent': 'Split Content',
-    'createkb.splitType': 'Split Type',
-    'createkb.chunkSize': 'Chunk Size',
-    'createkb.chunkOverlap': 'Chunk Overlap',
+    'createkb.splitType': 'Split Mode',
+    'createkb.chunkSize': 'Character Limit per Chunk',
+    'createkb.chunkOverlap': 'Character Overlap Limit per Chunk',
     'createkb.fileList': 'File List:',
-    'createkb.deleteFile': 'Delete File'
+    'createkb.deleteFile': 'Delete File',
+    
+    // Additional missing items
+    'createkb.splitMode': 'Split Mode'
 };
