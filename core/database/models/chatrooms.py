@@ -189,8 +189,11 @@ class Chatrooms(MySQL):
                             ]
                         )
                         
+                        # if agent_data and agent_data.get('avatar'):
+                        #     agent_data['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_data['avatar']}"
                         if agent_data and agent_data.get('avatar'):
-                            agent_data['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_data['avatar']}"
+                            if not agent_data['avatar'].startswith(('http://', 'https://')):
+                                agent_data['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_data['avatar']}"
                             
                         chat_item['agent_list'].append(agent_data)
 
@@ -306,8 +309,11 @@ class Chatrooms(MySQL):
                         joins=[["left", "apps", "apps.id = agents.app_id"]]
                     )
                     if agent_info:
+                        # if agent_info.get('avatar'):
+                        #     agent_info['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_info['avatar']}"
                         if agent_info.get('avatar'):
-                            agent_info['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_info['avatar']}"
+                            if not agent_info['avatar'].startswith(('http://', 'https://')):
+                                agent_info['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_info['avatar']}"
                         chat_item['agent_list'].append(agent_info)
 
         # Filter: only keep chatrooms where the agent list has exactly one agent and that agent's id equals agent_id.

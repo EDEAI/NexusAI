@@ -122,8 +122,11 @@ class Agents(MySQL):
 
         if list:
             for item in list:
+                # if item.get('avatar'):
+                #     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                 if item.get('avatar'):
-                    item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                    if not item['avatar'].startswith(('http://', 'https://')):
+                        item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
 
         return {
             "list": list,

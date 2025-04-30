@@ -98,8 +98,11 @@ class Workspaces(MySQL):
             app_list = [dict(app) for app in app_list]
 
             for app in app_list:
+                # if app.get('avatar'):
+                #     app['avatar'] = f"{settings.STORAGE_URL}/upload/{app['avatar']}"
                 if app.get('avatar'):
-                    app['avatar'] = f"{settings.STORAGE_URL}/upload/{app['avatar']}"
+                    if not app['avatar'].startswith(('http://', 'https://')):
+                        app['avatar'] = f"{settings.STORAGE_URL}/upload/{app['avatar']}"
                 app['last_agent_name'] = ''
                 if app["workflow_id"] > 0:
                     app["type"] = 3
@@ -146,8 +149,14 @@ class Workspaces(MySQL):
                         )
                         # Build a mapping from agent_id to agent information
                         for agent in agents:
+                            # if agent.get('avatar'):
+                            #     avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                            
                             if agent.get('avatar'):
-                                avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                                if not agent['avatar'].startswith(('http://', 'https://')):
+                                    avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                                else:
+                                    avatar_url = ''
                             else:
                                 avatar_url = ''
                             app['agents_data'].append({"avatar": avatar_url,"icon": agent.get("icon")})
@@ -209,8 +218,11 @@ class Workspaces(MySQL):
             
             from api.utils.common import extract_file_list_from_skill_output
             for app_node in app_node_list:
+                # if app_node.get('avatar'):
+                #     app_node['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node['avatar']}"
                 if app_node.get('avatar'):
-                    app_node['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node['avatar']}"
+                    if not app_node['avatar'].startswith(('http://', 'https://')):
+                        app_node['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node['avatar']}"
                 if app_node['need_human_confirm'] == 1:
                     users = Users()
                     app_node_user = AppNodeUserRelation()
@@ -436,8 +448,11 @@ class Workspaces(MySQL):
 
         if log_list:
             for log in log_list:
+                # if log.get('avatar'):
+                #     log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
                 if log.get('avatar'):
-                    log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
+                    if not log['avatar'].startswith(('http://', 'https://')):
+                        log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
                 # Meeting-driven record - status 1
                 if log['app_id'] == 0 and log['chatroom_id'] > 0:
                     log['show_status'] = 1
@@ -491,8 +506,13 @@ class Workspaces(MySQL):
                         
                         # Build a mapping from agent_id to agent information
                         for agent in agents:
+                            # if agent.get('avatar'):
+                            #     avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
                             if agent.get('avatar'):
-                                avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                                if not agent['avatar'].startswith(('http://', 'https://')):
+                                    agent['avatar'] = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                                else:
+                                    avatar_url =  ''
                             else:
                                 avatar_url = ''
                             log['agents_data'].append({"avatar": avatar_url,"icon": agent.get("icon")})
@@ -554,8 +574,11 @@ class Workspaces(MySQL):
                         log['file_list'] = []
                         if app_node_list and app_node_list.get('outputs'):
                             
+                            # if app_node_list.get('avatar'):
+                            #     app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
                             if app_node_list.get('avatar'):
-                                app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
+                                if not app_node_list['avatar'].startswith(('http://', 'https://')):
+                                    app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
                             if outputs := app_node_list.get('outputs'):
                                 app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
                                 
@@ -653,8 +676,11 @@ class Workspaces(MySQL):
                     )
                     log['file_list'] = []
                     if app_node_list and app_node_list.get('outputs'):
+                        # if app_node_list.get('avatar'):
+                        #     app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
                         if app_node_list.get('avatar'):
-                            app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
+                            if not app_node_list['avatar'].startswith(('http://', 'https://')):
+                                app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
                         if outputs := app_node_list.get('outputs'):
                             app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
                             
@@ -759,8 +785,11 @@ class Workspaces(MySQL):
 
         if list:
             for log in list:
+                # if log.get('avatar'):
+                #     log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
                 if log.get('avatar'):
-                    log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
+                    if not log['avatar'].startswith(('http://', 'https://')):
+                        log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
                 if 'app_runs_status' in log:
                     status = log['app_runs_status']
                     if status in (1, 2):
