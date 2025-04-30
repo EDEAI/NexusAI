@@ -1,0 +1,9 @@
+{
+  "createkb.uploadToKnowledgeBase": "上传到知识库",
+  "createkb.splitContent": "是否分段",
+  "createkb.splitType": "分段类型",
+  "createkb.chunkSize": "分段长度",
+  "createkb.chunkOverlap": "分段重叠长度",
+  "createkb.fileList": "文件列表：",
+  "createkb.deleteFile": "删除文件"
+} 

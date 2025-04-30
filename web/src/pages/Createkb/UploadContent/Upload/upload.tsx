@@ -1,12 +1,29 @@
-
+/*
+ * @LastEditors: biz
+ */
 import { getUploadUrl } from '@/api/createkb';
 import { useIntl } from '@umijs/max';
 import { message, Upload } from 'antd';
+import { useRef, useImperativeHandle, forwardRef } from 'react';
 import './upload.css';
 
 const { Dragger } = Upload;
-const UploadView = ({ fun, createkbInfo }: any) => {
+const UploadView = forwardRef(({ fun, createkbInfo }: any, ref) => {
     const intl = useIntl();
+    const uploadRef = useRef<any>(null);
+    
+    // 重置上传组件的方法
+    const resetUpload = () => {
+        if (uploadRef.current) {
+            uploadRef.current.fileList = [];
+        }
+    };
+    
+    // 暴露方法给父组件
+    useImperativeHandle(ref, () => ({
+        reset: resetUpload
+    }));
+    
     let uploads = {
         action: getUploadUrl,
         headers: {
@@ -14,6 +31,12 @@ const UploadView = ({ fun, createkbInfo }: any) => {
         },
         onChange(info) {
             fun(info);
+           
+            if (info.file.status === 'done' || info.file.status === 'error') {
+                resetUpload();
+              
+                
+            }
         },
         beforeUpload(file) {
             const isLt15M = file.size / 1024 / 1024 < 15;
@@ -40,6 +63,7 @@ const UploadView = ({ fun, createkbInfo }: any) => {
         <>
             <Dragger
                 {...props}
+                ref={uploadRef}
                 listType="picture"
                 className="flex flex-col items-center justify-center custom-dragger mt-[15px]"
                 accept=".txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv"
@@ -69,6 +93,6 @@ const UploadView = ({ fun, createkbInfo }: any) => {
             </Dragger>
         </>
     );
-};
+});
 
 export default UploadView;

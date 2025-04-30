@@ -976,7 +976,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
         if (instruction && instruction.length) {
             setsendMessageinit(instruction[0], instruction[1] ? instruction[1] : '');
             setInstruction([]);
-            debugger;
+          
         }
     }, [instruction]);
 

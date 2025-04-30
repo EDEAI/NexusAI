@@ -1,4 +1,3 @@
-
 import { datasetSet, documentList, getInforMation } from '@/api/createkb';
 import { PostappsCreate } from '@/api/creation';
 import { createappdata } from '@/utils/useUser';
@@ -11,10 +10,10 @@ const Setup = ({ createkbInfo, fun }: any) => {
     const [datacontent, setData] = useState(null);
     const [showSpin, showSpinfun] = useState(false);
 
-
     const [EmbeddingKey, EmbeddingKeyfun] = useState(1);
     const [ispublice, setispublice] = useState(1);
     const [suppliersdata, setSuppliersdata] = useState(null);
+    const [embeddingModelConfigId, setEmbeddingModelConfigId] = useState(null);
 
     const [appType, appTypefun] = useState(1);
 
@@ -33,10 +32,8 @@ const Setup = ({ createkbInfo, fun }: any) => {
     };
 
     const setJsonData = async () => {
-
         showSpinfun(true);
         if (!createkbInfo.app_id) {
-
             const data = await PostappsCreate(createappdata('GET'));
             if (data.code == 0) {
                 fun({ type: 'set', data: data.data.app_id });
@@ -59,7 +56,6 @@ const Setup = ({ createkbInfo, fun }: any) => {
         };
         let res = await datasetSet(data);
         if (res.code == 0) {
-
             message.success(
                 intl.formatMessage({ id: 'createkb.setupSuccess', defaultMessage: '' }),
             );
@@ -68,9 +64,7 @@ const Setup = ({ createkbInfo, fun }: any) => {
                 showSpinfun(false);
             }, 1000);
         } else {
-            message.error(
-                intl.formatMessage({ id: 'createkb.settingFailed', defaultMessage: '' }),
-            );
+            message.error(intl.formatMessage({ id: 'createkb.settingFailed', defaultMessage: '' }));
             showSpinfun(false);
         }
     };
@@ -85,30 +79,29 @@ const Setup = ({ createkbInfo, fun }: any) => {
         if (res.code == 0) {
             setispublice(res.data.dataset_detail.is_public);
             EmbeddingKeyfun(res.data.dataset_detail.mode);
+            setEmbeddingModelConfigId(res.data.dataset_detail.embedding_model_config_id);
             setData({
                 name: res.data.dataset_detail.name,
                 description: res.data.dataset_detail.description,
                 nickname: res.data.dataset_detail.nickname,
             });
+            getInformation(res.data.dataset_detail.embedding_model_config_id);
         }
     };
 
-    const getInformation = async () => {
-        let res = await getInforMation();
+    const getInformation = async embeddingModelConfigId => {
+        let res = await getInforMation(embeddingModelConfigId);
         if (res.code == 0) {
             setSuppliersdata(res.data.data);
         }
     };
 
-
     useEffect(() => {
-
         if (createkbInfo.app_id) {
-
             appTypefun(!createkbInfo.type ? 1 : 2);
             getDocumentList();
         } else {
-
+            getInformation(0);
             setData({
                 name: createkbInfo.name,
                 description: createkbInfo.description,
@@ -116,7 +109,6 @@ const Setup = ({ createkbInfo, fun }: any) => {
 
             appTypefun(3);
         }
-        getInformation();
     }, []);
 
     return (
@@ -127,8 +119,11 @@ const Setup = ({ createkbInfo, fun }: any) => {
                         <img src="/icons/flag.svg" className="w-4 h-4" />
                         <span className="ml-[10px] text-[#213044] text-[18px] leading-[25px] font-medium">
                             {appType == 2
-                                ? getLocale()=='zh-CN'?datacontent.nickname+intl.formatMessage({ id: 'createkb.knowledge.base.of', }) :intl.formatMessage({ id: 'createkb.knowledge.base.of', })+datacontent.nickname
-                              
+                                ? getLocale() == 'zh-CN'
+                                    ? datacontent.nickname +
+                                      intl.formatMessage({ id: 'createkb.knowledge.base.of' })
+                                    : intl.formatMessage({ id: 'createkb.knowledge.base.of' }) +
+                                      datacontent.nickname
                                 : appType == 1
                                 ? intl.formatMessage({
                                       id: 'createkb.editKB',
@@ -205,7 +200,6 @@ const Setup = ({ createkbInfo, fun }: any) => {
                                             <span className="text-[#555555] font-medium">
                                                 {intl.formatMessage({
                                                     id: 'createkb.modelSelect',
-
                                                 })}
                                             </span>
                                         </div>
@@ -252,21 +246,18 @@ const Setup = ({ createkbInfo, fun }: any) => {
                                                             >
                                                                 {intl.formatMessage({
                                                                     id: 'createkb.apiEmbed',
-
                                                                 })}
                                                             </span>
                                                         </p>
                                                         <p className="text-[#999999] mb-[10px]">
                                                             {intl.formatMessage({
                                                                 id: 'createkb.vendor',
-
                                                             })}
                                                             : {suppliersdata?.online.suppliers_name}
                                                         </p>
                                                         <p className="mb-0 text-[#999999]">
                                                             {intl.formatMessage({
                                                                 id: 'createkb.modelName',
-
                                                             })}
                                                             : {suppliersdata?.online.name}
                                                         </p>
@@ -313,21 +304,18 @@ const Setup = ({ createkbInfo, fun }: any) => {
                                                             >
                                                                 {intl.formatMessage({
                                                                     id: 'createkb.localEmbed',
-
                                                                 })}
                                                             </span>
                                                         </p>
                                                         <p className="text-[#999999] mb-[10px]">
                                                             {intl.formatMessage({
                                                                 id: 'createkb.vendor',
-
                                                             })}
                                                             ： -
                                                         </p>
                                                         <p className="mb-0 text-[#999999]">
                                                             {intl.formatMessage({
                                                                 id: 'createkb.modelName',
-
                                                             })}
                                                             : {suppliersdata?.local.name}
                                                         </p>
@@ -348,7 +336,6 @@ const Setup = ({ createkbInfo, fun }: any) => {
                                         >
                                             {intl.formatMessage({
                                                 id: 'createkb.save.and.upload.document',
-
                                             })}
                                         </Button>
                                         <Button
@@ -358,7 +345,6 @@ const Setup = ({ createkbInfo, fun }: any) => {
                                         >
                                             {intl.formatMessage({
                                                 id: 'createkb.cancel',
-
                                             })}
                                         </Button>
                                     </div>

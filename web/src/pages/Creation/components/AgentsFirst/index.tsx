@@ -405,7 +405,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 })}
                             />
                         </div>
-              
+                      
                     </div> */}
 
                     <Form.List name="users">
@@ -533,11 +533,15 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     </div>
                                     <Select
                                         size="large"
-                                        mode="tags"
-                                        style={{ width: '100%' }}
+                                        mode="multiple"
+                                        showSearch
+                                        style={{ width: '100%' ,fontSize:'12px'}}
                                         placeholder={intl.formatMessage({
                                             id: 'agent.pleaseselect',
                                         })}
+                                        filterOption={(input, option) =>
+                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                        }
                                         value={repository}
                                         onChange={handleChange}
                                         options={dataset}
