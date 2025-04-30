@@ -876,8 +876,8 @@ async def retrieval_history_list(
                     msg, user_id)
         return response_error(msg)
 
-@router.get('/get_model_information', response_model=ModelInformationResponse)
-async def get_model_information(userinfo: TokenData = Depends(get_current_user)) -> ModelInformationResponse:
+@router.get('/get_model_information/{model_config_id}', response_model=ModelInformationResponse)
+async def get_model_information(model_config_id: int, userinfo: TokenData = Depends(get_current_user)) -> ModelInformationResponse:
     """
     Get model information
 
@@ -901,6 +901,13 @@ async def get_model_information(userinfo: TokenData = Depends(get_current_user))
     team_id = userinfo.team_id
     online_model = Models().get_model_by_type(2, team_id, 1, user_id)
     local_model = Models().get_model_by_type(2, team_id, 2, user_id)
+    if model_config_id > 0:
+        # Override the default model
+        model = Models().get_model_by_config_id(model_config_id)
+        if model['model_mode'] == 1:
+            online_model = model
+        else:
+            local_model = model
     data = {
         'online': {
             'id': online_model['model_id'],
