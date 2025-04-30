@@ -533,11 +533,13 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     </div>
                                     <Select
                                         size="large"
-                                        mode="tags"
-                                        style={{ width: '100%' }}
+                                        mode="multiple"
+                                        showSearch
+                                        style={{ width: '100%',fontSize:'12px' }}
                                         placeholder={intl.formatMessage({
                                             id: 'agent.pleaseselect',
                                         })}
+                                        
                                         value={repository}
                                         onChange={handleChange}
                                         options={dataset}
