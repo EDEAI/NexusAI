@@ -246,7 +246,7 @@ const UploadList = ({ fun, createkbInfo }: any) => {
                 return [...prev,e.file]
             })
             // setUploadFileList(e.fileList)
-            debugger
+            
             uploadViewRef.current?.reset();
         }
     };

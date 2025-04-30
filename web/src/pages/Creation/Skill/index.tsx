@@ -201,11 +201,11 @@ const Skill: React.FC = () => {
     };
 
     const FirstValue = (value: any, newappId?: any) => {
-        debugger;
+       
         Skill_update(value, newappId);
-        debugger;
+     
         const param = objecttoarray(value.input_variables);
-        debugger;
+     
         Fourthlyref.setFieldsValue(param);
     };
 
@@ -310,7 +310,7 @@ const Skill: React.FC = () => {
             Fourthlyref.setFieldsValue(param);
             Skill_update(data, app_id);
             setLoading(false);
-            debugger
+            
             pageKeyfun('4');
             setskillmenudisabled({ ...skillmenudisabled, fourthly: false });
         

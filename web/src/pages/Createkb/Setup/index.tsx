@@ -100,7 +100,7 @@ const Setup = ({ createkbInfo, fun }: any) => {
         let res = await getInforMation(embeddingModelConfigId);
         if (res.code == 0) {
             setSuppliersdata(res.data.data);
-            debugger
+            
         }
     };
 
