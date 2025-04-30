@@ -16,8 +16,8 @@ export const documentList = async (data: any) => {
 };
 
 // Get supplier and model names
-export const getInforMation = async () => {
-    const res = await aniRequest<any>('/v1/vector/get_model_information', { method: 'GET' });
+export const getInforMation = async (embeddingModelConfigId: any) => {
+    const res = await aniRequest<any>(`/v1/vector/get_model_information/${embeddingModelConfigId}`, { method: 'GET' });
     return res;
 };
 

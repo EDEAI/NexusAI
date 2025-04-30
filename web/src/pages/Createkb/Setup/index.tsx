@@ -15,6 +15,7 @@ const Setup = ({ createkbInfo, fun }: any) => {
     const [EmbeddingKey, EmbeddingKeyfun] = useState(1);
     const [ispublice, setispublice] = useState(1);
     const [suppliersdata, setSuppliersdata] = useState(null);
+    const [embeddingModelConfigId, setEmbeddingModelConfigId] = useState(null);
 
     const [appType, appTypefun] = useState(1);
 
@@ -85,18 +86,21 @@ const Setup = ({ createkbInfo, fun }: any) => {
         if (res.code == 0) {
             setispublice(res.data.dataset_detail.is_public);
             EmbeddingKeyfun(res.data.dataset_detail.mode);
+            setEmbeddingModelConfigId(res.data.dataset_detail.embedding_model_config_id);
             setData({
                 name: res.data.dataset_detail.name,
                 description: res.data.dataset_detail.description,
                 nickname: res.data.dataset_detail.nickname,
             });
+            getInformation(res.data.dataset_detail.embedding_model_config_id);
         }
     };
 
-    const getInformation = async () => {
-        let res = await getInforMation();
+    const getInformation = async (embeddingModelConfigId) => {
+        let res = await getInforMation(embeddingModelConfigId);
         if (res.code == 0) {
             setSuppliersdata(res.data.data);
+            debugger
         }
     };
 
@@ -116,7 +120,7 @@ const Setup = ({ createkbInfo, fun }: any) => {
 
             appTypefun(3);
         }
-        getInformation();
+        // getInformation();
     }, []);
 
     return (
