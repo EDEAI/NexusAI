@@ -58,11 +58,8 @@ class AppRuns(MySQL):
         )
 
         for item in list:
-            # if item.get('avatar'):
-            #     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             if item.get('avatar'):
-                if not item['avatar'].startswith(('http://', 'https://')):
-                    item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
 
         return list
 
@@ -81,11 +78,8 @@ class AppRuns(MySQL):
                 ["left", "apps", "app_runs.app_id = apps.id"]
             ]
         )
-        # if data and data.get('avatar'):
-            # data['avatar'] = f"{settings.STORAGE_URL}/upload/{data['avatar']}"
         if data and data.get('avatar'):
-                if not data['avatar'].startswith(('http://', 'https://')):
-                    data['avatar'] = f"{settings.STORAGE_URL}/upload/{data['avatar']}"
+            data['avatar'] = f"{settings.STORAGE_URL}/upload/{data['avatar']}"
         return data
 
     def get_running_app_run_ai(self, app_run_id: int) -> Dict[str, Any]:
@@ -165,11 +159,8 @@ class AppRuns(MySQL):
         )
 
         for item in list:
-            # if item.get('avatar'):
-            #     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             if item.get('avatar'):
-                if not item['avatar'].startswith(('http://', 'https://')):
-                    item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
 
         # Add additional query to count records with need_human_confirm == 1
         human_confirm_total = self.select(
@@ -218,11 +209,8 @@ class AppRuns(MySQL):
         )
 
         for item in list:
-            # if item.get('avatar'):
-            #     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             if item.get('avatar'):
-                if not item['avatar'].startswith(('http://', 'https://')):
-                    item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
 
         return list
 

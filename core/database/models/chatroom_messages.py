@@ -131,11 +131,8 @@ class ChatroomMessages(MySQL):
                         item['is_agent'] = 0
                     item['content'] = item['message']
 
-                    # if item.get('avatar'):
-                    #     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                     if item.get('avatar'):
-                        if not item['avatar'].startswith(('http://', 'https://')):
-                            item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                        item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
 
                     if item['file_list']:
                         file_list = []
@@ -189,11 +186,8 @@ class ChatroomMessages(MySQL):
                             item['is_agent'] = 0
                         item['content'] = item['message']
 
-                        # if item.get('avatar'):
-                        #     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                         if item.get('avatar'):
-                            if not item['avatar'].startswith(('http://', 'https://')):
-                                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                            item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                         
                         if item['file_list']:
                             file_list = []
