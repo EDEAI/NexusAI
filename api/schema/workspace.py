@@ -53,6 +53,8 @@ class WorkspaceList(BaseModel):
     last_agent_name: Optional[str] = None
     icon: Optional[str] = None
     icon_background: Optional[str] = None
+    agents_data: Optional[List[Dict[str, Any]]] = None
+    
 class WorkspaceListResponseData(BaseModel):
     list: Optional[List[WorkspaceList]] = None
     total_count: Optional[int] = None

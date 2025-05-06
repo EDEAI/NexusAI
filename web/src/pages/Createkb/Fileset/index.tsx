@@ -21,7 +21,19 @@ const Fileset = ({ item, fun, createkbInfo }: any) => {
     let sz = [
         {
             title:
+                intl.formatMessage({ id: 'createkb.splitMode', defaultMessage: '' }) +
+                '：',
+            value: '',
+        },
+        {
+            title:
                 intl.formatMessage({ id: 'createkb.charLimit', defaultMessage: '' }) +
+                '：',
+            value: '',
+        },
+        {
+            title:
+                intl.formatMessage({ id: 'createkb.chunkOverlap', defaultMessage: '' }) +
                 '：',
             value: '',
         },
@@ -65,7 +77,9 @@ const Fileset = ({ item, fun, createkbInfo }: any) => {
         fun('return');
     };
     function wordDatafuns() {
-        return sz.map(x => {
+        return sz.filter(x =>{
+            return  x.value != null
+        }).map(x => {
             return (
                 <div className="mr-[40px]" key={`${x.title}`}>
                     <div className="flex items-center grow shrink-0">
@@ -122,12 +136,14 @@ const Fileset = ({ item, fun, createkbInfo }: any) => {
         });
         contentfun(res.data);
         if (content == null) {
-            sz[0].value = res.data.seg_set.seg_Len; //Seg Len
-            sz[1].value = res.data.seg_set.seg_Avg; //Seg Avg
-            sz[2].value = res.data.seg_set.seg_Num; //Seg Num
-            sz[3].value = res.data.seg_set.hit_Num; //Hit Num
-            sz[4].value = res.data.seg_set.Embedding_Time; //Embedding Time
-            sz[5].value = res.data.seg_set.Embedding_Token; //Seg Token
+            sz[0].value = res.data.seg_set.seg_Mode
+            sz[1].value = res.data.seg_set.seg_Len; //Seg Len
+            sz[2].value = res.data.seg_set.seg_Overlap; //Seg Len
+            sz[3].value = res.data.seg_set.seg_Avg; //Seg Avg
+            sz[4].value = res.data.seg_set.seg_Num; //Seg Num
+            sz[5].value = res.data.seg_set.hit_Num; //Hit Num
+            sz[6].value = res.data.seg_set.Embedding_Time; //Embedding Time
+            sz[7].value = res.data.seg_set.Embedding_Token; //Seg Token
             wordData = wordDatafuns();
         }
 

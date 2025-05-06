@@ -1,16 +1,21 @@
 import useWebSocketManager from '@//hooks/useSocket';
 import { getRoomMessage } from '@/api/plaza';
-import useChatroomStore from '@/store/chatroomstate';
-import { headportrait, userinfodata } from '@/utils/useUser';
 import Avatar from '@/components/ChatAvatar';
+import FileListDisplay from '@/components/FileListDisplay';
+import useFileUpload from '@/hooks/useFileUpload';
+import useChatroomStore from '@/store/chatroomstate';
+import { userinfodata } from '@/utils/useUser';
 import {
     ArrowDownOutlined,
+    DownloadOutlined,
     FileDoneOutlined,
+    FileOutlined,
     FundProjectionScreenOutlined,
     PauseCircleOutlined,
+    UploadOutlined,
 } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Input, Spin, message } from 'antd';
+import { Button, Image, Input, Spin, Tag, Tooltip, message } from 'antd';
 import copy from 'copy-to-clipboard';
 import 'highlight.js/styles/atom-one-dark.css';
 import { throttle } from 'lodash';
@@ -19,6 +24,20 @@ import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import { useParams } from 'umi';
 const { TextArea } = Input;
+
+const downloadFile = (url: string, filename: string) => {
+    try {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+     
+    }
+};
 
 // User enters text here
 interface inputFieldParameters {
@@ -34,11 +53,37 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
     let intl = useIntl();
 
     const disableInput = useChatroomStore(state => state.disableInput);
-
     const setDisableInput = useChatroomStore(state => state.setDisableInput);
+
+    const {
+        uploadedFiles,
+        handleUpload,
+        removeFile: handleRemoveFile,
+        clearFiles,
+        isUploading,
+    } = useFileUpload({
+        maxSizeMB: 15,
+        acceptedFileTypes: '.txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv,.jpg,.png,.jpeg',
+        multiple: true,
+    });
 
     // Value entered by the user
     const [userSendvalue, setUserSendvalue] = useState('');
+
+    const sendMessageUseFile = message => {
+        if (uploadedFiles?.length > 0) {
+            setInstruction(['FILELIST', uploadedFiles.map(file => file.file_id)]);
+            setTimeout(() => {
+                setInstruction(['INPUT', message]);
+
+                if (uploadedFiles.length > 0) {
+                    clearFiles();
+                }
+            }, 300);
+        } else {
+            setInstruction(['INPUT', message]);
+        }
+    };
     // Send message
     const userSendmessage = (e: any) => {
         if (!e.shiftKey && e.target.value == '') {
@@ -53,7 +98,7 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
         if (!e.shiftKey && e.keyCode == 13 && e.target.value != '') {
             setDisableInput(true);
             setUserSendvalue('');
-            setInstruction(['INPUT', e.target.value]);
+            sendMessageUseFile(e.target.value);
             e.preventDefault();
         }
     };
@@ -61,6 +106,12 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
     const stopChatRoom = throttle(() => {
         setInstruction(['STOP', null]);
     }, 300);
+
+    const handleFileUpload = () => {
+        if (disableInput) return;
+        handleUpload();
+    };
+
     return (
         <>
             <div className="max-w-[920px] w-full min-h-[60px] mt-[20px] mb-[20px] mx-auto relative">
@@ -76,7 +127,93 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
                 >
                     <ArrowDownOutlined className="text-[16px]" />
                 </div>
-                <div className="flex items-center p-[12px] gap-[10px] box-border border border-[#ccc] bg-[#fff] rounded-[8px]">
+
+                <Image.PreviewGroup>
+                            {uploadedFiles.length > 0 && (
+                                <div className="p-2 border-b border-gray-200">
+                                    <div className="flex flex-wrap gap-2">
+                                        {uploadedFiles.map(file => (
+                                            <Tag
+                                                key={file.uid}
+                                                closable
+                                                onClose={() => handleRemoveFile(file.uid)}
+                                                className={`flex items-center ${
+                                                    file.isImage
+                                                        ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                                                        : 'bg-blue-50 text-blue-600'
+                                                }`}
+                                            >
+                                                <Tooltip title={file.name}>
+                                                    <div className="flex items-center">
+                                                        {file.isImage ? (
+                                                            <div className="mr-1 flex items-center">
+                                                                <Image
+                                                                    src={file.path_show || file.url}
+                                                                    alt={file.name}
+                                                                    className="w-6 h-6 max-w-6 max-h-6 object-cover mr-1 rounded-sm cursor-pointer"
+                                                                    preview={{
+                                                                        src:
+                                                                            file.path_show ||
+                                                                            file.url,
+                                                                        mask: false,
+                                                                    }}
+                                                                />
+                                                                <span className="truncate mr-1">
+                                                                    {file.name}
+                                                                </span>
+                                                                <DownloadOutlined
+                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
+                                                                    onClick={e => {
+                                                                        e.stopPropagation();
+                                                                        downloadFile(
+                                                                            file.path_show ||
+                                                                                file.url,
+                                                                            file.name,
+                                                                        );
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center">
+                                                                <FileOutlined className="mr-1" />
+                                                                <span className="truncate mr-1">
+                                                                    {file.name}
+                                                                </span>
+                                                                <DownloadOutlined
+                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
+                                                                    onClick={e => {
+                                                                        e.stopPropagation();
+                                                                        downloadFile(
+                                                                            file.path_show ||
+                                                                                file.url,
+                                                                            file.name,
+                                                                        );
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </Tooltip>
+                                            </Tag>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </Image.PreviewGroup>
+
+                <div
+                    className={`flex items-center p-[12px] gap-[10px] box-border border border-[#ccc] bg-[#fff] ${
+                        uploadedFiles.length > 0 ? 'rounded-b-[8px]' : 'rounded-[8px]'
+                    }`}
+                >
+                    <Button
+                        type="text"
+                        icon={<UploadOutlined />}
+                        onClick={handleFileUpload}
+                        disabled={disableInput || isUploading}
+                        loading={isUploading}
+                    />
+
                     <TextArea
                         id="userValue"
                         className="placeholder-text-[#aaa] placeholder-text-[14px]"
@@ -112,7 +249,8 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
                                     });
                                 }
                                 setDisableInput(true);
-                                setInstruction(['INPUT', userSendvalue]);
+
+                                sendMessageUseFile(userSendvalue);
                                 setUserSendvalue('');
                             }, 300)}
                         >
@@ -204,6 +342,26 @@ const renderers = (index: any, intl: any) => {
                 return <code {...props}>{children}</code>;
             }
         },
+        img: ({node, ...props}) => (
+            <div className="relative group">
+                <Image 
+                    src={props.src} 
+                    alt={props.alt} 
+                    className="max-w-full max-h-40 h-auto rounded-md"
+                />
+                <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button 
+                        type="primary" 
+                        size="small" 
+                        icon={<DownloadOutlined />} 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            downloadFile(props.src || '', props.alt || 'image.png');
+                        }}
+                    />
+                </div>
+            </div>
+        )
     };
 };
 // Copy entire chat
@@ -394,6 +552,20 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                         upButtonDom.current.style.display = 'none';
                     });
                     break;
+                case 'WITHFILELIST':
+                    setCurrentMessageContent((pre: any) => {
+                        const newPre = [...pre];
+                        if (newPre.length) {
+                            newPre[newPre.length - 1].file_list = array[1];
+                        }
+
+                        return newPre;
+                    });
+                    setTimeout(() => {
+                        scrollDomRef.current.scrollTop = 0;
+                        upButtonDom.current.style.display = 'none';
+                    });
+                    break;
                 case 'STOPPABLE':
                     setIsStop(array[1]);
                     break;
@@ -500,22 +672,10 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                         currentMessage.is_agent != 1 ? 'flex-row-reverse' : ''
                     }`}
                 >
-                    {/* <div className='h-[30px]'><Avatar size={30} className='bg-[#ddd]' icon={currentMessage.icon?currentMessage.icon:<UserOutlined />}/></div> */}
-                    {/*<div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
-                        {currentMessage.is_agent == 1 ? (
-                            <img
-                                src={headportrait('single', currentMessage.icon)}
-                                alt=""
-                                className="w-[18px]  h-[18px]"
-                            />
-                        ) : (
-                            <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
-                        )}
-                    </div>*/}
                     {currentMessage.is_agent == 1 ? (
                         <Avatar data={currentMessage} />
-                    ):(
-                        <Avatar data={{avatar:"/icons/user_header.svg"}}/>
+                    ) : (
+                        <Avatar data={{ avatar: '/icons/user_header.svg' }} />
                     )}
                     <div className="flex1 max-w-[560px] text-right" id={`addcontent`}>
                         <div
@@ -545,6 +705,14 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                                 }
                                 id={`addchilContent`}
                             >
+                                {currentMessage.file_list && currentMessage.file_list.length > 0 && (
+                                    <div className="mb-3">
+                                        <FileListDisplay 
+                                            fileList={currentMessage.file_list} 
+                                            onDownload={downloadFile} 
+                                        />
+                                    </div>
+                                )}
                                 <ReactMarkdown
                                     rehypePlugins={[rehypeHighlight]}
                                     components={renderers('add', intl)}
@@ -610,23 +778,11 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                             item.is_agent != 1 ? 'flex-row-reverse' : ''
                         }`}
                     >
-                        {/* <div className='h-[30px]'><Avatar size={30} className='bg-[#ddd]' icon={item.icon?item.icon:<UserOutlined />}/></div> */}
-                        {/*<div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
-                            {item.is_agent == 1 ? (
-                                <img
-                                    src={headportrait('single', item.icon)}
-                                    alt=""
-                                    className="w-[18px]  h-[18px]"
-                                />
-                            ) : (
-                                <img src="/icons/user_header.svg" className="w-[18px]  h-[18px]" />
-                            )}
-                        </div>*/}
-                         {item.is_agent == 1 ? (
-                                <Avatar data={item}/>
-                            ):(
-                                <Avatar data={{avatar:"/icons/user_header.svg"}}/>
-                         )}
+                        {item.is_agent == 1 ? (
+                            <Avatar data={item} />
+                        ) : (
+                            <Avatar data={{ avatar: '/icons/user_header.svg' }} />
+                        )}
                         <div
                             className="flex1 max-w-[560px] text-right"
                             id={`currentContent${index}`}
@@ -656,6 +812,14 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                                     }
                                     id={`currentChilContent${index}`}
                                 >
+                                    {item.file_list && item.file_list.length > 0 && (
+                                        <div className="mb-3">
+                                            <FileListDisplay 
+                                                fileList={item.file_list} 
+                                                onDownload={downloadFile} 
+                                            />
+                                        </div>
+                                    )}
                                     <ReactMarkdown
                                         rehypePlugins={[rehypeHighlight]}
                                         components={renderers(index, intl)}
@@ -812,6 +976,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
         if (instruction && instruction.length) {
             setsendMessageinit(instruction[0], instruction[1] ? instruction[1] : '');
             setInstruction([]);
+          
         }
     }, [instruction]);
 
@@ -825,7 +990,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                 className={`h-full min-h-full overflow-y-auto flex flex-col-reverse  items-center  scroll-smooth chatroom`}
                 ref={scrollDomRef}
                 onScroll={slideScroll}
-            >   
+            >
                 <div className="min-w-[860px]">
                     <div className="w-full">
                         <div className="flex flex-col-reverse">
@@ -839,24 +1004,12 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                 item.is_agent != 1 ? 'flex-row-reverse' : ''
                                             }`}
                                         >
-                                            {/* <div className="w-[40px] h-[40px] bg-[#F4F8F1] rounded-[6px] flex items-center justify-center shrink-0">
-                                                {item.is_agent == 1 ? (
-                                                    <img
-                                                        src={headportrait('single', item.icon)}
-                                                        alt=""
-                                                        className="w-[18px]  h-[18px]"
-                                                    />
-                                                ) : (
-                                                    <img
-                                                        src="/icons/user_header.svg"
-                                                        className="w-[18px]  h-[18px]"
-                                                    />
-                                                )}
-                                            </div> */}
                                             {item.is_agent == 1 ? (
-                                                    <Avatar data={item}/>
-                                                ):(
-                                                    <Avatar data={{avatar:"/icons/user_header.svg"}}/>
+                                                <Avatar data={item} />
+                                            ) : (
+                                                <Avatar
+                                                    data={{ avatar: '/icons/user_header.svg' }}
+                                                />
                                             )}
                                             <div
                                                 className="flex1 max-w-[560px] text-right"
@@ -864,7 +1017,9 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                             >
                                                 <div
                                                     className={`${
-                                                        item.is_agent == 1 ? 'text-left' : 'text-right'
+                                                        item.is_agent == 1
+                                                            ? 'text-left'
+                                                            : 'text-right'
                                                     } font-[500] text-[14px] text-[#213044] pb-[8px]`}
                                                 >
                                                     {item.name
@@ -879,19 +1034,31 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                     }`}
                                                 >
                                                     <div
-                                                        className={`text-left markdown-container inline-block text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
+                                                        className={`text-left inline-block markdown-container text-[14px] font-[400] text-[#213044] bg-[#F7F7F7] p-[15px] pb-[1px] leading-[22px]`}
                                                         style={
                                                             item.is_agent == 1
-                                                                ? { borderRadius: ' 0px 8px 8px 8px' }
+                                                                ? {
+                                                                      borderRadius:
+                                                                          ' 0px 8px 8px 8px',
+                                                                  }
                                                                 : {
-                                                                    borderRadius: '8px 0px 8px 8px',
-                                                                    background:
-                                                                        'rgba(27,100,243,0.1)',
-                                                                    whiteSpace: 'pre-wrap',
-                                                                }
+                                                                      borderRadius:
+                                                                          '8px 0px 8px 8px',
+                                                                      background:
+                                                                          'rgba(27,100,243,0.1)',
+                                                                      whiteSpace: 'pre-wrap',
+                                                                  }
                                                         }
                                                         id={`chilContent${index}`}
                                                     >
+                                                        {item.file_list && item.file_list.length > 0 && (
+                                                            <div className="mb-3">
+                                                                <FileListDisplay 
+                                                                    fileList={item.file_list} 
+                                                                    onDownload={downloadFile} 
+                                                                />
+                                                            </div>
+                                                        )}
                                                         <ReactMarkdown
                                                             rehypePlugins={[rehypeHighlight]}
                                                             components={renderers(index, intl)}

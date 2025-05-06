@@ -1,9 +1,10 @@
 import { GetdatasetList } from '@/api/agents';
 import Callword from '@/components/callword';
+import { findOption } from '@/components/WorkFlow/components/Form/Select';
 import Variable from '@/components/WorkFlow/components/Variable';
 import { useModelSelect } from '@/store/modelList';
 import { useIntl } from '@umijs/max';
-import { Button, Form, Input, Radio, Select, Switch } from 'antd';
+import { Button, Form, Input, Radio, Select, Switch, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 const { TextArea } = Input;
@@ -297,7 +298,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     id: 'agent.pleaseselect',
                                 })}
                                 // defaultValue="jack"
-                                style={{ width: 270 }}
+                                // style={{ width: 270 }}
                                 value={
                                     Fourthly_config_id == 0
                                         ? intl.formatMessage({
@@ -308,6 +309,37 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 variant="filled"
                                 onChange={FourthlySelect}
                                 options={options}
+                                optionRender={option => {
+                                    return (
+                                        <div title={JSON.stringify(option)}>
+                                            {option.label}{' '}
+                                            {option?.data?.support_image == 1 && (
+                                                <Tag color="blue" className="text-xs">
+                                                    {intl.formatMessage({
+                                                        id: 'workflow.tag.imageUnderstanding',
+                                                        defaultMessage: 'Image Understanding',
+                                                    })}
+                                                </Tag>
+                                            )}
+                                        </div>
+                                    );
+                                }}
+                                labelRender={props => {
+                                    return (
+                                        <div>
+                                            {props?.label}{' '}
+                                            {findOption(props?.value, { options })?.support_image ==
+                                                1 && (
+                                                <Tag color="blue" className="text-xs">
+                                                    {intl.formatMessage({
+                                                        id: 'workflow.tag.imageUnderstanding',
+                                                        defaultMessage: 'Image Understanding',
+                                                    })}
+                                                </Tag>
+                                            )}
+                                        </div>
+                                    );
+                                }}
                             />
                         </div>
                     </Form.Item>
@@ -373,7 +405,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 })}
                             />
                         </div>
-              
+                      
                     </div> */}
 
                     <Form.List name="users">
@@ -501,11 +533,15 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     </div>
                                     <Select
                                         size="large"
-                                        mode="tags"
-                                        style={{ width: '100%' }}
+                                        mode="multiple"
+                                        showSearch
+                                        style={{ width: '100%' ,fontSize:'12px'}}
                                         placeholder={intl.formatMessage({
                                             id: 'agent.pleaseselect',
                                         })}
+                                        filterOption={(input, option) =>
+                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                        }
                                         value={repository}
                                         onChange={handleChange}
                                         options={dataset}

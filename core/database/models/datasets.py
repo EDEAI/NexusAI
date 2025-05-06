@@ -164,7 +164,7 @@ class Datasets(MySQL):
         :return: A dictionary containing the dataset information.
         """
         return self.select_one(
-            columns=['datasets.id', 'apps.name', 'apps.description', 'apps.is_public', 'models.mode', 'users.nickname'],
+            columns=['datasets.id', 'datasets.embedding_model_config_id', 'apps.name', 'apps.description', 'apps.is_public', 'models.mode', 'users.nickname'],
             joins=[
                 ['left', 'apps', 'datasets.app_id = apps.id'],
                 ['left', 'model_configurations', 'datasets.embedding_model_config_id = model_configurations.id'],

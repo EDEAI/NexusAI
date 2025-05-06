@@ -59,7 +59,7 @@ const skillFourthly: React.FC<ChildProps> = ({
                     item.content,
                     item.status,
                 );
-                debugger
+            
                 input_variables.addProperty(item.name, variable);
             });
             const param = {

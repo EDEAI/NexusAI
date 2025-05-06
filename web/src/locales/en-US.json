@@ -1,0 +1,9 @@
+{
+  "createkb.uploadToKnowledgeBase": "Upload to Knowledge Base",
+  "createkb.splitContent": "Split Content",
+  "createkb.splitType": "Split Type",
+  "createkb.chunkSize": "Chunk Size",
+  "createkb.chunkOverlap": "Chunk Overlap",
+  "createkb.fileList": "File List:",
+  "createkb.deleteFile": "Delete File"
+} 

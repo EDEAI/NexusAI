@@ -13,7 +13,18 @@ export interface LabelInValueType {
     /** @deprecated `key` is useless since it should always same as `value` */
     key?: React.Key;
 }
-export const SelectModelConfigId = ({ name, form }) => {
+export const findOption = (value: RawValueType,data) => {
+    if (!value || !data?.options) return null;
+
+    for (const group of data.options) {
+        if (group.options) {
+            const found = group.options.find(option => option.value === value);
+            if (found) return found;
+        }
+    }
+    return null;
+};
+export const SelectModelConfigId = ({ name, form, proComponentProps, fieldProps }) => {
     const intl = useIntl();
     // const { data, loading } = useRequest(
     //     () =>
@@ -52,17 +63,7 @@ export const SelectModelConfigId = ({ name, form }) => {
     const data = useStore(state => state.modelOptionsData);
     console.log(data);
 
-    const findOption = (value: RawValueType) => {
-        if (!value || !data?.options) return null;
-
-        for (const group of data.options) {
-            if (group.options) {
-                const found = group.options.find(option => option.value === value);
-                if (found) return found;
-            }
-        }
-        return null;
-    };
+    
 
     const imageUnderstandingText = intl.formatMessage({
         id: 'workflow.tag.imageUnderstanding',
@@ -99,7 +100,7 @@ export const SelectModelConfigId = ({ name, form }) => {
                             return (
                                 <div>
                                     {props?.label}{' '}
-                                    {findOption(props?.value)?.support_image==1 && (
+                                    {findOption(props?.value,data)?.support_image==1 && (
                                         <Tag color="blue" className="text-xs">
                                             {imageUnderstandingText}
                                         </Tag>
@@ -107,7 +108,10 @@ export const SelectModelConfigId = ({ name, form }) => {
                                 </div>
                             );
                         },
+                        ...fieldProps,
                     }}
+                    {...proComponentProps}
+                
                 ></ProFormSelect>
                 // )
             }

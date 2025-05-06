@@ -188,6 +188,7 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
     data_source_type = data.data_source_type
     file_ids = data.file_ids
     user_id = userinfo.uid
+    text_split_config = data.text_split_config
     try:
         dataset_id = Datasets().get_dataset_id(
             app_id, user_id, 'api_vector_auth',
@@ -203,6 +204,7 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
                     'data_source_type': data_source_type,
                     'dataset_process_rule_id': process_rule_id,
                     'upload_file_id': file_id,
+                    'text_split_config': text_split_config,
                     'word_count': 0,
                     'tokens': 0
                 }
@@ -212,7 +214,8 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
                 document_id=document_id,
                 dataset_id=dataset_id,
                 process_rule_id=process_rule_id,
-                file_path=str(project_root.joinpath(file['path']))
+                file_path=str(project_root.joinpath(file['path'])),
+                text_split_config=text_split_config
             )
             word_count, num_tokens, indexing_latency = result
             Documents().update(
@@ -516,14 +519,32 @@ async def document_segments_list(
         total_count = Documents().document_segments_count(conditions)
         segmented_information = DocumentSegments().document_segments_file_set(document_id)
         file_information = Documents().documents_dataset_process_rules(document_id)
+        text_split_config = file_information['text_split_config']
         seg_set = {
-            'seg_Avg': segmented_information.get("avg_word_count", ""),
-            'seg_Num': segmented_information.get("count_id", ""),
-            'hit_Num': segmented_information.get("sum_hit_count", ""),
-            'Embedding_Time': file_information.get("indexing_latency", ''),
-            'Embedding_Token': file_information.get("tokens", ''),
-            'seg_Len': file_information.get('config', {}).get("chunk_size", ""),
+            'seg_Mode': None,
+            'seg_Len': None,
+            'seg_Overlap': None,
+            'seg_Avg': None,
+            'seg_Num': None,
+            'hit_Num': segmented_information['sum_hit_count'],
+            'Embedding_Time': file_information['indexing_latency'],
+            'Embedding_Token': file_information['tokens'],
         }
+        if text_split_config is None:
+            seg_set['seg_Mode'] = 'text'
+            text_split_config = file_information['config']
+            seg_set['seg_Len'] = text_split_config['chunk_size']
+            seg_set['seg_Overlap'] = text_split_config['chunk_overlap']
+            seg_set['seg_Avg'] = segmented_information['avg_word_count']
+            seg_set['seg_Num'] = segmented_information['count_id']
+        else:
+            if text_split_config['split']:
+                seg_set['seg_Mode'] = text_split_config['split_mode']
+                if text_split_config['split_mode'] == 'text':
+                    seg_set['seg_Len'] = text_split_config['chunk_size']
+                    seg_set['seg_Overlap'] = text_split_config['chunk_overlap']
+                seg_set['seg_Avg'] = segmented_information['avg_word_count']
+                seg_set['seg_Num'] = segmented_information['count_id']
         paging_information = paging_result(page, page_size, total_count)
         paging_information['hit_count'] = hit_count
         result = Documents().document_segments_list(paging_information, conditions)
@@ -533,10 +554,10 @@ async def document_segments_list(
             'data': result['data'],
             'seg_set': seg_set,
             'paging_information': {
-                "total_pages": result['total_pages'],
-                "total_count": total_count,
-                "page": page,
-                "page_size": page_size,
+                'total_pages': result['total_pages'],
+                'total_count': total_count,
+                'page': page,
+                'page_size': page_size,
             }
         }
         return response_success(response, get_language_content("api_vector_success"))
@@ -873,8 +894,8 @@ async def retrieval_history_list(
                     msg, user_id)
         return response_error(msg)
 
-@router.get('/get_model_information', response_model=ModelInformationResponse)
-async def get_model_information(userinfo: TokenData = Depends(get_current_user)) -> ModelInformationResponse:
+@router.get('/get_model_information/{model_config_id}', response_model=ModelInformationResponse)
+async def get_model_information(model_config_id: int, userinfo: TokenData = Depends(get_current_user)) -> ModelInformationResponse:
     """
     Get model information
 
@@ -898,6 +919,13 @@ async def get_model_information(userinfo: TokenData = Depends(get_current_user))
     team_id = userinfo.team_id
     online_model = Models().get_model_by_type(2, team_id, 1, user_id)
     local_model = Models().get_model_by_type(2, team_id, 2, user_id)
+    if model_config_id > 0:
+        # Override the default model
+        model = Models().get_model_by_config_id(model_config_id)
+        if model['model_mode'] == 1:
+            online_model = model
+        else:
+            local_model = model
     data = {
         'online': {
             'id': online_model['model_id'],

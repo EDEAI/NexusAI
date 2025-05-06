@@ -8,18 +8,26 @@ import {
     PutagentPublish,
 } from '@/api/agents';
 import InfiniteScroll from '@/components/common/InfiniteScroll';
+import FileListDisplay from '@/components/FileListDisplay';
+import useFileUpload from '@/hooks/useFileUpload';
 import { createPromptFromObject } from '@/py2js/prompt.js';
 import useSocketStore from '@/store/websocket';
-import { DeleteOutlined, ExclamationCircleFilled, FileOutlined, PaperClipOutlined, SendOutlined, UploadOutlined } from '@ant-design/icons';
+import {
+    DeleteOutlined,
+    DownloadOutlined,
+    ExclamationCircleFilled,
+    FileOutlined,
+    SendOutlined,
+    UploadOutlined,
+} from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm, ProFormSelect, ProFormTextArea } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Button, message, Modal, Spin, Tag, Tooltip, Upload } from 'antd';
+import { Button, Image, message, Modal, Spin, Tag, Tooltip } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
-import { getUploadUrl } from '@/api/createkb';
 
 interface ApiResponse<T> {
     code: number;
@@ -36,6 +44,10 @@ interface SocketMessageData {
     created_time?: string;
     total_tokens?: number;
     agent_id?: number;
+    file_list?: Array<{
+        name: string;
+        url: string;
+    }>;
 }
 
 interface SocketMessage {
@@ -66,6 +78,10 @@ interface Message {
     agent_id?: number;
     completion_tokens?: number;
     prompt_tokens?: number;
+    file_list?: Array<{
+        name: string;
+        url: string;
+    }>;
 }
 
 interface MessageProps {
@@ -114,17 +130,53 @@ interface HistoryResponse {
     total_pages: number;
 }
 
-interface UploadedFile {
-    name: string;
-    url: string;
-    uid: string;
-    isImage?: boolean;
-}
+const downloadFile = (url: string, filename: string) => {
+    try {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+
+    }
+};
 
 const UserMessageComponent = memo(({ message }: MessageProps) => (
     <div className="flex justify-end">
         <div className="max-w-[70%] rounded-lg p-3 bg-blue-100 text-blue-900">
-            {message.message}
+            {message.file_list && message.file_list.length > 0 && (
+                <FileListDisplay fileList={message.file_list} onDownload={downloadFile} />
+            )}
+            <ReactMarkdown
+                components={{
+                    img: ({ node, ...props }) => (
+                        <div className="relative group">
+                            <Image
+                                src={props.src}
+                                alt={props.alt}
+                                className="max-w-full max-h-40 h-auto rounded-md"
+                            />
+                            <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                    type="primary"
+                                    size="small"
+                                    icon={<DownloadOutlined />}
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        downloadFile(props.src || '', props.alt || 'image.png');
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    ),
+                }}
+                rehypePlugins={[rehypeHighlight]}
+            >
+                {message.message}
+            </ReactMarkdown>
         </div>
     </div>
 ));
@@ -132,6 +184,7 @@ const UserMessageComponent = memo(({ message }: MessageProps) => (
 const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: MessageProps) => {
     const intl = useIntl();
     const ability = abilitiesList?.find(item => item.value === message.ability_id);
+
     return (
         <div className="flex justify-start pb-4">
             <div className="max-w-full">
@@ -144,11 +197,48 @@ const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: Messag
                     )}
                 </div>
                 <div className="max-w-[90%] rounded-lg  relative bg-white text-gray-900 border border-gray-200">
+                    {message.file_list && message.file_list.length > 0 && (
+                        <div className="p-3 border-b border-gray-100">
+                            <FileListDisplay
+                                fileList={message.file_list}
+                                onDownload={downloadFile}
+                            />
+                        </div>
+                    )}
                     {message.message && (
                         <div className="p-3 child  max-w-full [&_p]:mb-0 [&_div]:max-w-full break-words">
-                            <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                                {message.message}
-                            </ReactMarkdown>
+                            <Image.PreviewGroup>
+                                <ReactMarkdown
+                                    components={{
+                                        img: ({ node, ...props }) => (
+                                            <div className="relative group">
+                                                <Image
+                                                    src={props.src}
+                                                    alt={props.alt}
+                                                    className="max-w-full max-h-40 h-auto rounded-md"
+                                                />
+                                                <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button
+                                                        type="primary"
+                                                        size="small"
+                                                        icon={<DownloadOutlined />}
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            downloadFile(
+                                                                props.src || '',
+                                                                props.alt || 'image.png',
+                                                            );
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ),
+                                    }}
+                                    rehypePlugins={[rehypeHighlight]}
+                                >
+                                    {message.message}
+                                </ReactMarkdown>
+                            </Image.PreviewGroup>
                         </div>
                     )}
                     {message.error && (
@@ -199,22 +289,27 @@ export default memo((props: Props) => {
     const [clearingMemory, setClearingMemory] = useState(false);
     const [initialLoading, setInitialLoading] = useState(false);
     const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
-    const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
-    const [previewVisible, setPreviewVisible] = useState(false);
     const formRef = useRef<ProFormInstance>();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const intl = useIntl();
-
     const listenMessage = useSocketStore(state =>
         (state as unknown as WebSocketStore).getTypedMessages('chat_message_llm_return'),
     );
+    const [fileDisplayLayout, setFileDisplayLayout] = useState('list');
 
     const lastMessage = useSocketStore(state =>
         (state as unknown as WebSocketStore).getTypedLastMessage('chat_message_llm_return'),
     );
-   
+    // 使用自定义的 hook
+    const {
+        uploadedFiles,
+        setUploadedFiles,
+        handleUpload: triggerUpload,
+        removeFile: handleRemoveFile,
+        clearFiles,
+        isUploading,
+    } = useFileUpload();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -230,8 +325,9 @@ export default memo((props: Props) => {
     };
     useUpdateEffect(() => {
         const messageData = lastMessage?.data;
+
         if (!messageData) return;
-        if (messageData?.agent_id !== props.data?.detailList?.agent?.agent_id) {
+        if (messageData?.agent_id !== props.data?.detailList?.agent?.agent_id && !message.error) {
             return;
         }
 
@@ -243,11 +339,24 @@ export default memo((props: Props) => {
         if (listenMessage && listenMessage.length > 0) {
             setIsWaitingForResponse(false);
             setMessages(prev => [...prev, newMessage]);
+
             setTimeout(scrollToBottom, 100);
         }
     }, [listenMessage]);
 
-    const handleSubmit = async (values: { content: string }) => {
+    useEffect(() => {
+        if (props.data?.detailList?.agent?.agent_id) {
+            getMessageHistory();
+        }
+    }, [props.data?.detailList?.agent?.agent_id]);
+
+    useEffect(() => {
+        if (!initialLoading && messages.length > 0) {
+            scrollToBottom();
+        }
+    }, [initialLoading]);
+
+    const handleSubmit = async (values: { content: string; file_list: string[] }) => {
         console.log(values);
         const val = formRef.current?.getFieldsValue();
         if (!val || !values.content?.trim()) return;
@@ -261,6 +370,12 @@ export default memo((props: Props) => {
             },
         });
 
+        // 处理当前的上传文件
+        const currentFiles = uploadedFiles.map(file => ({
+            name: file.name,
+            url: file.url || file.path_show || '',
+        }));
+
         const newMessage: Message = {
             id: Date.now(),
             content: values.content,
@@ -273,6 +388,7 @@ export default memo((props: Props) => {
             message: val.content,
             prompt_tokens: 0,
             total_tokens: 0,
+            file_list: currentFiles.length > 0 ? currentFiles : undefined,
         };
 
         setIsWaitingForResponse(true);
@@ -285,7 +401,10 @@ export default memo((props: Props) => {
                 input_dict,
                 ability_id,
                 prompt,
+                file_list: uploadedFiles.map(file => file.file_id),
             });
+            // 发送成功后清空文件列表
+            clearFiles();
         } catch (error) {
             setIsWaitingForResponse(false);
             message.error('发送消息失败，请重试');
@@ -368,18 +487,6 @@ export default memo((props: Props) => {
         });
     };
 
-    useEffect(() => {
-        if (props.data?.detailList?.agent?.agent_id) {
-            getMessageHistory();
-        }
-    }, [props.data?.detailList?.agent?.agent_id]);
-
-    useEffect(() => {
-        if (!initialLoading && messages.length > 0) {
-            scrollToBottom();
-        }
-    }, [initialLoading]);
-
     const LoadingIndicator = () => (
         <div className="flex items-center justify-center py-2 bg-white/80">
             <Spin size="small" />
@@ -410,126 +517,30 @@ export default memo((props: Props) => {
         }, 500);
     };
 
-    const handleRemoveFile = (uid: string) => {
-        setUploadedFiles(prev => prev.filter(file => file.uid !== uid));
-    };
-
-    const isImageFile = (fileName: string) => {
-        const extension = fileName.split('.').pop()?.toLowerCase();
-        return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(extension || '');
-    };
-
     const handleUpload = () => {
         if (!props.data?.detailList?.agent?.agent_id) {
             message.error(intl.formatMessage({ id: 'agent.chat.error.message' }));
             return;
         }
-        
-        // 触发文件选择对话框
-        const uploadInput = document.createElement('input');
-        uploadInput.type = 'file';
-        uploadInput.accept = '.txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv,.jpg,.png,.jpeg';
-        uploadInput.multiple = true; // 支持多文件上传
-        
-        uploadInput.onchange = async (e) => {
-            const target = e.target as HTMLInputElement;
-            if (target.files && target.files.length > 0) {
-                const files = Array.from(target.files);
-                
-                // 检查文件大小
-                const oversizedFiles = files.filter(file => file.size / 1024 / 1024 > 15);
-                if (oversizedFiles.length > 0) {
-                    message.error(`${oversizedFiles.map(f => f.name).join(', ')} ${intl.formatMessage({ id: 'workflow.uploadFileErrorText' })}`);
-                    return;
-                }
-                
-                // 上传所有文件
-                for (const file of files) {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    
-                    try {
-                        const url = await getUploadUrl();
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                Authorization: `Bearer ${localStorage.getItem('token')}`,
-                            },
-                            body: formData,
-                        });
-                        
-                        const result = await response.json();
-                        
-                        if (result.code === 0) {
-                            message.success(`${file.name} ${intl.formatMessage({ id: 'workflow.uploadSuccess' })}`);
-                            
-                            // 将文件添加到上传文件列表
-                            if (result.data?.file_url) {
-                                const isImage = isImageFile(file.name);
-                                setUploadedFiles(prev => [
-                                    ...prev, 
-                                    { 
-                                        name: file.name, 
-                                        url: result.data.file_url,
-                                        uid: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                                        isImage
-                                    }
-                                ]);
-                            }
-                        } else {
-                            message.error(`${file.name} ${intl.formatMessage({ id: 'workflow.uploadFailed' })}`);
-                        }
-                    } catch (error) {
-                        console.error('Upload error:', error);
-                        message.error(`${file.name} ${intl.formatMessage({ id: 'workflow.uploadFailed' })}`);
-                    }
-                }
-            }
-        };
-        
-        uploadInput.click();
+
+        triggerUpload();
     };
 
     const handleSendMessage = async () => {
         const content = formRef.current?.getFieldValue('content') || '';
-        
-        // 合并文件链接和文本内容
+
         let messageContent = content;
-        
-        if (uploadedFiles.length > 0) {
-            const fileLinks = uploadedFiles.map(file => {
-                if (file.isImage) {
-                    // 对于图片文件，使用Markdown图片语法
-                    return `![${file.name}](${file.url})`;
-                } else {
-                    // 对于其他文件，使用普通链接语法
-                    return `[${file.name}](${file.url})`;
-                }
-            }).join('\n');
-            messageContent = fileLinks + (content ? '\n\n' + content : '');
-        }
-        
-        // 更新表单内容
+
         formRef.current?.setFieldsValue({ content: messageContent });
-        
-        // 提交表单
+
         await formRef.current?.submit();
-        
-        // 清空文件列表
-        setUploadedFiles([]);
-    };
-
-    const handlePreviewImage = (url: string) => {
-        setPreviewImage(url);
-        setPreviewVisible(true);
-    };
-
-    const handlePreviewClose = () => {
-        setPreviewVisible(false);
     };
 
     return (
-        <div className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border" style={{height: 'calc(100vh - 65px)'}}>
+        <div
+            className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border"
+            style={{ height: 'calc(100vh - 65px)' }}
+        >
             <ProForm
                 formRef={formRef}
                 submitter={false}
@@ -616,48 +627,80 @@ export default memo((props: Props) => {
                     </div>
 
                     <div className="border-t border-gray-200 bg-white px-4 py-2 relative">
-                        {/* 文件列表 */}
-                        {JSON.stringify(uploadedFiles)}
-                        {uploadedFiles.length > 0 && (
-                            <div className="p-2 border-b border-gray-200">
-                                <div className="flex items-center mb-1">
-                                    <PaperClipOutlined className="mr-2 text-gray-500" />
-                                    <span className="text-gray-700 text-sm">{intl.formatMessage({ id: 'agent.file.output' })} ({uploadedFiles.length})</span>
+                       
+                        <Image.PreviewGroup>
+                            {uploadedFiles.length > 0 && (
+                                <div className="p-2 border-b border-gray-200">
+                                    <div className="flex flex-wrap gap-2">
+                                        {uploadedFiles.map(file => (
+                                            <Tag
+                                                key={file.uid}
+                                                closable
+                                                onClose={() => handleRemoveFile(file.uid)}
+                                                className={`flex items-center ${
+                                                    file.isImage
+                                                        ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                                                        : 'bg-blue-50 text-blue-600'
+                                                }`}
+                                            >
+                                                <Tooltip title={file.name}>
+                                                    <div className="flex items-center">
+                                                        {file.isImage ? (
+                                                            <div className="mr-1 flex items-center">
+                                                                <Image
+                                                                    src={file.path_show || file.url}
+                                                                    alt={file.name}
+                                                                    className="w-6 h-6 max-w-6 max-h-6 object-cover mr-1 rounded-sm cursor-pointer"
+                                                                    preview={{
+                                                                        src:
+                                                                            file.path_show ||
+                                                                            file.url,
+                                                                        mask: false,
+                                                                    }}
+                                                                />
+                                                                <span className="truncate mr-1">
+                                                                    {file.name}
+                                                                </span>
+                                                                <DownloadOutlined
+                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
+                                                                    onClick={e => {
+                                                                        e.stopPropagation();
+                                                                        downloadFile(
+                                                                            file.path_show ||
+                                                                                file.url,
+                                                                            file.name,
+                                                                        );
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center">
+                                                                <FileOutlined className="mr-1" />
+                                                                <span className="truncate mr-1">
+                                                                    {file.name}
+                                                                </span>
+                                                                <DownloadOutlined
+                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
+                                                                    onClick={e => {
+                                                                        e.stopPropagation();
+                                                                        downloadFile(
+                                                                            file.path_show ||
+                                                                                file.url,
+                                                                            file.name,
+                                                                        );
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </Tooltip>
+                                            </Tag>
+                                        ))}
+                                    </div>
                                 </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {uploadedFiles.map(file => (
-                                        <Tag 
-                                            key={file.uid}
-                                            closable
-                                            onClose={() => handleRemoveFile(file.uid)}
-                                            className={`flex items-center ${file.isImage ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-blue-50 text-blue-600'}`}
-                                        >
-                                            <Tooltip title={file.name}>
-                                                <div className="flex items-center max-w-[150px]">
-                                                    {file.isImage ? (
-                                                        <div className="mr-1 flex items-center">
-                                                            <img 
-                                                                src={file.url} 
-                                                                alt={file.name} 
-                                                                className="w-6 h-6 object-cover mr-1 rounded-sm cursor-pointer" 
-                                                                onClick={() => handlePreviewImage(file.url)}
-                                                            />
-                                                            <span className="truncate">{file.name}</span>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex items-center">
-                                                            <FileOutlined className="mr-1" />
-                                                            <span className="truncate">{file.name}</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </Tooltip>
-                                        </Tag>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                        
+                            )}
+                        </Image.PreviewGroup>
+
                         <div className="flex items-center p-[8px] gap-[10px] box-border border bg-white rounded-[8px]">
                             <div className="flex-1">
                                 <ProFormTextArea
@@ -742,18 +785,6 @@ export default memo((props: Props) => {
                     </div>
                 </div>
             </ProForm>
-            {previewVisible && previewImage && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="max-w-full max-h-full">
-                        <img 
-                            src={previewImage} 
-                            alt="Preview" 
-                            className="max-w-full max-h-full object-contain"
-                            onClick={handlePreviewClose}
-                        />
-                    </div>
-                </div>
-            )}
         </div>
     );
 });

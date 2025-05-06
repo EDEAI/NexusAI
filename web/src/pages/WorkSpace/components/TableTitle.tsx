@@ -1,31 +1,34 @@
 /*
  * @LastEditors: biz
  */
+import ChatRoomAvatar from '@/components/ChatRoomAvatar';
 import Headportrait from '@/components/headportrait';
 import { WORKFLOW_ICON } from '@/components/WorkFlow/config';
 import { headportrait } from '@/utils/useUser';
 import { useIntl } from '@umijs/max';
 import { Pagination, Typography } from 'antd';
 
-export const Title = ({ iconSrc, titleText, pagination,showTotal=true, titleAfter=null }) => {
+export const Title = ({ iconSrc, titleText, pagination, showTotal = true, titleAfter = null }) => {
     const intl = useIntl();
     return (
         <div className="flex items-center gap-4">
             <img src={iconSrc} alt="" />
             <div>{titleText}</div>
-            
+
             <div>
                 <Pagination
                     size="small"
                     simple
                     showTotal={(total, range) =>
-                        showTotal?`${intl.formatMessage({ id: 'app.workflow.title.1' })}${range[0]}-${
-                            range[1]
-                        }${intl.formatMessage({
-                            id: 'app.workflow.title.2',
-                        })} / ${intl.formatMessage({
-                            id: 'app.workflow.title.3',
-                        })}${total} ${intl.formatMessage({ id: 'app.workflow.title.2' })}`:null
+                        showTotal
+                            ? `${intl.formatMessage({ id: 'app.workflow.title.1' })}${range[0]}-${
+                                  range[1]
+                              }${intl.formatMessage({
+                                  id: 'app.workflow.title.2',
+                              })} / ${intl.formatMessage({
+                                  id: 'app.workflow.title.3',
+                              })}${total} ${intl.formatMessage({ id: 'app.workflow.title.2' })}`
+                            : null
                     }
                     current={pagination.current}
                     pageSize={pagination.pageSize}
@@ -44,19 +47,19 @@ export const ItemHeader = ({ item }) => {
     const intl = useIntl();
     let root = `/icons/creation/`;
     let type = '';
-    let title=''
+    let title = '';
     switch (item.type) {
         case 1:
-            title =intl.formatMessage({ id: 'app.itemHeader.agent' });
-            type='Agent';
+            title = intl.formatMessage({ id: 'app.itemHeader.agent' });
+            type = 'Agent';
             break;
         case 2:
             title = intl.formatMessage({ id: 'app.itemHeader.chatRoom' });
-            type='ChatRoom';
+            type = 'ChatRoom';
             break;
         case 3:
             title = intl.formatMessage({ id: 'app.itemHeader.workFlow' });
-            type='WorkFlow';
+            type = 'WorkFlow';
             break;
         default:
             break;
@@ -72,13 +75,23 @@ export const ItemHeader = ({ item }) => {
                 </div>
             </div> */}
             <div className="shrink-0">
-                <Headportrait
-                    Image={
-                        item.type == 2 ? `/icons/chat_room.svg` : headportrait('single', item.icon)
-                    }
-                    avatar={item.avatar}
-                    icon={`${root}.svg`}
-                ></Headportrait>
+                {item.agents_data?.length > 0 ? (
+                    <ChatRoomAvatar
+                        agentList={item.agents_data}
+                        size="sm"
+                        // rounded={true}
+                    ></ChatRoomAvatar>
+                ) : (
+                    <Headportrait
+                        Image={
+                            item.type == 2
+                                ? `/icons/chat_room.svg`
+                                : headportrait('single', item.icon)
+                        }
+                        avatar={item.avatar}
+                        icon={`${root}.svg`}
+                    ></Headportrait>
+                )}
             </div>
             <div className="flex flex-col justify-center">
                 <div className="text-sm text-[#213044]">

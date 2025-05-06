@@ -1,10 +1,10 @@
 /*
  * @LastEditors: biz
  */
-import { ArrowsAltOutlined, FullscreenExitOutlined } from '@ant-design/icons';
+import { ArrowsAltOutlined, DownloadOutlined, FullscreenExitOutlined } from '@ant-design/icons';
 import Editor, { loader } from '@monaco-editor/react';
 import { useLocalStorageState } from 'ahooks';
-import { Button } from 'antd';
+import { Button, Image } from 'antd';
 import type { FC } from 'react';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -218,7 +218,19 @@ const CodeEditor: FC<Props> = memo(
                 />
             );
         };
-
+        const downloadFile = (url: string, filename: string) => {
+            try {
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e) {
+            
+            }
+        };
         const RenderFix = ({ key }) => {
             return (
                 <div
@@ -239,6 +251,31 @@ const CodeEditor: FC<Props> = memo(
                             <ReactMarkdown
                                 remarkPlugins={[remarkGfm]}
                                 rehypePlugins={[rehypeHighlight]}
+                                components={{
+                                    img: ({ node, ...props }) => (
+                                        <div className="relative group">
+                                            <Image
+                                                src={props.src}
+                                                alt={props.alt}
+                                                className="max-w-full max-h-40 h-auto rounded-md"
+                                            />
+                                            <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button
+                                                    type="primary"
+                                                    size="small"
+                                                    icon={<DownloadOutlined />}
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        downloadFile(
+                                                            props.src || '',
+                                                            props.alt || 'image.png',
+                                                        );
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    ),
+                                }}
                             >
                                 {mdValue}
                             </ReactMarkdown>

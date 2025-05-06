@@ -127,7 +127,7 @@ const profilephoto: React.FC<ChildProps> = ({ CardData, setCardData }) => {
             ...CardData, 
             icon: data.image, 
             id: data.id,
-            avatar: null ,// 清除自定义头像
+            avatar: null ,
             avatar_show: null,
         });
     };
@@ -179,7 +179,7 @@ const profilephoto: React.FC<ChildProps> = ({ CardData, setCardData }) => {
                         minCropBoxHeight={CROP_SIZE}
                         onInitialized={(instance) => {
                             setCropper(instance);
-                            // 初始化时自动调整裁剪框大小
+                      
                             instance.setCropBoxData({
                                 width: CROP_SIZE,
                                 height: CROP_SIZE,
@@ -187,14 +187,14 @@ const profilephoto: React.FC<ChildProps> = ({ CardData, setCardData }) => {
                         }}
                         ready={() => {
                             if (cropper) {
-                                // 确保图片最短边不小于裁剪框大小
+                             
                                 const imageData = cropper.getImageData();
                                 const minDimension = Math.min(imageData.width, imageData.height);
                                 if (minDimension < CROP_SIZE) {
-                                    const scale = (CROP_SIZE / minDimension) * 1.1; // 增加10%的缩放比例，确保完全覆盖
+                                    const scale = (CROP_SIZE / minDimension) * 1.1; 
                                     cropper.scale(scale);
                                 }
-                                // 确保裁剪框完全在图片范围内
+                               
                                 cropper.setData({
                                     width: CROP_SIZE,
                                     height: CROP_SIZE,

@@ -43,12 +43,12 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
         try {
             await fetchTags();
         } catch (error) {
-            message.error(
-                intl.formatMessage({
-                    id: 'error.fetchTags',
-                    defaultMessage: 'Failed to fetch tags',
-                }),
-            );
+            // message.error(
+            //     intl.formatMessage({
+            //         id: 'error.fetchTags',
+            //         defaultMessage: 'Failed to fetch tags',
+            //     }),
+            // );
         }
     }, [intl, fetchTags]);
 
@@ -99,15 +99,15 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                         }),
                     );
                 } else {
-                    throw new Error(res.message || 'Failed to create tag');
+                    // throw new Error(res.message || 'Failed to create tag');
                 }
             } catch (error) {
-                message.error(
-                    intl.formatMessage({
-                        id: 'error.createTag',
-                        defaultMessage: 'Failed to create tag',
-                    }),
-                );
+                // message.error(
+                //     intl.formatMessage({
+                //         id: 'error.createTag',
+                //         defaultMessage: 'Failed to create tag',
+                //     }),
+                // );
             }
         },
         [modes, intl, props?.onTagChange, fetchTags],
@@ -129,12 +129,12 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                     throw new Error(res.message || 'Failed to delete tag');
                 }
             } catch (error) {
-                message.error(
-                    intl.formatMessage({
-                        id: 'error.deleteTag',
-                        defaultMessage: 'Failed to delete tag',
-                    }),
-                );
+                // message.error(
+                //     intl.formatMessage({
+                //         id: 'error.deleteTag',
+                //         defaultMessage: 'Failed to delete tag',
+                //     }),
+                // );
             }
         },
         [intl, fetchTags],
@@ -156,12 +156,12 @@ const TagSearch: React.FC<TagSearchProps> = memo(({ children, showAddButton = tr
                     throw new Error(res.message || 'Failed to update tag');
                 }
             } catch (error) {
-                message.error(
-                    intl.formatMessage({
-                        id: 'error.updateTag',
-                        defaultMessage: 'Failed to update tag',
-                    }),
-                );
+                // message.error(
+                //     intl.formatMessage({
+                //         id: 'error.updateTag',
+                //         defaultMessage: 'Failed to update tag',
+                //     }),
+                // );
             }
         },
         [intl, fetchTags],

@@ -48,9 +48,10 @@ language_packs = {
             ********************End of identity definition content********************
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
-            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
+            1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
+            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
         ''',
         "agent_system_prompt_with_auto_match_ability_direct_output": '''
             You are an AI agent.
@@ -72,9 +73,10 @@ language_packs = {
             ********************End of identity definition content********************
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
-            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
+            1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
+            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
         ''',
         "agent_system_prompt_with_abilities": '''
             You are an AI agent.
@@ -97,9 +99,10 @@ language_packs = {
             ********************End of identity definition content********************
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
-            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
+            1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
+            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
         ''',
         "agent_system_prompt_with_no_ability": '''
             You are an AI agent.
@@ -119,11 +122,12 @@ language_packs = {
             ********************End of identity definition content********************
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
-            1. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            2. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            3. Through the analysis required in point 2, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding.
+            1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
+            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
+            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
         ''',
-        "agent_retrieved_docs_format": "I will provide the information retrieved from the knowledge base based on the user input text in the following JSON format: [{'content': content, 'source': source document name}, ...])",
+        "agent_retrieved_docs_format": '''I will provide the information retrieved from the knowledge base based on the user input text in the following JSON format: [{'content': content, 'source': source document name}, ...]\n''',
         "agent_reply_requirement_with_auto_match_ability": "Please match one corresponding ability based on the user input information and reply in the format corresponding to the ability.",
         "agent_reply_requirement_with_task_splitting_and_auto_match_ability": "Please match one corresponding ability based on the user input information, and based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it, and reply in the format corresponding to the ability.",
         "agent_reply_requirement_with_task_splitting_and_abilities": "Based on your responsibilities and abilities, select the part of the overall task that you should be responsible for and process it.",
@@ -387,7 +391,8 @@ language_packs = {
             {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
-            You need to fully analyze and understand every round of the conversation history through its message data structure, analyze the current conversation scene and conversation progress, and combine the user's speech content in the last round to summarize what the agents need to do next and the specific execution rules and requirements. This summary then will be passed to the agents as an instruction
+            If images are uploaded in the current request (note that they are not images in the conversation history), please fully understand and analyze the content of all images, as the image content is also an important part of the latest round of conversation content.
+            You need to fully analyze and understand every round of the conversation history through its message data structure, analyze the current conversation scene and conversation progress, and combine both the user's speech content in the last round and all images uploaded in the current request (as both together constitute the complete content of the latest round) to summarize what the agents need to do next and the specific execution rules and requirements. This summary then will be passed to the agents as an instruction.
 
             Then, respond according to the following requirements:
             1. Please only select agents from the provided agent list. Do not select agents that exist in the conversation history but not in the agent list;
@@ -452,10 +457,11 @@ language_packs = {
             You are an AI agent in a meeting room, where there is one user and at least one AI agent.
             You should adapt your identity and role according to the context of the conversation.
             You need to reply to the user's instructions. Please pay attention to the following requirements when responding:
-            1. You need to fully analyze and understand the conversation records, analyze the current conversation scene and progress through the last round of the conversation, focus on what the user wants, and provide enough details
-            2. You need to fully analyze and understand the user's command intention through the current conversation scene and progress, as well as the user's instructions, focus on what the user wants, and do not miss important information, rules or requirements in the instructions
-            3. You need to reply based on the current conversation scene and progress, as well as the user's command intention
-            4. Don't copy the viewpoints of other agents in the meeting room.
+            1. If images are uploaded in the current request (note that they are not images in the conversation history), please fully understand and analyze the content of all images, as the image content is also an important part of the latest round of conversation content.
+            2. You need to fully analyze and understand the conversation records, analyze the current conversation scene and progress through the last round of the conversation, focus on what the user wants, and provide enough details
+            3. You need to fully analyze and understand the user's command intention through the current conversation scene and progress, as well as the user's instructions, focus on what the user wants, and do not miss important information, rules or requirements in the instructions
+            4. You need to reply based on the current conversation scene and progress, as well as the user's command intention
+            5. Don't copy the viewpoints of other agents in the meeting room.
 
             The JSON format of the conversation history is as follows: [round 1, (round 2,) ...]
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
