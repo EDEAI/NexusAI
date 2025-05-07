@@ -1,6 +1,7 @@
 import json
 import sys
 import asyncio
+import re
 
 from collections import deque
 from datetime import datetime
@@ -42,8 +43,8 @@ datasets = Datasets()
 
 class Chatroom:
     @staticmethod
-    def _console_log(content: str) -> None:
-        sys.stdout.write(content)
+    def _console_log(content: Any) -> None:
+        sys.stdout.write(str(content))
         sys.stdout.flush()
 
     def _get_model_configs(self, all_agent_ids: Sequence[int], absent_agent_ids: Sequence[int]) -> None:
@@ -85,7 +86,8 @@ class Chatroom:
         ws_manager: WebSocketManager,
         user_message: str,
         user_message_id: int = 0,
-        topic: Optional[str] = None
+        topic: Optional[str] = None,
+        mcp_tool_list: Optional[List[Dict[str, Any]]] = None
     ) -> None:
         self._user_id = user_id
         self._team_id = team_id
@@ -114,6 +116,10 @@ class Chatroom:
         self._image_list: Optional[List[Union[int, str]]] = None
         self._current_round = 0
         self._last_speaker_id = 0
+        self._mcp_tool_list = mcp_tool_list
+        self._mcp_tool_using = False
+        self._mcp_tool_use_lock = asyncio.Event()
+        self._mcp_tool_uses: List[Dict[str, Any]] = []
 
     def _get_agents_info(self) -> str:
         '''
@@ -168,6 +174,7 @@ class Chatroom:
                 'id': agent_id,
                 'name': user_str if agent_id == 0 else self._all_agents[agent_id]['name'],
                 'role': user_str if agent_id == 0 else agent_str,
+                'type': message['type'],
                 'message': message['message']
             }
             # if (topic := message['topic']) is not None:
@@ -177,11 +184,11 @@ class Chatroom:
         messages_in_last_section = deque()
         for message in reversed(messages):
             messages_in_last_section.appendleft(message)
-            if message['id'] == 0:
+            if message['id'] == 0 and message['type'] == 'text':
                 break
         user_messages = []
         for message in messages:
-            if message['id'] == 0:
+            if message['id'] == 0 and message['type'] == 'text':
                 user_messages.append(message['message'])
         return (
             messages,
@@ -214,6 +221,7 @@ class Chatroom:
                 'id': agent_id,
                 'name': user_str if agent_id == 0 else self._all_agents[agent_id]['name'],
                 'role': user_str if agent_id == 0 else agent_str,
+                'type': message['type'],
                 'message': message['message']
             }
             messages.append(message_for_llm)
@@ -225,7 +233,7 @@ class Chatroom:
         message_sections = []
         current_section = []
         for message in messages:
-            if message['id'] == 0 and current_section:  # When encountering a user message and current section is not empty
+            if message['id'] == 0 and message['type'] == 'text' and current_section:  # When encountering a user message and current section is not empty
                 message_sections.append(current_section)
                 current_section = []
             current_section.append(message)
@@ -235,7 +243,7 @@ class Chatroom:
         # Get all user messages
         user_messages = []
         for message in messages:
-            if message['id'] == 0:
+            if message['id'] == 0 and message['type'] == 'text':
                 user_messages.append(message['message'])
                 
         return (
@@ -283,8 +291,8 @@ class Chatroom:
             }
         )
         self._history_messages.append({
-            'id': self._user_message_id,
             'agent_id': 0,
+            'type': 'text',
             'message': user_message,
             'file_list': file_list,
             'file_content_list': file_content_list
@@ -437,6 +445,12 @@ class Chatroom:
 
         # If the Speaker Selector has tried 5 times and still returned an invalid agent ID, stop the chat
         return 0
+    
+    def set_mcp_tool_result(self, index: int, result: str) -> None:
+        if not self._mcp_tool_is_using:
+            raise Exception('There is no MCP tool use!')
+        self._mcp_tool_uses[index]['result'] = result
+        self._mcp_tool_use_lock.set()
 
     async def _talk_to_agent(self, agent_id: int) -> None:
         prompt_tokens = 0
@@ -452,57 +466,158 @@ class Chatroom:
             ]
         )
 
-        messages, messages_in_last_section, user_messages = self._get_history_messages_list_grouped(self._model_config_ids[agent_id])
-        user_message = messages_in_last_section[0]['message']
-        agent_user_subprompt = get_language_content(
-            'chatroom_agent_user_subprompt',
-            self._user_id,
-            append_ret_lang_prompt=False
-        ).format(
-            messages = json.dumps(messages, ensure_ascii=False),
-            topic = self._topic,
-            user_message = user_message,
-            messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
-            user_messages = user_messages
-        )
-        prompt = Prompt(user=agent_user_subprompt)
-        agent_node = AgentNode(
-            title=f'Agent {agent_id}',
-            input=ObjectVariable('Input'),
-            agent_id=agent_id,
-            prompt=prompt
-        )
         try:
             self._console_log('Agent message: \033[36m')  # Print the agent message in green
             # Request LLM
-            agent_run_id = 0
+            agent_run_ids = []
             agent_message = ''
-            async for chunk in agent_node.run_in_chatroom(
-                context=Context(),
-                user_id=self._user_id,
-                type=2,
-                agent_run_type=3,
-                chatroom_id=self._chatroom_id,
-                override_rag_input=self._user_message,
-                override_dataset_id=override_dataset['id'] if override_dataset else None,
-                override_file_list=self._image_list if self._current_round == 0 else None
-            ):
-                if isinstance(chunk, int):
-                    agent_run_id = chunk
-                    continue
-                if content := chunk.content:
-                    self._console_log(content)
-                    agent_message += content
+            while True:
+                current_agent_message = ''
+
+                messages, messages_in_last_section, user_messages = self._get_history_messages_list_grouped(self._model_config_ids[agent_id])
+                user_message = messages_in_last_section[0]['message']
+                agent_user_subprompt = get_language_content(
+                    'chatroom_agent_user_subprompt',
+                    self._user_id,
+                    append_ret_lang_prompt=False
+                ).format(
+                    messages = json.dumps(messages, ensure_ascii=False),
+                    topic = self._topic,
+                    user_message = user_message,
+                    messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
+                    user_messages = user_messages
+                )
+                prompt = Prompt(user=agent_user_subprompt)
+                agent_node = AgentNode(
+                    title=f'Agent {agent_id}',
+                    input=ObjectVariable('Input'),
+                    agent_id=agent_id,
+                    prompt=prompt
+                )
+                async for chunk in agent_node.run_in_chatroom(
+                    context=Context(),
+                    user_id=self._user_id,
+                    type=2,
+                    agent_run_type=3,
+                    chatroom_id=self._chatroom_id,
+                    override_rag_input=self._user_message,
+                    override_dataset_id=override_dataset['id'] if override_dataset else None,
+                    override_file_list=self._image_list if self._current_round == 0 else None,
+                    mcp_tool_list=self._mcp_tool_list
+                ):
+                    if isinstance(chunk, int):
+                        agent_run_ids.append(chunk)
+                        continue
+                    if content := chunk.content:
+                        if isinstance(content, str):
+                            self._console_log(content)
+                            current_agent_message += content
+                            agent_message += content
+                            await self._ws_manager.send_agent_reply(
+                                self._chatroom_id,
+                                agent_id,
+                                content,
+                                agent_message
+                            )
+                        elif isinstance(content, list):
+                            for item in content:
+                                if isinstance(item, dict):
+                                    if item['type'] == 'text':
+                                        item_text = item['text']
+                                        self._console_log(item_text)
+                                        current_agent_message += item_text
+                                        agent_message += item_text
+                                        await self._ws_manager.send_agent_reply(
+                                            self._chatroom_id,
+                                            agent_id, 
+                                            item_text,
+                                            agent_message
+                                        )
+                                    elif item['type'] == 'tool_use':
+                                        self._console_log(str(item))
+                                        if mcp_tool_name := item.get('name'):
+                                            if item['index'] != len(self._mcp_tool_uses) + 1:
+                                                raise Exception(f'MCP tool use index is not correct: {item["index"]}')
+                                            self._mcp_tool_uses.append({
+                                                'name': mcp_tool_name,
+                                                'args': '',
+                                                'result': None
+                                            })
+                                        if mcp_tool_input := item.get('partial_json'):
+                                            self._mcp_tool_uses[item['index']-1]['args'] += mcp_tool_input
+                                    else:
+                                        raise Exception(f'Unsupported content item type: {item}')
+                                else:
+                                    raise Exception(f'Unsupported content item: {item}')
+                        else:
+                            raise Exception(f'Unsupported content: {content}')
+                    if usage_metadata := chunk.usage_metadata:
+                        prompt_tokens += usage_metadata['input_tokens']
+                        completion_tokens += usage_metadata['output_tokens']
+                        total_tokens += usage_metadata['total_tokens']
+                
+                self._history_messages.append({
+                    'agent_id': agent_id,
+                    'type': 'text',
+                    'message': current_agent_message
+                })
+                if not self._mcp_tool_uses:
+                    break
+                else:
                     await self._ws_manager.send_agent_reply(
                         self._chatroom_id,
-                        agent_id,
-                        content,
+                        agent_id, 
+                        '',
                         agent_message
                     )
-                if usage_metadata := chunk.usage_metadata:
-                    prompt_tokens += usage_metadata['input_tokens']
-                    completion_tokens += usage_metadata['output_tokens']
-                    total_tokens += usage_metadata['total_tokens']
+                    self._mcp_tool_is_using = True
+                    for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
+                        mcp_tool_use_in_message = {
+                            'index': index,
+                            'name': mcp_tool_use['name'],
+                            'args': mcp_tool_use['args']
+                        }
+                        await self._ws_manager.send_instruction(
+                            self._chatroom_id,
+                            'MCPTOOLUSE',
+                            mcp_tool_use_in_message
+                        )
+
+                    while True:
+                        await self._mcp_tool_use_lock.wait()
+                        self._mcp_tool_use_lock.clear()
+                        if all(mcp_tool_use['result'] is not None for mcp_tool_use in self._mcp_tool_uses):
+                            break
+
+                    for mcp_tool_use in self._mcp_tool_uses:
+                        self._history_messages.append({
+                            'agent_id': agent_id,
+                            'type': 'tool_use',
+                            'message': json.dumps(
+                                {
+                                    'name': mcp_tool_use['name'],
+                                    'args': mcp_tool_use['args']
+                                },
+                                ensure_ascii=False
+                            )
+                        })
+                        self._history_messages.append({
+                            'agent_id': 0,
+                            'type': 'tool_result',
+                            'message': mcp_tool_use['result']
+                        })
+                        mcp_tool_str = json.dumps({
+                            'name': mcp_tool_use['name'],
+                            'args': mcp_tool_use['args'],
+                            'result': mcp_tool_use['result']
+                        }, ensure_ascii=False)
+                        agent_message += (
+                            '<<<mcp-tool-start>>>'
+                            f'{mcp_tool_str}'
+                            '<<<mcp-tool-end>>>'
+                        )
+                    self._mcp_tool_uses.clear()
+                    self._mcp_tool_is_using = False
             await self._ws_manager.end_agent_reply(
                 self._chatroom_id,
                 agent_id,
@@ -512,14 +627,12 @@ class Chatroom:
             # Append the agent message to the history messages and insert it into the database
             # self._history_messages.append({'agent_id': agent_id, 'message': agent_message, 'topic': self._topic})
             self._last_speaker_id = agent_id
-            self._history_messages.append({'agent_id': agent_id, 'message': agent_message})
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
-            chatroom_messages.insert(
+            chatroom_message_id = chatroom_messages.insert(
                 {
                     'chatroom_id': self._chatroom_id,
                     'app_run_id': self._app_run_id,
                     'agent_id': agent_id,
-                    'agent_run_id': agent_run_id,
                     'llm_input': [
                         ['system', prompt.get_system()],
                         ['user', prompt.get_user()]
@@ -532,6 +645,7 @@ class Chatroom:
                     'total_tokens': total_tokens
                 }
             )
+            app_runs.set_chatroom_message_id(agent_run_ids, chatroom_message_id)
             app_runs.increment_steps(self._app_run_id)
             app_runs.increment_token_usage(
                 self._app_run_id,
@@ -573,7 +687,7 @@ class Chatroom:
         message: Dict[str, Any],
         mode: Literal['all', 'image_only', 'document_only'] = 'all'
     ) -> None:
-        if message['file_list'] and message['file_content_list']:
+        if message.get('file_list') and message.get('file_content_list'):
             for file_var_value in message['file_list']:
                 if isinstance(file_var_value, int):
                     attr = 'id'
@@ -592,11 +706,75 @@ class Chatroom:
                     if file_content[attr] == value:
                         message['message'] += f'\n******Start of {file_content["name"]}******\n{file_content["content"]}\n******End of {file_content["name"]}******\n'
 
+    def _split_agent_message(self, message: Dict[str, Any]) -> List[Dict[str, Any]]:
+        agent_id = message['agent_id']
+        if agent_id == 0:
+            message['type'] = 'text'
+            return [message]
+            
+        topic = message['topic']
+        content = message['message']
+        
+        pattern = r'<<<mcp-tool-start>>>(.*?)<<<mcp-tool-end>>>'
+        # Find all matches
+        matches = list(re.finditer(pattern, content, re.DOTALL))
+        if not matches:
+            message['type'] = 'text'
+            return [message]
+            
+        # Split messages
+        result = []
+        last_end = 0
+        
+        for match in matches:
+            # Add text before tool call
+            if match.start() > last_end:
+                text_content = content[last_end:match.start()]
+                if text_content:
+                    result.append({
+                        'agent_id': agent_id,
+                        'topic': topic,
+                        'type': 'text',
+                        'message': text_content
+                    })
+            
+            # Add tool call messages
+            mcp_tool = json.loads(match.group(1))
+            
+            result.append({
+                'agent_id': agent_id,
+                'topic': topic,
+                'type': 'tool_use',
+                'message': json.dumps({'name': mcp_tool['name'], 'args': mcp_tool['args']}, ensure_ascii=False)
+            })
+            
+            result.append({
+                'agent_id': 0,
+                'topic': topic,
+                'type': 'tool_result',
+                'message': mcp_tool['result']
+            })
+            
+            last_end = match.end()
+        
+        # Add the last piece of text
+        if last_end < len(content):
+            text_content = content[last_end:]
+            if text_content:
+                result.append({
+                    'agent_id': agent_id,
+                    'topic': topic,
+                    'type': 'text',
+                    'message': text_content
+                })
+                
+        return result
+    
     def load_history_messages(self, messages: List[Dict[str, Any]]) -> None:
-        # Add file content to the message content
         for message in messages:
             self._add_file_content_to_message(message, 'all')
-        self._history_messages.extend(messages)
+            split_messages = self._split_agent_message(message)
+            self._history_messages.extend(split_messages)
 
     async def _generate_title(self):
         logger.debug('Generating title...')

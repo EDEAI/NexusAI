@@ -76,7 +76,7 @@ class WebSocketManager:
         self,
         connection: WebSocketServerProtocol,
         cmd: str,
-        data: Optional[Union[int, str, bool, List[Union[int, str]]]] = None
+        data: Any = None
     ):
         instruction = json.dumps([cmd, data], ensure_ascii=False)
         await connection.send(INSTRUCTION_TEMPLATE.format(instruction=instruction))
@@ -85,12 +85,12 @@ class WebSocketManager:
         self,
         connections: Iterable[WebSocketServerProtocol],
         cmd: str,
-        data: Optional[Union[int, str, bool, List[Union[int, str]]]] = None
+        data: Any = None
     ):
         instruction = json.dumps([cmd, data], ensure_ascii=False)
         broadcast(connections, INSTRUCTION_TEMPLATE.format(instruction=instruction))
             
-    async def send_instruction(self, chatroom_id: int, cmd: str, data: Optional[Union[int, str, bool, List[Union[int, str]]]] = None):
+    async def send_instruction(self, chatroom_id: int, cmd: str, data: Any = None):
         if connections := self._connections_by_chatroom_id.get(chatroom_id):
             await self.send_instruction_by_connections(connections, cmd, data)
             
@@ -114,8 +114,8 @@ class WebSocketManager:
                 else:
                     not_replying_connections.add(connection)
                     self._replying_status_by_connection_id[id(connection)] = True
-            
-            broadcast(replying_connections, current_message_chunk)
+            if current_message_chunk:
+                broadcast(replying_connections, current_message_chunk)
             await self.send_instruction_by_connections(not_replying_connections, 'REPLY', agent_id)
             broadcast(not_replying_connections, full_message)
         

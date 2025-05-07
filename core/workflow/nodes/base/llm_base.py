@@ -233,7 +233,8 @@ class LLMBaseNode(Node):
         override_rag_input: Optional[str] = None,
         is_chat: bool = False,
         user_id: int = 0,
-        agent_id: int = 0
+        agent_id: int = 0,
+        mcp_tool_list: Optional[List[Dict[str, Any]]] = None
     ) -> Tuple[Dict[str, Any], str, int, int, int]:
         """
         Workflow node invokes the LLM model to generate text using the language model.
@@ -287,6 +288,8 @@ class LLMBaseNode(Node):
             not is_chat,
             input_variables=input
         )
+        if mcp_tool_list:
+            llm_pipeline.llm = llm_pipeline.llm.bind_tools(mcp_tool_list)
         ai_message = llm_pipeline.invoke_llm(messages_as_langchain_format)
         content = ai_message.content
         if return_json:
@@ -318,7 +321,8 @@ class LLMBaseNode(Node):
         file_list: Optional[ArrayVariable] = None,
         return_json: bool = False,
         correct_llm_output: bool = False,
-        override_rag_input: Optional[str] = None
+        override_rag_input: Optional[str] = None,
+        mcp_tool_list: Optional[List[Dict[str, Any]]] = None
     ) -> Tuple[Dict[str, Any], Callable[[], AsyncIterator[AIMessageChunk]]]:
         """
         This function is used to get the model data and the async AI invoke function.
@@ -365,7 +369,8 @@ class LLMBaseNode(Node):
                 model_info["supplier_name"],
                 False, input
             )
-
+            if mcp_tool_list:
+                llm_pipeline.llm = llm_pipeline.llm.bind_tools(mcp_tool_list)
             for _ in range(5):
                 try:
                     if model_info["supplier_name"] == "Anthropic":

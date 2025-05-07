@@ -388,7 +388,7 @@ language_packs = {
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
             Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "type": message type (text, or tool_use for agent, or tool_result for user), "message": message content}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
             If images are uploaded in the current request (note that they are not images in the conversation history), please fully understand and analyze the content of all images, as the image content is also an important part of the latest round of conversation content.
@@ -410,7 +410,7 @@ language_packs = {
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
             Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "type": message type (text, or tool_use for agent, or tool_result for user), "message": message content}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
             You should determine whether to end the conversation according to the following rules:
@@ -467,7 +467,7 @@ language_packs = {
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
             Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure of each message is as follows:
-            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}}.
+            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "type": message type (text, or tool_use for agent, or tool_result for user), "message": message content}}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
             
             User's instructions:
@@ -498,7 +498,7 @@ language_packs = {
 
             The conversation history is in the following JSON format: [message 1, (message 2,) ...]
             The JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "type": message type (text, or tool_use for agent, or tool_result for user), "message": message content}.
             
             Requirements:
             1. Capture core discussion theme

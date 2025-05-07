@@ -322,6 +322,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         override_dataset_id: Optional[int] = None,
         is_chat: bool = False,
         override_file_list: Optional[List[Union[int, str]]] = None,
+        mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -448,7 +449,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 override_rag_input=override_rag_input,
                 is_chat=is_chat,
                 user_id=user_id,
-                agent_id=agent_id
+                agent_id=agent_id,
+                mcp_tool_list=mcp_tool_list
             )
             print(model_data)
             AppRuns().update(
@@ -638,6 +640,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         override_rag_input: Optional[str] = None,
         override_dataset_id: Optional[int] = None,
         override_file_list: Optional[List[Union[int, str]]] = None,
+        mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
         **kwargs
     ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
@@ -751,7 +754,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 file_list=file_list,
                 return_json=False,
                 correct_llm_output=correct_llm_output,
-                override_rag_input=override_rag_input
+                override_rag_input=override_rag_input,
+                mcp_tool_list=mcp_tool_list
             )
 
             full_chunk: Optional[AIMessageChunk] = None

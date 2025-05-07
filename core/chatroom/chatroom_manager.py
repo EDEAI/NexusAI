@@ -3,7 +3,7 @@ import asyncio
 from datetime import datetime
 from pathlib import Path
 from time import time
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from websockets import (
     ConnectionClosed,
@@ -40,8 +40,11 @@ class ChatroomManager:
     def __init__(self, event_loop: asyncio.BaseEventLoop):
         self._event_loop = event_loop
         self._ws_manager = WebSocketManager(event_loop)
+        self._chatrooms: Dict[int, Chatroom] = {}
         self._file_lists: Dict[int, List[Union[int, str]]] = {}
-        
+        self._is_desktop: Dict[int, bool] = {}
+        self._mcp_tool_lists: Dict[int, List[Dict[str, Any]]] = {}
+
     def _get_chatroom_info(self, chatroom_id: int, user_id: int, check_chat_status: bool) -> Dict[str, int]:
         chatroom_info = chatrooms.select_one(
             columns=[
@@ -90,11 +93,11 @@ class ChatroomManager:
         chatroom_info: Dict[str, int],
         user_id: int,
         team_id: int,
-        user_input: Optional[str] = None,
-        file_list: Optional[List[Union[int, str]]] = None
+        user_input: Optional[str] = None
     ):
         chatroom_id = chatroom_info['id']
         app_id = chatroom_info['app_id']
+        file_list = self._file_lists.pop(chatroom_id, None)
         
         start_time = time()
         if user_input is None:
@@ -170,7 +173,7 @@ class ChatroomManager:
                 for relation in agent_relations
             )
             history_messages = chatroom_messages.select(
-                columns=['id', 'agent_id', 'message', 'file_list', 'file_content_list', 'topic'],
+                columns=['agent_id', 'message', 'file_list', 'file_content_list', 'topic'],
                 conditions=[
                     {'column': 'chatroom_id', 'value': chatroom_id},
                     {'column': 'id', 'op': '>', 'value': chatroom_info['initial_message_id']},
@@ -197,10 +200,13 @@ class ChatroomManager:
                     user_id, team_id, chatroom_id, app_run_id, bool(chatroom_info['is_temporary']),
                     all_agent_ids, absent_agent_ids,
                     chatroom_info['max_round'], bool(chatroom_info['smart_selection']),
-                    self._ws_manager, user_message, user_message_id, topic
+                    self._ws_manager, user_message, user_message_id, topic,
+                    self._mcp_tool_lists.get(chatroom_id)
                 )
+                self._chatrooms[chatroom_id] = chatroom
                 chatroom.load_history_messages(history_messages)
                 await chatroom.chat(user_input is None, file_list)
+                self._chatrooms.pop(chatroom_id)
             end_time = time()
             app_runs.update(
                 {'column': 'id', 'value': app_run_id},
@@ -235,8 +241,7 @@ class ChatroomManager:
         chatroom_id: int,
         user_id: int,
         team_id: int,
-        user_input: Optional[str] = None,
-        file_list: Optional[List[Union[int, str]]] = None
+        user_input: Optional[str] = None
     ) -> None:
         try:
             chatroom_info = self._get_chatroom_info(
@@ -244,7 +249,7 @@ class ChatroomManager:
                 user_id,
                 check_chat_status = user_input is not None 
             )
-            await self._start_chatroom(chatroom_info, user_id, team_id, user_input, file_list)
+            await self._start_chatroom(chatroom_info, user_id, team_id, user_input)
         except Exception as e:
             logger.exception('ERROR!!')
             await self._ws_manager.send_instruction(chatroom_id, 'ERROR', str(e))
@@ -307,13 +312,28 @@ class ChatroomManager:
                                     assert isinstance(data, list), 'File list should be a list.'
                                     self._file_lists[chatroom_id] = data
                                     await self._ws_manager.send_instruction(chatroom_id, 'OK')
+                                case 'ISDESKTOP':
+                                    # Is desktop
+                                    assert isinstance(data, bool), 'Is desktop should be a boolean.'
+                                    self._is_desktop[chatroom_id] = data
+                                    await self._ws_manager.send_instruction(chatroom_id, 'OK')
+                                case 'MCPTOOLLIST':
+                                    # MCP tool list
+                                    assert isinstance(data, list), 'MCP tool list should be a list.'
+                                    self._mcp_tool_lists[chatroom_id] = data
+                                    await self._ws_manager.send_instruction(chatroom_id, 'OK')
+                                case 'MCPTOOLRESULT':
+                                    assert isinstance(data, dict), 'MCP tool result should be a dictionary.'
+                                    assert isinstance(index := data['index'], int), f'Invalid MCP tool index: {index}'
+                                    assert isinstance(result := data['result'], str), f'Invalid MCP tool result: {result}'
+                                    self._chatrooms[chatroom_id].set_mcp_tool_result(index, result)
+                                    await self._ws_manager.send_instruction(chatroom_id, 'WITHMCPTOOLRESULT', data)
                                 case 'INPUT':
                                     # User input
                                     assert isinstance(data, str), 'User input should be a string.'
                                     user_input = data
                                     logger.info('Starting chatroom %s...', chatroom_id)
-                                    file_list = self._file_lists.pop(chatroom_id, None)
-                                    coro = self._handle_data_and_start_chatroom(chatroom_id, user_id, team_id, user_input, file_list)
+                                    coro = self._handle_data_and_start_chatroom(chatroom_id, user_id, team_id, user_input)
                                     self._event_loop.create_task(coro)
                                 case 'STOP':
                                     # Stop the chatroom
