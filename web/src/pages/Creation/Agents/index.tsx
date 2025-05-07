@@ -324,60 +324,63 @@ const Agents: React.FC = () => {
 
     const agentupdata = () => {
         setLoading(true);
-        var creationagentid = 0;
-        return new Promise((resolve, reject) => {
-            if (!creationappid) {
-                PostappsCreate(createappdata('GET'))
-                    .then(res => {
-                        setcreationappid(res.data.app_id);
-                        GetagentInfo(creationappid ? creationappid : res.data.app_id, false)
-                            .then(value => {
-                                resolve(value);
-                                creationagentid = value.data.agent.agent_id;
-                                agentfirst(creationagentid);
-                                if (res.data.app_id) {
-                                    history.replace(`/Agents?app_id=${res.data.app_id}&type=false`);
-                                }
-                                setTimeout(() => {
-                                    agentsecond(creationagentid);
-                                    message.success(
-                                        intl.formatMessage({ id: 'skill.conserve.success' }),
-                                    );
-                                }, 500);
-                                setTimeout(() => {
-                                    getAgent(res.data.app_id);
-                                    const createdData = {
-                                        ...createappdata('GET'),
-                                        app_id: res.data.app_id,
-                                    };
-                                    createappdata('SET', createdData);
-                                }, 1000);
-                                setNewagentid(creationagentid);
-                            })
-                            .catch(err => {
-                                resolve('');
-                            });
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    });
-            } else {
-                GetagentInfo(creationappid, false)
+        let creationagentid = 0;
+        return new Promise((resolve) => {
+            const handleAgentCreation = (appId) => {
+                return GetagentInfo(appId, false)
                     .then(value => {
                         creationagentid = value.data.agent.agent_id;
                         agentfirst(creationagentid);
-
-                        resolve('');
+                        
+                        if (!creationappid) {
+                            history.replace(`/Agents?app_id=${appId}&type=false`);
+                        }
+                        
                         setTimeout(() => {
                             agentsecond(creationagentid);
                             message.success(intl.formatMessage({ id: 'skill.conserve.success' }));
                         }, 500);
+                        
                         setTimeout(() => {
-                            getAgent(creationappid);
+                            getAgent(appId);
+                            if (!creationappid) {
+                                const createdData = {
+                                    ...createappdata('GET'),
+                                    app_id: appId,
+                                };
+                                createappdata('SET', createdData);
+                            }
                         }, 1000);
+                        
                         setNewagentid(creationagentid);
+                        return value;
+                    })
+                    .catch(() => {
+                        return '';
+                    });
+            };
+            
+            if (!creationappid) {
+                PostappsCreate(createappdata('GET'))
+                    .then(res => {
+                        setcreationappid(res.data.app_id);
+                        handleAgentCreation(res.data.app_id)
+                            .then(result => resolve(result))
+                            .catch(err => {
+                                console.error('Error during agent creation:', err);
+                                resolve('');
+                            });
                     })
                     .catch(err => {
+                        console.error('Error creating app:', err);
+                        setLoading(false);
+                        resolve('');
+                    });
+            } else {
+                handleAgentCreation(creationappid)
+                    .then(result => resolve(result))
+                    .catch(err => {
+                        console.error('Error during agent update:', err);
                         resolve('');
                     });
             }
