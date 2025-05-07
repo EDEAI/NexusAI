@@ -265,7 +265,8 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
 
     if avatar and avatar.startswith('upload_files/'):
         avatar = avatar.split('upload_files/')[-1]
-
+    if avatar and avatar.startswith(('http://', 'https://')):
+        avatar = avatar.split('/upload/')[-1]
     if mode == 3:
         publish_status =1
     else:
@@ -390,6 +391,8 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
         return response_error(get_language_content("avatar_or_icon_required"))
     if avatar and avatar.startswith('upload_files/'):
         avatar = avatar.split('upload_files/')[-1]
+    if avatar and avatar.startswith(('http://', 'https://')):
+        avatar = avatar.split('/upload/')[-1]
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     apps_data = {
