@@ -132,6 +132,13 @@ const AgentsFirst: React.FC<ChildProps> = ({
         });
     };
 
+    const MCPUpload = (checked:boolean)=>{
+        setDetaillist({
+            ...Detaillist,
+            agent: { ...Detaillist.agent, mcp: checked ? 1 : 0 },
+        });
+    }
+
     const handleChange = (value: any) => {
         setAgentsFirstData({
             ...AgentsFirstData,
@@ -271,13 +278,28 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     disabled={Detaillist?.app?.publish_status !== 1}
                                 />
                             </div>
-                            <div className="font-medium">
+                            <div className="mb-[30px] font-medium">
                                 <div className="mb-[15px] text-[#555555] text-xs">
                                     {intl.formatMessage({ id: 'agent.filesupload' })}
                                 </div>
                                 <Switch
                                     size="small"
                                     onChange={TPUpload}
+                                    checked={
+                                        Detaillist && Detaillist.agent?.allow_upload_file == 1
+                                            ? true
+                                            : false
+                                    }
+                                />
+                            </div>
+
+                            <div className="font-medium">
+                                <div className="mb-[15px] text-[#555555] text-xs">
+                                    MCP可调度资源
+                                </div>
+                                <Switch
+                                    size="small"
+                                    onChange={MCPUpload}
                                     checked={
                                         Detaillist && Detaillist.agent?.allow_upload_file == 1
                                             ? true
@@ -304,14 +326,15 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         ? intl.formatMessage({
                                               id: 'agent.pleaseselect',
                                           })
-                                        : Fourthly_config_id
+                                        : Fourthly_config_id 
                                 }
                                 variant="filled"
                                 onChange={FourthlySelect}
                                 options={options}
+                                
                                 optionRender={option => {
                                     return (
-                                        <div title={JSON.stringify(option)}>
+                                        <div >
                                             {option.label}{' '}
                                             {option?.data?.support_image == 1 && (
                                                 <Tag color="blue" className="text-xs">

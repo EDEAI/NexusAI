@@ -229,13 +229,18 @@ const Creation: React.FC = () => {
             avatar: CardData?.avatar || null,
         };
 
-        let res = await PutappsUpdate(param);
+        try{
+            let res = await PutappsUpdate(param);
 
         if (res.code == 0) {
             setIsModalOpen(false);
-
             getChatRoomList(1, searchType, null, null, null, apppage * 27);
         } else {
+                setIsModalOpen(false);
+            }
+        } catch (error) {
+            console.log(error);
+            setIsModalOpen(false);
         }
     };
 

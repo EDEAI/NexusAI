@@ -740,7 +740,7 @@ export default memo((props: Props) => {
                                 title={intl.formatMessage({ id: 'agent.chat.send' })}
                             />
                         </div>
-                        <div className="flex items-center mt-1 gap-2">
+                        <div className="flex items-center mt-1 gap-2 flex-wrap">
                             <ProFormSelect
                                 // label={intl.formatMessage({ id: 'agent.selectivepower' })}
                                 name="ability_id"

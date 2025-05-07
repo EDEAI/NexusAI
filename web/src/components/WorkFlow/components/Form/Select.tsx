@@ -3,9 +3,12 @@
  */
 import { ProFormSelect, ProFormSelectProps } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Tag, Tooltip } from 'antd';
+import { FormInstance, Tag, Tooltip } from 'antd';
 import useStore from '../../store';
 import { AppNode } from '../../types';
+import { useMount } from 'ahooks';
+import React from 'react';
+
 export type RawValueType = string | number;
 export interface LabelInValueType {
     label: React.ReactNode;
@@ -123,6 +126,7 @@ interface SelectVariableProps extends Omit<ProFormSelectProps, 'request'> {
     node?: AppNode | { id: string };
     filterFn?: (item: any) => boolean;
     customRequest?: () => Promise<any[]>;
+    formRef?: React.RefObject<FormInstance>;
     options?: any[];
 }
 
@@ -132,17 +136,26 @@ export const SelectVariable = ({
     filterFn = item => item.createVar.type != 'file',
     customRequest,
     options,
+    formRef,
     ...restProps
 }: SelectVariableProps) => {
     const intl = useIntl();
     const getVariables = useStore(state => state.getOutputVariables);
 
-    // 默认请求函数
     const defaultRequest = async () => {
         if (!node) return [];
         const variables = await getVariables(node.id);
         return variables.filter(filterFn);
     };
+
+    useMount(()=>{
+        if(formRef){    
+            setTimeout(()=>{
+                const currentValue = formRef.current?.getFieldsValue(name);
+                console.log(currentValue);
+            },1000)
+        }
+    })
    
     return (
         <ProFormSelect
