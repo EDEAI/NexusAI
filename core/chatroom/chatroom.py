@@ -810,7 +810,13 @@ class Chatroom:
         llm_input_var = model_data['messages']
         llm_input = []
         for role, message_var in llm_input_var:
-            llm_input.append([role, message_var['value']])
+            if message_var['type'].startswith('array'):
+                message_values = []
+                for message_value in message_var['values']:
+                    message_values.append(message_value['value'])
+                llm_input.append([role, message_values])
+            else:
+                llm_input.append([role, message_var['value']])
             
         has_connections = self._ws_manager.has_connections(self._chatroom_id)
         prompt_tokens = result_data['prompt_tokens']
