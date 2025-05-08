@@ -11,7 +11,6 @@ from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 from langchain_core.messages import AIMessageChunk
 
-from .mcp_client import MCPClient
 from .websocket import WebSocketManager
 from core.database.models import (
     AgentAbilities,
@@ -25,6 +24,7 @@ from core.database.models import (
 )
 from core.helper import truncate_messages_by_token_limit, get_file_content_list
 from core.llm import Prompt
+from core.mcp.client import MCPClient
 from core.workflow.context import Context
 from core.workflow.nodes import AgentNode, LLMNode
 from core.workflow.variables import create_variable_from_dict, ObjectVariable

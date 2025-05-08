@@ -11,7 +11,6 @@ from websockets import (
 )
 
 from .chatroom import Chatroom
-from .mcp_client import MCPClient
 from .websocket import WebSocketManager
 from config import settings
 from core.database.models import (
@@ -23,6 +22,7 @@ from core.database.models import (
     UploadFiles,
     Users
 )
+from core.mcp.client import MCPClient
 from languages import get_language_content
 from log import Logger
 
@@ -377,6 +377,7 @@ class ChatroomManager:
                 self._event_loop.create_task(coro)
         
     async def start(self):
+        await self._mcp_client.connect_to_builtin_server()
         logger.info('Ready.')
         self._event_loop.create_task(self._resume_chatrooms())
         await self._ws_manager.start(self._ws_handler)
