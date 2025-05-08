@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 from langchain_core.messages import AIMessageChunk
 
+from .mcp_client import MCPClient
 from .websocket import WebSocketManager
 from core.database.models import (
     AgentAbilities,
@@ -87,7 +88,9 @@ class Chatroom:
         user_message: str,
         user_message_id: int = 0,
         topic: Optional[str] = None,
-        mcp_tool_list: Optional[List[Dict[str, Any]]] = None
+        mcp_client: MCPClient = None,
+        is_desktop: bool = False,
+        desktop_mcp_tool_list: Optional[List[Dict[str, Any]]] = None
     ) -> None:
         self._user_id = user_id
         self._team_id = team_id
@@ -116,7 +119,9 @@ class Chatroom:
         self._image_list: Optional[List[Union[int, str]]] = None
         self._current_round = 0
         self._last_speaker_id = 0
-        self._mcp_tool_list = mcp_tool_list
+        self._mcp_client = mcp_client
+        self._is_desktop = is_desktop
+        self._desktop_mcp_tool_list = desktop_mcp_tool_list
         self._mcp_tool_using = False
         self._mcp_tool_use_lock = asyncio.Event()
         self._mcp_tool_uses: List[Dict[str, Any]] = []
@@ -494,6 +499,9 @@ class Chatroom:
                     agent_id=agent_id,
                     prompt=prompt
                 )
+                mcp_tool_list = []
+                if self._is_desktop and self._desktop_mcp_tool_list:
+                    mcp_tool_list.extend(self._desktop_mcp_tool_list)
                 async for chunk in agent_node.run_in_chatroom(
                     context=Context(),
                     user_id=self._user_id,
@@ -503,7 +511,7 @@ class Chatroom:
                     override_rag_input=self._user_message,
                     override_dataset_id=override_dataset['id'] if override_dataset else None,
                     override_file_list=self._image_list if self._current_round == 0 else None,
-                    mcp_tool_list=self._mcp_tool_list
+                    mcp_tool_list=mcp_tool_list
                 ):
                     if isinstance(chunk, int):
                         agent_run_ids.append(chunk)
@@ -582,6 +590,19 @@ class Chatroom:
                             'MCPTOOLUSE',
                             mcp_tool_use_in_message
                         )
+
+                    for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
+                        if mcp_tool_use['name'] in ['workflow_run', 'skill_run']:
+                            result = await self._mcp_client.call_tool(
+                                mcp_tool_use['name'],
+                                mcp_tool_use['args']
+                            )
+                            mcp_tool_use_in_message['result'] = result
+                            await self._ws_manager.send_instruction(
+                                self._chatroom_id,
+                                'WITHMCPTOOLRESULT',
+                                {'index': index, 'result': result}
+                            )
 
                     while True:
                         await self._mcp_tool_use_lock.wait()

@@ -11,6 +11,7 @@ from websockets import (
 )
 
 from .chatroom import Chatroom
+from .mcp_client import MCPClient
 from .websocket import WebSocketManager
 from config import settings
 from core.database.models import (
@@ -40,10 +41,11 @@ class ChatroomManager:
     def __init__(self, event_loop: asyncio.BaseEventLoop):
         self._event_loop = event_loop
         self._ws_manager = WebSocketManager(event_loop)
+        self._mcp_client = MCPClient()
         self._chatrooms: Dict[int, Chatroom] = {}
         self._file_lists: Dict[int, List[Union[int, str]]] = {}
         self._is_desktop: Dict[int, bool] = {}
-        self._mcp_tool_lists: Dict[int, List[Dict[str, Any]]] = {}
+        self._desktop_mcp_tool_lists: Dict[int, List[Dict[str, Any]]] = {}
 
     def _get_chatroom_info(self, chatroom_id: int, user_id: int, check_chat_status: bool) -> Dict[str, int]:
         chatroom_info = chatrooms.select_one(
@@ -201,7 +203,9 @@ class ChatroomManager:
                     all_agent_ids, absent_agent_ids,
                     chatroom_info['max_round'], bool(chatroom_info['smart_selection']),
                     self._ws_manager, user_message, user_message_id, topic,
-                    self._mcp_tool_lists.get(chatroom_id)
+                    self._mcp_client,
+                    self._is_desktop.get(chatroom_id, False),
+                    self._desktop_mcp_tool_lists.get(chatroom_id)
                 )
                 self._chatrooms[chatroom_id] = chatroom
                 chatroom.load_history_messages(history_messages)
