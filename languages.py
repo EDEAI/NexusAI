@@ -156,35 +156,35 @@ language_packs = {
 
             The skills/workflows list contains one or more dictionaries (skills/workflows);
             The format of each skill/workflow is as follows:
-            {{
+            {
                 "id": skill or workflow id,
                 "name": skill or workflow name,
                 "description": skill or workflow description,
-                "input_variables": {{
+                "input_variables": {
                     "name": "input_var" or something else,
                     "type": "object",
-                    "properties": {{
-                        variable name: {{
+                    "properties": {
+                        variable name: {
                             "name": Name of the variable.
                             "required": Whether the variable is mandatory.
                             "display_name": Display name of the variable. It can be used as a description of the function and purpose of the variable.
                             "type": The variable type. It can be "number" or "string".
                             "value": Empty value.
-                        }},
+                        },
                         ...
-                    }}
-                }}
-            }}
+                    }
+                }
+            }
             The parameter format for invoking the MCP tool (skill_run or workflow_run) is as follows:
-            {{
+            {
                 "id": ID of the skill or workflow you want to invoke,
                 "user_id": null (we will replace it with actual data),
                 "team_id": null (we will replace it with actual data),
-                "input_variables": {{
+                "input_variables": {
                     variable name: corresponding variable value you want to pass in,
                     ...
-                }}
-            }}
+                }
+            }
             Please invoke the MCP tool according to the correct parameter format.
         ''',
         "agent_callable_skills": '''
