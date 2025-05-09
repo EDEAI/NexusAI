@@ -14,11 +14,14 @@ from ..variables import ObjectVariable, Variable
 from ..recursive_task import RecursiveTaskCategory
 from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
 from core.database.models.agent_chat_messages import AgentChatMessages
-from core.database.models import Apps, AgentAbilities, AgentDatasetRelation, Agents, Chatrooms, Workflows, AppRuns, AppNodeExecutions, Models
+from core.database.models import (
+    Apps, AppNodeExecutions, AppRuns,
+    AgentAbilities, AgentCallableItems, AgentDatasetRelation, Agents,
+    Chatrooms, CustomTools, Workflows
+)
 from core.dataset import DatasetRetrieval
-from core.llm.messages import Messages
-from core.llm.models import LLMPipeline
 from core.llm.prompt import Prompt, replace_prompt_with_context
+from core.mcp.client import MCPClient
 from languages import get_language_content
 from log import Logger
 from core.helper import push_to_websocket_queue
@@ -119,6 +122,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         node_exec_id: int,
         task: Optional[Dict[str, RecursiveTaskCategory]],
         retrieve: bool,
+        callable_skills: List[Dict[str, Any]],
+        callable_workflows: List[Dict[str, Any]],
         direct_output: bool = False,
         is_chat: bool = False
     ) -> Tuple[Optional[int], Dict[str, Any]]:
@@ -128,6 +133,18 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             'name': agent['name'],
             'description': agent['description'],
             'obligations': agent['obligations'],
+            'callable_items_description': get_language_content(
+                'agent_callable_items_description',
+                append_ret_lang_prompt=False
+            ) if callable_skills or callable_workflows else '',
+            'callable_skills': get_language_content(
+                'agent_callable_skills',
+                append_ret_lang_prompt=False
+            ).format(skill_list=json.dumps(callable_skills, ensure_ascii=False)) if callable_skills else '',
+            'callable_workflows': get_language_content(
+                'agent_callable_workflows',
+                append_ret_lang_prompt=False
+            ).format(workflow_list=json.dumps(callable_workflows, ensure_ascii=False)) if callable_workflows else '',
             'retrieved_docs_format': '',
             'reply_requirement': '',
         }
@@ -301,6 +318,25 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         input_['user_prompt'] = user_prompt
 
         return output_format, input_
+    
+    def _get_callable_items(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        callable_skills = []
+        callable_workflows = []
+        for callable_item in AgentCallableItems().get_callable_items_by_agent_id(self.data['agent_id']):
+            match callable_item['item_type']:
+                case 1:
+                    skill = CustomTools().get_skill_by_app_id(callable_item['app_id'])
+                    callable_skills.append(skill)
+                case 2:
+                    workflow = Workflows().get_workflow_by_app_id(callable_item['app_id'])
+                    input_variables = workflow.pop('graph')['nodes'][0]['data']['input']
+                    input_variables = [
+                        {k: v for k, v in var.items() if k not in ['max_length']}
+                        for var in input_variables['properties'].values()
+                    ]
+                    workflow['input_variables'] = input_variables
+                    callable_workflows.append(workflow)
+        return callable_skills, callable_workflows
         
     def run(
         self,
@@ -423,12 +459,32 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     retrieval_chain, _, retrieval_token_counter = DatasetRetrieval.multiple_retrieve(
                         datasets, agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
+
+            callable_skills, callable_workflows = self._get_callable_items()
             
             # direct_output = bool(task) or is_chat  # Content output only (ability ID is omitted) for auto match ability & Force plain text output
             direct_output = False
             output_format, input_ = self._prepare_prompt(
-                agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets), direct_output, is_chat
+                agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets),
+                callable_skills, callable_workflows,
+                direct_output, is_chat
             )
+
+            mcp_client = MCPClient()
+            event_loop = asyncio.get_event_loop()
+            event_loop.run_until_complete(mcp_client.connect_to_builtin_server())
+            tool_list = event_loop.run_until_complete(mcp_client.get_tool_list())
+            event_loop.run_until_complete(mcp_client.cleanup())
+
+            all_mcp_tools = []
+            if mcp_tool_list:
+                all_mcp_tools.extend(mcp_tool_list)
+            for tool in tool_list:
+                if tool['name'] == 'workflow_run' and callable_workflows:
+                    all_mcp_tools.append(tool)
+                elif tool['name'] == 'skill_run' and callable_skills:
+                    all_mcp_tools.append(tool)
+
             # Auto match ability
             #       -- Force JSON output -- return_json is True
             # Ability output format is JSON
@@ -450,7 +506,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 is_chat=is_chat,
                 user_id=user_id,
                 agent_id=agent_id,
-                mcp_tool_list=mcp_tool_list
+                mcp_tool_list=all_mcp_tools
             )
             print(model_data)
             AppRuns().update(
@@ -741,9 +797,26 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     retrieval_chain, _, retrieval_token_counter = DatasetRetrieval.multiple_retrieve(
                         datasets, agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
+
+            callable_skills, callable_workflows = self._get_callable_items()
+
+            mcp_client = MCPClient()
+            await mcp_client.connect_to_builtin_server()
+            tool_list = await mcp_client.get_tool_list()
+            await mcp_client.cleanup()
+
+            all_mcp_tools = []
+            if mcp_tool_list:
+                all_mcp_tools.extend(mcp_tool_list)
+            for tool in tool_list:
+                if tool['name'] == 'workflow_run' and callable_workflows:
+                    all_mcp_tools.append(tool)
+                elif tool['name'] == 'skill_run' and callable_skills:
+                    all_mcp_tools.append(tool)
             
             _, input_ = self._prepare_prompt(
-                agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets), True, True
+                agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets),
+                callable_skills, callable_workflows, True, True
             )
             model_data, ainvoke = self.get_ainvoke_func(
                 app_run_id=app_run_id, 
@@ -755,7 +828,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 return_json=False,
                 correct_llm_output=correct_llm_output,
                 override_rag_input=override_rag_input,
-                mcp_tool_list=mcp_tool_list
+                mcp_tool_list=all_mcp_tools
             )
 
             full_chunk: Optional[AIMessageChunk] = None

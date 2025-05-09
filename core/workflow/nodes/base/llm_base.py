@@ -289,7 +289,11 @@ class LLMBaseNode(Node):
             input_variables=input
         )
         if mcp_tool_list:
-            llm_pipeline.llm = llm_pipeline.llm.bind_tools(mcp_tool_list)
+            llm_pipeline.llm = llm_pipeline.llm.bind_tools([{
+                'name': tool['name'],
+                'description': tool['description'],
+                'input_schema': tool['inputSchema']
+            } for tool in mcp_tool_list])
         ai_message = llm_pipeline.invoke_llm(messages_as_langchain_format)
         content = ai_message.content
         if return_json:
@@ -370,7 +374,11 @@ class LLMBaseNode(Node):
                 False, input
             )
             if mcp_tool_list:
-                llm_pipeline.llm = llm_pipeline.llm.bind_tools(mcp_tool_list)
+                llm_pipeline.llm = llm_pipeline.llm.bind_tools([{
+                    'name': tool['name'],
+                    'description': tool['description'],
+                    'input_schema': tool['inputSchema']
+                } for tool in mcp_tool_list])
             for _ in range(5):
                 try:
                     if model_info["supplier_name"] == "Anthropic":

@@ -287,8 +287,9 @@ class ChatroomManager:
                             chatroom_id = data
                             last_message_id = self._get_last_message_id(chatroom_id)
                             self._ws_manager.save_connection(chatroom_id, connection)
+                            await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                             if last_message_id and last_message_id > chatroom_info['initial_message_id']:
-                                await self._ws_manager.send_instruction(chatroom_id, 'TRUNCATABLE', True)
+                                await self._ws_manager.send_instruction_by_connection(connection, 'TRUNCATABLE', True)
                         case 'TRUNCATE':
                             # Truncate chat history
                             assert isinstance(data, int), 'Chatroom ID should be an integer.'
@@ -315,17 +316,17 @@ class ChatroomManager:
                                     # File list
                                     assert isinstance(data, list), 'File list should be a list.'
                                     self._file_lists[chatroom_id] = data
-                                    await self._ws_manager.send_instruction(chatroom_id, 'OK')
+                                    await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                                 case 'ISDESKTOP':
                                     # Is desktop
                                     assert isinstance(data, bool), 'Is desktop should be a boolean.'
                                     self._is_desktop[chatroom_id] = data
-                                    await self._ws_manager.send_instruction(chatroom_id, 'OK')
+                                    await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                                 case 'MCPTOOLLIST':
                                     # MCP tool list
                                     assert isinstance(data, list), 'MCP tool list should be a list.'
-                                    self._mcp_tool_lists[chatroom_id] = data
-                                    await self._ws_manager.send_instruction(chatroom_id, 'OK')
+                                    self._desktop_mcp_tool_lists[chatroom_id] = data
+                                    await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                                 case 'MCPTOOLRESULT':
                                     assert isinstance(data, dict), 'MCP tool result should be a dictionary.'
                                     assert isinstance(index := data['index'], int), f'Invalid MCP tool index: {index}'

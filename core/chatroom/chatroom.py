@@ -542,7 +542,6 @@ class Chatroom:
                                             agent_message
                                         )
                                     elif item['type'] == 'tool_use':
-                                        self._console_log(str(item))
                                         if mcp_tool_name := item.get('name'):
                                             if item['index'] != len(self._mcp_tool_uses) + 1:
                                                 raise Exception(f'MCP tool use index is not correct: {item["index"]}')
@@ -569,6 +568,10 @@ class Chatroom:
                     'type': 'text',
                     'message': current_agent_message
                 })
+                
+                if self._terminate():
+                    break
+
                 if not self._mcp_tool_uses:
                     break
                 else:
@@ -583,7 +586,7 @@ class Chatroom:
                         mcp_tool_use_in_message = {
                             'index': index,
                             'name': mcp_tool_use['name'],
-                            'args': mcp_tool_use['args']
+                            'args': json.loads(mcp_tool_use['args'])
                         }
                         await self._ws_manager.send_instruction(
                             self._chatroom_id,
@@ -593,22 +596,23 @@ class Chatroom:
 
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
                         if mcp_tool_use['name'] in ['workflow_run', 'skill_run']:
+                            mcp_tool_args = json.loads(mcp_tool_use['args'])
+                            mcp_tool_args['user_id'] = self._user_id
+                            mcp_tool_args['team_id'] = self._team_id
                             result = await self._mcp_client.call_tool(
                                 mcp_tool_use['name'],
-                                mcp_tool_use['args']
+                                mcp_tool_args
                             )
-                            mcp_tool_use_in_message['result'] = result
+                            mcp_tool_use['result'] = result
                             await self._ws_manager.send_instruction(
                                 self._chatroom_id,
                                 'WITHMCPTOOLRESULT',
                                 {'index': index, 'result': result}
                             )
 
-                    while True:
+                    while any(mcp_tool_use['result'] is None for mcp_tool_use in self._mcp_tool_uses):
                         await self._mcp_tool_use_lock.wait()
                         self._mcp_tool_use_lock.clear()
-                        if all(mcp_tool_use['result'] is not None for mcp_tool_use in self._mcp_tool_uses):
-                            break
 
                     for mcp_tool_use in self._mcp_tool_uses:
                         self._history_messages.append({
@@ -639,6 +643,10 @@ class Chatroom:
                         )
                     self._mcp_tool_uses.clear()
                     self._mcp_tool_is_using = False
+
+                if self._terminate():
+                    break
+            
             await self._ws_manager.end_agent_reply(
                 self._chatroom_id,
                 agent_id,

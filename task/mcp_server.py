@@ -34,35 +34,31 @@ workflows_db = Workflows()
 appRuns_db = AppRuns()
 appNodeUserRelation_db = AppNodeUserRelation()
 chatroomDrivenRecords_db = ChatroomDrivenRecords()
-mcp = FastMCP("skill_runner",port = settings.MCP_SERVER_PORT)
+mcp = FastMCP("builtin", port=settings.MCP_SERVER_PORT)
 
 @mcp.tool()
 async def workflow_run(
-    workflow_id: int, 
-    input_data: Dict[str, Any], 
+    id: int, 
+    input_variables: Dict[str, Any], 
     user_id: int, 
-    team_id: int,
-    knowledge_base_mapping: Optional[Dict[str, Any]] = None,
-    node_confirm_users: Optional[Dict[str, List[int]]] = None,
-    data_source_run_id: Optional[int] = 0
+    team_id: int
 ) -> Dict[str, Any]:
     """Run the specified workflow"""
     try:
         # Parameter type conversion
-        workflow_id = int(workflow_id) if not isinstance(workflow_id, int) else workflow_id
+        workflow_id = int(id)
         user_id = int(user_id) if not isinstance(user_id, int) else user_id
         team_id = int(team_id) if not isinstance(team_id, int) else team_id
-        data_source_run_id = int(data_source_run_id) if data_source_run_id and not isinstance(data_source_run_id, int) else data_source_run_id or 0
 
         # Input validation
-        if not isinstance(input_data, dict):
+        if not isinstance(input_variables, dict):
             raise ValueError("input_data must be a dictionary")
 
         # Parameter validation
         if workflow_id <= 0:
             raise ValueError(get_language_content("app_id_required"))
 
-        if not input_data:
+        if not input_variables:
             raise ValueError(get_language_content("input_data_required"))
 
         # Get workflow with all conditions
@@ -86,10 +82,10 @@ async def workflow_run(
         input_obj = deepcopy(input_of_start_node)
 
         # Process input data
-        if not isinstance(input_data, Dict):
+        if not isinstance(input_variables, Dict):
             raise ValueError(get_language_content("input_data_format_error"))
         
-        for k, v in input_data.items():
+        for k, v in input_variables.items():
             if var := input_obj.properties.get(k):
                 var.value = v
         
@@ -108,19 +104,8 @@ async def workflow_run(
             'status': 1,
             'total_steps': graph.get_total_steps()
         }
-        
-        if knowledge_base_mapping is not None:
-            app_run_data['knowledge_base_mapping'] = knowledge_base_mapping
 
         app_run_id = appRuns_db.insert(app_run_data)
-
-        if data_source_run_id > 0:
-            chatroomdriven_info = appNodeUserRelation_db.get_data_by_data_source_run_id(data_source_run_id)
-            if chatroomdriven_info:
-                appNodeUserRelation_db.update_data_driven_run_id(chatroomdriven_info['id'], data_source_run_id, app_run_id)
-
-        if node_confirm_users:
-            appNodeUserRelation_db.create_data(app_run_id, node_confirm_users)
 
         apps_db.increment_execution_times(workflow['app_id'])
         apps_db.commit()
@@ -146,36 +131,32 @@ async def workflow_run(
         # return {
         #     "outputs": flatten_variable_with_values(outputs)
         # }
-        return {'app_id': app_id, 'workflow_id': workflow['id'], 'app_run_id': app_run_id}
+        return {'workflow_id': workflow['id'], 'app_run_id': app_run_id}
     except ValueError as e:
         raise ValueError(str(e))
     except Exception as e:
         raise ValueError(f"Workflow execution failed: {str(e)}")
 
 @mcp.tool()
-async def skill_run(skill_id: int, input_dict: Dict[str, Any], user_id: int, team_id: int) -> Dict[str, Any]:
+async def skill_run(id: int, input_variables: Dict[str, Any], user_id: int, team_id: int) -> Dict[str, Any]:
     """Run the specified skill
     
     Args:
-        skill_id: Skill ID
-        input_dict: Input parameters dictionary
+        id: Skill ID
+        input_variables: Input parameters dictionary
         user_id: User ID
         team_id: Team ID
         
     Returns:
         Dict containing execution results
     """
+    skill_id = int(id)
     # Parameter validation
     if skill_id <= 0:
         raise ValueError(get_language_content("skill_id_required"))
 
-    if not input_dict:
+    if not input_variables:
         raise ValueError(get_language_content("input_dict_required"))
-        
-    try:
-        create_variable_from_dict(input_dict)
-    except Exception as e:
-        raise ValueError(get_language_content("input_dict_format_error"))
 
     # Get skill information
     skill = tools_db.select_one(
@@ -213,9 +194,14 @@ async def skill_run(skill_id: int, input_dict: Dict[str, Any], user_id: int, tea
             raise ValueError(get_language_content("team_members_not_open"))
         if app["status"] != 1:
             raise ValueError(get_language_content("app_status_not_normal"))
+        
+    input_obj = create_variable_from_dict(skill["input_variables"])
+    for k, v in input_variables.items():
+        if var := input_obj.properties.get(k):
+            var.value = v
 
     # Execute skill
-    task = run_app.delay(app_type="skill", id_=skill_id, user_id=user_id, input_dict=input_dict)
+    task = run_app.delay(app_type="skill", id_=skill_id, user_id=user_id, input_dict=input_obj.to_dict())
     while not task.ready():
         await asyncio.sleep(0.1)
     
@@ -240,3 +226,4 @@ if __name__ == "__main__":
     # Initialize and run server
     print("Server starting...")
     mcp.run(transport='sse')
+    
