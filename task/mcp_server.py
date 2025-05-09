@@ -38,7 +38,7 @@ mcp = FastMCP("skill_runner",port = settings.MCP_SERVER_PORT)
 
 @mcp.tool()
 async def workflow_run(
-    app_id: int, 
+    workflow_id: int, 
     input_data: Dict[str, Any], 
     user_id: int, 
     team_id: int,
@@ -49,7 +49,7 @@ async def workflow_run(
     """Run the specified workflow"""
     try:
         # Parameter type conversion
-        app_id = int(app_id) if not isinstance(app_id, int) else app_id
+        workflow_id = int(workflow_id) if not isinstance(workflow_id, int) else workflow_id
         user_id = int(user_id) if not isinstance(user_id, int) else user_id
         team_id = int(team_id) if not isinstance(team_id, int) else team_id
         data_source_run_id = int(data_source_run_id) if data_source_run_id and not isinstance(data_source_run_id, int) else data_source_run_id or 0
@@ -59,7 +59,7 @@ async def workflow_run(
             raise ValueError("input_data must be a dictionary")
 
         # Parameter validation
-        if app_id <= 0:
+        if workflow_id <= 0:
             raise ValueError(get_language_content("app_id_required"))
 
         if not input_data:
@@ -69,14 +69,14 @@ async def workflow_run(
         workflow = workflows_db.select_one(
             columns=['id', 'user_id', 'graph', 'app_id'],
             conditions=[
-                {'column': 'app_id', 'value': app_id},
+                {'column': 'id', 'value': workflow_id},
                 {'column': 'status', 'value': 1},
                 {'column': 'publish_status', 'value': 1}
             ]
         )
 
         if not workflow:
-            raise ValueError(f"No workflow found for app_id={app_id}")
+            raise ValueError(f"No workflow found for workflow_id={workflow_id}")
 
         # Validate graph and prepare input
         graph = create_graph_from_dict(workflow['graph'])
