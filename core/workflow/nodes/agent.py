@@ -2,6 +2,7 @@ import asyncio
 import json
 
 from copy import deepcopy
+from exceptiongroup import ExceptionGroup
 from datetime import datetime
 from time import monotonic
 from typing import Any, AsyncIterator, Dict, List, Optional, Tuple, Union
@@ -472,7 +473,10 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
 
             mcp_client = MCPClient()
             event_loop = asyncio.get_event_loop()
-            event_loop.run_until_complete(mcp_client.connect_to_builtin_server())
+            try:
+                event_loop.run_until_complete(mcp_client.connect_to_builtin_server())
+            except ExceptionGroup as e:
+                logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
             tool_list = event_loop.run_until_complete(mcp_client.get_tool_list())
             event_loop.run_until_complete(mcp_client.cleanup())
 
@@ -801,7 +805,10 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             callable_skills, callable_workflows = self._get_callable_items()
 
             mcp_client = MCPClient()
-            await mcp_client.connect_to_builtin_server()
+            try:
+                await mcp_client.connect_to_builtin_server()
+            except ExceptionGroup as e:
+                logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
             tool_list = await mcp_client.get_tool_list()
             await mcp_client.cleanup()
 
