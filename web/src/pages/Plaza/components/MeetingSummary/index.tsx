@@ -114,47 +114,49 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
             
             {
                 contentShow ? 
-                    <DraggablePanel
-                        minWidth={400}
-                        className={`relative h-full right-0 border-0 returned-0 px-[0] ${packUp?'translate-x-full flex-[0]':''}`}
-                    >
-                        {boxLoading?<div className='h-full w-full absolute top-0 left-0 flex justify-center items-center z-[100] bg-[rgba(255,255,255,0.5)]'><Spin size="large" /></div>:<></>}
-                        {
-                            <>
-                                <div onClick={()=>{ setPackUp(pre=>!pre)}} className={`
-                                        ${!packUp?'absolute right-[99%] top-[60px]':'fixed right-[100%] top-[60px]' }
-                                        history_packup
-                                        hover:text-[#1B64F3]
-                                         w-[30px] h-[60px] bg-[rgba(255,255,255,1)] shadow-md flex justify-center items-center cursor-pointer z-[99]
-                                    `}>
-                                   {!packUp?<MenuUnfoldOutlined className='text-[18px]'/>:<MenuFoldOutlined className='text-[18px]'/>}
-                                   
-                                </div>
-                                <div className={`h-full min-h-full overflow-y-auto flex flex-col-reverse scroll-smooth relative`} onScroll={historyLoad} ref={scrollDom}>
-                                    <div>
-                                        {summaryHistory.length?<SummaryHistoryDom id={id} runid={appRunId} scrollDom={scrollDom} list={summaryHistory} historyHeight={historyHeight.current}/>:<></>}
-                                        <div className={`w-full px-4 h-full`} style={{minHeight:summaryShow?scrollDom?.current?.offsetHeight:''}}>
-                                            <RevisionsMeetingSummary 
-                                                setShow={setRunboxShow}
-                                                inputShow={inputShow}
-                                                setBoxLoading={setBoxLoading}
-                                                setAppRunId={setAppRunId}
-                                                scrollDom={scrollDom}
-                                            />
-                                            {runboxShow?<RunsMeetingSummary
-                                                id={roomId} 
-                                                runid={appRunId}
-                                                setBoxLoading={setBoxLoading}
-                                                scrollDom={scrollDom}
-                                                setinputShow={setinputShow}
-                                            />:<></>}
+                    <div style={{overflow:packUp?'hidden':'initial'}} className='relative pl-[32px] box-border'>
+                        <div onClick={()=>{ setPackUp(pre=>!pre)}} className={`
+                                ${!packUp?'absolute left-[2px] top-[60px]':'absolute left-[2px]  top-[60px]' }
+                                history_packup
+                                hover:text-[#1B64F3]
+                                w-[30px] h-[60px] bg-[rgba(255,255,255,1)] shadow-md flex justify-center items-center cursor-pointer z-[99]
+                            `}>
+                            {!packUp?<MenuUnfoldOutlined className='text-[18px]'/>:<MenuFoldOutlined className='text-[18px]'/>}
+                        </div>
+                        <DraggablePanel
+                            minWidth={400}
+                            className={`relative h-full right-0 border-0 returned-0 px-[0] ${packUp?'hidden flex-[0]':'block'}`}
+                        >
+                            {boxLoading?<div className='h-full w-full absolute top-0 left-0 flex justify-center items-center z-[100] bg-[rgba(255,255,255,0.5)]'><Spin size="large" /></div>:<></>}
+                            {
+                                <>
+
+                                    <div className={`h-full min-h-full overflow-y-auto flex flex-col-reverse scroll-smooth relative`} onScroll={historyLoad} ref={scrollDom}>
+                                        <div>
+                                            {summaryHistory.length?<SummaryHistoryDom id={id} runid={appRunId} scrollDom={scrollDom} list={summaryHistory} historyHeight={historyHeight.current}/>:<></>}
+                                            <div className={`w-full px-4 h-full`} style={{minHeight:summaryShow?scrollDom?.current?.offsetHeight:''}}>
+                                                <RevisionsMeetingSummary 
+                                                    setShow={setRunboxShow}
+                                                    inputShow={inputShow}
+                                                    setBoxLoading={setBoxLoading}
+                                                    setAppRunId={setAppRunId}
+                                                    scrollDom={scrollDom}
+                                                />
+                                                {runboxShow?<RunsMeetingSummary
+                                                    id={roomId} 
+                                                    runid={appRunId}
+                                                    setBoxLoading={setBoxLoading}
+                                                    scrollDom={scrollDom}
+                                                    setinputShow={setinputShow}
+                                                />:<></>}
+                                            </div>
                                         </div>
+                                        {isLoad?<div className="text-center justify-center items-center flex"><Spin /></div>:<></>}
                                     </div>
-                                    {isLoad?<div className="text-center justify-center items-center flex"><Spin /></div>:<></>}
-                                </div>
-                            </>
-                        }
-                    </DraggablePanel>
+                                </>
+                            }
+                        </DraggablePanel>
+                    </div>
                 :<></>
             }
             
