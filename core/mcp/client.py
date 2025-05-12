@@ -10,7 +10,6 @@ from config import settings
 
 
 project_root = Path(__file__).parent.parent.parent
-logger = Logger.get_logger('chatroom')
 
 
 class MCPClient:
@@ -20,11 +19,10 @@ class MCPClient:
         self._exit_stack = AsyncExitStack()
         
     async def connect_to_builtin_server(self):
-        client = sse_client(f'http://localhost:{settings.MCP_SERVER_PORT}/sse', timeout=10)
+        client = sse_client(f'http://localhost:{settings.MCP_SERVER_PORT}/sse')
         sse_transport = await self._exit_stack.enter_async_context(client)
         session = await self._exit_stack.enter_async_context(ClientSession(*sse_transport))
         await session.initialize()
-
         self._servers['builtin'] = session
         response = await session.list_tools()
         for tool in response.tools:

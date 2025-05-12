@@ -611,8 +611,12 @@ class Chatroom:
                             )
 
                     while any(mcp_tool_use['result'] is None for mcp_tool_use in self._mcp_tool_uses):
-                        await self._mcp_tool_use_lock.wait()
-                        self._mcp_tool_use_lock.clear()
+                        for mcp_tool_use in self._mcp_tool_uses:
+                            try:
+                                await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
+                            except asyncio.TimeoutError:
+                                mcp_tool_use['result'] = 'Timeout'
+                            self._mcp_tool_use_lock.clear()
 
                     for mcp_tool_use in self._mcp_tool_uses:
                         self._history_messages.append({

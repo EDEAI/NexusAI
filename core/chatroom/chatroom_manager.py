@@ -5,6 +5,7 @@ from pathlib import Path
 from time import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from exceptiongroup import ExceptionGroup
 from websockets import (
     ConnectionClosed,
     WebSocketServerProtocol
@@ -378,7 +379,10 @@ class ChatroomManager:
                 self._event_loop.create_task(coro)
         
     async def start(self):
-        await self._mcp_client.connect_to_builtin_server()
+        try:
+            await self._mcp_client.connect_to_builtin_server()
+        except ExceptionGroup as e:
+            logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
         logger.info('Ready.')
         self._event_loop.create_task(self._resume_chatrooms())
         await self._ws_manager.start(self._ws_handler)
