@@ -15,7 +15,6 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useStore from '../../../../store';
 import DraggableList from '../DraggableList';
 
-// 定义 API 响应类型
 interface AppItemResponse {
     name: string;
     description: string;
@@ -37,7 +36,7 @@ interface SearchNodeList {
     workflow?: any;
 }
 
-// 添加缓存数据接口
+
 interface CacheData {
     [key: string]: {
         data: any[];
@@ -85,7 +84,7 @@ export default memo(({
     const lang = getLocale() == 'en-US' ? 'en_US' : 'zh_Hans';
     const originNodes = getBaseNode();
 
-    // 使用useMemo缓存baseNodes，避免每次渲染时重新计算
+
     const baseNodes = useMemo(() => {
         return Object.values(originNodes)
             .filter(
@@ -119,7 +118,7 @@ export default memo(({
 
     const toolData = useStore(state => state.toolData);
 
-    // 移除baseNodes依赖，只跟踪必要的状态变化
+    
     useTrackedEffect((changes)=>{
         console.log('toolData',changes);
     },[toolData, filterData, searchNode, searchNodeList, searchTools,visibleTabs,defaultActiveTab,showTeamSwitch,isMinWidth,isCollapsed,onItemClick]);

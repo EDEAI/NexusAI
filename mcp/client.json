@@ -1,0 +1,7 @@
+{
+    "mcpServers": {
+        "skill_runner": {
+            "url": "http://localhost:9486/sse"
+        }
+    }
+}

@@ -25,6 +25,10 @@ class ResAgentListSchema(BaseModel):
     detail: Optional[str] = None
     data: Optional[AgentListResponseData] = None
 
+class CallableList(BaseModel):
+    app_id: int
+    item_type: int
+
 class ReqAgentBaseCreateSchema(BaseModel):
     is_public: Optional[int] = None
     attrs_are_visible: Optional[int] = None
@@ -35,6 +39,7 @@ class ReqAgentBaseCreateSchema(BaseModel):
     m_config_id: Optional[int] = None
     allow_upload_file: Optional[int] = None
     default_output_format: Optional[int] = None
+    callable_list: Optional[List[CallableList]] = None
 
 class AgentBaseCreateResponseData(BaseModel):
     """Response schema for agent creation"""

@@ -358,12 +358,13 @@ class DatasetManagement:
         if file_path:
             # dl = DocumentLoader(file_path=file_path)
             # segments = dl.load_and_split(text_splitter=ts)
+            source = file_path
             text = cls.process_document_with_files(file_path, user_id)
             if text_split_config and not text_split_config['split']:
-                segments = [Document(page_content=text, metadata={'source': file_path})]
+                segments = [Document(page_content=text, metadata={'source': source})]
             else:
                 ts = get_text_splitter(document_type='markdown')
-                segments = ts.create_documents([text], [{'source': file_path}])
+                segments = ts.create_documents([text], [{'source': source}])
         elif text:
             if text_split_config and not text_split_config['split']:
                 segments = [Document(page_content=text, metadata={'source': source})]
@@ -389,11 +390,10 @@ class DatasetManagement:
         total_num_tokens = 0
         overall_indexing_start_time = monotonic()
         for segment in segments:
-            if not segment.metadata:
-                segment.metadata = {}
-            if 'source' not in segment.metadata:
-                segment.metadata['source'] = source
-            source = segment.metadata['source']
+            segment_source = segment.metadata.get('source')
+            if not segment_source:
+                segment_source = source
+            segment.metadata = {'source': segment_source}
             page_content = segment.page_content
             word_count = len(page_content)
             total_word_count += word_count

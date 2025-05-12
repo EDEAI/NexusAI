@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     CHATROOM_WEBSOCKET_PORT: int = int(
         os.environ.get('CHATROOM_WEBSOCKET_PORT', os.getenv('CHATROOM_WEBSOCKET_PORT', 8765)))
     WEBSOCKET_PORT: int = int(os.environ.get('WEBSOCKET_PORT', os.getenv('WEBSOCKET_PORT', 9473)))
-    CELL_WEBSOCKET_PORT: int = int(os.environ.get('CELL_WEBSOCKET_PORT', os.getenv('CELL_WEBSOCKET_PORT', 9475)))
+    MCP_SERVER_PORT: int = int(os.environ.get('MCP_SERVER_PORT', os.getenv('MCP_SERVER_PORT', 9478)))
 
     WEB_URL: str = os.environ.get('WEB_URL', os.getenv('WEB_URL'))
     ICON_URL: str = os.environ.get('ICON_URL', os.getenv('ICON_URL'))

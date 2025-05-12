@@ -5,7 +5,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { ProForm, ProFormList, ProFormText } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useMount, useReactive, useUpdateEffect } from 'ahooks';
-import { Button } from 'antd';
+import { Button, FormInstance } from 'antd';
 import { memo, useRef, useState } from 'react';
 import { SelectVariable } from '../../components/Form/Select';
 import useStore from '../../store';
@@ -30,12 +30,12 @@ export default memo(({ node }: { node: AppNode }) => {
         assistant: { serializedContent: '', value: {} },
     });
 
-    const formRef = useRef(null);
+    const formRef = useRef<FormInstance>(null);
     const [updateEditor, setUpdateEditor] = useState(0);
-
+   
     const updateNodeData = useStore(state => state.updateNodeData);
     const getVariables = useStore(state => state.getOutputVariables);
-
+    
     useMount(() => {
         const reset = resetFormNodes(formRef, node);
         setTimeout(() => {
@@ -132,6 +132,7 @@ export default memo(({ node }: { node: AppNode }) => {
                             <div className="flex-1">
                                 <SelectVariable
                                     name="variable"
+                                    formRef={formRef}
                                     node={node}
                                     filterFn={customFilterFn}
                                 />

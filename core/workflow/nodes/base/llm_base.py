@@ -374,7 +374,7 @@ class LLMBaseNode(Node):
                         llm_aiter = llm_pipeline.astream_llm(llm_input, stream_usage=True)
                     while True:
                         try:
-                            yield await asyncio.wait_for(anext(llm_aiter), timeout=20)
+                            yield await asyncio.wait_for(anext(llm_aiter), timeout=120)
                         except StopAsyncIteration:
                             break
                     break
