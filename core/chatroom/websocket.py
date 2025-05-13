@@ -39,12 +39,15 @@ class WebSocketManager:
         )
         assert match_result, 'Invalid connection path'
         token = match_result.group(1)
-        assert redis.sismember('blacklisted_tokens', token) == 0, 'Blacklisted token'
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         except JWTError:
             raise Exception('Invalid token')
         assert (user_id := payload.get('uid')), 'Invalid user ID'
+
+        stored_token = redis.get(f'access_token:{user_id}')
+        if not stored_token or stored_token.decode('utf-8') != token:
+            raise Exception('Invalid token')
         return user_id
             
     def parse_instruction(self, instruction_str: str) -> Tuple[str, Optional[Union[int, str, bool, List[Union[int, str]]]]]:
