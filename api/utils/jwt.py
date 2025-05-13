@@ -42,8 +42,6 @@ def verify_token(token: str, credentials_exception):
     """
     Verify the token.
     """
-    if redis.sismember('blacklisted_tokens', token):
-        raise credentials_exception
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         uid: int = payload.get("uid")
