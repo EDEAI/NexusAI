@@ -454,6 +454,7 @@ class Chatroom:
     def set_mcp_tool_result(self, index: int, result: str) -> None:
         if not self._mcp_tool_is_using:
             raise Exception('There is no MCP tool use!')
+        self._console_log(f'MCP tool result: \033[91m{result}\033[0m\n')
         self._mcp_tool_uses[index]['result'] = result
         self._mcp_tool_use_lock.set()
 
@@ -522,6 +523,11 @@ class Chatroom:
                             if tool_call_chunk['type'] == 'tool_call_chunk':
                                 mcp_tool_index = tool_call_chunk['index']
                                 if mcp_tool_name := tool_call_chunk['name']:
+                                    self._console_log(
+                                        '\033[91mTool call: '
+                                        f'\033[0mName: \033[36m{mcp_tool_name} '
+                                        '\033[0mArgs: \033[36m'
+                                    )
                                     self._mcp_tool_uses.append({
                                         'index': mcp_tool_index,
                                         'name': mcp_tool_name,
@@ -529,6 +535,7 @@ class Chatroom:
                                         'result': None
                                     })
                                 if mcp_tool_input := tool_call_chunk['args']:
+                                    self._console_log(mcp_tool_input)
                                     for mcp_tool_use in self._mcp_tool_uses:
                                         if mcp_tool_use['index'] == mcp_tool_index:
                                             mcp_tool_use['args'] += mcp_tool_input
@@ -575,6 +582,8 @@ class Chatroom:
                         prompt_tokens += usage_metadata['input_tokens']
                         completion_tokens += usage_metadata['output_tokens']
                         total_tokens += usage_metadata['total_tokens']
+                        
+                self._console_log('\n')
                 
                 self._history_messages.append({
                     'agent_id': agent_id,
@@ -698,7 +707,7 @@ class Chatroom:
                 prompt_tokens, completion_tokens, total_tokens
             )
         finally:
-            self._console_log('\033[0m\n')  # Reset the color
+            self._console_log('\033[0m')  # Reset the color
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
             if not has_connections:
                 chatrooms.update(
