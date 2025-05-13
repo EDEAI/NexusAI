@@ -708,6 +708,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         override_dataset_id: Optional[int] = None,
         override_file_list: Optional[List[Union[int, str]]] = None,
         mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
+        is_desktop: bool = False,
         **kwargs
     ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
@@ -809,24 +810,26 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         datasets, agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
 
-            callable_skills, callable_workflows = self._get_callable_items()
-
-            mcp_client = MCPClient()
-            try:
-                await mcp_client.connect_to_builtin_server()
-            except ExceptionGroup as e:
-                logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
-            tool_list = await mcp_client.get_tool_list()
-            await mcp_client.cleanup()
-
             all_mcp_tools = []
-            if mcp_tool_list:
-                all_mcp_tools.extend(mcp_tool_list)
-            for tool in tool_list:
-                if tool['name'] == 'workflow_run' and callable_workflows:
-                    all_mcp_tools.append(tool)
-                elif tool['name'] == 'skill_run' and callable_skills:
-                    all_mcp_tools.append(tool)
+            callable_skills, callable_workflows = [], []
+            if is_desktop:
+                callable_skills, callable_workflows = self._get_callable_items()
+
+                mcp_client = MCPClient()
+                try:
+                    await mcp_client.connect_to_builtin_server()
+                except ExceptionGroup as e:
+                    logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
+                tool_list = await mcp_client.get_tool_list()
+                await mcp_client.cleanup()
+
+                if mcp_tool_list:
+                    all_mcp_tools.extend(mcp_tool_list)
+                for tool in tool_list:
+                    if tool['name'] == 'workflow_run' and callable_workflows:
+                        all_mcp_tools.append(tool)
+                    elif tool['name'] == 'skill_run' and callable_skills:
+                        all_mcp_tools.append(tool)
             
             _, input_ = self._prepare_prompt(
                 agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets),

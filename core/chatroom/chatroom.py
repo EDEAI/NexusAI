@@ -45,7 +45,7 @@ datasets = Datasets()
 class Chatroom:
     @staticmethod
     def _console_log(content: Any) -> None:
-        sys.stdout.write(str(content))
+        sys.stdout.write(f'\n{str(content)}\n' if not isinstance(content, str) else content)
         sys.stdout.flush()
 
     def _get_model_configs(self, all_agent_ids: Sequence[int], absent_agent_ids: Sequence[int]) -> None:
@@ -511,11 +511,32 @@ class Chatroom:
                     override_rag_input=self._user_message,
                     override_dataset_id=override_dataset['id'] if override_dataset else None,
                     override_file_list=self._image_list if self._current_round == 0 else None,
-                    mcp_tool_list=mcp_tool_list
+                    mcp_tool_list=mcp_tool_list,
+                    is_desktop=self._is_desktop
                 ):
                     if isinstance(chunk, int):
                         agent_run_ids.append(chunk)
                         continue
+                    if tool_call_chunks := chunk.tool_call_chunks:
+                        for tool_call_chunk in tool_call_chunks:
+                            if tool_call_chunk['type'] == 'tool_call_chunk':
+                                mcp_tool_index = tool_call_chunk['index']
+                                if mcp_tool_name := tool_call_chunk['name']:
+                                    self._mcp_tool_uses.append({
+                                        'index': mcp_tool_index,
+                                        'name': mcp_tool_name,
+                                        'args': '',
+                                        'result': None
+                                    })
+                                if mcp_tool_input := tool_call_chunk['args']:
+                                    for mcp_tool_use in self._mcp_tool_uses:
+                                        if mcp_tool_use['index'] == mcp_tool_index:
+                                            mcp_tool_use['args'] += mcp_tool_input
+                                            break
+                                    else:
+                                        raise Exception(f'Cannot find MCP tool use: {tool_call_chunk}')
+                            else:
+                                raise Exception(f'Unsupported tool call chunk type: {tool_call_chunk["type"]}')
                     if content := chunk.content:
                         if isinstance(content, str):
                             self._console_log(content)
@@ -542,16 +563,8 @@ class Chatroom:
                                             agent_message
                                         )
                                     elif item['type'] == 'tool_use':
-                                        if mcp_tool_name := item.get('name'):
-                                            if item['index'] != len(self._mcp_tool_uses) + 1:
-                                                raise Exception(f'MCP tool use index is not correct: {item["index"]}')
-                                            self._mcp_tool_uses.append({
-                                                'name': mcp_tool_name,
-                                                'args': '',
-                                                'result': None
-                                            })
-                                        if mcp_tool_input := item.get('partial_json'):
-                                            self._mcp_tool_uses[item['index']-1]['args'] += mcp_tool_input
+                                        # Tool use has been handled in the tool_call_chunks
+                                        pass
                                     else:
                                         raise Exception(f'Unsupported content item type: {item}')
                                 else:

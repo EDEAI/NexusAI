@@ -186,6 +186,7 @@ language_packs = {
                 }
             }
             Please invoke the MCP tool according to the correct parameter format.
+            If you have got the result of the skill or workflow, please stop invoking it.
         ''',
         "agent_callable_skills": '''
             Below is the list of callable skills:
