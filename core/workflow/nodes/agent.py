@@ -461,7 +461,9 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         datasets, agent_id, agent_run_id, workflow_id, app_run_id, user_id, type
                     )
 
-            callable_skills, callable_workflows = self._get_callable_items()
+            # Temporarily disabled MCP tool feature. 2025-05-13
+            # callable_skills, callable_workflows = self._get_callable_items()
+            callable_skills, callable_workflows = [], []
             
             # direct_output = bool(task) or is_chat  # Content output only (ability ID is omitted) for auto match ability & Force plain text output
             direct_output = False
@@ -471,23 +473,28 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 direct_output, is_chat
             )
 
-            mcp_client = MCPClient()
-            event_loop = asyncio.get_event_loop()
-            try:
-                event_loop.run_until_complete(mcp_client.connect_to_builtin_server())
-            except ExceptionGroup as e:
-                logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
-            tool_list = event_loop.run_until_complete(mcp_client.get_tool_list())
-            event_loop.run_until_complete(mcp_client.cleanup())
+            # Temporarily disabled MCP tool feature. 2025-05-13
+            # mcp_client = MCPClient()
+            # event_loop = asyncio.get_event_loop()
 
+            # async def get_mcp_tool_list():
+            #     try:
+            #         await mcp_client.connect_to_builtin_server()
+            #     except ExceptionGroup as e:
+            #         logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
+            #     tool_list = await mcp_client.get_tool_list()
+            #     await mcp_client.cleanup()
+            #     return tool_list
+            
+            # tool_list = event_loop.run_until_complete(get_mcp_tool_list())
             all_mcp_tools = []
-            if mcp_tool_list:
-                all_mcp_tools.extend(mcp_tool_list)
-            for tool in tool_list:
-                if tool['name'] == 'workflow_run' and callable_workflows:
-                    all_mcp_tools.append(tool)
-                elif tool['name'] == 'skill_run' and callable_skills:
-                    all_mcp_tools.append(tool)
+            # if mcp_tool_list:
+            #     all_mcp_tools.extend(mcp_tool_list)
+            # for tool in tool_list:
+            #     if tool['name'] == 'workflow_run' and callable_workflows:
+            #         all_mcp_tools.append(tool)
+            #     elif tool['name'] == 'skill_run' and callable_skills:
+            #         all_mcp_tools.append(tool)
 
             # Auto match ability
             #       -- Force JSON output -- return_json is True
