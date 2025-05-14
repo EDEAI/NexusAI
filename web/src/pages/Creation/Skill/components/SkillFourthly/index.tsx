@@ -8,8 +8,7 @@ import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
 import FileDownloadList from '@/components/common/FileDownloadList';
 
-//
-const { TextArea, Search } = Input;
+
 
 interface ChildProps {
     FourthlyValue: (value: any) => void;
@@ -20,15 +19,7 @@ interface ChildProps {
     skillid: any;
     app_id: any;
 }
-const skillFourthly: React.FC<ChildProps> = ({
-    FourthlyValue,
-    Fourthlyref,
-    handleBack,
-    Skillinfo,
-    Operationbentate,
-    skillid,
-    app_id,
-}) => {
+const SkillFourthly: React.FC<ChildProps> = ({    FourthlyValue,    Fourthlyref,    handleBack,    Skillinfo,    Operationbentate,    skillid,    app_id,}) => {
     const intl = useIntl();
     const [skillRun, setSkillRun] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -257,4 +248,4 @@ const skillFourthly: React.FC<ChildProps> = ({
         </div>
     );
 };
-export default skillFourthly;
+export default SkillFourthly;
