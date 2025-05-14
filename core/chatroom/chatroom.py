@@ -622,10 +622,13 @@ class Chatroom:
                             mcp_tool_args = mcp_tool_use['args']
                             mcp_tool_args['user_id'] = self._user_id
                             mcp_tool_args['team_id'] = self._team_id
-                            result = await self._mcp_client.call_tool(
-                                mcp_tool_use['name'],
-                                mcp_tool_args
-                            )
+                            try:
+                                result = await self._mcp_client.call_tool(
+                                    mcp_tool_use['name'],
+                                    mcp_tool_args
+                                )
+                            except KeyError:
+                                raise Exception('Cannot connect to the built-in MCP server!')
                             mcp_tool_use['result'] = result
                             await self._ws_manager.send_instruction(
                                 self._chatroom_id,
