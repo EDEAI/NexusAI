@@ -483,7 +483,6 @@ def task_callback_thread():
                                 push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', result['data']['outputs'], elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
                                 # Single agent generation
                                 # if loop_count == 0:
-                                #     # 拼接所有agent的输出结果并返回给前端（需要调用郑帅的接口）
                                 #     outPuts = ai_tool_llm_records.append_record_outputs(app_run_id, loop_id)
                                 #     outPuts['value'] = json.dumps(outPuts['value'], ensure_ascii=False)
                                 #     push_websocket_message(user_id, ai_tool_type, app_run_id, 3, '', app_run_elapsed_time, app_run_prompt_tokens, app_run_completion_tokens, app_run_total_tokens, run['created_time'], end_time, id, 3, '', outPuts, elapsed_time, prompt_tokens, completion_tokens, total_tokens, run_ai_tool_type, loop_id)
