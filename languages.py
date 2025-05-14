@@ -55,7 +55,7 @@ language_packs = {
             
             In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
             {callable_items_description}
-            If you have got the result of the MCP tool(s), please stop re-invoking it (them).
+            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
         ''',
@@ -86,7 +86,7 @@ language_packs = {
             
             In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
             {callable_items_description}
-            If you have got the result of the MCP tool(s), please stop re-invoking it (them).
+            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
         ''',
@@ -118,7 +118,7 @@ language_packs = {
             
             In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
             {callable_items_description}
-            If you have got the result of the MCP tool(s), please stop re-invoking it (them).
+            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
         ''',
@@ -147,7 +147,7 @@ language_packs = {
             
             In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
             {callable_items_description}
-            If you have got the result of the MCP tool(s), please stop re-invoking it (them).
+            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
         ''',
