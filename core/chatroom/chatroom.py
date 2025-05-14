@@ -633,11 +633,16 @@ class Chatroom:
                             )
 
                     while any(mcp_tool_use['result'] is None for mcp_tool_use in self._mcp_tool_uses):
-                        for mcp_tool_use in self._mcp_tool_uses:
+                        for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
                             try:
                                 await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
                             except asyncio.TimeoutError:
                                 mcp_tool_use['result'] = 'Timeout'
+                                await self._ws_manager.send_instruction(
+                                    self._chatroom_id,
+                                    'WITHMCPTOOLRESULT',
+                                    {'index': index, 'result': 'Timeout'}
+                                )
                             self._mcp_tool_use_lock.clear()
 
                     for mcp_tool_use in self._mcp_tool_uses:
