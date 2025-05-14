@@ -46,6 +46,15 @@ export default {
     'app.check_agent_popup.save': 'Confirm',
     'app.check_agent_popup.cancel': 'Cancel',
 
+    'app.check_skill_popup.name': 'Skill',
+    'app.check_skill_popup.title': 'Select Skill',
+    'app.check_skill_popup.chenck_text': 'Selected',
+    'app.check_skill_popup.select_1': 'My Skill',
+    'app.check_skill_popup.select_2': 'Organization Skill',
+    'app.check_skill_popup.search': 'Please enter a keyword to search',
+    'app.check_skill_popup.save': 'Confirm',
+    'app.check_skill_popup.cancel': 'Cancel',
+
     'app.check_workflow_popup.name':'Workflow',
     'app.check_workflow_popup.title': 'Select Workflow',
     'app.check_workflow_popup.chenck_text': 'Selected',
