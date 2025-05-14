@@ -695,6 +695,11 @@ class Chatroom:
                     self._mcp_tool_uses.clear()
                     self._mcp_tool_is_using = False
                     if mcp_tool_use_timeout:
+                        # Terminate the chat if the MCP tool use timeout
+                        chatrooms.update(
+                            {'column': 'id', 'value': self._chatroom_id},
+                            {'chat_status': 0}
+                        )
                         break
 
                 if self._terminate():
