@@ -220,8 +220,8 @@ export default {
     // Skill and Workflow Selection
     'agent.selectSkills': 'Select Skills',
     'agent.selectWorkflows': 'Select Workflows',
-    'agent.explain.selectSkills': 'Select the required skills for the agent, multiple skills can be selected',
-    'agent.explain.selectWorkflows': 'Select the required workflows for the agent, multiple workflows can be selected',
+    'agent.explain.selectSkills': 'Select the schedulable skills for the agent, multiple skills can be selected',
+    'agent.explain.selectWorkflows': 'Select the schedulable workflows for the agent, multiple workflows can be selected',
     'agent.addSkill': 'Add Skill',
     'agent.addWorkflow': 'Add Workflow',
     
