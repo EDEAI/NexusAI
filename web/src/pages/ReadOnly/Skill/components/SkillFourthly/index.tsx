@@ -7,7 +7,6 @@ import { Button, Form, Input, message, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
 
-const { TextArea, Search } = Input;
 
 interface ChildProps {
     FourthlyValue: (value: any) => void;
@@ -16,7 +15,7 @@ interface ChildProps {
     Skillinfo: any;
     Operationbentate: any;
 }
-const skillFourthly: React.FC<ChildProps> = ({
+const SkillFourthly: React.FC<ChildProps> = ({
     FourthlyValue,
     Fourthlyref,
     handleBack,
@@ -256,4 +255,4 @@ const skillFourthly: React.FC<ChildProps> = ({
         </div>
     );
 };
-export default skillFourthly;
+export default SkillFourthly;
