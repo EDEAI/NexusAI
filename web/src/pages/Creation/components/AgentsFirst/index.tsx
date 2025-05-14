@@ -393,20 +393,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 />
                             </div> */}
                            
-                            <div className="font-medium">
-                                <div className="mb-[15px] text-[#555555] text-xs">
-                                    MCP可调度资源
-                                </div>
-                                <Switch
-                                    size="small"
-                                    onChange={MCPUpload}
-                                    checked={
-                                        Detaillist && Detaillist.agent?.allow_upload_file == 1
-                                            ? true
-                                            : false
-                                    }
-                                />
-                            </div>
+                            
                         </div>
                     </Form.Item>
                     <Form.Item className="mb-[30px]">
