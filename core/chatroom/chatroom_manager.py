@@ -311,7 +311,7 @@ class ChatroomManager:
                                 await self._ws_manager.send_instruction_by_connection(connection, 'TRUNCATEOK', chatroom_to_truncate)
                         case _:
                             # Other commands
-                            assert chatroom_id, get_language_content('chatroom_does_not_exist', user_id)
+                            assert chatroom_id, 'You should ENTER the chatroom first.'
                             match cmd:
                                 case 'FILELIST':
                                     # File list
