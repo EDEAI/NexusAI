@@ -197,7 +197,7 @@ export default {
     'customcode.notice.file.return': '文件返回要求',
     'customcode.notice.file.return.desc': '如果代码需要返回文件路径，该返回值必须以"file://"开头，以便系统正确识别为文件类型。',
     'customcode.notice.file.return.example': '例如：file:///storage/my_folder/my_file.txt',
-    
+
     // Chat interface additional translations
     'agent.chat.waiting': '思考中...',
     'agent.chat.send': '发送',
@@ -217,11 +217,11 @@ export default {
     // Skill and Workflow Selection
     'agent.selectSkills': '选择技能',
     'agent.selectWorkflows': '选择工作流',
-    'agent.explain.selectSkills': '为智能体选择需要的技能，可以选择多个技能',
-    'agent.explain.selectWorkflows': '为智能体选择需要的工作流，可以选择多个工作流',
+    'agent.explain.selectSkills': '为智能体选择可被调度的技能，可以选择多个技能',
+    'agent.explain.selectWorkflows': '为智能体选择可被调度的工作流，可以选择多个工作流',
     'agent.addSkill': '添加技能',
     'agent.addWorkflow': '添加工作流',
-    
+
     // Popup Dialog
     'app.check_skill_popup.title': '选择技能',
     'app.check_workflow_popup.title': '选择工作流',

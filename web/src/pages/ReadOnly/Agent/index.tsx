@@ -71,7 +71,7 @@ const Agents: React.FC = () => {
         },
         {
             key: '5',
-          
+
             icon: <FileTextOutlined />,
             label:intl.formatMessage({id:'app.dashboard.run_log_agent'}),
             style: {
@@ -102,6 +102,24 @@ const Agents: React.FC = () => {
                     return item.dataset_id;
                 });
                 setRepository(repositoryID);
+            }
+            if(res.data.callable_items){
+                res.data.agent.selected_skills=[]
+                res.data.agent.selected_workflows=[]
+                res.data.callable_items.forEach((item:any)=>{
+                    if(item.item_type==1){
+                        res.data.agent.selected_skills.push({
+                            ...item,
+                            mode:4
+                        })
+                    }else{
+                        res.data.agent.selected_workflows.push({
+                            ...item,
+                            mode:2
+                        })
+                    }
+                })
+
             }
             setDetaillist(res.data);
             setOperationbentate(
@@ -270,7 +288,7 @@ const Agents: React.FC = () => {
                     className="flex flex-col  "
                     style={{
                         height: 'calc(100vh - 56px)',
-                    
+
                         overflowY: 'scroll',
                         scrollbarWidth: 'none',
                     }}
@@ -353,7 +371,7 @@ const Agents: React.FC = () => {
                 </div>
             )}
            </div>
-           
+
         </div>
     );
 };
