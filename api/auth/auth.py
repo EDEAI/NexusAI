@@ -29,17 +29,25 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(
-        data={"uid": user["id"], "team_id": user["team_id"], "nickname": user["nickname"], "phone": user["phone"],
-              "email": user["email"],"inviter_id": user["inviter_id"],"role": user["role"]}
-    )
+    # Check if a valid token already exists in Redis
+    redis_key = f"access_token:{user['id']}"
+    existing_token = redis.get(redis_key)
+    
+    if existing_token:
+        access_token = existing_token.decode('utf-8')
+    else:
+        access_token = create_access_token(
+            data={"uid": user["id"], "team_id": user["team_id"], "nickname": user["nickname"], "phone": user["phone"],
+                  "email": user["email"],"inviter_id": user["inviter_id"],"role": user["role"]}
+        )
+        # Store token in Redis
+        redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60  # expiration time (using token expiration time)
+        redis.set(redis_key, access_token, ex=redis_expiry_seconds)
+    
     # get user language setting
     user_language = user.get("language", "zh")  # get user language
     set_current_user_id(user["id"])
     set_current_language(user["id"],user_language)  # set current language
-    redis_key = f"access_token:{user['id']}"
-    redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60  # expiration time (using token expiration time)
-    redis.set(redis_key, access_token, ex=redis_expiry_seconds)
 
     client_ip = request.client.host
     if client_ip:
@@ -138,17 +146,20 @@ async def register_user(register_user: RegisterUserData):
 @router.post("/logout", response_model=ResUserLogoutSchema)
 async def logout(current_user: TokenData = Depends(get_current_user), token: str = Depends(oauth2_scheme)):
     """
-    Logs out the current user by blacklisting the provided token.
+    Logs out the current user by deleting their access token from Redis.
     
     Args:
         current_user (TokenData): The current user's token data, obtained using the `get_current_user` dependency.
-        token (str): The token to be blacklisted, obtained using the `oauth2_scheme` dependency.
+        token (str): The token to be deleted, obtained using the `oauth2_scheme` dependency.
     
     Returns:
         A success response with the message "Successfully logged out".
     """
         
-    blacklist_token(token)
+    # Delete the token directly from Redis
+    redis_key = f"access_token:{current_user.uid}"
+    redis.delete(redis_key)
+    
     return response_success("Successfully logged out")
 
 @router.get("/user_info", response_model=ResUserInfoSchema)

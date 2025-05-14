@@ -42,8 +42,6 @@ def verify_token(token: str, credentials_exception):
     """
     Verify the token.
     """
-    if redis.sismember('blacklisted_tokens', token):
-        raise credentials_exception
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         uid: int = payload.get("uid")
@@ -54,13 +52,13 @@ def verify_token(token: str, credentials_exception):
         inviter_id: str = payload.get("inviter_id")
         role: str = payload.get("role")
         if uid is None:
-            print(f"uid存在问题：{uid}")
+            print(f"Problem with uid: {uid}")
             raise credentials_exception
-        # 从 Redis 中获取存储的 token
+        # Get stored token from Redis
         redis_key = f"access_token:{uid}"
         stored_token = redis.get(redis_key)
         
-        # 验证 token 是否匹配
+        # Verify if token matches
         if not stored_token or stored_token.decode('utf-8') != token:
             print(f"Token mismatch for user {uid}")
             raise HTTPException(

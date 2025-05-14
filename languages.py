@@ -52,6 +52,9 @@ language_packs = {
             2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
             3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            {callable_items_description}
+            {callable_skills}
+            {callable_workflows}
         ''',
         "agent_system_prompt_with_auto_match_ability_direct_output": '''
             You are an AI agent.
@@ -77,6 +80,9 @@ language_packs = {
             2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
             3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            {callable_items_description}
+            {callable_skills}
+            {callable_workflows}
         ''',
         "agent_system_prompt_with_abilities": '''
             You are an AI agent.
@@ -103,6 +109,9 @@ language_packs = {
             2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
             3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            {callable_items_description}
+            {callable_skills}
+            {callable_workflows}
         ''',
         "agent_system_prompt_with_no_ability": '''
             You are an AI agent.
@@ -126,6 +135,9 @@ language_packs = {
             2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
             3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            {callable_items_description}
+            {callable_skills}
+            {callable_workflows}
         ''',
         "agent_retrieved_docs_format": '''I will provide the information retrieved from the knowledge base based on the user input text in the following JSON format: [{'content': content, 'source': source document name}, ...]\n''',
         "agent_reply_requirement_with_auto_match_ability": "Please match one corresponding ability based on the user input information and reply in the format corresponding to the ability.",
@@ -136,6 +148,58 @@ language_packs = {
         "agent_output_format_2": "in JSON format",
         "agent_output_format_3": "in code format",
         "agent_output_format_2_md": "in JSON format contained in Markdown format",
+        "agent_callable_items_description": '''
+            In addition, to answer user questions or fulfill user needs, you can also invoke certain skills or workflows.
+            To invoke a skill, please use the MCP tool skill_run;
+            To invoke a workflow, please use the MCP tool workflow_run.
+            I will provide you with a list of skills and/or workflows.
+
+            The skills/workflows list contains one or more dictionaries (skills/workflows);
+            The format of each skill/workflow is as follows:
+            {
+                "id": skill or workflow id,
+                "name": skill or workflow name,
+                "description": skill or workflow description,
+                "input_variables": {
+                    "name": "input_var" or something else,
+                    "type": "object",
+                    "properties": {
+                        variable name: {
+                            "name": Name of the variable.
+                            "required": Whether the variable is mandatory.
+                            "display_name": Display name of the variable. It can be used as a description of the function and purpose of the variable.
+                            "type": The variable type. It can be "number" or "string".
+                            "value": Empty value.
+                        },
+                        ...
+                    }
+                }
+            }
+            The parameter format for invoking the MCP tool (skill_run or workflow_run) is as follows:
+            {
+                "id": ID of the skill or workflow you want to invoke,
+                "user_id": null (we will replace it with actual data),
+                "team_id": null (we will replace it with actual data),
+                "input_variables": {
+                    variable name: corresponding variable value you want to pass in,
+                    ...
+                }
+            }
+            Please invoke the MCP tool according to the correct parameter format.
+            If you have got the result of the skill or workflow, please stop invoking it.
+        ''',
+        "agent_callable_skills": '''
+            Below is the list of callable skills:
+            ********************Start of the list of callable skills********************
+            {skill_list}
+            ********************End of the list of callable skills********************
+        ''',
+        "agent_callable_workflows": '''
+            Below is the list of callable workflows:
+            ********************Start of the list of callable workflows********************
+            {workflow_list}
+            ********************End of the list of callable workflows********************
+        ''',
         "agent_user_prompt": '''
             Below is the user's questions or needs:
             ********************Start of the user's questions or needs********************
@@ -349,6 +413,7 @@ language_packs = {
         'api_agent_publish_agent_insert_error': 'publish agent insert error',
         'api_agent_publish_agent_dataset_insert_error': 'agent dataset relation insert error',
         'api_agent_publish_abilities_insert_error': 'abilities insert error',
+        'api_agent_callable_items_insert_error': 'Adding MCP failed',
         'api_agent_publish_app_update_error': 'publish app update error',
         'api_agent_publish_agent_publish_error': 'agent publish error',
         'api_agent_delete_app_id_required': 'app_id is required',
@@ -388,7 +453,7 @@ language_packs = {
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
             Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "type": message type (text, or tool_use for agent, or tool_result for user), "message": message content}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
             If images are uploaded in the current request (note that they are not images in the conversation history), please fully understand and analyze the content of all images, as the image content is also an important part of the latest round of conversation content.
@@ -410,7 +475,7 @@ language_packs = {
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
             Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "type": message type (text, or tool_use for agent, or tool_result for user), "message": message content}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
 
             You should determine whether to end the conversation according to the following rules:
@@ -467,7 +532,7 @@ language_packs = {
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
             Each round starts with a user message and includes all subsequent agent messages until the next user message;
             The JSON structure of each message is as follows:
-            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "message": message content}}.
+            {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "type": message type (text, or tool_use for agent, or tool_result for user), "message": message content}}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
             
             User's instructions:
@@ -498,7 +563,7 @@ language_packs = {
 
             The conversation history is in the following JSON format: [message 1, (message 2,) ...]
             The JSON structure for each message is as follows:
-            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "message": message content}.
+            {"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": "speaker role, user or agent", "type": message type (text, or tool_use for agent, or tool_result for user), "message": message content}.
             
             Requirements:
             1. Capture core discussion theme
@@ -1196,6 +1261,7 @@ language_packs = {
         'api_agent_publish_agent_insert_error': '添加发布智能体错误',
         'api_agent_publish_agent_dataset_insert_error': '添加智能体知识库关联失败',
         'api_agent_publish_abilities_insert_error': '添加能力失败',
+        'api_agent_callable_items_insert_error': '添加MCP失败',
         'api_agent_publish_app_update_error': '更新发布应用错误',
         'api_agent_publish_agent_publish_error': '智能体发布失败',
         'api_agent_delete_app_id_required': '应用ID是必传的',
@@ -1395,6 +1461,9 @@ prompt_keys = {
     "agent_output_format_2",
     "agent_output_format_3",
     "agent_output_format_2_md",
+    "agent_callable_items_description",
+    "agent_callable_skills",
+    "agent_callable_workflows",
     "agent_user_prompt",
     "agent_user_prompt_with_retrieved_docs",
     "llm_reply_requirement_with_task_splitting",
