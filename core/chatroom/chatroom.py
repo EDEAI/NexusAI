@@ -605,10 +605,11 @@ class Chatroom:
                     )
                     self._mcp_tool_is_using = True
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
+                        mcp_tool_use['args'] = json.loads(mcp_tool_use['args'])
                         mcp_tool_use_in_message = {
                             'index': index,
                             'name': mcp_tool_use['name'],
-                            'args': json.loads(mcp_tool_use['args'])
+                            'args': mcp_tool_use['args']
                         }
                         await self._ws_manager.send_instruction(
                             self._chatroom_id,
@@ -618,7 +619,7 @@ class Chatroom:
 
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
                         if mcp_tool_use['name'] in ['workflow_run', 'skill_run']:
-                            mcp_tool_args = json.loads(mcp_tool_use['args'])
+                            mcp_tool_args = mcp_tool_use['args']
                             mcp_tool_args['user_id'] = self._user_id
                             mcp_tool_args['team_id'] = self._team_id
                             result = await self._mcp_client.call_tool(
