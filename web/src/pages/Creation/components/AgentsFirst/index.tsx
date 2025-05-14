@@ -696,7 +696,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                     </Form.List>
                     <Form.Item className="mb-[30px]">
                         <div className='text-[#555555] text-base mb-[15px]'>
-                            MCP可调度资源
+                            {intl.formatMessage({ id: 'agent.mcp.resources' })}
                         </div>
                         <div className='pl-4 '>
                             <div className="mb-[30px]">

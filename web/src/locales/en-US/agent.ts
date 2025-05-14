@@ -198,7 +198,7 @@ export default {
     'customcode.notice.file.write.desc': 'When writing files in code, the target file path must start with "/storage".',
     'customcode.notice.file.write.example': 'Example: /storage/my_folder/my_file.txt',
     'customcode.notice.file.return': 'File Return Requirement',
-    'customcode.notice.file.return.desc': 'If returning a file path, the value must start with "file://" for correct system recognition.',
+    'customcode.notice.file.return.desc': 'If your code needs to return a file path, the return value must start with "file://" for the system to correctly identify it as a file type.',
     'customcode.notice.file.return.example': 'Example: file:///storage/my_folder/my_file.txt',
     
     // Chat interface additional translations
@@ -244,4 +244,7 @@ export default {
     'app.check_skill_popup.name': 'Skills',
     'app.check_workflow_popup.name': 'Workflows',
     'app.check_popup.check': 'Select All',
+
+    // MCP Resources
+    'agent.mcp.resources': 'MCP Schedulable Resources',
 };

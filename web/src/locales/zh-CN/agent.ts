@@ -241,5 +241,8 @@ export default {
     'app.check_skill_popup.name': '技能',
     'app.check_workflow_popup.name': '工作流',
     'app.check_popup.check': '全选',
+
+    // MCP Resources
+    'agent.mcp.resources': 'MCP可调度资源',
 };
 // {intl.formatMessage({ id: 'agent.btn.back' })}
