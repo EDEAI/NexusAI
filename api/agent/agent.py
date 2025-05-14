@@ -129,6 +129,12 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
                         {"column": "item_type", "value": item.item_type}
                     ]
                 )
+    else:
+        AgentCallableItems().delete(
+            conditions=[
+                {"column": "agent_id", "value": agent_id}
+            ]
+        )
 
     # dapeng 2025/4/11 end
     if agent_id <= 0:

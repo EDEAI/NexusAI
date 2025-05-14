@@ -213,5 +213,33 @@ export default {
     'agent.chat.scroll.bottom': '滚动到底部',
     'agent.chat.new.message': '有新消息',
     'agent.chat.upload.file': '上传文件',
+
+    // Skill and Workflow Selection
+    'agent.selectSkills': '选择技能',
+    'agent.selectWorkflows': '选择工作流',
+    'agent.explain.selectSkills': '为智能体选择需要的技能，可以选择多个技能',
+    'agent.explain.selectWorkflows': '为智能体选择需要的工作流，可以选择多个工作流',
+    'agent.addSkill': '添加技能',
+    'agent.addWorkflow': '添加工作流',
+    
+    // Popup Dialog
+    'app.check_skill_popup.title': '选择技能',
+    'app.check_workflow_popup.title': '选择工作流',
+    'app.check_skill_popup.chenck_text': '已选择',
+    'app.check_workflow_popup.chenck_text': '已选择',
+    'app.check_skill_popup.select_1': '我的技能',
+    'app.check_skill_popup.select_2': '更多技能',
+    'app.check_workflow_popup.select_1': '我的工作流',
+    'app.check_workflow_popup.select_2': '更多工作流',
+    'app.check_skill_popup.search': '搜索技能',
+    'app.check_workflow_popup.search': '搜索工作流',
+    'app.check_skill_popup.cancel': '取消',
+    'app.check_workflow_popup.cancel': '取消',
+    'app.check_skill_popup.save': '确定',
+    'app.check_workflow_popup.save': '确定',
+    'app.check_popup.add': '已添加',
+    'app.check_skill_popup.name': '技能',
+    'app.check_workflow_popup.name': '工作流',
+    'app.check_popup.check': '全选',
 };
 // {intl.formatMessage({ id: 'agent.btn.back' })}

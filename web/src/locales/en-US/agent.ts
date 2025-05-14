@@ -216,4 +216,32 @@ export default {
     'agent.chat.scroll.bottom': 'Scroll to bottom',
     'agent.chat.new.message': 'New message',
     'agent.chat.upload.file': 'Upload File',
+
+    // Skill and Workflow Selection
+    'agent.selectSkills': 'Select Skills',
+    'agent.selectWorkflows': 'Select Workflows',
+    'agent.explain.selectSkills': 'Select the required skills for the agent, multiple skills can be selected',
+    'agent.explain.selectWorkflows': 'Select the required workflows for the agent, multiple workflows can be selected',
+    'agent.addSkill': 'Add Skill',
+    'agent.addWorkflow': 'Add Workflow',
+    
+    // Popup Dialog
+    'app.check_skill_popup.title': 'Select Skills',
+    'app.check_workflow_popup.title': 'Select Workflows',
+    'app.check_skill_popup.chenck_text': 'Selected',
+    'app.check_workflow_popup.chenck_text': 'Selected',
+    'app.check_skill_popup.select_1': 'My Skills',
+    'app.check_skill_popup.select_2': 'More Skills',
+    'app.check_workflow_popup.select_1': 'My Workflows',
+    'app.check_workflow_popup.select_2': 'More Workflows',
+    'app.check_skill_popup.search': 'Search Skills',
+    'app.check_workflow_popup.search': 'Search Workflows',
+    'app.check_skill_popup.cancel': 'Cancel',
+    'app.check_workflow_popup.cancel': 'Cancel',
+    'app.check_skill_popup.save': 'Confirm',
+    'app.check_workflow_popup.save': 'Confirm',
+    'app.check_popup.add': 'Added',
+    'app.check_skill_popup.name': 'Skills',
+    'app.check_workflow_popup.name': 'Workflows',
+    'app.check_popup.check': 'Select All',
 };

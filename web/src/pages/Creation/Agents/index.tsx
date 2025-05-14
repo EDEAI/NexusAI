@@ -141,6 +141,24 @@ const Agents: React.FC = () => {
             return item.dataset_id;
         });
         setRepository(repositoryID);
+        if(res.data.callable_items){
+            res.data.agent.selected_skills=[]
+            res.data.agent.selected_workflows=[]
+            res.data.callable_items.forEach((item:any)=>{
+                if(item.item_type==1){
+                    res.data.agent.selected_skills.push({
+                        ...item,
+                        mode:4
+                    })
+                }else{
+                    res.data.agent.selected_workflows.push({
+                        ...item,
+                        mode:2
+                    })
+                }
+            })
+            
+        }
         setDetaillist(res.data);
         setOperationbentate(
             res.data.agent.publish_status === 0 && res.data.is_creator === 1 ? 'false' : 'true',
@@ -391,6 +409,20 @@ const Agents: React.FC = () => {
         // debugger;
         Ffromref.validateFields()
             .then(value => {
+//                 "callable_list": [
+//     {
+//       "app_id": 0,
+//       "item_type": 0
+//     }
+//   ]
+                const callable_list=[...Detaillist.agent.selected_skills||[],...Detaillist.agent.selected_workflows||[]].map((item:any)=>{
+                    return {
+                        app_id:item.app_id,
+                        //1skill 2workflow
+                        item_type:item.mode==4?1:2
+                    }
+                })
+                
                 const putBasedata = {
                     agent_id: agent_id,
                     data: {
@@ -405,10 +437,12 @@ const Agents: React.FC = () => {
                         m_config_id: Fourthly_config_id,
                         allow_upload_file: Detaillist.agent.allow_upload_file,
                         default_output_format: Detaillist.agent.default_output_format,
+                        callable_list:callable_list
                     },
                 };
                 if (Operationbentate == 'false') {
                     AgentUpdate(putBasedata, 1);
+                    
                 }
 
                 Fourthlyref.setFieldsValue(Ffromref.getFieldsValue());
