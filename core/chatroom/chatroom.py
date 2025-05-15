@@ -314,8 +314,11 @@ class Chatroom:
                 # If there is only one agent in the chatroom, handle directly
                 if len(self._model_config_ids) <= 2:  # Including Speaker Selector (id=0) and one agent
                     # Set user message as topic directly
-                    self._topic = self._history_messages[-1]['message']
-                    logger.debug('Current topic: %s', self._topic)
+                    for message in reversed(self._history_messages):
+                        if message['agent_id'] == 0 and message['type'] == 'text':
+                            self._topic = message['message']
+                            logger.debug('Current topic: %s', self._topic)
+                            break
                     chatroom_messages.update(
                         {'column': 'id', 'value': self._user_message_id},
                         {'topic': self._topic}
