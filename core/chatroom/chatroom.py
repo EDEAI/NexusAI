@@ -457,6 +457,10 @@ class Chatroom:
     def set_mcp_tool_result(self, index: int, result: str) -> None:
         if not self._mcp_tool_is_using:
             raise Exception('There is no MCP tool use!')
+        if index >= len(self._mcp_tool_uses):
+            raise Exception('Invalid MCP tool use index!')
+        if self._mcp_tool_uses[index]['result'] is not None:
+            raise Exception('MCP tool use has finished!')
         self._console_log(f'MCP tool result: \033[91m{result}\033[0m\n')
         self._mcp_tool_uses[index]['result'] = result
         self._mcp_tool_use_lock.set()
