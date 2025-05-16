@@ -664,6 +664,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
     useEffect(() => {
         runSocket();
     }, []);
+    
     return (
         <>
             {currentMessage.name ? (

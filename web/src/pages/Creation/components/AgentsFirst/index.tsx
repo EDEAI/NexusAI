@@ -1,13 +1,36 @@
 import { GetdatasetList } from '@/api/agents';
+import { getAppListByMode } from '@/api/workflow';
 import Callword from '@/components/callword';
 import { findOption } from '@/components/WorkFlow/components/Form/Select';
 import Variable from '@/components/WorkFlow/components/Variable';
 import { useModelSelect } from '@/store/modelList';
 import { useIntl } from '@umijs/max';
-import { Button, Form, Input, Radio, Select, Switch, Tag } from 'antd';
+import { Button, Form, Input, Radio, Select, Switch, Tag, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
+import SelectApp from '../../../Plaza/components/CreationChatRoom/selectApp';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import Avatar from '@/components/ChatAvatar';
+import { headportrait } from '@/utils/useUser';
 
 const { TextArea } = Input;
+
+interface ApiResponse<T> {
+    code: number;
+    data: T;
+    message?: string;
+}
+
+interface AppListData {
+    list: Array<{
+        app_id: number;
+        name: string;
+        description: string;
+        publish_status: number;
+        [key: string]: any;
+    }>;
+    total_pages: number;
+}
+
 interface ChildProps {
     FirstValue: (value: any) => void;
     Detaillist: any;
@@ -25,11 +48,11 @@ interface ChildProps {
     firstjudgingcondition: any;
     setAgentmunudisabled: any;
     agentmenudisabled: any;
-    loading: boolean;
+    loading?: boolean;
 }
 
 const AgentsFirst: React.FC<ChildProps> = ({
-    loading,
+    loading: parentLoading,
     FirstValue,
     Detaillist,
     setDetaillist,
@@ -49,6 +72,12 @@ const AgentsFirst: React.FC<ChildProps> = ({
 }) => {
     const intl = useIntl();
     const [dataset, setDataset] = useState([]);
+  
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedSkills, setSelectedSkills] = useState([]);
+    const [selectedWorkflows, setSelectedWorkflows] = useState([]);
+    const [showSkillSelect, setShowSkillSelect] = useState(false);
+    const [showWorkflowSelect, setShowWorkflowSelect] = useState(false);
     const [AgentsFirstData, setAgentsFirstData] = useState({
         agent_id: 0,
         data: {
@@ -62,7 +91,15 @@ const AgentsFirst: React.FC<ChildProps> = ({
     });
     useEffect(() => {
         getDataset();
-    }, []);
+        if (Detaillist.agent.selected_skills) {
+            setSelectedSkills(Detaillist.agent.selected_skills)
+        }
+        if (Detaillist.agent.selected_workflows) {
+            setSelectedWorkflows(Detaillist.agent.selected_workflows)
+        }
+    }, [Detaillist,Detaillist?.agent]);
+
+
 
     const FourthlySelect = (value: any) => {
         setFourthly_config_id(value);
@@ -156,6 +193,24 @@ const AgentsFirst: React.FC<ChildProps> = ({
         );
     };
 
+   
+
+    const handleSkillSelect = (selectedItems: any[]) => {
+        setSelectedSkills(selectedItems);
+        setDetaillist({
+            ...Detaillist,
+            agent: { ...Detaillist.agent, selected_skills: selectedItems }
+        });
+    };
+
+    const handleWorkflowSelect = (selectedItems: any[]) => {
+        setSelectedWorkflows(selectedItems);
+        setDetaillist({
+            ...Detaillist,
+            agent: { ...Detaillist.agent, selected_workflows: selectedItems }
+        });
+    };
+
     const PutBaseUpdate = async () => {
         if (firstjudgingcondition()) {
         } else {
@@ -179,6 +234,51 @@ const AgentsFirst: React.FC<ChildProps> = ({
     };
 
     const { options, defaultValue } = useModelSelect();
+
+    const handleSkillPopupSave = (params: { checkItem: any[] }) => {
+        setSelectedSkills(params.checkItem);
+        setDetaillist({
+            ...Detaillist,
+            agent: { ...Detaillist.agent, selected_skills: params.checkItem }
+        });
+        setShowSkillSelect(false);
+    };
+
+    const handleWorkflowPopupSave = (params: { checkItem: any[] }) => {
+        setSelectedWorkflows(params.checkItem);
+        setDetaillist({
+            ...Detaillist,
+            agent: { ...Detaillist.agent, selected_workflows: params.checkItem }
+        });
+        setShowWorkflowSelect(false);
+    };
+
+    const handleSkillPopupClose = () => {
+        setShowSkillSelect(false);
+    };
+
+    const handleWorkflowPopupClose = () => {
+        setShowWorkflowSelect(false);
+    };
+
+    const handleRemoveSkill = (skillToRemove: any) => {
+        const updatedSkills = selectedSkills.filter(skill => skill.app_id !== skillToRemove.app_id);
+        setSelectedSkills(updatedSkills);
+        setDetaillist({
+            ...Detaillist,
+            agent: { ...Detaillist.agent, selected_skills: updatedSkills }
+        });
+        
+    };
+
+    const handleRemoveWorkflow = (workflowToRemove: any) => {
+        const updatedWorkflows = selectedWorkflows.filter(workflow => workflow.app_id !== workflowToRemove.app_id);
+        setSelectedWorkflows(updatedWorkflows);
+        setDetaillist({
+            ...Detaillist,
+            agent: { ...Detaillist.agent, selected_workflows: updatedWorkflows }
+        });
+    };
 
     return (
         <div style={{ height: '100%', width: '100%', marginBottom: '30px' }}>
@@ -278,7 +378,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     disabled={Detaillist?.app?.publish_status !== 1}
                                 />
                             </div>
-                            <div className="mb-[30px] font-medium">
+                            {/* <div className="mb-[30px] font-medium">
                                 <div className="mb-[15px] text-[#555555] text-xs">
                                     {intl.formatMessage({ id: 'agent.filesupload' })}
                                 </div>
@@ -291,22 +391,9 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                             : false
                                     }
                                 />
-                            </div>
-
-                            <div className="font-medium">
-                                <div className="mb-[15px] text-[#555555] text-xs">
-                                    MCP可调度资源
-                                </div>
-                                <Switch
-                                    size="small"
-                                    onChange={MCPUpload}
-                                    checked={
-                                        Detaillist && Detaillist.agent?.allow_upload_file == 1
-                                            ? true
-                                            : false
-                                    }
-                                />
-                            </div>
+                            </div> */}
+                           
+                            
                         </div>
                     </Form.Item>
                     <Form.Item className="mb-[30px]">
@@ -392,7 +479,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                             />
                         </div>
                     </Form.Item>
-                    {!loading && (
+                    {!isLoading && (
                         <div className="mb-[30px]">
                             <Variable
                                 title={
@@ -607,6 +694,135 @@ const AgentsFirst: React.FC<ChildProps> = ({
                             </>
                         )}
                     </Form.List>
+                    <Form.Item className="mb-[30px]">
+                        <div className='text-[#555555] text-base mb-[15px]'>
+                            {intl.formatMessage({ id: 'agent.mcp.resources' })}
+                        </div>
+                        <div className='pl-4 '>
+                            <div className="mb-[30px]">
+                                <div className="flex items-center justify-between mb-[15px]">
+                                    <div className="text-[#555555] text-xs">
+                                        <Callword
+                                            className="font-medium"
+                                            name={intl.formatMessage({ id: 'agent.selectSkills' })}
+                                            title={intl.formatMessage({ id: 'agent.explain.selectSkills' })}
+                                        />
+                                    </div>
+                                    <Button 
+                                        type="link"
+                                        icon={<PlusOutlined />}
+                                        onClick={() => setShowSkillSelect(true)}
+                                        className="text-xs"
+                                    >
+                                        {intl.formatMessage({ id: 'agent.addSkill' })}
+                                    </Button>
+                                </div>
+                                {selectedSkills.length > 0 ? (
+                                    <div className="flex flex-col gap-4 mb-4">
+                                        {selectedSkills.map((skill: any) => (
+                                            <div key={skill.app_id} className="group relative flex items-center cursor-pointer w-full p-2 bg-white rounded-lg shadow-sm transition-shadow">
+                                                <Avatar
+                                                    rounded="6px"
+                                                    data={skill}
+                                                    bg={skill.icon_background}
+                                                />
+                                                <div className="flex flex-col ml-2 truncate">
+                                                    <span className="text-sm font-medium text-[#333333]">{skill.name}</span>
+                                                    <span className="text-xs text-[#666666] truncate">{skill.description}</span>
+                                                </div>
+                                                <div 
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-red-500"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRemoveSkill(skill);
+                                                    }}
+                                                >
+                                                    <DeleteOutlined />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div onClick={() => setShowSkillSelect(true)} className="w-full h-[120px] flex items-center justify-center border border-dashed border-[#e8e8e8] rounded-lg bg-[#fafafa] cursor-pointer hover:border-[#1b64f3] transition-colors">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <PlusOutlined className="text-[#999999] text-lg" />
+                                            <span className="text-[#999999] text-sm">{intl.formatMessage({ id: 'agent.addSkill' })}</span>
+                                        </div>
+                                    </div>
+                                )}
+                                <SelectApp 
+                                    show={showSkillSelect}
+                                    popupClose={handleSkillPopupClose}
+                                    popupSave={handleSkillPopupSave}
+                                    checkList={selectedSkills}
+                                    radio={false}
+                                    nodetype={'skill'}
+                                    zIndex={30}
+                                />
+                            </div>
+                            <div className="mb-[30px]">
+                                <div className="flex items-center justify-between mb-[15px]">
+                                    <div className="text-[#555555] text-xs">
+                                        <Callword
+                                            className="font-medium"
+                                            name={intl.formatMessage({ id: 'agent.selectWorkflows' })}
+                                            title={intl.formatMessage({ id: 'agent.explain.selectWorkflows' })}
+                                        />
+                                    </div>
+                                    <Button 
+                                        type="link"
+                                        icon={<PlusOutlined />}
+                                        onClick={() => setShowWorkflowSelect(true)}
+                                        className="text-xs"
+                                    >
+                                        {intl.formatMessage({ id: 'agent.addWorkflow' })}
+                                    </Button>
+                                </div>
+                                {selectedWorkflows.length > 0 ? (
+                                    <div className="flex flex-col gap-4 mb-4">
+                                        {selectedWorkflows.map((workflow: any) => (
+                                            <div key={workflow.app_id} className="group relative flex items-center cursor-pointer w-full p-2 bg-white rounded-lg shadow-sm transition-shadow">
+                                                <Avatar
+                                                    rounded="6px"
+                                                    data={workflow}
+                                                    bg={workflow.icon_background}
+                                                />
+                                                <div className="flex flex-col ml-2 truncate">
+                                                    <span className="text-sm font-medium text-[#333333]">{workflow.name}</span>
+                                                    <span className="text-xs text-[#666666] truncate">{workflow.description}</span>
+                                                </div>
+                                                <div 
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-red-500"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRemoveWorkflow(workflow);
+                                                    }}
+                                                >
+                                                    <DeleteOutlined />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div  onClick={() => setShowWorkflowSelect(true)} className="w-full h-[120px] flex items-center justify-center border border-dashed border-[#e8e8e8] rounded-lg bg-[#fafafa] cursor-pointer hover:border-[#1b64f3] transition-colors">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <PlusOutlined className="text-[#999999] text-lg" />
+                                            <span className="text-[#999999] text-sm">{intl.formatMessage({ id: 'agent.addWorkflow' })}</span>
+                                        </div>
+                                    </div>
+                                )}
+                                <SelectApp 
+                                    show={showWorkflowSelect}
+                                    popupClose={handleWorkflowPopupClose}
+                                    popupSave={handleWorkflowPopupSave}
+                                    checkList={selectedWorkflows}
+                                    radio={false}
+                                    nodetype={'workflow'}
+                                    zIndex={30}
+                                />
+                            </div>
+                        </div>
+                    </Form.Item>
                     <div>
                         <Button
                             type="primary"

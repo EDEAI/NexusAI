@@ -57,6 +57,25 @@ class Workflows(MySQL):
             ]
         )
 
+    def get_workflow_by_app_id(self, app_id: int):
+        workflow = self.select_one(
+            columns=[
+                'workflows.id',
+                'workflows.graph',
+                'apps.name',
+                'apps.description',
+            ],
+            joins=[
+                ['inner', "apps", "workflows.app_id = apps.id"]
+            ],
+            conditions=[
+                {"column": "app_id", "value": app_id},
+                {"column": "publish_status", "value": 1},
+                {"column": "status", "value": 1}
+            ]
+        )
+        return workflow
+
     def workflows_info(self, app_id: int, publish_status: int, uid: int, team_id: int):
         # get app
         apps_model = Apps()

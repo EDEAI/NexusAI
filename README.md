@@ -208,10 +208,11 @@ SANDBOX_FASTAPI_WORKERS: 2
 DEFAULT_LLM_SUPPLIER_CONFIG_ID: 1
 DEFAULT_LLM_CONFIG_ID: 3
 
-# API, websocket and roundtable websocket service port configuration
+# API, websocket, roundtable websocket, and MCP service port configuration
 API_PORT: 9472
 WEBSOCKET_PORT: 9473
 CHATROOM_WEBSOCKET_PORT: 9474
+MCP_SERVER_PORT: 9475
 
 # Web access address
 WEB_URL: http://127.0.0.1:9470
@@ -397,6 +398,7 @@ roundtable                       RUNNING   pid 121128, uptime 0:00:11
 web                              RUNNING   pid 121129, uptime 0:00:11
 websocket                        RUNNING   pid 121130, uptime 0:00:11
 workflow                         RUNNING   pid 121131, uptime 0:00:11
+mcp                              RUNNING   pid 121132, uptime 0:00:11
 ```
 
 Visit NexusAI

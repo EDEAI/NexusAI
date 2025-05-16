@@ -106,6 +106,25 @@ class CustomTools(MySQL):
                                 ])
         return skill if skill else {}
 
+    def get_skill_by_app_id(self, app_id: int):
+        skill = self.select_one(
+            columns=[
+                'custom_tools.id',
+                'custom_tools.input_variables',
+                'apps.name',
+                'apps.description',
+            ],
+            joins=[
+                ['inner', "apps", "custom_tools.app_id = apps.id"]
+            ],
+            conditions=[
+                {"column": "app_id", "value": app_id},
+                {"column": "publish_status", "value": 1},
+                {"column": "status", "value": 1}
+            ]
+        )
+        return skill
+
     def skill_list(self, page: int = 1, page_size: int = 10, uid: int = 0, team_id: int = 0, skill_search_type: int = 1,
                    name: str = ""):
         if skill_search_type == 1:

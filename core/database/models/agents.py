@@ -6,6 +6,7 @@ from core.database.models.agent_dataset_relation import AgentDatasetRelation
 from core.database.models.agent_abilities import AgentAbilities
 from core.database.models.model_configurations import ModelConfigurations
 from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
+from core.database.models.agent_callable_items import AgentCallableItems
 from core.database.models.tag_bindings import TagBindings
 from core.database.models.users import Users
 from datetime import datetime
@@ -393,6 +394,14 @@ class Agents(MySQL):
                 {"column": "status", "op": "in", "value": [1, 2]}
             ]
         )
+        
+        agent_callable_items_model = AgentCallableItems()
+        agent_callable_items_list = agent_callable_items_model.select(
+            columns="*",
+            conditions=[
+                {"column": "agent_id", "value": agent_id}
+            ]
+        )
 
         published_agent = self.select_one(columns="*", conditions=[{"column": "app_id", "value": agent["app_id"]},
                                                                    {"column": "publish_status", "value": 1},
@@ -429,6 +438,7 @@ class Agents(MySQL):
                 # delete publish abilities
                 agent_abilities_model.soft_delete([{"column": "agent_id", "value": published_agent_id},
                                                    {"column": "status", "op": "in", "value": [1, 2]}])
+                agent_callable_items_model.delete([{"column": "agent_id", "value": published_agent_id}])
             else:
                 # create publish agent
                 agents_data["created_time"] = current_time
@@ -462,7 +472,20 @@ class Agents(MySQL):
                     if not create_abilities_res:
                         return {"status": 2,
                                 "message": get_language_content("api_agent_publish_abilities_insert_error")}
-
+            
+            if agent_callable_items_list:
+                for agent_callable_items_val in agent_callable_items_list:
+                    create_callable_items_data = {
+                        "agent_id": published_agent_id,
+                        "app_id": agent_callable_items_val["app_id"],
+                        "item_type": agent_callable_items_val["item_type"],
+                        "created_time": current_time,
+                        "updated_time": current_time
+                    }
+                    create_callable_items_res = agent_callable_items_model.insert(create_callable_items_data)
+                    if not create_callable_items_res:
+                        return {"status": 2,
+                                "message": get_language_content("api_agent_callable_items_insert_error")}
             # update publish app
             app_data = {
                 "publish_status": 1,
@@ -630,6 +653,9 @@ class Agents(MySQL):
             order_by="model_configurations.id ASC"
         )
 
+        
+        callable_items = AgentCallableItems().get_callable_items_by_agent_id(agent["agent_id"])
+
         # get user
         users_model = Users()
         user = users_model.select_one(
@@ -648,6 +674,7 @@ class Agents(MySQL):
             data = {
                 "app": app,
                 "agent": input_variables,
+                "callable_items": callable_items,
                 "agent_dataset_relation_list": '',
                 "agent_abilities_list": '',
                 "m_configurations_list": '',
@@ -658,6 +685,7 @@ class Agents(MySQL):
             data = {
                 "app": app,
                 "agent": agent,
+                "callable_items": callable_items,
                 "agent_dataset_relation_list": agent_dataset_relation_list,
                 "agent_abilities_list": agent_abilities_list,
                 "m_configurations_list": m_configurations_list,

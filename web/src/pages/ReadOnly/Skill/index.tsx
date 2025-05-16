@@ -14,7 +14,7 @@ import React, { useEffect, useState } from 'react';
 import SkillFirst from './components/SkillFirst';
 import SkillSecond from './components/SkillSecond';
 import SkillThirdly from './components/SkillThirdly';
-import SkillFourthly from './components/skillFourthly';
+import SkillFourthly from './components/SkillFourthly';
 type MenuItem = Required<MenuProps>['items'][number];
 
 const Skill: React.FC = () => {

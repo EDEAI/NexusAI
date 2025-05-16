@@ -36,6 +36,7 @@ x-common-environment-backend: &common-environment-backend
   API_PORT: 9472
   WEBSOCKET_PORT: 9473
   CHATROOM_WEBSOCKET_PORT: 9474
+  MCP_SERVER_PORT: 9475
   WEB_URL: http://127.0.0.1:9470
   ICON_URL: http://127.0.0.1:9470
   STORAGE_URL: http://127.0.0.1:9470
@@ -48,6 +49,7 @@ x-common-environment-frontend: &common-environment-frontend
   WEB_API_URL: http://127.0.0.1:9470
   WEB_WS_URL: ws://127.0.0.1:9470/ws
   WEB_CHAT_URL: ws://127.0.0.1:9470/ws_chat
+  MCP_SERVER_SSE: http://127.0.0.1:9470/sse
 
 # Use network proxy as needed
 # x-common-environment-proxy: &common-environment-proxy

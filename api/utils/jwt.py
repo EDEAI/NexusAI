@@ -42,8 +42,6 @@ def verify_token(token: str, credentials_exception):
     """
     Verify the token.
     """
-    if redis.sismember('blacklisted_tokens', token):
-        raise credentials_exception
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         uid: int = payload.get("uid")
@@ -54,7 +52,20 @@ def verify_token(token: str, credentials_exception):
         inviter_id: str = payload.get("inviter_id")
         role: str = payload.get("role")
         if uid is None:
+            print(f"Problem with uid: {uid}")
             raise credentials_exception
+        # Get stored token from Redis
+        redis_key = f"access_token:{uid}"
+        stored_token = redis.get(redis_key)
+        
+        # Verify if token matches
+        if not stored_token or stored_token.decode('utf-8') != token:
+            print(f"Token mismatch for user {uid}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         token_data = TokenData(uid=uid,team_id=team_id,nickname=nickname,phone=phone,email=email,inviter_id=inviter_id,role=role)
         from api.utils.auth import set_current_user_id
         set_current_user_id(uid)

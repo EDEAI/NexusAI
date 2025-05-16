@@ -268,7 +268,7 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
         conditions=[
             {"column": "id", "value": skill_id},
             {"column": "team_id", "value": team_id},
-            {"column": "status", "op": "in", "value": [1, 2]}
+            {"column": "status", "value": 1}
         ])
     if not skill:
         return response_error(get_language_content("skill_error"))
@@ -286,7 +286,7 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
             {"column": "id", "value": skill["app_id"]},
             {"column": "team_id", "value": team_id},
             {"column": "mode", "value": 4},
-            {"column": "status", "op": "in", "value": [1, 2]}
+            {"column": "status", "value": 1}
         ]
     )
 

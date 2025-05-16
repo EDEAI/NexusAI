@@ -359,3 +359,17 @@ class AppRuns(MySQL):
             "page": page,
             "page_size": page_size
         }
+    
+    def set_chatroom_message_id(self, ids: List[int], chatroom_message_id: int):
+        """
+        Set the chatroom message ID for multiple app runs.
+
+        :param ids: A list of app run IDs to update
+        :param chatroom_message_id: The chatroom message ID to set
+        """
+        self.update(
+            {'column': 'id', 'op': 'in', 'value': ids},
+            {
+                'chatroom_message_id': chatroom_message_id,
+            }
+        )
