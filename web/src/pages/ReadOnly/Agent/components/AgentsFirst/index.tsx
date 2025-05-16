@@ -419,6 +419,13 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         </div>
                                     </div>
                                 )}
+                                {
+                                    !Detaillist.agent.selected_skills && !Detaillist.agent.selected_workflows && (
+                                        <div className="text-[#555555] text-xs">
+                                            {intl.formatMessage({ id: 'agent.noResources' })}
+                                        </div>
+                                    )
+                                }
                             </div>
                         </Form.Item>
                     )}
