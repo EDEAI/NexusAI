@@ -511,7 +511,7 @@ class Chatroom:
                 if self._is_desktop and self._desktop_mcp_tool_list:
                     mcp_tool_list.extend(self._desktop_mcp_tool_list)
 
-                has_sent_reply = False
+                new_text = True
                 async for chunk in agent_node.run_in_chatroom(
                     context=Context(),
                     user_id=self._user_id,
@@ -563,9 +563,9 @@ class Chatroom:
                                 agent_id,
                                 content,
                                 agent_message,
-                                has_sent_reply
+                                new_text
                             )
-                            has_sent_reply = True
+                            new_text = False
                         elif isinstance(content, list):
                             for item in content:
                                 if isinstance(item, dict):
@@ -580,9 +580,9 @@ class Chatroom:
                                                 agent_id, 
                                                 item_text,
                                                 agent_message,
-                                                has_sent_reply
+                                                new_text
                                             )
-                                            has_sent_reply = True
+                                            new_text = False
                                     elif item['type'] == 'tool_use':
                                         # Tool use has been handled in the tool_call_chunks
                                         pass
@@ -617,9 +617,9 @@ class Chatroom:
                         agent_id, 
                         '',
                         agent_message,
-                        has_sent_reply
+                        new_text
                     )
-                    has_sent_reply = True
+                    new_text = False
                     self._mcp_tool_is_using = True
                     mcp_tool_use_timeout = False
 
