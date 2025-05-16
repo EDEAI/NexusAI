@@ -110,6 +110,19 @@ stderr_logfile=logs/supervisor_ai_tool_run_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
 
+[program:mcp]
+command=python task/mcp_server.py
+autostart=true
+autorestart=true
+startretries=3
+priority=20
+stdout_logfile=logs/supervisor_mcp.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/supervisor_mcp_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+
 [program:celery]
 command=python celery_app.py
 autostart=true
