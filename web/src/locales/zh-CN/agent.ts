@@ -244,5 +244,6 @@ export default {
 
     // MCP Resources
     'agent.mcp.resources': 'MCP可调度资源',
+    'agent.noResources': '暂无可调度资源',
 };
 // {intl.formatMessage({ id: 'agent.btn.back' })}

@@ -247,4 +247,5 @@ export default {
 
     // MCP Resources
     'agent.mcp.resources': 'MCP Schedulable Resources',
+    'agent.noResources': 'No schedulable resources',
 };
