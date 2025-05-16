@@ -510,6 +510,8 @@ class Chatroom:
                 mcp_tool_list = []
                 if self._is_desktop and self._desktop_mcp_tool_list:
                     mcp_tool_list.extend(self._desktop_mcp_tool_list)
+
+                has_sent_reply = False
                 async for chunk in agent_node.run_in_chatroom(
                     context=Context(),
                     user_id=self._user_id,
@@ -560,22 +562,27 @@ class Chatroom:
                                 self._chatroom_id,
                                 agent_id,
                                 content,
-                                agent_message
+                                agent_message,
+                                has_sent_reply
                             )
+                            has_sent_reply = True
                         elif isinstance(content, list):
                             for item in content:
                                 if isinstance(item, dict):
                                     if item['type'] == 'text':
-                                        item_text = item['text']
-                                        self._console_log(item_text)
-                                        current_agent_message += item_text
-                                        agent_message += item_text
-                                        await self._ws_manager.send_agent_reply(
-                                            self._chatroom_id,
-                                            agent_id, 
-                                            item_text,
-                                            agent_message
-                                        )
+                                        item_text: str = item['text']
+                                        if item_text:
+                                            self._console_log(item_text)
+                                            current_agent_message += item_text
+                                            agent_message += item_text
+                                            await self._ws_manager.send_agent_reply(
+                                                self._chatroom_id,
+                                                agent_id, 
+                                                item_text,
+                                                agent_message,
+                                                has_sent_reply
+                                            )
+                                            has_sent_reply = True
                                     elif item['type'] == 'tool_use':
                                         # Tool use has been handled in the tool_call_chunks
                                         pass
@@ -609,8 +616,10 @@ class Chatroom:
                         self._chatroom_id,
                         agent_id, 
                         '',
-                        agent_message
+                        agent_message,
+                        has_sent_reply
                     )
+                    has_sent_reply = True
                     self._mcp_tool_is_using = True
                     mcp_tool_use_timeout = False
 
