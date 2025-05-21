@@ -1,0 +1,50 @@
+Commit SHA: 3e12becb0ee60400ff7db2ddc9a649f3e710027f
+Author: Itachi
+Date: 2025-05-16T13:11:03Z
+Message: Merge branch 'dev'
+
+Commit SHA: 32d7aa6ea31d2e7ef8f3bbde17dd9d7f29ff15f3
+Author: Marcus Blackburn
+Date: 2025-05-16T12:51:05Z
+Message: Only send TEXT when message is not empty.
+
+Commit SHA: 5a1e089c947bfb85de790290c41215346c39c5ac
+Author: Marcus Blackburn
+Date: 2025-05-16T12:44:10Z
+Message: Cancelled previous change and now send TEXT every time when a new text starts.
+
+Commit SHA: 6ea85cc0512e5e964df6b00372a7139c32dd9d13
+Author: Marcus Blackburn
+Date: 2025-05-16T11:36:15Z
+Message: Now send REPLY every time when calling the LLM.
+
+Commit SHA: 25560488520a54532e97a575f53188f36ed5f002
+Author: Itachi
+Date: 2025-05-16T11:08:35Z
+Message: Merge branch 'dev'
+
+Commit SHA: 8527ee04245656c17fa83d2ae8716ed9c76ced61
+Author: Itachi
+Date: 2025-05-16T08:46:07Z
+Message: Update README to include MCP server port configuration and status in service overview
+
+Commit SHA: 483fcb433f737a8464d84ca7012aa16d69cb5cdc
+Author: Itachi
+Date: 2025-05-16T07:30:13Z
+Message: Add MCP program configuration to supervisord templates
+
+Commit SHA: 7d1b222426c39014b18396b894f03a4f2f9e9a97
+Author: wnagchi
+Date: 2025-05-16T01:56:36Z
+Message: Display a message when no skills or workflows are selected for the agent.
+
+Commit SHA: 2c932eabeb084533b2b3fabdee554aef562b35ed
+Author: wnagchi
+Date: 2025-05-16T01:44:01Z
+Message: 'agent.noResources'
+
+Commit SHA: ee1ee1a74af3156aef2a474750d871593d21faee
+Author: wnagchi
+Date: 2025-05-16T01:37:43Z
+Message: Merge branch 'dev' of https://github.com/EDEAI/NexusAI into dev
+
