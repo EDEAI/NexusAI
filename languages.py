@@ -1128,6 +1128,11 @@ language_packs = {
         'round_table_orientation_operation': 'round_table_orientation_operation',
         'avatar_or_icon_required': 'At least one avatar or icon needs to be filled in',
         "graph_data_in_wrong_format": "Graph data is in the wrong format",
+        'api_agent_upload_invalid_file_type': 'Invalid file type',
+        'api_agent_upload_missing_keys': 'Missing required keys',
+        'api_agent_upload_invalid_json': 'Invalid JSON format',
+        'api_agent_upload_success': 'File uploaded successfully',
+        'api_agent_upload_failed': 'File upload failed',
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1442,6 +1447,11 @@ language_packs = {
         'round_table_orientation_operation': '圆桌导向运行',
         'avatar_or_icon_required': '头像或图标至少需要填写一个',
         "graph_data_in_wrong_format": "图数据格式错误",
+        'api_agent_upload_invalid_file_type': '无效的文件类型',
+        'api_agent_upload_missing_keys': '缺少必要的字段',
+        'api_agent_upload_invalid_json': '无效的JSON格式',
+        'api_agent_upload_success': '文件上传成功',
+        'api_agent_upload_failed': '文件上传失败',
     }
 }
 

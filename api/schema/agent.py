@@ -289,6 +289,11 @@ class ClearAgentChatMemoryReturn(BaseModel):
     data: Dict[str, Any]
 
 
+class RespBaseSchema(BaseModel):
+    code: int
+    detail: str
+    data: Optional[Dict[str, Any]] = None
+
 class AgentChatMessage(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None

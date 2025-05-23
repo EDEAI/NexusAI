@@ -1,5 +1,5 @@
 import asyncio
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, UploadFile, File
 from api.utils.common import *
 from api.utils.jwt import *
 from api.schema.agent import *
@@ -23,6 +23,9 @@ import traceback
 from core.database.models.models import Models
 from core.helper import truncate_messages_by_token_limit
 from core.database.models.chatrooms import Chatrooms  # add import if not present
+from pathlib import Path
+import os
+from config import settings
 
 router = APIRouter()
 
@@ -42,6 +45,54 @@ async def agent_list(page: int = 1, page_size: int = 10, agent_search_type: int 
     result = agents_model.get_agent_list(page, page_size, userinfo.uid, userinfo.team_id, agent_search_type, name)
 
     return response_success(result, get_language_content("api_agent_success"))
+
+
+@router.post("/upload_agent_config", response_model=RespBaseSchema)
+async def upload_agent_config(file: UploadFile = File(...), userinfo: TokenData = Depends(get_current_user)):
+    """
+    Upload agent configuration file
+
+    Args:
+        file (UploadFile): The uploaded file.
+        userinfo (TokenData): User authentication information.
+
+    Returns:
+        JSON response indicating success or failure.
+    """
+    uid = userinfo.uid
+    required_keys = ["assistants", "discussions", "workflows", "order"]
+
+    # Validate file extension
+    file_extension = Path(file.filename).suffix.lower()
+    if file_extension != '.json':
+        return response_error(get_language_content("api_agent_upload_invalid_file_type"))
+
+    try:
+        # Read and load JSON content
+        content = await file.read()
+        data = json.loads(content)
+
+        # Validate required keys
+        if not all(key in data for key in required_keys):
+            return response_error(get_language_content("api_agent_upload_missing_keys"))
+
+        # Define save path and ensure directory exists
+        save_dir = Path(f'storage/desktop/user_{uid}')
+        save_dir.mkdir(parents=True, exist_ok=True)
+        save_path = save_dir / 'agents_data.json'
+
+        # Save the file
+        with save_path.open('w') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+
+        return response_success({}, get_language_content("api_agent_upload_success"))
+
+    except json.JSONDecodeError:
+        return response_error(get_language_content("api_agent_upload_invalid_json"))
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error uploading agent config: {e}")
+        return response_error(get_language_content("api_agent_upload_failed"))
 
 
 @router.put("/agent_base_update/{agent_id}", response_model=ResAgentBaseCreateSchema)
@@ -1302,5 +1353,130 @@ async def get_agent_chatrooms(agent_id: int, page: int = 1, page_size: int = 10,
     """
     result = Chatrooms().get_chatrooms_by_agent(agent_id, page, page_size, show_all=all, current_user_id=userinfo.uid)
     return response_success(result)
+
+
+@router.post("/process_agent_file", response_model=RespBaseSchema)
+async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
+    """
+    Process agent configuration file and retrieve related data.
+
+    Args:
+        userinfo (TokenData): User authentication information.
+
+    Returns:
+        JSON response containing processed data or an error.
+    """
+    uid = userinfo.uid
+    file_path = Path(f'storage/desktop/user_{uid}/agents_data.json')
+
+    if not file_path.exists():
+        return response_success({
+            "assistants": [],
+            "discussions": [],
+            "workflows": [],
+            "order": []
+        }, get_language_content("api_agent_success"))
+    
+
+    with file_path.open('r') as f:
+        data = json.load(f)
+    print('------------------------------------------------------------------------------------------------------------------------------')
+    print(data)
+    print('------------------------------------------------------------------------------------------------------------------------------')
+    processed_data = {}
+    agents_model = Agents()
+    apps_model = Apps()
+
+    # Process assistants
+    if "assistants" in data and isinstance(data["assistants"], list):
+        processed_assistants = []
+        for assistant_item in data["assistants"]:
+            agent_id = assistant_item.get("agent_id")
+            new_item = assistant_item.copy()
+            if agent_id:
+                # Query agents and apps tables using join and filter by status=1
+                app_info = agents_model.select_one(
+                    columns=["apps.name", "apps.description", "apps.avatar"],
+                    joins=[["inner", "apps", "agents.app_id = apps.id"]],
+                    conditions=[
+                        {"column": "agents.id", "value": agent_id},
+                        {"column": "apps.status", "value": 1}
+                    ]
+                )
+                if app_info:
+                    # Process avatar
+                    if app_info.get("avatar"):
+                        app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+                    # 只替换name, description, avatar
+                    new_item["name"] = app_info.get("name", new_item.get("name"))
+                    new_item["description"] = app_info.get("description", new_item.get("description"))
+                    new_item["avatar"] = app_info.get("avatar", new_item.get("avatar"))
+            processed_assistants.append(new_item)
+        processed_data["assistants"] = processed_assistants
+
+    # Process workflows
+    if "workflows" in data and isinstance(data["workflows"], list):
+        processed_workflows = []
+        for workflow_item in data["workflows"]:
+            app_id = workflow_item.get("app_id")
+            new_item = workflow_item.copy()
+            if app_id:
+                # Query apps table for details and filter by status=1
+                app_info = apps_model.select_one(
+                    columns=["name", "description", "avatar"], 
+                    conditions=[
+                        {"column": "id", "value": app_id}, 
+                        {"column": "status", "value": 1}
+                        ]
+                )
+                if app_info:
+                    # Process avatar
+                    if app_info.get("avatar"):
+                        app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+                    # 只替换name, description, avatar
+                    new_item["name"] = app_info.get("name", new_item.get("name"))
+                    new_item["description"] = app_info.get("description", new_item.get("description"))
+                    new_item["avatar"] = app_info.get("avatar", new_item.get("avatar"))
+            processed_workflows.append(new_item)
+        processed_data["workflows"] = processed_workflows
+
+    # Process discussions
+    if "discussions" in data and isinstance(data["discussions"], list):
+        processed_discussions = []
+        for discussion_item in data["discussions"]:
+            current_discussion = discussion_item.copy()
+            if "agent_list" in current_discussion and isinstance(current_discussion["agent_list"], list):
+                processed_agent_list = []
+                for agent_list_item in current_discussion["agent_list"]:
+                    app_id = agent_list_item.get("app_id")
+                    new_agent_item = agent_list_item.copy()
+                    if app_id:
+                        # Query apps table for details and filter by status=1
+                        app_info = apps_model.select_one(
+                            columns=["name", "description", "avatar"], 
+                            conditions=[
+                                {"column": "id", "value": app_id}, 
+                                {"column": "status", "value": 1}
+                                ]
+                            )
+                        if app_info:
+                            # Process avatar
+                            if app_info.get("avatar"):
+                                app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+                            # 只替换name, description, avatar
+                            new_agent_item["name"] = app_info.get("name", new_agent_item.get("name"))
+                            new_agent_item["description"] = app_info.get("description", new_agent_item.get("description"))
+                            new_agent_item["avatar"] = app_info.get("avatar", new_agent_item.get("avatar"))
+                    processed_agent_list.append(new_agent_item)
+                # Replace the original agent_list with the processed one
+                current_discussion["agent_list"] = processed_agent_list
+            processed_discussions.append(current_discussion)
+        processed_data["discussions"] = processed_discussions
+
+    # Skip "order" key and include it directly if present
+    if "order" in data and isinstance(data["order"], list):
+        processed_data["order"] = data["order"]
+
+    return response_success(processed_data, get_language_content("api_agent_success"))
 
 
