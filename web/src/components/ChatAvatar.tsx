@@ -1,28 +1,44 @@
+/*
+ * @LastEditors: biz
+ */
 import { headportrait } from '@/utils/useUser';
-import React,{memo} from 'react';
+import React, { memo } from 'react';
 
 interface params {
-    width?: any;
-    bg?: any;
-    rounded?: any;
+    width?: string;
+    bg?: string;
+    rounded?: string;
     data?: any;
-    imgWidth?:any;
+    imgWidth?: string;
+    background?: string;
 }
+
 const AvatarContent: React.FC<params> = param => {
-    let { width="40px", bg="#F4F8F1", rounded="6px", data, imgWidth='18px'} = param;
-    if(data.avatar){
-      imgWidth=width
+    let { width = "40px", bg = "#F4F8F1", rounded = "6px", data, imgWidth = '18px', background } = param;
+    if (data?.avatar) {
+        imgWidth = width;
     }
-    return(
-        <div className={`w-[${width}] h-[${width}] bg-[${bg}] rounded-[${rounded}] relative flex items-center justify-center shrink-0`}>
+    
+    const bgColor = background || bg;
+    
+    return (
+        <div className="relative flex items-center justify-center shrink-0" style={{
+            width: width,
+            height: width,
+            backgroundColor: bgColor,
+            borderRadius: rounded
+        }}>
             <img
-                src={data.avatar?data.avatar:headportrait(
-                    'single',
-                    data.icon,
-                )}
-                className={`w-[${imgWidth}]  h-[${imgWidth}]`}
+                src={data?.avatar ? data.avatar : headportrait('single', data?.icon)}
+                style={{
+                    width: imgWidth,
+                    height: imgWidth,
+                    borderRadius: rounded
+                }}
+                alt=""
             />
         </div>
-    )
-}
+    );
+};
+
 export default memo(AvatarContent);

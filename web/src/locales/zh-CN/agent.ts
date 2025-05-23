@@ -197,7 +197,7 @@ export default {
     'customcode.notice.file.return': '文件返回要求',
     'customcode.notice.file.return.desc': '如果代码需要返回文件路径，该返回值必须以"file://"开头，以便系统正确识别为文件类型。',
     'customcode.notice.file.return.example': '例如：file:///storage/my_folder/my_file.txt',
-    
+
     // Chat interface additional translations
     'agent.chat.waiting': '思考中...',
     'agent.chat.send': '发送',
@@ -213,5 +213,37 @@ export default {
     'agent.chat.scroll.bottom': '滚动到底部',
     'agent.chat.new.message': '有新消息',
     'agent.chat.upload.file': '上传文件',
+
+    // Skill and Workflow Selection
+    'agent.selectSkills': '选择技能',
+    'agent.selectWorkflows': '选择工作流',
+    'agent.explain.selectSkills': '为智能体选择可被调度的技能，可以选择多个技能',
+    'agent.explain.selectWorkflows': '为智能体选择可被调度的工作流，可以选择多个工作流',
+    'agent.addSkill': '添加技能',
+    'agent.addWorkflow': '添加工作流',
+
+    // Popup Dialog
+    'app.check_skill_popup.title': '选择技能',
+    'app.check_workflow_popup.title': '选择工作流',
+    'app.check_skill_popup.chenck_text': '已选择',
+    'app.check_workflow_popup.chenck_text': '已选择',
+    'app.check_skill_popup.select_1': '我的技能',
+    'app.check_skill_popup.select_2': '更多技能',
+    'app.check_workflow_popup.select_1': '我的工作流',
+    'app.check_workflow_popup.select_2': '更多工作流',
+    'app.check_skill_popup.search': '搜索技能',
+    'app.check_workflow_popup.search': '搜索工作流',
+    'app.check_skill_popup.cancel': '取消',
+    'app.check_workflow_popup.cancel': '取消',
+    'app.check_skill_popup.save': '确定',
+    'app.check_workflow_popup.save': '确定',
+    'app.check_popup.add': '已添加',
+    'app.check_skill_popup.name': '技能',
+    'app.check_workflow_popup.name': '工作流',
+    'app.check_popup.check': '全选',
+
+    // MCP Resources
+    'agent.mcp.resources': 'MCP可调度资源',
+    'agent.noResources': '暂无可调度资源',
 };
 // {intl.formatMessage({ id: 'agent.btn.back' })}

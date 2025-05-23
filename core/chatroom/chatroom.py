@@ -314,8 +314,11 @@ class Chatroom:
                 # If there is only one agent in the chatroom, handle directly
                 if len(self._model_config_ids) <= 2:  # Including Speaker Selector (id=0) and one agent
                     # Set user message as topic directly
-                    self._topic = self._history_messages[-1]['message']
-                    logger.debug('Current topic: %s', self._topic)
+                    for message in reversed(self._history_messages):
+                        if message['agent_id'] == 0 and message['type'] == 'text':
+                            self._topic = message['message']
+                            logger.debug('Current topic: %s', self._topic)
+                            break
                     chatroom_messages.update(
                         {'column': 'id', 'value': self._user_message_id},
                         {'topic': self._topic}
@@ -454,6 +457,11 @@ class Chatroom:
     def set_mcp_tool_result(self, index: int, result: str) -> None:
         if not self._mcp_tool_is_using:
             raise Exception('There is no MCP tool use!')
+        if index >= len(self._mcp_tool_uses):
+            raise Exception('Invalid MCP tool use index!')
+        if self._mcp_tool_uses[index]['result'] is not None:
+            raise Exception('MCP tool use has finished!')
+        self._console_log(f'MCP tool result: \033[91m{result}\033[0m\n')
         self._mcp_tool_uses[index]['result'] = result
         self._mcp_tool_use_lock.set()
 
@@ -502,6 +510,8 @@ class Chatroom:
                 mcp_tool_list = []
                 if self._is_desktop and self._desktop_mcp_tool_list:
                     mcp_tool_list.extend(self._desktop_mcp_tool_list)
+
+                new_text = True
                 async for chunk in agent_node.run_in_chatroom(
                     context=Context(),
                     user_id=self._user_id,
@@ -522,6 +532,11 @@ class Chatroom:
                             if tool_call_chunk['type'] == 'tool_call_chunk':
                                 mcp_tool_index = tool_call_chunk['index']
                                 if mcp_tool_name := tool_call_chunk['name']:
+                                    self._console_log(
+                                        '\033[91mTool call: '
+                                        f'\033[0mName: \033[36m{mcp_tool_name} '
+                                        '\033[0mArgs: \033[36m'
+                                    )
                                     self._mcp_tool_uses.append({
                                         'index': mcp_tool_index,
                                         'name': mcp_tool_name,
@@ -529,6 +544,7 @@ class Chatroom:
                                         'result': None
                                     })
                                 if mcp_tool_input := tool_call_chunk['args']:
+                                    self._console_log(mcp_tool_input)
                                     for mcp_tool_use in self._mcp_tool_uses:
                                         if mcp_tool_use['index'] == mcp_tool_index:
                                             mcp_tool_use['args'] += mcp_tool_input
@@ -546,22 +562,27 @@ class Chatroom:
                                 self._chatroom_id,
                                 agent_id,
                                 content,
-                                agent_message
+                                agent_message,
+                                new_text
                             )
+                            new_text = False
                         elif isinstance(content, list):
                             for item in content:
                                 if isinstance(item, dict):
                                     if item['type'] == 'text':
-                                        item_text = item['text']
-                                        self._console_log(item_text)
-                                        current_agent_message += item_text
-                                        agent_message += item_text
-                                        await self._ws_manager.send_agent_reply(
-                                            self._chatroom_id,
-                                            agent_id, 
-                                            item_text,
-                                            agent_message
-                                        )
+                                        item_text: str = item['text']
+                                        if item_text:
+                                            self._console_log(item_text)
+                                            current_agent_message += item_text
+                                            agent_message += item_text
+                                            await self._ws_manager.send_agent_reply(
+                                                self._chatroom_id,
+                                                agent_id, 
+                                                item_text,
+                                                agent_message,
+                                                new_text
+                                            )
+                                            new_text = False
                                     elif item['type'] == 'tool_use':
                                         # Tool use has been handled in the tool_call_chunks
                                         pass
@@ -575,6 +596,8 @@ class Chatroom:
                         prompt_tokens += usage_metadata['input_tokens']
                         completion_tokens += usage_metadata['output_tokens']
                         total_tokens += usage_metadata['total_tokens']
+                        
+                self._console_log('\n')
                 
                 self._history_messages.append({
                     'agent_id': agent_id,
@@ -586,20 +609,27 @@ class Chatroom:
                     break
 
                 if not self._mcp_tool_uses:
+                    # No MCP tool use, stop invoking the LLM
                     break
                 else:
                     await self._ws_manager.send_agent_reply(
                         self._chatroom_id,
                         agent_id, 
                         '',
-                        agent_message
+                        agent_message,
+                        new_text
                     )
+                    new_text = False
                     self._mcp_tool_is_using = True
+                    mcp_tool_use_timeout = False
+
+                    # Send the MCP tool use instructions to the frontend
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
+                        mcp_tool_use['args'] = json.loads(mcp_tool_use['args'])
                         mcp_tool_use_in_message = {
                             'index': index,
                             'name': mcp_tool_use['name'],
-                            'args': json.loads(mcp_tool_use['args'])
+                            'args': mcp_tool_use['args']
                         }
                         await self._ws_manager.send_instruction(
                             self._chatroom_id,
@@ -607,15 +637,20 @@ class Chatroom:
                             mcp_tool_use_in_message
                         )
 
+                    # Invoke the MCP tool(s) of the built-in MCP server
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
                         if mcp_tool_use['name'] in ['workflow_run', 'skill_run']:
-                            mcp_tool_args = json.loads(mcp_tool_use['args'])
+                            mcp_tool_args = mcp_tool_use['args']
                             mcp_tool_args['user_id'] = self._user_id
                             mcp_tool_args['team_id'] = self._team_id
-                            result = await self._mcp_client.call_tool(
-                                mcp_tool_use['name'],
-                                mcp_tool_args
-                            )
+                            try:
+                                result = await self._mcp_client.call_tool(
+                                    mcp_tool_use['name'],
+                                    mcp_tool_args
+                                )
+                            except KeyError:
+                                raise Exception('Cannot connect to the built-in MCP server!')
+                        if mcp_tool_use['name'] == 'skill_run':
                             mcp_tool_use['result'] = result
                             await self._ws_manager.send_instruction(
                                 self._chatroom_id,
@@ -623,14 +658,28 @@ class Chatroom:
                                 {'index': index, 'result': result}
                             )
 
+                    # Wait for the MCP tool uses to finish
                     while any(mcp_tool_use['result'] is None for mcp_tool_use in self._mcp_tool_uses):
-                        for mcp_tool_use in self._mcp_tool_uses:
+                        for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
                             try:
+                                self._mcp_tool_use_lock.clear()
                                 await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
                             except asyncio.TimeoutError:
-                                mcp_tool_use['result'] = 'Timeout'
-                            self._mcp_tool_use_lock.clear()
+                                mcp_tool_use_timeout = True
+                                break
+                        if mcp_tool_use_timeout:
+                            for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
+                                if mcp_tool_use['result'] is None:
+                                    # Set the result of all unfinished MCP tool uses to 'Timeout'
+                                    # then the while-loop will break
+                                    mcp_tool_use['result'] = 'Timeout'
+                                    await self._ws_manager.send_instruction(
+                                        self._chatroom_id,
+                                        'WITHMCPTOOLRESULT',
+                                        {'index': index, 'result': 'Timeout'}
+                                    )
 
+                    # Append the tool use and tool result to the history messages
                     for mcp_tool_use in self._mcp_tool_uses:
                         self._history_messages.append({
                             'agent_id': agent_id,
@@ -658,8 +707,17 @@ class Chatroom:
                             f'{mcp_tool_str}'
                             '<<<mcp-tool-end>>>'
                         )
+
+                    # Clear the MCP tool uses and reset the MCP tool use flag
                     self._mcp_tool_uses.clear()
                     self._mcp_tool_is_using = False
+                    if mcp_tool_use_timeout:
+                        # Terminate the chat if the MCP tool use timeout
+                        chatrooms.update(
+                            {'column': 'id', 'value': self._chatroom_id},
+                            {'chat_status': 0}
+                        )
+                        break
 
                 if self._terminate():
                     break
@@ -698,7 +756,7 @@ class Chatroom:
                 prompt_tokens, completion_tokens, total_tokens
             )
         finally:
-            self._console_log('\033[0m\n')  # Reset the color
+            self._console_log('\033[0m')  # Reset the color
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
             if not has_connections:
                 chatrooms.update(

@@ -4,6 +4,7 @@ import Variable from '@/components/WorkFlow/components/Variable';
 import { useIntl } from '@umijs/max';
 import { Form, Input, Radio, Select, Switch } from 'antd';
 import React, { useEffect, useState } from 'react';
+import Avatar from '@/components/ChatAvatar';
 
 const { TextArea } = Input;
 interface ChildProps {
@@ -354,6 +355,81 @@ const AgentsFirst: React.FC<ChildProps> = ({
                             )}
                         </Form.List>
                     )}
+                    
+                    {Detaillist && Detaillist.app.attrs_are_visible === 1 && Detaillist.agent.selected_skills && (
+                        <Form.Item className="mb-[30px]">
+                            <div className='text-[#555555] text-base mb-[15px]'>
+                                {intl.formatMessage({ id: 'agent.mcp.resources' })}
+                            </div>
+                            <div className='pl-4'>
+                                {Detaillist.agent.selected_skills && Detaillist.agent.selected_skills.length > 0 && (
+                                    <div className="mb-[30px]">
+                                        <div className="flex items-center mb-[15px]">
+                                            <div className="text-[#555555] text-xs">
+                                                <Callword
+                                                    className="font-medium"
+                                                    name={intl.formatMessage({ id: 'agent.selectSkills' })}
+                                                    title={intl.formatMessage({ id: 'agent.explain.selectSkills' })}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-4 mb-4">
+                                            {Detaillist.agent.selected_skills.map((skill: any) => (
+                                                <div key={skill.app_id} className="flex items-center w-full p-2 bg-white rounded-lg shadow-sm">
+                                                    <Avatar
+                                                        rounded="6px"
+                                                        data={skill}
+                                                        bg={skill.icon_background}
+                                                    />
+                                                    <div className="flex flex-col ml-2 truncate">
+                                                        <span className="text-sm font-medium text-[#333333]">{skill.name}</span>
+                                                        <span className="text-xs text-[#666666] truncate">{skill.description}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {Detaillist.agent.selected_workflows && Detaillist.agent.selected_workflows.length > 0 && (
+                                    <div className="mb-[30px]">
+                                        <div className="flex items-center mb-[15px]">
+                                            <div className="text-[#555555] text-xs">
+                                                <Callword
+                                                    className="font-medium"
+                                                    name={intl.formatMessage({ id: 'agent.selectWorkflows' })}
+                                                    title={intl.formatMessage({ id: 'agent.explain.selectWorkflows' })}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-4 mb-4">
+                                            {Detaillist.agent.selected_workflows.map((workflow: any) => (
+                                                <div key={workflow.app_id} className="flex items-center w-full p-2 bg-white rounded-lg shadow-sm">
+                                                    <Avatar
+                                                        rounded="6px"
+                                                        data={workflow}
+                                                        bg={workflow.icon_background}
+                                                    />
+                                                    <div className="flex flex-col ml-2 truncate">
+                                                        <span className="text-sm font-medium text-[#333333]">{workflow.name}</span>
+                                                        <span className="text-xs text-[#666666] truncate">{workflow.description}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {
+                                    !Detaillist.agent.selected_skills && !Detaillist.agent.selected_workflows && (
+                                        <div className="text-[#555555] text-xs">
+                                            {intl.formatMessage({ id: 'agent.noResources' })}
+                                        </div>
+                                    )
+                                }
+                            </div>
+                        </Form.Item>
+                    )}
+                    
                     <div className="h-[30px] w-1"></div>
                 </Form>
             </div>

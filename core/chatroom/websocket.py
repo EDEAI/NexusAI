@@ -102,7 +102,8 @@ class WebSocketManager:
         chatroom_id: int,
         agent_id: int,
         current_message_chunk: str,
-        full_message: str
+        full_message: str,
+        new_text: bool
     ):
         '''
         Send the agent reply to the chatroom.
@@ -117,10 +118,16 @@ class WebSocketManager:
                 else:
                     not_replying_connections.add(connection)
                     self._replying_status_by_connection_id[id(connection)] = True
+            
             if current_message_chunk:
+                if new_text:
+                    await self.send_instruction_by_connections(replying_connections, 'TEXT')
                 broadcast(replying_connections, current_message_chunk)
+
             await self.send_instruction_by_connections(not_replying_connections, 'REPLY', agent_id)
-            broadcast(not_replying_connections, full_message)
+            if full_message:
+                await self.send_instruction_by_connections(not_replying_connections, 'TEXT')
+                broadcast(not_replying_connections, full_message)
         
     async def end_agent_reply(
         self,
@@ -141,6 +148,7 @@ class WebSocketManager:
                     not_replying_connections.add(connection)
             
             await self.send_instruction_by_connections(not_replying_connections, 'REPLY', agent_id)
+            await self.send_instruction_by_connections(not_replying_connections, 'TEXT')
             broadcast(not_replying_connections, full_message)
             
     def stop(self):

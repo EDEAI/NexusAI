@@ -52,7 +52,10 @@ language_packs = {
             2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
             3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            
+            In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
             {callable_items_description}
+            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
         ''',
@@ -80,7 +83,10 @@ language_packs = {
             2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
             3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            
+            In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
             {callable_items_description}
+            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
         ''',
@@ -109,7 +115,10 @@ language_packs = {
             2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
             3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            
+            In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
             {callable_items_description}
+            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
         ''',
@@ -135,7 +144,10 @@ language_packs = {
             2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
             3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            
+            In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
             {callable_items_description}
+            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
         ''',
@@ -149,7 +161,7 @@ language_packs = {
         "agent_output_format_3": "in code format",
         "agent_output_format_2_md": "in JSON format contained in Markdown format",
         "agent_callable_items_description": '''
-            In addition, to answer user questions or fulfill user needs, you can also invoke certain skills or workflows.
+            You can also invoke certain skills or workflows.
             To invoke a skill, please use the MCP tool skill_run;
             To invoke a workflow, please use the MCP tool workflow_run.
             I will provide you with a list of skills and/or workflows.
@@ -186,7 +198,6 @@ language_packs = {
                 }
             }
             Please invoke the MCP tool according to the correct parameter format.
-            If you have got the result of the skill or workflow, please stop invoking it.
         ''',
         "agent_callable_skills": '''
             Below is the list of callable skills:

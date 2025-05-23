@@ -53,6 +53,15 @@ export default {
     'app.check_agent_popup.save': '确认',
     'app.check_agent_popup.cancel': '取消',
 
+    'app.check_skill_popup.name': '技能',
+    'app.check_skill_popup.title': '选择技能',
+    'app.check_skill_popup.chenck_text': '已选',
+    'app.check_skill_popup.select_1': '我的 技能',
+    'app.check_skill_popup.select_2': '组织内 技能',
+    'app.check_skill_popup.search': '搜索技能',
+    'app.check_skill_popup.save': '确认',
+    'app.check_skill_popup.cancel': '取消',
+
     'app.check_workflow_popup.name':'工作流',
     'app.check_workflow_popup.title': '选择工作流',
     'app.check_workflow_popup.chenck_text': '已选',
