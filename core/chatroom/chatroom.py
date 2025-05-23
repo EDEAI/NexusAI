@@ -650,6 +650,7 @@ class Chatroom:
                                 )
                             except KeyError:
                                 raise Exception('Cannot connect to the built-in MCP server!')
+                        if mcp_tool_use['name'] == 'skill_run':
                             mcp_tool_use['result'] = result
                             await self._ws_manager.send_instruction(
                                 self._chatroom_id,
