@@ -211,7 +211,6 @@ class ChatroomManager:
                 self._chatrooms[chatroom_id] = chatroom
                 chatroom.load_history_messages(history_messages)
                 await chatroom.chat(user_input is None, file_list)
-                self._chatrooms.pop(chatroom_id)
             end_time = time()
             app_runs.update(
                 {'column': 'id', 'value': app_run_id},
@@ -240,6 +239,7 @@ class ChatroomManager:
                 {'column': 'id', 'value': chatroom_id},
                 {'chat_status': 0}
             )
+            self._chatrooms.pop(chatroom_id)
         
     async def _handle_data_and_start_chatroom(
         self,
@@ -249,6 +249,14 @@ class ChatroomManager:
         user_input: Optional[str] = None
     ) -> None:
         try:
+            if chatroom_id in self._chatrooms:
+                chatroom = self._chatrooms[chatroom_id]
+                if chatroom.mcp_tool_is_using:
+                    # Interrupt all MCP tool uses and wait for the chatroom to be terminated
+                    await chatroom.interrupt_all_mcp_tool_uses()
+                    while chatroom_id in self._chatrooms:
+                        await asyncio.sleep(0.1)
+
             chatroom_info = self._get_chatroom_info(
                 chatroom_id,
                 user_id,
