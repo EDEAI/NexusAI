@@ -91,11 +91,11 @@ const AgentsFirst: React.FC<ChildProps> = ({
     });
     useEffect(() => {
         getDataset();
-        if (Detaillist.agent.selected_skills) {
+        if (Detaillist?.agent?.selected_skills) {
             setSelectedSkills(Detaillist.agent.selected_skills)
         }
-        if (Detaillist.agent.selected_workflows) {
-            setSelectedWorkflows(Detaillist.agent.selected_workflows)
+        if (Detaillist?.agent?.selected_workflows) {
+            setSelectedWorkflows(Detaillist?.agent?.selected_workflows)
         }
     }, [Detaillist,Detaillist?.agent]);
 
