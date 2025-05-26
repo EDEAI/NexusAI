@@ -1401,7 +1401,6 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     joins=[["inner", "apps", "agents.app_id = apps.id"]],
                     conditions=[
                         {"column": "agents.id", "value": agent_id},
-                        {"column": "apps.publish_status", "value": 1},
                         {"column": "apps.team_id", "value": team_id},
                         {"column": "apps.status", "value": 1}
                     ]
@@ -1432,7 +1431,6 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     columns=["name", "description", "avatar"], 
                     conditions=[
                         {"column": "id", "value": app_id}, 
-                        {"column": "publish_status", "value": 1},
                         {"column": "team_id", "value": team_id},
                         {"column": "status", "value": 1}
                     ]
@@ -1462,7 +1460,6 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     columns=["name", "description", "avatar"], 
                     conditions=[
                         {"column": "id", "value": app_id}, 
-                        {"column": "publish_status", "value": 1},
                         {"column": "team_id", "value": team_id},
                         {"column": "status", "value": 1}
                     ]
@@ -1479,7 +1476,6 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                                     columns=["name", "description", "avatar"], 
                                     conditions=[
                                         {"column": "id", "value": app_id}, 
-                                        {"column": "publish_status", "value": 1},
                                         {"column": "team_id", "value": team_id},
                                         {"column": "status", "value": 1}
                                     ]
