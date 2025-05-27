@@ -122,7 +122,8 @@ class Chatroom:
         self._mcp_client = mcp_client
         self._is_desktop = is_desktop
         self._desktop_mcp_tool_list = desktop_mcp_tool_list
-        self._mcp_tool_using = False
+        self._mcp_tool_is_using = False
+        self._mcp_tool_use_is_interrupted = False
         self._mcp_tool_use_lock = asyncio.Event()
         self._mcp_tool_uses: List[Dict[str, Any]] = []
 
@@ -454,6 +455,10 @@ class Chatroom:
         # If the Speaker Selector has tried 5 times and still returned an invalid agent ID, stop the chat
         return 0
     
+    @property
+    def mcp_tool_is_using(self) -> bool:
+        return self._mcp_tool_is_using
+    
     def set_mcp_tool_result(self, index: int, result: str) -> None:
         if not self._mcp_tool_is_using:
             raise Exception('There is no MCP tool use!')
@@ -464,6 +469,24 @@ class Chatroom:
         self._console_log(f'MCP tool result: \033[91m{result}\033[0m\n')
         self._mcp_tool_uses[index]['result'] = result
         self._mcp_tool_use_lock.set()
+
+    async def _stop_all_mcp_tool_uses(self, result: str) -> None:
+        self._mcp_tool_use_is_interrupted = True
+        for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
+            if mcp_tool_use['result'] is None:
+                # Set the result of all unfinished MCP tool uses
+                mcp_tool_use['result'] = result
+                await self._ws_manager.send_instruction(
+                    self._chatroom_id,
+                    'WITHMCPTOOLRESULT',
+                    {'index': index, 'result': result}
+                )
+        self._mcp_tool_use_lock.set()
+
+    async def interrupt_all_mcp_tool_uses(self) -> None:
+        if not self._mcp_tool_is_using:
+            raise Exception('There is no MCP tool use!')
+        await self._stop_all_mcp_tool_uses('Interrupted')
 
     async def _talk_to_agent(self, agent_id: int) -> None:
         prompt_tokens = 0
@@ -621,7 +644,7 @@ class Chatroom:
                     )
                     new_text = False
                     self._mcp_tool_is_using = True
-                    mcp_tool_use_timeout = False
+                    self._mcp_tool_use_is_interrupted = False
 
                     # Send the MCP tool use instructions to the frontend
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
@@ -665,19 +688,8 @@ class Chatroom:
                                 self._mcp_tool_use_lock.clear()
                                 await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
                             except asyncio.TimeoutError:
-                                mcp_tool_use_timeout = True
+                                await self._stop_all_mcp_tool_uses('Timeout')
                                 break
-                        if mcp_tool_use_timeout:
-                            for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
-                                if mcp_tool_use['result'] is None:
-                                    # Set the result of all unfinished MCP tool uses to 'Timeout'
-                                    # then the while-loop will break
-                                    mcp_tool_use['result'] = 'Timeout'
-                                    await self._ws_manager.send_instruction(
-                                        self._chatroom_id,
-                                        'WITHMCPTOOLRESULT',
-                                        {'index': index, 'result': 'Timeout'}
-                                    )
 
                     # Append the tool use and tool result to the history messages
                     for mcp_tool_use in self._mcp_tool_uses:
@@ -711,12 +723,13 @@ class Chatroom:
                     # Clear the MCP tool uses and reset the MCP tool use flag
                     self._mcp_tool_uses.clear()
                     self._mcp_tool_is_using = False
-                    if mcp_tool_use_timeout:
-                        # Terminate the chat if the MCP tool use timeout
+                    if self._mcp_tool_use_is_interrupted:
+                        # Terminate the chat if the MCP tool use is interrupted
                         chatrooms.update(
                             {'column': 'id', 'value': self._chatroom_id},
                             {'chat_status': 0}
                         )
+                        self._mcp_tool_use_is_interrupted = False
                         break
 
                 if self._terminate():

@@ -289,6 +289,8 @@ export default memo((props: Props) => {
     const [clearingMemory, setClearingMemory] = useState(false);
     const [initialLoading, setInitialLoading] = useState(false);
     const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+    const [savingInfo, setSavingInfo] = useState(false);
+    const [publishing, setPublishing] = useState(false);
     const formRef = useRef<ProFormInstance>();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -315,12 +317,20 @@ export default memo((props: Props) => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
     const handleSaveInfo = async () => {
-        if (props?.saveInfo?.firstjudgingcondition()) {
-            return true;
-        } else if (props?.saveInfo?.secondjudgingcondition()) {
-            return true;
-        } else {
-            return await props?.saveInfo?.agentupdata();
+        try {
+            setSavingInfo(true);
+            if (props?.saveInfo?.firstjudgingcondition()) {
+                return true;
+            } else if (props?.saveInfo?.secondjudgingcondition()) {
+                return true;
+            } else {
+                return await props?.saveInfo?.agentupdata();
+            }
+        } catch (error) {
+            console.error('Failed to save info:', error);
+            return false;
+        } finally {
+            setSavingInfo(false);
         }
     };
     useUpdateEffect(() => {
@@ -504,17 +514,30 @@ export default memo((props: Props) => {
         );
     }
     const agentPublish = async () => {
-        await handleSaveInfo();
+        try {
+            setPublishing(true);
+            await handleSaveInfo();
 
-        setTimeout(async () => {
-            const res = await PutagentPublish(props.data?.detailList?.agent?.agent_id);
+            setTimeout(async () => {
+                try {
+                    const res = await PutagentPublish(props.data?.detailList?.agent?.agent_id);
 
-            if (res.code == 0) {
-                message.success(intl.formatMessage({ id: 'agent.message.success.publish' }));
-            } else {
-                message.error(intl.formatMessage({ id: 'agent.message.fail.publish' }));
-            }
-        }, 500);
+                    if (res.code == 0) {
+                        message.success(intl.formatMessage({ id: 'agent.message.success.publish' }));
+                    } else {
+                        message.error(intl.formatMessage({ id: 'agent.message.fail.publish' }));
+                    }
+                } catch (error) {
+                    console.error('Failed to publish agent:', error);
+                    message.error(intl.formatMessage({ id: 'agent.message.fail.publish' }));
+                } finally {
+                    setPublishing(false);
+                }
+            }, 500);
+        } catch (error) {
+            console.error('Failed to save before publish:', error);
+            setPublishing(false);
+        }
     };
 
     const handleUpload = () => {
@@ -579,6 +602,7 @@ export default memo((props: Props) => {
                             <Button
                                 type="primary"
                                 disabled={props.operationbentate == 'false' ? false : true}
+                                loading={savingInfo}
                                 onClick={handleSaveInfo}
                                 className="min-w-24"
                             >
@@ -587,6 +611,7 @@ export default memo((props: Props) => {
                             <Button
                                 type="primary"
                                 disabled={props.operationbentate == 'false' ? false : true}
+                                loading={publishing||savingInfo}
                                 onClick={agentPublish}
                                 className="min-w-24"
                             >
