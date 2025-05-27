@@ -10,6 +10,8 @@ from core.database.models.app_runs import AppRuns
 from core.database.models.agent_abilities import AgentAbilities
 from core.database.models.agent_chat_messages import AgentChatMessages
 from core.database.models.agent_callable_items import AgentCallableItems
+
+from core.database.models import ChatroomAgentRelation
 from core.workflow.nodes import AgentNode
 from core.workflow.variables import create_variable_from_dict
 from core.llm.prompt import create_prompt_from_dict, Prompt
@@ -1454,6 +1456,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
         for discussion_item in data["discussions"]:
             app_id = discussion_item.get("app_id")
             current_discussion = discussion_item.copy()
+            chatroom_id = discussion_item.get("chatroom_id")
             if app_id:
                 # Query apps table for details and filter by status=1
                 app_info = apps_model.select_one(
@@ -1465,35 +1468,55 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     ]
                 )
                 if app_info:
-                    if "agent_list" in current_discussion and isinstance(current_discussion["agent_list"], list):
-                        processed_agent_list = []
-                        for agent_list_item in current_discussion["agent_list"]:
-                            app_id = agent_list_item.get("app_id")
-                            new_agent_item = agent_list_item.copy()
-                            if app_id:
-                                # Query apps table for details and filter by status=1
-                                app_info = apps_model.select_one(
-                                    columns=["name", "description", "avatar"], 
-                                    conditions=[
-                                        {"column": "id", "value": app_id}, 
-                                        {"column": "team_id", "value": team_id},
-                                        {"column": "status", "value": 1}
-                                    ]
-                                )
-                                if app_info:
-                                    # Process avatar
-                                    if app_info.get("avatar"):
-                                        app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
-                                    # 只替换name, description, avatar
-                                    new_agent_item["name"] = app_info.get("name", new_agent_item.get("name"))
-                                    new_agent_item["description"] = app_info.get("description", new_agent_item.get("description"))
-                                    new_agent_item["avatar"] = app_info.get("avatar", new_agent_item.get("avatar"))
-                                    processed_agent_list.append(new_agent_item)
-                                # 查不到app_info时不加入
-                            # app_id不存在时也不加入
-                        # Replace the original agent_list with the processed one
-                        current_discussion["agent_list"] = processed_agent_list
-                    processed_discussions.append(current_discussion)
+                    # Process avatar
+                    if app_info.get("avatar"):
+                        app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+                    # 更新name, description, avatar
+                    current_discussion["name"] = app_info.get("name", current_discussion.get("name"))
+                    current_discussion["description"] = app_info.get("description", current_discussion.get("description"))
+                    current_discussion["avatar"] = app_info.get("avatar", current_discussion.get("avatar"))
+                    processed_agent_list = []
+                    processed_agent_list = ChatroomAgentRelation().show_chatroom_agent(chatroom_id)
+                    processed_agent_list_cleaned = []
+                    for item in processed_agent_list:
+                        new_item = {key: value for key, value in item.items() if key not in ['user_id', 'active']}
+                        if item.get('avatar'):
+                            item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                        processed_agent_list_cleaned.append(new_item)
+            current_discussion["agent_list"] = processed_agent_list_cleaned
+            # if "agent_list" in current_discussion and isinstance(current_discussion["agent_list"], list):
+            #     processed_agent_list = []
+            #     for agent_list_item in current_discussion["agent_list"]:
+            #         agent_id = agent_list_item.get("agent_id")
+            #         new_agent_item = agent_list_item.copy()
+            #         if agent_id:
+            #             # Query agents and apps tables using join and filter by status=1
+            #             app_info = agents_model.select_one(
+            #                 columns=["apps.name", "apps.description", "apps.avatar"],
+            #                 joins=[["inner", "apps", "agents.app_id = apps.id"]],
+            #                 conditions=[
+            #                     {"column": "agents.id", "value": agent_id},
+            #                     {"column": "apps.team_id", "value": team_id},
+            #                     {"column": "apps.status", "value": 1}
+            #                 ]
+            #             )
+            #             if app_info:
+            #                 # Process avatar
+            #                 if app_info.get("avatar"):
+            #                     app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+            #                 # 只替换name, description, avatar
+            #                 new_agent_item["name"] = app_info.get("name", new_agent_item.get("name"))
+            #                 new_agent_item["description"] = app_info.get("description", new_agent_item.get("description"))
+            #                 new_agent_item["avatar"] = app_info.get("avatar", new_agent_item.get("avatar"))
+            #                 processed_agent_list.append(new_agent_item)
+            #             # 查不到app_info时不加入
+            #         # agent_id不存在时也不加入
+            #     # Replace the original agent_list with the processed one
+            #     current_discussion["agent_list"] = processed_agent_list
+
+            # Discussion item is always added, even if app_id is not found or app_info is not found
+            processed_discussions.append(current_discussion)
+
         processed_data["discussions"] = processed_discussions
 
     # Skip "order" key and include it directly if present
