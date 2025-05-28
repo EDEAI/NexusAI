@@ -658,11 +658,17 @@ class Chatroom:
                         mcp_tool_use['args'] = json.loads(mcp_tool_use['args'])
                         if mcp_tool_use['name'] == 'skill_run':
                             skill = custom_tools.get_skill_by_id(mcp_tool_use['args']['id'])
-                            app = apps.get_app_by_id(skill['app_id'])
-                            mcp_tool_use['skill_or_workflow_name'] = app['name']
+                            if not skill:
+                                mcp_tool_use['result'] = 'Skill not found'
+                            else:
+                                app = apps.get_app_by_id(skill['app_id'])
+                                mcp_tool_use['skill_or_workflow_name'] = app['name']
                         elif mcp_tool_use['name'] == 'workflow_run':
                             workflow = workflows.get_workflow_app(mcp_tool_use['args']['id'])
-                            mcp_tool_use['skill_or_workflow_name'] = workflow['name']
+                            if not workflow:
+                                mcp_tool_use['result'] = 'Workflow not found'
+                            else:
+                                mcp_tool_use['skill_or_workflow_name'] = workflow['name']
                         mcp_tool_use_in_message = {
                             'index': index,
                             'name': mcp_tool_use['name'],
@@ -678,38 +684,39 @@ class Chatroom:
                     # Invoke the MCP tool(s) of the built-in MCP server
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
                         if mcp_tool_use['name'] in ['workflow_run', 'skill_run']:
-                            mcp_tool_args = mcp_tool_use['args']
-                            mcp_tool_args['user_id'] = self._user_id
-                            mcp_tool_args['team_id'] = self._team_id
-                            try:
-                                logger.debug('Invoking MCP tool: %s', mcp_tool_use['name'])
-                                logger.debug('MCP tool args: %s', mcp_tool_args)
-                                result = await self._mcp_client.call_tool(
-                                    mcp_tool_use['name'],
-                                    mcp_tool_args
-                                )
-                                logger.debug('MCP tool result: %s', result)
-                            except KeyError:
-                                raise Exception('Cannot connect to the built-in MCP server!')
-                        if mcp_tool_use['name'] == 'skill_run':
-                            mcp_tool_use['result'] = result
-                        elif mcp_tool_use['name'] == 'workflow_run':
-                            if result.startswith('Error executing tool workflow_run:'):
-                                result = json.dumps(
-                                    {'status': 'failed', 'message': result},
-                                    ensure_ascii=False
-                                )
-                                mcp_tool_use['result'] = result
-                            else:
-                                result = json.dumps(
-                                    {'status': 'success', 'message': 'Workflow run successfully'}
-                                )
-                                # Not set the result of workflow_run, because it will be set by the client later
-                        await self._ws_manager.send_instruction(
-                            self._chatroom_id,
-                            'WITHMCPTOOLRESULT',
-                            {'index': index, 'result': result}
-                        )
+                            if mcp_tool_use['result'] is None:
+                                mcp_tool_args = mcp_tool_use['args']
+                                mcp_tool_args['user_id'] = self._user_id
+                                mcp_tool_args['team_id'] = self._team_id
+                                try:
+                                    logger.debug('Invoking MCP tool: %s', mcp_tool_use['name'])
+                                    logger.debug('MCP tool args: %s', mcp_tool_args)
+                                    result = await self._mcp_client.call_tool(
+                                        mcp_tool_use['name'],
+                                        mcp_tool_args
+                                    )
+                                    logger.debug('MCP tool result: %s', result)
+                                except KeyError:
+                                    raise Exception('Cannot connect to the built-in MCP server!')
+                                if mcp_tool_use['name'] == 'skill_run':
+                                    mcp_tool_use['result'] = result
+                                elif mcp_tool_use['name'] == 'workflow_run':
+                                    if result.startswith('Error executing tool workflow_run:'):
+                                        result = json.dumps(
+                                            {'status': 'failed', 'message': result},
+                                            ensure_ascii=False
+                                        )
+                                        mcp_tool_use['result'] = result
+                                    else:
+                                        result = json.dumps(
+                                            {'status': 'success', 'message': 'Workflow run successfully'}
+                                        )
+                                        # Not set the result of workflow_run, because it will be set by the client later
+                            await self._ws_manager.send_instruction(
+                                self._chatroom_id,
+                                'WITHMCPTOOLRESULT',
+                                {'index': index, 'result': result}
+                            )
 
                     # Wait for the MCP tool uses to finish
                     while any(mcp_tool_use['result'] is None for mcp_tool_use in self._mcp_tool_uses):
