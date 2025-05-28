@@ -667,10 +667,13 @@ class Chatroom:
                             mcp_tool_args['user_id'] = self._user_id
                             mcp_tool_args['team_id'] = self._team_id
                             try:
+                                logger.debug('Invoking MCP tool: %s', mcp_tool_use['name'])
+                                logger.debug('MCP tool args: %s', mcp_tool_args)
                                 result = await self._mcp_client.call_tool(
                                     mcp_tool_use['name'],
                                     mcp_tool_args
                                 )
+                                logger.debug('MCP tool result: %s', result)
                             except KeyError:
                                 raise Exception('Cannot connect to the built-in MCP server!')
                         if mcp_tool_use['name'] == 'skill_run':
