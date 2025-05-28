@@ -678,11 +678,23 @@ class Chatroom:
                                 raise Exception('Cannot connect to the built-in MCP server!')
                         if mcp_tool_use['name'] == 'skill_run':
                             mcp_tool_use['result'] = result
-                            await self._ws_manager.send_instruction(
-                                self._chatroom_id,
-                                'WITHMCPTOOLRESULT',
-                                {'index': index, 'result': result}
-                            )
+                        elif mcp_tool_use['name'] == 'workflow_run':
+                            if result.startswith('Error executing tool workflow_run:'):
+                                result = json.dumps(
+                                    {'status': 'failed', 'message': result},
+                                    ensure_ascii=False
+                                )
+                                mcp_tool_use['result'] = result
+                            else:
+                                result = json.dumps(
+                                    {'status': 'success', 'message': 'Workflow run successfully'}
+                                )
+                                # Not set the result of workflow_run, because it will be set by the client later
+                        await self._ws_manager.send_instruction(
+                            self._chatroom_id,
+                            'WITHMCPTOOLRESULT',
+                            {'index': index, 'result': result}
+                        )
 
                     # Wait for the MCP tool uses to finish
                     while any(mcp_tool_use['result'] is None for mcp_tool_use in self._mcp_tool_uses):
