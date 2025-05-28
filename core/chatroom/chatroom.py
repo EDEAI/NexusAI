@@ -19,8 +19,10 @@ from core.database.models import (
     Apps,
     ChatroomMessages,
     Chatrooms,
+    CustomTools,
+    Datasets,
     Models,
-    Datasets
+    Workflows
 )
 from core.helper import truncate_messages_by_token_limit, get_file_content_list
 from core.llm import Prompt
@@ -35,11 +37,15 @@ project_root = Path(__file__).parent.parent.parent
 logger = Logger.get_logger('chatroom')
 
 agent_abilities = AgentAbilities()
+agents = Agents()
 app_runs = AppRuns()
 apps = Apps()
 chatrooms = Chatrooms()
 chatroom_messages = ChatroomMessages()
+custom_tools = CustomTools()
 datasets = Datasets()
+models = Models()
+workflows = Workflows()
 
 
 class Chatroom:
@@ -49,14 +55,14 @@ class Chatroom:
         sys.stdout.flush()
 
     def _get_model_configs(self, all_agent_ids: Sequence[int], absent_agent_ids: Sequence[int]) -> None:
-        model_info = Models().get_model_by_type(1, self._team_id, uid=self._user_id)
+        model_info = models.get_model_by_type(1, self._team_id, uid=self._user_id)
         model_config_id = model_info['model_config_id']
         self._model_config_ids[0] = model_config_id
-        model_info = Models().get_model_by_config_id(model_config_id)
+        model_info = models.get_model_by_config_id(model_config_id)
         assert model_info, f'Model configuration {model_config_id} not found.'
         self._model_configs[model_config_id] = model_info
         for agent_id in all_agent_ids:
-            agent = Agents().select_one(
+            agent = agents.select_one(
                 columns=['id', 'app_id', 'apps.name', 'apps.description', 'obligations', 'model_config_id'],
                 joins=[('left', 'apps', 'agents.app_id = apps.id')],
                 conditions={'column': 'id', 'value': agent_id}  # Include deleted agents (with status=3)
@@ -69,7 +75,7 @@ class Chatroom:
             if agent_id not in absent_agent_ids:
                 model_config_id = agent['model_config_id']
                 self._model_config_ids[agent_id] = model_config_id
-                model_info = Models().get_model_by_config_id(model_config_id)
+                model_info = models.get_model_by_config_id(model_config_id)
                 assert model_info, f'Model configuration {model_config_id} not found.'
                 self._model_configs[model_config_id] = model_info
     
@@ -563,6 +569,7 @@ class Chatroom:
                                     self._mcp_tool_uses.append({
                                         'index': mcp_tool_index,
                                         'name': mcp_tool_name,
+                                        'skill_or_workflow_name': None,
                                         'args': '',
                                         'result': None
                                     })
@@ -649,9 +656,17 @@ class Chatroom:
                     # Send the MCP tool use instructions to the frontend
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
                         mcp_tool_use['args'] = json.loads(mcp_tool_use['args'])
+                        if mcp_tool_use['name'] == 'skill_run':
+                            skill = custom_tools.get_skill_by_id(mcp_tool_use['args']['id'])
+                            app = apps.get_app_by_id(skill['app_id'])
+                            mcp_tool_use['skill_or_workflow_name'] = app['name']
+                        elif mcp_tool_use['name'] == 'workflow_run':
+                            workflow = workflows.get_workflow_app(mcp_tool_use['args']['id'])
+                            mcp_tool_use['skill_or_workflow_name'] = workflow['name']
                         mcp_tool_use_in_message = {
                             'index': index,
                             'name': mcp_tool_use['name'],
+                            'skill_or_workflow_name': mcp_tool_use['skill_or_workflow_name'],
                             'args': mcp_tool_use['args']
                         }
                         await self._ws_manager.send_instruction(
@@ -726,6 +741,7 @@ class Chatroom:
                         })
                         mcp_tool_str = json.dumps({
                             'name': mcp_tool_use['name'],
+                            'skill_or_workflow_name': mcp_tool_use['skill_or_workflow_name'],
                             'args': mcp_tool_use['args'],
                             'result': mcp_tool_use['result']
                         }, ensure_ascii=False)
