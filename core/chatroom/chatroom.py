@@ -684,7 +684,7 @@ class Chatroom:
                     # Invoke the MCP tool(s) of the built-in MCP server
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
                         if mcp_tool_use['name'] in ['workflow_run', 'skill_run']:
-                            if mcp_tool_use['result'] is None:
+                            if result := mcp_tool_use['result'] is None:
                                 mcp_tool_args = mcp_tool_use['args']
                                 mcp_tool_args['user_id'] = self._user_id
                                 mcp_tool_args['team_id'] = self._team_id
