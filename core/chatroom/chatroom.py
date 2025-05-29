@@ -513,7 +513,7 @@ class Chatroom:
             # Request LLM
             agent_run_ids = []
             agent_message = ''
-            while True:
+            for _ in range(20):
                 current_agent_message = ''
 
                 messages, messages_in_last_section, user_messages = self._get_history_messages_list_grouped(self._model_config_ids[agent_id])
