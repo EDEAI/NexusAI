@@ -691,13 +691,16 @@ class Chatroom:
                                 try:
                                     logger.debug('Invoking MCP tool: %s', mcp_tool_use['name'])
                                     logger.debug('MCP tool args: %s', mcp_tool_args)
-                                    result = await self._mcp_client.call_tool(
-                                        mcp_tool_use['name'],
-                                        mcp_tool_args
+                                    result = await asyncio.wait_for(
+                                        self._mcp_client.call_tool(mcp_tool_use['name'], mcp_tool_args),
+                                        timeout=3600
                                     )
                                     logger.debug('MCP tool result: %s', result)
                                 except KeyError:
                                     raise Exception('Cannot connect to the built-in MCP server!')
+                                except asyncio.TimeoutError:
+                                    await self._stop_all_mcp_tool_uses('Timeout')
+                                    break
                                 if mcp_tool_use['name'] == 'skill_run':
                                     mcp_tool_use['result'] = result
                                 elif mcp_tool_use['name'] == 'workflow_run':
