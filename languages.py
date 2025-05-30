@@ -170,6 +170,7 @@ language_packs = {
             To invoke a workflow, please use the MCP tool workflow_run.
 
             If there are nodes in the workflow that require manual confirmation (as indicated by the need_confirm_nodes field), then for each of these nodes, you must select ONLY ONE most suitable team member from the team member list based on the node's name and description, the team members' names and email addresses, and the user's requirements, and assign the node to the team member for confirmation.
+            If there is no clear basis for selecting a member, just select the user.
 
             I will provide you with a list of skills and/or workflows.
             I will also provide you with the list of team members, if there are any workflows that require manual confirmation.
