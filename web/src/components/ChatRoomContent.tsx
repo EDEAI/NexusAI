@@ -990,9 +990,9 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
     useEffect(() => {
         const handleResize = () => {
             if(window.innerWidth < 1280){
-                // setbminWidth();
+                
             }else{
-                setbminWidth((window.innerWidth - 320) - (window.innerWidth - 320)/2);
+                setbminWidth((window.innerWidth - 320) - (window.innerWidth - 320)/2 - 88);
             }
         };
 

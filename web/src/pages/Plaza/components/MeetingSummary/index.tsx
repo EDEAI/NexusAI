@@ -26,7 +26,6 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
     const totalPages = useRef(0)
     const [isLoad,setisLoad] = useState(false);
     const [bMaxWidth,setbMaxWidth] = useState(800);
-
     const summaryParams = useChatroomStore(state=>state.summaryParams);
     const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
 
@@ -112,11 +111,10 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
 
     useEffect(() => {
         const handleResize = () => {
-            if(window.innerWidth < 1480){
-                setbMaxWidth((window.innerWidth - 320)/2)
-            }else{
+            if(window.innerWidth < 1280){
                 setbMaxWidth(400)
             }
+            setbMaxWidth((window.innerWidth - 320)/2)
         };
 
         // 添加事件监听器
