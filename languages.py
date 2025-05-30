@@ -58,6 +58,7 @@ language_packs = {
             If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
+            {team_members}
         ''',
         "agent_system_prompt_with_auto_match_ability_direct_output": '''
             You are an AI agent.
@@ -89,6 +90,7 @@ language_packs = {
             If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
+            {team_members}
         ''',
         "agent_system_prompt_with_abilities": '''
             You are an AI agent.
@@ -121,6 +123,7 @@ language_packs = {
             If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
+            {team_members}
         ''',
         "agent_system_prompt_with_no_ability": '''
             You are an AI agent.
@@ -150,6 +153,7 @@ language_packs = {
             If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
             {callable_skills}
             {callable_workflows}
+            {team_members}
         ''',
         "agent_retrieved_docs_format": '''I will provide the information retrieved from the knowledge base based on the user input text in the following JSON format: [{'content': content, 'source': source document name}, ...]\n''',
         "agent_reply_requirement_with_auto_match_ability": "Please match one corresponding ability based on the user input information and reply in the format corresponding to the ability.",
@@ -164,14 +168,18 @@ language_packs = {
             You can also invoke certain skills or workflows.
             To invoke a skill, please use the MCP tool skill_run;
             To invoke a workflow, please use the MCP tool workflow_run.
+
+            If there are nodes in the workflow that require manual confirmation (as indicated by the need_confirm_nodes field), then for each of these nodes, you should select one or more suitable team members from the team member list based on the node's name and description, the team members' names and email addresses, and the user's requirements, and assign the node to them for confirmation.
+
             I will provide you with a list of skills and/or workflows.
+            I will also provide you with the list of team members, if there are any workflows that require manual confirmation.
 
             The skills/workflows list contains one or more dictionaries (skills/workflows);
-            The format of each skill/workflow is as follows:
+            The format of each skill is as follows:
             {
-                "id": skill or workflow id,
-                "name": skill or workflow name,
-                "description": skill or workflow description,
+                "id": skill id,
+                "name": skill name,
+                "description": skill description,
                 "input_variables": {
                     "name": "input_var" or something else,
                     "type": "object",
@@ -187,9 +195,37 @@ language_packs = {
                     }
                 }
             }
-            The parameter format for invoking the MCP tool (skill_run or workflow_run) is as follows:
+            The format of each workflow is as follows:
             {
-                "id": ID of the skill or workflow you want to invoke,
+                "id": workflow id,
+                "name": workflow name,
+                "description": workflow description,
+                "need_confirm_nodes": [
+                    {
+                        "node_id": node id,
+                        "node_name": node name,
+                        "node_desc": node description
+                    },
+                    ...
+                ],
+                "input_variables": {
+                    "name": "input_var" or something else,
+                    "type": "object",
+                    "properties": {
+                        variable name: {
+                            "name": Name of the variable.
+                            "required": Whether the variable is mandatory.
+                            "display_name": Display name of the variable. It can be used as a description of the function and purpose of the variable.
+                            "type": The variable type. It can be "number" or "string".
+                            "value": Empty value.
+                        },
+                        ...
+                    }
+                }
+            }
+            The parameter format for invoking the MCP tool skill_run or is as follows:
+            {
+                "id": ID of the skill you want to invoke,
                 "user_id": null (we will replace it with actual data),
                 "team_id": null (we will replace it with actual data),
                 "input_variables": {
@@ -197,6 +233,22 @@ language_packs = {
                     ...
                 }
             }
+            The parameter format for invoking the MCP tool or workflow_run is as follows:
+            {
+                "id": ID of the workflow you want to invoke,
+                "user_id": null (we will replace it with actual data),
+                "team_id": null (we will replace it with actual data),
+                "node_confirm_users": the node id and the user id(s) that need to confirm the node, as follows
+                {
+                    node id: [user id, ...],
+                    ...
+                },
+                "input_variables": {
+                    variable name: corresponding variable value you want to pass in,
+                    ...
+                }
+            }
+            Note that sometimes the name of a user/skill/workflow might look like an ID number, but you must still pass in its ID, not its name.
             Please invoke the MCP tool according to the correct parameter format.
         ''',
         "agent_callable_skills": '''
@@ -210,6 +262,12 @@ language_packs = {
             ********************Start of the list of callable workflows********************
             {workflow_list}
             ********************End of the list of callable workflows********************
+        ''',
+        "agent_team_members": '''
+            Below is the list of team members:
+            ********************Start of the list of team members********************
+            {team_members}
+            ********************End of the list of team members********************
         ''',
         "agent_user_prompt": '''
             Below is the user's questions or needs:
@@ -473,7 +531,7 @@ language_packs = {
             Then, respond according to the following requirements:
             1. Please only select agents from the provided agent list. Do not select agents that exist in the conversation history but not in the agent list;
             2. Please select the next agent to speak based on the summary and all agents' responsibilities and capabilities. If you are unsure, please select the agent whose responsibilities and capabilities most closely match the historical message content;
-            3. Please return in JSON format: {"summary": summary, "id": the ID of the agent you selected}. Sometimes an agent's name might look like an ID number, but you must still return the agent's ID, not their name.
+            3. Please return in JSON format: {"summary": summary, "id": the ID of the agent you selected}. Sometimes an agent's name might look like an ID number, but you must still return the agent's ID, not its name.
         ''',
 
         'chatroom_manager_system_with_optional_selection': '''

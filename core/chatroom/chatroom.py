@@ -393,10 +393,13 @@ class Chatroom:
                 prompt=Prompt(system_prompt, user_prompt)
             )
             llm_node.schema_key = schema_key
-            result = await asyncio.to_thread(
-                llm_node.run,
-                return_json=True,
-                override_file_list=self._image_list if self._current_round == 0 else None
+            result = await asyncio.wait_for(
+                asyncio.to_thread(
+                    llm_node.run,
+                    return_json=True,
+                    override_file_list=self._image_list if self._current_round == 0 else None
+                ),
+                timeout=120
             )
             assert result['status'] == 'success', result['message']
             result_data = result['data']
