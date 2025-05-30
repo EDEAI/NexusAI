@@ -10,7 +10,7 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 from typing import Dict, Optional, Any
 from log import Logger
 from core.database import redis
-from core.database.models import AppRuns, AppNodeExecutions, AppNodeUserRelation, UploadFiles
+from core.database.models import AppRuns, AppNodeExecutions, AppNodeUserRelation, UploadFiles, Users
 from core.workflow import *
 from core.workflow.nodes import *
 from celery_app import run_workflow_node
@@ -28,6 +28,7 @@ level_tasks = {}  # Dictionary to store tasks status for each level
 app_run = AppRuns()
 app_node_exec = AppNodeExecutions()
 app_node_user_relation = AppNodeUserRelation()
+users_model = Users()
 
 def update_app_run(app_run_id: int, data: dict) -> bool:
     """
@@ -405,9 +406,7 @@ def push_human_confirm_message(
     :param run_type: The type of the run.
     :param run_name: The name of the run.
     :param edge: The edge object.
-    :param node_id: The ID of the node.
-    :param node_type: The type of the node.
-    :param node_name: The name of the node.
+    :param node: The node object.
     :param exec_id: The ID of the node execution record.
     :param run_status: The status of the run.
     :param parent_exec_id: The ID of the parent node execution record.
@@ -416,6 +415,8 @@ def push_human_confirm_message(
     user_ids = [user_id] if run_type == 1 else app_node_user_relation.get_node_user_ids(app_run_id, node.id)
     if run_status == 4 and user_id not in user_ids:
         user_ids.append(user_id)
+    
+    # Push normal confirmation messages to users who need to confirm
     for uid in user_ids:
         data = {
             'user_id': uid,
@@ -443,6 +444,48 @@ def push_human_confirm_message(
         }
         push_to_websocket_queue(data)
         logger.info(f"Human confirm message pushed for user_id:{uid} run:{app_run_id} node:{node.id}:{node.data['type']}:{node.data['title']} exec_id:{exec_id} data:{data} queue_length:{get_websocket_queue_length()}")
+
+    # If the actual runner is not in the confirmation users list, send a waiting message
+    if run_type != 1 and run_status != 4 and user_id not in user_ids:
+        waiting_users = []
+        
+        # Get information of users who need to confirm
+        for uid in user_ids:
+            user_info = users_model.get_user_by_id(uid)
+            if user_info:
+                waiting_users.append({
+                    'user_id': uid,
+                    'nickname': user_info.get('nickname', f'User_{uid}')
+                })
+        
+        # Send waiting message to the actual runner
+        waiting_data = {
+            'user_id': user_id,
+            'type': 'workflow_waiting_for_confirm',
+            'data': {
+                'app_id': app_id,
+                'app_name': app_name,
+                'icon': icon,
+                'icon_background': icon_background,
+                'workflow_id': workflow_id,
+                'app_run_id': app_run_id,
+                'type': run_type,
+                'run_name': run_name,
+                'node_exec_data': {
+                    'node_exec_id': exec_id,
+                    'level': edge.level,
+                    'edge_id': edge.id if edge else None,
+                    'node_id': node.id,
+                    'node_type': node.data['type'],
+                    'node_name': node.data['title'],
+                    'parent_exec_id': parent_exec_id,
+                    'first_task_exec_id': first_task_exec_id
+                },
+                'waiting_users': waiting_users
+            }
+        }
+        push_to_websocket_queue(waiting_data)
+        logger.info(f"Waiting confirm message pushed for runner user_id:{user_id} run:{app_run_id} node:{node.id}:{node.data['type']}:{node.data['title']} exec_id:{exec_id} waiting_users:{waiting_users} queue_length:{get_websocket_queue_length()}")
 
 def push_remove_human_confirm_message(
     user_id: int,
