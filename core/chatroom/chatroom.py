@@ -691,6 +691,10 @@ class Chatroom:
                                 mcp_tool_args = mcp_tool_use['args']
                                 mcp_tool_args['user_id'] = self._user_id
                                 mcp_tool_args['team_id'] = self._team_id
+                                if mcp_tool_use['name'] == 'workflow_run' and (node_confirm_users := mcp_tool_args.get('node_confirm_users')):
+                                    for user_ids in node_confirm_users.values():
+                                        if user_ids == [0]:
+                                            user_ids[0] = self._user_id
                                 try:
                                     logger.debug('Invoking MCP tool: %s', mcp_tool_use['name'])
                                     logger.debug('MCP tool args: %s', mcp_tool_args)
