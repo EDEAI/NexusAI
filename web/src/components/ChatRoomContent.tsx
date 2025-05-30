@@ -891,6 +891,8 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
 
     let intl = useIntl();
 
+    const [bminWidth, setbminWidth] = useState(860);
+
     const { id } = useParams<{ id: string }>();
     // const setDisableInput = useChatroomStore(state=>state.setDisableInput)
     // chat history
@@ -985,6 +987,23 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
         roomMessagepage.current = 1;
         getChathistory(true);
     }, []);
+    useEffect(() => {
+        const handleResize = () => {
+            if(window.innerWidth < 1280){
+                // setbminWidth();
+            }else{
+                setbminWidth((window.innerWidth - 320) - (window.innerWidth - 320)/2);
+            }
+        };
+
+        // 添加事件监听器
+        window.addEventListener('resize', handleResize);
+
+        // 清除事件监听器
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
     return (
         <div className="flex-1 min-h-0">
             <div
@@ -992,7 +1011,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                 ref={scrollDomRef}
                 onScroll={slideScroll}
             >
-                <div className="min-w-[860px]">
+                <div  style={{minWidth:`${bminWidth}px`}}>
                     <div className="w-full">
                         <div className="flex flex-col-reverse">
                             <>

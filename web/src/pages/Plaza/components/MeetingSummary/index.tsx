@@ -25,6 +25,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
     const isUpload = useRef(true);
     const totalPages = useRef(0)
     const [isLoad,setisLoad] = useState(false);
+    const [bMaxWidth,setbMaxWidth] = useState(800);
 
     const summaryParams = useChatroomStore(state=>state.summaryParams);
     const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
@@ -108,13 +109,31 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
             setOrientationShow(true)
         }
     },[contentShow])
+
+    useEffect(() => {
+        const handleResize = () => {
+            if(window.innerWidth < 1480){
+                setbMaxWidth((window.innerWidth - 320)/2)
+            }else{
+                setbMaxWidth(400)
+            }
+        };
+
+        // 添加事件监听器
+        window.addEventListener('resize', handleResize);
+
+        // 清除事件监听器
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
     
     return (
         <>
             
             {
                 contentShow ? 
-                    <div style={{overflow:packUp?'hidden':'initial'}} className='relative pl-[32px] box-border'>
+                    <div style={{overflow:packUp?'hidden':'initial'}} className="pl-[32px] box-border relative">
                         <div onClick={()=>{ setPackUp(pre=>!pre)}} className={`
                                 ${!packUp?'absolute left-[2px] top-[60px]':'absolute left-[2px]  top-[60px]' }
                                 history_packup
@@ -125,6 +144,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                         </div>
                         <DraggablePanel
                             minWidth={400}
+                            maxWidth={bMaxWidth}
                             className={`relative h-full right-0 border-0 returned-0 px-[0] ${packUp?'hidden flex-[0]':'block'}`}
                         >
                             {boxLoading?<div className='h-full w-full absolute top-0 left-0 flex justify-center items-center z-[100] bg-[rgba(255,255,255,0.5)]'><Spin size="large" /></div>:<></>}
