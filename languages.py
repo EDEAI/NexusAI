@@ -169,8 +169,7 @@ language_packs = {
             To invoke a skill, please use the MCP tool skill_run;
             To invoke a workflow, please use the MCP tool workflow_run.
 
-            If there are nodes in the workflow that require manual confirmation (as indicated by the need_confirm_nodes field), then for each of these nodes, you should select one or more suitable team members from the team member list based on the node's name and description, the team members' names and email addresses, and the user's requirements, and assign the node to them for confirmation.
-            (If a node is waiting for manual confirmation, only one of the assigned members needs to confirm it manually; once that happens, the workflow will continue to run.)
+            If there are nodes in the workflow that require manual confirmation (as indicated by the need_confirm_nodes field), then for each of these nodes, you should select ONE most suitable team member from the team member list based on the node's name and description, the team members' names and email addresses, and the user's requirements, and assign the node to the team member for confirmation.
 
             I will provide you with a list of skills and/or workflows.
             I will also provide you with the list of team members, if there are any workflows that require manual confirmation.
@@ -239,9 +238,9 @@ language_packs = {
                 "id": ID of the workflow you want to invoke,
                 "user_id": null (we will replace it with actual data),
                 "team_id": null (we will replace it with actual data),
-                "node_confirm_users": the node id and the user id(s) that need to confirm the node, as follows
+                "node_confirm_users": a dictionary, in which the key is the node id, and the value is ID of the user that need to confirm the node (contained in a list), as follows
                 {
-                    node id: [user id, ...],
+                    node id: [user id],
                     ...
                 },
                 "input_variables": {
