@@ -250,6 +250,8 @@ language_packs = {
             }
             Note that sometimes the name of a user/skill/workflow might look like an ID number, but you must still pass in its ID, not its name.
             Please invoke the MCP tool according to the correct parameter format.
+            
+            Besides, do not mention anything related to the IDs of users/skills/workflows when responding to the user.
         ''',
         "agent_callable_skills": '''
             Below is the list of callable skills:
