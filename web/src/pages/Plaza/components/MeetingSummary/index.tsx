@@ -26,6 +26,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
     const totalPages = useRef(0)
     const [isLoad,setisLoad] = useState(false);
     const [bMaxWidth,setbMaxWidth] = useState(800);
+    const [slideFixed,setSlideFixed] = useState(false);
     const summaryParams = useChatroomStore(state=>state.summaryParams);
     const setSummaryParams = useChatroomStore(state=>state.setSummaryParams);
 
@@ -110,13 +111,20 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
     },[contentShow])
 
     useEffect(() => {
+        
         const handleResize = () => {
             if(window.innerWidth < 1280){
                 setbMaxWidth(400)
+                setSlideFixed(true)
+                setPackUp(true)
+            }else{
+                setbMaxWidth((window.innerWidth - 320)/2)
+                setSlideFixed(false)
+                setPackUp(false)
             }
-            setbMaxWidth((window.innerWidth - 320)/2)
+            
         };
-
+        handleResize()
         // 添加事件监听器
         window.addEventListener('resize', handleResize);
 
@@ -131,7 +139,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
             
             {
                 contentShow ? 
-                    <div style={{overflow:packUp?'hidden':'initial'}} className="pl-[32px] box-border relative">
+                    <div style={{overflow:packUp?'hidden':'initial'}} className={`pl-[32px] box-border ${!slideFixed?'relative':'fixed top-[56px] right-0 bottom-0'}`}>
                         <div onClick={()=>{ setPackUp(pre=>!pre)}} className={`
                                 ${!packUp?'absolute left-[2px] top-[60px]':'absolute left-[2px]  top-[60px]' }
                                 history_packup

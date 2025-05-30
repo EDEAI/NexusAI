@@ -996,6 +996,8 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
             }
         };
 
+        handleResize()
+
         // 添加事件监听器
         window.addEventListener('resize', handleResize);
 
