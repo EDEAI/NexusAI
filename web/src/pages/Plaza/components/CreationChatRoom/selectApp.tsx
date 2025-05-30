@@ -1,4 +1,3 @@
-
 import Scroll from '@/components/InfiniteScroll';
 import { headportrait } from '@/utils/useUser';
 import Avatar from '@/components/ChatAvatar';
@@ -72,7 +71,7 @@ const Content: React.FC<params> = param => {
         if (res?.code == 0) {
             const newList = res.data.list.map(item => ({
                 ...item,
-                check: isCheckAagent(item,data.search_type)
+                check: isCheckAagent(item, data.search_type)
             }));
     
             const updateList = (list, setList) => {
@@ -88,10 +87,19 @@ const Content: React.FC<params> = param => {
         }
     };
     const setSeachInput = (e: any) => {
-        parameters.current.apps_name = e.target.value;
+        e.preventDefault();
+        e.stopPropagation();
+        const searchValue = e.target.value || inputval;
+        parameters.current.apps_name = searchValue;
         parameters.current.page = 1;
         getList(parameters.current, true);
     };
+    
+    const handleSearchInputChange = (e: any) => {
+        setInputVal(e.target.value);
+     
+    };
+    
     const radiocheckMyItem = (type, item) => {
         const isTypeThree = type == 3;
         item.type = isTypeThree ? `my_${nodetype}` : `more_${nodetype}`;
@@ -114,12 +122,12 @@ const Content: React.FC<params> = param => {
         const updateList = (list, id) => list.map(i => ({ ...i, check: i.app_id == id ? !i.check : i.check }));
         type == 3 ? setMyList(pre => updateList(pre, item.app_id)) : setMoreList(pre => updateList(pre, item.app_id));
     };
-    const isCheckAagent = (item: any,type) => {
+    const isCheckAagent = (item: any, type) => {
         const currentCheckList = checkItems.current;
-        if(radio && currentCheckList.length>1){
-            return 0
+        if(radio && currentCheckList.length > 1){
+            return 0;
         }
-        return currentCheckList.some(i => i.app_id == item.app_id)?1:0;
+        return currentCheckList.some(i => i.app_id == item.app_id) ? 1 : 0;
     };
     const Cancel = () => {
         popupClose();
@@ -263,7 +271,7 @@ const Content: React.FC<params> = param => {
                                     placeholder={intl.formatMessage({
                                         id: `app.check_${nodetype}_popup.search`,
                                     })}
-                                    onChange={(e) => setInputVal(e.target.value)}
+                                    onChange={handleSearchInputChange}
                                     value={inputval}
                                     prefix={
                                         <img
