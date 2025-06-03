@@ -930,10 +930,12 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                         : [...pre, ...res.data.list.reverse()];
                 });
                 if (init) {
-                    setTimeout(() => {
-                        scrollDomRef.current.scrollTop = 0;
-                        upButtonDom.current.style.display = 'none';
-                    });
+                    if(scrollDomRef && scrollDomRef.current){
+                        setTimeout(() => {
+                            scrollDomRef.current.scrollTop = 0;
+                            upButtonDom.current.style.display = 'none';
+                        });
+                    }
                 } else {
                     newAddLength.current = res.data.list.length;
                     // toTOP({ length: res.data.list.length });

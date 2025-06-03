@@ -38,7 +38,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
         let resData=await getMeetingSummaryHistory({
             'chatroom_id':id,
             'page':historyPage.current,
-            'page_size':10
+            'page_size':2
         })
         if(resData.code == 0){
             if(resData?.data?.list && resData?.data?.list?.length){
@@ -63,29 +63,14 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
         }
     }
 
-    const throttle = (func, limit) => {
-        let inThrottle;
-        return function() {
-            const args = arguments;
-            const context = this;
-            if (!inThrottle) {
-                func.apply(context, args);
-                inThrottle = true;
-                setTimeout(() => {
-                    inThrottle = false;
-                }, limit);
-            }
-        }
-    }
-
-    const historyLoad =throttle(async(e)=>{
+    const historyLoad =(e)=>{
         if( e.target.scrollHeight + (e.target.scrollTop - e.target.clientHeight) < 400 && isUpload.current){
             isUpload.current = false
             setisLoad(true)
             historyPage.current = historyPage.current+=1
             getSummaryHistory(true,false)
         }
-    },800)
+    }
 
     
 
