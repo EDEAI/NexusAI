@@ -46,9 +46,9 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                 setSummaryHistory(pre=>{
                     return init? [...resData.data.list.reverse()] : [...resData.data.list.reverse(),...pre]
                 });
+                isUpload.current = true
                 setContentShow(true);
-                setisLoad(true)
-                setTimeout(()=>{isUpload.current = true},500)
+                setisLoad(true);
             }
             if(init){
                 setTimeout(()=>{
@@ -59,18 +59,36 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
                 setRoomId(summaryParams.id)
                 setSummaryParams({})
             }
+           
         }
     }
 
-    const historyLoad =async(e)=>{
+    const throttle = (func, limit) => {
+        let inThrottle;
+        return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => {
+                    inThrottle = false;
+                }, limit);
+            }
+        }
+    }
+
+    const historyLoad =throttle(async(e)=>{
         if( e.target.scrollHeight + (e.target.scrollTop - e.target.clientHeight) < 400 && isUpload.current){
             isUpload.current = false
             setisLoad(true)
             historyPage.current = historyPage.current+=1
             getSummaryHistory(true,false)
         }
+    },800)
 
-    }
+    
+
     
     useEffect(()=>{
         historyPage.current = 1
@@ -79,6 +97,8 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
 
 
     useEffect(()=>{
+        console.log(summaryParams);
+        
         if(summaryParams && summaryParams.id){
             setContentShow(true);
             if(!inputShow){
@@ -111,12 +131,14 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
     },[contentShow])
 
     useEffect(() => {
+        console.log(isLoad);
         
         const handleResize = () => {
             if(window.innerWidth < 1280){
                 setbMaxWidth(400)
                 setSlideFixed(true)
-                setPackUp(true)
+                console.log(scrollDom);
+                setTimeout(()=>{setPackUp(true)},200)
             }else{
                 setbMaxWidth((window.innerWidth - 320)/2)
                 setSlideFixed(false)
@@ -139,7 +161,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
             
             {
                 contentShow ? 
-                    <div style={{overflow:packUp?'hidden':'initial'}} className={`pl-[32px] box-border ${!slideFixed?'relative':'fixed top-[56px] right-0 bottom-0'}`}>
+                    <div style={{overflow:packUp?'hidden':'initial'}} className={`pl-[32px] box-border ${!slideFixed?'relative':'fixed  right-0 bottom-0 top-[56px]'}`}>
                         <div onClick={()=>{ setPackUp(pre=>!pre)}} className={`
                                 ${!packUp?'absolute left-[2px] top-[60px]':'absolute left-[2px]  top-[60px]' }
                                 history_packup
