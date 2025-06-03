@@ -1545,6 +1545,7 @@ prompt_keys = {
     "agent_callable_items_description",
     "agent_callable_skills",
     "agent_callable_workflows",
+    "agent_team_members",
     "agent_user_prompt",
     "agent_user_prompt_with_retrieved_docs",
     "llm_reply_requirement_with_task_splitting",
