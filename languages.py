@@ -165,7 +165,7 @@ language_packs = {
         "agent_output_format_3": "in code format",
         "agent_output_format_2_md": "in JSON format contained in Markdown format",
         "agent_callable_items_description": '''
-            You can also invoke certain skills or workflows.
+            Please pay attention to the skills and workflow information I provided (names and descriptions), and fully understand the purpose of each skill and workflow. If the user's questions or needs match the purpose of skills or workflows, then you can invoke the corresponding skills or workflows.
             To invoke a skill, please use the MCP tool skill_run;
             To invoke a workflow, please use the MCP tool workflow_run.
 
