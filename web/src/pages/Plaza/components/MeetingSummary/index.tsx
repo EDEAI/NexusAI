@@ -38,7 +38,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
         let resData=await getMeetingSummaryHistory({
             'chatroom_id':id,
             'page':historyPage.current,
-            'page_size':2
+            'page_size':10
         })
         if(resData.code == 0){
             if(resData?.data?.list && resData?.data?.list?.length){
