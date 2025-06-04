@@ -76,7 +76,7 @@ export default {
     'createkb.deleteOperation': 'Delete Operation',
     'createkb.confirmDelete': 'Are you sure you want to delete?',
     
-    // New internationalization content
+    // Upload related internationalization
     'createkb.uploadToKnowledgeBase': 'Upload to Knowledge Base',
     'createkb.splitContent': 'Split Content',
     'createkb.splitType': 'Split Mode',
@@ -84,7 +84,31 @@ export default {
     'createkb.chunkOverlap': 'Character Overlap Limit per Chunk',
     'createkb.fileList': 'File List:',
     'createkb.deleteFile': 'Delete File',
+    'createkb.splitMode': 'Split Mode',
     
-    // Additional missing items
-    'createkb.splitMode': 'Split Mode'
+    // Upload progress and status
+    'createkb.upload.starting': 'Starting upload',
+    'createkb.upload.fileSize': 'File size',
+    'createkb.upload.progress': 'Uploading...',
+    'createkb.upload.complete': 'Upload completed',
+    'createkb.upload.failed': 'Upload failed',
+    'createkb.upload.success': 'File uploaded successfully',
+    'createkb.upload.error': 'File upload failed',
+    'createkb.upload.cancel': 'Cancel',
+    'createkb.upload.retry': 'Retry',
+    'createkb.upload.selectFileFirst': 'Please upload files first',
+    
+    // Error messages
+    'createkb.error.fileSize': 'File size cannot exceed 15MB',
+    'createkb.error.serverResponse': 'Server response data format error',
+    'createkb.error.httpStatus': 'Upload failed: HTTP',
+    'createkb.error.network': 'Network error, please check your connection',
+    'createkb.error.timeout': 'Upload timeout, please retry or check your network connection',
+    'createkb.error.cancelled': 'Upload cancelled',
+    'createkb.error.unknown': 'Unknown error',
+    
+    // Instructions
+    'createkb.instruction.dragOrClick': 'Drag files here or click to upload',
+    'createkb.instruction.uploadLimit': 'Support batch upload, single file no more than 15MB',
+    'createkb.instruction.retryUpload': 'Please select files to upload again'
 };
