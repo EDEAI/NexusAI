@@ -41,7 +41,8 @@ async def workflow_run(
     id: int, 
     input_variables: Dict[str, Any], 
     user_id: int, 
-    team_id: int
+    team_id: int,
+    node_confirm_users: Optional[Dict[str, List[int]]] = None
 ) -> Dict[str, Any]:
     """Run the specified workflow"""
     try:
@@ -63,7 +64,7 @@ async def workflow_run(
 
         # Get workflow with all conditions
         workflow = workflows_db.select_one(
-            columns=['id', 'user_id', 'graph', 'app_id'],
+            columns=['id', 'graph', 'app_id'],
             conditions=[
                 {'column': 'id', 'value': workflow_id},
                 {'column': 'status', 'value': 1},
@@ -94,7 +95,7 @@ async def workflow_run(
         # Create app run record
         start_datetime_str = datetime.now().replace(microsecond=0).isoformat(sep='_')
         app_run_data = {
-            'user_id': workflow['user_id'],
+            'user_id': user_id,
             'app_id': workflow['app_id'],
             'workflow_id': workflow['id'],
             'type': 2,
@@ -106,6 +107,9 @@ async def workflow_run(
         }
 
         app_run_id = appRuns_db.insert(app_run_data)
+
+        if node_confirm_users:
+            AppNodeUserRelation().create_data(app_run_id, node_confirm_users)
 
         apps_db.increment_execution_times(workflow['app_id'])
         apps_db.commit()

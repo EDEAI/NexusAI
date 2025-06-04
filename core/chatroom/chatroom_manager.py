@@ -32,6 +32,8 @@ project_root = Path(__file__).parent.parent.parent
 logger = Logger.get_logger('chatroom')
 
 app_runs = AppRuns()
+apps = Apps()
+chatroom_agent_relation = ChatroomAgentRelation()
 chatrooms = Chatrooms()
 chatroom_messages = ChatroomMessages()
 upload_files = UploadFiles()
@@ -148,7 +150,7 @@ class ChatroomManager:
                 {'column': 'id', 'value': chatroom_id},
                 {'chat_status': 1}
             )
-            Apps().increment_execution_times(app_id)
+            apps.increment_execution_times(app_id)
             start_datetime_str = datetime.fromtimestamp(start_time) \
                 .replace(microsecond=0).isoformat(sep='_')
             app_run_id = app_runs.insert(
@@ -164,7 +166,7 @@ class ChatroomManager:
             user_message_id, user_message, topic = 0, user_input, None
         try:
             # Get related agents
-            agent_relations = ChatroomAgentRelation().select(
+            agent_relations = chatroom_agent_relation.select(
                 columns=['agent_id'],
                 conditions=[
                     {'column': 'chatroom_id', 'value': chatroom_id},

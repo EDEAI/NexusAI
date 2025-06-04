@@ -19,8 +19,10 @@ from core.database.models import (
     Apps,
     ChatroomMessages,
     Chatrooms,
+    CustomTools,
+    Datasets,
     Models,
-    Datasets
+    Workflows
 )
 from core.helper import truncate_messages_by_token_limit, get_file_content_list
 from core.llm import Prompt
@@ -35,11 +37,15 @@ project_root = Path(__file__).parent.parent.parent
 logger = Logger.get_logger('chatroom')
 
 agent_abilities = AgentAbilities()
+agents = Agents()
 app_runs = AppRuns()
 apps = Apps()
 chatrooms = Chatrooms()
 chatroom_messages = ChatroomMessages()
+custom_tools = CustomTools()
 datasets = Datasets()
+models = Models()
+workflows = Workflows()
 
 
 class Chatroom:
@@ -49,14 +55,14 @@ class Chatroom:
         sys.stdout.flush()
 
     def _get_model_configs(self, all_agent_ids: Sequence[int], absent_agent_ids: Sequence[int]) -> None:
-        model_info = Models().get_model_by_type(1, self._team_id, uid=self._user_id)
+        model_info = models.get_model_by_type(1, self._team_id, uid=self._user_id)
         model_config_id = model_info['model_config_id']
         self._model_config_ids[0] = model_config_id
-        model_info = Models().get_model_by_config_id(model_config_id)
+        model_info = models.get_model_by_config_id(model_config_id)
         assert model_info, f'Model configuration {model_config_id} not found.'
         self._model_configs[model_config_id] = model_info
         for agent_id in all_agent_ids:
-            agent = Agents().select_one(
+            agent = agents.select_one(
                 columns=['id', 'app_id', 'apps.name', 'apps.description', 'obligations', 'model_config_id'],
                 joins=[('left', 'apps', 'agents.app_id = apps.id')],
                 conditions={'column': 'id', 'value': agent_id}  # Include deleted agents (with status=3)
@@ -69,7 +75,7 @@ class Chatroom:
             if agent_id not in absent_agent_ids:
                 model_config_id = agent['model_config_id']
                 self._model_config_ids[agent_id] = model_config_id
-                model_info = Models().get_model_by_config_id(model_config_id)
+                model_info = models.get_model_by_config_id(model_config_id)
                 assert model_info, f'Model configuration {model_config_id} not found.'
                 self._model_configs[model_config_id] = model_info
     
@@ -387,10 +393,13 @@ class Chatroom:
                 prompt=Prompt(system_prompt, user_prompt)
             )
             llm_node.schema_key = schema_key
-            result = await asyncio.to_thread(
-                llm_node.run,
-                return_json=True,
-                override_file_list=self._image_list if self._current_round == 0 else None
+            result = await asyncio.wait_for(
+                asyncio.to_thread(
+                    llm_node.run,
+                    return_json=True,
+                    override_file_list=self._image_list if self._current_round == 0 else None
+                ),
+                timeout=120
             )
             assert result['status'] == 'success', result['message']
             result_data = result['data']
@@ -507,7 +516,7 @@ class Chatroom:
             # Request LLM
             agent_run_ids = []
             agent_message = ''
-            while True:
+            for _ in range(20):
                 current_agent_message = ''
 
                 messages, messages_in_last_section, user_messages = self._get_history_messages_list_grouped(self._model_config_ids[agent_id])
@@ -563,6 +572,7 @@ class Chatroom:
                                     self._mcp_tool_uses.append({
                                         'index': mcp_tool_index,
                                         'name': mcp_tool_name,
+                                        'skill_or_workflow_name': None,
                                         'args': '',
                                         'result': None
                                     })
@@ -649,9 +659,23 @@ class Chatroom:
                     # Send the MCP tool use instructions to the frontend
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
                         mcp_tool_use['args'] = json.loads(mcp_tool_use['args'])
+                        if mcp_tool_use['name'] == 'skill_run':
+                            skill = custom_tools.get_skill_by_id(mcp_tool_use['args']['id'])
+                            if not skill:
+                                mcp_tool_use['result'] = 'Skill not found'
+                            else:
+                                app = apps.get_app_by_id(skill['app_id'])
+                                mcp_tool_use['skill_or_workflow_name'] = app['name']
+                        elif mcp_tool_use['name'] == 'workflow_run':
+                            workflow = workflows.get_workflow_app(mcp_tool_use['args']['id'])
+                            if not workflow:
+                                mcp_tool_use['result'] = 'Workflow not found'
+                            else:
+                                mcp_tool_use['skill_or_workflow_name'] = workflow['name']
                         mcp_tool_use_in_message = {
                             'index': index,
                             'name': mcp_tool_use['name'],
+                            'skill_or_workflow_name': mcp_tool_use['skill_or_workflow_name'],
                             'args': mcp_tool_use['args']
                         }
                         await self._ws_manager.send_instruction(
@@ -663,18 +687,41 @@ class Chatroom:
                     # Invoke the MCP tool(s) of the built-in MCP server
                     for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
                         if mcp_tool_use['name'] in ['workflow_run', 'skill_run']:
-                            mcp_tool_args = mcp_tool_use['args']
-                            mcp_tool_args['user_id'] = self._user_id
-                            mcp_tool_args['team_id'] = self._team_id
-                            try:
-                                result = await self._mcp_client.call_tool(
-                                    mcp_tool_use['name'],
-                                    mcp_tool_args
-                                )
-                            except KeyError:
-                                raise Exception('Cannot connect to the built-in MCP server!')
-                        if mcp_tool_use['name'] == 'skill_run':
-                            mcp_tool_use['result'] = result
+                            if result := mcp_tool_use['result'] is None:
+                                mcp_tool_args = mcp_tool_use['args']
+                                mcp_tool_args['user_id'] = self._user_id
+                                mcp_tool_args['team_id'] = self._team_id
+                                if mcp_tool_use['name'] == 'workflow_run' and (node_confirm_users := mcp_tool_args.get('node_confirm_users')):
+                                    for user_ids in node_confirm_users.values():
+                                        if user_ids == [0]:
+                                            user_ids[0] = self._user_id
+                                try:
+                                    logger.debug('Invoking MCP tool: %s', mcp_tool_use['name'])
+                                    logger.debug('MCP tool args: %s', mcp_tool_args)
+                                    result = await asyncio.wait_for(
+                                        self._mcp_client.call_tool(mcp_tool_use['name'], mcp_tool_args),
+                                        timeout=3600
+                                    )
+                                    logger.debug('MCP tool result: %s', result)
+                                except KeyError:
+                                    raise Exception('Cannot connect to the built-in MCP server!')
+                                except asyncio.TimeoutError:
+                                    await self._stop_all_mcp_tool_uses('Timeout')
+                                    break
+                                if mcp_tool_use['name'] == 'skill_run':
+                                    mcp_tool_use['result'] = result
+                                elif mcp_tool_use['name'] == 'workflow_run':
+                                    if result.startswith('Error executing tool workflow_run:'):
+                                        result = json.dumps(
+                                            {'status': 'failed', 'message': result},
+                                            ensure_ascii=False
+                                        )
+                                        mcp_tool_use['result'] = result
+                                    else:
+                                        result = json.dumps(
+                                            {'status': 'success', 'message': 'Workflow run successfully'}
+                                        )
+                                        # Not set the result of workflow_run, because it will be set by the client later
                             await self._ws_manager.send_instruction(
                                 self._chatroom_id,
                                 'WITHMCPTOOLRESULT',
@@ -711,6 +758,7 @@ class Chatroom:
                         })
                         mcp_tool_str = json.dumps({
                             'name': mcp_tool_use['name'],
+                            'skill_or_workflow_name': mcp_tool_use['skill_or_workflow_name'],
                             'args': mcp_tool_use['args'],
                             'result': mcp_tool_use['result']
                         }, ensure_ascii=False)

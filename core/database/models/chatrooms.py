@@ -121,6 +121,7 @@ class Chatrooms(MySQL):
             {"column": "apps.status", "value": 1},
             {"column": "apps.mode", "value": 5},
             {"column": "chatrooms.user_id", "value": uid},
+            {"column": "chatrooms.chat_agent_id", "value": 0},
             {"column": "chatrooms.is_temporary", "value": 0},
         ]
 

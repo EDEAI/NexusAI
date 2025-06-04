@@ -511,6 +511,8 @@ class Agents(MySQL):
         :param uid: User ID.
         :return: A dictionary representing the result record.
         """
+        from core.database.models.chatrooms import Chatrooms
+
         # verify app
         apps_model = Apps()
         app = apps_model.select_one(columns="*",
@@ -551,10 +553,76 @@ class Agents(MySQL):
                 # delete chatroom agent relation
                 chatroom_agent_relation_model = ChatroomAgentRelation()
                 chatroom_agent_relation_model.delete({"column": "agent_id", "value": agent_val["id"]})
+
+                # delete agent chatrooms
+                agent_chatrooms = Chatrooms().select(
+                    columns=["id", "app_id"],
+                    conditions=[
+                        {"column": "chat_agent_id", "value": agent_val["id"]},
+                        {"column": "status", "value": 1}
+                    ]
+                )
+                for agent_chatroom in agent_chatrooms:
+                    Chatrooms().update(
+                        {"column": "id", "value": agent_chatroom["id"]},
+                        {"status": 3}
+                    )
+                    Apps().update(
+                        {"column": "id", "value": agent_chatroom["app_id"]},
+                        {"status": 3}
+                    )
+                    ChatroomAgentRelation().delete(
+                        {"column": "chatroom_id", "value": agent_chatroom["id"]}
+                    )
         except:
             return {"status": 2, "message": get_language_content("api_agent_delete_agent_delete_error")}
 
         return {"status": 1, "message": get_language_content("api_agent_success"), "data": {}}
+
+    def _get_agent_chatroom_id(self, agent_id: int, user_id: int, team_id: int) -> int:
+        from core.database.models.chatrooms import Chatrooms
+
+        chatroom_info = Chatrooms().select_one(
+            columns=['id'],
+            conditions=[
+                {'column': 'team_id', 'value': team_id},
+                {'column': 'user_id', 'value': user_id},
+                {'column': 'chat_agent_id', 'value': agent_id},
+                {'column': 'status', 'value': 1}
+            ]
+        )
+        if chatroom_info:
+            return chatroom_info['id']
+        else:
+            # Create a new chatroom
+            app_id = Apps().insert(
+                {
+                    'team_id': team_id,
+                    'user_id': user_id,
+                    'name': f'Agent Chat {user_id}-{agent_id}',
+                    'description': f'Agent Chat for user {user_id} and agent {agent_id}',
+                    'is_public': 0,
+                    'mode': 5,  # Chatroom
+                    'status': 1
+                }
+            )
+            chatroom_id = Chatrooms().insert(
+                {
+                    'team_id': team_id,
+                    'user_id': user_id,
+                    'app_id': app_id,
+                    'chat_agent_id': agent_id,
+                    'is_temporary': 0,
+                    'max_round': 10
+                }
+            )
+            ChatroomAgentRelation().insert_agent(
+                {
+                    'chatroom_id': chatroom_id,
+                    'agent': [{'agent_id': agent_id, 'active': 1}]
+                }
+            )
+            return chatroom_id
 
     def agent_info(self, app_id: int, publish_status: int, uid: int, team_id: int):
         """
@@ -665,6 +733,8 @@ class Agents(MySQL):
             ]
         )
 
+        agent_chatroom_id = self._get_agent_chatroom_id(agent["agent_id"], uid, team_id)
+
         if app["user_id"] != uid and app["attrs_are_visible"] != 1:
             input_variables = {
                 "agent_id": agent['agent_id'],
@@ -674,6 +744,7 @@ class Agents(MySQL):
             data = {
                 "app": app,
                 "agent": input_variables,
+                "agent_chatroom_id": agent_chatroom_id,
                 "callable_items": callable_items,
                 "agent_dataset_relation_list": '',
                 "agent_abilities_list": '',
@@ -685,6 +756,7 @@ class Agents(MySQL):
             data = {
                 "app": app,
                 "agent": agent,
+                "agent_chatroom_id": agent_chatroom_id,
                 "callable_items": callable_items,
                 "agent_dataset_relation_list": agent_dataset_relation_list,
                 "agent_abilities_list": agent_abilities_list,

@@ -18,7 +18,7 @@ from core.database.models.agent_chat_messages import AgentChatMessages
 from core.database.models import (
     Apps, AppNodeExecutions, AppRuns,
     AgentAbilities, AgentCallableItems, AgentDatasetRelation, Agents,
-    Chatrooms, CustomTools, Workflows
+    Chatrooms, CustomTools, Users, Workflows
 )
 from core.dataset import DatasetRetrieval
 from core.llm.prompt import Prompt, replace_prompt_with_context
@@ -146,6 +146,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 'agent_callable_workflows',
                 append_ret_lang_prompt=False
             ).format(workflow_list=json.dumps(callable_workflows, ensure_ascii=False)) if callable_workflows else '',
+            'team_members': get_language_content(
+                'agent_team_members',
+                append_ret_lang_prompt=False
+            ).format(team_members=(
+                json.dumps(self._get_team_members(user_id), ensure_ascii=False)
+                if callable_workflows and any(workflow['need_confirm_nodes'] for workflow in callable_workflows) else ''
+            )),
             'retrieved_docs_format': '',
             'reply_requirement': '',
         }
@@ -320,7 +327,29 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
 
         return output_format, input_
     
+    def _get_team_members(self, user_id: int) -> List[Dict[str, Any]]:
+        current_user = Users().get_user_by_id(user_id)
+        team_members = []
+        user_info_list = Users().select(
+            columns=['id', 'nickname', 'email'],
+            conditions=[
+                {'column': 'team_id', 'value': current_user['team_id']},
+                {'column': 'status', 'value': 1}
+            ]
+        )
+        for user in user_info_list:
+            if user['email']:
+                member_info = {
+                    'user_id': user['id'],
+                    'nickname': user['nickname'],
+                    'email': user['email']
+                }
+                team_members.append(member_info)
+        return team_members
+    
     def _get_callable_items(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        from core.workflow.graph import create_graph_from_dict
+        
         callable_skills = []
         callable_workflows = []
         for callable_item in AgentCallableItems().get_callable_items_by_agent_id(self.data['agent_id']):
@@ -330,12 +359,29 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     callable_skills.append(skill)
                 case 2:
                     workflow = Workflows().get_workflow_by_app_id(callable_item['app_id'])
-                    input_variables = workflow.pop('graph')['nodes'][0]['data']['input']
+                    graph = create_graph_from_dict(workflow.pop('graph'))
+                    input_variables = graph.nodes.nodes[0].data['input']
                     input_variables = [
-                        {k: v for k, v in var.items() if k not in ['max_length']}
-                        for var in input_variables['properties'].values()
+                        {k: v for k, v in var.to_dict().items() if k not in ['max_length']}
+                        for var in input_variables.properties.values()
                     ]
                     workflow['input_variables'] = input_variables
+                    
+                    need_confirm_nodes = []
+                    for node in graph.nodes.nodes:
+                        if node.data['type'] == 'human' or node.data.get("manual_confirmation", False):
+                            node_name = node.data.get("title", "")
+                            node_desc = node.data.get("desc", "")
+                            need_confirm_nodes.append({'node_id': node.id, 'node_name': node_name, 'node_desc': node_desc})
+                            if node.data['type'] == 'recursive_task_execution' and node.data.get('executor_list', None):
+                                for child_node in node.data['executor_list'].nodes:
+                                    need_confirm_nodes.append({
+                                        'node_id': child_node.id,
+                                        'node_name': f"{node_name}.{child_node.data.get('title', '')}",
+                                        'node_desc': child_node.data.get('desc', '')
+                                    })
+                    workflow['need_confirm_nodes'] = need_confirm_nodes
+
                     callable_workflows.append(workflow)
         return callable_skills, callable_workflows
         
