@@ -239,13 +239,12 @@ const UploadList = ({ fun, createkbInfo }: any) => {
     ];
 
     const getList = async e => {
-        setUploadFileList(e.fileList);
+        // Update file list with current upload state
+        console.log('getList called with:', e.fileList.length, 'files');
+        console.log('File names:', e.fileList.map(f => f.name));
+        console.log('File statuses:', e.fileList.map(f => `${f.name}: ${f.status}`));
         
-        if (e.file.status === 'done') {
-            setTimeout(() => {
-                uploadViewRef.current?.reset();
-            }, 1000);
-        }
+        setUploadFileList(e.fileList);
     };
 
     const getDocumentList = async (page = 1, sorts = sortscontent) => {
@@ -312,24 +311,51 @@ const UploadList = ({ fun, createkbInfo }: any) => {
             message.warning(intl.formatMessage({ id: 'createkb.upload.selectFileFirst' }));
             return;
         }
- 
-        let res = await addDocument({
-            app_id: createkbInfo.app_id * 1,
-            file_ids: completedFiles.map(item => item.response.data.file_id * 1),
-            process_rule_id: 1,
-            data_source_type: 1,
-            text_split_config:{
-                ...initValues,
-                ...values
+
+        try {
+            let res = await addDocument({
+                app_id: createkbInfo.app_id * 1,
+                file_ids: completedFiles.map(item => item.response.data.file_id * 1),
+                process_rule_id: 1,
+                data_source_type: 1,
+                text_split_config:{
+                    ...initValues,
+                    ...values
+                }
+            });
+
+            if(res.code == 0){
+                // Clear upload file list completely
+                setUploadFileList([]);
+                
+                // Reset upload component with a slight delay to ensure state is updated
+                setTimeout(() => {
+                    uploadViewRef.current?.reset();
+                }, 100);
+                
+                // Refresh document list
+                getDocumentList(listPageNum);
+                
+                // Show success message
+                message.success(intl.formatMessage({ 
+                    id: 'createkb.upload.addToKbSuccess', 
+                    defaultMessage: 'Files successfully added to knowledge base'
+                }));
+                
+                console.log('Files cleared and component reset');
+            } else {
+                message.error(intl.formatMessage({ 
+                    id: 'createkb.upload.addToKbFailed', 
+                    defaultMessage: 'Failed to add files to knowledge base'
+                }));
             }
-        });
-
-        if(res.code == 0){
-            setUploadFileList([]);
-            getDocumentList(listPageNum);
-            uploadViewRef.current?.reset();
+        } catch (error) {
+            console.error('Add document error:', error);
+            message.error(intl.formatMessage({ 
+                id: 'createkb.upload.addToKbFailed', 
+                defaultMessage: 'Failed to add files to knowledge base'
+            }));
         }
-
     };  
     
     const UploadPrev = () => {
@@ -405,8 +431,32 @@ const UploadList = ({ fun, createkbInfo }: any) => {
 
 
     const handleDeleteUploadedFile = (indexToDelete: number) => {
-        setUploadFileList(prevList => prevList.filter((_, index) => index !== indexToDelete));
-  
+        setUploadFileList(prevList => {
+            const fileToDelete = prevList[indexToDelete];
+            const newList = prevList.filter((_, index) => index !== indexToDelete);
+            console.log(`File deleted: ${fileToDelete?.name} at index ${indexToDelete}`);
+            console.log(`Remaining files:`, newList.map(f => f.name));
+            console.log(`File list length changed from ${prevList.length} to ${newList.length}`);
+            return newList;
+        });
+    };
+
+    const handleClearAllFiles = () => {
+        // Clear the parent component state first
+        setUploadFileList([]);
+        
+        // Reset upload component with a delay to ensure state synchronization
+        setTimeout(() => {
+            uploadViewRef.current?.reset();
+        }, 100);
+        
+        // Show confirmation message
+        message.info(intl.formatMessage({ 
+            id: 'createkb.upload.allFilesCleared', 
+            defaultMessage: 'All files cleared'
+        }));
+        
+        console.log('All files manually cleared');
     };
 
     return (
@@ -443,13 +493,21 @@ const UploadList = ({ fun, createkbInfo }: any) => {
                             })}
                         </div>
                         
-                        <UploadView ref={uploadViewRef} fun={getList} createkbInfo={createkbInfo}></UploadView>
+                        <UploadView ref={uploadViewRef} fun={getList} createkbInfo={createkbInfo} fileList={uploadFileList}></UploadView>
                         {
                             uploadFileList.length > 0 && (
                                 <div className="mt-4 p-4 border border-gray-200 rounded-lg ">
-                                    <h4 className="text-base font-medium mb-2 text-gray-700">
-                                        {intl.formatMessage({ id: 'createkb.fileList', defaultMessage: '' })}
-                                    </h4>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h4 className="text-base font-medium text-gray-700">
+                                            {intl.formatMessage({ id: 'createkb.fileList', defaultMessage: '' })}
+                                        </h4>
+                                        <button
+                                            onClick={handleClearAllFiles}
+                                            className="text-xs text-red-500 hover:text-red-700 transition-colors px-2 py-1 border border-red-200 rounded hover:border-red-300"
+                                        >
+                                            {intl.formatMessage({ id: 'createkb.upload.clearAll', defaultMessage: 'Clear All' })}
+                                        </button>
+                                    </div>
                                     <ul className="space-y-1">
                                                                 {uploadFileList.map((item, index) => {
                             return (

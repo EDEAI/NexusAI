@@ -8,13 +8,30 @@ import { useRef, useImperativeHandle, forwardRef } from 'react';
 import './upload.css';
 
 const { Dragger } = Upload;
-const UploadView = forwardRef(({ fun, createkbInfo }: any, ref) => {
+const UploadView = forwardRef(({ fun, createkbInfo, fileList = [] }: any, ref) => {
     const intl = useIntl();
     const uploadRef = useRef<any>(null);
     
+    // Debug: log when fileList prop changes
+    console.log('Upload component received fileList:', fileList.length, 'files');
+    console.log('Upload fileList names:', fileList.map(f => f.name));
+    
     const resetUpload = () => {
         if (uploadRef.current) {
+            // Clear the internal file list
             uploadRef.current.fileList = [];
+            
+            // Clear any pending uploads
+            if (uploadRef.current.upload) {
+                uploadRef.current.upload.fileList = [];
+            }
+            
+            // Force component to re-render
+            if (uploadRef.current.forceUpdate) {
+                uploadRef.current.forceUpdate();
+            }
+            
+            console.log('Upload component reset completed');
         }
     };
     
@@ -28,6 +45,8 @@ const UploadView = forwardRef(({ fun, createkbInfo }: any, ref) => {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         timeout: 300000,
+        // Controlled mode: fileList is managed by parent component
+        fileList: fileList,
         onChange(info) {
             const { status } = info.file;
             
@@ -41,11 +60,8 @@ const UploadView = forwardRef(({ fun, createkbInfo }: any, ref) => {
                 message.error(`${info.file.name} ${intl.formatMessage({ id: 'createkb.upload.error' })}`);
             }
             
+            // Always call parent function to update state
             fun(info);
-           
-            if (info.file.status === 'done' || info.file.status === 'error') {
-                resetUpload();
-            }
         },
         beforeUpload(file) {
             const isLt15M = file.size / 1024 / 1024 < 15;
@@ -64,14 +80,8 @@ const UploadView = forwardRef(({ fun, createkbInfo }: any, ref) => {
             message.info(startMessage);
             return isLt15M;
         },
-        customRequest({
-            action,
-            file,
-            onError,
-            onProgress,
-            onSuccess,
-            headers
-        }) {
+        customRequest(options) {
+            const { action, file, onError, onProgress, onSuccess, headers } = options;
             const formData = new FormData();
             formData.append('file', file);
             
