@@ -1,3 +1,6 @@
+/*
+ * @LastEditors: biz
+ */
 import { create } from 'zustand';
 import { getTagList } from '@/api/workflow';
 import { message } from 'antd';
@@ -39,7 +42,7 @@ export const useTagStore = create<TagState>((set) => ({
             }
         } catch (error) {
             set({ error: error.message });
-            message.error('Failed to fetch tags');
+            // message.error('Failed to fetch tags');
         } finally {
             set({ loading: false });
         }

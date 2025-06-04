@@ -87,9 +87,10 @@ export const useDealtWithState = (dealtWithData: DealtWithData | null) => {
 
   const submitPrompt = useCallback((values: any) => {
     setButtonLoading(true);
+    
     return updateDealtWith(execId, {
-      correct_prompt: new Prompt('', values.prompt, ''),
-      operation: 1,
+      correct_prompt:values.correct_prompt|| new Prompt('', values.prompt, ''),
+      operation:values.operation!==undefined?values.operation:1,
       outputs: dealtWithInfo?.outputs || null,
     });
   }, [execId, dealtWithInfo]);

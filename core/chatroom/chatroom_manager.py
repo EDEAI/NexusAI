@@ -50,50 +50,6 @@ class ChatroomManager:
         self._is_desktop: Dict[int, bool] = {}
         self._desktop_mcp_tool_lists: Dict[int, List[Dict[str, Any]]] = {}
 
-    def _create_agent_chatroom(self, agent_id: int, user_id: int, team_id: int) -> int:
-        app_id = apps.insert(
-            {
-                'team_id': team_id,
-                'user_id': user_id,
-                'name': f'Agent Chat {user_id}-{agent_id}',
-                'description': f'Agent Chat for user {user_id} and agent {agent_id}',
-                'is_public': 0,
-                'mode': 5,  # Chatroom
-                'status': 1
-            }
-        )
-        chatroom_id = chatrooms.insert(
-            {
-                'team_id': team_id,
-                'user_id': user_id,
-                'app_id': app_id,
-                'chat_agent_id': agent_id,
-                'is_temporary': 0,
-                'max_round': 10
-            }
-        )
-        chatroom_agent_relation.insert_agent(
-            {
-                'chatroom_id': chatroom_id,
-                'agent': [{'agent_id': agent_id, 'active': 1}]
-            }
-        )
-        return chatroom_id
-
-    def _get_agent_chatroom(self, agent_id: int, user_id: int, team_id: int) -> int:
-        chatroom_info = chatrooms.select_one(
-            columns=['id'],
-            conditions=[
-                {'column': 'team_id', 'value': team_id},
-                {'column': 'user_id', 'value': user_id},
-                {'column': 'chat_agent_id', 'value': agent_id},
-                {'column': 'status', 'value': 1}
-            ]
-        )
-        if chatroom_info:
-            return chatroom_info['id']
-        return self._create_agent_chatroom(agent_id, user_id, team_id)
-
     def _get_chatroom_info(self, chatroom_id: int, user_id: int, check_chat_status: bool) -> Dict[str, int]:
         chatroom_info = chatrooms.select_one(
             columns=[
@@ -340,18 +296,6 @@ class ChatroomManager:
                             assert isinstance(data, int), 'Chatroom ID should be an integer.'
                             chatroom_info = self._get_chatroom_info(data, user_id, check_chat_status=False)  # Also check if the chatroom is available
                             chatroom_id = data
-                            last_message_id = self._get_last_message_id(chatroom_id)
-                            self._ws_manager.save_connection(chatroom_id, connection)
-                            await self._ws_manager.send_instruction_by_connection(connection, 'OK')
-                            if last_message_id and last_message_id > chatroom_info['initial_message_id']:
-                                await self._ws_manager.send_instruction_by_connection(connection, 'TRUNCATABLE', True)
-                        case 'ENTERAGENTCHAT':
-                            # Enter Agent Chat mode
-                            assert chatroom_id == 0, 'You should not ENTER twice.'
-                            assert isinstance(data, int), 'Agent ID should be an integer.'
-                            agent_id = data
-                            chatroom_id = self._get_agent_chatroom(agent_id, user_id, team_id)
-                            chatroom_info = self._get_chatroom_info(chatroom_id, user_id, check_chat_status=False)  # Also check if the chatroom is available
                             last_message_id = self._get_last_message_id(chatroom_id)
                             self._ws_manager.save_connection(chatroom_id, connection)
                             await self._ws_manager.send_instruction_by_connection(connection, 'OK')

@@ -84,5 +84,31 @@ export default {
     'createkb.deleteFile': '删除文件',
     
     // 补充缺失的项目
-    'createkb.splitMode': '分段模式'
+    'createkb.splitMode': '分段模式',
+    
+    // Upload progress and status
+    'createkb.upload.starting': '开始上传',
+    'createkb.upload.fileSize': '文件大小',
+    'createkb.upload.progress': '上传中...',
+    'createkb.upload.complete': '上传完成',
+    'createkb.upload.failed': '上传失败',
+    'createkb.upload.success': '文件上传成功',
+    'createkb.upload.error': '文件上传失败',
+    'createkb.upload.cancel': '取消',
+    'createkb.upload.retry': '重试',
+    'createkb.upload.selectFileFirst': '请先上传文件',
+    
+    // Error messages
+    'createkb.error.fileSize': '文件大小不能超过15MB',
+    'createkb.error.serverResponse': '服务器返回数据格式错误',
+    'createkb.error.httpStatus': '上传失败: HTTP',
+    'createkb.error.network': '网络错误，请检查网络连接',
+    'createkb.error.timeout': '上传超时，请重试或检查网络连接',
+    'createkb.error.cancelled': '上传已取消',
+    'createkb.error.unknown': '未知错误',
+    
+    // Instructions
+    'createkb.instruction.dragOrClick': '拖拽文件到此处或点击上传',
+    'createkb.instruction.uploadLimit': '支持批量上传，单个文件不超过15MB',
+    'createkb.instruction.retryUpload': '请重新选择文件上传'
 };
