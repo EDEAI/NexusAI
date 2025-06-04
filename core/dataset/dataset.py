@@ -414,6 +414,7 @@ class DatasetManagement:
                     {'column': 'id', 'value': segment_id},
                     {'indexing_status': 3}
                 )
+                document_segments.commit()
                 raise
             else:
                 completed_time = datetime.now()
@@ -428,6 +429,7 @@ class DatasetManagement:
                         'completed_time': completed_time
                     }
                 )
+                document_segments.commit()
                 
         indexing_latency = monotonic() - overall_indexing_start_time
         return total_word_count, total_num_tokens, indexing_latency
@@ -473,6 +475,7 @@ class DatasetManagement:
                     {'column': 'id', 'value': segment_id},
                     {'indexing_status': 3}
                 )
+                document_segments.commit()
                 raise
             else:
                 completed_time = datetime.now()
@@ -488,6 +491,7 @@ class DatasetManagement:
                     {'column': 'id', 'value': segment_id},
                     update_data
                 )
+                document_segments.commit()
                 
         return True
 
@@ -511,6 +515,7 @@ class DatasetManagement:
             {'column': 'document_id', 'value': document_id},
             {'indexing_status': 0}
         )
+        document_segments.commit()
         return result
 
     @classmethod
@@ -547,6 +552,7 @@ class DatasetManagement:
                 'value': document_id
             }
         )
+        document_segments.commit()
         return result
 
     @classmethod
@@ -592,6 +598,7 @@ class DatasetManagement:
                 {'column': 'id', 'value': segment_id},
                 {'indexing_status': 3}
             )
+            document_segments.commit()
             raise
         completed_time = datetime.now()
         num_tokens = vdb.embeddings.get_and_reset_num_tokens()
@@ -606,6 +613,7 @@ class DatasetManagement:
             {'column': 'id', 'value': segment_id},
             update_data
         )
+        document_segments.commit()
         
         return index_id
 
@@ -634,6 +642,7 @@ class DatasetManagement:
                 'status': 2
             }
         )
+        document_segments.commit()
         
         return result
 
@@ -748,6 +757,7 @@ class DatasetManagement:
                         {'column': 'id', 'value': segment_id},
                         {'indexing_status': 3}
                     )
+                    document_segments.commit()
                     raise
                 else:
                     completed_time = datetime.now()
@@ -761,6 +771,7 @@ class DatasetManagement:
                             'completed_time': completed_time
                         }
                     )
+                    document_segments.commit()
         
         datasets.update(
             {'column': 'id', 'value': dataset_id},
@@ -819,6 +830,7 @@ class DatasetManagement:
                     {'column': 'status', 'op': '<', 'value': 3}
                 ]
             )
+        document_segments.commit()
 
 
 class DatasetRetrieval:
