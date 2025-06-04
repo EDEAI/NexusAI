@@ -1,5 +1,5 @@
 import { SearchOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Button, Input, Modal, Switch, Table, TableColumnsType } from 'antd';
+import { Button, Input, Modal, Switch, Table, TableColumnsType, Progress, message } from 'antd';
 import { useEffect, useState, useRef } from 'react';
 import UploadView from './Upload/upload';
 
@@ -97,7 +97,7 @@ const UploadList = ({ fun, createkbInfo }: any) => {
         setOpen(newOpen);
     };
 
-    const onChange = async (checked: boolean, text: String, record: Object, index: Number) => {
+    const onChange = async (checked: boolean, text: String, record: any, index: Number) => {
         let res = null;
         if (!checked) {
             res = await disableDocument(record.id);
@@ -239,15 +239,12 @@ const UploadList = ({ fun, createkbInfo }: any) => {
     ];
 
     const getList = async e => {
-        // loadingfun(true);
+        setUploadFileList(e.fileList);
         
-        if (e.file.status == 'done') {
-            setUploadFileList(prev=>{
-                return [...prev,e.file]
-            })
-            // setUploadFileList(e.fileList)
-            
-            uploadViewRef.current?.reset();
+        if (e.file.status === 'done') {
+            setTimeout(() => {
+                uploadViewRef.current?.reset();
+            }, 1000);
         }
     };
 
@@ -309,10 +306,16 @@ const UploadList = ({ fun, createkbInfo }: any) => {
     }
 
     const onFinish = async (values) => {
+        const completedFiles = uploadFileList.filter(item => item.status === 'done' && item.response);
+        
+        if (completedFiles.length === 0) {
+            message.warning(intl.formatMessage({ id: 'createkb.upload.selectFileFirst' }));
+            return;
+        }
  
         let res = await addDocument({
             app_id: createkbInfo.app_id * 1,
-            file_ids:uploadFileList.map(item=>item.response.data.file_id * 1),
+            file_ids: completedFiles.map(item => item.response.data.file_id * 1),
             process_rule_id: 1,
             data_source_type: 1,
             text_split_config:{
@@ -448,21 +451,96 @@ const UploadList = ({ fun, createkbInfo }: any) => {
                                         {intl.formatMessage({ id: 'createkb.fileList', defaultMessage: '' })}
                                     </h4>
                                     <ul className="space-y-1">
-                                        {uploadFileList.map((item, index) => {
-                                            return (
-                                                <li key={index} className="flex items-center justify-between text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                                                    <span className="truncate mr-2">{item.name}</span>
+                                                                {uploadFileList.map((item, index) => {
+                            return (
+                                <li key={item.uid || index} className="flex items-center justify-between text-sm text-gray-600 bg-gray-50 p-3 rounded">
+                                    <div className="flex-1 mr-2">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="truncate font-medium">{item.name}</span>
+                                            <div className="flex items-center space-x-2">
+                                                {item.status === 'uploading' && (
                                                     <button
-                                                        onClick={() => handleDeleteUploadedFile(index)}
-                                                        className="text-red-500 hover:text-red-700 transition-colors"
-                                                        aria-label={`${intl.formatMessage({ id: 'createkb.deleteFile', defaultMessage: '' })} ${item.name}`}
-                                                        title={`${intl.formatMessage({ id: 'createkb.deleteFile', defaultMessage: '' })} ${item.name}`}
+                                                        onClick={() => {
+                                                            if (item.xhr) {
+                                                                item.xhr.abort();
+                                                            }
+                                                            handleDeleteUploadedFile(index);
+                                                        }}
+                                                        className="text-gray-500 hover:text-gray-700 transition-colors text-xs"
                                                     >
-                                                        <DeleteOutlined />
+                                                        {intl.formatMessage({ id: 'createkb.upload.cancel' })}
                                                     </button>
-                                                </li>
-                                            );
-                                        })}
+                                                )}
+                                                <button
+                                                    onClick={() => handleDeleteUploadedFile(index)}
+                                                    className="text-red-500 hover:text-red-700 transition-colors"
+                                                    aria-label={`${intl.formatMessage({ id: 'createkb.deleteFile' })} ${item.name}`}
+                                                    title={`${intl.formatMessage({ id: 'createkb.deleteFile' })} ${item.name}`}
+                                                >
+                                                    <DeleteOutlined />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        {item.status === 'uploading' && (
+                                            <div className="space-y-1">
+                                                <Progress 
+                                                    percent={Math.round(item.percent || 0)} 
+                                                    size="small" 
+                                                    status="active"
+                                                    strokeColor="#1B64F3"
+                                                />
+                                                <div className="text-xs text-blue-500 font-medium">
+                                                    {intl.formatMessage({ id: 'createkb.upload.progress' })} {Math.round(item.percent || 0)}% 
+                                                    {item.size && (
+                                                        <span className="text-gray-400 ml-2">
+                                                            ({(item.size / 1024 / 1024).toFixed(2)}MB)
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {item.status === 'done' && (
+                                            <div className="flex items-center space-x-2">
+                                                <div className="w-full bg-green-100 rounded-full h-2">
+                                                    <div className="bg-green-500 h-2 rounded-full w-full"></div>
+                                                </div>
+                                                <div className="text-xs text-green-600 font-medium whitespace-nowrap">
+                                                    {intl.formatMessage({ id: 'createkb.upload.complete' })}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {item.status === 'error' && (
+                                            <div className="space-y-1">
+                                                <div className="flex items-center space-x-2">
+                                                    <div className="w-full bg-red-100 rounded-full h-2">
+                                                        <div className="bg-red-500 h-2 rounded-full w-full"></div>
+                                                    </div>
+                                                                                                    <div className="text-xs text-red-600 font-medium whitespace-nowrap">
+                                                    {intl.formatMessage({ id: 'createkb.upload.failed' })}
+                                                </div>
+                                                </div>
+                                                {item.error && (
+                                                    <div className="text-xs text-red-500 mt-1">
+                                                        {item.error.message || intl.formatMessage({ id: 'createkb.error.unknown' })}
+                                                    </div>
+                                                )}
+                                                <button
+                                                    onClick={() => {
+                                                        message.info(intl.formatMessage({ id: 'createkb.instruction.retryUpload' }));
+                                                    }}
+                                                    className="text-xs text-blue-500 hover:text-blue-700"
+                                                >
+                                                    {intl.formatMessage({ id: 'createkb.upload.retry' })}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </li>
+                            );
+                        })}
                                     </ul>
                                     <UploadPrev />
                                 </div>

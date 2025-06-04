@@ -12,14 +12,12 @@ const UploadView = forwardRef(({ fun, createkbInfo }: any, ref) => {
     const intl = useIntl();
     const uploadRef = useRef<any>(null);
     
-    // 重置上传组件的方法
     const resetUpload = () => {
         if (uploadRef.current) {
             uploadRef.current.fileList = [];
         }
     };
     
-    // 暴露方法给父组件
     useImperativeHandle(ref, () => ({
         reset: resetUpload
     }));
@@ -29,13 +27,24 @@ const UploadView = forwardRef(({ fun, createkbInfo }: any, ref) => {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
+        timeout: 300000,
         onChange(info) {
+            const { status } = info.file;
+            
+            if (status === 'uploading') {
+                console.log('Upload progress:', info.file.percent);
+            }
+            
+            if (status === 'done') {
+                message.success(`${info.file.name} ${intl.formatMessage({ id: 'createkb.upload.success' })}`);
+            } else if (status === 'error') {
+                message.error(`${info.file.name} ${intl.formatMessage({ id: 'createkb.upload.error' })}`);
+            }
+            
             fun(info);
            
             if (info.file.status === 'done' || info.file.status === 'error') {
                 resetUpload();
-              
-                
             }
         },
         beforeUpload(file) {
@@ -43,15 +52,87 @@ const UploadView = forwardRef(({ fun, createkbInfo }: any, ref) => {
             if (!isLt15M) {
                 message.error(
                     intl.formatMessage({
-                        id: 'createkb.fileLimit',
-                        defaultMessage: '15M',
+                        id: 'createkb.error.fileSize',
+                        defaultMessage: 'File size cannot exceed 15MB',
                     }),
                 );
                 return false;
             }
+            
+            const fileSize = (file.size / 1024 / 1024).toFixed(2);
+            const startMessage = `${intl.formatMessage({ id: 'createkb.upload.starting' })} ${file.name}，${intl.formatMessage({ id: 'createkb.upload.fileSize' })}: ${fileSize}MB`;
+            message.info(startMessage);
             return isLt15M;
         },
+        customRequest({
+            action,
+            file,
+            onError,
+            onProgress,
+            onSuccess,
+            headers
+        }) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const xhr = new XMLHttpRequest();
+            xhr.timeout = 300000;
+            
+            xhr.open('post', typeof action === 'function' ? action(file) : action, true);
+            
+            if (headers) {
+                Object.keys(headers).forEach(key => {
+                    xhr.setRequestHeader(key, headers[key]);
+                });
+            }
+            
+            xhr.upload.addEventListener('progress', (event) => {
+                if (event.lengthComputable) {
+                    const percent = Math.round((event.loaded / event.total) * 100);
+                    onProgress({ percent }, file);
+                }
+            });
+            
+            xhr.addEventListener('load', () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const response = JSON.parse(xhr.response);
+                        onSuccess(response, file);
+                    } catch (e) {
+                        const errorMessage = intl.formatMessage({ id: 'createkb.error.serverResponse' });
+                        onError(new Error(errorMessage), file);
+                    }
+                } else {
+                    const errorMessage = `${intl.formatMessage({ id: 'createkb.error.httpStatus' })} ${xhr.status}`;
+                    onError(new Error(errorMessage), file);
+                }
+            });
+            
+            xhr.addEventListener('error', () => {
+                const errorMessage = intl.formatMessage({ id: 'createkb.error.network' });
+                onError(new Error(errorMessage), file);
+            });
+            
+            xhr.addEventListener('timeout', () => {
+                const errorMessage = intl.formatMessage({ id: 'createkb.error.timeout' });
+                onError(new Error(errorMessage), file);
+            });
+            
+            xhr.addEventListener('abort', () => {
+                const errorMessage = intl.formatMessage({ id: 'createkb.error.cancelled' });
+                onError(new Error(errorMessage), file);
+            });
+            
+            xhr.send(formData);
+            
+            return {
+                abort() {
+                    xhr.abort();
+                }
+            };
+        }
     };
+    
     const props = {
         ...uploads,
         name: 'file',
@@ -59,6 +140,7 @@ const UploadView = forwardRef(({ fun, createkbInfo }: any, ref) => {
         className: 'h-[200px]',
         showUploadList: false,
     };
+    
     return (
         <>
             <Dragger
@@ -79,14 +161,14 @@ const UploadView = forwardRef(({ fun, createkbInfo }: any, ref) => {
                     </div>
                     <div className="mt-[10px] text-[#213044] text-sm">
                         {intl.formatMessage({
-                            id: 'createkb.dragOrClick',
-                            defaultMessage: '，',
+                            id: 'createkb.instruction.dragOrClick',
+                            defaultMessage: 'Drag files here or click to upload',
                         })}
                     </div>
                     <div className="mt-[10px] text-[#999999] text-sm">
                         {intl.formatMessage({
-                            id: 'createkb.uploadLimit',
-                            defaultMessage: '10， 15MB',
+                            id: 'createkb.instruction.uploadLimit',
+                            defaultMessage: 'Support batch upload, single file no more than 15MB',
                         })}
                     </div>
                 </div>

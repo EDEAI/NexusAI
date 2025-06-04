@@ -30,7 +30,7 @@ const apiRequest = async <T>(
     headers['Content-Type'] = headers['Content-Type'] || DEFAULT_CONTENT_TYPE;
     let requestData = method.toUpperCase() === 'GET' ? { params: data } : { data };
     const token = localStorage.getItem('token');
-    console.log('BASE_URL', BASE_URL);
+   
 
     if (token && url !== LOGIN_URL) {
         headers['Authorization'] = `Bearer ${token}`;
