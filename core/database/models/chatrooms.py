@@ -227,7 +227,7 @@ class Chatrooms(MySQL):
                     FROM app_runs
                     GROUP BY chatroom_id
                 ) AS last_runs ON chatrooms.id = last_runs.chatroom_id
-                WHERE chatrooms.status = 1 AND apps.status = 1 AND apps.mode = 5 AND chatrooms.user_id = {uid} AND chatrooms.id != {chatroom_id}
+                WHERE chatrooms.status = 1 AND chatrooms.is_temporary = 0 AND apps.status = 1 AND apps.mode = 5 AND chatrooms.user_id = {uid} AND chatrooms.id != {chatroom_id}
                 ORDER BY last_run_time DESC
                 LIMIT 5
             """
