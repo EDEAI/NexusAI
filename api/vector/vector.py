@@ -229,6 +229,7 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
                     'indexing_latency': indexing_latency
                 }
             )
+            Documents().commit()
     except Exception as e:
         msg = str(e)
         logger.exception('add_document: %s desc: Current user id %s',
