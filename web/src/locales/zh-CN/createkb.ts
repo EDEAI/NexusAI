@@ -97,6 +97,10 @@ export default {
     'createkb.upload.cancel': '取消',
     'createkb.upload.retry': '重试',
     'createkb.upload.selectFileFirst': '请先上传文件',
+    'createkb.upload.addToKbSuccess': '文件已成功添加到知识库',
+    'createkb.upload.addToKbFailed': '添加文件到知识库失败',
+    'createkb.upload.clearAll': '清除所有',
+    'createkb.upload.allFilesCleared': '已清除所有文件',
     
     // Error messages
     'createkb.error.fileSize': '文件大小不能超过15MB',

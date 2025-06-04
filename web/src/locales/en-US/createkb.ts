@@ -97,6 +97,10 @@ export default {
     'createkb.upload.cancel': 'Cancel',
     'createkb.upload.retry': 'Retry',
     'createkb.upload.selectFileFirst': 'Please upload files first',
+    'createkb.upload.addToKbSuccess': 'Files successfully added to knowledge base',
+    'createkb.upload.addToKbFailed': 'Failed to add files to knowledge base',
+    'createkb.upload.clearAll': 'Clear All',
+    'createkb.upload.allFilesCleared': 'All files cleared',
     
     // Error messages
     'createkb.error.fileSize': 'File size cannot exceed 15MB',
