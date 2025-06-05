@@ -384,6 +384,12 @@ language_packs = {
         "login_user_name_absent": "Login failed, Username does not exist",
         "login_user_password_empty": "Login failed, Password cannot be empty",
         "login_user_password_failed": "Login failed, Password error",
+        
+        # third-party login
+        "third_party_login_platform_empty": "Login failed, Platform cannot be empty",
+        "third_party_login_openid_empty": "Login failed, OpenID cannot be empty",
+        "third_party_login_failed": "Third-party login failed, please try again",
+        "third_party_login_success": "Third-party login successful",
 
         "login_time_last_year": "Last year",
         "login_time_a_month_ago": "A month ago",
@@ -1237,6 +1243,12 @@ language_packs = {
         "login_user_name_absent": "登录失败，用户名不存在",
         "login_user_password_empty": "登录失败，密码不能为空",
         "login_user_password_failed": "登录失败，密码错误",
+        
+        # third-party login
+        "third_party_login_platform_empty": "登录失败，平台标识不能为空",
+        "third_party_login_openid_empty": "登录失败，OpenID不能为空",
+        "third_party_login_failed": "第三方登录失败，请重试",
+        "third_party_login_success": "第三方登录成功",
 
         "login_time_last_year": "年前",
         "login_time_a_month_ago": "月前",
