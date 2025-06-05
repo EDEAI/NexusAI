@@ -23,6 +23,10 @@ class TokenData(BaseModel):
     email: Optional[str] = None
     inviter_id: Optional[int] = None
     role: Optional[int] = None
+    # Third-party user fields
+    platform: Optional[str] = None
+    openid: Optional[str] = None
+    user_type: Optional[str] = None  # 'regular' or 'third_party'
 
 def create_access_token(data: dict):
     """
@@ -51,11 +55,22 @@ def verify_token(token: str, credentials_exception):
         email: str = payload.get("email")
         inviter_id: str = payload.get("inviter_id")
         role: str = payload.get("role")
+        
+        # Third-party user fields
+        platform: str = payload.get("platform")
+        openid: str = payload.get("openid")
+        user_type: str = payload.get("user_type", "regular")
+        
         if uid is None:
             print(f"Problem with uid: {uid}")
             raise credentials_exception
-        # Get stored token from Redis
-        redis_key = f"access_token:{uid}"
+            
+        # Get stored token from Redis based on user type
+        if user_type == "third_party":
+            redis_key = f"third_party_access_token:{uid}"
+        else:
+            redis_key = f"access_token:{uid}"
+            
         stored_token = redis.get(redis_key)
         
         # Verify if token matches
@@ -66,7 +81,18 @@ def verify_token(token: str, credentials_exception):
                 detail="Invalid or expired token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        token_data = TokenData(uid=uid,team_id=team_id,nickname=nickname,phone=phone,email=email,inviter_id=inviter_id,role=role)
+        token_data = TokenData(
+            uid=uid,
+            team_id=team_id,
+            nickname=nickname,
+            phone=phone,
+            email=email,
+            inviter_id=inviter_id,
+            role=role,
+            platform=platform,
+            openid=openid,
+            user_type=user_type
+        )
         from api.utils.auth import set_current_user_id
         set_current_user_id(uid)
     except JWTError:

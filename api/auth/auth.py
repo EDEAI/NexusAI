@@ -7,7 +7,7 @@ from core.database.models import (
     Users,
     Teams
 )
-from api.utils.auth import  is_valid_username, is_valid_email,authenticate_user,updata_login_ip
+from api.utils.auth import  is_valid_username, is_valid_email,authenticate_user,updata_login_ip,authenticate_third_party_user
 from api.utils.common import *
 from languages import get_language_content, language_packs
 from api.schema.user import *
@@ -156,8 +156,11 @@ async def logout(current_user: TokenData = Depends(get_current_user), token: str
         A success response with the message "Successfully logged out".
     """
         
-    # Delete the token directly from Redis
-    redis_key = f"access_token:{current_user.uid}"
+    # Delete the token directly from Redis based on user type
+    if current_user.user_type == "third_party":
+        redis_key = f"third_party_access_token:{current_user.uid}"
+    else:
+        redis_key = f"access_token:{current_user.uid}"
     redis.delete(redis_key)
     
     return response_success("Successfully logged out")
@@ -174,8 +177,21 @@ async def get_user_info(userinfo: TokenData = Depends(get_current_user)):
         A success response containing the user information.
     """
     uid = userinfo.uid
-    user_info = get_uid_user_info(uid)
-    user_info['uid'] = uid
+    
+    # Handle different user types
+    if userinfo.user_type == "third_party":
+        from api.utils.auth import get_third_party_user_info
+        user_info = get_third_party_user_info(uid)
+        if user_info:
+            user_info['uid'] = uid
+            user_info['user_type'] = 'third_party'
+        else:
+            return response_error("User not found")
+    else:
+        user_info = get_uid_user_info(uid)
+        user_info['uid'] = uid
+        user_info['user_type'] = 'regular'
+    
     return response_success(user_info)
 
 @router.post("/switch_the_language", response_model=ResDictSchema)
@@ -316,3 +332,91 @@ async def invite_user(team_id: int = 1,userinfo: TokenData = Depends(get_current
     SQLDatabase.commit()
     SQLDatabase.close()
     return response_success({'team_name':team_name, 'team_member_list':team_member_list})
+
+@router.post('/third_party_login', response_model=ResThirdPartyLoginSchema)
+async def third_party_login(request: Request, login_data: ThirdPartyLoginData):
+    """
+    Third-party user login/register endpoint.
+    
+    This endpoint handles both login and registration for third-party users.
+    If the user exists, it will log them in and return a token.
+    If the user doesn't exist, it will register them first, then log them in.
+    
+    Args:
+        request (Request): The request object to get client IP.
+        login_data (ThirdPartyLoginData): The third-party login data containing:
+            - platform: Third-party platform identifier
+            - openid: User's openid on the platform
+            - nickname: User's nickname (optional)
+            - avatar: User's avatar URL (optional)
+            - language: User's language preference (optional, defaults to 'en')
+    
+    Returns:
+        ResThirdPartyLoginSchema: Response containing access token and user info.
+    """
+    # Get client IP
+    client_ip = request.client.host
+    if request.headers.get("X-Forwarded-For"):
+        client_ip = request.headers.get("X-Forwarded-For").split(",")[0]
+    elif request.headers.get("X-Real-IP"):
+        client_ip = request.headers.get("X-Real-IP")
+    
+    # Validate required parameters
+    if not login_data.platform or not login_data.openid:
+        return response_error(get_language_content('login_user_name_empty'))
+    
+    # Authenticate or register third-party user
+    user = authenticate_third_party_user(
+        platform=login_data.platform,
+        openid=login_data.openid,
+        nickname=login_data.nickname,
+        avatar=login_data.avatar,
+        language=login_data.language or 'en',
+        client_ip=client_ip
+    )
+    
+    if not user:
+        return response_error(get_language_content('login_user_password_failed'))
+    
+    # Check if a valid token already exists in Redis
+    redis_key = f"third_party_access_token:{user['id']}"
+    existing_token = redis.get(redis_key)
+    
+    if existing_token:
+        access_token = existing_token.decode('utf-8')
+    else:
+        # Create access token for third-party user
+        access_token = create_access_token(
+            data={
+                "uid": user["id"], 
+                "platform": user["platform"],
+                "openid": user["openid"],
+                "nickname": user["nickname"],
+                "language": user["language"],
+                "user_type": "third_party"  # Add user type to distinguish from regular users
+            }
+        )
+        # Store token in Redis
+        redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        redis.set(redis_key, access_token, ex=redis_expiry_seconds)
+    
+    # Get user language setting
+    user_language = user.get("language", "en")
+    set_current_user_id(user["id"])
+    set_current_language(user["id"], user_language)
+    
+    # Prepare response data
+    response_data = {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_info": {
+            "uid": user["id"],
+            "nickname": user["nickname"],
+            "avatar": user["avatar"],
+            "language": user["language"],
+            "platform": user["platform"],
+            "openid": user["openid"]
+        }
+    }
+    
+    return response_success(response_data)

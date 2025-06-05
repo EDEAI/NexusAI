@@ -53,4 +53,23 @@ class CreateDataEmailList(BaseModel):
 class SwitchLanguageSchema(BaseModel):
     language: str = 'en'
 
-    
+# Third-party user login/register schemas
+class ThirdPartyLoginData(BaseModel):
+    platform: str
+    openid: str
+    nickname: Optional[str] = None
+    avatar: Optional[str] = None
+    language: Optional[str] = 'en'
+
+class ThirdPartyUserData(BaseModel):
+    uid: Optional[int] = None
+    nickname: Optional[str] = None
+    avatar: Optional[str] = None
+    language: Optional[str] = None
+    platform: Optional[str] = None
+    openid: Optional[str] = None
+
+class ResThirdPartyLoginSchema(BaseModel):
+    code: int = 0
+    detail: str = 'OK'
+    data: Dict[str, Any]

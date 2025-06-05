@@ -14,6 +14,7 @@ from api.utils.jwt import *
 from api.utils.common import *
 import hashlib
 from core.database.models.users import Users
+from core.database.models.third_party_users import ThirdPartyUsers
 from contextvars import ContextVar
 from languages import language_packs
 
@@ -233,4 +234,61 @@ def get_current_language(uid:int = 0) -> str:
         user_language = Users().get_user_language(user_id)
         redis.set("user_language:{}".format(user_id), user_language if user_language in language_packs else 'en')
         return user_language
+
+def authenticate_third_party_user(platform: str, openid: str, nickname: str = None, 
+                                  avatar: str = None, language: str = 'en', 
+                                  client_ip: str = None):
+    """
+    Authenticate or register a third-party user.
+    
+    :param platform: The third-party platform identifier.
+    :param openid: The user's openid on the platform.
+    :param nickname: The user's nickname (optional).
+    :param avatar: The user's avatar URL (optional).
+    :param language: The user's language preference.
+    :param client_ip: The user's login IP.
+    :return: The user data if successful, False otherwise.
+    """
+    try:
+        third_party_user_model = ThirdPartyUsers()
+        
+        # Create or update user and get user ID
+        user_id = third_party_user_model.create_or_update_user(
+            platform=platform,
+            openid=openid,
+            nickname=nickname,
+            avatar=avatar,
+            language=language,
+            last_login_ip=client_ip
+        )
+        
+        # Commit the transaction
+        SQLDatabase.commit()
+        SQLDatabase.close()
+        
+        # Get the complete user data
+        user = third_party_user_model.get_user_by_id(user_id)
+        
+        if user:
+            return user
+        else:
+            return False
+    except Exception as e:
+        SQLDatabase.rollback()
+        SQLDatabase.close()
+        print(f"Error in authenticate_third_party_user: {e}")
+        return False
+
+def get_third_party_user_info(uid: int):
+    """
+    Retrieve third-party user information by user ID.
+    
+    :param uid: The user ID.
+    :return: The user data if found, False otherwise.
+    """
+    third_party_user_model = ThirdPartyUsers()
+    user = third_party_user_model.get_user_by_id(uid)
+    if not user:
+        return False
+    return user
 
