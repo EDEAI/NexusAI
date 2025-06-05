@@ -330,6 +330,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
     def _get_team_members(self, user_id: int) -> List[Dict[str, Any]]:
         current_user = Users().get_user_by_id(user_id)
         team_members = []
+        if current_user['team_id'] == 0:
+            return team_members
         user_info_list = Users().select(
             columns=['id', 'nickname', 'email'],
             conditions=[

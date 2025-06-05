@@ -178,19 +178,17 @@ async def get_user_info(userinfo: TokenData = Depends(get_current_user)):
     """
     uid = userinfo.uid
     
-    # Handle different user types
-    if userinfo.user_type == "third_party":
-        from api.utils.auth import get_third_party_user_info
-        user_info = get_third_party_user_info(uid)
-        if user_info:
-            user_info['uid'] = uid
+    # Get user info (works for both regular and third-party users)
+    user_info = get_uid_user_info(uid)
+    if user_info:
+        user_info['uid'] = uid
+        # Set user type based on whether platform and openid exist
+        if user_info.get('platform') and user_info.get('openid'):
             user_info['user_type'] = 'third_party'
         else:
-            return response_error("User not found")
+            user_info['user_type'] = 'regular'
     else:
-        user_info = get_uid_user_info(uid)
-        user_info['uid'] = uid
-        user_info['user_type'] = 'regular'
+        return response_error("User not found")
     
     return response_success(user_info)
 
@@ -389,9 +387,14 @@ async def third_party_login(request: Request, login_data: ThirdPartyLoginData):
         access_token = create_access_token(
             data={
                 "uid": user["id"], 
+                "team_id": user["team_id"],
+                "nickname": user["nickname"],
+                "phone": user["phone"],
+                "email": user["email"],
+                "inviter_id": user["inviter_id"],
+                "role": user["role"],
                 "platform": user["platform"],
                 "openid": user["openid"],
-                "nickname": user["nickname"],
                 "language": user["language"],
                 "user_type": "third_party"  # Add user type to distinguish from regular users
             }

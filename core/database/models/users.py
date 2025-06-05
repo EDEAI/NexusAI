@@ -76,3 +76,109 @@ class Users(MySQL):
             ]
         )
         return user
+
+    def get_user_by_platform_and_openid(self, platform: str, openid: str) -> Optional[Dict[str, Any]]:
+        """
+        Get user by platform and openid.
+
+        :param platform: The third-party platform identifier.
+        :param openid: The user's openid on the platform.
+        :return: The user data if found, None otherwise.
+        """
+        user = self.select_one(
+            columns='*',
+            conditions=[
+                {'column': 'platform', 'value': platform},
+                {'column': 'openid', 'value': openid},
+                {'column': 'status', 'value': 1}
+            ]
+        )
+        return user
+
+    def create_or_update_third_party_user(self, platform: str, openid: str, nickname: str = None, 
+                                          avatar: str = None, language: str = 'en', 
+                                          last_login_ip: str = None):
+        """
+        Create a new third-party user or update existing user information.
+
+        :param platform: The third-party platform identifier.
+        :param openid: The user's openid on the platform.
+        :param nickname: The user's nickname (optional).
+        :param avatar: The user's avatar URL (optional).
+        :param language: The user's language preference.
+        :param last_login_ip: The user's last login IP.
+        :return: The user ID if successful, None otherwise.
+        """
+        # Check if user already exists
+        existing_user = self.get_user_by_platform_and_openid(platform, openid)
+        
+        if existing_user:
+            # Update existing user
+            from datetime import datetime
+            current_time = datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            
+            update_data = {
+                'last_login_ip': last_login_ip,
+                'last_login_time': formatted_time
+            }
+            
+            # Update optional fields if provided
+            if nickname is not None:
+                update_data['nickname'] = nickname
+            if avatar is not None:
+                update_data['avatar'] = avatar
+            if language is not None:
+                update_data['language'] = language
+                
+            self.update(
+                [{'column': 'id', 'value': existing_user['id']}],
+                update_data
+            )
+            return existing_user['id']
+        else:
+            # Create new user
+            from datetime import datetime
+            current_time = datetime.now()
+            formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            
+            user_data = {
+                'team_id': 0,  # Third-party users are not associated with any team
+                'role': 2,     # Default role for third-party users
+                'inviter_id': 0,
+                'nickname': nickname or f'{platform}_user',
+                'phone': None,
+                'email': None,
+                'password': 'third_party_default',
+                'password_salt': 'third_party_salt',
+                'avatar': avatar,
+                'created_time': formatted_time,
+                'language': language,
+                'platform': platform,
+                'openid': openid,
+                'last_login_ip': last_login_ip,
+                'last_login_time': formatted_time,
+                'status': 1
+            }
+            
+            user_id = self.insert(user_data)
+            return user_id
+
+    def update_login_info(self, user_id: int, last_login_ip: str):
+        """
+        Update user's login information.
+
+        :param user_id: The ID of the user.
+        :param last_login_ip: The user's last login IP.
+        """
+        from datetime import datetime
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        
+        self.update(
+            [{'column': 'id', 'value': user_id}],
+            {
+                'last_login_ip': last_login_ip,
+                'last_login_time': formatted_time
+            }
+        )

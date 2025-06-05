@@ -14,7 +14,6 @@ from api.utils.jwt import *
 from api.utils.common import *
 import hashlib
 from core.database.models.users import Users
-from core.database.models.third_party_users import ThirdPartyUsers
 from contextvars import ContextVar
 from languages import language_packs
 
@@ -250,10 +249,10 @@ def authenticate_third_party_user(platform: str, openid: str, nickname: str = No
     :return: The user data if successful, False otherwise.
     """
     try:
-        third_party_user_model = ThirdPartyUsers()
+        user_model = Users()
         
         # Create or update user and get user ID
-        user_id = third_party_user_model.create_or_update_user(
+        user_id = user_model.create_or_update_third_party_user(
             platform=platform,
             openid=openid,
             nickname=nickname,
@@ -267,7 +266,13 @@ def authenticate_third_party_user(platform: str, openid: str, nickname: str = No
         SQLDatabase.close()
         
         # Get the complete user data
-        user = third_party_user_model.get_user_by_id(user_id)
+        user = user_model.select_one(
+            columns='*',
+            conditions=[
+                {'column': 'id', 'value': user_id},
+                {'column': 'status', 'value': 1}
+            ]
+        )
         
         if user:
             return user
@@ -286,8 +291,14 @@ def get_third_party_user_info(uid: int):
     :param uid: The user ID.
     :return: The user data if found, False otherwise.
     """
-    third_party_user_model = ThirdPartyUsers()
-    user = third_party_user_model.get_user_by_id(uid)
+    user_model = Users()
+    user = user_model.select_one(
+        columns='*',
+        conditions=[
+            {'column': 'id', 'value': uid},
+            {'column': 'status', 'value': 1}
+        ]
+    )
     if not user:
         return False
     return user
