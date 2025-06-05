@@ -104,6 +104,35 @@ class Apps(MySQL):
         if tag_ids != '0' and tag_ids:
             app_ids = TagBindings().get_tag_apps_by_tag_id(tag_ids,user_id, apps_mode)
             conditions.append({"column": "apps.id", "op": "in", "value": app_ids})
+        
+        # Filter valid app IDs for mode=3 before calculating total count to ensure pagination consistency
+        if len(apps_mode.split(',')) == 1 and int(apps_mode.split(',')[0]) == 3:
+            # Query all mode=3 apps first
+            temp_mode_3_apps = self.select(
+                columns=['id'],
+                conditions=conditions
+            )
+            mode_3_app_ids = [item['id'] for item in temp_mode_3_apps]
+            
+            if mode_3_app_ids:
+                # Query datasets table to get valid app_ids
+                valid_app_ids = Datasets().select(
+                    columns=['app_id'], 
+                    conditions=[
+                        {"column": "temporary_chatroom_id", "value": 0},
+                        {"column": "app_id", "op": "in", "value": mode_3_app_ids},
+                        {"column": "status", "op": "<", "value": 3}
+                    ]
+                )
+                valid_app_ids = [item['app_id'] for item in valid_app_ids]
+                
+                # Update conditions to include only valid app_ids
+                if valid_app_ids:
+                    conditions.append({"column": "apps.id", "op": "in", "value": valid_app_ids})
+                else:
+                    # Set impossible condition if no valid apps found
+                    conditions.append({"column": "apps.id", "value": -1})
+        
         total_count = self.select_one(
             aggregates={"id": "count"},
             conditions=conditions,
@@ -120,24 +149,6 @@ class Apps(MySQL):
             offset=(page - 1) * page_size
         )
 
-        if len(apps_mode_list) == 1 and int(apps_mode_list[0]) == 3:
-            # Collect app_ids with mode 3
-            mode_3_app_ids = [item['app_id'] for item in all_app if item['mode'] == 3]
-            
-            # Query datasets to get app_ids where temporary_chatroom_id is 0
-            valid_app_ids = Datasets().select(
-                columns=['app_id'], 
-                conditions=[
-                    {"column": "temporary_chatroom_id", "value": 0},
-                    {"column": "app_id", "op": "in", "value": mode_3_app_ids},
-                    {"column": "status", "op": "<", "value": 3}
-                ]
-            )
-            valid_app_ids = set(item['app_id'] for item in valid_app_ids)
-            
-            # Filter all_app to keep only valid apps
-            all_app = [item for item in all_app if item['mode'] != 3 or item['app_id'] in valid_app_ids]
-        
         workflow_app_ids = []
         other_app_ids = []
         for item in all_app:
