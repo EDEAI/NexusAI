@@ -165,7 +165,7 @@ language_packs = {
         "agent_output_format_3": "in code format",
         "agent_output_format_2_md": "in JSON format contained in Markdown format",
         "agent_callable_items_description": '''
-            Please pay attention to the skills and workflow information I provided (names and descriptions), and fully understand the purpose of each skill and workflow. If the user's questions or needs match the purpose of skills or workflows, then you can invoke the corresponding skills or workflows.
+            Please carefully read the skills and workflow information I provided (names and descriptions). When analyzing the user's questions or needs, please actively confirm whether they are related to any skills or workflows, or can be solved through any skills or workflows. If so, you should prioritize invoking the corresponding skills or workflows rather than attempting to answer directly.
             To invoke a skill, please use the MCP tool skill_run;
             To invoke a workflow, please use the MCP tool workflow_run.
 
