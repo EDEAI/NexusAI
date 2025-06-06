@@ -1,6 +1,5 @@
 from .teams import Teams
 from .users import Users
-from .third_party_users import ThirdPartyUsers
 
 from .suppliers import Suppliers
 from .supplier_configurations import SupplierConfigurations
@@ -48,7 +47,6 @@ from .mcp_servers import MCPServers
 __all__ = [
     'Teams',
     'Users',
-    'ThirdPartyUsers',
     
     'Suppliers',
     'SupplierConfigurations',
