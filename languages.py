@@ -165,7 +165,7 @@ language_packs = {
         "agent_output_format_3": "in code format",
         "agent_output_format_2_md": "in JSON format contained in Markdown format",
         "agent_callable_items_description": '''
-            Please pay attention to the skills and workflow information I provided (names and descriptions), and fully understand the purpose of each skill and workflow. If the user's questions or needs match the purpose of skills or workflows, then you can invoke the corresponding skills or workflows.
+            Please carefully read the skills and workflow information I provided (names and descriptions). When analyzing the user's instructions, please actively confirm whether they are related to any skills or workflows, or can be solved through any skills or workflows. If so, you should prioritize invoking the corresponding skills or workflows rather than attempting to answer directly.
             To invoke a skill, please use the MCP tool skill_run;
             To invoke a workflow, please use the MCP tool workflow_run.
 
@@ -604,6 +604,7 @@ language_packs = {
             3. You need to fully analyze and understand the user's command intention through the current conversation scene and progress, as well as the user's instructions, focus on what the user wants, and do not miss important information, rules or requirements in the instructions
             4. You need to reply based on the current conversation scene and progress, as well as the user's command intention
             5. Don't copy the viewpoints of other agents in the meeting room.
+            6. If you are provided with MCP tools, to reply to the user's instructions, you can invoke the MCP tool(s) provided.
 
             The JSON format of the conversation history is as follows: [round 1, (round 2,) ...]
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
