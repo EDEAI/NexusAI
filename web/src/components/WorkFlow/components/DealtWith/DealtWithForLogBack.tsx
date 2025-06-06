@@ -57,6 +57,8 @@ export default memo((props: any) => {
         if (id) {
             getHumanMessage(id);
         }
+        
+        
         return () => {
             setShow(false);
         };
@@ -324,7 +326,7 @@ export default memo((props: any) => {
             }),
             description: intl.formatMessage({ id: 'workflow.uploadFileDes' }),
 
-            accept: '.txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv',
+            accept: '.txt,.md,.pdf,.html,.xlsx,.pptx,.docx,.csv',
 
             fieldProps: {
                 listType: 'picture',

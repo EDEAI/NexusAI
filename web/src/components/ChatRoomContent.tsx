@@ -22,7 +22,7 @@ import { throttle } from 'lodash';
 import React, { FC, ReactNode, memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
-import { useParams } from 'umi';
+import { useParams, useLocation } from 'umi';
 const { TextArea } = Input;
 
 const downloadFile = (url: string, filename: string) => {
@@ -63,7 +63,7 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
         isUploading,
     } = useFileUpload({
         maxSizeMB: 15,
-        acceptedFileTypes: '.txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv,.jpg,.png,.jpeg',
+        acceptedFileTypes: '.txt,.md,.pdf,.html,.xlsx,.pptx,.docx,.csv,.jpg,.png,.jpeg',
         multiple: true,
     });
 
@@ -511,7 +511,12 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
     } = porpos;
     let intl = useIntl();
     // page id
-    const { id } = useParams<{ id: string }>();
+    const { id: urlParamId } = useParams<{ id: string }>();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const searchParamId = searchParams.get('id');
+    // Use URL param id if available, otherwise use search param id
+    const id = urlParamId || searchParamId;
 
     const setDisableInput = useChatroomStore(state => state.setDisableInput);
 
@@ -595,6 +600,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                 let agentId = JSON.parse(data.slice(22, -2))[1];
                 agentText.current = '';
                 chatReturn.current = true;
+                
                 let currentAgent = agentList.current.filter(
                     (item: any) => item.agent_id == agentId,
                 )[0];
@@ -756,7 +762,12 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
     let intl = useIntl();
     const [currentMessageContent, setCurrentMessageContent]: any = useState([]);
     const [isEnd, setisEnd] = useState(false);
-    const { id } = useParams<{ id: string }>();
+    const { id: urlParamId } = useParams<{ id: string }>();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const searchParamId = searchParams.get('id');
+    // Use URL param id if available, otherwise use search param id
+    const id = urlParamId || searchParamId;
     useEffect(() => {
         if (isEnd) {
             setUserMessage((pre: any) => {
@@ -893,7 +904,14 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
 
     const [bminWidth, setbminWidth] = useState(860);
 
-    const { id } = useParams<{ id: string }>();
+    // Get both URL params and search params
+    const { id: urlParamId } = useParams<{ id: string }>();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const searchParamId = searchParams.get('id');
+    // Use URL param id if available, otherwise use search param id
+    const id = urlParamId || searchParamId;
+
     // const setDisableInput = useChatroomStore(state=>state.setDisableInput)
     // chat history
     const [userMessage, setUserMessage] = useState([]);
@@ -1161,6 +1179,13 @@ export const ChatRoomContent: FC<parameters> = memo(porpos => {
     const [isStop, setIsStop] = useState(false);
     // Parameters to be sent
     const [instruction, setInstruction] = useState([]);
+    // Get both URL params and search params
+    const { id: urlParamId } = useParams<{ id: string }>();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const searchParamId = searchParams.get('id');
+    // Use URL param id if available, otherwise use search param id
+    const id = urlParamId || searchParamId;
 
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -1169,7 +1194,6 @@ export const ChatRoomContent: FC<parameters> = memo(porpos => {
             {contextHolder}
             <div
                 className="mx-[44px] flex justify-center relative box-border pt-[12px] h-full"
-                // style={{ height: 'calc(100% )' }}
             >
                 <div className="flex flex-col w-full h-full">
                     <ChatRoomContentbox
