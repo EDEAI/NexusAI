@@ -33,6 +33,7 @@ export default memo(({ onSubmit }: DealtWithForLogNewProps) => {
 
   const handleSubmitPrompt = useCallback((values: any) => {
     setButtonLoading(true);
+    
     submitPrompt(values).then(res => {
       if (res.code === 0) {
         setShow(false);

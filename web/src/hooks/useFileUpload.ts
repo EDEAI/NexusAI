@@ -30,7 +30,7 @@ export const useFileUpload = (options: UseFileUploadOptions = {}) => {
 
     const {
         maxSizeMB = 15,
-        acceptedFileTypes = '.txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv,.jpg,.png,.jpeg',
+        acceptedFileTypes = '.txt,.md,.pdf,.html,.xlsx,.pptx,.docx,.csv,.jpg,.png,.jpeg',
         multiple = true
     } = options;
 
