@@ -95,7 +95,8 @@ class ChatroomMessages(MySQL):
                              "chatroom_messages.id",
                              "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id",
                              "chatroom_messages.user_id", 'chatroom_messages.file_list',
-                             "chatroom_messages.agent_id", "chatroom_messages.message", "chatroom_messages.is_read",
+                             "chatroom_messages.agent_id", "chatroom_messages.ability_id",
+                             "chatroom_messages.message", "chatroom_messages.is_read",
                              "chatroom_messages.created_time"],
                     joins=[
                         ["left", "chatrooms", "chatrooms.id = chatroom_messages.chatroom_id"],
@@ -111,7 +112,8 @@ class ChatroomMessages(MySQL):
                 list = self.select(
                     columns=["apps.name", "apps.description", "apps.icon", "apps.avatar", "apps.icon_background", "chatroom_messages.id",
                              "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id", "chatroom_messages.user_id", 'chatroom_messages.file_list',
-                             "chatroom_messages.agent_id", "chatroom_messages.message", "chatroom_messages.is_read",
+                             "chatroom_messages.agent_id", "chatroom_messages.ability_id",
+                             "chatroom_messages.message", "chatroom_messages.is_read",
                              "chatroom_messages.created_time"],
                     joins=[
                         ["left", "chatrooms", "chatrooms.id = chatroom_messages.chatroom_id"],
@@ -166,7 +168,8 @@ class ChatroomMessages(MySQL):
                              "chatroom_messages.id",
                              "chatroom_messages.chatroom_id", "chatroom_messages.app_run_id",
                              "chatroom_messages.user_id", 'chatroom_messages.file_list',
-                             "chatroom_messages.agent_id", "chatroom_messages.message", "chatroom_messages.is_read",
+                             "chatroom_messages.agent_id", "chatroom_messages.ability_id",
+                             "chatroom_messages.message", "chatroom_messages.is_read",
                              "chatroom_messages.created_time"],
                     joins=[
                         ["left", "chatrooms", "chatrooms.id = chatroom_messages.chatroom_id"],

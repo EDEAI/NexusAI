@@ -46,9 +46,10 @@ class ChatroomManager:
         self._ws_manager = WebSocketManager(event_loop)
         self._mcp_client = MCPClient()
         self._chatrooms: Dict[int, Chatroom] = {}
-        self._file_lists: Dict[int, List[Union[int, str]]] = {}
-        self._is_desktop: Dict[int, bool] = {}
-        self._desktop_mcp_tool_lists: Dict[int, List[Dict[str, Any]]] = {}
+        self._ability_id_by_chatroom: Dict[int, int] = {}
+        self._file_list_by_chatroom: Dict[int, List[Union[int, str]]] = {}
+        self._is_desktop_by_chatroom: Dict[int, bool] = {}
+        self._desktop_mcp_tool_list_by_chatroom: Dict[int, List[Dict[str, Any]]] = {}
 
     def _get_chatroom_info(self, chatroom_id: int, user_id: int, check_chat_status: bool) -> Dict[str, int]:
         chatroom_info = chatrooms.select_one(
@@ -102,7 +103,7 @@ class ChatroomManager:
     ):
         chatroom_id = chatroom_info['id']
         app_id = chatroom_info['app_id']
-        file_list = self._file_lists.pop(chatroom_id, None)
+        file_list = self._file_list_by_chatroom.pop(chatroom_id, None)
         
         start_time = time()
         if user_input is None:
@@ -205,10 +206,12 @@ class ChatroomManager:
                     user_id, team_id, chatroom_id, app_run_id, bool(chatroom_info['is_temporary']),
                     all_agent_ids, absent_agent_ids,
                     chatroom_info['max_round'], bool(chatroom_info['smart_selection']),
-                    self._ws_manager, user_message, user_message_id, topic,
+                    self._ws_manager, user_message, user_message_id,
+                    self._ability_id_by_chatroom.get(chatroom_id, 0),
+                    topic,
                     self._mcp_client,
-                    self._is_desktop.get(chatroom_id, False),
-                    self._desktop_mcp_tool_lists.get(chatroom_id)
+                    self._is_desktop_by_chatroom.get(chatroom_id, False),
+                    self._desktop_mcp_tool_list_by_chatroom.get(chatroom_id)
                 )
                 self._chatrooms[chatroom_id] = chatroom
                 chatroom.load_history_messages(history_messages)
@@ -323,20 +326,25 @@ class ChatroomManager:
                             # Other commands
                             assert chatroom_id, 'You should ENTER the chatroom first.'
                             match cmd:
+                                case 'SETABILITY':
+                                    # Set ability ID
+                                    assert isinstance(data, int), 'Ability ID should be an integer.'
+                                    self._ability_id_by_chatroom[chatroom_id] = data
+                                    await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                                 case 'FILELIST':
                                     # File list
                                     assert isinstance(data, list), 'File list should be a list.'
-                                    self._file_lists[chatroom_id] = data
+                                    self._file_list_by_chatroom[chatroom_id] = data
                                     await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                                 case 'ISDESKTOP':
                                     # Is desktop
                                     assert isinstance(data, bool), 'Is desktop should be a boolean.'
-                                    self._is_desktop[chatroom_id] = data
+                                    self._is_desktop_by_chatroom[chatroom_id] = data
                                     await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                                 case 'MCPTOOLLIST':
                                     # MCP tool list
                                     assert isinstance(data, list), 'MCP tool list should be a list.'
-                                    self._desktop_mcp_tool_lists[chatroom_id] = data
+                                    self._desktop_mcp_tool_list_by_chatroom[chatroom_id] = data
                                     await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                                 case 'MCPTOOLRESULT':
                                     assert isinstance(data, dict), 'MCP tool result should be a dictionary.'
