@@ -101,6 +101,7 @@ class WebSocketManager:
         self,
         chatroom_id: int,
         agent_id: int,
+        ability_id: int,
         current_message_chunk: str,
         full_message: str,
         new_text: bool
@@ -125,6 +126,7 @@ class WebSocketManager:
                 broadcast(replying_connections, current_message_chunk)
 
             await self.send_instruction_by_connections(not_replying_connections, 'REPLY', agent_id)
+            await self.send_instruction_by_connections(not_replying_connections, 'ABILITY', ability_id)
             if full_message:
                 await self.send_instruction_by_connections(not_replying_connections, 'TEXT')
                 broadcast(not_replying_connections, full_message)
@@ -133,6 +135,7 @@ class WebSocketManager:
         self,
         chatroom_id: int,
         agent_id: int,
+        ability_id: int,
         full_message: str
     ):
         '''
@@ -148,6 +151,7 @@ class WebSocketManager:
                     not_replying_connections.add(connection)
             
             await self.send_instruction_by_connections(not_replying_connections, 'REPLY', agent_id)
+            await self.send_instruction_by_connections(not_replying_connections, 'ABILITY', ability_id)
             await self.send_instruction_by_connections(not_replying_connections, 'TEXT')
             broadcast(not_replying_connections, full_message)
             

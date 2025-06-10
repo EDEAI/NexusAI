@@ -93,6 +93,7 @@ class Chatroom:
         ws_manager: WebSocketManager,
         user_message: str,
         user_message_id: int = 0,
+        ability_id: int = 0,
         topic: Optional[str] = None,
         mcp_client: MCPClient = None,
         is_desktop: bool = False,
@@ -115,6 +116,7 @@ class Chatroom:
         self._ws_manager = ws_manager
         self._user_message = user_message
         self._user_message_id = user_message_id
+        self._ability_id = ability_id
         self._topic = topic
         # self._history_messages: list
         # each item is a dict with the following keys:
@@ -534,6 +536,8 @@ class Chatroom:
                     title=f'Agent {agent_id}',
                     input=ObjectVariable('Input'),
                     agent_id=agent_id,
+                    # Ability ID takes effect only when the chatroom has only one agent
+                    ability_id=self._ability_id if len(self._model_config_ids) <= 2 else 0,
                     prompt=prompt
                 )
                 mcp_tool_list = []
@@ -590,10 +594,8 @@ class Chatroom:
                             agent_message += content
                             await self._ws_manager.send_agent_reply(
                                 self._chatroom_id,
-                                agent_id,
-                                content,
-                                agent_message,
-                                new_text
+                                agent_id, self._ability_id,
+                                content, agent_message, new_text
                             )
                             new_text = False
                         elif isinstance(content, list):
@@ -607,10 +609,8 @@ class Chatroom:
                                             agent_message += item_text
                                             await self._ws_manager.send_agent_reply(
                                                 self._chatroom_id,
-                                                agent_id, 
-                                                item_text,
-                                                agent_message,
-                                                new_text
+                                                agent_id, self._ability_id,
+                                                item_text, agent_message, new_text
                                             )
                                             new_text = False
                                     elif item['type'] == 'tool_use':
@@ -644,10 +644,8 @@ class Chatroom:
                 else:
                     await self._ws_manager.send_agent_reply(
                         self._chatroom_id,
-                        agent_id, 
-                        '',
-                        agent_message,
-                        new_text
+                        agent_id, self._ability_id,
+                        '', agent_message, new_text
                     )
                     new_text = False
                     self._mcp_tool_is_using = True
@@ -782,7 +780,7 @@ class Chatroom:
             
             await self._ws_manager.end_agent_reply(
                 self._chatroom_id,
-                agent_id,
+                agent_id, self._ability_id,
                 agent_message
             )
 
@@ -795,6 +793,7 @@ class Chatroom:
                     'chatroom_id': self._chatroom_id,
                     'app_run_id': self._app_run_id,
                     'agent_id': agent_id,
+                    'ability_id': self._ability_id,
                     'llm_input': [
                         ['system', prompt.get_system()],
                         ['user', prompt.get_user()]
