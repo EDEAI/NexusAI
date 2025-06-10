@@ -133,7 +133,11 @@ export default {
     "app.summaryhistory.results":"运行结果",
     "app.summaryhistory.prompt":"指令提示",
     "app.summaryhistory.userPrompt":"修正提示词",
-    "app.summaryhistory.tag":"待确认",
+"app.summaryhistory.tag":"待确认",
 
-    "app.summaryhistory.submitText":"重新导向"
+"app.summaryhistory.submitText":"重新导向",
+
+"agent.chat.send.failed":"发送消息失败，请重试",
+"agent.chat.fullscreen":"全屏显示",
+"agent.chat.exit.fullscreen":"退出全屏"
 };

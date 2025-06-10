@@ -446,7 +446,7 @@ export default memo((props: Props) => {
             clearFiles();
         } catch (error) {
             setIsWaitingForResponse(false);
-            message.error('发送消息失败，请重试');
+            message.error(intl.formatMessage({ id: 'agent.chat.send.failed' }));
         }
 
         setTimeout(scrollToBottom, 100);
@@ -674,7 +674,7 @@ export default memo((props: Props) => {
                     )}
                 </div>
                 <div
-                    className={`w-full flex-1 flex bg-[#fff] overflow-hidden overflow-x-auto ${isFullscreen ? 'max-w-[1400px]' : ''}`}
+                    className={`w-full flex-1 flex bg-[#fff] overflow-hidden overflow-x-auto ${isFullscreen ? 'max-w-[1400px] mx-auto justify-center' : ''}`}
                     style={{ height: isFullscreen ? 'calc(100vh - 64px)' : 'calc(100vh - 56px)' }}
                 >
                     <ChatRoomContent

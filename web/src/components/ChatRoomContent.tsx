@@ -7,7 +7,9 @@ import useChatroomStore from '@/store/chatroomstate';
 import { userinfodata } from '@/utils/useUser';
 import {
     ArrowDownOutlined,
+    ClearOutlined,
     DownloadOutlined,
+    ExclamationCircleFilled,
     FileDoneOutlined,
     FileOutlined,
     FundProjectionScreenOutlined,
@@ -16,7 +18,7 @@ import {
 } from '@ant-design/icons';
 import { ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Image, Input, Spin, Tag, Tooltip, message } from 'antd';
+import { Button, Image, Input, Modal, Spin, Tag, Tooltip, message } from 'antd';
 import copy from 'copy-to-clipboard';
 import 'highlight.js/styles/atom-one-dark.css';
 import { throttle } from 'lodash';
@@ -46,16 +48,25 @@ interface inputFieldParameters {
     scrollDomRef?: any;
     upButtonDom?: any;
     abilitiesList?: any;
+    agentChatRoomId?: any;
 }
 const InputField: FC<inputFieldParameters> = memo(porpos => {
-    let { setInstruction, messageApi, isStop, scrollDomRef, upButtonDom, abilitiesList } = porpos;
+    let {
+        setInstruction,
+        messageApi,
+        isStop,
+        scrollDomRef,
+        upButtonDom,
+        abilitiesList,
+        agentChatRoomId,
+    } = porpos;
     // useIntl
     let intl = useIntl();
 
     const disableInput = useChatroomStore(state => state.disableInput);
     const setDisableInput = useChatroomStore(state => state.setDisableInput);
     const [abilityId, setAbilityId] = useState(null);
-
+    const setClearMemory = useChatroomStore(state => state.setClearMemory);
     const {
         uploadedFiles,
         handleUpload,
@@ -70,7 +81,20 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
 
     // Value entered by the user
     const [userSendvalue, setUserSendvalue] = useState('');
-
+    const clearContext = () => {
+        const { confirm } = Modal;
+        confirm({
+            title: intl.formatMessage({ id: 'app.chatroom.clear.title' }),
+            icon: <ExclamationCircleFilled />,
+            content: intl.formatMessage({ id: 'app.chatroom.clear.tips' }),
+            okText: intl.formatMessage({ id: 'app.chatroom.clear.confirm' }),
+            okType: 'danger',
+            cancelText: intl.formatMessage({ id: 'app.chatroom.clear.cancel' }),
+            onOk() {
+                setClearMemory(['TRUNCATE', '0']);
+            },
+        });
+    };
     const sendMessageUseFile = message => {
         if (uploadedFiles?.length > 0) {
             setInstruction(['FILELIST', uploadedFiles.map(file => file.file_id)]);
@@ -208,24 +232,37 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
                         </div>
                     )}
                 </Image.PreviewGroup>
-                {abilitiesList?.length > 0 && (
-                    <ProFormSelect
-                        label={intl.formatMessage({ id: 'agent.selectivepower' })}
-                        name="ability_id"
-                        options={abilitiesList}
-                        initialValue={abilityId}
-                        fieldProps={{
-                            placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
-                            size: 'small',
-                            onChange: (value: any) => {
-                                setAbilityId(value);
-                            },
-                        }}
-                        formItemProps={{
-                            className: 'mb-0 flex-1',
-                        }}
-                    />
-                )}
+                <div className="flex flex-wrap gap-2 items-center">
+                    {abilitiesList?.length > 0 && (
+                        <ProFormSelect
+                            label={intl.formatMessage({ id: 'agent.selectivepower' })}
+                            name="ability_id"
+                            options={abilitiesList}
+                            initialValue={abilityId}
+                            fieldProps={{
+                                placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
+                                size: 'small',
+                                onChange: (value: any) => {
+                                    setAbilityId(value);
+                                },
+                            }}
+                            formItemProps={{
+                                className: 'm-0 flex-1',
+                            }}
+                        />
+                    )}
+                    {agentChatRoomId && (
+                        <Button
+                            size="small"
+                            color="danger"
+                            variant="outlined"
+                            onClick={clearContext}
+                            icon={<ClearOutlined></ClearOutlined>}
+                        >
+                            {intl.formatMessage({ id: 'app.chatroom.sidebar.agent_button' })}
+                        </Button>
+                    )}
+                </div>
                 <div
                     className={`flex items-center p-[12px] gap-[10px] box-border border border-[#ccc] bg-[#fff] ${
                         uploadedFiles.length > 0 ? 'rounded-b-[8px]' : 'rounded-[8px]'
@@ -1147,7 +1184,10 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                             (
                                                             {abilitiesList.find(
                                                                 x => item.ability_id == x.value,
-                                                            )?.label || intl.formatMessage({ id: 'app.chatroom.content.abilityNotFound' })}
+                                                            )?.label ||
+                                                                intl.formatMessage({
+                                                                    id: 'app.chatroom.content.abilityNotFound',
+                                                                })}
                                                             )
                                                         </>
                                                     )}
@@ -1306,6 +1346,7 @@ export const ChatRoomContent: FC<parameters> = memo(porpos => {
                         isStop={isStop}
                         upButtonDom={upButtonDom}
                         scrollDomRef={scrollDomRef}
+                        agentChatRoomId={agentChatRoomId}
                         abilitiesList={abilitiesList}
                     ></InputField>
                 </div>

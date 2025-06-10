@@ -127,7 +127,11 @@ export default {
     "app.summaryhistory.results":"Execution results",
     "app.summaryhistory.prompt":"Instruction prompt",
     "app.summaryhistory.userPrompt":"Correction prompt",
-    "app.summaryhistory.tag":"Pending",
+"app.summaryhistory.tag":"Pending",
 
-    "app.summaryhistory.submitText":"Reorientation"
+"app.summaryhistory.submitText":"Reorientation",
+
+"agent.chat.send.failed":"Failed to send message, please try again",
+"agent.chat.fullscreen":"Fullscreen",
+"agent.chat.exit.fullscreen":"Exit Fullscreen"
 };
