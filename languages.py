@@ -1539,9 +1539,8 @@ language_packs = {
     }
 }
 
-# Dictionary to store all prompt keys
-prompt_keys = {
-    "requirement_category",
+# Dictionary to store all prompt keys (ordered)
+prompt_keys = [
     "agent_system_prompt_with_auto_match_ability",
     "agent_system_prompt_with_auto_match_ability_direct_output",
     "agent_system_prompt_with_abilities",
@@ -1561,35 +1560,19 @@ prompt_keys = {
     "agent_team_members",
     "agent_user_prompt",
     "agent_user_prompt_with_retrieved_docs",
-    "llm_reply_requirement_with_task_splitting",
-    "recursive_task_generation",
-    "recursive_task_assign",
-    "recursive_task_execute",
-    "recursive_task_execute_agent_user_subprompt",
+    
     "chatroom_manager_system",
     "chatroom_manager_system_with_optional_selection",
-    "chatroom_manager_user_invalid_selection",
     "chatroom_manager_user",
     "chatroom_manager_user_with_optional_selection",
-    "chatroom_agent_user_subprompt",
+    "chatroom_manager_user_invalid_selection",
     "chatroom_agent_description_with_abilities",
     "chatroom_agent_description_with_no_ability",
+    "chatroom_agent_user_subprompt",
     "chatroom_role_user",
     "chatroom_role_agent",
     "chatroom_title_system",
     "chatroom_title_user",
-    "generate_agent_system_prompt",
-    "generate_agent_user",
-    "regenerate_agent_system",
-    "regenerate_agent_user",
-    "agent_supplement_system",
-    "agent_supplement_user",
-    "agent_batch_sample_system",
-    "agent_batch_one_system",
-    "agent_batch_one_user",
-    "agent_batch_sample_user",
-    "agent_batch_generate_system",
-    "agent_batch_generate_user",
     "chatroom_meeting_summary_system",
     "chatroom_meeting_summary_user",
     "chatroom_meeting_summary_system_correct",
@@ -1600,12 +1583,32 @@ prompt_keys = {
     "chatroom_conference_orientation_user",
     "chatroom_conference_orientation_system_correct",
     "chatroom_conference_orientation_user_correct",
+    
+    "requirement_category",
+    "llm_reply_requirement_with_task_splitting",
+    "recursive_task_generation",
+    "recursive_task_assign",
+    "recursive_task_execute",
+    "recursive_task_execute_agent_user_subprompt",
+    
+    "generate_agent_system_prompt",
+    "generate_agent_user",
+    "regenerate_agent_system",
+    "regenerate_agent_user",
+    "agent_supplement_system",
+    "agent_supplement_user",
+    "agent_batch_sample_system",
+    "agent_batch_sample_user",
+    "agent_batch_one_system",
+    "agent_batch_one_user",
+    "agent_batch_generate_system",
+    "agent_batch_generate_user",
+    
     "generate_skill_system_prompt",
     "generate_skill_user",
     "correction_skill_system_prompt",
     "correction_skill_user"
-}
-
+]
 
 def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = True) -> Any:
     """
@@ -1650,3 +1653,197 @@ def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = 
     if isinstance(content, dict):
         return content.copy()
     return content
+
+# Dictionary to store prompt function descriptions
+prompt_descriptions = {
+    "en": [
+        {
+            "group_name": "Agent",
+            "prompts": {
+                "agent_system_prompt_with_auto_match_ability": "Agent System Prompt (Auto-Match Ability - JSON Output with Ability ID)",
+                "agent_system_prompt_with_auto_match_ability_direct_output": "Agent System Prompt (Auto-Match Ability - Text Output without Ability ID)",
+                "agent_system_prompt_with_abilities": "Agent System Prompt (Specify One or All Abilities)",
+                "agent_system_prompt_with_no_ability": "Agent System Prompt (No Ability)",
+                "agent_retrieved_docs_format": "Agent Retrieved Knowledge Base Content Format [Sub]",
+                "agent_reply_requirement_with_auto_match_ability": "Agent Reply Requirement (Auto-Match Ability) [Sub]",
+                # "agent_reply_requirement_with_task_splitting_and_auto_match_ability": "Agent Reply Requirement with Task Splitting and Auto-Match Ability",
+                # "agent_reply_requirement_with_task_splitting_and_abilities": "Agent Reply Requirement with Task Splitting and Abilities",
+                # "agent_reply_requirement_with_task_splitting_and_no_ability": "Agent Reply Requirement with Task Splitting (No Ability)",
+                # "agent_output_format_1": "Agent Output Format: Plain Text",
+                # "agent_output_format_2": "Agent Output Format: JSON",
+                # "agent_output_format_3": "Agent Output Format: Code",
+                # "agent_output_format_2_md": "Agent Output Format: JSON in Markdown",
+                "agent_callable_items_description": "Agent MCP Tool Calling Requirements (Skills, Workflows) [Sub]",
+                "agent_callable_skills": "Agent Callable Skills List [Sub]",
+                "agent_callable_workflows": "Agent Callable Workflows List [Sub]",
+                "agent_team_members": "Team Members List [Sub]",
+                "agent_user_prompt": "Agent User Prompt (Not Bound to Knowledge Base)",
+                "agent_user_prompt_with_retrieved_docs": "Agent User Prompt (With Knowledge Base Retrieval)"
+            }
+        },
+        {
+            "group_name": "Round Table",
+            "prompts": {
+                "chatroom_manager_system": "Round Table Manager System Prompt (Must Select Next Speaking Agent)",
+                "chatroom_manager_system_with_optional_selection": "Round Table Manager System Prompt (Optional Selection of Next Agent or End Conversation)",
+                "chatroom_manager_user": "Round Table Manager User Prompt (Must Select Next Speaking Agent)",
+                "chatroom_manager_user_with_optional_selection": "Round Table Manager User Prompt (Optional Selection of Next Agent or End Conversation)",
+                "chatroom_manager_user_invalid_selection": "Round Table Manager User Prompt (Previous Selection Invalid, Reselect) [Sub]",
+                "chatroom_agent_description_with_abilities": "Round Table Manager User Prompt (Agent with Abilities) [Sub]",
+                "chatroom_agent_description_with_no_ability": "Round Table Manager User Prompt (Agent without Ability) [Sub]",
+                "chatroom_agent_user_subprompt": "Agent User Prompt in Round Table [Sub]",
+                # "chatroom_role_user": "Chatroom User Role",
+                # "chatroom_role_agent": "Chatroom Agent Role",
+                "chatroom_title_system": "Round Table Title Generator System Prompt",
+                "chatroom_title_user": "Round Table Title Generator User Prompt"
+            }
+        },
+        {
+            "group_name": "Round Table Orientation",
+            "prompts": {
+                "chatroom_meeting_summary_system": "Round Table Discussion Summary System Prompt",
+                "chatroom_meeting_summary_user": "Round Table Discussion Summary User Prompt",
+                "chatroom_meeting_summary_system_correct": "Round Table Discussion Summary Correction System Prompt",
+                "chatroom_meeting_summary_user_correct": "Round Table Discussion Summary Correction User Prompt",
+                "chatroom_generate_meeting_summary_from_a_single_message_system_correct": "Round Table Discussion Summary System Prompt (Single Message)",
+                "chatroom_generate_meeting_summary_from_a_single_message_user_correct": "Round Table Discussion Summary User Prompt (Single Message)",
+                "chatroom_conference_orientation_system": "Round Table Orientation Data Generation System Prompt",
+                "chatroom_conference_orientation_user": "Round Table Orientation Data Generation User Prompt",
+                "chatroom_conference_orientation_system_correct": "Round Table Orientation Data Correction System Prompt",
+                "chatroom_conference_orientation_user_correct": "Round Table Orientation Data Correction User Prompt"
+            }
+        },
+        {
+            "group_name": "Workflow Nodes",
+            "prompts": {
+                "requirement_category": "Problem Classifier Node Prompt",
+                # "llm_reply_requirement_with_task_splitting": "LLM Reply Requirement with Task Splitting",
+                "recursive_task_generation": "Recursive Task Generation Node Prompt",
+                "recursive_task_assign": "Recursive Task Assignment Prompt",
+                "recursive_task_execute": "Recursive Task Execution Node Prompt",
+                "recursive_task_execute_agent_user_subprompt": "Recursive Task Execution Corresponding Agent User Prompt [Sub]"
+            }
+        },
+        {
+            "group_name": "AI Generate Agent",
+            "prompts": {
+                "generate_agent_system_prompt": "AI Generate Agent System Prompt",
+                "generate_agent_user": "AI Generate Agent User Prompt",
+                "regenerate_agent_system": "AI Regenerate Agent System Prompt",
+                "regenerate_agent_user": "AI Regenerate Agent User Prompt",
+                "agent_supplement_system": "AI Correct Agent System Prompt",
+                "agent_supplement_user": "AI Correct Agent User Prompt",
+                "agent_batch_sample_system": "AI Generate Sample Agent System Prompt",
+                "agent_batch_sample_user": "AI Generate Sample Agent User Prompt",
+                "agent_batch_one_system": "AI Batch Generate Agent System Prompt",
+                "agent_batch_one_user": "AI Batch Generate Agent User Prompt"
+                # "agent_batch_generate_system": "AI Batch Generate Agent System Prompt",
+                # "agent_batch_generate_user": "AI Batch Generate Agent User Prompt",
+            }
+        },
+        {
+            "group_name": "AI Generate Skill",
+            "prompts": {
+                "generate_skill_system_prompt": "AI Generate Skill System Prompt",
+                "generate_skill_user": "AI Generate Skill User Prompt",
+                "correction_skill_system_prompt": "AI Correct Skill System Prompt",
+                "correction_skill_user": "AI Correct Skill User Prompt"
+            }
+        }
+    ],
+    "zh": [
+        {
+            "group_name": "智能体",
+            "prompts": {
+                "agent_system_prompt_with_auto_match_ability": "智能体系统提示词（自动匹配能力-带能力ID的JSON结构输出）",
+                "agent_system_prompt_with_auto_match_ability_direct_output": "智能体系统提示词（自动匹配能力-不带能力ID的文本输出）",
+                "agent_system_prompt_with_abilities": "智能体系统提示词（指定一个或全部能力）",
+                "agent_system_prompt_with_no_ability": "智能体系统提示词（无能力）",
+                "agent_retrieved_docs_format": "智能体检索知识库内容格式【子】",
+                "agent_reply_requirement_with_auto_match_ability": "智能体回复要求（自动匹配能力）【子】",
+                # "agent_reply_requirement_with_task_splitting_and_auto_match_ability": "智能体回复要求（任务拆分和自动匹配能力）",
+                # "agent_reply_requirement_with_task_splitting_and_abilities": "智能体回复要求（任务拆分和能力）",
+                # "agent_reply_requirement_with_task_splitting_and_no_ability": "智能体回复要求（任务拆分-无能力）",
+                # "agent_output_format_1": "智能体输出格式：纯文本【子】",
+                # "agent_output_format_2": "智能体输出格式：JSON【子】",
+                # "agent_output_format_3": "智能体输出格式：代码【子】",
+                # "agent_output_format_2_md": "智能体输出格式：Markdown形式的JSON【子】",
+                "agent_callable_items_description": "智能体调用MCP工具（技能、工作流）要求【子】",
+                "agent_callable_skills": "智能体可调用技能列表【子】",
+                "agent_callable_workflows": "智能体可调用工作流列表【子】",
+                "agent_team_members": "团队成员列表【子】",
+                "agent_user_prompt": "智能体用户提示词（未绑定知识库）",
+                "agent_user_prompt_with_retrieved_docs": "智能体用户提示词（检索知识库）"
+            }
+        },
+        {
+            "group_name": "圆桌",
+            "prompts": {
+                "chatroom_manager_system": "圆桌管理员系统提示词（必选下一个发言的智能体）",
+                "chatroom_manager_system_with_optional_selection": "圆桌管理员系统提示词（可选下一个发言的智能体或结束对话）",
+                "chatroom_manager_user": "圆桌管理员用户提示词（必选下一个发言的智能体）",
+                "chatroom_manager_user_with_optional_selection": "圆桌管理员用户提示词（可选下一个发言的智能体或结束对话）",
+                "chatroom_manager_user_invalid_selection": "圆桌管理员用户提示词（上一次选择无效，重新选择）【子】",
+                "chatroom_agent_description_with_abilities": "圆桌管理员用户提示词（智能体有能力）【子】",
+                "chatroom_agent_description_with_no_ability": "圆桌管理员用户提示词（智能体无能力）【子】",
+                "chatroom_agent_user_subprompt": "圆桌中智能体的用户提示词【子】",
+                # "chatroom_role_user": "聊天室用户角色",
+                # "chatroom_role_agent": "聊天室智能体角色",
+                "chatroom_title_system": "圆桌标题生成器系统提示词",
+                "chatroom_title_user": "圆桌标题生成器用户提示词"
+            }
+        },
+        {
+            "group_name": "圆桌导向",
+            "prompts": {
+                "chatroom_meeting_summary_system": "圆桌讨论总结系统提示词",
+                "chatroom_meeting_summary_user": "圆桌讨论总结用户提示词",
+                "chatroom_meeting_summary_system_correct": "圆桌讨论总结修正系统提示词",
+                "chatroom_meeting_summary_user_correct": "圆桌讨论总结修正用户提示词",
+                "chatroom_generate_meeting_summary_from_a_single_message_system_correct": "圆桌讨论总结系统提示词（单条消息）",
+                "chatroom_generate_meeting_summary_from_a_single_message_user_correct": "圆桌讨论总结用户提示词（单条消息）",
+                "chatroom_conference_orientation_system": "圆桌导向数据生成系统提示词",
+                "chatroom_conference_orientation_user": "圆桌导向数据生成用户提示词",
+                "chatroom_conference_orientation_system_correct": "圆桌导向数据修正系统提示词",
+                "chatroom_conference_orientation_user_correct": "圆桌导向数据修正用户提示词"
+            }
+        },
+        {
+            "group_name": "工作流节点",
+            "prompts": {
+                "requirement_category": "问题分类器节点提示词",
+                # "llm_reply_requirement_with_task_splitting": "LLM回复要求（任务拆分）",
+                "recursive_task_generation": "递归任务生成节点提示词",
+                "recursive_task_assign": "递归任务分配提示词",
+                "recursive_task_execute": "递归任务执行节点提示词",
+                "recursive_task_execute_agent_user_subprompt": "递归任务执行对应的智能体用户提示词【子】"
+            }
+        },
+        {
+            "group_name": "AI生成智能体",
+            "prompts": {
+                "generate_agent_system_prompt": "AI生成智能体系统提示词",
+                "generate_agent_user": "AI生成智能体用户提示词",
+                "regenerate_agent_system": "AI重新生成智能体系统提示词",
+                "regenerate_agent_user": "AI重新生成智能体用户提示词",
+                "agent_supplement_system": "AI修正智能体系统提示词",
+                "agent_supplement_user": "AI修正智能体用户提示词",
+                "agent_batch_sample_system": "AI生成样例智能体系统提示词",
+                "agent_batch_sample_user": "AI生成样例智能体用户提示词",
+                "agent_batch_one_system": "AI批量生成智能体系统提示词",
+                "agent_batch_one_user": "AI批量生成智能体用户提示词"
+                # "agent_batch_generate_system": "AI批量生成智能体系统提示词",
+                # "agent_batch_generate_user": "AI批量生成智能体用户提示词",
+            }
+        },
+        {
+            "group_name": "AI生成技能",
+            "prompts": {
+                "generate_skill_system_prompt": "AI生成技能系统提示词",
+                "generate_skill_user": "AI生成技能用户提示词",
+                "correction_skill_system_prompt": "AI修正技能系统提示词",
+                "correction_skill_user": "AI修正技能用户提示词"
+            }
+        }
+    ]
+}
