@@ -63,7 +63,7 @@ export default {
     'app.check_workflow_popup.search': 'Please enter a keyword to search',
     'app.check_workflow_popup.save': 'Confirm',
     'app.check_workflow_popup.cancel': 'Cancel',
-    
+
     'app.check_popup.add':'Added',
 
     'app.check_popup.check': 'Add all',
@@ -91,6 +91,7 @@ export default {
     'app.chatroom.content.copySucceed': 'Copy Successful',
     'app.chatroom.content.addAgentTips': 'Added Successfully',
     'app.chatroom.content.addAgentTips_fail': 'Addition Failed',
+    'app.chatroom.content.abilityNotFound': 'Ability not found',
 
     'app.dashboard.None': 'No Data',
 

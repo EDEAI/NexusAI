@@ -21,7 +21,7 @@ const ResizablePanel: React.FC<ResizablePanelProps> = ({
     children,
     className = '',
     dragDirection = 'left',
-    minWidth = 415,
+    minWidth = 115,
     maxWidth = 820,
     minHeight = 200,
     maxHeight = 800,
@@ -54,7 +54,7 @@ const ResizablePanel: React.FC<ResizablePanelProps> = ({
     return (
         <div
             ref={containerRef}
-            style={{ 
+            style={{
                 width: ['left', 'right'].includes(dragDirection) ? `${panelWidth}px` : undefined,
                 height: ['top', 'bottom'].includes(dragDirection) ? `${panelHeight}px` : undefined
             }}

@@ -14,6 +14,7 @@ import {
     PauseCircleOutlined,
     UploadOutlined,
 } from '@ant-design/icons';
+import { ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Button, Image, Input, Spin, Tag, Tooltip, message } from 'antd';
 import copy from 'copy-to-clipboard';
@@ -22,7 +23,7 @@ import { throttle } from 'lodash';
 import React, { FC, ReactNode, memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
-import { useParams, useLocation } from 'umi';
+import { useLocation, useParams } from 'umi';
 const { TextArea } = Input;
 
 const downloadFile = (url: string, filename: string) => {
@@ -34,9 +35,7 @@ const downloadFile = (url: string, filename: string) => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    } catch (e) {
-     
-    }
+    } catch (e) {}
 };
 
 // User enters text here
@@ -46,14 +45,16 @@ interface inputFieldParameters {
     isStop?: any;
     scrollDomRef?: any;
     upButtonDom?: any;
+    abilitiesList?: any;
 }
 const InputField: FC<inputFieldParameters> = memo(porpos => {
-    let { setInstruction, messageApi, isStop, scrollDomRef, upButtonDom } = porpos;
+    let { setInstruction, messageApi, isStop, scrollDomRef, upButtonDom, abilitiesList } = porpos;
     // useIntl
     let intl = useIntl();
 
     const disableInput = useChatroomStore(state => state.disableInput);
     const setDisableInput = useChatroomStore(state => state.setDisableInput);
+    const [abilityId, setAbilityId] = useState(null);
 
     const {
         uploadedFiles,
@@ -73,6 +74,10 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
     const sendMessageUseFile = message => {
         if (uploadedFiles?.length > 0) {
             setInstruction(['FILELIST', uploadedFiles.map(file => file.file_id)]);
+            if (abilityId) {
+                setInstruction(['SETABILITY', abilityId]);
+            }
+
             setTimeout(() => {
                 setInstruction(['INPUT', message]);
 
@@ -81,7 +86,13 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
                 }
             }, 300);
         } else {
-            setInstruction(['INPUT', message]);
+            if (abilityId) {
+                setInstruction(['SETABILITY', abilityId]);
+            }
+
+            setTimeout(() => {
+                setInstruction(['INPUT', message]);
+            }, 300);
         }
     };
     // Send message
@@ -99,6 +110,7 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
             setDisableInput(true);
             setUserSendvalue('');
             sendMessageUseFile(e.target.value);
+
             e.preventDefault();
         }
     };
@@ -129,78 +141,91 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
                 </div>
 
                 <Image.PreviewGroup>
-                            {uploadedFiles.length > 0 && (
-                                <div className="p-2 border-b border-gray-200">
-                                    <div className="flex flex-wrap gap-2">
-                                        {uploadedFiles.map(file => (
-                                            <Tag
-                                                key={file.uid}
-                                                closable
-                                                onClose={() => handleRemoveFile(file.uid)}
-                                                className={`flex items-center ${
-                                                    file.isImage
-                                                        ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-                                                        : 'bg-blue-50 text-blue-600'
-                                                }`}
-                                            >
-                                                <Tooltip title={file.name}>
-                                                    <div className="flex items-center">
-                                                        {file.isImage ? (
-                                                            <div className="mr-1 flex items-center">
-                                                                <Image
-                                                                    src={file.path_show || file.url}
-                                                                    alt={file.name}
-                                                                    className="w-6 h-6 max-w-6 max-h-6 object-cover mr-1 rounded-sm cursor-pointer"
-                                                                    preview={{
-                                                                        src:
-                                                                            file.path_show ||
-                                                                            file.url,
-                                                                        mask: false,
-                                                                    }}
-                                                                />
-                                                                <span className="truncate mr-1">
-                                                                    {file.name}
-                                                                </span>
-                                                                <DownloadOutlined
-                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
-                                                                    onClick={e => {
-                                                                        e.stopPropagation();
-                                                                        downloadFile(
-                                                                            file.path_show ||
-                                                                                file.url,
-                                                                            file.name,
-                                                                        );
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        ) : (
-                                                            <div className="flex items-center">
-                                                                <FileOutlined className="mr-1" />
-                                                                <span className="truncate mr-1">
-                                                                    {file.name}
-                                                                </span>
-                                                                <DownloadOutlined
-                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
-                                                                    onClick={e => {
-                                                                        e.stopPropagation();
-                                                                        downloadFile(
-                                                                            file.path_show ||
-                                                                                file.url,
-                                                                            file.name,
-                                                                        );
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        )}
+                    {uploadedFiles.length > 0 && (
+                        <div className="p-2 border-b border-gray-200">
+                            <div className="flex flex-wrap gap-2">
+                                {uploadedFiles.map(file => (
+                                    <Tag
+                                        key={file.uid}
+                                        closable
+                                        onClose={() => handleRemoveFile(file.uid)}
+                                        className={`flex items-center ${
+                                            file.isImage
+                                                ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                                                : 'bg-blue-50 text-blue-600'
+                                        }`}
+                                    >
+                                        <Tooltip title={file.name}>
+                                            <div className="flex items-center">
+                                                {file.isImage ? (
+                                                    <div className="mr-1 flex items-center">
+                                                        <Image
+                                                            src={file.path_show || file.url}
+                                                            alt={file.name}
+                                                            className="w-6 h-6 max-w-6 max-h-6 object-cover mr-1 rounded-sm cursor-pointer"
+                                                            preview={{
+                                                                src: file.path_show || file.url,
+                                                                mask: false,
+                                                            }}
+                                                        />
+                                                        <span className="truncate mr-1">
+                                                            {file.name}
+                                                        </span>
+                                                        <DownloadOutlined
+                                                            className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
+                                                            onClick={e => {
+                                                                e.stopPropagation();
+                                                                downloadFile(
+                                                                    file.path_show || file.url,
+                                                                    file.name,
+                                                                );
+                                                            }}
+                                                        />
                                                     </div>
-                                                </Tooltip>
-                                            </Tag>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </Image.PreviewGroup>
-
+                                                ) : (
+                                                    <div className="flex items-center">
+                                                        <FileOutlined className="mr-1" />
+                                                        <span className="truncate mr-1">
+                                                            {file.name}
+                                                        </span>
+                                                        <DownloadOutlined
+                                                            className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
+                                                            onClick={e => {
+                                                                e.stopPropagation();
+                                                                downloadFile(
+                                                                    file.path_show || file.url,
+                                                                    file.name,
+                                                                );
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </Tooltip>
+                                    </Tag>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </Image.PreviewGroup>
+                {abilitiesList?.length > 0 && (
+                    <ProFormSelect
+                        label={intl.formatMessage({ id: 'agent.selectivepower' })}
+                        name="ability_id"
+                        options={abilitiesList}
+                        initialValue={abilityId}
+                        fieldProps={{
+                            placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
+                            size: 'small',
+                            onChange: (value: any) => {
+                                setAbilityId(value);
+                            },
+                        }}
+                        formItemProps={{
+                            className: 'mb-0 flex-1',
+                        }}
+                    />
+                )}
                 <div
                     className={`flex items-center p-[12px] gap-[10px] box-border border border-[#ccc] bg-[#fff] ${
                         uploadedFiles.length > 0 ? 'rounded-b-[8px]' : 'rounded-[8px]'
@@ -342,26 +367,26 @@ const renderers = (index: any, intl: any) => {
                 return <code {...props}>{children}</code>;
             }
         },
-        img: ({node, ...props}) => (
+        img: ({ node, ...props }) => (
             <div className="relative group">
-                <Image 
-                    src={props.src} 
-                    alt={props.alt} 
+                <Image
+                    src={props.src}
+                    alt={props.alt}
                     className="max-w-full max-h-40 h-auto rounded-md"
                 />
                 <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button 
-                        type="primary" 
-                        size="small" 
-                        icon={<DownloadOutlined />} 
-                        onClick={(e) => {
+                    <Button
+                        type="primary"
+                        size="small"
+                        icon={<DownloadOutlined />}
+                        onClick={e => {
                             e.stopPropagation();
                             downloadFile(props.src || '', props.alt || 'image.png');
                         }}
                     />
                 </div>
             </div>
-        )
+        ),
     };
 };
 // Copy entire chat
@@ -496,6 +521,7 @@ interface chatwindowParameters {
     upButtonDom?: any;
     setIsStop?: any;
     setSendValue?: any;
+    agentChatRoomId?: any;
 }
 const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
     let {
@@ -508,6 +534,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
         setIsStop,
         setisEnd,
         setSendValue,
+        agentChatRoomId,
     } = porpos;
     let intl = useIntl();
     // page id
@@ -516,7 +543,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
     const searchParams = new URLSearchParams(location.search);
     const searchParamId = searchParams.get('id');
     // Use URL param id if available, otherwise use search param id
-    const id = urlParamId || searchParamId;
+    const id = agentChatRoomId || urlParamId || searchParamId;
 
     const setDisableInput = useChatroomStore(state => state.setDisableInput);
 
@@ -571,6 +598,16 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                         upButtonDom.current.style.display = 'none';
                     });
                     break;
+                // case 'ABILITY':
+                //     setCurrentMessageContent((pre: any) => {
+                //         const newPre = [...pre];
+                //         if (newPre.length) {
+                //             newPre[newPre.length - 1].ability_id = array[1];
+                //         }
+                //         debugger
+                //         return newPre;
+                //     });
+                //     break;
                 case 'STOPPABLE':
                     setIsStop(array[1]);
                     break;
@@ -600,7 +637,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                 let agentId = JSON.parse(data.slice(22, -2))[1];
                 agentText.current = '';
                 chatReturn.current = true;
-                
+
                 let currentAgent = agentList.current.filter(
                     (item: any) => item.agent_id == agentId,
                 )[0];
@@ -619,6 +656,20 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                 });
                 setIsStop(true);
                 setTruncatable(false);
+            }
+        }
+
+        if (data.indexOf('ABILITY') !== -1) {
+            if (data.indexOf('--NEXUSAI-INSTRUCTION-') !== -1) {
+                let ability_id = JSON.parse(data.slice(22, -2))[1];
+
+                setCurrentMessage((pre: any) => {
+                    return {
+                        ...pre,
+                        is_agent: 1,
+                        ability_id: ability_id,
+                    };
+                });
             }
         }
         if (data.indexOf('--NEXUSAI-INSTRUCTION-') === -1 && chatReturn.current) {
@@ -670,7 +721,7 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
     useEffect(() => {
         runSocket();
     }, []);
-    
+
     return (
         <>
             {currentMessage.name ? (
@@ -684,7 +735,10 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                     ) : (
                         <Avatar data={{ avatar: '/icons/user_header.svg' }} />
                     )}
-                    <div className="flex1 max-w-[560px] text-right" id={`addcontent`}>
+                    <div
+                        className={`flex1 ${agentChatRoomId ? '' : 'max-w-[560px]'} text-right`}
+                        id={`addcontent`}
+                    >
                         <div
                             className={`${
                                 currentMessage.is_agent == 1 ? 'text-left' : 'text-right'
@@ -712,14 +766,15 @@ const Chatwindow: FC<chatwindowParameters> = memo(porpos => {
                                 }
                                 id={`addchilContent`}
                             >
-                                {currentMessage.file_list && currentMessage.file_list.length > 0 && (
-                                    <div className="mb-3">
-                                        <FileListDisplay 
-                                            fileList={currentMessage.file_list} 
-                                            onDownload={downloadFile} 
-                                        />
-                                    </div>
-                                )}
+                                {currentMessage.file_list &&
+                                    currentMessage.file_list.length > 0 && (
+                                        <div className="mb-3">
+                                            <FileListDisplay
+                                                fileList={currentMessage.file_list}
+                                                onDownload={downloadFile}
+                                            />
+                                        </div>
+                                    )}
                                 <ReactMarkdown
                                     rehypePlugins={[rehypeHighlight]}
                                     components={renderers('add', intl)}
@@ -746,6 +801,8 @@ interface chatwindowContParameters {
     upButtonDom?: any;
     setIsStop?: any;
     setSendValue?: any;
+    agentChatRoomId?: any;
+    abilitiesList?: any;
 }
 // Current round of speaking until the end of this round is merged into the main array
 const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
@@ -758,6 +815,8 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
         upButtonDom,
         setIsStop,
         setSendValue,
+        agentChatRoomId,
+        abilitiesList,
     } = porpos;
     let intl = useIntl();
     const [currentMessageContent, setCurrentMessageContent]: any = useState([]);
@@ -796,7 +855,7 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                             <Avatar data={{ avatar: '/icons/user_header.svg' }} />
                         )}
                         <div
-                            className="flex1 max-w-[560px] text-right"
+                            className={`flex1 ${agentChatRoomId ? '' : 'max-w-[560px]'} text-right`}
                             id={`currentContent${index}`}
                         >
                             <div
@@ -805,6 +864,15 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                                 } font-[500] text-[14px] text-[#213044] pb-[8px]`}
                             >
                                 {item.name ? item.name : userinfodata('GET').nickname}
+                                {item.name && item.ability_id > 0 && (
+                                    <>
+                                        {' '}
+                                        (
+                                        {abilitiesList.find(x => item.ability_id == x.value)
+                                            ?.label || '未找到该能力'}
+                                        )
+                                    </>
+                                )}
                             </div>
                             <div
                                 className={`flex ${
@@ -826,9 +894,9 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                                 >
                                     {item.file_list && item.file_list.length > 0 && (
                                         <div className="mb-3">
-                                            <FileListDisplay 
-                                                fileList={item.file_list} 
-                                                onDownload={downloadFile} 
+                                            <FileListDisplay
+                                                fileList={item.file_list}
+                                                onDownload={downloadFile}
                                             />
                                         </div>
                                     )}
@@ -848,12 +916,14 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                                         idName="currentContent"
                                         cidName="currentChilContent"
                                     />
-                                    <SummaryButton
-                                        id={id}
-                                        index={index}
-                                        idName="currentContent"
-                                        cidName="currentChilContent"
-                                    />
+                                    {!agentChatRoomId && (
+                                        <SummaryButton
+                                            id={id}
+                                            index={index}
+                                            idName="currentContent"
+                                            cidName="currentChilContent"
+                                        />
+                                    )}
                                 </div>
                             ) : (
                                 <></>
@@ -874,6 +944,7 @@ const ChatwindowCont: React.FC<chatwindowContParameters> = memo(porpos => {
                 setIsStop={setIsStop}
                 setisEnd={setisEnd}
                 setSendValue={setSendValue}
+                agentChatRoomId={agentChatRoomId}
             ></Chatwindow>
         </>
     );
@@ -887,6 +958,8 @@ interface contentParameters {
     setIsStop?: any;
     upButtonDom?: any;
     agentList?: any;
+    agentChatRoomId?: any;
+    abilitiesList?: any;
 }
 // Main section
 const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
@@ -898,6 +971,8 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
         upButtonDom,
         setInstruction,
         agentList,
+        agentChatRoomId,
+        abilitiesList,
     } = porpos;
 
     let intl = useIntl();
@@ -909,8 +984,9 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const searchParamId = searchParams.get('id');
+
     // Use URL param id if available, otherwise use search param id
-    const id = urlParamId || searchParamId;
+    const id = agentChatRoomId || urlParamId || searchParamId;
 
     // const setDisableInput = useChatroomStore(state=>state.setDisableInput)
     // chat history
@@ -948,7 +1024,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                         : [...pre, ...res.data.list.reverse()];
                 });
                 if (init) {
-                    if(scrollDomRef && scrollDomRef.current){
+                    if (scrollDomRef && scrollDomRef.current) {
                         setTimeout(() => {
                             scrollDomRef.current.scrollTop = 0;
                             upButtonDom.current.style.display = 'none';
@@ -999,7 +1075,6 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
         if (instruction && instruction.length) {
             setsendMessageinit(instruction[0], instruction[1] ? instruction[1] : '');
             setInstruction([]);
-          
         }
     }, [instruction]);
 
@@ -1009,19 +1084,16 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
     }, []);
     useEffect(() => {
         const handleResize = () => {
-            if(window.innerWidth < 1280){
-                
-            }else{
-                setbminWidth((window.innerWidth - 320) - (window.innerWidth - 320)/2 - 88);
+            if (window.innerWidth < 1280) {
+            } else {
+                setbminWidth(window.innerWidth - 320 - (window.innerWidth - 320) / 2 - 88);
             }
         };
 
-        handleResize()
+        handleResize();
 
-        // 添加事件监听器
         window.addEventListener('resize', handleResize);
 
-        // 清除事件监听器
         return () => {
             window.removeEventListener('resize', handleResize);
         };
@@ -1033,7 +1105,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                 ref={scrollDomRef}
                 onScroll={slideScroll}
             >
-                <div  style={{minWidth:`${bminWidth}px`}}>
+                <div style={{ minWidth: agentChatRoomId ? '' : `${bminWidth}px` }}>
                     <div className="w-full">
                         <div className="flex flex-col-reverse">
                             <>
@@ -1054,7 +1126,9 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                 />
                                             )}
                                             <div
-                                                className="flex1 max-w-[560px] text-right"
+                                                className={`flex1 ${
+                                                    agentChatRoomId ? '' : 'max-w-[560px]'
+                                                } text-right`}
                                                 id={`content${index}`}
                                             >
                                                 <div
@@ -1067,6 +1141,16 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                     {item.name
                                                         ? item.name
                                                         : userinfodata('GET').nickname}
+                                                    {item.ability_id > 0 && (
+                                                        <>
+                                                            {' '}
+                                                            (
+                                                            {abilitiesList.find(
+                                                                x => item.ability_id == x.value,
+                                                            )?.label || intl.formatMessage({ id: 'app.chatroom.content.abilityNotFound' })}
+                                                            )
+                                                        </>
+                                                    )}
                                                 </div>
                                                 <div
                                                     className={`flex ${
@@ -1093,14 +1177,15 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                         }
                                                         id={`chilContent${index}`}
                                                     >
-                                                        {item.file_list && item.file_list.length > 0 && (
-                                                            <div className="mb-3">
-                                                                <FileListDisplay 
-                                                                    fileList={item.file_list} 
-                                                                    onDownload={downloadFile} 
-                                                                />
-                                                            </div>
-                                                        )}
+                                                        {item.file_list &&
+                                                            item.file_list.length > 0 && (
+                                                                <div className="mb-3">
+                                                                    <FileListDisplay
+                                                                        fileList={item.file_list}
+                                                                        onDownload={downloadFile}
+                                                                    />
+                                                                </div>
+                                                            )}
                                                         <ReactMarkdown
                                                             rehypePlugins={[rehypeHighlight]}
                                                             components={renderers(index, intl)}
@@ -1117,12 +1202,14 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                                                             cidName="chilContent"
                                                             index={index}
                                                         />
-                                                        <SummaryButton
-                                                            id={id}
-                                                            index={index}
-                                                            idName="content"
-                                                            cidName="chilContent"
-                                                        />
+                                                        {!agentChatRoomId && (
+                                                            <SummaryButton
+                                                                id={id}
+                                                                index={index}
+                                                                idName="content"
+                                                                cidName="chilContent"
+                                                            />
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <></>
@@ -1144,10 +1231,12 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                             upButtonDom={upButtonDom}
                             setIsStop={setIsStop}
                             setSendValue={setSendValue}
+                            agentChatRoomId={agentChatRoomId}
+                            abilitiesList={abilitiesList}
                         ></ChatwindowCont>
                     </div>
                     <div className="w-full flex justify-center pb-[10px]">
-                        {!disableInput && userMessage.length ? (
+                        {!agentChatRoomId && !disableInput && userMessage.length ? (
                             <MeetingSummaryBtn roomid={id} />
                         ) : (
                             <></>
@@ -1168,9 +1257,11 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
 
 interface parameters {
     agentList?: any;
+    agentChatRoomId?: any;
+    abilitiesList?: any;
 }
 export const ChatRoomContent: FC<parameters> = memo(porpos => {
-    let { agentList } = porpos;
+    let { agentList, agentChatRoomId, abilitiesList } = porpos;
     // Get current scroll
     const scrollDomRef = useRef(null);
     // Get DOM
@@ -1193,7 +1284,9 @@ export const ChatRoomContent: FC<parameters> = memo(porpos => {
         <>
             {contextHolder}
             <div
-                className="mx-[44px] flex justify-center relative box-border pt-[12px] h-full"
+                className={`mx-[44px] flex justify-center relative box-border pt-[12px] h-full ${
+                    agentChatRoomId ? 'w-full' : ''
+                }`}
             >
                 <div className="flex flex-col w-full h-full">
                     <ChatRoomContentbox
@@ -1204,6 +1297,8 @@ export const ChatRoomContent: FC<parameters> = memo(porpos => {
                         setIsStop={setIsStop}
                         upButtonDom={upButtonDom}
                         agentList={agentList}
+                        agentChatRoomId={agentChatRoomId}
+                        abilitiesList={abilitiesList}
                     ></ChatRoomContentbox>
                     <InputField
                         setInstruction={setInstruction}
@@ -1211,6 +1306,7 @@ export const ChatRoomContent: FC<parameters> = memo(porpos => {
                         isStop={isStop}
                         upButtonDom={upButtonDom}
                         scrollDomRef={scrollDomRef}
+                        abilitiesList={abilitiesList}
                     ></InputField>
                 </div>
             </div>

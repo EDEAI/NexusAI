@@ -21,17 +21,18 @@ const LLMContent = ({ dealtWithInfo, dealtWithData, execId, buttonLoading, onSub
   // Save previous execId and dealtWithInfo for change detection
   const prevExecIdRef = React.useRef(execId);
   const prevInfoRef = React.useRef(dealtWithInfo);
-  
+
   React.useEffect(() => {
+
     // If execId changes, it means we're loading new results
     if (execId !== prevExecIdRef.current) {
       setUpdating(true);
       prevExecIdRef.current = execId;
-    } 
+    }
     // If dealtWithInfo changes and status is updating, show update success message
     else if (
-      dealtWithInfo && 
-      updating && 
+      dealtWithInfo &&
+      updating &&
       JSON.stringify(dealtWithInfo) !== JSON.stringify(prevInfoRef.current)
     ) {
       setUpdating(false);
@@ -42,24 +43,24 @@ const LLMContent = ({ dealtWithInfo, dealtWithData, execId, buttonLoading, onSub
         })
       );
     }
-    
+
     // Update references
     prevInfoRef.current = dealtWithInfo;
   }, [execId, dealtWithInfo, updating, messageApi, intl]);
 
   const handleSubmit = useCallback((values: any) => {
     setSubmitting(true);
-    
+
     // Construct data structure same as DealtWithNew
     const submitData = {
       correct_prompt: new Prompt('', values.prompt, ''),
       operation: 1,
       outputs: dealtWithInfo?.outputs || null,
     };
-    
+
     // Call the onSubmit method passed from parent component
     onSubmit(submitData);
-    
+
     // Set success message and status
     setTimeout(() => {
       setSubmitting(false);
@@ -184,4 +185,4 @@ const LLMContent = ({ dealtWithInfo, dealtWithData, execId, buttonLoading, onSub
   );
 };
 
-export default LLMContent; 
+export default LLMContent;

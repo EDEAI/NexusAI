@@ -94,6 +94,7 @@ export default {
     'app.chatroom.content.copySucceed': '复制成功',
     'app.chatroom.content.addAgentTips': '添加成功',
     'app.chatroom.content.addAgentTips_fail': '添加失败',
+    'app.chatroom.content.abilityNotFound': '未找到该能力',
 
     'app.chatroom.content.summary':'导向',
     'app.chatroom.content.meetingSummary':'圆桌导向',

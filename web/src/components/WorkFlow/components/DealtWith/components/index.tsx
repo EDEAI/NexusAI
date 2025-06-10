@@ -17,12 +17,12 @@ const DealtWith = memo(({ onSubmit, onClose }: DealtWithProps) => {
   const dealtWithData = useSocketStore(state => state.dealtWithData);
   const setDealtWithData = useSocketStore(state => state.setDealtWithData);
   const flowMessage = useSocketStore(state => state.flowMessage);
-  
+
   // Reference to track if correction has been submitted
   const submitSuccessRef = useRef(false);
   // Reference to store the returned execId after submission
   const submitExecIdRef = useRef('');
-  
+
   const {
     show,
     setShow,
@@ -39,6 +39,7 @@ const DealtWith = memo(({ onSubmit, onClose }: DealtWithProps) => {
 
   const handleSubmitPrompt = useCallback((values: any) => {
     setButtonLoading(true);
+
     // When submitting LLM correction content, don't automatically close the page
     updateDealtWith(execId, values).then(res => {
       if (res.code === 0) {
@@ -64,7 +65,7 @@ const DealtWith = memo(({ onSubmit, onClose }: DealtWithProps) => {
       const newLLMResult = flowMessage.find(
         item => item?.data?.node_exec_data?.node_exec_id === submitExecIdRef.current
       );
-      
+
       // If a matching message is found, get the latest information
       if (newLLMResult) {
         getHumanMessage(submitExecIdRef.current);
@@ -77,7 +78,7 @@ const DealtWith = memo(({ onSubmit, onClose }: DealtWithProps) => {
   const handleConfirmDealtWith = useCallback(() => {
     // Use the latest execId for confirmation
     const currentExecId = submitExecIdRef.current || execId;
-    
+
     confirmDealtWith(currentExecId).then(res => {
       if (res.code === 0) {
         setShow(false);
@@ -189,4 +190,4 @@ export { default as HumanContent } from './HumanContent';
 export { default as LLMContent } from './LLMContent';
 export * from './hooks';
 export * from './types';
-export * from './utils'; 
+export * from './utils';
