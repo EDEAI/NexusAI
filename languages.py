@@ -1,4 +1,6 @@
 import os
+import sys
+import importlib
 from typing import Any
 
 # Dictionary to store language codes and their corresponding language names
@@ -1610,50 +1612,6 @@ prompt_keys = [
     "correction_skill_user"
 ]
 
-def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = True) -> Any:
-    """
-    Retrieves the content for the specified key based on the current language.
-    Supports nested keys separated by dots.
-
-    :param key: The key for the desired content, with nested keys separated by dots.
-    :param uid: The user ID.
-    :param append_ret_lang_prompt: Whether to append the language prompt to the content.
-    :return: The content string in the current language.
-    """
-    from api.utils.auth import get_current_language
-
-    actual_uid = uid if uid > 0 else int(os.getenv('ACTUAL_USER_ID', 0))
-    current_language = get_current_language(actual_uid)
-    keys = key.split('.')
-
-    if key in prompt_keys:
-        content = language_packs.get("en", {})
-        for k in keys:
-            if isinstance(content, dict):
-                content = content.get(k, None)
-            else:
-                return None
-        if append_ret_lang_prompt:
-            return_language_prompt = f"\n\nPlease note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction."
-            if isinstance(content, str):
-                content += return_language_prompt
-            elif isinstance(content, dict):
-                content = content.copy()
-                if 'system' in content:
-                    content['system'] += return_language_prompt
-        return content
-
-    content = language_packs.get(current_language, {})
-    for k in keys:
-        if isinstance(content, dict):
-            content = content.get(k, None)
-        else:
-            return None
-
-    if isinstance(content, dict):
-        return content.copy()
-    return content
-
 # Dictionary to store prompt function descriptions
 prompt_descriptions = {
     "en": [
@@ -1847,3 +1805,136 @@ prompt_descriptions = {
         }
     ]
 }
+
+def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = True) -> Any:
+    """
+    Retrieves the content for the specified key based on the current language.
+    Supports nested keys separated by dots.
+
+    :param key: The key for the desired content, with nested keys separated by dots.
+    :param uid: The user ID.
+    :param append_ret_lang_prompt: Whether to append the language prompt to the content.
+    :return: The content string in the current language.
+    """
+
+    try:
+        from api.utils.auth import get_current_language
+        actual_uid = uid if uid > 0 else int(os.getenv('ACTUAL_USER_ID', 0))
+        current_language = get_current_language(actual_uid)
+    except:
+        current_language = "en"
+    
+    keys = key.split('.')
+
+    if key in prompt_keys:
+        # Check if prompt.py exists in current directory
+        prompt_file_path = os.path.join(os.path.dirname(__file__), 'prompt.py')
+        
+        if not os.path.exists(prompt_file_path):
+            # If not exists, create prompt.py file
+            _create_prompt_file()
+        
+        # Dynamic import of prompt.py
+        try:
+            # If module already imported, reload to get latest content
+            if 'prompt' in sys.modules:
+                prompt_module = importlib.reload(sys.modules['prompt'])
+            else:
+                import prompt as prompt_module
+            
+            if hasattr(prompt_module, 'PROMPTS') and key in prompt_module.PROMPTS:
+                content = prompt_module.PROMPTS[key]
+            else:
+                # If no corresponding key in prompt.py, fallback to language_packs
+                content = language_packs.get("en", {})
+                for k in keys:
+                    if isinstance(content, dict):
+                        content = content.get(k, None)
+                    else:
+                        return None
+        except ImportError:
+            # If import fails, fallback to language_packs
+            content = language_packs.get("en", {})
+            for k in keys:
+                if isinstance(content, dict):
+                    content = content.get(k, None)
+                else:
+                    return None
+        
+        if append_ret_lang_prompt:
+            return_language_prompt = f"\n\nPlease note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction."
+            if isinstance(content, str):
+                content += return_language_prompt
+            elif isinstance(content, dict):
+                content = content.copy()
+                if 'system' in content:
+                    content['system'] += return_language_prompt
+        return content
+
+    content = language_packs.get(current_language, {})
+    for k in keys:
+        if isinstance(content, dict):
+            content = content.get(k, None)
+        else:
+            return None
+
+    if isinstance(content, dict):
+        return content.copy()
+    return content
+
+
+def _create_prompt_file():
+    """
+    Create prompt.py file containing all prompt_keys content
+    """
+    prompt_file_path = os.path.join(os.path.dirname(__file__), 'prompt.py')
+    
+    # Build PROMPTS dictionary
+    prompts_dict = {}
+    
+    for key in prompt_keys:
+        keys = key.split('.')
+        content = language_packs.get("en", {})
+        
+        for k in keys:
+            if isinstance(content, dict):
+                content = content.get(k, None)
+            else:
+                content = None
+                break
+        
+        if content is not None:
+            prompts_dict[key] = content
+    
+    # Generate file content
+    file_content = '''# -*- coding: utf-8 -*-
+"""
+Dynamically generated prompt file
+This file is automatically generated by the system and contains all built-in prompts
+You can directly modify the prompt content in this file, and the system will dynamically load the latest content
+"""
+
+PROMPTS = {
+'''
+    
+    for key, value in prompts_dict.items():
+        if isinstance(value, str):
+            # Use triple quotes to preserve original formatting
+            file_content += f'    "{key}": """{value}""",\n'
+        elif isinstance(value, dict):
+            # Format dict with proper indentation and triple quotes for string values
+            file_content += f'    "{key}": {{\n'
+            for sub_key, sub_value in value.items():
+                if isinstance(sub_value, str):
+                    file_content += f'        "{sub_key}": """{sub_value}""",\n'
+                else:
+                    file_content += f'        "{sub_key}": {repr(sub_value)},\n'
+            file_content += '    },\n'
+    
+    file_content += '}\n'
+    
+    # Write to file
+    with open(prompt_file_path, 'w', encoding='utf-8') as f:
+        f.write(file_content)
+    
+    print(f"Created prompt.py file at: {prompt_file_path}")
