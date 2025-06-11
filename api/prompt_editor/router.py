@@ -1,12 +1,16 @@
 import json
 import re
+import os
+import sys
+import importlib
 import subprocess
+from datetime import datetime
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 # Import language pack related modules
-from languages import language_packs, prompt_descriptions
+from languages import get_language_content, prompt_descriptions
 
 router = APIRouter()
 
@@ -594,16 +598,9 @@ async def get_prompt_descriptions():
 async def get_prompt_content(key: str):
     """Get prompt content for a specific key"""
     try:
-        content = language_packs.get("en", {})
         
-        # Handle nested keys
-        keys = key.split('.')
-        for k in keys:
-            if isinstance(content, dict):
-                content = content.get(k, "")
-            else:
-                content = ""
-                break
+        # Use get_language_content to get content (this will use prompt.py if available)
+        content = get_language_content(key, uid=0, append_ret_lang_prompt=False)
         
         # Return different data based on type
         if isinstance(content, dict):
@@ -613,7 +610,7 @@ async def get_prompt_content(key: str):
             }
         else:
             return {
-                "content": str(content),
+                "content": str(content) if content is not None else "",
                 "type": "string"
             }
     except Exception as e:
@@ -621,36 +618,24 @@ async def get_prompt_content(key: str):
 
 @router.post("/save")
 async def save_prompt(request: PromptUpdateRequest):
-    """Save single prompt to file"""
+    """Save single prompt to prompt.py file"""
     try:
-        from datetime import datetime
-        
-        # Read current languages.py file
-        with open("languages.py", "r", encoding="utf-8") as f:
+        # Read current prompt.py file
+        prompt_file_path = "prompt.py"
+        with open(prompt_file_path, "r", encoding="utf-8") as f:
             content = f.read()
         
         key = request.key
-        lang = request.language
         new_content = request.content
         content_type = request.content_type
         
         # Create backup with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        backup_file = f"languages.py.backup_{timestamp}"
+        backup_file = f"prompt.py.backup_{timestamp}"
         with open(backup_file, "w", encoding="utf-8") as f:
             f.write(content)
         
-        # Force use English since we only edit English prompts  
-        lang = "en"
-        
-        if key not in language_packs[lang]:
-            raise HTTPException(status_code=404, detail=f"Unable to locate key: {key} in language_packs[{lang}]")
-        
-        # Get original content
-        original_content = language_packs[lang][key]
-        
-        # Find the key pattern and replace it
-        # Use a simple approach: find the key line and replace its value
+        # Find the key pattern and replace it in PROMPTS dictionary
         lines = content.split('\n')
         new_lines = []
         i = 0
@@ -671,120 +656,101 @@ async def save_prompt(request: PromptUpdateRequest):
                 else:
                     key_quote = "'"
                 
-                # Determine the triple quote style used in the original value
-                original_triple_quote = '"""'  # default
-                if line.strip().endswith("'''"):
-                    original_triple_quote = "'''"
-                elif line.strip().endswith('"""'):
-                    original_triple_quote = '"""'
-                
-                # Build new value string based on content type using original quote style
+                # Build new value string based on content type
                 if content_type == "dict" and isinstance(new_content, dict):
-                    # Dictionary type: format as Python dict with original triple quotes
+                    # Dictionary type: format as Python dict with triple quotes
                     dict_items = []
                     for sub_key, sub_value in new_content.items():
-                        # Clean the value and wrap in original triple quotes
-                        clean_value = str(sub_value).strip()
-                        formatted_value = f'{original_triple_quote}\n            {clean_value}\n        {original_triple_quote}'
-                        dict_items.append(f'            "{sub_key}": {formatted_value}')
-                    new_value = "{\n" + ",\n".join(dict_items) + "\n        }"
+                        # Preserve original formatting, only convert to string
+                        formatted_value = f'"""\n{str(sub_value)}"""'
+                        dict_items.append(f'        "{sub_key}": {formatted_value}')
+                    new_value = "{\n" + ",\n".join(dict_items) + "\n    }"
                 else:
-                    # String type: wrap entire content in original triple quotes
-                    clean_content = str(new_content).strip()
-                    new_value = f'{original_triple_quote}\n            {clean_content}\n        {original_triple_quote}'
+                    # String type: wrap entire content in triple quotes, preserve formatting
+                    new_value = f'"""\n{str(new_content)}"""'
                 
-                # Check if the value starts on the same line or next line
-                if line.strip().endswith('{') or line.strip().endswith('"""') or line.strip().endswith("'''"):
-                    # Multi-line value, need to find the end
-                    new_lines.append(f'{indent_str}{key_quote}{key}{key_quote}: {new_value},')
+                # Replace the current line
+                new_lines.append(f'{indent_str}{key_quote}{key}{key_quote}: {new_value},')
+                
+                # Skip until we find the end of the current value
+                i += 1
+                if content_type == "dict":
+                    # For dict type, skip until we find the matching closing brace
+                    brace_count = 1  # Start with 1 since we already have the opening brace
+                    in_triple_quotes = False
+                    quote_type = None
                     
-                    # Skip until we find the end of the current value
-                    i += 1
-                    if content_type == "dict":
-                        # For dict type, skip until we find the matching closing brace
-                        # Need to be careful about braces inside triple quotes
-                        brace_count = 1  # Start with 1 since we already have the opening brace
-                        in_triple_quotes = False
-                        quote_type = None
+                    while i < len(lines):
+                        current_line = lines[i]
+                        line_content = current_line.strip()
                         
-                        while i < len(lines):
-                            current_line = lines[i]
-                            line_content = current_line.strip()
+                        # Check for triple quote start/end
+                        if not in_triple_quotes:
+                            if '"""' in current_line:
+                                in_triple_quotes = True
+                                quote_type = '"""'
+                            elif "'''" in current_line:
+                                in_triple_quotes = True
+                                quote_type = "'''"
+                        else:
+                            # We're inside triple quotes, check for end
+                            if quote_type in current_line:
+                                # Check if this line ends the triple quote
+                                if line_content.endswith(quote_type) or line_content.endswith(quote_type + ','):
+                                    in_triple_quotes = False
+                                    quote_type = None
+                        
+                        # Only count braces when not inside triple quotes
+                        if not in_triple_quotes:
+                            if '{' in current_line:
+                                brace_count += current_line.count('{')
+                            if '}' in current_line:
+                                brace_count -= current_line.count('}')
                             
-                            # Check for triple quote start/end
-                            if not in_triple_quotes:
-                                if '"""' in current_line:
-                                    in_triple_quotes = True
-                                    quote_type = '"""'
-                                elif "'''" in current_line:
-                                    in_triple_quotes = True
-                                    quote_type = "'''"
-                            else:
-                                # We're inside triple quotes, check for end
-                                if quote_type in current_line:
-                                    # Check if this line ends the triple quote
-                                    if line_content.endswith(quote_type) or line_content.endswith(quote_type + ','):
-                                        in_triple_quotes = False
-                                        quote_type = None
-                            
-                            # Only count braces when not inside triple quotes
-                            if not in_triple_quotes:
-                                if '{' in current_line:
-                                    brace_count += current_line.count('{')
-                                if '}' in current_line:
-                                    brace_count -= current_line.count('}')
-                                
-                                # Check if we've found the matching closing brace
-                                if brace_count <= 0:
-                                    # Found the end, stop here
-                                    break
-                            
-                            i += 1
-                    else:
-                        # For string type, skip until we find the end of the matching triple quotes
-                        while i < len(lines):
-                            current_line = lines[i]
-                            line_stripped = current_line.strip()
-                            if line_stripped.endswith(original_triple_quote + ',') or \
-                               line_stripped.endswith(original_triple_quote) or \
-                               line_stripped == original_triple_quote + ',' or \
-                               line_stripped == original_triple_quote:
-                                # Found the ending line, stop here (don't increment i)
+                            # Check if we've found the matching closing brace
+                            if brace_count <= 0:
+                                # Found the end, stop here
                                 break
-                            i += 1
+                        
+                        i += 1
                 else:
-                    # Single line value
-                    new_lines.append(f'{indent_str}{key_quote}{key}{key_quote}: {new_value},')
+                    # For string type, skip until we find the end of the matching triple quotes
+                    while i < len(lines):
+                        current_line = lines[i]
+                        line_stripped = current_line.strip()
+                        if line_stripped.endswith('""",' ) or \
+                           line_stripped.endswith('"""') or \
+                           line_stripped == '""",' or \
+                           line_stripped == '"""':
+                            # Found the ending line, stop here (don't increment i)
+                            break
+                        i += 1
             else:
                 new_lines.append(line)
             i += 1
         
         if not found_key:
-            raise HTTPException(status_code=404, detail=f"Unable to locate key: {key} in language_packs[{lang}]")
+            raise HTTPException(status_code=404, detail=f"Unable to locate key: {key} in prompt.py")
         
-        # Write the modified content back to file
+        # Write the modified content back to prompt.py
         new_content_file = '\n'.join(new_lines)
-        with open("languages.py", "w", encoding="utf-8") as f:
+        with open(prompt_file_path, "w", encoding="utf-8") as f:
             f.write(new_content_file)
         
-        # Update language_packs in memory
-        if content_type == "dict" and isinstance(new_content, dict):
-            language_packs[lang][key] = new_content
-        else:
-            language_packs[lang][key] = new_content
+        # Force reload the prompt module to get the latest content
+        if 'prompt' in sys.modules:
+            importlib.reload(sys.modules['prompt'])
         
-        # Restart services after successful save
-        # restart_services()
-        
-        return {"status": "success", "message": f"Prompt {key} ({lang}) saved successfully"}
+        return {"status": "success", "message": f"Prompt {key} saved successfully to prompt.py"}
         
     except Exception as e:
         # If error occurs, try to restore from backup
         try:
-            with open(backup_file, "r", encoding="utf-8") as f:
-                backup_content = f.read()
-            with open("languages.py", "w", encoding="utf-8") as f:
-                f.write(backup_content)
+            if 'backup_file' in locals():
+                with open(backup_file, "r", encoding="utf-8") as f:
+                    backup_content = f.read()
+                with open(prompt_file_path, "w", encoding="utf-8") as f:
+                    f.write(backup_content)
         except:
             pass
         raise HTTPException(status_code=500, detail=f"Save failed: {str(e)}")

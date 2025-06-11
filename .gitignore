@@ -20,3 +20,5 @@ scripts/test*.py
 /docker-compose.yml
 .history
 .cursor
+prompt.py
+prompt.py.backup_*
