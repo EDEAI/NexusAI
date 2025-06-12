@@ -355,7 +355,7 @@ class ChatroomManager:
                                 case 'WFCONFIRM':
                                     assert isinstance(data, dict), 'Workflow confirmation data should be a dictionary.'
                                     assert isinstance(index := data['index'], int), f'Invalid workflow index: {index}'
-                                    assert isinstance(status := data['status'], str), f'Invalid workflow status: {status}'
+                                    assert isinstance(status := data['status'], dict), f'Invalid workflow status: {status}'
                                     self._chatrooms[chatroom_id].set_workflow_confirmation_status(index, status)
                                     await self._ws_manager.send_instruction(chatroom_id, 'WITHWFCONFIRM', data)
                                 case 'INPUT':

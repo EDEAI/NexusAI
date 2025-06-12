@@ -537,7 +537,7 @@ class Chatroom:
         )
         self._mcp_tool_use_lock.set()
 
-    def set_workflow_confirmation_status(self, index: int, status: str) -> None:
+    def set_workflow_confirmation_status(self, index: int, status: Dict[str, Any]) -> None:
         if not self._mcp_tool_is_using:
             raise Exception('There is no MCP tool use!')
         if index >= len(self._mcp_tool_uses):
