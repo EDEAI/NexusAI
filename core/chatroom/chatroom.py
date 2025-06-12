@@ -629,7 +629,10 @@ class Chatroom:
                         await self._stop_all_mcp_tool_uses('Timeout')
                         break
                     if mcp_tool_use['name'] == 'skill_run':
-                        mcp_tool_use['result'] = result
+                        mcp_tool_use['result'] = json.dumps(
+                            json.loads(result),
+                            ensure_ascii=False
+                        )
                         self._update_chatroom_message(
                             self._current_agent_message_id,
                             self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
