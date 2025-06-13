@@ -1,9 +1,8 @@
 from pathlib import Path
-from typing import AsyncGenerator
 import sys
 sys.path.append(str(Path(__file__).absolute().parent.parent))
+
 from typing import Any, Dict, Optional, List
-from mcp.server.fastmcp import FastMCP
 from core.database.models import CustomTools, Apps, Workflows, AppRuns, AppNodeUserRelation
 from core.workflow.variables import create_variable_from_dict, validate_required_variable
 from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
@@ -14,42 +13,122 @@ from celery_app import run_app
 from api.utils.common import *
 from datetime import datetime
 from copy import deepcopy
-import json
-import redis
-from config import settings
 
-# Initialize Redis client
-redis_client = redis.Redis(
-    host=settings.REDIS_HOST if hasattr(settings, 'REDIS_HOST') else 'localhost',
-    port=settings.REDIS_PORT if hasattr(settings, 'REDIS_PORT') else 6379,
-    db=settings.REDIS_DB if hasattr(settings, 'REDIS_DB') else 0,
-    password=settings.REDIS_PASSWORD if hasattr(settings, 'REDIS_PASSWORD') else None,
-    decode_responses=True
-)
-
-# Initialize database models and FastMCP server
 tools_db = CustomTools()
 apps_db = Apps()
 workflows_db = Workflows()
 appRuns_db = AppRuns()
 appNodeUserRelation_db = AppNodeUserRelation()
 chatroomDrivenRecords_db = ChatroomDrivenRecords()
-mcp = FastMCP("builtin", port=settings.MCP_SERVER_PORT)
 
-@mcp.tool()
+
+async def skill_run(
+    skill_id: int,
+    user_id: int,
+    team_id: int,
+    mcp_tool_args: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Run the specified skill
+    
+    Args:
+        skill_id: Skill ID
+        user_id: User ID
+        team_id: Team ID
+        mcp_tool_args: MCP tool args
+        
+    Returns:
+        Dict containing execution results
+    """
+    input_variables: Dict[str, Any] = mcp_tool_args['input_variables']
+    # Parameter validation
+    if skill_id <= 0:
+        raise ValueError(get_language_content("skill_id_required"))
+
+    if not input_variables:
+        raise ValueError(get_language_content("input_dict_required"))
+
+    # Get skill information
+    skill = tools_db.select_one(
+        columns="*",
+        conditions=[
+            {"column": "id", "value": skill_id},
+            {"column": "team_id", "value": team_id},
+            {"column": "status", "value": 1}
+        ])
+    if not skill:
+        raise ValueError(get_language_content("skill_error"))
+
+    # Validate user permissions
+    if skill["user_id"] != user_id:
+        if skill["status"] != 1:
+            raise ValueError(get_language_content("skill_status_not_normal"))
+        if skill["publish_status"] != 1:
+            raise ValueError(get_language_content("skill_draft_creators_only"))
+
+    # Validate application information
+    app = apps_db.select_one(
+        columns="*",
+        conditions=[
+            {"column": "id", "value": skill["app_id"]},
+            {"column": "team_id", "value": team_id},
+            {"column": "mode", "value": 4},
+            {"column": "status", "value": 1}
+        ]
+    )
+
+    if not app:
+        raise ValueError(get_language_content("app_error"))
+    if app["user_id"] != user_id:
+        if app["is_public"] == 0:
+            raise ValueError(get_language_content("team_members_not_open"))
+        if app["status"] != 1:
+            raise ValueError(get_language_content("app_status_not_normal"))
+        
+    input_obj = create_variable_from_dict(skill["input_variables"])
+    for k, v in input_variables.items():
+        if var := input_obj.properties.get(k):
+            var.value = v
+
+    # Execute skill
+    task = run_app.delay(app_type="skill", id_=skill_id, user_id=user_id, input_dict=input_obj.to_dict())
+    while not task.ready():
+        await asyncio.sleep(0.1)
+    
+    result = task.get()
+    if result["status"] != "success":
+        return {"outputs": {
+            'error': result["message"]
+        }}
+
+    outputs = result["data"]["outputs"]
+    file_list = []
+
+    if skill and skill.get("output_variables"):
+        file_list = extract_file_list_from_skill_output(outputs, skill["output_variables"])
+    
+    return {
+        "outputs": outputs,
+        "file_list": file_list
+    }
+
 async def workflow_run(
-    id: int, 
-    input_variables: Dict[str, Any], 
+    workflow_id: int, 
     user_id: int, 
     team_id: int,
-    node_confirm_users: Optional[Dict[str, List[int]]] = None
+    mcp_tool_args: Dict[str, Any]
 ) -> Dict[str, Any]:
     """Run the specified workflow"""
     try:
         # Parameter type conversion
-        workflow_id = int(id)
         user_id = int(user_id) if not isinstance(user_id, int) else user_id
         team_id = int(team_id) if not isinstance(team_id, int) else team_id
+        node_confirm_users: Optional[Dict[str, List[int]]] = mcp_tool_args.get('node_confirm_users')
+        if node_confirm_users:
+            node_confirm_users = {
+                node_id: [user_id if node_confirm_user_id == 0 else node_confirm_user_id]
+                for node_id, node_confirm_user_id in node_confirm_users.items()
+            }
+        input_variables: Dict[str, Any] = mcp_tool_args['input_variables']
 
         # Input validation
         if not isinstance(input_variables, dict):
@@ -141,93 +220,4 @@ async def workflow_run(
     except Exception as e:
         raise ValueError(f"Workflow execution failed: {str(e)}")
 
-@mcp.tool()
-async def skill_run(id: int, input_variables: Dict[str, Any], user_id: int, team_id: int) -> Dict[str, Any]:
-    """Run the specified skill
-    
-    Args:
-        id: Skill ID
-        input_variables: Input parameters dictionary
-        user_id: User ID
-        team_id: Team ID
-        
-    Returns:
-        Dict containing execution results
-    """
-    skill_id = int(id)
-    # Parameter validation
-    if skill_id <= 0:
-        raise ValueError(get_language_content("skill_id_required"))
-
-    if not input_variables:
-        raise ValueError(get_language_content("input_dict_required"))
-
-    # Get skill information
-    skill = tools_db.select_one(
-        columns="*",
-        conditions=[
-            {"column": "id", "value": skill_id},
-            {"column": "team_id", "value": team_id},
-            {"column": "status", "value": 1}
-        ])
-    if not skill:
-        raise ValueError(get_language_content("skill_error"))
-
-    # Validate user permissions
-    if skill["user_id"] != user_id:
-        if skill["status"] != 1:
-            raise ValueError(get_language_content("skill_status_not_normal"))
-        if skill["publish_status"] != 1:
-            raise ValueError(get_language_content("skill_draft_creators_only"))
-
-    # Validate application information
-    app = apps_db.select_one(
-        columns="*",
-        conditions=[
-            {"column": "id", "value": skill["app_id"]},
-            {"column": "team_id", "value": team_id},
-            {"column": "mode", "value": 4},
-            {"column": "status", "value": 1}
-        ]
-    )
-
-    if not app:
-        raise ValueError(get_language_content("app_error"))
-    if app["user_id"] != user_id:
-        if app["is_public"] == 0:
-            raise ValueError(get_language_content("team_members_not_open"))
-        if app["status"] != 1:
-            raise ValueError(get_language_content("app_status_not_normal"))
-        
-    input_obj = create_variable_from_dict(skill["input_variables"])
-    for k, v in input_variables.items():
-        if var := input_obj.properties.get(k):
-            var.value = v
-
-    # Execute skill
-    task = run_app.delay(app_type="skill", id_=skill_id, user_id=user_id, input_dict=input_obj.to_dict())
-    while not task.ready():
-        await asyncio.sleep(0.1)
-    
-    result = task.get()
-    if result["status"] != "success":
-        return {"outputs": {
-            'error': result["message"]
-        }}
-
-    outputs = result["data"]["outputs"]
-    file_list = []
-
-    if skill and skill.get("output_variables"):
-        file_list = extract_file_list_from_skill_output(outputs, skill["output_variables"])
-    
-    return {
-        "outputs": outputs,
-        "file_list": file_list
-    }
-
-if __name__ == "__main__":
-    # Initialize and run server
-    print("Server starting...")
-    mcp.run(transport='sse')
     

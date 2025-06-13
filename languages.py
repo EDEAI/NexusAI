@@ -493,7 +493,6 @@ language_packs = {
             3. You need to fully analyze and understand the user's command intention through the current conversation scene and progress, as well as the user's instructions, focus on what the user wants, and do not miss important information, rules or requirements in the instructions
             4. You need to reply based on the current conversation scene and progress, as well as the user's command intention
             5. Don't copy the viewpoints of other agents in the meeting room.
-            6. If you are provided with MCP tools, to reply to the user's instructions, you can invoke the MCP tool(s) provided.
 
             The JSON format of the conversation history is as follows: [round 1, (round 2,) ...]
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]

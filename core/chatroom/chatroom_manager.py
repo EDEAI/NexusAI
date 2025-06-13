@@ -226,7 +226,6 @@ class ChatroomManager:
                 }
             )
         except Exception as e:
-            logger.exception('ERROR!!')
             end_time = time()
             app_runs.update(
                 {'column': 'id', 'value': app_run_id},
@@ -403,10 +402,6 @@ class ChatroomManager:
                 self._event_loop.create_task(coro)
         
     async def start(self):
-        try:
-            await self._mcp_client.connect_to_builtin_server()
-        except ExceptionGroup as e:
-            logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
         logger.info('Ready.')
         self._event_loop.create_task(self._resume_chatrooms())
         await self._ws_manager.start(self._ws_handler)

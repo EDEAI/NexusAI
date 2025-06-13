@@ -26,6 +26,7 @@ from core.database.models import (
 )
 from core.helper import truncate_messages_by_token_limit, get_file_content_list
 from core.llm import Prompt
+from core.mcp.app_executor import skill_run, workflow_run
 from core.mcp.client import MCPClient
 from core.workflow.context import Context
 from core.workflow.nodes import AgentNode, LLMNode
@@ -47,6 +48,8 @@ datasets = Datasets()
 models = Models()
 workflows = Workflows()
 
+skill_pattern = re.compile(r'nexusai__skill-(\d+)-.*')
+workflow_pattern = re.compile(r'nexusai__workflow-(\d+)-.*')
 
 class Chatroom:
     @staticmethod
@@ -529,7 +532,7 @@ class Chatroom:
         self._console_log(f'MCP tool result: \033[91m{result}\033[0m\n')
         mcp_tool_use = self._mcp_tool_uses[index]
         mcp_tool_use['result'] = result
-        if mcp_tool_use['name'] == 'workflow_run':
+        if workflow_pattern.fullmatch(mcp_tool_use['name']):
             mcp_tool_use['workflow_confirmation_status'] = None
         self._update_chatroom_message(
             self._current_agent_message_id,
@@ -574,15 +577,15 @@ class Chatroom:
         # Send the MCP tool use instructions to the frontend
         for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
             mcp_tool_use['args'] = json.loads(mcp_tool_use['args'])
-            if mcp_tool_use['name'] == 'skill_run':
-                skill = custom_tools.get_skill_by_id(mcp_tool_use['args']['id'])
+            if match := skill_pattern.fullmatch(mcp_tool_use['name']):
+                skill = custom_tools.get_skill_by_id(int(match.group(1)))
                 if not skill:
                     mcp_tool_use['result'] = 'Skill not found'
                 else:
                     app = apps.get_app_by_id(skill['app_id'])
                     mcp_tool_use['skill_or_workflow_name'] = app['name']
-            elif mcp_tool_use['name'] == 'workflow_run':
-                workflow = workflows.get_workflow_app(mcp_tool_use['args']['id'])
+            elif match := workflow_pattern.fullmatch(mcp_tool_use['name']):
+                workflow = workflows.get_workflow_app(int(match.group(1)))
                 if not workflow:
                     mcp_tool_use['result'] = 'Workflow not found'
                 else:
@@ -606,53 +609,54 @@ class Chatroom:
     async def _wait_for_mcp_tool_uses(self) -> None:
         # Invoke the MCP tool(s) of the built-in MCP server
         for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
-            if mcp_tool_use['name'] in ['workflow_run', 'skill_run']:
+            mcp_tool_name = mcp_tool_use['name']
+            mcp_tool_args = mcp_tool_use['args']
+            skill_match = skill_pattern.fullmatch(mcp_tool_name)
+            workflow_match = workflow_pattern.fullmatch(mcp_tool_name)
+            if skill_match or workflow_match:
                 if result := mcp_tool_use['result'] is None:
-                    mcp_tool_args = mcp_tool_use['args']
-                    mcp_tool_args['user_id'] = self._user_id
-                    mcp_tool_args['team_id'] = self._team_id
-                    if mcp_tool_use['name'] == 'workflow_run' and (node_confirm_users := mcp_tool_args.get('node_confirm_users')):
-                        for user_ids in node_confirm_users.values():
-                            if user_ids == [0]:
-                                user_ids[0] = self._user_id
                     try:
-                        logger.debug('Invoking MCP tool: %s', mcp_tool_use['name'])
+                        logger.debug('Invoking MCP tool: %s', mcp_tool_name)
                         logger.debug('MCP tool args: %s', mcp_tool_args)
-                        result = await asyncio.wait_for(
-                            self._mcp_client.call_tool(mcp_tool_use['name'], mcp_tool_args),
-                            timeout=3600
-                        )
-                        logger.debug('MCP tool result: %s', result)
-                    except KeyError:
-                        raise Exception('Cannot connect to the built-in MCP server!')
-                    except asyncio.TimeoutError:
-                        await self._stop_all_mcp_tool_uses('Timeout')
-                        break
-                    if mcp_tool_use['name'] == 'skill_run':
-                        mcp_tool_use['result'] = json.dumps(
-                            json.loads(result),
-                            ensure_ascii=False
-                        )
-                        self._update_chatroom_message(
-                            self._current_agent_message_id,
-                            self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
-                        )
-                    elif mcp_tool_use['name'] == 'workflow_run':
-                        if result.startswith('Error executing tool workflow_run:'):
-                            result = json.dumps(
-                                {'status': 'failed', 'message': result},
-                                ensure_ascii=False
+                        if skill_match:
+                            result = await asyncio.wait_for(
+                                skill_run(
+                                    int(skill_match.group(1)),
+                                    self._user_id, self._team_id,
+                                    mcp_tool_args
+                                ),
+                                timeout=3600
                             )
+                            result = json.dumps(result, ensure_ascii=False)
                             mcp_tool_use['result'] = result
                             self._update_chatroom_message(
                                 self._current_agent_message_id,
                                 self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
                             )
-                        else:
-                            result = json.dumps(
-                                {'status': 'success', 'message': 'Workflow run successfully'}
+                        elif workflow_match:
+                            result = await asyncio.wait_for(
+                                workflow_run(
+                                    int(workflow_match.group(1)),
+                                    self._user_id, self._team_id,
+                                    mcp_tool_args
+                                ),
+                                timeout=3600
                             )
-                            # Not set the result of workflow_run, because it will be set by the client later
+                            result = json.dumps(result, ensure_ascii=False)
+                            # Not set the result of workflow tool, because it will be set by the client later
+                        logger.debug('MCP tool result: %s', result)
+                    except asyncio.TimeoutError:
+                        await self._stop_all_mcp_tool_uses('Timeout')
+                        break
+                    except Exception as e:
+                        result = f'Error executing tool {mcp_tool_name}: {e}'
+                        logger.exception(result)
+                        mcp_tool_use['result'] = result
+                        self._update_chatroom_message(
+                            self._current_agent_message_id,
+                            self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
+                        )
+                        # Not set the result of workflow_run, because it will be set by the client later
                 await self._ws_manager.send_instruction(
                     self._chatroom_id,
                     'WITHMCPTOOLRESULT',
