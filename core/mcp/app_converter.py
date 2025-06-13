@@ -38,7 +38,7 @@ def skill_to_mcp_tool(skill_data: Dict[str, Any]) -> Dict[str, Any]:
     # Extract basic information
     skill_id = skill_data.get("id")
     skill_name = skill_data.get("name")
-    skill_description = skill_data.get("description", f"Execute skill {skill_name}")
+    skill_description = skill_data.get("description")
     
     # Build input schema properties
     properties = {
@@ -82,8 +82,8 @@ def skill_to_mcp_tool(skill_data: Dict[str, Any]) -> Dict[str, Any]:
     
     # Build MCP tool format
     mcp_tool = {
-        "name": f'nexusai__skill-{skill_id}-{skill_name}',
-        "description": skill_description,
+        "name": f'nexusai__skill-{skill_id}',
+        "description": f'Name: {skill_name}, Description: {skill_description}',
         "inputSchema": {
             "type": "object",
             "properties": properties,
@@ -132,7 +132,7 @@ def workflow_to_mcp_tool(workflow_data: Dict[str, Any]) -> Dict[str, Any]:
     # Extract basic information
     workflow_id = workflow_data.get("id")
     workflow_name = workflow_data.get("name")
-    workflow_description = workflow_data.get("description", f"Execute workflow {workflow_name}")
+    workflow_description = workflow_data.get("description")
     
     # Build input schema properties
     properties = {
@@ -200,8 +200,8 @@ def workflow_to_mcp_tool(workflow_data: Dict[str, Any]) -> Dict[str, Any]:
     
     # Build MCP tool format
     mcp_tool = {
-        "name": f'nexusai__workflow-{workflow_id}-{workflow_name}',
-        "description": workflow_description,
+        "name": f'nexusai__workflow-{workflow_id}',
+        "description": f'Name: {workflow_name}, Description: {workflow_description}',
         "inputSchema": {
             "type": "object",
             "properties": properties,

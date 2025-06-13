@@ -48,8 +48,8 @@ datasets = Datasets()
 models = Models()
 workflows = Workflows()
 
-skill_pattern = re.compile(r'nexusai__skill-(\d+)-.*')
-workflow_pattern = re.compile(r'nexusai__workflow-(\d+)-.*')
+skill_pattern = re.compile(r'nexusai__skill-(\d+)')
+workflow_pattern = re.compile(r'nexusai__workflow-(\d+)')
 
 class Chatroom:
     @staticmethod

@@ -139,7 +139,7 @@ async def workflow_run(
             raise ValueError(get_language_content("app_id_required"))
 
         if not input_variables:
-            raise ValueError(get_language_content("input_data_required"))
+            raise ValueError(get_language_content("input_dict_required"))
 
         # Get workflow with all conditions
         workflow = workflows_db.select_one(
@@ -163,7 +163,7 @@ async def workflow_run(
 
         # Process input data
         if not isinstance(input_variables, Dict):
-            raise ValueError(get_language_content("input_data_format_error"))
+            raise ValueError(get_language_content("input_dict_format_error"))
         
         for k, v in input_variables.items():
             if var := input_obj.properties.get(k):

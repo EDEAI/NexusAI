@@ -351,11 +351,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     workflow = Workflows().get_workflow_by_app_id(callable_item['app_id'])
                     graph = create_graph_from_dict(workflow.pop('graph'))
                     input_variables = graph.nodes.nodes[0].data['input']
-                    input_variables = [
-                        {k: v for k, v in var.to_dict().items() if k not in ['max_length']}
-                        for var in input_variables.properties.values()
-                    ]
-                    workflow['input_variables'] = input_variables
+                    workflow['input_variables'] = input_variables.to_dict()
                     
                     need_confirm_nodes = []
                     for node in graph.nodes.nodes:
