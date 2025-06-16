@@ -45,7 +45,11 @@ class WebSocketManager:
             raise Exception('Invalid token')
         assert (user_id := payload.get('uid')), 'Invalid user ID'
 
-        stored_token = redis.get(f'access_token:{user_id}')
+        stored_token = (
+            redis.get(f'third_party_access_token:{user_id}')
+            if payload.get('openid')
+            else redis.get(f'access_token:{user_id}')
+        )
         if not stored_token or stored_token.decode('utf-8') != token:
             raise Exception('Invalid token')
         return user_id
