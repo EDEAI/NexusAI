@@ -117,6 +117,12 @@ class ChatroomManager:
                     {'column': 'status', 'value': 2}
                 ]
             )
+            if app_run is None:
+                chatrooms.update(
+                    {'column': 'id', 'value': chatroom_id},
+                    {'chat_status': 0}
+                )
+                return
             app_run_id = app_run['id']
             user_message_id, user_message, topic = self._get_user_message_info(chatroom_id)
         else:
