@@ -37,7 +37,7 @@ class WebSocketManager:
             connection_path_pattern.fullmatch(connection_path) or
             connection_path_pattern_docker.fullmatch(connection_path)
         )
-        assert match_result, 'Invalid connection path'
+        assert match_result, f'Invalid connection path: {connection_path}'
         token = match_result.group(1)
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
