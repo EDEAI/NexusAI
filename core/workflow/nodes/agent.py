@@ -867,6 +867,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             else:
                 embedding_tokens, reranking_tokens = 0, 0
 
+            model_data['tools'] = all_mcp_tools
             model_data['raw_output'] = full_chunk.content
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
