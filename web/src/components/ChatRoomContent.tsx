@@ -1161,7 +1161,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
                 ref={scrollDomRef}
                 onScroll={slideScroll}
             >
-                <div style={{ minWidth: agentChatRoomId ? '' : `${bminWidth}px` }}>
+                <div className="w-full" style={{ minWidth: agentChatRoomId ? '' : `${bminWidth}px` }}>
                     <div className="w-full">
                         <div className="flex flex-col-reverse">
                             <>
