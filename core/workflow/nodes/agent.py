@@ -22,7 +22,7 @@ from core.database.models import (
 )
 from core.dataset import DatasetRetrieval
 from core.llm.prompt import Prompt, replace_prompt_with_context
-from core.mcp.client import MCPClient
+from core.mcp.app_converter import convert_callable_items_to_mcp_tools
 from languages import get_language_content
 from log import Logger
 from core.helper import push_to_websocket_queue
@@ -134,18 +134,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             'name': agent['name'],
             'description': agent['description'],
             'obligations': agent['obligations'],
-            'callable_items_description': get_language_content(
-                'agent_callable_items_description',
-                append_ret_lang_prompt=False
-            ) if callable_skills or callable_workflows else '',
-            'callable_skills': get_language_content(
-                'agent_callable_skills',
-                append_ret_lang_prompt=False
-            ).format(skill_list=json.dumps(callable_skills, ensure_ascii=False)) if callable_skills else '',
-            'callable_workflows': get_language_content(
-                'agent_callable_workflows',
-                append_ret_lang_prompt=False
-            ).format(workflow_list=json.dumps(callable_workflows, ensure_ascii=False)) if callable_workflows else '',
             'team_members': get_language_content(
                 'agent_team_members',
                 append_ret_lang_prompt=False
@@ -363,11 +351,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     workflow = Workflows().get_workflow_by_app_id(callable_item['app_id'])
                     graph = create_graph_from_dict(workflow.pop('graph'))
                     input_variables = graph.nodes.nodes[0].data['input']
-                    input_variables = [
-                        {k: v for k, v in var.to_dict().items() if k not in ['max_length']}
-                        for var in input_variables.properties.values()
-                    ]
-                    workflow['input_variables'] = input_variables
+                    workflow['input_variables'] = input_variables.to_dict()
                     
                     need_confirm_nodes = []
                     for node in graph.nodes.nodes:
@@ -520,29 +504,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 callable_skills, callable_workflows,
                 direct_output, is_chat
             )
-
-            # Temporarily disabled MCP tool feature. 2025-05-13
-            # mcp_client = MCPClient()
-            # event_loop = asyncio.get_event_loop()
-
-            # async def get_mcp_tool_list():
-            #     try:
-            #         await mcp_client.connect_to_builtin_server()
-            #     except ExceptionGroup as e:
-            #         logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
-            #     tool_list = await mcp_client.get_tool_list()
-            #     await mcp_client.cleanup()
-            #     return tool_list
             
-            # tool_list = event_loop.run_until_complete(get_mcp_tool_list())
             all_mcp_tools = []
-            # if mcp_tool_list:
-            #     all_mcp_tools.extend(mcp_tool_list)
-            # for tool in tool_list:
-            #     if tool['name'] == 'workflow_run' and callable_workflows:
-            #         all_mcp_tools.append(tool)
-            #     elif tool['name'] == 'skill_run' and callable_skills:
-            #         all_mcp_tools.append(tool)
 
             # Auto match ability
             #       -- Force JSON output -- return_json is True
@@ -567,6 +530,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 agent_id=agent_id,
                 mcp_tool_list=all_mcp_tools
             )
+            model_data['tools'] = all_mcp_tools
             print(model_data)
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
@@ -862,22 +826,11 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             callable_skills, callable_workflows = [], []
             if is_desktop:
                 callable_skills, callable_workflows = self._get_callable_items()
-
-                mcp_client = MCPClient()
-                try:
-                    await mcp_client.connect_to_builtin_server()
-                except ExceptionGroup as e:
-                    logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
-                tool_list = await mcp_client.get_tool_list()
-                await mcp_client.cleanup()
+                app_tools = convert_callable_items_to_mcp_tools(callable_skills, callable_workflows)
+                all_mcp_tools.extend(app_tools)
 
                 if mcp_tool_list:
                     all_mcp_tools.extend(mcp_tool_list)
-                for tool in tool_list:
-                    if tool['name'] == 'workflow_run' and callable_workflows:
-                        all_mcp_tools.append(tool)
-                    elif tool['name'] == 'skill_run' and callable_skills:
-                        all_mcp_tools.append(tool)
             
             _, input_ = self._prepare_prompt(
                 agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets),
@@ -915,6 +868,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             else:
                 embedding_tokens, reranking_tokens = 0, 0
 
+            model_data['tools'] = all_mcp_tools
             model_data['raw_output'] = full_chunk.content
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},

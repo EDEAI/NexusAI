@@ -143,7 +143,7 @@ class Users(MySQL):
             formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
             
             user_data = {
-                'team_id': 0,  # Third-party users are not associated with any team
+                'team_id': 1,  # Third-party users are not associated with any team
                 'role': 2,     # Default role for third-party users
                 'inviter_id': 0,
                 'nickname': nickname or f'{platform}_user',

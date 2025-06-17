@@ -117,6 +117,12 @@ class ChatroomManager:
                     {'column': 'status', 'value': 2}
                 ]
             )
+            if app_run is None:
+                chatrooms.update(
+                    {'column': 'id', 'value': chatroom_id},
+                    {'chat_status': 0}
+                )
+                return
             app_run_id = app_run['id']
             user_message_id, user_message, topic = self._get_user_message_info(chatroom_id)
         else:
@@ -226,7 +232,6 @@ class ChatroomManager:
                 }
             )
         except Exception as e:
-            logger.exception('ERROR!!')
             end_time = time()
             app_runs.update(
                 {'column': 'id', 'value': app_run_id},
@@ -352,6 +357,12 @@ class ChatroomManager:
                                     assert isinstance(result := data['result'], str), f'Invalid MCP tool result: {result}'
                                     self._chatrooms[chatroom_id].set_mcp_tool_result(index, result)
                                     await self._ws_manager.send_instruction(chatroom_id, 'WITHMCPTOOLRESULT', data)
+                                case 'WFCONFIRM':
+                                    assert isinstance(data, dict), 'Workflow confirmation data should be a dictionary.'
+                                    assert isinstance(index := data['index'], int), f'Invalid workflow index: {index}'
+                                    assert isinstance(status := data['status'], dict), f'Invalid workflow status: {status}'
+                                    self._chatrooms[chatroom_id].set_workflow_confirmation_status(index, status)
+                                    await self._ws_manager.send_instruction(chatroom_id, 'WITHWFCONFIRM', data)
                                 case 'INPUT':
                                     # User input
                                     assert isinstance(data, str), 'User input should be a string.'
@@ -397,10 +408,6 @@ class ChatroomManager:
                 self._event_loop.create_task(coro)
         
     async def start(self):
-        try:
-            await self._mcp_client.connect_to_builtin_server()
-        except ExceptionGroup as e:
-            logger.warning('Failed to connect to built-in MCP server: %s', e.exceptions)
         logger.info('Ready.')
         self._event_loop.create_task(self._resume_chatrooms())
         await self._ws_manager.start(self._ws_handler)

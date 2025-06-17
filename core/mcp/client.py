@@ -17,16 +17,6 @@ class MCPClient:
         self._servers: Dict[str, ClientSession] = {}
         self._tool_name_to_server_name: Dict[str, str] = {}
         self._exit_stack = AsyncExitStack()
-        
-    async def connect_to_builtin_server(self):
-        client = sse_client(f'http://localhost:{settings.MCP_SERVER_PORT}/sse')
-        sse_transport = await self._exit_stack.enter_async_context(client)
-        session = await self._exit_stack.enter_async_context(ClientSession(*sse_transport))
-        await session.initialize()
-        self._servers['builtin'] = session
-        response = await session.list_tools()
-        for tool in response.tools:
-            self._tool_name_to_server_name[tool.name] = 'builtin'
 
     async def connect_to_server(self, server_name: str, server_config: Dict[str, Any]):
         raise NotImplementedError('Not implemented')

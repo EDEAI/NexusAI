@@ -37,7 +37,7 @@ class WebSocketManager:
             connection_path_pattern.fullmatch(connection_path) or
             connection_path_pattern_docker.fullmatch(connection_path)
         )
-        assert match_result, 'Invalid connection path'
+        assert match_result, f'Invalid connection path: {connection_path}'
         token = match_result.group(1)
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
@@ -45,7 +45,11 @@ class WebSocketManager:
             raise Exception('Invalid token')
         assert (user_id := payload.get('uid')), 'Invalid user ID'
 
-        stored_token = redis.get(f'access_token:{user_id}')
+        stored_token = (
+            redis.get(f'third_party_access_token:{user_id}')
+            if payload.get('openid')
+            else redis.get(f'access_token:{user_id}')
+        )
         if not stored_token or stored_token.decode('utf-8') != token:
             raise Exception('Invalid token')
         return user_id
@@ -134,26 +138,14 @@ class WebSocketManager:
     async def end_agent_reply(
         self,
         chatroom_id: int,
-        agent_id: int,
-        ability_id: int,
-        full_message: str
     ):
         '''
         End the agent reply to the chatroom.
         '''
         if connections := self._connections_by_chatroom_id.get(chatroom_id):
-            not_replying_connections = set()
-            
             for connection in connections:
                 if self._replying_status_by_connection_id[id(connection)]:
                     self._replying_status_by_connection_id[id(connection)] = False
-                else:
-                    not_replying_connections.add(connection)
-            
-            await self.send_instruction_by_connections(not_replying_connections, 'REPLY', agent_id)
-            await self.send_instruction_by_connections(not_replying_connections, 'ABILITY', ability_id)
-            await self.send_instruction_by_connections(not_replying_connections, 'TEXT')
-            broadcast(not_replying_connections, full_message)
             
     def stop(self):
         self._stop_future.set_result(None)

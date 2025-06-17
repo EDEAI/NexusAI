@@ -1,14 +1,32 @@
 import json
 import re
+import os
+import sys
+import importlib
 import subprocess
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import HTMLResponse
+from datetime import datetime
+from fastapi import APIRouter, HTTPException, Depends, Request, status
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
 # Import language pack related modules
-from languages import language_packs, prompt_descriptions
+from languages import get_language_content, prompt_descriptions
+# Import authentication modules
+from api.utils.jwt import get_current_user, TokenData, oauth2_scheme
+from api.utils.common import response_success, response_error
 
 router = APIRouter()
+
+# Middleware to handle unauthorized access
+async def check_authentication_middleware(request: Request, call_next):
+    """Check if user is authenticated for prompt editor routes"""
+    if request.url.path.startswith("/prompt-editor/") and not request.url.path.endswith("/login"):
+        auth_header = request.headers.get("Authorization")
+        if not auth_header:
+            return RedirectResponse(url="/prompt-editor/login", status_code=307)
+    
+    response = await call_next(request)
+    return response
 
 def restart_services():
     """Restart services after prompt update"""
@@ -30,9 +48,188 @@ class PromptUpdateRequest(BaseModel):
     content_type: str = "string"  # "string" or "dict"
     language: str = "en"
 
+@router.get("/login", response_class=HTMLResponse)
+async def prompt_editor_login_page():
+    """Display login page for prompt editor"""
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login - NexusAI Prompt Editor</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+            .login-container {
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                padding: 40px;
+                width: 100%;
+                max-width: 400px;
+            }
+            .login-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .login-header h1 {
+                color: #4f46e5;
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+            .login-header p {
+                color: #64748b;
+                font-size: 1rem;
+            }
+            .form-group {
+                margin-bottom: 20px;
+            }
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                color: #374151;
+                font-weight: 600;
+            }
+            .form-group input {
+                width: 100%;
+                padding: 12px 16px;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 16px;
+                transition: border-color 0.2s;
+            }
+            .form-group input:focus {
+                outline: none;
+                border-color: #4f46e5;
+            }
+            .login-button {
+                width: 100%;
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+                color: white;
+                border: none;
+                padding: 12px 16px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .login-button:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            }
+            .login-button:disabled {
+                background: #9ca3af;
+                transform: none;
+                box-shadow: none;
+                cursor: not-allowed;
+            }
+            .error-message {
+                color: #ef4444;
+                font-size: 14px;
+                margin-top: 10px;
+                text-align: center;
+            }
+            .success-message {
+                color: #10b981;
+                font-size: 14px;
+                margin-top: 10px;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🔐 Login</h1>
+                <p>Access NexusAI Prompt Editor</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username or Email:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="login-button" id="loginButton">
+                    🚀 Login to Prompt Editor
+                </button>
+                
+                <div id="message"></div>
+            </form>
+        </div>
+        
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const button = document.getElementById('loginButton');
+                const messageDiv = document.getElementById('message');
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                button.disabled = true;
+                button.textContent = 'Logging in...';
+                messageDiv.innerHTML = '';
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('username', username);
+                    formData.append('password', password);
+                    
+                    const response = await fetch('/v1/auth/login', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok && result.access_token) {
+                        // Store token in localStorage
+                        localStorage.setItem('access_token', result.access_token);
+                        messageDiv.innerHTML = '<div class="success-message">✅ Login successful! Redirecting...</div>';
+                        
+                        // Redirect to prompt editor
+                        setTimeout(() => {
+                            window.location.href = '/prompt-editor/';
+                        }, 1000);
+                    } else {
+                        messageDiv.innerHTML = '<div class="error-message">❌ ' + (result.detail || 'Login failed') + '</div>';
+                    }
+                } catch (error) {
+                    messageDiv.innerHTML = '<div class="error-message">❌ Network error occurred</div>';
+                } finally {
+                    button.disabled = false;
+                    button.textContent = '🚀 Login to Prompt Editor';
+                }
+            });
+        </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
+
 @router.get("/", response_class=HTMLResponse)
 async def prompt_editor_page():
-    """Display prompt editor page"""
+    """Display prompt editor page with client-side authentication check"""
     
     html_content = f"""
     <!DOCTYPE html>
@@ -251,6 +448,9 @@ async def prompt_editor_page():
             .message.error {{
                 background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             }}
+            .message.info {{
+                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            }}
             .prompt-key-info {{
                 margin-bottom: 15px;
                 padding: 10px;
@@ -277,6 +477,10 @@ async def prompt_editor_page():
             <div class="header">
                 <h1>🚀 NexusAI Prompt Editor</h1>
                 <p>Built-in Prompt Quality Debugging Tool</p>
+                <div style="position: absolute; top: 20px; right: 20px;">
+                    <span id="userWelcome" style="margin-right: 15px; color: rgba(255,255,255,0.9); display: none;">Welcome, <span id="userName"></span>!</span>
+                    <button onclick="logout()" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">🚪 Logout</button>
+                </div>
             </div>
             
             <div class="statistics">
@@ -307,15 +511,21 @@ async def prompt_editor_page():
             // Load prompt data
             async function loadPromptData() {{
                 try {{
-                    const response = await fetch('/prompt-editor/api/descriptions');
+                    const response = await authenticatedFetch('/prompt-editor/api/descriptions');
                     const data = await response.json();
                     promptData = data;
                     renderPrompts();
                     updateStatistics();
                     // Load prompt contents after rendering
                     await loadPromptContents();
+                    
+                    // Re-check admin status for save buttons
+                    await checkAdminStatus();
                 }} catch (error) {{
                     showMessage('❌ Failed to load prompt data', 'error');
+                    if (error === 'No token') {{
+                        window.location.href = '/prompt-editor/login';
+                    }}
                 }}
             }}
             
@@ -431,7 +641,7 @@ async def prompt_editor_page():
                 for (const group of langData) {{
                     for (const key of Object.keys(group.prompts)) {{
                         try {{
-                            const response = await fetch(`/prompt-editor/api/content/${{key}}`);
+                            const response = await authenticatedFetch(`/prompt-editor/api/content/${{key}}`);
                             const data = await response.json();
                             const container = document.getElementById(`textarea-container-${{key}}`);
                             
@@ -508,11 +718,8 @@ async def prompt_editor_page():
                         throw new Error('No textarea found');
                     }}
                     
-                    const response = await fetch('/prompt-editor/save', {{
+                    const response = await authenticatedFetch('/prompt-editor/save', {{
                         method: 'POST',
-                        headers: {{
-                            'Content-Type': 'application/json',
-                        }},
                         body: JSON.stringify({{
                             key: key,
                             content: content,
@@ -574,9 +781,201 @@ async def prompt_editor_page():
                 }});
             }});
             
+            // Logout function
+            async function logout() {{
+                try {{
+                    const token = localStorage.getItem('access_token');
+                    if (token) {{
+                        await fetch('/v1/auth/logout', {{
+                            method: 'POST',
+                            headers: {{
+                                'Authorization': `Bearer ${{token}}`,
+                                'Content-Type': 'application/json'
+                            }}
+                        }});
+                        localStorage.removeItem('access_token');
+                    }}
+                    window.location.href = '/prompt-editor/login';
+                }} catch (error) {{
+                    console.error('Logout error:', error);
+                    localStorage.removeItem('access_token');
+                    window.location.href = '/prompt-editor/login';
+                }}
+            }}
+            
+            // Check authentication and get user info
+            async function checkAuth() {{
+                const token = localStorage.getItem('access_token');
+                if (!token) {{
+                    console.log('No token found, redirecting to login');
+                    window.location.href = '/prompt-editor/login';
+                    return false;
+                }}
+                
+                console.log('Token found:', token.substring(0, 20) + '...');
+                
+                try {{
+                    // First try a simple API call to verify token works
+                    const testResponse = await fetch('/prompt-editor/api/descriptions', {{
+                        headers: {{
+                            'Authorization': `Bearer ${{token}}`
+                        }}
+                    }});
+                    
+                    if (!testResponse.ok) {{
+                        console.log('Token test failed, removing token');
+                        localStorage.removeItem('access_token');
+                        window.location.href = '/prompt-editor/login';
+                        return false;
+                    }}
+                    
+                    // If test passes, get user info
+                    const response = await fetch('/v1/auth/user_info', {{
+                        headers: {{
+                            'Authorization': `Bearer ${{token}}`
+                        }}
+                    }});
+                    
+                    if (response.ok) {{
+                        const userInfo = await response.json();
+                        console.log('User info response:', userInfo); // Debug log
+                        
+                        // Check different possible response formats
+                        let userData = null;
+                        if (userInfo.success && userInfo.data) {{
+                            userData = userInfo.data;
+                        }} else if (userInfo.data) {{
+                            userData = userInfo.data;
+                        }} else if (userInfo.uid) {{
+                            userData = userInfo; // Direct user data
+                        }}
+                        
+                        if (userData) {{
+                            // Display user info
+                            const userName = userData.nickname || userData.email || userData.phone || 'User';
+                            document.getElementById('userName').textContent = userName;
+                            document.getElementById('userWelcome').style.display = 'inline';
+                            
+                            // Check if user is admin (role = 1)
+                            const isAdmin = userData.role === 1;
+                            if (!isAdmin) {{
+                                // Show read-only message after content loads
+                                setTimeout(() => {{
+                                    const saveButtons = document.querySelectorAll('.save-button');
+                                    saveButtons.forEach(button => {{
+                                        button.style.display = 'none';
+                                    }});
+                                    showMessage('ℹ️ You are in read-only mode. Only administrators can modify prompts.', 'info');
+                                }}, 1000);
+                            }}
+                            
+                            return true;
+                        }} else {{
+                            console.error('No valid user data found in response');
+                            // Even if user info fails, if token test passed, allow access with limited info
+                            document.getElementById('userName').textContent = 'User';
+                            document.getElementById('userWelcome').style.display = 'inline';
+                            
+                            // Assume non-admin if we can't get user info
+                            setTimeout(() => {{
+                                const saveButtons = document.querySelectorAll('.save-button');
+                                saveButtons.forEach(button => {{
+                                    button.style.display = 'none';
+                                }});
+                                showMessage('ℹ️ You are in read-only mode. Could not verify admin privileges.', 'info');
+                            }}, 1000);
+                            
+                            return true;
+                        }}
+                    }} else {{
+                        console.error('User info request failed:', response.status, response.statusText);
+                        // If user info API fails but token test passed, allow with limited access
+                        document.getElementById('userName').textContent = 'User';
+                        document.getElementById('userWelcome').style.display = 'inline';
+                        
+                        setTimeout(() => {{
+                            const saveButtons = document.querySelectorAll('.save-button');
+                            saveButtons.forEach(button => {{
+                                button.style.display = 'none';
+                            }});
+                            showMessage('ℹ️ You are in read-only mode. User info unavailable.', 'info');
+                        }}, 1000);
+                        
+                        return true;
+                    }}
+                    
+                    // This should not be reached if token test passed
+                    console.log('Unexpected code path reached');
+                    return true;
+                    
+                }} catch (error) {{
+                    console.error('Auth check error:', error);
+                    localStorage.removeItem('access_token');
+                    window.location.href = '/prompt-editor/login';
+                    return false;
+                }}
+            }}
+            
+            // Add authentication headers to fetch requests
+            function authenticatedFetch(url, options = {{}}) {{
+                const token = localStorage.getItem('access_token');
+                if (!token) {{
+                    window.location.href = '/prompt-editor/login';
+                    return Promise.reject('No token');
+                }}
+                
+                const headers = {{
+                    'Authorization': `Bearer ${{token}}`,
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }};
+                
+                return fetch(url, {{
+                    ...options,
+                    headers
+                }});
+             }}
+             
+             // Check admin status and hide save buttons for non-admin users
+             async function checkAdminStatus() {{
+                 try {{
+                     const token = localStorage.getItem('access_token');
+                     if (!token) return;
+                     
+                     const response = await fetch('/v1/auth/user_info', {{
+                         headers: {{
+                             'Authorization': `Bearer ${{token}}`
+                         }}
+                     }});
+                     
+                     if (response.ok) {{
+                         const userInfo = await response.json();
+                         if (userInfo.success && userInfo.data) {{
+                             const isAdmin = userInfo.data.role === 1;
+                             const saveButtons = document.querySelectorAll('.save-button');
+                             
+                             if (!isAdmin) {{
+                                 saveButtons.forEach(button => {{
+                                     button.style.display = 'none';
+                                 }});
+                             }} else {{
+                                 saveButtons.forEach(button => {{
+                                     button.style.display = 'inline-block';
+                                 }});
+                             }}
+                         }}
+                     }}
+                 }} catch (error) {{
+                     console.error('Admin status check error:', error);
+                 }}
+             }}
+            
             // Initialize page
-            window.addEventListener('load', () => {{
-                loadPromptData();
+            window.addEventListener('load', async () => {{
+                const isAuthenticated = await checkAuth();
+                if (isAuthenticated) {{
+                    loadPromptData();
+                }}
             }});
         </script>
     </body>
@@ -586,24 +985,17 @@ async def prompt_editor_page():
     return HTMLResponse(content=html_content)
 
 @router.get("/api/descriptions")
-async def get_prompt_descriptions():
+async def get_prompt_descriptions(current_user: TokenData = Depends(get_current_user)):
     """Get prompt descriptions for both languages"""
     return prompt_descriptions
 
 @router.get("/api/content/{key}")
-async def get_prompt_content(key: str):
+async def get_prompt_content(key: str, current_user: TokenData = Depends(get_current_user)):
     """Get prompt content for a specific key"""
     try:
-        content = language_packs.get("en", {})
         
-        # Handle nested keys
-        keys = key.split('.')
-        for k in keys:
-            if isinstance(content, dict):
-                content = content.get(k, "")
-            else:
-                content = ""
-                break
+        # Use get_language_content to get content (this will use prompt.py if available)
+        content = get_language_content(key, uid=0, append_ret_lang_prompt=False)
         
         # Return different data based on type
         if isinstance(content, dict):
@@ -613,44 +1005,38 @@ async def get_prompt_content(key: str):
             }
         else:
             return {
-                "content": str(content),
+                "content": str(content) if content is not None else "",
                 "type": "string"
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get content: {str(e)}")
 
 @router.post("/save")
-async def save_prompt(request: PromptUpdateRequest):
-    """Save single prompt to file"""
+async def save_prompt(request: PromptUpdateRequest, current_user: TokenData = Depends(get_current_user)):
+    """Save single prompt to prompt.py file"""
     try:
-        from datetime import datetime
-        
-        # Read current languages.py file
-        with open("languages.py", "r", encoding="utf-8") as f:
+        # Check if user has admin privileges (role = 1 is admin)
+        if current_user.role != 1:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied. Administrator privileges required to modify prompts."
+            )
+        # Read current prompt.py file
+        prompt_file_path = "prompt.py"
+        with open(prompt_file_path, "r", encoding="utf-8") as f:
             content = f.read()
         
         key = request.key
-        lang = request.language
         new_content = request.content
         content_type = request.content_type
         
         # Create backup with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        backup_file = f"languages.py.backup_{timestamp}"
+        backup_file = f"prompt.py.backup_{timestamp}"
         with open(backup_file, "w", encoding="utf-8") as f:
             f.write(content)
         
-        # Force use English since we only edit English prompts  
-        lang = "en"
-        
-        if key not in language_packs[lang]:
-            raise HTTPException(status_code=404, detail=f"Unable to locate key: {key} in language_packs[{lang}]")
-        
-        # Get original content
-        original_content = language_packs[lang][key]
-        
-        # Find the key pattern and replace it
-        # Use a simple approach: find the key line and replace its value
+        # Find the key pattern and replace it in PROMPTS dictionary
         lines = content.split('\n')
         new_lines = []
         i = 0
@@ -671,120 +1057,101 @@ async def save_prompt(request: PromptUpdateRequest):
                 else:
                     key_quote = "'"
                 
-                # Determine the triple quote style used in the original value
-                original_triple_quote = '"""'  # default
-                if line.strip().endswith("'''"):
-                    original_triple_quote = "'''"
-                elif line.strip().endswith('"""'):
-                    original_triple_quote = '"""'
-                
-                # Build new value string based on content type using original quote style
+                # Build new value string based on content type
                 if content_type == "dict" and isinstance(new_content, dict):
-                    # Dictionary type: format as Python dict with original triple quotes
+                    # Dictionary type: format as Python dict with triple quotes
                     dict_items = []
                     for sub_key, sub_value in new_content.items():
-                        # Clean the value and wrap in original triple quotes
-                        clean_value = str(sub_value).strip()
-                        formatted_value = f'{original_triple_quote}\n            {clean_value}\n        {original_triple_quote}'
-                        dict_items.append(f'            "{sub_key}": {formatted_value}')
-                    new_value = "{\n" + ",\n".join(dict_items) + "\n        }"
+                        # Preserve original formatting, only convert to string
+                        formatted_value = f'"""\n{str(sub_value)}"""'
+                        dict_items.append(f'        "{sub_key}": {formatted_value}')
+                    new_value = "{\n" + ",\n".join(dict_items) + "\n    }"
                 else:
-                    # String type: wrap entire content in original triple quotes
-                    clean_content = str(new_content).strip()
-                    new_value = f'{original_triple_quote}\n            {clean_content}\n        {original_triple_quote}'
+                    # String type: wrap entire content in triple quotes, preserve formatting
+                    new_value = f'"""\n{str(new_content)}"""'
                 
-                # Check if the value starts on the same line or next line
-                if line.strip().endswith('{') or line.strip().endswith('"""') or line.strip().endswith("'''"):
-                    # Multi-line value, need to find the end
-                    new_lines.append(f'{indent_str}{key_quote}{key}{key_quote}: {new_value},')
+                # Replace the current line
+                new_lines.append(f'{indent_str}{key_quote}{key}{key_quote}: {new_value},')
+                
+                # Skip until we find the end of the current value
+                i += 1
+                if content_type == "dict":
+                    # For dict type, skip until we find the matching closing brace
+                    brace_count = 1  # Start with 1 since we already have the opening brace
+                    in_triple_quotes = False
+                    quote_type = None
                     
-                    # Skip until we find the end of the current value
-                    i += 1
-                    if content_type == "dict":
-                        # For dict type, skip until we find the matching closing brace
-                        # Need to be careful about braces inside triple quotes
-                        brace_count = 1  # Start with 1 since we already have the opening brace
-                        in_triple_quotes = False
-                        quote_type = None
+                    while i < len(lines):
+                        current_line = lines[i]
+                        line_content = current_line.strip()
                         
-                        while i < len(lines):
-                            current_line = lines[i]
-                            line_content = current_line.strip()
+                        # Check for triple quote start/end
+                        if not in_triple_quotes:
+                            if '"""' in current_line:
+                                in_triple_quotes = True
+                                quote_type = '"""'
+                            elif "'''" in current_line:
+                                in_triple_quotes = True
+                                quote_type = "'''"
+                        else:
+                            # We're inside triple quotes, check for end
+                            if quote_type in current_line:
+                                # Check if this line ends the triple quote
+                                if line_content.endswith(quote_type) or line_content.endswith(quote_type + ','):
+                                    in_triple_quotes = False
+                                    quote_type = None
+                        
+                        # Only count braces when not inside triple quotes
+                        if not in_triple_quotes:
+                            if '{' in current_line:
+                                brace_count += current_line.count('{')
+                            if '}' in current_line:
+                                brace_count -= current_line.count('}')
                             
-                            # Check for triple quote start/end
-                            if not in_triple_quotes:
-                                if '"""' in current_line:
-                                    in_triple_quotes = True
-                                    quote_type = '"""'
-                                elif "'''" in current_line:
-                                    in_triple_quotes = True
-                                    quote_type = "'''"
-                            else:
-                                # We're inside triple quotes, check for end
-                                if quote_type in current_line:
-                                    # Check if this line ends the triple quote
-                                    if line_content.endswith(quote_type) or line_content.endswith(quote_type + ','):
-                                        in_triple_quotes = False
-                                        quote_type = None
-                            
-                            # Only count braces when not inside triple quotes
-                            if not in_triple_quotes:
-                                if '{' in current_line:
-                                    brace_count += current_line.count('{')
-                                if '}' in current_line:
-                                    brace_count -= current_line.count('}')
-                                
-                                # Check if we've found the matching closing brace
-                                if brace_count <= 0:
-                                    # Found the end, stop here
-                                    break
-                            
-                            i += 1
-                    else:
-                        # For string type, skip until we find the end of the matching triple quotes
-                        while i < len(lines):
-                            current_line = lines[i]
-                            line_stripped = current_line.strip()
-                            if line_stripped.endswith(original_triple_quote + ',') or \
-                               line_stripped.endswith(original_triple_quote) or \
-                               line_stripped == original_triple_quote + ',' or \
-                               line_stripped == original_triple_quote:
-                                # Found the ending line, stop here (don't increment i)
+                            # Check if we've found the matching closing brace
+                            if brace_count <= 0:
+                                # Found the end, stop here
                                 break
-                            i += 1
+                        
+                        i += 1
                 else:
-                    # Single line value
-                    new_lines.append(f'{indent_str}{key_quote}{key}{key_quote}: {new_value},')
+                    # For string type, skip until we find the end of the matching triple quotes
+                    while i < len(lines):
+                        current_line = lines[i]
+                        line_stripped = current_line.strip()
+                        if line_stripped.endswith('""",' ) or \
+                           line_stripped.endswith('"""') or \
+                           line_stripped == '""",' or \
+                           line_stripped == '"""':
+                            # Found the ending line, stop here (don't increment i)
+                            break
+                        i += 1
             else:
                 new_lines.append(line)
             i += 1
         
         if not found_key:
-            raise HTTPException(status_code=404, detail=f"Unable to locate key: {key} in language_packs[{lang}]")
+            raise HTTPException(status_code=404, detail=f"Unable to locate key: {key} in prompt.py")
         
-        # Write the modified content back to file
+        # Write the modified content back to prompt.py
         new_content_file = '\n'.join(new_lines)
-        with open("languages.py", "w", encoding="utf-8") as f:
+        with open(prompt_file_path, "w", encoding="utf-8") as f:
             f.write(new_content_file)
         
-        # Update language_packs in memory
-        if content_type == "dict" and isinstance(new_content, dict):
-            language_packs[lang][key] = new_content
-        else:
-            language_packs[lang][key] = new_content
+        # Force reload the prompt module to get the latest content
+        if 'prompt' in sys.modules:
+            importlib.reload(sys.modules['prompt'])
         
-        # Restart services after successful save
-        # restart_services()
-        
-        return {"status": "success", "message": f"Prompt {key} ({lang}) saved successfully"}
+        return {"status": "success", "message": f"Prompt {key} saved successfully to prompt.py"}
         
     except Exception as e:
         # If error occurs, try to restore from backup
         try:
-            with open(backup_file, "r", encoding="utf-8") as f:
-                backup_content = f.read()
-            with open("languages.py", "w", encoding="utf-8") as f:
-                f.write(backup_content)
+            if 'backup_file' in locals():
+                with open(backup_file, "r", encoding="utf-8") as f:
+                    backup_content = f.read()
+                with open(prompt_file_path, "w", encoding="utf-8") as f:
+                    f.write(backup_content)
         except:
             pass
         raise HTTPException(status_code=500, detail=f"Save failed: {str(e)}")
