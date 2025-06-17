@@ -95,29 +95,42 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
             },
         });
     };
-    const sendMessageUseFile = message => {
-        if (uploadedFiles?.length > 0) {
-            setInstruction(['FILELIST', uploadedFiles.map(file => file.file_id)]);
-            if (abilityId) {
-                setInstruction(['SETABILITY', abilityId]);
-            }
-
-            setTimeout(() => {
-                setInstruction(['INPUT', message]);
-
-                if (uploadedFiles.length > 0) {
-                    clearFiles();
-                }
-            }, 300);
-        } else {
-            if (abilityId) {
-                setInstruction(['SETABILITY', abilityId]);
-            }
-
-            setTimeout(() => {
-                setInstruction(['INPUT', message]);
-            }, 300);
+    // Send instructions in sequence with appropriate timing
+    const sendInstructionQueue = (instructions, finalCallback) => {
+        if (instructions.length === 0) {
+            if (finalCallback) finalCallback();
+            return;
         }
+
+        const [currentInstruction, ...remainingInstructions] = instructions;
+        setInstruction(currentInstruction);
+
+        // Use shorter delay for better responsiveness while ensuring order
+        setTimeout(() => {
+            sendInstructionQueue(remainingInstructions, finalCallback);
+        }, 100);
+    };
+
+    const sendMessageUseFile = message => {
+        const instructions = [];
+
+        // Build instruction queue based on current state
+        if (uploadedFiles?.length > 0) {
+            instructions.push(['FILELIST', uploadedFiles.map(file => file.file_id)]);
+        }
+
+        if (abilityId) {
+            instructions.push(['SETABILITY', abilityId]);
+        }
+
+        instructions.push(['INPUT', message]);
+
+        // Send instructions in sequence and clean up files after completion
+        sendInstructionQueue(instructions, () => {
+            if (uploadedFiles?.length > 0) {
+                clearFiles();
+            }
+        });
     };
     // Send message
     const userSendmessage = (e: any) => {
@@ -232,105 +245,112 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
                         </div>
                     )}
                 </Image.PreviewGroup>
-                <div className="flex flex-wrap gap-2 items-center">
-                    {abilitiesList?.length > 0 && (
-                        <ProFormSelect
-                            label={intl.formatMessage({ id: 'agent.selectivepower' })}
-                            name="ability_id"
-                            options={abilitiesList}
-                            initialValue={abilityId}
-                            fieldProps={{
-                                placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
-                                size: 'small',
-                                onChange: (value: any) => {
-                                    setAbilityId(value);
-                                },
-                            }}
-                            formItemProps={{
-                                className: 'm-0 flex-1',
-                            }}
-                        />
-                    )}
-                    {agentChatRoomId && (
-                        <Button
-                            size="small"
-                            color="danger"
-                            variant="outlined"
-                            onClick={clearContext}
-                            icon={<ClearOutlined></ClearOutlined>}
-                        >
-                            {intl.formatMessage({ id: 'app.chatroom.sidebar.agent_button' })}
-                        </Button>
-                    )}
-                </div>
                 <div
-                    className={`flex items-center p-[12px] gap-[10px] box-border border border-[#ccc] bg-[#fff] ${
+                    className={`border  px-[12px] py-2 border-[#ccc] bg-[#fff]  ${
                         uploadedFiles.length > 0 ? 'rounded-b-[8px]' : 'rounded-[8px]'
                     }`}
                 >
-                    <Button
-                        type="text"
-                        icon={<UploadOutlined />}
-                        onClick={handleFileUpload}
-                        disabled={disableInput || isUploading}
-                        loading={isUploading}
-                    />
-
-                    <TextArea
-                        id="userValue"
-                        className="placeholder-text-[#aaa] placeholder-text-[14px]"
-                        autoSize={{ minRows: 1, maxRows: 6 }}
-                        value={userSendvalue}
-                        disabled={disableInput}
-                        onChange={(e: any) => {
-                            setUserSendvalue(e.target.value);
-                        }}
-                        onPressEnter={userSendmessage}
-                        style={{
-                            height: '34px',
-                            border: 'none',
-                            resize: 'none',
-                            backgroundColor: 'transparent',
-                        }}
-                        placeholder={`${intl.formatMessage({ id: 'app.chatroom.content.input' })}…`}
-                    ></TextArea>
-                    {!isStop ? (
-                        <div
-                            className={`${
-                                disableInput || !userSendvalue ? 'bg-[#ddd]' : 'bg-[#1B64F3]'
-                            } min-w-[30px] h-[30px]  flex items-center justify-center cursor-pointer rounded-[6px]`}
-                            onClick={throttle(() => {
-                                if (disableInput || !userSendvalue) return false;
-                                if (!userSendvalue) {
-                                    messageApi.open({
-                                        type: 'warning',
-                                        content: intl.formatMessage({
-                                            id: 'app.chatroom.content.input',
+                    {agentChatRoomId && (
+                        <div className="flex flex-wrap gap-2 items-center mb-2">
+                            {abilitiesList?.length > 0 && (
+                                <ProFormSelect
+                                    label={intl.formatMessage({ id: 'agent.selectivepower' })}
+                                    name="ability_id"
+                                    options={abilitiesList}
+                                    initialValue={abilityId}
+                                    fieldProps={{
+                                        placeholder: intl.formatMessage({
+                                            id: 'agent.pleaseselect',
                                         }),
-                                        duration: 10,
-                                    });
-                                }
-                                setDisableInput(true);
+                                        size: 'small',
+                                        onChange: (value: any) => {
+                                            setAbilityId(value);
+                                        },
+                                    }}
+                                    formItemProps={{
+                                        className: 'm-0',
+                                    }}
+                                />
+                            )}
 
-                                sendMessageUseFile(userSendvalue);
-                                setUserSendvalue('');
-                            }, 300)}
-                        >
-                            <img
-                                src="/icons/send_icon_w.svg"
-                                alt=""
-                                className="w-[18px] h-[18px]"
-                            />
-                            {/* <EnterOutlined style={{color:'#fff',fontSize:'20px'}}/> */}
-                        </div>
-                    ) : (
-                        <div
-                            className="min-w-[34px] h-[34px] bg-[#000] flex items-center justify-center cursor-pointer rounded-[4px]"
-                            onClick={stopChatRoom}
-                        >
-                            <PauseCircleOutlined style={{ color: '#fff', fontSize: '20px' }} />
+                            <Button
+                                size="small"
+                                color="danger"
+                                variant="outlined"
+                                onClick={clearContext}
+                                icon={<ClearOutlined></ClearOutlined>}
+                            >
+                                {intl.formatMessage({ id: 'app.chatroom.sidebar.agent_button' })}
+                            </Button>
                         </div>
                     )}
+                    <div className={`flex items-center gap-[10px] box-border `}>
+                        <Button
+                            type="text"
+                            icon={<UploadOutlined />}
+                            onClick={handleFileUpload}
+                            disabled={disableInput || isUploading}
+                            loading={isUploading}
+                        />
+
+                        <TextArea
+                            id="userValue"
+                            className="placeholder-text-[#aaa] placeholder-text-[14px]"
+                            autoSize={{ minRows: 1, maxRows: 6 }}
+                            value={userSendvalue}
+                            disabled={disableInput}
+                            onChange={(e: any) => {
+                                setUserSendvalue(e.target.value);
+                            }}
+                            onPressEnter={userSendmessage}
+                            style={{
+                                height: '34px',
+                                border: 'none',
+                                resize: 'none',
+                                backgroundColor: 'transparent',
+                            }}
+                            placeholder={`${intl.formatMessage({
+                                id: 'app.chatroom.content.input',
+                            })}…`}
+                        ></TextArea>
+                        {!isStop ? (
+                            <div
+                                className={`${
+                                    disableInput || !userSendvalue ? 'bg-[#ddd]' : 'bg-[#1B64F3]'
+                                } min-w-[30px] h-[30px]  flex items-center justify-center cursor-pointer rounded-[6px]`}
+                                onClick={throttle(() => {
+                                    if (disableInput || !userSendvalue) return false;
+                                    if (!userSendvalue) {
+                                        messageApi.open({
+                                            type: 'warning',
+                                            content: intl.formatMessage({
+                                                id: 'app.chatroom.content.input',
+                                            }),
+                                            duration: 10,
+                                        });
+                                    }
+                                    setDisableInput(true);
+
+                                    sendMessageUseFile(userSendvalue);
+                                    setUserSendvalue('');
+                                }, 300)}
+                            >
+                                <img
+                                    src="/icons/send_icon_w.svg"
+                                    alt=""
+                                    className="w-[18px] h-[18px]"
+                                />
+                                {/* <EnterOutlined style={{color:'#fff',fontSize:'20px'}}/> */}
+                            </div>
+                        ) : (
+                            <div
+                                className="min-w-[34px] h-[34px] bg-[#000] flex items-center justify-center cursor-pointer rounded-[4px]"
+                                onClick={stopChatRoom}
+                            >
+                                <PauseCircleOutlined style={{ color: '#fff', fontSize: '20px' }} />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </>
