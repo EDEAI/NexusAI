@@ -158,7 +158,7 @@ const UploadView = forwardRef(({ fun, createkbInfo, fileList = [] }: any, ref) =
                 ref={uploadRef}
                 listType="picture"
                 className="flex flex-col items-center justify-center custom-dragger mt-[15px]"
-                accept=".txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv"
+                accept=".txt,.md,.pdf,.html,.xlsx,.pptx,.docx,.csv"
                 disabled={createkbInfo.type}
             >
                 <div className="update p-[4px]">

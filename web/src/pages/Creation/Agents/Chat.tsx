@@ -7,24 +7,17 @@ import {
     postAgentChatMessage,
     PutagentPublish,
 } from '@/api/agents';
-import InfiniteScroll from '@/components/common/InfiniteScroll';
+import { ChatRoomContent } from '@/components/ChatRoomContent';
 import FileListDisplay from '@/components/FileListDisplay';
 import useFileUpload from '@/hooks/useFileUpload';
 import { createPromptFromObject } from '@/py2js/prompt.js';
 import useSocketStore from '@/store/websocket';
-import {
-    DeleteOutlined,
-    DownloadOutlined,
-    ExclamationCircleFilled,
-    FileOutlined,
-    SendOutlined,
-    UploadOutlined,
-} from '@ant-design/icons';
+import { DownloadOutlined, ExclamationCircleFilled, FullscreenOutlined, FullscreenExitOutlined } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
-import { ProForm, ProFormSelect, ProFormTextArea } from '@ant-design/pro-components';
+import { ProForm } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Button, Image, message, Modal, Spin, Tag, Tooltip } from 'antd';
+import { Button, Image, message, Modal, Spin } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
@@ -111,6 +104,7 @@ interface Props {
             app?: {
                 name: string;
             };
+            agent_chatroom_id?: number;
         };
         abilitiesList: Array<{
             value: number;
@@ -139,9 +133,7 @@ const downloadFile = (url: string, filename: string) => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    } catch (e) {
-
-    }
+    } catch (e) {}
 };
 
 const UserMessageComponent = memo(({ message }: MessageProps) => (
@@ -285,24 +277,61 @@ export default memo((props: Props) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [hasMoreHistory, setHasMoreHistory] = useState(true);
     const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [clearingMemory, setClearingMemory] = useState(false);
     const [initialLoading, setInitialLoading] = useState(false);
     const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
     const [savingInfo, setSavingInfo] = useState(false);
     const [publishing, setPublishing] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
     const formRef = useRef<ProFormInstance>();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
+    const chatWrapperRef = useRef<HTMLDivElement>(null);
     const intl = useIntl();
     const listenMessage = useSocketStore(state =>
         (state as unknown as WebSocketStore).getTypedMessages('chat_message_llm_return'),
     );
     const [fileDisplayLayout, setFileDisplayLayout] = useState('list');
-
+    const [agentChatRoomId, setAgentChatRoomId] = useState(null);
     const lastMessage = useSocketStore(state =>
         (state as unknown as WebSocketStore).getTypedLastMessage('chat_message_llm_return'),
     );
+    const [agentInfo, setAgentInfo] = useState(null);
+
+    // 处理窗口全屏切换
+    const toggleFullscreen = () => {
+        setIsFullscreen(prev => !prev);
+    };
+
+    useEffect(() => {
+        if (props.data?.detailList?.app?.name != undefined) {
+            console.log(props.data);
+            const id = props.data.detailList.agent_chatroom_id;
+
+            if (id) {
+                const currentSearch = window.location.search;
+                const searchParams = new URLSearchParams(currentSearch);
+                setAgentChatRoomId(id);
+                searchParams.set('id', String(id));
+
+                const newUrl = `${window.location.pathname}?${searchParams.toString()}${
+                    window.location.hash
+                }`;
+                window.history.replaceState({}, '', newUrl);
+            }
+
+            setAgentInfo({
+                ...props.data.detailList.app,
+                agent_id: props.data.detailList.agent.agent_id,
+            });
+
+            setTimeout(() => {
+                setLoading(false);
+            }, 500);
+        }
+    }, [props.data?.detailList?.app?.name]);
+
     // 使用自定义的 hook
     const {
         uploadedFiles,
@@ -417,7 +446,7 @@ export default memo((props: Props) => {
             clearFiles();
         } catch (error) {
             setIsWaitingForResponse(false);
-            message.error('发送消息失败，请重试');
+            message.error(intl.formatMessage({ id: 'agent.chat.send.failed' }));
         }
 
         setTimeout(scrollToBottom, 100);
@@ -523,7 +552,9 @@ export default memo((props: Props) => {
                     const res = await PutagentPublish(props.data?.detailList?.agent?.agent_id);
 
                     if (res.code == 0) {
-                        message.success(intl.formatMessage({ id: 'agent.message.success.publish' }));
+                        message.success(
+                            intl.formatMessage({ id: 'agent.message.success.publish' }),
+                        );
                     } else {
                         message.error(intl.formatMessage({ id: 'agent.message.fail.publish' }));
                     }
@@ -558,11 +589,23 @@ export default memo((props: Props) => {
 
         await formRef.current?.submit();
     };
+    if (loading) {
+        return null;
+    }
+    // return (<div className="w-full flex bg-[#fff] overflow-hidden overflow-x-auto" style={{ height: 'calc(100vh - 56px)' }}>
+    //       <ChatRoomContent agentList={{
+    //         current:[agentInfo]
+    //       }} agentChatRoomId={agentChatRoomId}/>
 
+    //     </div>)
     return (
         <div
-            className="!h-[calc(100vh-65px)] p-4 !pb-0 box-border"
-            style={{ height: 'calc(100vh - 65px)' }}
+            ref={chatWrapperRef}
+            className={`${isFullscreen ? 'fixed inset-0 z-50 !h-screen  border border-gray-300 top-[55px] left-0 bg-white p-4' : '!h-[calc(100vh-65px)] p-4 !pb-0'} box-border transition-all duration-300`}
+            style={{
+                height: isFullscreen ? 'calc(100vh - 265px)' : 'calc(100vh - 65px)',
+                backgroundColor: '#fff'
+            }}
         >
             <ProForm
                 formRef={formRef}
@@ -573,12 +616,12 @@ export default memo((props: Props) => {
                     ability_id: 0,
                 }}
                 style={{
-                    height: 'calc(100vh - 57px - 16px)',
+                    height: isFullscreen ? 'calc(100vh - 57px - 16px)' : 'calc(100vh - 57px - 16px)',
                 }}
-                className="m-0 flex flex-col overflow-y-auto "
+                className="m-0 flex flex-col overflow-y-auto"
             >
                 <div
-                    className="pb-4 flex gap-[10px] "
+                    className="pb-4 flex gap-[10px] items-center"
                     style={{
                         paddingBottom: '16px',
                     }}
@@ -597,6 +640,16 @@ export default memo((props: Props) => {
                     <div className="flex-1 flex items-center font-bold text-base">
                         {props.data?.detailList?.app?.name}
                     </div>
+
+                    <Button
+                        type="text"
+                        icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                        onClick={toggleFullscreen}
+                        title={intl.formatMessage({
+                            id: isFullscreen ? 'agent.chat.exit.fullscreen' : 'agent.chat.fullscreen'
+                        })}
+                    />
+
                     {props.operationbentate == 'false' && (
                         <>
                             <Button
@@ -611,7 +664,7 @@ export default memo((props: Props) => {
                             <Button
                                 type="primary"
                                 disabled={props.operationbentate == 'false' ? false : true}
-                                loading={publishing||savingInfo}
+                                loading={publishing || savingInfo}
                                 onClick={agentPublish}
                                 className="min-w-24"
                             >
@@ -620,7 +673,19 @@ export default memo((props: Props) => {
                         </>
                     )}
                 </div>
-                <div className="bg-gray-50 rounded-md border border-[#ccc] flex-1 overflow-y-auto flex flex-col">
+                <div
+                    className={`w-full flex-1 flex bg-[#fff] overflow-hidden overflow-x-auto ${isFullscreen ? 'max-w-[1400px] mx-auto justify-center' : ''}`}
+                    style={{ height: isFullscreen ? 'calc(100vh - 64px)' : 'calc(100vh - 56px)' }}
+                >
+                    <ChatRoomContent
+                        agentList={{
+                            current: [agentInfo],
+                        }}
+                        abilitiesList={props.data?.abilitiesList}
+                        agentChatRoomId={agentChatRoomId}
+                    />
+                </div>
+                {/* <div className="bg-gray-50 rounded-md border border-[#ccc] flex-1 overflow-y-auto flex flex-col">
                     <div className="flex-1 overflow-y-auto " ref={chatContainerRef}>
                         <InfiniteScroll
                             className="h-full"
@@ -652,7 +717,7 @@ export default memo((props: Props) => {
                     </div>
 
                     <div className="border-t border-gray-200 bg-white px-4 py-2 relative">
-                       
+
                         <Image.PreviewGroup>
                             {uploadedFiles.length > 0 && (
                                 <div className="p-2 border-b border-gray-200">
@@ -808,7 +873,7 @@ export default memo((props: Props) => {
                             </Button>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </ProForm>
         </div>
     );

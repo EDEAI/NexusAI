@@ -33,7 +33,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
   const getOutputVariables = useStore(state => state.getOutputVariables);
   const datasetData = useStore(state => state.datasetData);
   const [submitLoading, setSubmitLoading] = useState(false);
-  
+
   // Use the original saveWorkFlow hook
   const saveWorkFlow = useSaveWorkFlow();
 
@@ -42,7 +42,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
     const initialValues: Record<string, any> = {
 
     };
-    
+
     if (nodes[0]?.id) {
       const variables = getOutputVariables(nodes[0].id);
       variables.forEach(item => {
@@ -58,7 +58,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
         }
       });
     }
-    
+
     return initialValues;
   };
 
@@ -77,7 +77,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
   // Implement workflow running logic in the component
   const handleRun = async (value: any) => {
     setSubmitLoading(true);
-    
+
     const findEnd = nodes.find(x => x.type === BlockEnum.End);
     if (!findEnd) {
       setSubmitLoading(false);
@@ -87,11 +87,11 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
     try {
       // First save the workflow
       await saveWorkFlow();
-      
+
       // Build input variables object
       const input = new ObjectVariable('input_var');
       const vals = getOutputVariables(nodes[0].id);
-      
+
       // Process variables
       for (const key in value) {
         if (key.startsWith('var.')) {
@@ -107,7 +107,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
           }
         }
       }
-      
+
       // Process files
       // const freeFile = new ArrayVariable(UPLOAD_FILES_KEY, 'array[number]');
       // if (value.file && Array.isArray(value.file)) {
@@ -120,12 +120,12 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
       //   });
       // }
       // input.addProperty(UPLOAD_FILES_KEY, freeFile);
-      
+
       // Process knowledge base mapping
-      const knowledge_base_mapping = (nodes[0]?.data && 'knowledge_base_mapping' in nodes[0].data) 
-        ? nodes[0].data.knowledge_base_mapping 
+      const knowledge_base_mapping = (nodes[0]?.data && 'knowledge_base_mapping' in nodes[0].data)
+        ? nodes[0].data.knowledge_base_mapping
         : { input: {}, output: {} };
-      
+
       Object.entries(value).forEach(([key, val]) => {
         if (key.startsWith('dataset.')) {
           if (!knowledge_base_mapping.input[UPLOAD_FILES_KEY]) {
@@ -143,10 +143,10 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
         node_confirm_users: {},
         knowledge_base_mapping,
       };
-      
+
       // Call run API
       const res = await runWorkFlow(app_id, params);
-      
+
       if (res && res.code === 0) {
         onRunResult?.(res);
       }
@@ -183,7 +183,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
       initialValues={getInitialValues()}
     >
       <TextareaRunName name={'run_name'} />
-      
+
       {nodes[0]?.id &&
         getOutputVariables(nodes[0].id)
           .sort((a, b) => a.createVar.sort_order - b.createVar.sort_order)
@@ -207,7 +207,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                 />
               );
             }
-            
+
             // Handle file type variables
             if (item?.createVar?.type === 'file') {
               return (
@@ -223,7 +223,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                 </div>
               );
             }
-            
+
             // Handle text type variables (default)
             return (
               <ProFormTextArea
@@ -240,16 +240,16 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
               />
             );
           })}
-          
+
       {firstNodeData.requires_upload && (
         <div>
           <Typography.Title level={5}>
             {intl.formatMessage({ id: 'workflow.uploadFile' })}
           </Typography.Title>
-          <UploadDragger 
+          <UploadDragger
             name="file"
             multiple={true}
-            accept=".txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv"
+            accept=".txt,.md,.pdf,.html,.xlsx,.pptx,.docx,.csv"
           />
 
           <ProFormDependency name={['file']}>
@@ -294,4 +294,4 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
   );
 });
 
-export default InputContent; 
+export default InputContent;

@@ -94,6 +94,7 @@ export default {
     'app.chatroom.content.copySucceed': '复制成功',
     'app.chatroom.content.addAgentTips': '添加成功',
     'app.chatroom.content.addAgentTips_fail': '添加失败',
+    'app.chatroom.content.abilityNotFound': '未找到该能力',
 
     'app.chatroom.content.summary':'导向',
     'app.chatroom.content.meetingSummary':'圆桌导向',
@@ -132,7 +133,11 @@ export default {
     "app.summaryhistory.results":"运行结果",
     "app.summaryhistory.prompt":"指令提示",
     "app.summaryhistory.userPrompt":"修正提示词",
-    "app.summaryhistory.tag":"待确认",
+"app.summaryhistory.tag":"待确认",
 
-    "app.summaryhistory.submitText":"重新导向"
+"app.summaryhistory.submitText":"重新导向",
+
+"agent.chat.send.failed":"发送消息失败，请重试",
+"agent.chat.fullscreen":"全屏显示",
+"agent.chat.exit.fullscreen":"退出全屏"
 };

@@ -45,7 +45,7 @@ const FileUploadExample: FC<FileUploadExampleProps> = ({
         isUploading
     } = useFileUpload({
         maxSizeMB: maxSize,
-        acceptedFileTypes: customFileTypes || '.txt,.md,.pdf,.html,.xlsx,.xls,.docx,.csv,.jpg,.png,.jpeg',
+        acceptedFileTypes: customFileTypes || '.txt,.md,.pdf,.html,.xlsx,.pptx,.docx,.csv,.jpg,.png,.jpeg',
         multiple
     });
     

@@ -209,7 +209,8 @@ async def add_document(data: AddDocumentSchema, userinfo: TokenData = Depends(ge
                     'tokens': 0
                 }
             )
-            result = DatasetManagement.add_document_to_dataset(
+            result = await asyncio.to_thread(
+                DatasetManagement.add_document_to_dataset,
                 user_id=user_id,
                 document_id=document_id,
                 dataset_id=dataset_id,

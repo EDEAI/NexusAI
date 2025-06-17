@@ -51,15 +51,12 @@ language_packs = {
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
             1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
-            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            2. Thoroughly analyze the user's questions or needs. Note that the user's questions or needs may contain conversation history. You need to analyze the current dialogue scenario and identify the user's real requirements, and plan realistic multi-step executable tasks. Additionally, the conversation history may already contain some tool execution results. You need to analyze the current task execution progress through the current task planning and tool execution results;
+            3. Based on the dialogue scenario analysis from point 2, if the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding;
+            5. Based on the current task planning, task progress, and the related tools I have provided, select the most suitable tool for the next step of task processing. Tools can be called repeatedly, with only one tool called at a time. Patiently repeat the above steps until the task processing is completed or you have failed to execute the tool after 3 consecutive attempts;
+            6. Pay attention to the tool list I provide. Tools with the name prefix "nexusai__workflow" are workflow tools. Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users". Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
             
-            In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
-            {callable_items_description}
-            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
-            {callable_skills}
-            {callable_workflows}
             {team_members}
         ''',
         "agent_system_prompt_with_auto_match_ability_direct_output": '''
@@ -83,15 +80,12 @@ language_packs = {
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
             1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
-            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            2. Thoroughly analyze the user's questions or needs. Note that the user's questions or needs may contain conversation history. You need to analyze the current dialogue scenario and identify the user's real requirements, and plan realistic multi-step executable tasks. Additionally, the conversation history may already contain some tool execution results. You need to analyze the current task execution progress through the current task planning and tool execution results;
+            3. Based on the dialogue scenario analysis from point 2, if the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding;
+            5. Based on the current task planning, task progress, and the related tools I have provided, select the most suitable tool for the next step of task processing. Tools can be called repeatedly, with only one tool called at a time. Patiently repeat the above steps until the task processing is completed or you have failed to execute the tool after 3 consecutive attempts;
+            6. Pay attention to the tool list I provide. Tools with the name prefix "nexusai__workflow" are workflow tools. Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users". Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
             
-            In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
-            {callable_items_description}
-            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
-            {callable_skills}
-            {callable_workflows}
             {team_members}
         ''',
         "agent_system_prompt_with_abilities": '''
@@ -116,15 +110,12 @@ language_packs = {
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
             1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
-            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            2. Thoroughly analyze the user's questions or needs. Note that the user's questions or needs may contain conversation history. You need to analyze the current dialogue scenario and identify the user's real requirements, and plan realistic multi-step executable tasks. Additionally, the conversation history may already contain some tool execution results. You need to analyze the current task execution progress through the current task planning and tool execution results;
+            3. Based on the dialogue scenario analysis from point 2, if the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding;
+            5. Based on the current task planning, task progress, and the related tools I have provided, select the most suitable tool for the next step of task processing. Tools can be called repeatedly, with only one tool called at a time. Patiently repeat the above steps until the task processing is completed or you have failed to execute the tool after 3 consecutive attempts;
+            6. Pay attention to the tool list I provide. Tools with the name prefix "nexusai__workflow" are workflow tools. Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users". Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
             
-            In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
-            {callable_items_description}
-            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
-            {callable_skills}
-            {callable_workflows}
             {team_members}
         ''',
         "agent_system_prompt_with_no_ability": '''
@@ -146,15 +137,12 @@ language_packs = {
 
             Please answer questions or handle needs based on user's questions or needs, paying attention to the following requirements:
             1. Please be aware that the user's questions or needs may include images uploaded in the current request. You must fully analyze all images and any other document information included in the user's questions or needs;
-            2. Focus on analyzing the user's questions or needs and respond according to their requirements or rules;
-            3. Analyze the current dialogue scenario based on the user's questions or needs. If the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
-            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding. 
+            2. Thoroughly analyze the user's questions or needs. Note that the user's questions or needs may contain conversation history. You need to analyze the current dialogue scenario and identify the user's real requirements, and plan realistic multi-step executable tasks. Additionally, the conversation history may already contain some tool execution results. You need to analyze the current task execution progress through the current task planning and tool execution results;
+            3. Based on the dialogue scenario analysis from point 2, if the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
+            4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding;
+            5. Based on the current task planning, task progress, and the related tools I have provided, select the most suitable tool for the next step of task processing. Tools can be called repeatedly, with only one tool called at a time. Patiently repeat the above steps until the task processing is completed or you have failed to execute the tool after 3 consecutive attempts;
+            6. Pay attention to the tool list I provide. Tools with the name prefix "nexusai__workflow" are workflow tools. Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users". Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
             
-            In addition, to answer user questions or fulfill user needs, you can invoke the MCP tool(s) provided.
-            {callable_items_description}
-            If you have got the result (or error message) of the MCP tool(s), please stop re-invoking it (them).
-            {callable_skills}
-            {callable_workflows}
             {team_members}
         ''',
         "agent_retrieved_docs_format": '''I will provide the information retrieved from the knowledge base based on the user input text in the following JSON format: [{'content': content, 'source': source document name}, ...]\n''',
@@ -166,107 +154,6 @@ language_packs = {
         "agent_output_format_2": "in JSON format",
         "agent_output_format_3": "in code format",
         "agent_output_format_2_md": "in JSON format contained in Markdown format",
-        "agent_callable_items_description": '''
-            Please carefully read the skills and workflow information I provided (names and descriptions). When analyzing the user's instructions, please actively confirm whether they are related to any skills or workflows, or can be solved through any skills or workflows. If so, you should prioritize invoking the corresponding skills or workflows rather than attempting to answer directly.
-            To invoke a skill, please use the MCP tool skill_run;
-            To invoke a workflow, please use the MCP tool workflow_run.
-
-            If there are nodes in the workflow that require manual confirmation (as indicated by the need_confirm_nodes field), then for each of these nodes, you must select ONLY ONE most suitable team member from the team member list based on the node's name and description, the team members' names and email addresses, and the user's requirements, and assign the node to the team member for confirmation.
-
-            I will provide you with a list of skills and/or workflows.
-            I will also provide you with the list of team members, if there are any workflows that require manual confirmation.
-
-            The skills/workflows list contains one or more dictionaries (skills/workflows);
-            The format of each skill is as follows:
-            {
-                "id": skill id,
-                "name": skill name,
-                "description": skill description,
-                "input_variables": {
-                    "name": "input_var" or something else,
-                    "type": "object",
-                    "properties": {
-                        variable name: {
-                            "name": Name of the variable.
-                            "required": Whether the variable is mandatory.
-                            "display_name": Display name of the variable. It can be used as a description of the function and purpose of the variable.
-                            "type": The variable type. It can be "number" or "string".
-                            "value": Empty value.
-                        },
-                        ...
-                    }
-                }
-            }
-            The format of each workflow is as follows:
-            {
-                "id": workflow id,
-                "name": workflow name,
-                "description": workflow description,
-                "need_confirm_nodes": [
-                    {
-                        "node_id": node id,
-                        "node_name": node name,
-                        "node_desc": node description
-                    },
-                    ...
-                ],
-                "input_variables": {
-                    "name": "input_var" or something else,
-                    "type": "object",
-                    "properties": {
-                        variable name: {
-                            "name": Name of the variable.
-                            "required": Whether the variable is mandatory.
-                            "display_name": Display name of the variable. It can be used as a description of the function and purpose of the variable.
-                            "type": The variable type. It can be "number" or "string".
-                            "value": Empty value.
-                        },
-                        ...
-                    }
-                }
-            }
-            The parameter format for invoking the MCP tool skill_run is as follows:
-            {
-                "id": ID of the skill you want to invoke,
-                "user_id": null (we will replace it with actual data),
-                "team_id": null (we will replace it with actual data),
-                "input_variables": {
-                    variable name: corresponding variable value you want to pass in,
-                    ...
-                }
-            }
-            The parameter format for invoking the MCP tool workflow_run is as follows:
-            {
-                "id": ID of the workflow you want to invoke,
-                "user_id": null (we will replace it with actual data),
-                "team_id": null (we will replace it with actual data),
-                "node_confirm_users": a dictionary, in which the key is the node id, and the value is ID of the ONLY user you select (if there is no clear basis for selecting a member, just fill in with user ID 0) to confirm the node (even if it is contained in a list), as follows
-                {
-                    node id: [user id],
-                    ...
-                },
-                "input_variables": {
-                    variable name: corresponding variable value you want to pass in,
-                    ...
-                }
-            }
-            Note that sometimes the name of a user/skill/workflow might look like an ID number, but you must still pass in its ID, not its name.
-            Please invoke the MCP tool according to the correct parameter format.
-
-            Besides, do not mention anything related to the IDs of users/skills/workflows when responding to the user.
-        ''',
-        "agent_callable_skills": '''
-            Below is the list of callable skills:
-            ********************Start of the list of callable skills********************
-            {skill_list}
-            ********************End of the list of callable skills********************
-        ''',
-        "agent_callable_workflows": '''
-            Below is the list of callable workflows:
-            ********************Start of the list of callable workflows********************
-            {workflow_list}
-            ********************End of the list of callable workflows********************
-        ''',
         "agent_team_members": '''
             Below is the list of team members:
             ********************Start of the list of team members********************
@@ -602,11 +489,11 @@ language_packs = {
             You should adapt your identity and role according to the context of the conversation.
             You need to reply to the user's instructions. Please pay attention to the following requirements when responding:
             1. If images are uploaded in the current request (note that they are not images in the conversation history), please fully understand and analyze the content of all images, as the image content is also an important part of the latest round of conversation content.
-            2. You need to fully analyze and understand the conversation records, analyze the current conversation scene and progress through the last round of the conversation, focus on what the user wants, and provide enough details
+            2. You need to fully analyze and understand the conversation records, analyze the current conversation scene and progress through the last round of the conversation, focus on what the user wants, and provide enough details. Note that tool uses of every agent are included in the conversation records
             3. You need to fully analyze and understand the user's command intention through the current conversation scene and progress, as well as the user's instructions, focus on what the user wants, and do not miss important information, rules or requirements in the instructions
             4. You need to reply based on the current conversation scene and progress, as well as the user's command intention
-            5. Don't copy the viewpoints of other agents in the meeting room.
-            6. If you are provided with MCP tools, to reply to the user's instructions, you can invoke the MCP tool(s) provided.
+            5. Don't copy the viewpoints of other agents in the meeting room
+            6. Stop calling the tool after the user's instructions have been completed or you have failed to execute the tool after 3 consecutive attempts in the conversation records
 
             The JSON format of the conversation history is as follows: [round 1, (round 2,) ...]
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
@@ -1556,9 +1443,6 @@ prompt_keys = [
     "agent_output_format_2",
     "agent_output_format_3",
     "agent_output_format_2_md",
-    "agent_callable_items_description",
-    "agent_callable_skills",
-    "agent_callable_workflows",
     "agent_team_members",
     "agent_user_prompt",
     "agent_user_prompt_with_retrieved_docs",
@@ -1631,9 +1515,6 @@ prompt_descriptions = {
                 # "agent_output_format_2": "Agent Output Format: JSON",
                 # "agent_output_format_3": "Agent Output Format: Code",
                 # "agent_output_format_2_md": "Agent Output Format: JSON in Markdown",
-                "agent_callable_items_description": "Agent MCP Tool Calling Requirements (Skills, Workflows) [Sub]",
-                "agent_callable_skills": "Agent Callable Skills List [Sub]",
-                "agent_callable_workflows": "Agent Callable Workflows List [Sub]",
                 "agent_team_members": "Team Members List [Sub]",
                 "agent_user_prompt": "Agent User Prompt (Not Bound to Knowledge Base)",
                 "agent_user_prompt_with_retrieved_docs": "Agent User Prompt (With Knowledge Base Retrieval)"
@@ -1726,9 +1607,6 @@ prompt_descriptions = {
                 # "agent_output_format_2": "智能体输出格式：JSON【子】",
                 # "agent_output_format_3": "智能体输出格式：代码【子】",
                 # "agent_output_format_2_md": "智能体输出格式：Markdown形式的JSON【子】",
-                "agent_callable_items_description": "智能体调用MCP工具（技能、工作流）要求【子】",
-                "agent_callable_skills": "智能体可调用技能列表【子】",
-                "agent_callable_workflows": "智能体可调用工作流列表【子】",
                 "agent_team_members": "团队成员列表【子】",
                 "agent_user_prompt": "智能体用户提示词（未绑定知识库）",
                 "agent_user_prompt_with_retrieved_docs": "智能体用户提示词（检索知识库）"
