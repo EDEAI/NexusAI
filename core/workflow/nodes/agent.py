@@ -530,6 +530,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 agent_id=agent_id,
                 mcp_tool_list=all_mcp_tools
             )
+            model_data['tools'] = all_mcp_tools
             print(model_data)
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},

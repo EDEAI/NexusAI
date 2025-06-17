@@ -872,6 +872,7 @@ class Chatroom:
                 if self._terminate():
                     break
 
+            self._ws_manager.end_agent_reply(self._chatroom_id)
             self._last_speaker_id = agent_id
             app_runs.increment_steps(self._app_run_id)
             app_runs.increment_token_usage(

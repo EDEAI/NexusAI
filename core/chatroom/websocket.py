@@ -138,26 +138,14 @@ class WebSocketManager:
     async def end_agent_reply(
         self,
         chatroom_id: int,
-        agent_id: int,
-        ability_id: int,
-        full_message: str
     ):
         '''
         End the agent reply to the chatroom.
         '''
         if connections := self._connections_by_chatroom_id.get(chatroom_id):
-            not_replying_connections = set()
-            
             for connection in connections:
                 if self._replying_status_by_connection_id[id(connection)]:
                     self._replying_status_by_connection_id[id(connection)] = False
-                else:
-                    not_replying_connections.add(connection)
-            
-            await self.send_instruction_by_connections(not_replying_connections, 'REPLY', agent_id)
-            await self.send_instruction_by_connections(not_replying_connections, 'ABILITY', ability_id)
-            await self.send_instruction_by_connections(not_replying_connections, 'TEXT')
-            broadcast(not_replying_connections, full_message)
             
     def stop(self):
         self._stop_future.set_result(None)
