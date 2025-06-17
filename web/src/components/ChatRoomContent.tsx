@@ -118,11 +118,8 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
         if (uploadedFiles?.length > 0) {
             instructions.push(['FILELIST', uploadedFiles.map(file => file.file_id)]);
         }
-
-        if (abilityId) {
-            instructions.push(['SETABILITY', abilityId]);
-        }
-
+        const ability = abilityId || 0;
+        instructions.push(['SETABILITY', ability]);
         instructions.push(['INPUT', message]);
 
         // Send instructions in sequence and clean up files after completion
@@ -262,6 +259,7 @@ const InputField: FC<inputFieldParameters> = memo(porpos => {
                                         placeholder: intl.formatMessage({
                                             id: 'agent.pleaseselect',
                                         }),
+                                        allowClear: false,
                                         size: 'small',
                                         onChange: (value: any) => {
                                             setAbilityId(value);
@@ -1116,7 +1114,8 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
     // WebSocket send command
     const setsendMessageinit = (type: string, value: any) => {
         if (value === '0') value = Number(value);
-        let initChatRoomstok = [`${type}`, value === 0 || value ? value : null];
+        // Handle 0 as a valid value, only convert empty string, null, undefined to null
+        let initChatRoomstok = [`${type}`, value !== '' && value !== null && value !== undefined ? value : null];
         setSendValue(JSON.stringify(initChatRoomstok));
     };
 
@@ -1130,7 +1129,7 @@ const ChatRoomContentbox: FC<contentParameters> = memo(porpos => {
 
     useEffect(() => {
         if (instruction && instruction.length) {
-            setsendMessageinit(instruction[0], instruction[1] ? instruction[1] : '');
+            setsendMessageinit(instruction[0], instruction[1] !== undefined ? instruction[1] : '');
             setInstruction([]);
         }
     }, [instruction]);
