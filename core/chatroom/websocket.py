@@ -198,7 +198,7 @@ class WorkflowWebSocketManager():
                 except (KeyError, TypeError):
                     workflow_run_id = 0
                 if (
-                    workflow_runs := self._workflow_runs_by_user_id.get(user_id)
+                    (workflow_runs := self._workflow_runs_by_user_id.get(user_id))
                     and workflow_run_id in workflow_runs
                 ):
                     message_data = message['data']
