@@ -112,6 +112,7 @@ class ChatRoomDetailAgentBase(BaseModel):
     avatar: Optional[str] = None
     icon: Optional[str] = None
     icon_background: Optional[str] = None
+    support_image: Optional[int] = None
 
 
 class RecentChatRoomInfoBase(BaseModel):
