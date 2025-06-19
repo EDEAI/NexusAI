@@ -572,6 +572,14 @@ class Chatroom:
         for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
             if mcp_tool_use['result'] is None:
                 # Set the result of all unfinished MCP tool uses
+                mcp_tool_name = mcp_tool_use['name']
+                skill_match = skill_pattern.fullmatch(mcp_tool_name)
+                workflow_match = workflow_pattern.fullmatch(mcp_tool_name)
+                if skill_match or workflow_match:
+                    result = json.dumps({
+                        'status': 'failed',
+                        'message': f'Error executing tool {mcp_tool_name}: {result}'
+                    }, ensure_ascii=False)
                 mcp_tool_use['result'] = result
                 self._update_chatroom_message(
                     self._current_agent_message_id,
@@ -648,6 +656,11 @@ class Chatroom:
                             result = json.dumps(result, ensure_ascii=False)
                             logger.debug('MCP tool result: %s', result)
                             mcp_tool_use['result'] = result
+                            await self._ws_manager.send_instruction(
+                                self._chatroom_id,
+                                'WITHMCPTOOLRESULT',
+                                {'index': index, 'result': result}
+                            )
                             self._update_chatroom_message(
                                 self._current_agent_message_id,
                                 self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
@@ -664,6 +677,11 @@ class Chatroom:
                             logger.debug('Workflow run: %s', result_dict)
                             workflow_run_id = result_dict['app_run_id']
                             mcp_tool_use['workflow_run_id'] = workflow_run_id
+                            await self._ws_manager.send_instruction(
+                                self._chatroom_id,
+                                'WITHWFRUNID',
+                                {'index': index, 'workflow_run_id': workflow_run_id}
+                            )
                             self._workflow_ws_manager.add_workflow_run(
                                 self._user_id, workflow_run_id,
                                 self, index
@@ -673,20 +691,24 @@ class Chatroom:
                         await self._stop_all_mcp_tool_uses('Timeout')
                         break
                     except Exception as e:
-                        result = f'Error executing tool {mcp_tool_name}: {e}'
-                        logger.exception(result)
+                        logger.exception('ERROR!!')
+                        result = {
+                            'status': 'failed',
+                            'message': f'Error executing tool {mcp_tool_name}: {e}'
+                        }
+                        result = json.dumps(result, ensure_ascii=False)
                         mcp_tool_use['result'] = result
+                        await self._ws_manager.send_instruction(
+                            self._chatroom_id,
+                            'WITHMCPTOOLRESULT',
+                            {'index': index, 'result': result}
+                        )
                         self._update_chatroom_message(
                             self._current_agent_message_id,
                             self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
                         )
                         if workflow_run_id := mcp_tool_use['workflow_run_id']:
                             self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
-                await self._ws_manager.send_instruction(
-                    self._chatroom_id,
-                    'WITHMCPTOOLRESULT',
-                    {'index': index, 'result': result}
-                )
 
         # Wait for the MCP tool uses to finish
         while any(mcp_tool_use['result'] is None for mcp_tool_use in self._mcp_tool_uses):

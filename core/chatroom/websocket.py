@@ -230,17 +230,30 @@ class WorkflowWebSocketManager():
                         }
                         await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_index, status)
                     elif message_type == self.DEBUG_MSG:
-                        if message_data['node_exec_data']['node_type'] == 'end':
-                            logger.info(f'User {user_id} received workflow message: {message}')
-                            try:
-                                result = message_data['node_exec_data'].get('outputs', {})
+                        if message_data['status'] == 3:
+                            # Workflow execution failed
+                            self.remove_workflow_run(user_id, workflow_run_id)
+                            result = {
+                                'status': 'failed',
+                                'message': message_data['error'],
+                            }
+                            await self._set_workflow_result_cb(
+                                chatroom, mcp_tool_index,
+                                json.dumps(result, ensure_ascii=False)
+                            )
+                        else:
+                            if message_data['node_exec_data']['node_type'] == 'end':
+                                # Success
+                                logger.info(f'User {user_id} received workflow message: {message}')
+                                self.remove_workflow_run(user_id, workflow_run_id)
+                                result = {
+                                    'status': 'success',
+                                    'outputs': message_data['node_exec_data']['outputs'],
+                                }
                                 await self._set_workflow_result_cb(
                                     chatroom, mcp_tool_index,
                                     json.dumps(result, ensure_ascii=False)
                                 )
-                            except:
-                                self.remove_workflow_run(user_id, workflow_run_id)
-                                raise
                 # Else ignore the message
             except ConnectionClosed:
                 logger.info(f'Connection closed for user {user_id}.')
