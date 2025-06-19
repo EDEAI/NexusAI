@@ -9,6 +9,7 @@ from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
 from core.database.models.agent_callable_items import AgentCallableItems
 from core.database.models.tag_bindings import TagBindings
 from core.database.models.users import Users
+from core.database.models.models import Models
 from datetime import datetime
 from core.helper import generate_api_token, encrypt_id
 from languages import get_language_content
@@ -675,6 +676,13 @@ class Agents(MySQL):
             return {"status": 2, "message": get_language_content("api_agent_info_agent_error")}
         if agent["user_id"] != uid and agent["status"] != 1:
             return {"status": 2, "message": get_language_content("api_agent_info_agent_status_not_normal")}
+        
+        agent['support_image'] = Models().select_one(
+            columns=["support_image"],
+            conditions=[
+                {"column": "id", "value": agent['m_config_id']}
+            ]
+        )['support_image']
 
         # get agent dataset relation
         agent_dataset_relation_model = AgentDatasetRelation()
