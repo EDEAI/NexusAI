@@ -232,6 +232,7 @@ class WorkflowWebSocketManager():
                     elif message_type == self.DEBUG_MSG:
                         if message_data['status'] == 3:
                             # Workflow execution failed
+                            logger.info(f'User {user_id} received workflow message: {message}')
                             self.remove_workflow_run(user_id, workflow_run_id)
                             result = {
                                 'status': 'failed',
@@ -256,7 +257,7 @@ class WorkflowWebSocketManager():
                                 )
                 # Else ignore the message
             except ConnectionClosed:
-                logger.info(f'Connection closed for user {user_id}.')
+                logger.info(f'Workflow WebSocket connection of user {user_id} closed.')
                 break
             except:
                 logger.exception('ERROR!!!')
