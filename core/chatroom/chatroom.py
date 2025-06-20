@@ -311,6 +311,10 @@ class Chatroom:
                 'is_read': 1 if self._ws_manager.has_connections(self._chatroom_id) else 0
             }
         )
+        chatrooms.update(
+            {'column': 'id', 'value': self._chatroom_id},
+            {'last_chat_time': datetime.now()}
+        )
         self._history_messages.append({
             'agent_id': 0,
             'type': 'text',
@@ -503,6 +507,10 @@ class Chatroom:
                 'is_read': 1 if self._ws_manager.has_connections(self._chatroom_id) else 0
             }
         )
+        chatrooms.update(
+            {'column': 'id', 'value': self._chatroom_id},
+            {'last_chat_time': datetime.now()}
+        )
         return chatroom_message_id
     
     def _update_chatroom_message(self, chatroom_message_id: int, message: str) -> None:
@@ -510,7 +518,11 @@ class Chatroom:
             {'column': 'id', 'value': chatroom_message_id},
             {'message': message}
         )
-
+        chatrooms.update(
+            {'column': 'id', 'value': self._chatroom_id},
+            {'last_chat_time': datetime.now()}
+        )
+    
     def _update_chatroom_message_and_token_usage(
         self, chatroom_message_id: int, message: str,
         prompt_tokens: int, completion_tokens: int, total_tokens: int
@@ -523,6 +535,10 @@ class Chatroom:
                 'completion_tokens': completion_tokens,
                 'total_tokens': total_tokens
             }
+        )
+        chatrooms.update(
+            {'column': 'id', 'value': self._chatroom_id},
+            {'last_chat_time': datetime.now()}
         )
     
     async def set_mcp_tool_result(self, index: int, result: str) -> None:
