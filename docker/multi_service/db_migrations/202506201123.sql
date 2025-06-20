@@ -1,0 +1,1 @@
+ALTER TABLE `chatrooms` ADD `last_chat_time` DATETIME NULL DEFAULT NULL COMMENT 'Last chat time' AFTER `updated_time`;
