@@ -477,7 +477,7 @@ class Chatroom:
     
     def _get_mcp_tool_use(self, mcp_tool_use_id: str) -> Dict[str, Any]:
         for mcp_tool_use in self._mcp_tool_uses:
-            if mcp_tool_use['uuid'] == mcp_tool_use_id:
+            if mcp_tool_use['id'] == mcp_tool_use_id:
                 return mcp_tool_use
         raise Exception('MCP tool use not found!')
     
@@ -488,6 +488,7 @@ class Chatroom:
     def _get_agent_message_with_mcp_tool_uses(self, agent_message: str) -> str:
         for mcp_tool_use in self._mcp_tool_uses:
             mcp_tool_str = json.dumps({
+                'id': mcp_tool_use['id'],
                 'name': mcp_tool_use['name'],
                 'skill_or_workflow_name': mcp_tool_use['skill_or_workflow_name'],
                 'workflow_run_id': mcp_tool_use['workflow_run_id'],
@@ -548,15 +549,13 @@ class Chatroom:
             {'last_chat_time': str(datetime.now())}
         )
     
-    async def set_mcp_tool_result(self, index: int, result: str) -> None:
+    async def set_mcp_tool_result(self, mcp_tool_use_id: str, result: str) -> None:
         if not self._mcp_tool_is_using:
             raise Exception('There is no MCP tool use!')
-        if index >= len(self._mcp_tool_uses):
-            raise Exception('Invalid MCP tool use index!')
-        if self._mcp_tool_uses[index]['result'] is not None:
+        mcp_tool_use = self._get_mcp_tool_use(mcp_tool_use_id)
+        if mcp_tool_use['result'] is not None:
             raise Exception('MCP tool use has finished!')
         self._console_log(f'MCP tool result: \033[91m{result}\033[0m\n')
-        mcp_tool_use = self._mcp_tool_uses[index]
         mcp_tool_use['result'] = result
         if workflow_pattern.fullmatch(mcp_tool_use['name']):
             mcp_tool_use['workflow_confirmation_status'] = None
@@ -567,19 +566,18 @@ class Chatroom:
         await self._ws_manager.send_instruction(
             self._chatroom_id,
             'WITHMCPTOOLRESULT', 
-            {'index': index, 'result': result}
+            {'id': mcp_tool_use_id, 'result': result}
         )
         if workflow_run_id := mcp_tool_use['workflow_run_id']:
             self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
         self._mcp_tool_use_lock.set()
 
-    async def set_workflow_confirmation_status(self, index: int, status: Dict[str, Any]) -> None:
+    async def set_workflow_confirmation_status(self, mcp_tool_use_id: str, status: Dict[str, Any]) -> None:
         if not self._mcp_tool_is_using:
             raise Exception('There is no MCP tool use!')
-        if index >= len(self._mcp_tool_uses):
-            raise Exception('Invalid MCP tool use index!')
+        mcp_tool_use = self._get_mcp_tool_use(mcp_tool_use_id)
         self._console_log(f'Workflow comfirmation status: \033[91m{status}\033[0m\n')
-        self._mcp_tool_uses[index]['workflow_confirmation_status'] = status
+        mcp_tool_use['workflow_confirmation_status'] = status
         self._update_chatroom_message(
             self._current_agent_message_id,
             self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
@@ -587,12 +585,12 @@ class Chatroom:
         await self._ws_manager.send_instruction(
             self._chatroom_id,
             'WITHWFCONFIRM', 
-            {'index': index, 'status': status}
+            {'id': mcp_tool_use_id, 'status': status}
         )
 
     async def _stop_all_mcp_tool_uses(self, result: str) -> None:
         self._mcp_tool_use_is_interrupted = True
-        for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
+        for mcp_tool_use in self._mcp_tool_uses:
             if mcp_tool_use['result'] is None:
                 # Set the result of all unfinished MCP tool uses
                 mcp_tool_name = mcp_tool_use['name']
@@ -611,7 +609,7 @@ class Chatroom:
                 await self._ws_manager.send_instruction(
                     self._chatroom_id,
                     'WITHMCPTOOLRESULT',
-                    {'index': index, 'result': result}
+                    {'id': mcp_tool_use['id'], 'result': result}
                 )
                 if workflow_run_id := mcp_tool_use['workflow_run_id']:
                     self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
@@ -624,7 +622,7 @@ class Chatroom:
 
     async def _start_mcp_tool_uses(self) -> None:
         # Send the MCP tool use instructions to the frontend
-        for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
+        for mcp_tool_use in self._mcp_tool_uses:
             mcp_tool_use['args'] = json.loads(mcp_tool_use['args'])
             if match := skill_pattern.fullmatch(mcp_tool_use['name']):
                 skill = custom_tools.get_skill_by_id(int(match.group(1)))
@@ -644,7 +642,7 @@ class Chatroom:
                 self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
             )
             mcp_tool_use_in_message = {
-                'index': index,
+                'id': mcp_tool_use['id'],
                 'name': mcp_tool_use['name'],
                 'skill_or_workflow_name': mcp_tool_use['skill_or_workflow_name'],
                 'args': mcp_tool_use['args']
@@ -657,7 +655,7 @@ class Chatroom:
 
     async def _wait_for_mcp_tool_uses(self) -> None:
         # Invoke the MCP tool(s) of the built-in MCP server
-        for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
+        for mcp_tool_use in self._mcp_tool_uses:
             mcp_tool_name = mcp_tool_use['name']
             mcp_tool_args = mcp_tool_use['args']
             skill_match = skill_pattern.fullmatch(mcp_tool_name)
@@ -682,7 +680,7 @@ class Chatroom:
                             await self._ws_manager.send_instruction(
                                 self._chatroom_id,
                                 'WITHMCPTOOLRESULT',
-                                {'index': index, 'result': result}
+                                {'id': mcp_tool_use['id'], 'result': result}
                             )
                             self._update_chatroom_message(
                                 self._current_agent_message_id,
@@ -702,7 +700,7 @@ class Chatroom:
                             mcp_tool_use['workflow_run_id'] = workflow_run_id
                             self._workflow_ws_manager.add_workflow_run(
                                 self._user_id, workflow_run_id,
-                                self, index
+                                self, mcp_tool_use['id']
                             )
                             result = json.dumps(result_dict, ensure_ascii=False)
                     except asyncio.TimeoutError:
@@ -719,7 +717,7 @@ class Chatroom:
                         await self._ws_manager.send_instruction(
                             self._chatroom_id,
                             'WITHMCPTOOLRESULT',
-                            {'index': index, 'result': result}
+                            {'id': mcp_tool_use['id'], 'result': result}
                         )
                         self._update_chatroom_message(
                             self._current_agent_message_id,
@@ -730,7 +728,7 @@ class Chatroom:
 
         # Wait for the MCP tool uses to finish
         while any(mcp_tool_use['result'] is None for mcp_tool_use in self._mcp_tool_uses):
-            for index, mcp_tool_use in enumerate(self._mcp_tool_uses):
+            for mcp_tool_use in self._mcp_tool_uses:
                 try:
                     self._mcp_tool_use_lock.clear()
                     await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
@@ -830,7 +828,7 @@ class Chatroom:
                                     )
                                     self._mcp_tool_uses.append({
                                         'index': mcp_tool_index,
-                                        'uuid': str(uuid4()),
+                                        'id': str(uuid4()),
                                         'name': mcp_tool_name,
                                         'skill_or_workflow_name': None,
                                         'workflow_run_id': 0,
