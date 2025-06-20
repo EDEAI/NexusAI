@@ -823,14 +823,12 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     )
 
             all_mcp_tools = []
-            callable_skills, callable_workflows = [], []
-            if is_desktop:
-                callable_skills, callable_workflows = self._get_callable_items()
-                app_tools = convert_callable_items_to_mcp_tools(callable_skills, callable_workflows)
-                all_mcp_tools.extend(app_tools)
-
-                if mcp_tool_list:
-                    all_mcp_tools.extend(mcp_tool_list)
+            callable_skills, callable_workflows = self._get_callable_items()
+            app_tools = convert_callable_items_to_mcp_tools(callable_skills, callable_workflows)
+            all_mcp_tools.extend(app_tools)
+            
+            if is_desktop and mcp_tool_list:
+                all_mcp_tools.extend(mcp_tool_list)
             
             _, input_ = self._prepare_prompt(
                 agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets),
