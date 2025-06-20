@@ -329,6 +329,7 @@ class ChatRoomData(BaseModel):
     smart_selection: Optional[int] = None
     app_id: int
     created_time: Optional[datetime] = None
+    updated_time: Optional[datetime] = None
     agent_list: Optional[List[Dict[str, Any]]] = []
 
 class AgentChatRoomsResponse(BaseModel):
