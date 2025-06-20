@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from time import monotonic
 from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Union
+from uuid import uuid4
 
 from langchain_core.messages import AIMessageChunk
 
@@ -313,7 +314,7 @@ class Chatroom:
         )
         chatrooms.update(
             {'column': 'id', 'value': self._chatroom_id},
-            {'last_chat_time': datetime.now()}
+            {'last_chat_time': str(datetime.now())}
         )
         self._history_messages.append({
             'agent_id': 0,
@@ -474,6 +475,12 @@ class Chatroom:
         # If the Speaker Selector has tried 5 times and still returned an invalid agent ID, stop the chat
         return 0
     
+    def _get_mcp_tool_use(self, mcp_tool_use_id: str) -> Dict[str, Any]:
+        for mcp_tool_use in self._mcp_tool_uses:
+            if mcp_tool_use['uuid'] == mcp_tool_use_id:
+                return mcp_tool_use
+        raise Exception('MCP tool use not found!')
+    
     @property
     def mcp_tool_is_using(self) -> bool:
         return self._mcp_tool_is_using
@@ -509,7 +516,7 @@ class Chatroom:
         )
         chatrooms.update(
             {'column': 'id', 'value': self._chatroom_id},
-            {'last_chat_time': datetime.now()}
+            {'last_chat_time': str(datetime.now())}
         )
         return chatroom_message_id
     
@@ -520,7 +527,7 @@ class Chatroom:
         )
         chatrooms.update(
             {'column': 'id', 'value': self._chatroom_id},
-            {'last_chat_time': datetime.now()}
+            {'last_chat_time': str(datetime.now())}
         )
     
     def _update_chatroom_message_and_token_usage(
@@ -538,7 +545,7 @@ class Chatroom:
         )
         chatrooms.update(
             {'column': 'id', 'value': self._chatroom_id},
-            {'last_chat_time': datetime.now()}
+            {'last_chat_time': str(datetime.now())}
         )
     
     async def set_mcp_tool_result(self, index: int, result: str) -> None:
@@ -823,6 +830,7 @@ class Chatroom:
                                     )
                                     self._mcp_tool_uses.append({
                                         'index': mcp_tool_index,
+                                        'uuid': str(uuid4()),
                                         'name': mcp_tool_name,
                                         'skill_or_workflow_name': None,
                                         'workflow_run_id': 0,
