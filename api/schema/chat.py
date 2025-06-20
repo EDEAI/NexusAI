@@ -154,6 +154,7 @@ class ChatRoomDetailInfo(BaseModel):
     max_round: Optional[int] = None
     chatroom_status: Optional[int] = None
     smart_selection: Optional[int] = None
+    chat_status: Optional[int] = None
 
 class ChatRoomDetailResponse(ResponseBase):
     data: Optional[ChatRoomDetailInfo] = None

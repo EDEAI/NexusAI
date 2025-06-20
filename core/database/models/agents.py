@@ -635,6 +635,8 @@ class Agents(MySQL):
         :return: A dictionary representing the agent info record.
         """
         # get app
+        
+        from core.database.models.chatrooms import Chatrooms
         apps_model = Apps()
         app = apps_model.select_one(
             columns=["id AS app_id", "user_id", "name", "description", "icon", "icon_background", "is_public", "attrs_are_visible",
@@ -734,6 +736,12 @@ class Agents(MySQL):
         )
 
         agent_chatroom_id = self._get_agent_chatroom_id(agent["agent_id"], uid, team_id)
+        chat_status = Chatrooms().select_one(
+            columns=["chat_status"],
+            conditions=[
+                {"column": "chat_agent_id", "value": agent["agent_id"]},
+            ]
+        )['chat_status']
 
         if app["user_id"] != uid and app["attrs_are_visible"] != 1:
             input_variables = {
@@ -750,7 +758,8 @@ class Agents(MySQL):
                 "agent_abilities_list": '',
                 "m_configurations_list": '',
                 "is_creator": 0 if app["user_id"] != uid else 1,
-                "creator_nickname": user["nickname"] if user else None
+                "creator_nickname": user["nickname"] if user else None,
+                "chat_status": chat_status
             }
         else:
             data = {
@@ -762,7 +771,8 @@ class Agents(MySQL):
                 "agent_abilities_list": agent_abilities_list,
                 "m_configurations_list": m_configurations_list,
                 "is_creator": 0 if app["user_id"] != uid else 1,
-                "creator_nickname": user["nickname"] if user else None
+                "creator_nickname": user["nickname"] if user else None,
+                "chat_status": chat_status
             }
 
         return {"status": 1, "message": get_language_content("api_agent_success"), "data": data}

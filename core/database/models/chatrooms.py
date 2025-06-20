@@ -93,7 +93,7 @@ class Chatrooms(MySQL):
         """
         info = self.select_one(
             columns=[
-                'id', 'max_round', 'app_id', 'status', 'smart_selection', 'initial_message_id'
+                'id', 'max_round', 'app_id', 'status', 'chat_status', 'smart_selection', 'initial_message_id'
             ],
             conditions=[
                 {"column": "id", "value": chatroom_id},
@@ -102,7 +102,7 @@ class Chatrooms(MySQL):
             ]
         )
         if info is not None:
-            return {'status': 1, 'max_round': info['max_round'], 'app_id': info['app_id'], 'chatroom_status': info['status'], 'smart_selection': info['smart_selection'], 'initial_message_id': info['initial_message_id']}
+            return {'status': 1, 'chat_status':info['chat_status'] ,'max_round': info['max_round'], 'app_id': info['app_id'], 'chatroom_status': info['status'], 'smart_selection': info['smart_selection'], 'initial_message_id': info['initial_message_id']}
         else:
             return {'status': 0}
 
