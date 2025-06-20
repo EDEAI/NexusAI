@@ -363,8 +363,6 @@ class ChatroomManager:
                                     assert isinstance(index := data['index'], int), f'Invalid MCP tool index: {index}'
                                     assert isinstance(result := data['result'], str), f'Invalid MCP tool result: {result}'
                                     await self._chatrooms[chatroom_id].set_mcp_tool_result(index, result)
-                                case 'WFCONFIRM':
-                                    pass
                                 case 'INPUT':
                                     # User input
                                     assert isinstance(data, str), 'User input should be a string.'
