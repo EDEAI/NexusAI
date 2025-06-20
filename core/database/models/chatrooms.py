@@ -274,7 +274,7 @@ class Chatrooms(MySQL):
                 ],
                 joins=joins,
                 conditions=conditions,
-                order_by="chatrooms.id DESC"
+                order_by="chatrooms.last_chat_time DESC"
             )
         else:
             chat_list = self.select(
@@ -285,7 +285,7 @@ class Chatrooms(MySQL):
                 ],
                 joins=joins,
                 conditions=conditions,
-                order_by="chatrooms.id DESC",
+                order_by="chatrooms.last_chat_time DESC",
                 limit=page_size,
                 offset=(page - 1) * page_size
             )
