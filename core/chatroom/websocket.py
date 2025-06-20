@@ -175,8 +175,8 @@ class WorkflowWebSocketManager():
         self._set_workflow_result_cb = set_workflow_result_cb
         self._connection_by_user_id: Dict[int, WebSocketClientProtocol] = {}
         self._chatrooms_by_user_id: Dict[int, Set[int]] = {}
-        # {user_id: {workflow_run_id: (Chatroom, mcp_tool_index)}}
-        self._workflow_runs_by_user_id: Dict[int, Dict[int, Tuple['Chatroom', int]]] = {} 
+        # {user_id: {workflow_run_id: (Chatroom, mcp_tool_use_id)}}
+        self._workflow_runs_by_user_id: Dict[int, Dict[int, Tuple['Chatroom', str]]] = {} 
 
     async def _start_connection(self, user_id: int):
         token = (
@@ -209,7 +209,7 @@ class WorkflowWebSocketManager():
                         and workflow_run_id in workflow_runs
                     ):
                         message_data = message['data']
-                        chatroom, mcp_tool_index = workflow_runs[workflow_run_id]
+                        chatroom, mcp_tool_use_id = workflow_runs[workflow_run_id]
                         if message_type == self.CONFIRMATION_MSG:
                             logger.info(f'User {user_id} received workflow message: {message}')
                             status = {
@@ -221,7 +221,7 @@ class WorkflowWebSocketManager():
                                 'need_user_confirm': False,
                                 'show_todo_button': True
                             }
-                            await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_index, status)
+                            await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
                         elif message_type == self.WAITING_FOR_CONFIRMATION_MSG:
                             logger.info(f'User {user_id} received workflow message: {message}')
                             user_names = [user['nickname'] for user in message_data['waiting_users']]
@@ -235,7 +235,7 @@ class WorkflowWebSocketManager():
                                 'show_todo_button': False,
                                 'confirmer_name': f'[{", ".join(user_names)}]'
                             }
-                            await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_index, status)
+                            await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
                         elif message_type == self.DEBUG_MSG:
                             if message_data['status'] == 3:
                                 # Workflow execution failed
@@ -246,7 +246,7 @@ class WorkflowWebSocketManager():
                                     'message': message_data['error'],
                                 }
                                 await self._set_workflow_result_cb(
-                                    chatroom, mcp_tool_index,
+                                    chatroom, mcp_tool_use_id,
                                     json.dumps(result, ensure_ascii=False)
                                 )
                             else:
@@ -259,7 +259,7 @@ class WorkflowWebSocketManager():
                                         'outputs': message_data['node_exec_data']['outputs'],
                                     }
                                     await self._set_workflow_result_cb(
-                                        chatroom, mcp_tool_index,
+                                        chatroom, mcp_tool_use_id,
                                         json.dumps(result, ensure_ascii=False)
                                     )
                     # Else ignore the message
@@ -290,10 +290,10 @@ class WorkflowWebSocketManager():
         ):
             await connection.close()
 
-    def add_workflow_run(self, user_id: int, workflow_run_id: int, chatroom: 'Chatroom', mcp_tool_index: int):
+    def add_workflow_run(self, user_id: int, workflow_run_id: int, chatroom: 'Chatroom', mcp_tool_use_id: str):
         assert user_id in self._connection_by_user_id, f'No Websocket connection for user {user_id}'
         assert user_id in self._chatrooms_by_user_id, f'No chatroom for user {user_id}'
-        self._workflow_runs_by_user_id.setdefault(user_id, {})[workflow_run_id] = (chatroom, mcp_tool_index)
+        self._workflow_runs_by_user_id.setdefault(user_id, {})[workflow_run_id] = (chatroom, mcp_tool_use_id)
     
     def remove_workflow_run(self, user_id: int, workflow_run_id: int):
         assert user_id in self._connection_by_user_id, f'No Websocket connection for user {user_id}'

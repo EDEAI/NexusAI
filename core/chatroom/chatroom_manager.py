@@ -360,9 +360,9 @@ class ChatroomManager:
                                     await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                                 case 'MCPTOOLRESULT':
                                     assert isinstance(data, dict), 'MCP tool result should be a dictionary.'
-                                    assert isinstance(index := data['index'], int), f'Invalid MCP tool index: {index}'
+                                    assert isinstance(mcp_tool_use_id := data['id'], str), f'Invalid MCP tool use ID: {mcp_tool_use_id}'
                                     assert isinstance(result := data['result'], str), f'Invalid MCP tool result: {result}'
-                                    await self._chatrooms[chatroom_id].set_mcp_tool_result(index, result)
+                                    await self._chatrooms[chatroom_id].set_mcp_tool_result(mcp_tool_use_id, result)
                                 case 'INPUT':
                                     # User input
                                     assert isinstance(data, str), 'User input should be a string.'
