@@ -677,11 +677,6 @@ class Chatroom:
                             logger.debug('Workflow run: %s', result_dict)
                             workflow_run_id = result_dict['app_run_id']
                             mcp_tool_use['workflow_run_id'] = workflow_run_id
-                            await self._ws_manager.send_instruction(
-                                self._chatroom_id,
-                                'WITHWFRUNID',
-                                {'index': index, 'workflow_run_id': workflow_run_id}
-                            )
                             self._workflow_ws_manager.add_workflow_run(
                                 self._user_id, workflow_run_id,
                                 self, index
