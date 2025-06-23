@@ -584,7 +584,7 @@ class Chatroom:
         )
         await self._ws_manager.send_instruction(
             self._chatroom_id,
-            'WITHWFCONFIRM', 
+            'WITHWFSTATUS', 
             {'id': mcp_tool_use_id, 'status': status}
         )
 
