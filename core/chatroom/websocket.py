@@ -262,6 +262,17 @@ class WorkflowWebSocketManager():
                                         chatroom, mcp_tool_use_id,
                                         json.dumps(result, ensure_ascii=False)
                                     )
+                                else:
+                                    if message_data['need_human_confirm'] == 0:
+                                        # Running
+                                        logger.info(f'User {user_id} received workflow message: {message}')
+                                        status = {
+                                            'id': message_data['workflow_id'],
+                                            'status': 'running',
+                                            'app_run_id': message_data['app_run_id'],
+                                            'node_exec_id': message_data['node_exec_data']['node_exec_id']
+                                        }
+                                        await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
                     # Else ignore the message
                 except ConnectionClosed as e:
                     if e.code == CloseCode.NORMAL_CLOSURE:
