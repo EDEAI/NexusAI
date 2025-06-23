@@ -328,7 +328,12 @@ class Chatroom:
 
     async def _select_next_speaker(self) -> int:
         agent_id = None
-        last_speaker_id = self._history_messages[-1]['agent_id']
+        for message in reversed(self._history_messages):
+            if message['type'] == 'text':
+                last_speaker_id = message['agent_id']
+                break
+        else:
+            last_speaker_id = 0
 
         for i in range(5):  # Try 5 times
             if last_speaker_id == 0:
