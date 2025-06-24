@@ -93,7 +93,7 @@ class Chatrooms(MySQL):
         """
         info = self.select_one(
             columns=[
-                'id', 'max_round', 'app_id', 'status', 'smart_selection', 'initial_message_id'
+                'id', 'max_round', 'app_id', 'status', 'chat_status', 'smart_selection', 'initial_message_id'
             ],
             conditions=[
                 {"column": "id", "value": chatroom_id},
@@ -102,7 +102,7 @@ class Chatrooms(MySQL):
             ]
         )
         if info is not None:
-            return {'status': 1, 'max_round': info['max_round'], 'app_id': info['app_id'], 'chatroom_status': info['status'], 'smart_selection': info['smart_selection'], 'initial_message_id': info['initial_message_id']}
+            return {'status': 1, 'chat_status':info['chat_status'] ,'max_round': info['max_round'], 'app_id': info['app_id'], 'chatroom_status': info['status'], 'smart_selection': info['smart_selection'], 'initial_message_id': info['initial_message_id']}
         else:
             return {'status': 0}
 
@@ -270,22 +270,22 @@ class Chatrooms(MySQL):
                 columns=[
                     "apps.name", "apps.description", "chatrooms.id as chatroom_id", "chatrooms.chat_status",
                     "chatrooms.active", "chatrooms.status as chatroom_status", "chatrooms.smart_selection",
-                    "apps.id as app_id", "chatrooms.created_time"
+                    "apps.id as app_id", "chatrooms.created_time", "chatrooms.last_chat_time"
                 ],
                 joins=joins,
                 conditions=conditions,
-                order_by="chatrooms.id DESC"
+                order_by="chatrooms.last_chat_time DESC"
             )
         else:
             chat_list = self.select(
                 columns=[
                     "apps.name", "apps.description", "chatrooms.id as chatroom_id", "chatrooms.chat_status",
                     "chatrooms.active", "chatrooms.status as chatroom_status", "chatrooms.smart_selection",
-                    "apps.id as app_id", "chatrooms.created_time"
+                    "apps.id as app_id", "chatrooms.created_time", "chatrooms.last_chat_time"
                 ],
                 joins=joins,
                 conditions=conditions,
-                order_by="chatrooms.id DESC",
+                order_by="chatrooms.last_chat_time DESC",
                 limit=page_size,
                 offset=(page - 1) * page_size
             )

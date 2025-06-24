@@ -166,7 +166,7 @@ class ChatroomAgentRelation(MySQL):
         ]
 
         list = self.select(
-            columns=["agents.id AS agent_id", "agents.app_id", "agents.user_id", "apps.name", "apps.description", "apps.icon", "apps.avatar", "apps.icon_background", "agents.obligations", "chatroom_agent_relation.active"],
+            columns=["agents.id AS agent_id", "agents.app_id", "agents.model_config_id", "agents.user_id", "apps.name", "apps.description", "apps.icon", "apps.avatar", "apps.icon_background", "agents.obligations", "chatroom_agent_relation.active"],
             joins=[
                 ["left", "agents", "agents.id = chatroom_agent_relation.agent_id"],
                 ["left", "apps", "agents.app_id = apps.id"],
