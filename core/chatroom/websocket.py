@@ -179,6 +179,7 @@ class WorkflowWebSocketManager():
         self._workflow_runs_by_user_id: Dict[int, Dict[int, Tuple['Chatroom', str]]] = {} 
 
     async def _start_connection(self, user_id: int):
+        logger.info(f'Starting Workflow WebSocket connection for user {user_id}...')
         token = (
             redis.get(f'access_token:{user_id}')
             or redis.get(f'third_party_access_token:{user_id}')
@@ -195,98 +196,102 @@ class WorkflowWebSocketManager():
             else:
                 logger.info(f'User {user_id} connected to Workflow WebSocket.')
                 self._connection_by_user_id[user_id] = connection
-            while True:
-                try:
-                    message = await connection.recv()
-                    message = json.loads(message)
-                    message_type = message['type']
+                while True:
                     try:
-                        workflow_run_id = message['data']['app_run_id']
-                    except (KeyError, TypeError):
-                        workflow_run_id = 0
-                    if (
-                        (workflow_runs := self._workflow_runs_by_user_id.get(user_id))
-                        and workflow_run_id in workflow_runs
-                    ):
-                        message_data = message['data']
-                        chatroom, mcp_tool_use_id = workflow_runs[workflow_run_id]
-                        if message_type == self.CONFIRMATION_MSG:
-                            logger.info(f'User {user_id} received workflow message: {message}')
-                            status = {
-                                'id': message_data['workflow_id'],
-                                'status': 'waiting_confirm',
-                                'app_run_id': message_data['app_run_id'],
-                                'node_exec_id': message_data['node_exec_data']['node_exec_id'],
-                                'workflow_name': message_data['app_name'],
-                                'need_user_confirm': False,
-                                'show_todo_button': True
-                            }
-                            await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
-                        elif message_type == self.WAITING_FOR_CONFIRMATION_MSG:
-                            logger.info(f'User {user_id} received workflow message: {message}')
-                            user_names = [user['nickname'] for user in message_data['waiting_users']]
-                            status = {
-                                'id': message_data['workflow_id'],
-                                'status': 'waiting_confirm',
-                                'app_run_id': message_data['app_run_id'],
-                                'node_exec_id': message_data['node_exec_data']['node_exec_id'],
-                                'workflow_name': message_data['app_name'],
-                                'need_user_confirm': True,
-                                'show_todo_button': False,
-                                'confirmer_name': f'[{", ".join(user_names)}]'
-                            }
-                            await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
-                        elif message_type == self.DEBUG_MSG:
-                            if message_data['status'] == 3:
-                                # Workflow execution failed
+                        message = await connection.recv()
+                        message = json.loads(message)
+                        message_type = message['type']
+                        try:
+                            workflow_run_id = message['data']['app_run_id']
+                        except (KeyError, TypeError):
+                            workflow_run_id = 0
+                        if (
+                            (workflow_runs := self._workflow_runs_by_user_id.get(user_id))
+                            and workflow_run_id in workflow_runs
+                        ):
+                            message_data = message['data']
+                            chatroom, mcp_tool_use_id = workflow_runs[workflow_run_id]
+                            if message_type == self.CONFIRMATION_MSG:
                                 logger.info(f'User {user_id} received workflow message: {message}')
-                                self.remove_workflow_run(user_id, workflow_run_id)
-                                result = {
-                                    'status': 'failed',
-                                    'message': message_data['error'],
+                                status = {
+                                    'id': message_data['workflow_id'],
+                                    'status': 'waiting_confirm',
+                                    'app_run_id': message_data['app_run_id'],
+                                    'node_exec_id': message_data['node_exec_data']['node_exec_id'],
+                                    'workflow_name': message_data['app_name'],
+                                    'need_user_confirm': False,
+                                    'show_todo_button': True
                                 }
-                                await self._set_workflow_result_cb(
-                                    chatroom, mcp_tool_use_id,
-                                    json.dumps(result, ensure_ascii=False)
-                                )
-                            else:
-                                if message_data['node_exec_data']['node_type'] == 'end':
-                                    # Success
+                                await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
+                            elif message_type == self.WAITING_FOR_CONFIRMATION_MSG:
+                                logger.info(f'User {user_id} received workflow message: {message}')
+                                user_names = [user['nickname'] for user in message_data['waiting_users']]
+                                status = {
+                                    'id': message_data['workflow_id'],
+                                    'status': 'waiting_confirm',
+                                    'app_run_id': message_data['app_run_id'],
+                                    'node_exec_id': message_data['node_exec_data']['node_exec_id'],
+                                    'workflow_name': message_data['app_name'],
+                                    'need_user_confirm': True,
+                                    'show_todo_button': False,
+                                    'confirmer_name': f'[{", ".join(user_names)}]'
+                                }
+                                await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
+                            elif message_type == self.DEBUG_MSG:
+                                if message_data['status'] == 3:
+                                    # Workflow execution failed
                                     logger.info(f'User {user_id} received workflow message: {message}')
                                     self.remove_workflow_run(user_id, workflow_run_id)
                                     result = {
-                                        'status': 'success',
-                                        'outputs': message_data['node_exec_data']['outputs'],
+                                        'status': 'failed',
+                                        'message': message_data['error'],
                                     }
                                     await self._set_workflow_result_cb(
                                         chatroom, mcp_tool_use_id,
                                         json.dumps(result, ensure_ascii=False)
                                     )
                                 else:
-                                    if message_data['need_human_confirm'] == 0:
-                                        # Running
+                                    if message_data['node_exec_data']['node_type'] == 'end':
+                                        # Success
                                         logger.info(f'User {user_id} received workflow message: {message}')
-                                        status = {
-                                            'id': message_data['workflow_id'],
-                                            'status': 'running',
-                                            'app_run_id': message_data['app_run_id'],
-                                            'node_exec_id': message_data['node_exec_data']['node_exec_id']
+                                        self.remove_workflow_run(user_id, workflow_run_id)
+                                        result = {
+                                            'status': 'success',
+                                            'outputs': message_data['node_exec_data']['outputs'],
                                         }
-                                        await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
-                    # Else ignore the message
-                except ConnectionClosed as e:
-                    if e.code == CloseCode.NORMAL_CLOSURE:
-                        # Normal closure when the user is not active anymore
-                        logger.info(f'Workflow WebSocket connection of user {user_id} closed.')
-                        exit_ = True
-                    else:
-                        logger.info(f'Workflow WebSocket connection of user {user_id} closed: {e}. Reconnecting...')
-                    break
-                except:
-                    logger.exception('ERROR!!!')
+                                        await self._set_workflow_result_cb(
+                                            chatroom, mcp_tool_use_id,
+                                            json.dumps(result, ensure_ascii=False)
+                                        )
+                                    else:
+                                        if message_data['need_human_confirm'] == 0:
+                                            # Running
+                                            logger.info(f'User {user_id} received workflow message: {message}')
+                                            status = {
+                                                'id': message_data['workflow_id'],
+                                                'status': 'running',
+                                                'app_run_id': message_data['app_run_id'],
+                                                'node_exec_id': message_data['node_exec_data']['node_exec_id']
+                                            }
+                                            await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
+                        # Else ignore the message
+                    except ConnectionClosed as e:
+                        if e.code == CloseCode.NORMAL_CLOSURE:
+                            # Normal closure when the user is not active anymore
+                            logger.info(f'Workflow WebSocket connection of user {user_id} closed.')
+                            exit_ = True
+                        else:
+                            logger.info(f'Workflow WebSocket connection of user {user_id} closed: {e}. Reconnecting...')
+                        break
+                    except:
+                        logger.exception('ERROR!!!')
+        logger.info(f'User {user_id} has disconnected from Workflow WebSocket.')
     
     def add_chatroom(self, user_id: int, chatroom_id: int):
-        if user_id not in self._connection_by_user_id:
+        if (
+            user_id not in self._connection_by_user_id
+            and user_id not in self._connection_by_user_id
+        ):
             self._event_loop.create_task(self._start_connection(user_id))
         self._chatrooms_by_user_id.setdefault(user_id, set()).add(chatroom_id)
     

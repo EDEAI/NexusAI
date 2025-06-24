@@ -526,15 +526,16 @@ class Chatroom:
         )
         return chatroom_message_id
     
-    def _update_chatroom_message(self, chatroom_message_id: int, message: str) -> None:
+    def _update_chatroom_message(self, chatroom_message_id: int, message: str, update_last_chat_time: bool = True) -> None:
         chatroom_messages.update(
             {'column': 'id', 'value': chatroom_message_id},
             {'message': message}
         )
-        chatrooms.update(
-            {'column': 'id', 'value': self._chatroom_id},
-            {'last_chat_time': str(datetime.now())}
-        )
+        if update_last_chat_time:
+            chatrooms.update(
+                {'column': 'id', 'value': self._chatroom_id},
+                {'last_chat_time': str(datetime.now())}
+            )
     
     def _update_chatroom_message_and_token_usage(
         self, chatroom_message_id: int, message: str,
@@ -609,7 +610,8 @@ class Chatroom:
                 mcp_tool_use['result'] = result
                 self._update_chatroom_message(
                     self._current_agent_message_id,
-                    self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
+                    self._get_agent_message_with_mcp_tool_uses(self._current_agent_message),
+                    update_last_chat_time=False
                 )
                 await self._ws_manager.send_instruction(
                     self._chatroom_id,
