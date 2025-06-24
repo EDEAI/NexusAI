@@ -56,11 +56,10 @@ const Container = ({
     }
     return null;
   };
-
   return show ? (
     <ProCard
-      className="w-[400px] border border-blue-300 fixed z-20 top-[105px] right-2"
-      style={{ height: 'calc(100vh - 10px - 100px)' }}
+      className="w-[400px] border border-blue-300 fixed z-60 top-[65px] right-2"
+      style={{ height: 'calc(100vh - 10px - 60px)' ,zIndex: 60}}
       extra={
         <div className="flex gap-2">
           {<ConfirmButton />}

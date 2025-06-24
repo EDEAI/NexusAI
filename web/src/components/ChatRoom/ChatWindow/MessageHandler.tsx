@@ -7,6 +7,7 @@ import { useIntl } from '@umijs/max';
 import useChatroomStore from '@/store/chatroomstate';
 import { MCPToolRuntimeData, MCPToolStatus, WorkflowConfirmationStatus } from '../types/mcp';
 import { parseMCPContent } from '../utils/mcpParser';
+import { ContentBlock } from '../types';
 
 export const useMessageHandler = (
     setDisableInput: any,
@@ -41,50 +42,103 @@ export const useMessageHandler = (
         return data.indexOf('--NEXUSAI-INSTRUCTION-') !== -1;
     };
 
-    // Helper function to update MCP tool state in current message and conversation
-    const updateMCPToolState = (id: string | number, updates: Partial<MCPToolRuntimeData>) => {
-        // Update conversation state if function is provided
-        if (updateMCPTool) {
-            updateMCPTool(id, updates);
-            
-        }
-        
-        return
-        // Also update current message state for consistency
+    // Helper function to manage contentBlocks for streaming messages
+    const updateContentBlocks = (updateFn: (blocks: ContentBlock[]) => ContentBlock[]) => {
         setCurrentMessage((prev: any) => {
-            // Initialize mcpTools array if it doesn't exist
-            const currentTools = prev.mcpTools || [];
+            const currentBlocks = prev.contentBlocks || [];
+            const updatedBlocks = updateFn(currentBlocks);
             
-            // Find existing tool by id or create new one
-            const existingToolIndex = currentTools.findIndex((tool: MCPToolRuntimeData) => tool.id === id);
-            
-            let updatedTools;
-            if (existingToolIndex >= 0) {
-                // Update existing tool using immutable pattern
-                updatedTools = currentTools.map((tool: MCPToolRuntimeData, index: number) =>
-                    index === existingToolIndex 
-                        ? { ...tool, ...updates }
-                        : tool
-                );
-            } else {
-                // Add new tool using concat for better performance
-                const newTool = {
-                    id,
-                    status: MCPToolStatus.PENDING,
-                    name: '',
-                    skill_or_workflow_name: '',
-                    workflow_run_id: 0,
-                    workflow_confirmation_status: null,
-                    args: {},
-                    result: null,
-                    ...updates
-                };
-                updatedTools = currentTools.concat(newTool);
-            }
-            debugger
             return {
                 ...prev,
-                mcpTools: updatedTools
+                contentBlocks: updatedBlocks
+            };
+        });
+    };
+
+    // Helper function to append text to current text block or create new one
+    const appendTextToCurrentBlock = (text: string) => {
+        updateContentBlocks((blocks: ContentBlock[]) => {
+            const lastBlock = blocks[blocks.length - 1];
+            
+            // If last block is text type, append to it
+            if (lastBlock && lastBlock.type === 'text') {
+                return blocks.map((block, index) => 
+                    index === blocks.length - 1 
+                        ? { ...block, content: (block.content || '') + text }
+                        : block
+                );
+            } else {
+                // Create new text block
+                return [...blocks, {
+                    type: 'text',
+                    content: text,
+                    timestamp: Date.now()
+                }];
+            }
+        });
+    };
+
+    // Helper function to create MCP block
+    const createMCPBlock = (toolId: string | number) => {
+        updateContentBlocks((blocks: ContentBlock[]) => [
+            ...blocks,
+            {
+                type: 'mcp',
+                toolId,
+                timestamp: Date.now()
+            }
+        ]);
+    };
+
+    // Helper function to convert parsedContent.blocks to contentBlocks format
+    const convertParsedContentToContentBlocks = (parsedContent: any): ContentBlock[] => {
+        if (!parsedContent?.blocks || !Array.isArray(parsedContent.blocks)) {
+            return [];
+        }
+        
+        return parsedContent.blocks.map((block: any) => {
+            if (block.type === 'text') {
+                return {
+                    type: 'text',
+                    content: block.content || '',
+                    timestamp: Date.now()
+                };
+            } else if (block.type === 'mcp-tool' && block.toolData?.id) {
+                return {
+                    type: 'mcp',
+                    toolId: block.toolData.id,
+                    timestamp: Date.now()
+                };
+            }
+            // Skip invalid blocks
+            return null;
+        }).filter(Boolean) as ContentBlock[];
+    };
+
+    // Helper function to extract MCP tool IDs from contentBlocks
+    const extractMCPToolIds = (contentBlocks: ContentBlock[]): (string | number)[] => {
+        return contentBlocks
+            .filter(block => block.type === 'mcp' && block.toolId)
+            .map(block => block.toolId!);
+    };
+
+    // Helper function to update MCP tool state in current message and conversation
+    const updateMCPToolState = (id: string | number, updates: Partial<MCPToolRuntimeData>) => {
+        // 1. 优先更新对话级别状态（唯一真实数据源）
+        if (updateMCPTool) {
+            updateMCPTool(id, updates);
+        }
+        
+        // 2. 标记当前消息包含此工具（用于渲染识别）
+        setCurrentMessage((prev: any) => {
+            const currentActiveMCPTools = prev.activeMCPTools || [];
+            const updatedActiveMCPTools = currentActiveMCPTools.includes(id) 
+                ? currentActiveMCPTools 
+                : [...currentActiveMCPTools, id];
+            
+            return {
+                ...prev,
+                activeMCPTools: updatedActiveMCPTools
             };
         });
     };
@@ -183,6 +237,9 @@ export const useMessageHandler = (
                 status: MCPToolStatus.RUNNING,
                 isWorkflow
             });
+            
+            // Create MCP block in contentBlocks for ordered rendering
+            createMCPBlock(id);
         },
 
         WITHMCPTOOLRESULT: (data: any) => {
@@ -279,7 +336,7 @@ export const useMessageHandler = (
             setCurrentMessageContent((pre: any) => {
                 // First, save the current message if it has meaningful content
                 let updatedMessages = pre;
-                if (Object.keys(currentMessage).length && (currentMessage.content || currentMessage.mcpTools?.length)) {
+                if (Object.keys(currentMessage).length && (currentMessage.content || currentMessage.activeMCPTools?.length)) {
                     updatedMessages = pre.concat(currentMessage);
                 }
                 
@@ -293,11 +350,11 @@ export const useMessageHandler = (
                 }
                 
                 // Check if the last message in the complete list is from the same agent
-                const lastMessage = completeMessageList[completeMessageList.length - 1];
+                const lastMessage = completeMessageList[0];
                 const shouldMergeWithLastMessage = lastMessage && 
                     lastMessage.is_agent === 1 && 
                     lastMessage.agent_id == agentId;
-                    debugger
+                    
                 if (shouldMergeWithLastMessage) {
                     // Check if the last message is in current messages or history
                     const isLastMessageInCurrent = updatedMessages.length > 0 && 
@@ -305,27 +362,37 @@ export const useMessageHandler = (
                     
                     if (isLastMessageInCurrent) {
                         // Merge with existing message in current list: continue using the last message
-                        // Extract pure text content from parsedContent if available
-                        let pureTextContent = '';
-                        if (lastMessage.parsedContent && lastMessage.parsedContent.blocks) {
-                            pureTextContent = lastMessage.parsedContent.blocks
-                                .filter(block => block.type === 'text')
-                                .map(block => block.content)
-                                .join('');
-                        } else {
-                            // Fallback to original content if parsedContent is not available
-                            pureTextContent = lastMessage.content || '';
+                        agentText.current = lastMessage.content || '';
+                        
+                        // Convert parsedContent to contentBlocks if not already present
+                        let initialContentBlocks = lastMessage.contentBlocks;
+                        let initialActiveMCPTools = lastMessage.activeMCPTools || [];
+                        
+                        if (!initialContentBlocks && lastMessage.parsedContent) {
+                            // Convert from parsedContent to contentBlocks
+                            initialContentBlocks = convertParsedContentToContentBlocks(lastMessage.parsedContent);
+                            initialActiveMCPTools = extractMCPToolIds(initialContentBlocks);
+                        } else if (!initialContentBlocks && lastMessage.content) {
+                            // Fallback: create single text block
+                            initialContentBlocks = [{
+                                type: 'text',
+                                content: lastMessage.content,
+                                timestamp: Date.now()
+                            }];
+                        } else if (!initialContentBlocks) {
+                            initialContentBlocks = [];
                         }
                         
-                        agentText.current = pureTextContent;
                         setCurrentMessage({
                             ...lastMessage,
                             // Keep existing properties but ensure agent_id is set
                             agent_id: agentId,
-                            // Set content to pure text only
-                            content: pureTextContent,
                             // Preserve parsedContent if it exists
-                            parsedContent: lastMessage.parsedContent
+                            parsedContent: lastMessage.parsedContent,
+                            // Use converted or existing contentBlocks
+                            contentBlocks: initialContentBlocks,
+                            // Sync activeMCPTools with contentBlocks
+                            activeMCPTools: initialActiveMCPTools
                         });
                         
                         // Remove the last message from the list since we're continuing it
@@ -335,26 +402,38 @@ export const useMessageHandler = (
                         return updatedMessages.slice(0, -1);
                     } else {
                         // Last message is in history, continue from where it left off
-                        // Extract pure text content from parsedContent if available
-                        let pureTextContent = '';
-                        if (lastMessage.parsedContent && lastMessage.parsedContent.blocks) {
-                            pureTextContent = lastMessage.parsedContent.blocks
-                                .filter(block => block.type === 'text')
-                                .map(block => block.content)
-                                .join('');
-                        } else {
-                            // Fallback to original content if parsedContent is not available
-                            pureTextContent = lastMessage.content || '';
+                        agentText.current = lastMessage.content || '';
+                        
+                        // Convert parsedContent to contentBlocks for historical message
+                        let initialContentBlocks = lastMessage.contentBlocks;
+                        let initialActiveMCPTools = lastMessage.activeMCPTools || [];
+                        
+                        if (!initialContentBlocks && lastMessage.parsedContent) {
+                            // Convert from parsedContent to contentBlocks
+                            initialContentBlocks = convertParsedContentToContentBlocks(lastMessage.parsedContent);
+                            initialActiveMCPTools = extractMCPToolIds(initialContentBlocks);
+                        } else if (!initialContentBlocks && lastMessage.content) {
+                            // Fallback: create single text block
+                            initialContentBlocks = [{
+                                type: 'text',
+                                content: lastMessage.content,
+                                timestamp: Date.now()
+                            }];
+                        } else if (!initialContentBlocks) {
+                            initialContentBlocks = [];
                         }
                         
-                        agentText.current = pureTextContent;
                         setCurrentMessage({
                             ...lastMessage,
                             agent_id: agentId,
-                            // Set content to pure text only for continuation
-                            content: pureTextContent,
+                            // Reset content to continue appending
+                            content: lastMessage.content || '',
                             // Preserve parsedContent if it exists, will be updated as content changes
-                            parsedContent: lastMessage.parsedContent
+                            parsedContent: lastMessage.parsedContent,
+                            // Use converted contentBlocks
+                            contentBlocks: initialContentBlocks,
+                            // Sync activeMCPTools with contentBlocks
+                            activeMCPTools: initialActiveMCPTools
                         });
                         
                         chatReturn.current = true;
@@ -370,10 +449,12 @@ export const useMessageHandler = (
                         icon: currentAgent?.icon,
                         name: currentAgent?.name,
                         content: '',
-                        mcpTools: [],
+                        activeMCPTools: [],
                         agent_id: agentId,
                         // Initialize parsedContent for new message
-                        parsedContent: null
+                        parsedContent: null,
+                        // Initialize empty contentBlocks for new streaming message
+                        contentBlocks: []
                     });
                     
                     chatReturn.current = true;
@@ -411,7 +492,7 @@ export const useMessageHandler = (
                 }
             });
             
-            // Update message content state and parsedContent in real-time
+            // Update both content and contentBlocks for dual compatibility
             setCurrentMessage((pre: any) => {
                 const updatedContent = agentText.current;
                 const updatedMessage = {
@@ -426,6 +507,9 @@ export const useMessageHandler = (
                 
                 return updatedMessage;
             });
+            
+            // Also append to contentBlocks for new rendering mode
+            appendTextToCurrentBlock(data);
         }
         
         // Handle ENDCHAT

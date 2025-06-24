@@ -100,6 +100,8 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
                 agentChatRoomId={agentChatRoomId}
                 updateMCPTool={updateMCPTool}
                 getCurrentMessageList={() => userMessage || []}
+                mcpTools={mcpTools}
+                getMCPTool={getMCPTool}
             />
         </>
     );

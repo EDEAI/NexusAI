@@ -100,4 +100,22 @@ export interface UploadFile {
     url?: string;
     response?: any;
     [key: string]: any;
+}
+
+// Streaming content block types for ordered text/mcp rendering
+export interface ContentBlock {
+    type: 'text' | 'mcp';
+    content?: string;        // Used for text type blocks
+    toolId?: string | number;  // Used for mcp type blocks  
+    timestamp?: number;      // For debugging and ordering
+}
+
+export interface StreamingMessage {
+    name: string;
+    is_agent: number;
+    contentBlocks: ContentBlock[];
+    file_list?: any[];
+    // Legacy fields for backward compatibility
+    content?: string;
+    activeMCPTools?: (string | number)[];
 } 

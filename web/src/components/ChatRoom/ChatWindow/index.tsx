@@ -23,6 +23,8 @@ interface chatwindowParameters {
     agentChatRoomId?: any;
     updateMCPTool?: (id: string | number, updates: Partial<MCPToolRuntimeData>) => void;
     getCurrentMessageList?: () => any[];
+    mcpTools?: Record<string | number, MCPToolRuntimeData>;
+    getMCPTool?: (id: string | number) => MCPToolRuntimeData | null;
 }
 
 export const Chatwindow: FC<chatwindowParameters> = memo(props => {
@@ -39,6 +41,8 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
         agentChatRoomId,
         updateMCPTool,
         getCurrentMessageList,
+        mcpTools = {},
+        getMCPTool = () => null,
     } = props;
     
     const intl = useIntl();
@@ -97,6 +101,9 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
             currentMessage={currentMessage}
             agentChatRoomId={agentChatRoomId}
             intl={intl}
+            mcpTools={mcpTools}
+            updateMCPTool={updateMCPTool}
+            getMCPTool={getMCPTool}
         />
     );
 }); 
