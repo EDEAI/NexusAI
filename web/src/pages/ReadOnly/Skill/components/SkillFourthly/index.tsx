@@ -49,7 +49,7 @@ const SkillFourthly: React.FC<ChildProps> = ({
                 const variable = new SkillVariable(
                     item.name,
                     item.type,
-                    item.type == 'string' ? item.value : Number(item.value),
+                    item.type == 'string' ? item.value : (item.type == 'number' ? Number(item.value) : item.value),
                     item.content,
                     item.status,
                 );
@@ -59,6 +59,7 @@ const SkillFourthly: React.FC<ChildProps> = ({
                 skill_id: Skillinfo.id,
                 input_dict: input_variables,
             };
+            debugger
             SkillRun(param);
         }
     };
