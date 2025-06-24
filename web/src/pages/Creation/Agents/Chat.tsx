@@ -1,6 +1,9 @@
 /*
  * @LastEditors: biz
  */
+/*
+ * @LastEditors: biz
+ */
 import {
     clearAgentMessageMemory,
     getAgentMessageHistory,
@@ -12,12 +15,13 @@ import FileListDisplay from '@/components/FileListDisplay';
 import useFileUpload from '@/hooks/useFileUpload';
 import { createPromptFromObject } from '@/py2js/prompt.js';
 import useSocketStore from '@/store/websocket';
+import { ModelImageSupportProvider } from '@/contexts/ModelImageSupportContext';
 import { DownloadOutlined, ExclamationCircleFilled, FullscreenOutlined, FullscreenExitOutlined } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Button, Image, message, Modal, Spin } from 'antd';
+import { Button, Empty, Image, message, Modal, Spin } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
@@ -100,6 +104,7 @@ interface Props {
             agent: {
                 agent_id: number;
                 input_variables: any;
+                m_config_id?: number;
             };
             app?: {
                 name: string;
@@ -321,16 +326,25 @@ export default memo((props: Props) => {
                 window.history.replaceState({}, '', newUrl);
             }
 
-            setAgentInfo({
+            const newAgentInfo = {
                 ...props.data.detailList.app,
+                agent:props.data.detailList.agent,
                 agent_id: props.data.detailList.agent.agent_id,
+            };
+            
+            console.log('AgentInfo updated:', {
+                m_config_id: newAgentInfo.agent?.m_config_id,
+                agent_id: newAgentInfo.agent_id,
+                name: newAgentInfo.name
             });
+            
+            setAgentInfo(newAgentInfo);
 
             setTimeout(() => {
                 setLoading(false);
             }, 500);
         }
-    }, [props.data?.detailList?.app?.name]);
+    }, [props.data?.detailList?.app?.name, props.data?.detailList?.agent?.m_config_id]);
 
     // 使用自定义的 hook
     const {
@@ -607,6 +621,7 @@ export default memo((props: Props) => {
                 backgroundColor: '#fff'
             }}
         >
+            
             <ProForm
                 formRef={formRef}
                 submitter={false}
@@ -673,18 +688,22 @@ export default memo((props: Props) => {
                         </>
                     )}
                 </div>
-                <div
+                {agentChatRoomId?<div
                     className={`w-full flex-1 flex bg-[#fff] overflow-hidden overflow-x-auto ${isFullscreen ? 'max-w-[1400px] mx-auto justify-center' : ''}`}
                     style={{ height: isFullscreen ? 'calc(100vh - 64px)' : 'calc(100vh - 56px)' }}
                 >
-                    <ChatRoomContent
-                        agentList={{
-                            current: [agentInfo],
-                        }}
-                        abilitiesList={props.data?.abilitiesList}
-                        agentChatRoomId={agentChatRoomId}
-                    />
-                </div>
+                    <ModelImageSupportProvider>
+                        <ChatRoomContent
+                            agentList={{
+                                current: [agentInfo],
+                            }}
+                            abilitiesList={props.data?.abilitiesList}
+                            agentChatRoomId={agentChatRoomId}
+                        />
+                    </ModelImageSupportProvider>
+                </div>:<div className="flex items-center justify-center h-full">
+                <Empty  description={`等待创建智能体`}></Empty>
+            </div>}
                 {/* <div className="bg-gray-50 rounded-md border border-[#ccc] flex-1 overflow-y-auto flex flex-col">
                     <div className="flex-1 overflow-y-auto " ref={chatContainerRef}>
                         <InfiniteScroll
