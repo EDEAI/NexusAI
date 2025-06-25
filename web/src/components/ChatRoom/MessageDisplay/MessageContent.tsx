@@ -71,7 +71,7 @@ export const MessageContent: FC<MessageContentProps> = props => {
                 </div>
             )}
             
-            {/* 渲染文本内容 - 支持contentBlocks和传统parsedContent双模式 */}
+            {/* Render text content - supports both contentBlocks and traditional parsedContent modes */}
             {contentBlocks && contentBlocks.length > 0 ? (
                 // New: contentBlocks rendering mode for streaming messages
                 <div>
@@ -141,7 +141,7 @@ export const MessageContent: FC<MessageContentProps> = props => {
                 </ReactMarkdown>
             )}
             
-            {/* 对于当前消息，仅在没有contentBlocks时显示activeMCPTools（向后兼容） */}
+            {/* For current messages, only show activeMCPTools when contentBlocks is not available (backward compatibility) */}
             {props.isCurrentMessage && !contentBlocks && item?.activeMCPTools?.length > 0 && (
                 <div className="mt-3">
                     {item.activeMCPTools

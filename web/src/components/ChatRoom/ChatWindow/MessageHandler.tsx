@@ -23,7 +23,8 @@ export const useMessageHandler = (
     agentText: any,
     chatReturn: any,
     updateMCPTool?: (id: string | number, updates: Partial<MCPToolRuntimeData>) => void,
-    getCurrentMessageList?: () => any[]
+    getCurrentMessageList?: () => any[],
+    setIsWaitingReply?: (waiting: boolean) => void
 ) => {
     const intl = useIntl();
     const setTruncatable = useChatroomStore(state => state.setTruncatable);
@@ -124,12 +125,12 @@ export const useMessageHandler = (
 
     // Helper function to update MCP tool state in current message and conversation
     const updateMCPToolState = (id: string | number, updates: Partial<MCPToolRuntimeData>) => {
-        // 1. 优先更新对话级别状态（唯一真实数据源）
+        // 1. Prioritize updating conversation-level state (single source of truth)
         if (updateMCPTool) {
             updateMCPTool(id, updates);
         }
         
-        // 2. 标记当前消息包含此工具（用于渲染识别）
+        // 2. Mark current message as containing this tool (for rendering identification)
         setCurrentMessage((prev: any) => {
             const currentActiveMCPTools = prev.activeMCPTools || [];
             const updatedActiveMCPTools = currentActiveMCPTools.includes(id) 
@@ -164,6 +165,12 @@ export const useMessageHandler = (
             setCurrentMessageContent((pre: any) => 
                 pre.concat(userObj)
             );
+            
+            // Set waiting for reply state
+            if (setIsWaitingReply) {
+                setIsWaitingReply(true);
+            }
+            
             // Use requestAnimationFrame for better performance and avoiding potential memory leaks
             requestAnimationFrame(() => {
                 if (scrollDomRef.current) {
@@ -224,7 +231,7 @@ export const useMessageHandler = (
         },
 
         MCPTOOLUSE: (data: any) => {
-            console.log('MCPTOOLUSE data:', data);
+          
             
             const { id, name, skill_or_workflow_name, args } = data;
             const isWorkflow = skill_or_workflow_name && skill_or_workflow_name.toLowerCase().includes('workflow');
@@ -243,7 +250,7 @@ export const useMessageHandler = (
         },
 
         WITHMCPTOOLRESULT: (data: any) => {
-            console.log('WITHMCPTOOLRESULT data:', data);
+       
             
             const { id, result } = data;
             
@@ -270,7 +277,7 @@ export const useMessageHandler = (
         },
 
         WITHWFSTATUS: (data: any) => {
-            console.log('WITHWFSTATUS data:', data);
+       
             
             const { id, status: confirmationData } = data;
             
@@ -328,6 +335,11 @@ export const useMessageHandler = (
         if (hasReply && hasInstructionMarker) {
             let agentId = array[1];
             
+            // Clear waiting for reply state
+            if (setIsWaitingReply) {
+                setIsWaitingReply(false);
+            }
+            
             let currentAgent = agentList.current.filter(
                 (item: any) => item.agent_id == agentId,
             )[0];
@@ -344,7 +356,7 @@ export const useMessageHandler = (
                 let completeMessageList = [];
                 if (getCurrentMessageList) {
                     const historyMessages = getCurrentMessageList();
-                    completeMessageList = [...historyMessages, ...updatedMessages];
+                    completeMessageList = [...updatedMessages,...historyMessages];
                 } else {
                     completeMessageList = updatedMessages;
                 }

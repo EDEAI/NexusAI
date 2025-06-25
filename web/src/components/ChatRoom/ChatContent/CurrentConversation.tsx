@@ -6,6 +6,7 @@ import { useLocation, useParams } from 'umi';
 import { Chatwindow } from '../ChatWindow';
 import { MessageItem } from '../MessageDisplay/MessageItem';
 import { MCPToolRuntimeData } from '../types/mcp';
+import { WaitingReplyIndicator } from './WaitingReplyIndicator';
 
 interface CurrentConversationProps {
     messageApi?: any;
@@ -44,6 +45,7 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
 
     const [currentMessageContent, setCurrentMessageContent]: any = useState([]);
     const [isEnd, setisEnd] = useState(false);
+    const [isWaitingReply, setIsWaitingReply] = useState(false);
     
     const { id: urlParamId } = useParams<{ id: string }>();
     const location = useLocation();
@@ -87,6 +89,7 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
             ) : (
                 <></>
             )}
+            <WaitingReplyIndicator isVisible={isWaitingReply} />
             <Chatwindow
                 messageApi={messageApi}
                 setCurrentMessageContent={setCurrentMessageContent}
@@ -102,6 +105,7 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
                 getCurrentMessageList={() => userMessage || []}
                 mcpTools={mcpTools}
                 getMCPTool={getMCPTool}
+                setIsWaitingReply={setIsWaitingReply}
             />
         </>
     );

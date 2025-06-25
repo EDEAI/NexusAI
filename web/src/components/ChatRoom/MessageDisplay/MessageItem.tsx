@@ -39,10 +39,7 @@ export const MessageItem: FC<MessageItemProps> = props => {
     } = props;
     const intl = useIntl();
     const isAgent = item.is_agent === 1;
-    useEffect(() => {
-        console.log(item.content,item.is_agent);
 
-    }, [item]);
     return (
         <div
             className={`w-full flex gap-[15px] pt-[15px] pb-[15px] ${

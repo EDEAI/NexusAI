@@ -63,7 +63,7 @@ export const InputField: FC<inputFieldParameters> = memo(props => {
     });
 
     useEffect(() => {
-        console.log('agentList changed:', agentList, options);
+     
         if (
             agentChatRoomId &&
             agentList?.current?.length > 0 &&

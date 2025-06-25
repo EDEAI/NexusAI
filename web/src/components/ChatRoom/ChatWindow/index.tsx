@@ -25,6 +25,7 @@ interface chatwindowParameters {
     getCurrentMessageList?: () => any[];
     mcpTools?: Record<string | number, MCPToolRuntimeData>;
     getMCPTool?: (id: string | number) => MCPToolRuntimeData | null;
+    setIsWaitingReply?: (waiting: boolean) => void;
 }
 
 export const Chatwindow: FC<chatwindowParameters> = memo(props => {
@@ -43,6 +44,7 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
         getCurrentMessageList,
         mcpTools = {},
         getMCPTool = () => null,
+        setIsWaitingReply,
     } = props;
     
     const intl = useIntl();
@@ -71,7 +73,8 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
         agentText,
         chatReturn,
         updateMCPTool,
-        getCurrentMessageList
+        getCurrentMessageList,
+        setIsWaitingReply
     );
 
     const { runSocket, sendMessage, readyState } = useWebSocketManager('chat', getSocketMessage);
