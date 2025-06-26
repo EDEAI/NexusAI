@@ -455,7 +455,7 @@ async def toggle_auto_answer_switch(chatroom_id: int, agent_id: int, agent_setti
 
 @router.get("/{chatroom_id}/chatroom_message", response_model=ChatRoomResponseBase,
             summary="Get a list of historical messages")
-async def show_chatroom_details(chatroom_id: int, page: int = 1, page_size: int = 10,
+async def show_chatroom_messages(chatroom_id: int, page: int = 1, page_size: int = 10,
                                 userinfo: TokenData = Depends(get_current_user)):
     """
     Retrieve historical messages for a specific chat room.
