@@ -266,10 +266,10 @@ class ChatroomManager:
         user_input: Optional[str] = None
     ) -> None:
         try:
-            if chatroom_id in self._chatrooms:
+            # Interrupt all MCP tool uses and wait for the chatroom to be terminated, when the chatroom is resumed
+            if user_input is None and chatroom_id in self._chatrooms:
                 chatroom = self._chatrooms[chatroom_id]
                 if chatroom.mcp_tool_is_using:
-                    # Interrupt all MCP tool uses and wait for the chatroom to be terminated
                     await chatroom.interrupt_all_mcp_tool_uses()
                     while chatroom_id in self._chatrooms:
                         await asyncio.sleep(0.1)
