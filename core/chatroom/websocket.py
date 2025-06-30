@@ -190,12 +190,15 @@ class WorkflowWebSocketManager():
         while user_id in self._users_with_connection:
             try:
                 connection = await connect(
-                    f'ws://localhost:{settings.WEBSOCKET_PORT}/ws?token={token}',
+                    f'ws://127.0.0.1:{settings.WEBSOCKET_PORT}/ws?token={token}',
                     ping_interval=None,
                     ping_timeout=None
                 )
             except ConnectionError as e:
-                logger.info(f'Workflow WebSocket connection of user {user_id} failed: {e}. Reconnecting...')
+                logger.error(f'Workflow WebSocket connection of user {user_id} failed: {e}. Reconnecting...')
+                await asyncio.sleep(5)
+            except Exception as e:
+                logger.exception(f'Workflow WebSocket connection of user {user_id} failed: {e}. Reconnecting...')
                 await asyncio.sleep(5)
             else:
                 logger.info(f'User {user_id} connected to Workflow WebSocket.')
