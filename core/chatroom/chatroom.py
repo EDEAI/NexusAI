@@ -941,7 +941,6 @@ class Chatroom:
                 if self._terminate():
                     break
 
-            await self._ws_manager.end_agent_reply(self._chatroom_id)
             self._last_speaker_id = agent_id
             app_runs.increment_steps(self._app_run_id)
             app_runs.increment_token_usage(
@@ -949,6 +948,7 @@ class Chatroom:
                 prompt_tokens, completion_tokens, total_tokens
             )
         finally:
+            await self._ws_manager.end_agent_reply(self._chatroom_id)
             self._console_log('\033[0m')  # Reset the color
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
             if not has_connections:

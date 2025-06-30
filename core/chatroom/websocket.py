@@ -153,6 +153,7 @@ class WebSocketManager:
         if connections := self._connections_by_chatroom_id.get(chatroom_id):
             for connection in connections:
                 if self._replying_status_by_connection_id[id(connection)]:
+                    await self.send_instruction_by_connection(connection, 'ENDREPLY')
                     self._replying_status_by_connection_id[id(connection)] = False
             
     def stop(self):
