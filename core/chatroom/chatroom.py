@@ -916,10 +916,15 @@ class Chatroom:
                     )
                     if self._terminate():
                         break
-                    
+
                     new_text = False
                     self._mcp_tool_is_using = True
                     self._mcp_tool_use_is_interrupted = False
+                    await self._ws_manager.send_agent_reply(
+                        self._chatroom_id,
+                        agent_id, self._ability_id,
+                        '', agent_message, False
+                    )
 
                     await self._start_mcp_tool_uses()
                     await self._wait_for_mcp_tool_uses()
