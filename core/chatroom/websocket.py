@@ -10,7 +10,6 @@ from websockets import (
     ServerConnection,
     broadcast, connect, serve
 )
-from websockets.frames import CloseCode
 
 from config import settings
 from core.database import redis
@@ -188,11 +187,15 @@ class WorkflowWebSocketManager():
         if not token:
             raise Exception('Invalid token')
         token = token.decode('utf-8')
-        exit_ = False
-        while not exit_:
+        while user_id in self._users_with_connection:
             try:
-                connection = await connect(f'ws://localhost:{settings.WEBSOCKET_PORT}/ws?token={token}')
-            except ConnectionRefusedError:
+                connection = await connect(
+                    f'ws://localhost:{settings.WEBSOCKET_PORT}/ws?token={token}',
+                    ping_interval=None,
+                    ping_timeout=None
+                )
+            except ConnectionError as e:
+                logger.info(f'Workflow WebSocket connection of user {user_id} failed: {e}. Reconnecting...')
                 await asyncio.sleep(5)
             else:
                 logger.info(f'User {user_id} connected to Workflow WebSocket.')
@@ -200,7 +203,6 @@ class WorkflowWebSocketManager():
                     try:
                         message = await connection.recv()
                         if user_id not in self._users_with_connection:
-                            exit_ = True
                             await connection.close()
                             break
                         message = json.loads(message)
@@ -280,12 +282,7 @@ class WorkflowWebSocketManager():
                                             await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
                         # Else ignore the message
                     except ConnectionClosed as e:
-                        if e.code == CloseCode.NORMAL_CLOSURE:
-                            # Normal closure when the user is not active anymore
-                            logger.info(f'Workflow WebSocket connection of user {user_id} closed.')
-                            exit_ = True
-                        else:
-                            logger.info(f'Workflow WebSocket connection of user {user_id} closed: {e}. Reconnecting...')
+                        logger.info(f'Workflow WebSocket connection of user {user_id} closed: {e}. Reconnecting...')
                         break
                     except:
                         logger.exception('ERROR!!!')

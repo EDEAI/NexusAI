@@ -900,9 +900,6 @@ class Chatroom:
                     'type': 'text',
                     'message': agent_message
                 })
-                
-                if self._terminate():
-                    break
 
                 if not self._mcp_tool_uses:
                     # No MCP tool use, stop invoking the LLM
@@ -917,6 +914,9 @@ class Chatroom:
                         self._get_agent_message_with_mcp_tool_uses(self._current_agent_message),
                         prompt_tokens, completion_tokens, total_tokens
                     )
+                    if self._terminate():
+                        break
+                    
                     new_text = False
                     self._mcp_tool_is_using = True
                     self._mcp_tool_use_is_interrupted = False
