@@ -176,7 +176,8 @@ class WorkflowWebSocketManager():
         self._users_with_connection: Set[int] = set()
         self._chatrooms_by_user_id: Dict[int, Set[int]] = {}
         # {user_id: {workflow_run_id: (Chatroom, mcp_tool_use_id)}}
-        self._workflow_runs_by_user_id: Dict[int, Dict[int, Tuple['Chatroom', str]]] = {} 
+        self._workflow_runs_by_user_id: Dict[int, Dict[int, Tuple['Chatroom', str]]] = {}
+        self._connection_creation_lock = asyncio.Lock() 
 
     async def _start_connection(self, user_id: int):
         logger.info(f'Starting Workflow WebSocket connection for user {user_id}...')
@@ -295,14 +296,16 @@ class WorkflowWebSocketManager():
                         logger.exception('ERROR!!!')
         logger.info(f'User {user_id} has disconnected from Workflow WebSocket.')
     
-    def add_chatroom(self, user_id: int, chatroom_id: int):
-        if (
-            user_id not in self._users_with_connection
-            and user_id not in self._chatrooms_by_user_id
-        ):
-            self._users_with_connection.add(user_id)
-            self._event_loop.create_task(self._start_connection(user_id))
-        self._chatrooms_by_user_id.setdefault(user_id, set()).add(chatroom_id)
+    async def add_chatroom(self, user_id: int, chatroom_id: int):
+        async with self._connection_creation_lock:
+            if (
+                user_id not in self._users_with_connection
+                and user_id not in self._chatrooms_by_user_id
+            ):
+                self._users_with_connection.add(user_id)
+                self._event_loop.create_task(self._start_connection(user_id))
+            
+            self._chatrooms_by_user_id.setdefault(user_id, set()).add(chatroom_id)
     
     def remove_chatroom(self, user_id: int, chatroom_id: int):
         if user_id in self._chatrooms_by_user_id:
