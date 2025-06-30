@@ -7,7 +7,7 @@ from typing import Any, Awaitable, Callable, Dict, Iterable, List, Optional, Set
 from jose import JWTError, jwt
 from websockets import (
     ConnectionClosed,
-    WebSocketClientProtocol, WebSocketServerProtocol,
+    ServerConnection,
     broadcast, connect, serve
 )
 from websockets.frames import CloseCode
@@ -33,10 +33,10 @@ connection_path_pattern_docker = re.compile(r'/ws_chat\?token=([A-Za-z0-9\.\-_]+
 class WebSocketManager:
     def __init__(self, event_loop: asyncio.BaseEventLoop):
         self._stop_future = event_loop.create_future()
-        self._connections_by_chatroom_id: Dict[int, Set[WebSocketServerProtocol]] = {}
+        self._connections_by_chatroom_id: Dict[int, Set[ServerConnection]] = {}
         self._replying_status_by_connection_id: Dict[int, bool] = {}
         
-    async def start(self, callback: Callable[[WebSocketServerProtocol], Awaitable[Any]]):
+    async def start(self, callback: Callable[[ServerConnection], Awaitable[Any]]):
         async with serve(callback, '0.0.0.0', settings.CHATROOM_WEBSOCKET_PORT):
             await self._stop_future  # run forever
     
@@ -70,13 +70,13 @@ class WebSocketManager:
             logger.error('Invalid instruction: %s', instruction_str)
             raise ValueError(f'Invalid instruction: {instruction_str}')
     
-    def save_connection(self, chatroom_id: int, connection: WebSocketServerProtocol):
+    def save_connection(self, chatroom_id: int, connection: ServerConnection):
         connections = self._connections_by_chatroom_id.setdefault(chatroom_id, set())
         connections.add(connection)
         logger.debug(f'Connection {id(connection)} saved for chatroom {chatroom_id}')
         self._replying_status_by_connection_id[id(connection)] = False
         
-    def remove_connection(self, chatroom_id: int, connection: WebSocketServerProtocol):
+    def remove_connection(self, chatroom_id: int, connection: ServerConnection):
         if connections := self._connections_by_chatroom_id.get(chatroom_id):
             connections.discard(connection)
             logger.debug(f'Connection {id(connection)} removed from chatroom {chatroom_id}')
@@ -89,7 +89,7 @@ class WebSocketManager:
             
     async def send_instruction_by_connection(
         self,
-        connection: WebSocketServerProtocol,
+        connection: ServerConnection,
         cmd: str,
         data: Any = None
     ):
@@ -98,7 +98,7 @@ class WebSocketManager:
         
     async def send_instruction_by_connections(
         self,
-        connections: Iterable[WebSocketServerProtocol],
+        connections: Iterable[ServerConnection],
         cmd: str,
         data: Any = None
     ):

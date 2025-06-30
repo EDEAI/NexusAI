@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from websockets import (
     ConnectionClosed,
-    WebSocketServerProtocol
+    ServerConnection
 )
 
 from .chatroom import Chatroom
@@ -284,9 +284,9 @@ class ChatroomManager:
             logger.exception('ERROR!!')
             await self._ws_manager.send_instruction(chatroom_id, 'ERROR', str(e))
         
-    async def _ws_handler(self, connection: WebSocketServerProtocol):
+    async def _ws_handler(self, connection: ServerConnection):
         try:
-            user_id = self._ws_manager.verify_connection(connection.path)
+            user_id = self._ws_manager.verify_connection(connection.request.path)
         except Exception as e:
             logger.exception('ERROR!!')
             await connection.send(str(e))
