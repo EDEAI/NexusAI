@@ -125,7 +125,8 @@ class Chatrooms(MySQL):
         ]
 
         if is_temporary:    
-            conditions.append({"column": "chatrooms.is_temporary", "op": "in", "value": [1, 0]})
+            conditions.append({"column": "chatrooms.is_temporary", "value": 1})
+            # conditions.append({"column": "chatrooms.is_temporary", "op": "in", "value": [1, 0]})
         else:
             conditions.append({"column": "chatrooms.is_temporary", "value": 0})
 
