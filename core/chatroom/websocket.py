@@ -219,6 +219,7 @@ class WorkflowWebSocketManager():
                         message = await connection.recv()
                         if user_id not in self._users_with_connection:
                             await connection.close()
+                            logger.info(f'Connection {id(connection)} of user {user_id} has disconnected from Workflow WebSocket.')
                             break
                         message = json.loads(message)
                         message_type = message['type']
@@ -301,7 +302,6 @@ class WorkflowWebSocketManager():
                         break
                     except:
                         logger.exception('ERROR!!!')
-        logger.info(f'Connection {id(connection)} of user {user_id} has disconnected from Workflow WebSocket.')
     
     async def add_chatroom(self, user_id: int, chatroom_id: int):
         async with self._connection_creation_lock:
@@ -310,6 +310,7 @@ class WorkflowWebSocketManager():
                 and user_id not in self._chatrooms_by_user_id
             ):
                 self._users_with_connection.add(user_id)
+                await asyncio.sleep(0.1)
                 self._event_loop.create_task(self._start_connection(user_id))
             
             self._chatrooms_by_user_id.setdefault(user_id, set()).add(chatroom_id)
