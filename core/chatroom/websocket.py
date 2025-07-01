@@ -6,6 +6,7 @@ from typing import Any, Awaitable, Callable, Dict, Iterable, List, Optional, Set
 
 from jose import JWTError, jwt
 from websockets import (
+    CloseCode,
     ConnectionClosed,
     ServerConnection,
     broadcast, connect, serve
@@ -167,6 +168,10 @@ class WebSocketManager:
     
 
 class WorkflowWebSocketManager():
+    NOT_RUNNING = None
+    RUNNING = 1
+    EXITING = 2
+
     DEBUG_MSG = 'workflow_run_debug'
     CONFIRMATION_MSG = 'workflow_need_human_confirm'
     WAITING_FOR_CONFIRMATION_MSG = 'workflow_waiting_for_confirm'
@@ -180,13 +185,15 @@ class WorkflowWebSocketManager():
         self._event_loop = event_loop
         self._set_workflow_confirmation_status_cb = set_workflow_confirmation_status_cb
         self._set_workflow_result_cb = set_workflow_result_cb
-        self._users_with_connection: Set[int] = set()
+        self._connection_status_by_user_id: Dict[int, Optional[int]] = {}
+        self._connection_by_user_id: Dict[int, ServerConnection] = {}
         self._chatrooms_by_user_id: Dict[int, Set[int]] = {}
         # {user_id: {workflow_run_id: (Chatroom, mcp_tool_use_id)}}
         self._workflow_runs_by_user_id: Dict[int, Dict[int, Tuple['Chatroom', str]]] = {}
-        self._connection_creation_lock = asyncio.Lock() 
 
     async def _start_connection(self, user_id: int):
+        assert user_id in self._connection_status_by_user_id, f'User {user_id} is not in connection status'
+        assert self._connection_status_by_user_id[user_id] == self.RUNNING, f'User {user_id} is not running'
         logger.info(f'Starting Workflow WebSocket connection for user {user_id}...')
         token = (
             redis.get(f'access_token:{user_id}')
@@ -195,7 +202,7 @@ class WorkflowWebSocketManager():
         if not token:
             raise Exception('Invalid token')
         token = token.decode('utf-8')
-        while user_id in self._users_with_connection:
+        while self._connection_status_by_user_id[user_id] == self.RUNNING:
             try:
                 connection = await connect(
                     f'ws://127.0.0.1:{settings.WEBSOCKET_PORT}/ws?token={token}',
@@ -214,10 +221,11 @@ class WorkflowWebSocketManager():
                 await asyncio.sleep(5)
             else:
                 logger.info(f'User {user_id} connected to Workflow WebSocket. Connection ID: {id(connection)}')
+                self._connection_by_user_id[user_id] = connection
                 while True:
                     try:
                         message = await connection.recv()
-                        if user_id not in self._users_with_connection:
+                        if self._connection_status_by_user_id[user_id] != self.RUNNING:
                             await connection.close()
                             logger.info(f'Connection {id(connection)} of user {user_id} has disconnected from Workflow WebSocket.')
                             break
@@ -298,38 +306,59 @@ class WorkflowWebSocketManager():
                                             await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
                         # Else ignore the message
                     except ConnectionClosed as e:
-                        logger.info(f'Connection {id(connection)} of user {user_id} closed: {e}. Reconnecting...')
+                        if e.rcvd.code == CloseCode.NORMAL_CLOSURE:
+                            logger.info(f'Connection {id(connection)} of user {user_id} has disconnected from Workflow WebSocket.')
+                        else:
+                            logger.info(f'Connection {id(connection)} of user {user_id} closed: {e}. Reconnecting...')
                         break
                     except:
                         logger.exception('ERROR!!!')
+        self._connection_by_user_id.pop(user_id, None)
+        del self._connection_status_by_user_id[user_id]
     
-    async def add_chatroom(self, user_id: int, chatroom_id: int):
-        async with self._connection_creation_lock:
-            if (
-                user_id not in self._users_with_connection
-                and user_id not in self._chatrooms_by_user_id
-            ):
-                self._users_with_connection.add(user_id)
-                await asyncio.sleep(0.1)
+    def add_chatroom(self, user_id: int, chatroom_id: int):
+        connection_status = self._connection_status_by_user_id.get(user_id)
+        if (
+            connection_status != self.RUNNING
+            and user_id not in self._chatrooms_by_user_id
+        ):
+            logger.info(
+                f'Status of Workflow WebSocket connection for user {user_id} changed from '
+                f'{"EXITING" if connection_status == self.EXITING else "NOT RUNNING"} to RUNNING'
+            )
+            if user_id not in self._connection_status_by_user_id:
                 self._event_loop.create_task(self._start_connection(user_id))
             
+            self._connection_status_by_user_id[user_id] = self.RUNNING
             self._chatrooms_by_user_id.setdefault(user_id, set()).add(chatroom_id)
     
-    def remove_chatroom(self, user_id: int, chatroom_id: int):
+    async def remove_chatroom(self, user_id: int, chatroom_id: int):
+        connection_status = self._connection_status_by_user_id.get(user_id)
         if user_id in self._chatrooms_by_user_id:
             self._chatrooms_by_user_id[user_id].discard(chatroom_id)
             if not self._chatrooms_by_user_id[user_id]:
                 del self._chatrooms_by_user_id[user_id]
         if user_id not in self._chatrooms_by_user_id:
-            self._users_with_connection.discard(user_id)
+            if connection_status is None:
+                logger.info(
+                    f'Status of Workflow WebSocket connection for user {user_id} is NOT RUNNING'
+                )
+            else:
+                logger.info(
+                    f'Status of Workflow WebSocket connection for user {user_id} changed from '
+                    'RUNNING to EXITING'
+                )
+                self._connection_status_by_user_id[user_id] = self.EXITING
+                if connection := self._connection_by_user_id.get(user_id):
+                    await connection.close()
 
     def add_workflow_run(self, user_id: int, workflow_run_id: int, chatroom: 'Chatroom', mcp_tool_use_id: str):
-        assert user_id in self._users_with_connection, f'No Websocket connection for user {user_id}'
+        assert self._connection_status_by_user_id.get(user_id) == self.RUNNING, f'No Websocket connection for user {user_id}'
         assert user_id in self._chatrooms_by_user_id, f'No chatroom for user {user_id}'
         self._workflow_runs_by_user_id.setdefault(user_id, {})[workflow_run_id] = (chatroom, mcp_tool_use_id)
     
     def remove_workflow_run(self, user_id: int, workflow_run_id: int):
-        assert user_id in self._users_with_connection, f'No Websocket connection for user {user_id}'
+        assert self._connection_status_by_user_id.get(user_id) == self.RUNNING, f'No Websocket connection for user {user_id}'
         assert user_id in self._chatrooms_by_user_id, f'No chatroom for user {user_id}'
         if user_id in self._workflow_runs_by_user_id:
             self._workflow_runs_by_user_id[user_id].pop(workflow_run_id, None)
