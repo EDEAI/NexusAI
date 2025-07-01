@@ -526,15 +526,16 @@ class Chatroom:
         )
         return chatroom_message_id
     
-    def _update_chatroom_message(self, chatroom_message_id: int, message: str) -> None:
+    def _update_chatroom_message(self, chatroom_message_id: int, message: str, update_last_chat_time: bool = True) -> None:
         chatroom_messages.update(
             {'column': 'id', 'value': chatroom_message_id},
             {'message': message}
         )
-        chatrooms.update(
-            {'column': 'id', 'value': self._chatroom_id},
-            {'last_chat_time': str(datetime.now())}
-        )
+        if update_last_chat_time:
+            chatrooms.update(
+                {'column': 'id', 'value': self._chatroom_id},
+                {'last_chat_time': str(datetime.now())}
+            )
     
     def _update_chatroom_message_and_token_usage(
         self, chatroom_message_id: int, message: str,
@@ -593,7 +594,7 @@ class Chatroom:
             {'id': mcp_tool_use_id, 'status': status}
         )
 
-    async def _stop_all_mcp_tool_uses(self, result: str) -> None:
+    async def stop_all_mcp_tool_uses(self, result: str) -> None:
         self._mcp_tool_use_is_interrupted = True
         for mcp_tool_use in self._mcp_tool_uses:
             if mcp_tool_use['result'] is None:
@@ -609,7 +610,8 @@ class Chatroom:
                 mcp_tool_use['result'] = result
                 self._update_chatroom_message(
                     self._current_agent_message_id,
-                    self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
+                    self._get_agent_message_with_mcp_tool_uses(self._current_agent_message),
+                    update_last_chat_time=False
                 )
                 await self._ws_manager.send_instruction(
                     self._chatroom_id,
@@ -619,11 +621,6 @@ class Chatroom:
                 if workflow_run_id := mcp_tool_use['workflow_run_id']:
                     self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
         self._mcp_tool_use_lock.set()
-
-    async def interrupt_all_mcp_tool_uses(self) -> None:
-        if not self._mcp_tool_is_using:
-            raise Exception('There is no MCP tool use!')
-        await self._stop_all_mcp_tool_uses('Interrupted')
 
     async def _start_mcp_tool_uses(self) -> None:
         # Send the MCP tool use instructions to the frontend
@@ -709,7 +706,7 @@ class Chatroom:
                             )
                             result = json.dumps(result_dict, ensure_ascii=False)
                     except asyncio.TimeoutError:
-                        await self._stop_all_mcp_tool_uses('Timeout')
+                        await self.stop_all_mcp_tool_uses('Timeout')
                         break
                     except Exception as e:
                         logger.exception('ERROR!!')
@@ -738,7 +735,7 @@ class Chatroom:
                     self._mcp_tool_use_lock.clear()
                     await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
                 except asyncio.TimeoutError:
-                    await self._stop_all_mcp_tool_uses('Timeout')
+                    await self.stop_all_mcp_tool_uses('Timeout')
                     break
 
     def _append_mcp_tool_uses_to_history_messages(self, agent_id: int) -> None:
@@ -762,6 +759,7 @@ class Chatroom:
             })
 
     async def _talk_to_agent(self, agent_id: int) -> None:
+        reply_started = False
         try:
             # Check if there is a temporary dataset for this chatroom
             override_dataset = datasets.select_one(
@@ -772,7 +770,6 @@ class Chatroom:
                 ]
             )
 
-            self._current_agent_message_id = self._create_chatroom_message(agent_id)
             self._current_agent_message = ''
             prompt_tokens = 0
             completion_tokens = 0
@@ -817,6 +814,10 @@ class Chatroom:
                     mcp_tool_list=self._desktop_mcp_tool_list,
                     is_desktop=self._is_desktop
                 ):
+                    if not reply_started:
+                        await self._ws_manager.start_agent_reply(self._chatroom_id, agent_id, self._ability_id)
+                        self._current_agent_message_id = self._create_chatroom_message(agent_id)
+                        reply_started = True
                     if isinstance(chunk, int):
                         # Agent run ID
                         app_runs.set_chatroom_message_id(chunk, self._current_agent_message_id)
@@ -858,7 +859,6 @@ class Chatroom:
                             self._current_agent_message += content
                             await self._ws_manager.send_agent_reply(
                                 self._chatroom_id,
-                                agent_id, self._ability_id,
                                 content, agent_message, new_text
                             )
                             new_text = False
@@ -873,7 +873,6 @@ class Chatroom:
                                             self._current_agent_message += item_text
                                             await self._ws_manager.send_agent_reply(
                                                 self._chatroom_id,
-                                                agent_id, self._ability_id,
                                                 item_text, agent_message, new_text
                                             )
                                             new_text = False
@@ -898,9 +897,6 @@ class Chatroom:
                     'type': 'text',
                     'message': agent_message
                 })
-                
-                if self._terminate():
-                    break
 
                 if not self._mcp_tool_uses:
                     # No MCP tool use, stop invoking the LLM
@@ -915,9 +911,16 @@ class Chatroom:
                         self._get_agent_message_with_mcp_tool_uses(self._current_agent_message),
                         prompt_tokens, completion_tokens, total_tokens
                     )
+                    if self._terminate():
+                        break
+
                     new_text = False
                     self._mcp_tool_is_using = True
                     self._mcp_tool_use_is_interrupted = False
+                    await self._ws_manager.send_agent_reply(
+                        self._chatroom_id,
+                        '', agent_message, False
+                    )
 
                     await self._start_mcp_tool_uses()
                     await self._wait_for_mcp_tool_uses()
@@ -939,7 +942,6 @@ class Chatroom:
                 if self._terminate():
                     break
 
-            await self._ws_manager.end_agent_reply(self._chatroom_id)
             self._last_speaker_id = agent_id
             app_runs.increment_steps(self._app_run_id)
             app_runs.increment_token_usage(
@@ -947,6 +949,8 @@ class Chatroom:
                 prompt_tokens, completion_tokens, total_tokens
             )
         finally:
+            if reply_started:
+                await self._ws_manager.end_agent_reply(self._chatroom_id, agent_id)
             self._console_log('\033[0m')  # Reset the color
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
             if not has_connections:

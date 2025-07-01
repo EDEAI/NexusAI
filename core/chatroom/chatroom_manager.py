@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from websockets import (
     ConnectionClosed,
-    WebSocketServerProtocol
+    ServerConnection
 )
 
 from .chatroom import Chatroom
@@ -266,11 +266,11 @@ class ChatroomManager:
         user_input: Optional[str] = None
     ) -> None:
         try:
-            if chatroom_id in self._chatrooms:
+            # Interrupt all MCP tool uses and wait for the chatroom to be terminated, when the chatroom is resumed
+            if user_input is None and chatroom_id in self._chatrooms:
                 chatroom = self._chatrooms[chatroom_id]
                 if chatroom.mcp_tool_is_using:
-                    # Interrupt all MCP tool uses and wait for the chatroom to be terminated
-                    await chatroom.interrupt_all_mcp_tool_uses()
+                    await chatroom.stop_all_mcp_tool_uses('Interrupted')
                     while chatroom_id in self._chatrooms:
                         await asyncio.sleep(0.1)
 
@@ -284,9 +284,9 @@ class ChatroomManager:
             logger.exception('ERROR!!')
             await self._ws_manager.send_instruction(chatroom_id, 'ERROR', str(e))
         
-    async def _ws_handler(self, connection: WebSocketServerProtocol):
+    async def _ws_handler(self, connection: ServerConnection):
         try:
-            user_id = self._ws_manager.verify_connection(connection.path)
+            user_id = self._ws_manager.verify_connection(connection.request.path)
         except Exception as e:
             logger.exception('ERROR!!')
             await connection.send(str(e))
@@ -303,7 +303,7 @@ class ChatroomManager:
                 instruction_str = await connection.recv()
                 try:
                     cmd, data = self._ws_manager.parse_instruction(instruction_str)
-                    logger.info(f'cmd: {cmd}, data: {data}')
+                    logger.info(f'cmd: {cmd}, data: {str(data) if len(str(data)) < 500 else str(data)[:500] + "..."}')
                     match cmd:
                         case 'ENTER':
                             # Enter a chatroom
@@ -377,6 +377,7 @@ class ChatroomManager:
                                         {'chat_status': 0}
                                     )
                                     await self._ws_manager.send_instruction(chatroom_id, 'STOPPABLE', False)
+                                    await self._chatrooms[chatroom_id].stop_all_mcp_tool_uses('Interrupted by user')
                                 case _:
                                     raise Exception(f'Unknown command: {cmd}')
                 except Exception as e:

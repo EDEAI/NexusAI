@@ -94,6 +94,6 @@ def extract_file_list_from_skill_output(outputs: dict, node_data_dict: dict) -> 
                 file_list.append({
                     "file_name": file_name,
                     "file_path": full_path,
-                    "variable_name": var.display_name if var.display_name else var.name
+                    "variable_name": var.display_name if hasattr(var, 'display_name') and var.display_name else var.name
                 })
     return file_list

@@ -106,7 +106,7 @@ class Chatrooms(MySQL):
         else:
             return {'status': 0}
 
-    def all_chat_room_list(self, page: int = 1, page_size: int = 10, uid: int = 0, name: str = ""):
+    def all_chat_room_list(self, page: int = 1, page_size: int = 10, uid: int = 0, name: str = "", is_temporary: bool = False):
         """
         Retrieves a list of chat rooms with pagination, filtering by user ID and chat room name.
 
@@ -122,8 +122,13 @@ class Chatrooms(MySQL):
             {"column": "apps.mode", "value": 5},
             {"column": "chatrooms.user_id", "value": uid},
             {"column": "chatrooms.chat_agent_id", "value": 0},
-            {"column": "chatrooms.is_temporary", "value": 0},
         ]
+
+        if is_temporary:    
+            # conditions.append({"column": "chatrooms.is_temporary", "value": 1})
+            conditions.append({"column": "chatrooms.is_temporary", "op": "in", "value": [1, 0]})
+        else:
+            conditions.append({"column": "chatrooms.is_temporary", "value": 0})
 
         if name:
             conditions.append({"column": "apps.name", "op": "like", "value": "%" + name + "%"})
@@ -145,6 +150,7 @@ class Chatrooms(MySQL):
                 "chatrooms.active",
                 "chatrooms.status as chatroom_status",
                 "chatrooms.smart_selection",
+                "chatrooms.is_temporary",
                 "apps.id as app_id"
             ],
             joins=[
