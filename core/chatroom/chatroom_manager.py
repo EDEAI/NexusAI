@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from websockets import (
     ConnectionClosed,
-    WebSocketServerProtocol
+    ServerConnection
 )
 
 from .chatroom import Chatroom
@@ -225,7 +225,7 @@ class ChatroomManager:
                     self._desktop_mcp_tool_list_by_chatroom.get(chatroom_id)
                 )
                 self._chatrooms[chatroom_id] = chatroom
-                self._workflow_ws_manager.add_chatroom(user_id, chatroom_id)
+                await self._workflow_ws_manager.add_chatroom(user_id, chatroom_id)
                 chatroom.load_history_messages(history_messages)
                 await chatroom.chat(user_input is None, file_list)
             end_time = time()
@@ -256,7 +256,7 @@ class ChatroomManager:
                 {'chat_status': 0}
             )
             self._chatrooms.pop(chatroom_id, None)
-            await self._workflow_ws_manager.remove_chatroom(user_id, chatroom_id)
+            self._workflow_ws_manager.remove_chatroom(user_id, chatroom_id)
         
     async def _handle_data_and_start_chatroom(
         self,
@@ -284,9 +284,9 @@ class ChatroomManager:
             logger.exception('ERROR!!')
             await self._ws_manager.send_instruction(chatroom_id, 'ERROR', str(e))
         
-    async def _ws_handler(self, connection: WebSocketServerProtocol):
+    async def _ws_handler(self, connection: ServerConnection):
         try:
-            user_id = self._ws_manager.verify_connection(connection.path)
+            user_id = self._ws_manager.verify_connection(connection.request.path)
         except Exception as e:
             logger.exception('ERROR!!')
             await connection.send(str(e))
@@ -303,7 +303,7 @@ class ChatroomManager:
                 instruction_str = await connection.recv()
                 try:
                     cmd, data = self._ws_manager.parse_instruction(instruction_str)
-                    logger.info(f'cmd: {cmd}, data: {data}')
+                    logger.info(f'cmd: {cmd}, data: {str(data) if len(str(data)) < 500 else str(data)[:500] + "..."}')
                     match cmd:
                         case 'ENTER':
                             # Enter a chatroom
