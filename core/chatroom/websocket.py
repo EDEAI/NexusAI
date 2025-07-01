@@ -213,7 +213,7 @@ class WorkflowWebSocketManager():
                 logger.exception(f'Workflow WebSocket connection of user {user_id} failed: {e}. Reconnecting...')
                 await asyncio.sleep(5)
             else:
-                logger.info(f'User {user_id} connected to Workflow WebSocket.')
+                logger.info(f'User {user_id} connected to Workflow WebSocket. Connection ID: {id(connection)}')
                 while True:
                     try:
                         message = await connection.recv()
@@ -233,7 +233,7 @@ class WorkflowWebSocketManager():
                             message_data = message['data']
                             chatroom, mcp_tool_use_id = workflow_runs[workflow_run_id]
                             if message_type == self.CONFIRMATION_MSG:
-                                logger.info(f'User {user_id} received workflow message: {message}')
+                                logger.info(f'Connection {id(connection)} of user {user_id} received workflow message: {message}')
                                 status = {
                                     'id': message_data['workflow_id'],
                                     'status': 'waiting_confirm',
@@ -245,7 +245,7 @@ class WorkflowWebSocketManager():
                                 }
                                 await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
                             elif message_type == self.WAITING_FOR_CONFIRMATION_MSG:
-                                logger.info(f'User {user_id} received workflow message: {message}')
+                                logger.info(f'Connection {id(connection)} of user {user_id} received workflow message: {message}')
                                 user_names = [user['nickname'] for user in message_data['waiting_users']]
                                 status = {
                                     'id': message_data['workflow_id'],
@@ -261,7 +261,7 @@ class WorkflowWebSocketManager():
                             elif message_type == self.DEBUG_MSG:
                                 if message_data['status'] == 3:
                                     # Workflow execution failed
-                                    logger.info(f'User {user_id} received workflow message: {message}')
+                                    logger.info(f'Connection {id(connection)} of user {user_id} received workflow message: {message}')
                                     self.remove_workflow_run(user_id, workflow_run_id)
                                     result = {
                                         'status': 'failed',
@@ -274,7 +274,7 @@ class WorkflowWebSocketManager():
                                 else:
                                     if message_data['node_exec_data']['node_type'] == 'end':
                                         # Success
-                                        logger.info(f'User {user_id} received workflow message: {message}')
+                                        logger.info(f'Connection {id(connection)} of user {user_id} received workflow message: {message}')
                                         self.remove_workflow_run(user_id, workflow_run_id)
                                         result = {
                                             'status': 'success',
@@ -287,7 +287,7 @@ class WorkflowWebSocketManager():
                                     else:
                                         if message_data['need_human_confirm'] == 0:
                                             # Running
-                                            logger.info(f'User {user_id} received workflow message: {message}')
+                                            logger.info(f'Connection {id(connection)} of user {user_id} received workflow message: {message}')
                                             status = {
                                                 'id': message_data['workflow_id'],
                                                 'status': 'running',
@@ -297,11 +297,11 @@ class WorkflowWebSocketManager():
                                             await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
                         # Else ignore the message
                     except ConnectionClosed as e:
-                        logger.info(f'Workflow WebSocket connection of user {user_id} closed: {e}. Reconnecting...')
+                        logger.info(f'Connection {id(connection)} of user {user_id} closed: {e}. Reconnecting...')
                         break
                     except:
                         logger.exception('ERROR!!!')
-        logger.info(f'User {user_id} has disconnected from Workflow WebSocket.')
+        logger.info(f'Connection {id(connection)} of user {user_id} has disconnected from Workflow WebSocket.')
     
     async def add_chatroom(self, user_id: int, chatroom_id: int):
         async with self._connection_creation_lock:
