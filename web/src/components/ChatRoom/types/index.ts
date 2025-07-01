@@ -118,4 +118,39 @@ export interface StreamingMessage {
     // Legacy fields for backward compatibility
     content?: string;
     activeMCPTools?: (string | number)[];
+}
+
+// Content detection types
+export interface MessageContentAnalysis {
+    hasText: boolean;
+    hasFiles: boolean;
+    hasParsedMCP: boolean;
+    hasContentBlocksMCP: boolean;
+    hasActiveMCP: boolean;
+    hasStreamingText: boolean;
+    textLength: number;
+    fileCount: number;
+    mcpToolCount: number;
+    blockCount: number;
+}
+
+export interface ContentDetectionConfig {
+    checkText?: boolean;
+    checkFiles?: boolean;
+    checkMCPTools?: boolean;
+    checkStreaming?: boolean;
+    minTextLength?: number;
+}
+
+export interface MessageWithContent {
+    content?: string;
+    fileList?: any[];
+    file_list?: any[];
+    parsedContent?: {
+        hasMCPTools?: boolean;
+        [key: string]: any;
+    };
+    contentBlocks?: ContentBlock[];
+    activeMCPTools?: (string | number)[];
+    [key: string]: any;
 } 

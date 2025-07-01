@@ -446,7 +446,7 @@ export const MCPToolDisplay: FC<MCPToolDisplayProps> = ({ toolData, intl, runtim
                         <div className="flex items-center gap-2">
                             <UserOutlined className="text-orange-500" />
                             <Text className="text-sm font-medium">
-                                {intl.formatMessage({ id: 'app.chatroom.mcptool.workflow' })}: {workflowConfirmation.workflow_name}
+                                {intl.formatMessage({ id: 'app.chatroom.mcptool.workflow' })}: {runtimeData?.skill_or_workflow_name || toolData.skill_or_workflow_name}
                             </Text>
                             {workflowConfirmation.confirmer_name && (
                                 <Text className="text-xs text-gray-600">

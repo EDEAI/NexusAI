@@ -23,6 +23,7 @@ interface inputFieldParameters {
     abilitiesList?: any;
     agentChatRoomId?: any;
     agentList?: any;
+    chatStatus?: any;
 }
 
 export const InputField: FC<inputFieldParameters> = memo(props => {
@@ -35,6 +36,7 @@ export const InputField: FC<inputFieldParameters> = memo(props => {
         agentList,
         abilitiesList,
         agentChatRoomId,
+        chatStatus,
     } = props;
     
     const intl = useIntl();

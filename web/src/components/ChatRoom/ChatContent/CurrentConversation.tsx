@@ -1,12 +1,13 @@
 /*
  * @LastEditors: biz
  */
-import React, { FC, memo, useEffect, useState } from 'react';
+import React, { FC, memo, useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'umi';
 import { Chatwindow } from '../ChatWindow';
 import { MessageItem } from '../MessageDisplay/MessageItem';
 import { MCPToolRuntimeData } from '../types/mcp';
 import { WaitingReplyIndicator } from './WaitingReplyIndicator';
+import { checkLastAgentMessage } from '../utils';
 
 interface CurrentConversationProps {
     messageApi?: any;
@@ -47,6 +48,10 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
     const [isEnd, setisEnd] = useState(false);
     const [isWaitingReply, setIsWaitingReply] = useState(false);
     
+    // State management for preventing duplicate history processing
+    const hasProcessedHistory = useRef(false);
+    const setCurrentMessageFromHistoryCallback = useRef<((message: any) => void) | null>(null);
+    
     const { id: urlParamId } = useParams<{ id: string }>();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -66,6 +71,73 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
             }, 200);
         }
     }, [isEnd]);
+
+    // Monitor history message changes and automatically set last Agent message as CurrentMessage
+    useEffect(() => {
+        // Prevent duplicate processing
+        if (hasProcessedHistory.current) {
+            return;
+        }
+        
+        // Boundary check: ensure userMessage is valid array
+        if (!userMessage || !Array.isArray(userMessage) || userMessage.length === 0) {
+            return;
+        }
+
+        // Boundary check: ensure callback is available
+        if (!setCurrentMessageFromHistoryCallback.current) {
+            console.warn('setCurrentMessageFromHistory callback not available');
+            return;
+        }
+
+        try {
+            // Check for the last Agent message
+            const lastAgentMessage = checkLastAgentMessage(userMessage);
+            
+            if (lastAgentMessage) {
+                // Additional validation before setting as current message
+                if (!lastAgentMessage.id) {
+                    console.warn('Found agent message without ID, skipping:', lastAgentMessage);
+                    hasProcessedHistory.current = true;
+                    return;
+                }
+
+                // Set as CurrentMessage (via callback)
+                setCurrentMessageFromHistoryCallback.current(lastAgentMessage);
+                
+                // Remove this message from history with safety check
+                if (setUserMessage) {
+                    const updatedHistory = userMessage.filter(msg => msg !== lastAgentMessage);
+                    setUserMessage(updatedHistory);
+                } else {
+                    console.warn('setUserMessage not available for history update');
+                }
+                
+                // Mark as processed to prevent repeated execution
+                hasProcessedHistory.current = true;
+            }
+        } catch (error) {
+            console.error('Failed to process history message:', error, {
+                userMessageLength: userMessage?.length,
+                hasCallback: !!setCurrentMessageFromHistoryCallback.current
+            });
+            // Mark as processed even on error to avoid loop attempts
+            hasProcessedHistory.current = true;
+        }
+    }, [userMessage, setUserMessage]);
+
+    // Reset processing flag when chat room ID changes
+    useEffect(() => {
+        hasProcessedHistory.current = false;
+    }, [id]);
+
+    // Helper function to remove message from history (userMessage)
+    const removeHistoryMessage = (messageToRemove: any) => {
+        if (setUserMessage && userMessage) {
+            const updatedHistory = userMessage.filter(msg => msg !== messageToRemove);
+            setUserMessage(updatedHistory);
+        }
+    };
 
     return (
         <>
@@ -106,6 +178,10 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
                 mcpTools={mcpTools}
                 getMCPTool={getMCPTool}
                 setIsWaitingReply={setIsWaitingReply}
+                removeHistoryMessage={removeHistoryMessage}
+                setCurrentMessageFromHistory={(callback) => {
+                    setCurrentMessageFromHistoryCallback.current = callback;
+                }}
             />
         </>
     );

@@ -63,7 +63,6 @@
     "antd-style": "^3.6.1",
     "autoprefixer": "^10.4.19",
     "classnames": "^2.5.1",
-    "copy-to-clipboard": "^3.3.3",
     "dagre": "^0.8.5",
     "fuse.js": "^7.0.0",
     "lexical": "^0.17.0",

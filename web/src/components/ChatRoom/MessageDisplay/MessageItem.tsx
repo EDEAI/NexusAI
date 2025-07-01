@@ -8,6 +8,7 @@ import { userinfodata } from '@/utils/useUser';
 import { MessageContent } from './MessageContent';
 import { MessageActions } from './MessageActions';
 import { MCPToolRuntimeData } from '../types/mcp';
+import { hasMessageContent } from '../utils';
 
 interface MessageItemProps {
     item: any;
@@ -39,6 +40,11 @@ export const MessageItem: FC<MessageItemProps> = props => {
     } = props;
     const intl = useIntl();
     const isAgent = item.is_agent === 1;
+
+    // New: Smart content check - hide empty historical messages
+    if (!hasMessageContent(item)) {
+        return null;
+    }
 
     return (
         <div

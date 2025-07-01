@@ -4,7 +4,7 @@
 import React from 'react';
 import { Button, Image } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
-import copy from 'copy-to-clipboard';
+import { copyToClipboard } from '../utils/clipboard';
 import { extractTextFromArray } from '../utils';
 
 // Markdown renderers for code blocks and images
@@ -25,17 +25,28 @@ export const createRenderers = (index: any, intl: any) => {
                                 onClick={async (e: any) => {
                                     try {
                                         let ct = e.currentTarget;
-                                        await copy(extractTextFromArray(children));
-                                        if (ct)
+                                        const success = await copyToClipboard(extractTextFromArray(children));
+                                        if (success && ct) {
                                             ct.children[1].innerText = intl.formatMessage({
                                                 id: 'app.chatroom.content.copySucceed',
                                             });
-                                        setTimeout(() => {
-                                            if (ct)
-                                                ct.children[1].innerText = intl.formatMessage({
-                                                    id: 'app.chatroom.content.copycode',
-                                                });
-                                        }, 200);
+                                            setTimeout(() => {
+                                                if (ct)
+                                                    ct.children[1].innerText = intl.formatMessage({
+                                                        id: 'app.chatroom.content.copycode',
+                                                    });
+                                            }, 200);
+                                        } else if (ct) {
+                                            ct.children[1].innerText = intl.formatMessage({
+                                                id: 'app.chatroom.content.copyFailed',
+                                            }) || 'Copy failed';
+                                            setTimeout(() => {
+                                                if (ct)
+                                                    ct.children[1].innerText = intl.formatMessage({
+                                                        id: 'app.chatroom.content.copycode',
+                                                    });
+                                            }, 1000);
+                                        }
                                     } catch (err) {
                                         console.error('Failed to copy text: ', err);
                                     }

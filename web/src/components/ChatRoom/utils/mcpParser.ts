@@ -2,6 +2,7 @@
  * @LastEditors: biz
  */
 import { MCPToolData, ContentBlock, ParsedMCPContent, MCPToolRuntimeData } from '../types/mcp';
+import { ContentBlock as StreamingContentBlock } from '../types';
 
 const MCP_START_TAG = '<<<mcp-tool-start>>>';
 const MCP_END_TAG = '<<<mcp-tool-end>>>';
@@ -212,4 +213,63 @@ export const getAllMCPToolsFromMessage = (message: any): MCPToolRuntimeData[] =>
     
     // Sort by converting to string for consistent ordering
     return [...message.mcpTools].sort((a, b) => String(a.id).localeCompare(String(b.id)));
+};
+
+/**
+ * Serialize MCP tool runtime data to content string format
+ */
+export const serializeMCPToolToContent = (toolData: MCPToolRuntimeData): string => {
+    try {
+        const mcpToolData: MCPToolData = {
+            id: toolData.id,
+            name: toolData.name,
+            skill_or_workflow_name: toolData.skill_or_workflow_name,
+            workflow_run_id: toolData.workflow_run_id,
+            workflow_confirmation_status: toolData.workflow_confirmation_status,
+            args: toolData.args,
+            result: toolData.result
+        };
+        
+        const jsonContent = JSON.stringify(mcpToolData, null, 0);
+        return `${MCP_START_TAG}${jsonContent}${MCP_END_TAG}`;
+    } catch (error) {
+        console.error('Failed to serialize MCP tool:', error);
+        return '';
+    }
+};
+
+/**
+ * Reconstruct content string with updated MCP tool states from contentBlocks
+ */
+export const reconstructContentWithUpdatedMCPTools = (
+    contentBlocks: StreamingContentBlock[], 
+    getMCPTool: (id: string | number) => MCPToolRuntimeData | null
+): string => {
+    try {
+        if (!contentBlocks || !Array.isArray(contentBlocks)) {
+            console.warn('reconstructContentWithUpdatedMCPTools: contentBlocks is not a valid array');
+            return '';
+        }
+
+        let reconstructedContent = '';
+
+        contentBlocks.forEach(block => {
+            if (block.type === 'text') {
+                reconstructedContent += block.content || '';
+            } else if (block.type === 'mcp' && block.toolId) {
+                const runtimeToolData = getMCPTool(block.toolId);
+                if (runtimeToolData) {
+                    const serializedTool = serializeMCPToolToContent(runtimeToolData);
+                    reconstructedContent += serializedTool;
+                } else {
+                    console.warn(`MCP tool ${block.toolId} not found in runtime data`);
+                }
+            }
+        });
+
+        return reconstructedContent;
+    } catch (error) {
+        console.error('Failed to reconstruct content with updated MCP tools:', error);
+        return '';
+    }
 }; 

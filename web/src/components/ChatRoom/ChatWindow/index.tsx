@@ -1,7 +1,7 @@
 /*
  * @LastEditors: biz
  */
-import React, { FC, memo, useEffect, useRef, useState } from 'react';
+import React, { FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from '@umijs/max';
 import { useLocation, useParams } from 'umi';
 import useWebSocketManager from '@//hooks/useSocket';
@@ -9,6 +9,7 @@ import useChatroomStore from '@/store/chatroomstate';
 import { useMessageHandler } from './MessageHandler';
 import { CurrentMessage } from './CurrentMessage';
 import { MCPToolRuntimeData } from '../types/mcp';
+import { prepareHistoryMessageForCurrent } from '../utils';
 
 interface chatwindowParameters {
     setisEnd?: any;
@@ -26,6 +27,8 @@ interface chatwindowParameters {
     mcpTools?: Record<string | number, MCPToolRuntimeData>;
     getMCPTool?: (id: string | number) => MCPToolRuntimeData | null;
     setIsWaitingReply?: (waiting: boolean) => void;
+    removeHistoryMessage?: (message: any) => void;
+    setCurrentMessageFromHistory?: (message: any) => void;
 }
 
 export const Chatwindow: FC<chatwindowParameters> = memo(props => {
@@ -45,6 +48,8 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
         mcpTools = {},
         getMCPTool = () => null,
         setIsWaitingReply,
+        removeHistoryMessage,
+        setCurrentMessageFromHistory,
     } = props;
     
     const intl = useIntl();
@@ -58,6 +63,52 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
     const [currentMessage, setCurrentMessage]: any = useState({});
     const chatReturn = useRef(false);
     const agentText = useRef('');
+
+    // Handle setting current message from history
+    const handleSetCurrentMessageFromHistory = useCallback((historyMessage: any) => {
+        try {
+            // Boundary check: validate history message
+            if (!historyMessage || typeof historyMessage !== 'object') {
+                console.warn('Invalid history message provided:', historyMessage);
+                return;
+            }
+
+            // Boundary check: ensure it's an agent message
+            if (historyMessage.is_agent !== 1) {
+                console.warn('Attempted to set non-agent message as current:', historyMessage);
+                return;
+            }
+
+            const preparedMessage = prepareHistoryMessageForCurrent(
+                historyMessage, 
+                getMCPTool
+            );
+            
+            // Boundary check: validate prepared message
+            if (!preparedMessage) {
+                console.warn('Failed to prepare history message:', historyMessage);
+                return;
+            }
+            
+            setCurrentMessage(preparedMessage);
+            
+            // 关键改动：设置为true以允许后续流式文本追加
+            chatReturn.current = true;
+            
+            // 初始化agentText为当前内容，以便正确累积
+            agentText.current = preparedMessage.content || '';
+            
+        } catch (error) {
+            console.error('Failed to set current message from history:', error);
+        }
+    }, [getMCPTool]);
+
+    // Expose the handler to parent component
+    useEffect(() => {
+        if (setCurrentMessageFromHistory) {
+            setCurrentMessageFromHistory(handleSetCurrentMessageFromHistory);
+        }
+    }, [setCurrentMessageFromHistory, handleSetCurrentMessageFromHistory]);
 
     const { getSocketMessage } = useMessageHandler(
         setDisableInput,
@@ -74,7 +125,9 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
         chatReturn,
         updateMCPTool,
         getCurrentMessageList,
-        setIsWaitingReply
+        setIsWaitingReply,
+        getMCPTool,
+        removeHistoryMessage
     );
 
     const { runSocket, sendMessage, readyState } = useWebSocketManager('chat', getSocketMessage);

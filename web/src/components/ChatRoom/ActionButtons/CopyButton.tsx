@@ -3,7 +3,7 @@
  */
 import React, { FC, memo, useState } from 'react';
 import { useIntl } from '@umijs/max';
-import copy from 'copy-to-clipboard';
+import { copyToClipboard } from '../utils/clipboard';
 
 interface CopyButtonProps {
     messageApi?: any;
@@ -31,14 +31,27 @@ export const CopyButton: FC<CopyButtonProps> = memo(props => {
                     const dom = e.target.closest(`#${idName}${index}`);
                     const childElement = dom.querySelector(`#${cidName}${index}`);
                     try {
-                        await copy(childElement.innerText);
-                        messageApi.open({
-                            type: 'success',
-                            content: intl.formatMessage({ id: 'app.chatroom.content.copySucceed' }),
-                            duration: 2,
-                        });
+                        const success = await copyToClipboard(childElement.innerText);
+                        if (success) {
+                            messageApi.open({
+                                type: 'success',
+                                content: intl.formatMessage({ id: 'app.chatroom.content.copySucceed' }),
+                                duration: 2,
+                            });
+                        } else {
+                            messageApi.open({
+                                type: 'error',
+                                content: intl.formatMessage({ id: 'app.chatroom.content.copyFailed' }) || 'Copy failed',
+                                duration: 2,
+                            });
+                        }
                     } catch (err) {
                         console.error('Failed to copy text: ', err);
+                        messageApi.open({
+                            type: 'error',
+                            content: intl.formatMessage({ id: 'app.chatroom.content.copyFailed' }) || 'Copy failed',
+                            duration: 2,
+                        });
                     }
                 }}
             >

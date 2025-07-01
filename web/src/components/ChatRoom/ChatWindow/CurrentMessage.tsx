@@ -7,6 +7,8 @@ import { userinfodata } from '@/utils/useUser';
 import { MessageContent } from '../MessageDisplay/MessageContent';
 import { parseMCPContent } from '../utils/mcpParser';
 import { MCPToolRuntimeData } from '../types/mcp';
+import { hasMessageContent } from '../utils';
+import { Tag } from 'antd';
 
 interface CurrentMessageProps {
     currentMessage: any;
@@ -28,6 +30,10 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
     } = props;
 
     if (!currentMessage.name) {
+        return null;
+    }
+
+    if (!hasMessageContent(currentMessage)) {
         return null;
     }
 
@@ -60,6 +66,7 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
                         currentMessage.is_agent == 1 ? 'flex-row' : 'flex-row-reverse'
                     }`}
                 >
+                 
                     <MessageContent
                         content={currentMessage.content || ''}
                         fileList={currentMessage.file_list}
