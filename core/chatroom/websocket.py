@@ -107,12 +107,20 @@ class WebSocketManager:
     async def send_instruction(self, chatroom_id: int, cmd: str, data: Any = None):
         if connections := self._connections_by_chatroom_id.get(chatroom_id):
             await self.send_instruction_by_connections(connections, cmd, data)
-            
-    async def send_agent_reply(
+
+    async def start_agent_reply(
         self,
         chatroom_id: int,
         agent_id: int,
         ability_id: int,
+    ):
+        if connections := self._connections_by_chatroom_id.get(chatroom_id):
+            await self.send_instruction_by_connections(connections, 'REPLY', agent_id)
+            await self.send_instruction_by_connections(connections, 'ABILITY', ability_id)
+            
+    async def send_agent_reply(
+        self,
+        chatroom_id: int,
         current_message_chunk: str,
         full_message: str,
         new_text: bool
@@ -136,8 +144,6 @@ class WebSocketManager:
                     await self.send_instruction_by_connections(replying_connections, 'TEXT')
                 broadcast(replying_connections, current_message_chunk)
 
-            await self.send_instruction_by_connections(not_replying_connections, 'REPLY', agent_id)
-            await self.send_instruction_by_connections(not_replying_connections, 'ABILITY', ability_id)
             if full_message:
                 await self.send_instruction_by_connections(not_replying_connections, 'TEXT')
                 broadcast(not_replying_connections, full_message)
@@ -145,14 +151,15 @@ class WebSocketManager:
     async def end_agent_reply(
         self,
         chatroom_id: int,
+        agent_id: int,
     ):
         '''
         End the agent reply to the chatroom.
         '''
         if connections := self._connections_by_chatroom_id.get(chatroom_id):
+            await self.send_instruction_by_connections(connections, 'ENDREPLY', agent_id)
             for connection in connections:
                 if self._replying_status_by_connection_id[id(connection)]:
-                    await self.send_instruction_by_connection(connection, 'ENDREPLY')
                     self._replying_status_by_connection_id[id(connection)] = False
             
     def stop(self):

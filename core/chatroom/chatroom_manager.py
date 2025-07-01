@@ -303,7 +303,7 @@ class ChatroomManager:
                 instruction_str = await connection.recv()
                 try:
                     cmd, data = self._ws_manager.parse_instruction(instruction_str)
-                    logger.info(f'cmd: {cmd}, data: {data}')
+                    logger.info(f'cmd: {cmd}, data: {str(data) if len(str(data)) < 500 else str(data)[:500] + "..."}')
                     match cmd:
                         case 'ENTER':
                             # Enter a chatroom

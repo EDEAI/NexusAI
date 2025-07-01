@@ -764,6 +764,7 @@ class Chatroom:
             })
 
     async def _talk_to_agent(self, agent_id: int) -> None:
+        reply_started = False
         try:
             # Check if there is a temporary dataset for this chatroom
             override_dataset = datasets.select_one(
@@ -823,6 +824,9 @@ class Chatroom:
                         # Agent run ID
                         app_runs.set_chatroom_message_id(chunk, self._current_agent_message_id)
                         continue
+                    if not reply_started:
+                        await self._ws_manager.start_agent_reply(self._chatroom_id, agent_id, self._ability_id)
+                        reply_started = True
                     if tool_call_chunks := chunk.tool_call_chunks:
                         for tool_call_chunk in tool_call_chunks:
                             if tool_call_chunk['type'] == 'tool_call_chunk':
@@ -860,7 +864,6 @@ class Chatroom:
                             self._current_agent_message += content
                             await self._ws_manager.send_agent_reply(
                                 self._chatroom_id,
-                                agent_id, self._ability_id,
                                 content, agent_message, new_text
                             )
                             new_text = False
@@ -875,7 +878,6 @@ class Chatroom:
                                             self._current_agent_message += item_text
                                             await self._ws_manager.send_agent_reply(
                                                 self._chatroom_id,
-                                                agent_id, self._ability_id,
                                                 item_text, agent_message, new_text
                                             )
                                             new_text = False
@@ -922,7 +924,6 @@ class Chatroom:
                     self._mcp_tool_use_is_interrupted = False
                     await self._ws_manager.send_agent_reply(
                         self._chatroom_id,
-                        agent_id, self._ability_id,
                         '', agent_message, False
                     )
 
@@ -953,7 +954,8 @@ class Chatroom:
                 prompt_tokens, completion_tokens, total_tokens
             )
         finally:
-            await self._ws_manager.end_agent_reply(self._chatroom_id)
+            if reply_started:
+                await self._ws_manager.end_agent_reply(self._chatroom_id, agent_id)
             self._console_log('\033[0m')  # Reset the color
             has_connections = self._ws_manager.has_connections(self._chatroom_id)
             if not has_connections:
