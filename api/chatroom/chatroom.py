@@ -22,7 +22,7 @@ models = Models()
 
 
 @router.get("/", response_model=ChatRoomListResponse, summary="Fetching the List of Chat Rooms")
-async def chatroom_list(page: int = 1, page_size: int = 10, name: str = "",
+async def chatroom_list(page: int = 1, page_size: int = 10, name: str = "",is_temporary: bool = False,
                         userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of all chat rooms.
@@ -41,7 +41,7 @@ async def chatroom_list(page: int = 1, page_size: int = 10, name: str = "",
     Raises:
     - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
     """
-    result = Chatrooms().all_chat_room_list(page, page_size, userinfo.uid, name)
+    result = Chatrooms().all_chat_room_list(page, page_size, userinfo.uid, name, is_temporary)
     return response_success(result)
 
 
