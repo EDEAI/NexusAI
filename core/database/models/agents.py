@@ -740,6 +740,7 @@ class Agents(MySQL):
             columns=["chat_status"],
             conditions=[
                 {"column": "chat_agent_id", "value": agent["agent_id"]},
+                {"column": "user_id", "value": uid},
             ]
         )['chat_status']
 
