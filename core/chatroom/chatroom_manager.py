@@ -256,7 +256,7 @@ class ChatroomManager:
                 {'chat_status': 0}
             )
             self._chatrooms.pop(chatroom_id, None)
-            self._workflow_ws_manager.remove_chatroom(user_id, chatroom_id)
+            await self._workflow_ws_manager.remove_chatroom(user_id, chatroom_id)
         
     async def _handle_data_and_start_chatroom(
         self,
