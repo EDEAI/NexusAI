@@ -270,7 +270,7 @@ class ChatroomManager:
             if user_input is None and chatroom_id in self._chatrooms:
                 chatroom = self._chatrooms[chatroom_id]
                 if chatroom.mcp_tool_is_using:
-                    await chatroom.interrupt_all_mcp_tool_uses()
+                    await chatroom.stop_all_mcp_tool_uses('Interrupted')
                     while chatroom_id in self._chatrooms:
                         await asyncio.sleep(0.1)
 
@@ -377,6 +377,7 @@ class ChatroomManager:
                                         {'chat_status': 0}
                                     )
                                     await self._ws_manager.send_instruction(chatroom_id, 'STOPPABLE', False)
+                                    await self._chatrooms[chatroom_id].stop_all_mcp_tool_uses('Interrupted by user')
                                 case _:
                                     raise Exception(f'Unknown command: {cmd}')
                 except Exception as e:

@@ -594,7 +594,7 @@ class Chatroom:
             {'id': mcp_tool_use_id, 'status': status}
         )
 
-    async def _stop_all_mcp_tool_uses(self, result: str) -> None:
+    async def stop_all_mcp_tool_uses(self, result: str) -> None:
         self._mcp_tool_use_is_interrupted = True
         for mcp_tool_use in self._mcp_tool_uses:
             if mcp_tool_use['result'] is None:
@@ -621,11 +621,6 @@ class Chatroom:
                 if workflow_run_id := mcp_tool_use['workflow_run_id']:
                     self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
         self._mcp_tool_use_lock.set()
-
-    async def interrupt_all_mcp_tool_uses(self) -> None:
-        if not self._mcp_tool_is_using:
-            raise Exception('There is no MCP tool use!')
-        await self._stop_all_mcp_tool_uses('Interrupted')
 
     async def _start_mcp_tool_uses(self) -> None:
         # Send the MCP tool use instructions to the frontend
@@ -711,7 +706,7 @@ class Chatroom:
                             )
                             result = json.dumps(result_dict, ensure_ascii=False)
                     except asyncio.TimeoutError:
-                        await self._stop_all_mcp_tool_uses('Timeout')
+                        await self.stop_all_mcp_tool_uses('Timeout')
                         break
                     except Exception as e:
                         logger.exception('ERROR!!')
@@ -740,7 +735,7 @@ class Chatroom:
                     self._mcp_tool_use_lock.clear()
                     await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
                 except asyncio.TimeoutError:
-                    await self._stop_all_mcp_tool_uses('Timeout')
+                    await self.stop_all_mcp_tool_uses('Timeout')
                     break
 
     def _append_mcp_tool_uses_to_history_messages(self, agent_id: int) -> None:
