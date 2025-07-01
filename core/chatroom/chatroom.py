@@ -775,7 +775,6 @@ class Chatroom:
                 ]
             )
 
-            self._current_agent_message_id = self._create_chatroom_message(agent_id)
             self._current_agent_message = ''
             prompt_tokens = 0
             completion_tokens = 0
@@ -820,13 +819,14 @@ class Chatroom:
                     mcp_tool_list=self._desktop_mcp_tool_list,
                     is_desktop=self._is_desktop
                 ):
+                    if not reply_started:
+                        await self._ws_manager.start_agent_reply(self._chatroom_id, agent_id, self._ability_id)
+                        self._current_agent_message_id = self._create_chatroom_message(agent_id)
+                        reply_started = True
                     if isinstance(chunk, int):
                         # Agent run ID
                         app_runs.set_chatroom_message_id(chunk, self._current_agent_message_id)
                         continue
-                    if not reply_started:
-                        await self._ws_manager.start_agent_reply(self._chatroom_id, agent_id, self._ability_id)
-                        reply_started = True
                     if tool_call_chunks := chunk.tool_call_chunks:
                         for tool_call_chunk in tool_call_chunks:
                             if tool_call_chunk['type'] == 'tool_call_chunk':
