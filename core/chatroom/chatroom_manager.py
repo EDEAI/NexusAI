@@ -225,7 +225,7 @@ class ChatroomManager:
                     self._desktop_mcp_tool_list_by_chatroom.get(chatroom_id)
                 )
                 self._chatrooms[chatroom_id] = chatroom
-                await self._workflow_ws_manager.add_chatroom(user_id, chatroom_id)
+                self._workflow_ws_manager.add_chatroom(user_id, chatroom_id)
                 chatroom.load_history_messages(history_messages)
                 await chatroom.chat(user_input is None, file_list)
             end_time = time()
