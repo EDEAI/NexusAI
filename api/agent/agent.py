@@ -1455,7 +1455,8 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
         processed_discussions = []
         for discussion_item in data["discussions"]:
             app_id = discussion_item.get("app_id")
-            current_discussion = discussion_item.copy()
+            current_discussion=[]
+            # current_discussion = discussion_item.copy()
             chatroom_id = discussion_item.get("chatroom_id")
             processed_agent_list_cleaned = []
             if app_id:
@@ -1473,6 +1474,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     if app_info.get("avatar"):
                         app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                     # 更新name, description, avatar
+                    current_discussion = discussion_item.copy()
                     current_discussion["name"] = app_info.get("name", current_discussion.get("name"))
                     current_discussion["description"] = app_info.get("description", current_discussion.get("description"))
                     current_discussion["avatar"] = app_info.get("avatar", current_discussion.get("avatar"))
@@ -1484,7 +1486,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                         if item.get('avatar'):
                             item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                         processed_agent_list_cleaned.append(new_item)
-            current_discussion["agent_list"] = processed_agent_list_cleaned
+                    current_discussion["agent_list"] = processed_agent_list_cleaned
             # if "agent_list" in current_discussion and isinstance(current_discussion["agent_list"], list):
             #     processed_agent_list = []
             #     for agent_list_item in current_discussion["agent_list"]:
