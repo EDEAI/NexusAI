@@ -77,12 +77,7 @@ export const InputField: FC<inputFieldParameters> = memo(props => {
                 supportsImage ? ',.jpg,.png,.jpeg' : ''
             }`;
 
-            console.log('Model config changed:', {
-                modelConfigId,
-                supportsImage,
-                newFileTypes,
-                currentFileTypes: uploadFileTypes
-            });
+       
 
             setUploadFileTypes(newFileTypes);
         }

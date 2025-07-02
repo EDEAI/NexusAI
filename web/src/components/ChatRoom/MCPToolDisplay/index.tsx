@@ -289,6 +289,36 @@ const EnhancedParametersDisplay: FC<{ args: any; intl: any }> = ({ args, intl })
     }
 };
 
+// Extract file list from result data
+const extractFileList = (resultData: any): MCPFileItem[] => {
+    try {
+        // Parse result data
+        let parsedResult = resultData;
+        if (typeof resultData === 'string') {
+            try {
+                parsedResult = JSON.parse(resultData);
+            } catch {
+                // Keep original if not JSON
+                return [];
+            }
+        }
+        
+        // Check if it's a structured success result with file_list
+        if (parsedResult && 
+            typeof parsedResult === 'object' && 
+            parsedResult.status === 'success' && 
+            parsedResult.file_list && 
+            Array.isArray(parsedResult.file_list)) {
+            return parsedResult.file_list;
+        }
+        
+        return [];
+    } catch (error) {
+        console.warn('Failed to extract file list from result data:', error);
+        return [];
+    }
+};
+
 // Enhanced result display component
 const EnhancedResultDisplay: FC<{ resultData: any; intl: any; status: MCPToolStatus }> = ({ resultData, intl, status }) => {
     // Parse result data
@@ -311,11 +341,9 @@ const EnhancedResultDisplay: FC<{ resultData: any; intl: any; status: MCPToolSta
     
     if (isSuccessWithOutputs) {
         const outputs = parsedResult.outputs;
-        const fileList = parsedResult.file_list;
         const hasOutputs = Object.keys(outputs).length > 0;
-        const hasFileList = fileList && Array.isArray(fileList) && fileList.length > 0;
         
-        if (!hasOutputs && !hasFileList) {
+        if (!hasOutputs) {
             return (
                 <div className="bg-green-50 p-2 rounded text-xs text-gray-500">
                     {intl.formatMessage({ id: 'app.chatroom.mcptool.noOutputs' })}
@@ -325,52 +353,35 @@ const EnhancedResultDisplay: FC<{ resultData: any; intl: any; status: MCPToolSta
         
         return (
             <div className="bg-green-50 p-3 rounded border border-green-200">
-                {hasOutputs && (
-                    <>
-                        <div className="mb-2">
-                            <Text strong className="text-green-600 text-sm">
-                                {intl.formatMessage({ id: 'app.chatroom.mcptool.outputs' })}
+                <div className="mb-2">
+                    <Text strong className="text-green-600 text-sm">
+                        {intl.formatMessage({ id: 'app.chatroom.mcptool.outputs' })}
+                    </Text>
+                </div>
+                {Object.entries(outputs).map(([key, value]) => (
+                    <div key={key} className="mb-3 last:mb-0">
+                        <div className="mb-1">
+                            <Text strong className="text-xs text-gray-700">
+                                {key}:
                             </Text>
                         </div>
-                        {Object.entries(outputs).map(([key, value]) => (
-                            <div key={key} className="mb-3 last:mb-0">
-                                <div className="mb-1">
-                                    <Text strong className="text-xs text-gray-700">
-                                        {key}:
-                                    </Text>
-                                </div>
-                                <div className="bg-white p-2 rounded border border-green-300 whitespace-pre-wrap">
-                                    {typeof value === 'string' ? (
-                                        <ReactMarkdown
-                                            rehypePlugins={[rehypeHighlight]}
-                                            components={createRenderers(0, intl)}
-                                            className="text-xs [&_p]:mb-1 [&_p:last-child]:mb-0 [&_pre]:text-xs [&_code]:text-xs"
-                                        >
-                                            {value}
-                                        </ReactMarkdown>
-                                    ) : (
-                                        <pre className="whitespace-pre-wrap m-0 font-mono text-xs text-gray-800">
-                                            {formatJSONData(value)}
-                                        </pre>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </>
-                )}
-                
-                {hasFileList && (
-                    <div className={hasOutputs ? "mt-4" : ""}>
-                        <div className="mb-2">
-                            <Text strong className="text-green-600 text-sm">
-                                {intl.formatMessage({ id: 'app.chatroom.mcptool.files' })}
-                            </Text>
-                        </div>
-                        <div className="bg-white p-3 rounded border border-green-300">
-                            <MCPFileList fileList={fileList} intl={intl} />
+                        <div className="bg-white p-2 rounded border border-green-300 whitespace-pre-wrap">
+                            {typeof value === 'string' ? (
+                                <ReactMarkdown
+                                    rehypePlugins={[rehypeHighlight]}
+                                    components={createRenderers(0, intl)}
+                                    className="text-xs [&_p]:mb-1 [&_p:last-child]:mb-0 [&_pre]:text-xs [&_code]:text-xs"
+                                >
+                                    {value}
+                                </ReactMarkdown>
+                            ) : (
+                                <pre className="whitespace-pre-wrap m-0 font-mono text-xs text-gray-800">
+                                    {formatJSONData(value)}
+                                </pre>
+                            )}
                         </div>
                     </div>
-                )}
+                ))}
             </div>
         );
     }
@@ -422,6 +433,10 @@ export const MCPToolDisplay: FC<MCPToolDisplayProps> = ({ toolData, intl, runtim
             exec_id: workflowConfirmation.node_exec_id
         });
     };
+
+    // Extract file list for independent display
+    const fileList = extractFileList(resultData);
+    const hasFileList = fileList && Array.isArray(fileList) && fileList.length > 0;
 
     return (
         <Card 
@@ -493,7 +508,13 @@ export const MCPToolDisplay: FC<MCPToolDisplayProps> = ({ toolData, intl, runtim
                     </Panel>
                 )}
 
-                {workflowConfirmation && (
+                {hasFileList && (
+                    <Panel header={intl.formatMessage({ id: 'app.chatroom.mcptool.files' })} key="files">
+                        <MCPFileList fileList={fileList} intl={intl} />
+                    </Panel>
+                )}
+
+                {/* {workflowConfirmation && (
                     <Panel header={intl.formatMessage({ id: 'app.chatroom.mcptool.workflowDetails' })} key="workflow">
                         <div className="bg-blue-50 p-2 rounded text-xs">
                             <pre className="whitespace-pre-wrap m-0 font-mono">
@@ -501,7 +522,7 @@ export const MCPToolDisplay: FC<MCPToolDisplayProps> = ({ toolData, intl, runtim
                             </pre>
                         </div>
                     </Panel>
-                )}
+                )} */}
             </Collapse>
         </Card>
     );
