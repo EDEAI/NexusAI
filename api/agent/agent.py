@@ -1524,7 +1524,10 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
 
     # Skip "order" key and include it directly if present
     if "order" in data and isinstance(data["order"], list):
-        processed_data["order"] = data["order"]
+        if all(processed_data[key] == [] for key in ["discussions", "workflows", "assistants"]):
+            processed_data["order"] = []
+        else:
+            processed_data["order"] = data["order"]
 
     return response_success(processed_data, get_language_content("api_agent_success"))
 
