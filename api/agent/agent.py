@@ -1487,6 +1487,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                             item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                         processed_agent_list_cleaned.append(new_item)
                     current_discussion["agent_list"] = processed_agent_list_cleaned
+                    processed_discussions.append(current_discussion)
             # if "agent_list" in current_discussion and isinstance(current_discussion["agent_list"], list):
             #     processed_agent_list = []
             #     for agent_list_item in current_discussion["agent_list"]:
@@ -1518,7 +1519,6 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
             #     current_discussion["agent_list"] = processed_agent_list
 
             # Discussion item is always added, even if app_id is not found or app_info is not found
-            processed_discussions.append(current_discussion)
 
         processed_data["discussions"] = processed_discussions
 
