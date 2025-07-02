@@ -288,6 +288,7 @@ class WorkflowWebSocketManager():
                                         result = {
                                             'status': 'success',
                                             'outputs': message_data['node_exec_data']['outputs'],
+                                            'file_list': message_data['node_exec_data']['file_list']
                                         }
                                         await self._set_workflow_result_cb(
                                             chatroom, mcp_tool_use_id,
