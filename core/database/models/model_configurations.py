@@ -58,6 +58,7 @@ class ModelConfigurations(MySQL):
             conditions=[
                 {"column": "model_configurations.team_id", "value": team_id},
                 {"column": "model_configurations.status", "value": 1},
+                {"column": "model_configurations.default_used", "value": 1},
                 {"column": "models.type", "value": _type},
                 {"column": "models.status", "value": 1},
                 {"column": "suppliers.status", "value": 1}
