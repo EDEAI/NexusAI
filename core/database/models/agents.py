@@ -550,7 +550,7 @@ class Agents(MySQL):
                 agent_abilities_model.soft_delete([{"column": "agent_id", "value": agent_val["id"]},
                                                    {"column": "status", "op": "in", "value": [1, 2]}])
 
-                # delete chatroom agent relation
+                # delete chatroom agent relation 
                 chatroom_agent_relation_model = ChatroomAgentRelation()
 
                 chatroom_select_list = chatroom_agent_relation_model.select(
