@@ -1457,6 +1457,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
             app_id = discussion_item.get("app_id")
             current_discussion = discussion_item.copy()
             chatroom_id = discussion_item.get("chatroom_id")
+            processed_agent_list_cleaned = []
             if app_id:
                 # Query apps table for details and filter by status=1
                 app_info = apps_model.select_one(
