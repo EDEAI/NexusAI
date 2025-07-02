@@ -756,6 +756,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'status': 2
                 }
             )
+            yield agent_run_id
+            
             replace_variable_value_with_context(self.data['input'], context)
 
             # Temporarily disable variable validation of Agent node in current version. 2024-10-22
@@ -910,7 +912,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 chatroomdriven_info = ChatroomDrivenRecords().get_data_by_data_source_run_id(data_source_run_id)
                 if chatroomdriven_info:
                     ChatroomDrivenRecords().update_data_driven_run_id(chatroomdriven_info['id'],data_source_run_id, agent_run_id)
-            yield agent_run_id
         except Exception as e:
             logger.exception('ERROR!!')
             if 'agent_run_id' in locals():
