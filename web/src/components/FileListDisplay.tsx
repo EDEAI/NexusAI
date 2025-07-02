@@ -19,7 +19,7 @@ interface FileListDisplayProps {
     maxHeight?: string;
 }
 
-// 默认下载文件函数
+
 const defaultDownloadFile = (url: string, filename: string) => {
     try {
         const link = document.createElement('a');

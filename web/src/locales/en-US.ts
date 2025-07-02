@@ -15,6 +15,7 @@ import settings from './en-US/settings';
 import skill from './en-US/skill';
 import user from './en-US/user';
 import workflow from './en-US/workflow';
+import chatroom from './en-US/chatroom';
 
 export default {
     'navBar.lang': 'Language',
@@ -38,6 +39,7 @@ export default {
     ...user,
     ...skill,
     ...plaza,
+    ...chatroom,
     'skill.downloadFiles': 'Output Files',
     'skill.download': 'Download',
     'app.workflow.log.filter.all': 'All Logs',

@@ -1,6 +1,9 @@
 /*
  * @LastEditors: biz
  */
+/*
+ * @LastEditors: biz
+ */
 import {
     clearAgentMessageMemory,
     getAgentMessageHistory,
@@ -12,12 +15,14 @@ import FileListDisplay from '@/components/FileListDisplay';
 import useFileUpload from '@/hooks/useFileUpload';
 import { createPromptFromObject } from '@/py2js/prompt.js';
 import useSocketStore from '@/store/websocket';
+import { ModelImageSupportProvider } from '@/contexts/ModelImageSupportContext';
+import { getAgentFullscreenState, setAgentFullscreenState } from '@/utils/fullscreenStorage';
 import { DownloadOutlined, ExclamationCircleFilled, FullscreenOutlined, FullscreenExitOutlined } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Button, Image, message, Modal, Spin } from 'antd';
+import { Button, Empty, Image, message, Modal, Spin } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
@@ -100,11 +105,13 @@ interface Props {
             agent: {
                 agent_id: number;
                 input_variables: any;
+                m_config_id?: number;
             };
             app?: {
                 name: string;
             };
             agent_chatroom_id?: number;
+            chat_status?: number;
         };
         abilitiesList: Array<{
             value: number;
@@ -124,161 +131,14 @@ interface HistoryResponse {
     total_pages: number;
 }
 
-const downloadFile = (url: string, filename: string) => {
-    try {
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } catch (e) {}
-};
 
-const UserMessageComponent = memo(({ message }: MessageProps) => (
-    <div className="flex justify-end">
-        <div className="max-w-[70%] rounded-lg p-3 bg-blue-100 text-blue-900">
-            {message.file_list && message.file_list.length > 0 && (
-                <FileListDisplay fileList={message.file_list} onDownload={downloadFile} />
-            )}
-            <ReactMarkdown
-                components={{
-                    img: ({ node, ...props }) => (
-                        <div className="relative group">
-                            <Image
-                                src={props.src}
-                                alt={props.alt}
-                                className="max-w-full max-h-40 h-auto rounded-md"
-                            />
-                            <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button
-                                    type="primary"
-                                    size="small"
-                                    icon={<DownloadOutlined />}
-                                    onClick={e => {
-                                        e.stopPropagation();
-                                        downloadFile(props.src || '', props.alt || 'image.png');
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    ),
-                }}
-                rehypePlugins={[rehypeHighlight]}
-            >
-                {message.message}
-            </ReactMarkdown>
-        </div>
-    </div>
-));
-
-const LLMMessageComponent = memo(({ message, detailList, abilitiesList }: MessageProps) => {
-    const intl = useIntl();
-    const ability = abilitiesList?.find(item => item.value === message.ability_id);
-
-    return (
-        <div className="flex justify-start pb-4">
-            <div className="max-w-full">
-                <div className="text-sm font-bold mb-2">
-                    {detailList?.app?.name}{' '}
-                    {ability?.label && (
-                        <span className="text-gray-500 font-normal text-xs">
-                            ({ability?.label})
-                        </span>
-                    )}
-                </div>
-                <div className="max-w-[90%] rounded-lg  relative bg-white text-gray-900 border border-gray-200">
-                    {message.file_list && message.file_list.length > 0 && (
-                        <div className="p-3 border-b border-gray-100">
-                            <FileListDisplay
-                                fileList={message.file_list}
-                                onDownload={downloadFile}
-                            />
-                        </div>
-                    )}
-                    {message.message && (
-                        <div className="p-3 child  max-w-full [&_p]:mb-0 [&_div]:max-w-full break-words">
-                            <Image.PreviewGroup>
-                                <ReactMarkdown
-                                    components={{
-                                        img: ({ node, ...props }) => (
-                                            <div className="relative group">
-                                                <Image
-                                                    src={props.src}
-                                                    alt={props.alt}
-                                                    className="max-w-full max-h-40 h-auto rounded-md"
-                                                />
-                                                <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Button
-                                                        type="primary"
-                                                        size="small"
-                                                        icon={<DownloadOutlined />}
-                                                        onClick={e => {
-                                                            e.stopPropagation();
-                                                            downloadFile(
-                                                                props.src || '',
-                                                                props.alt || 'image.png',
-                                                            );
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        ),
-                                    }}
-                                    rehypePlugins={[rehypeHighlight]}
-                                >
-                                    {message.message}
-                                </ReactMarkdown>
-                            </Image.PreviewGroup>
-                        </div>
-                    )}
-                    {message.error && (
-                        <div className="p-3 text-red-500">
-                            <div>{intl.formatMessage({ id: 'agent.chat.error.message' })}</div>
-                            {message.error}
-                        </div>
-                    )}
-                    <div className="absolute w-full mt-1">
-                        <div className="text-xs text-gray-500 flex justify-between">
-                            <div>{message.created_time}</div>
-                            <div>
-                                {/* {intl.formatMessage({ id: 'agent.chat.tokens' })}:{' '}
-                                <span className="text-blue-500">{message.total_tokens || 0}</span> */}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-});
-
-const LoadingMessage = memo(({ detailList }: { detailList: MessageProps['detailList'] }) => {
-    const intl = useIntl();
-    return (
-        <div className="flex justify-start pb-4 max-w-[90%] min-w-[70%]">
-            <div className="max-w-full">
-                <div className="text-sm font-bold mb-2">{detailList?.app?.name}</div>
-                <div className="max-w-[90%] min-w-[200px] rounded-lg relative bg-white text-gray-900 border border-gray-200 p-4">
-                    <div className="flex items-center gap-2 pr-4">
-                        <Spin size="small" />
-                        <span className="text-gray-500">
-                            {intl.formatMessage({ id: 'agent.chat.waiting' })}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-});
 
 export default memo((props: Props) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [hasMoreHistory, setHasMoreHistory] = useState(true);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
-    const [clearingMemory, setClearingMemory] = useState(false);
+
     const [initialLoading, setInitialLoading] = useState(false);
     const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
     const [savingInfo, setSavingInfo] = useState(false);
@@ -286,28 +146,35 @@ export default memo((props: Props) => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const formRef = useRef<ProFormInstance>();
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const chatContainerRef = useRef<HTMLDivElement>(null);
     const chatWrapperRef = useRef<HTMLDivElement>(null);
     const intl = useIntl();
     const listenMessage = useSocketStore(state =>
         (state as unknown as WebSocketStore).getTypedMessages('chat_message_llm_return'),
     );
-    const [fileDisplayLayout, setFileDisplayLayout] = useState('list');
     const [agentChatRoomId, setAgentChatRoomId] = useState(null);
     const lastMessage = useSocketStore(state =>
         (state as unknown as WebSocketStore).getTypedLastMessage('chat_message_llm_return'),
     );
     const [agentInfo, setAgentInfo] = useState(null);
 
-    // 处理窗口全屏切换
+
     const toggleFullscreen = () => {
-        setIsFullscreen(prev => !prev);
+        const agentId = props.data?.detailList?.agent?.agent_id;
+        if (agentId) {
+            const newFullscreenState = !isFullscreen;
+            setIsFullscreen(newFullscreenState);
+            setAgentFullscreenState(agentId, newFullscreenState);
+        } else {
+            console.warn('Cannot save fullscreen state: agentId is not available');
+            setIsFullscreen(prev => !prev);
+        }
     };
 
     useEffect(() => {
         if (props.data?.detailList?.app?.name != undefined) {
             console.log(props.data);
             const id = props.data.detailList.agent_chatroom_id;
+            const agentId = props.data.detailList.agent.agent_id;
 
             if (id) {
                 const currentSearch = window.location.search;
@@ -321,18 +188,34 @@ export default memo((props: Props) => {
                 window.history.replaceState({}, '', newUrl);
             }
 
-            setAgentInfo({
+            const newAgentInfo = {
                 ...props.data.detailList.app,
-                agent_id: props.data.detailList.agent.agent_id,
+                agent:props.data.detailList.agent,
+                agent_id: agentId,
+            };
+            
+            console.log('AgentInfo updated:', {
+                m_config_id: newAgentInfo.agent?.m_config_id,
+                agent_id: newAgentInfo.agent_id,
+                name: newAgentInfo.name
             });
+            
+            setAgentInfo(newAgentInfo);
+
+            // 恢复该Agent的全屏状态
+            if (agentId) {
+                const savedFullscreenState = getAgentFullscreenState(agentId);
+                console.log(`Restoring fullscreen state for agent ${agentId}: ${savedFullscreenState}`);
+                setIsFullscreen(savedFullscreenState);
+            }
 
             setTimeout(() => {
                 setLoading(false);
             }, 500);
         }
-    }, [props.data?.detailList?.app?.name]);
+    }, [props.data?.detailList?.app?.name, props.data?.detailList?.agent?.m_config_id]);
 
-    // 使用自定义的 hook
+    
     const {
         uploadedFiles,
         setUploadedFiles,
@@ -383,11 +266,15 @@ export default memo((props: Props) => {
         }
     }, [listenMessage]);
 
-    useEffect(() => {
-        if (props.data?.detailList?.agent?.agent_id) {
-            getMessageHistory();
-        }
-    }, [props.data?.detailList?.agent?.agent_id]);
+    // useEffect(() => {
+  
+
+    //     if (props.data?.detailList?.agent?.agent_id) {
+    //         console.log(props);
+    //         debugger
+    //         // getMessageHistory();
+    //     }
+    // }, [props]);
 
     useEffect(() => {
         if (!initialLoading && messages.length > 0) {
@@ -442,7 +329,7 @@ export default memo((props: Props) => {
                 prompt,
                 file_list: uploadedFiles.map(file => file.file_id),
             });
-            // 发送成功后清空文件列表
+          
             clearFiles();
         } catch (error) {
             setIsWaitingForResponse(false);
@@ -472,68 +359,6 @@ export default memo((props: Props) => {
             setInitialLoading(false);
         }
     };
-
-    const fetchHistoryMessages = async () => {
-        if (loading || !props.data?.detailList?.agent?.agent_id) return;
-
-        try {
-            setLoading(true);
-            const nextPage = page + 1;
-            const res = (await getAgentMessageHistory(
-                String(props.data.detailList.agent.agent_id),
-                nextPage,
-            )) as ApiResponse<HistoryResponse>;
-
-            if (res.data?.list?.length > 0) {
-                setMessages(prev => [...res.data.list, ...prev]);
-                setPage(nextPage);
-                setHasMoreHistory(nextPage < res.data.total_pages);
-            } else {
-                setHasMoreHistory(false);
-            }
-        } catch (error) {
-            console.error('Failed to load more messages:', error);
-            setHasMoreHistory(false);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleClearMemory = async () => {
-        if (!props.data?.detailList?.agent?.agent_id || clearingMemory || !messages.length) return;
-
-        Modal.confirm({
-            title: intl.formatMessage({ id: 'agent.chat.clear.memory.confirm.title' }),
-            icon: <ExclamationCircleFilled />,
-            content: intl.formatMessage({ id: 'agent.chat.clear.memory.confirm.content' }),
-            okText: intl.formatMessage({ id: 'agent.chat.clear.memory.confirm.ok' }),
-            cancelText: intl.formatMessage({ id: 'agent.chat.clear.memory.confirm.cancel' }),
-            onOk: async () => {
-                try {
-                    setClearingMemory(true);
-                    const lastMessageId = messages[messages.length - 1].id;
-                    await clearAgentMessageMemory(
-                        String(props.data.detailList.agent.agent_id),
-                        lastMessageId,
-                    );
-                    message.success(intl.formatMessage({ id: 'agent.chat.clear.memory.success' }));
-                } catch (error) {
-                    console.error('Failed to clear context memory:', error);
-                } finally {
-                    setClearingMemory(false);
-                }
-            },
-        });
-    };
-
-    const LoadingIndicator = () => (
-        <div className="flex items-center justify-center py-2 bg-white/80">
-            <Spin size="small" />
-            <span className="ml-2 text-sm text-gray-500">
-                {intl.formatMessage({ id: 'agent.chat.loading.more' })}
-            </span>
-        </div>
-    );
 
     if (initialLoading) {
         return (
@@ -571,24 +396,6 @@ export default memo((props: Props) => {
         }
     };
 
-    const handleUpload = () => {
-        if (!props.data?.detailList?.agent?.agent_id) {
-            message.error(intl.formatMessage({ id: 'agent.chat.error.message' }));
-            return;
-        }
-
-        triggerUpload();
-    };
-
-    const handleSendMessage = async () => {
-        const content = formRef.current?.getFieldValue('content') || '';
-
-        let messageContent = content;
-
-        formRef.current?.setFieldsValue({ content: messageContent });
-
-        await formRef.current?.submit();
-    };
     if (loading) {
         return null;
     }
@@ -607,6 +414,7 @@ export default memo((props: Props) => {
                 backgroundColor: '#fff'
             }}
         >
+            
             <ProForm
                 formRef={formRef}
                 submitter={false}
@@ -673,207 +481,24 @@ export default memo((props: Props) => {
                         </>
                     )}
                 </div>
-                <div
+                {agentChatRoomId?<div
                     className={`w-full flex-1 flex bg-[#fff] overflow-hidden overflow-x-auto ${isFullscreen ? 'max-w-[1400px] mx-auto justify-center' : ''}`}
                     style={{ height: isFullscreen ? 'calc(100vh - 64px)' : 'calc(100vh - 56px)' }}
                 >
-                    <ChatRoomContent
-                        agentList={{
-                            current: [agentInfo],
-                        }}
-                        abilitiesList={props.data?.abilitiesList}
-                        agentChatRoomId={agentChatRoomId}
-                    />
-                </div>
-                {/* <div className="bg-gray-50 rounded-md border border-[#ccc] flex-1 overflow-y-auto flex flex-col">
-                    <div className="flex-1 overflow-y-auto " ref={chatContainerRef}>
-                        <InfiniteScroll
-                            className="h-full"
-                            onLoadPrevious={fetchHistoryMessages}
-                            hasPrevious={hasMoreHistory}
-                            hasMore={false}
-                            threshold={50}
-                            loadingComponent={<LoadingIndicator />}
-                        >
-                            <div className="px-4 py-2 space-y-4">
-                                {messages.map(message =>
-                                    message.agent_run_id === 0 ? (
-                                        <UserMessageComponent key={message.id} message={message} />
-                                    ) : (
-                                        <LLMMessageComponent
-                                            key={message.id}
-                                            detailList={props?.data?.detailList}
-                                            abilitiesList={props?.data?.abilitiesList}
-                                            message={message}
-                                        />
-                                    ),
-                                )}
-                                {isWaitingForResponse && (
-                                    <LoadingMessage detailList={props?.data?.detailList} />
-                                )}
-                                <div ref={messagesEndRef} />
-                            </div>
-                        </InfiniteScroll>
-                    </div>
-
-                    <div className="border-t border-gray-200 bg-white px-4 py-2 relative">
-
-                        <Image.PreviewGroup>
-                            {uploadedFiles.length > 0 && (
-                                <div className="p-2 border-b border-gray-200">
-                                    <div className="flex flex-wrap gap-2">
-                                        {uploadedFiles.map(file => (
-                                            <Tag
-                                                key={file.uid}
-                                                closable
-                                                onClose={() => handleRemoveFile(file.uid)}
-                                                className={`flex items-center ${
-                                                    file.isImage
-                                                        ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-                                                        : 'bg-blue-50 text-blue-600'
-                                                }`}
-                                            >
-                                                <Tooltip title={file.name}>
-                                                    <div className="flex items-center">
-                                                        {file.isImage ? (
-                                                            <div className="mr-1 flex items-center">
-                                                                <Image
-                                                                    src={file.path_show || file.url}
-                                                                    alt={file.name}
-                                                                    className="w-6 h-6 max-w-6 max-h-6 object-cover mr-1 rounded-sm cursor-pointer"
-                                                                    preview={{
-                                                                        src:
-                                                                            file.path_show ||
-                                                                            file.url,
-                                                                        mask: false,
-                                                                    }}
-                                                                />
-                                                                <span className="truncate mr-1">
-                                                                    {file.name}
-                                                                </span>
-                                                                <DownloadOutlined
-                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
-                                                                    onClick={e => {
-                                                                        e.stopPropagation();
-                                                                        downloadFile(
-                                                                            file.path_show ||
-                                                                                file.url,
-                                                                            file.name,
-                                                                        );
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        ) : (
-                                                            <div className="flex items-center">
-                                                                <FileOutlined className="mr-1" />
-                                                                <span className="truncate mr-1">
-                                                                    {file.name}
-                                                                </span>
-                                                                <DownloadOutlined
-                                                                    className="text-gray-500 hover:text-blue-600 cursor-pointer ml-1"
-                                                                    onClick={e => {
-                                                                        e.stopPropagation();
-                                                                        downloadFile(
-                                                                            file.path_show ||
-                                                                                file.url,
-                                                                            file.name,
-                                                                        );
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </Tooltip>
-                                            </Tag>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </Image.PreviewGroup>
-
-                        <div className="flex items-center p-[8px] gap-[10px] box-border border bg-white rounded-[8px]">
-                            <div className="flex-1">
-                                <ProFormTextArea
-                                    name="content"
-                                    placeholder={intl.formatMessage({
-                                        id: 'agent.chat.input.placeholder',
-                                    })}
-                                    disabled={props?.data?.detailList?.agent?.agent_id == 0}
-                                    fieldProps={{
-                                        autoSize: { minRows: 1, maxRows: 4 },
-                                        variant: 'borderless',
-                                        onPressEnter: e => {
-                                            if (!e.shiftKey) {
-                                                e.preventDefault();
-                                                handleSendMessage();
-                                            }
-                                        },
-                                        size: 'small',
-                                        className: '',
-                                        title: intl.formatMessage({
-                                            id: 'agent.chat.input.shift.enter',
-                                        }),
-                                    }}
-                                    formItemProps={{
-                                        className: 'mb-0',
-                                    }}
-                                    className="mb-0"
-                                />
-                            </div>
-
-                            <Button
-                                onClick={handleSendMessage}
-                                type="primary"
-                                disabled={props?.data?.detailList?.agent?.agent_id == 0}
-                                className="min-w-[30px] h-[30px] flex items-center justify-center cursor-pointer rounded-[6px]"
-                                icon={<SendOutlined />}
-                                title={intl.formatMessage({ id: 'agent.chat.send' })}
-                            />
-                        </div>
-                        <div className="flex items-center mt-1 gap-2 flex-wrap">
-                            <ProFormSelect
-                                // label={intl.formatMessage({ id: 'agent.selectivepower' })}
-                                name="ability_id"
-                                options={
-                                    props.data?.abilitiesList || [
-                                        {
-                                            value: 0,
-                                            label: intl.formatMessage({ id: 'agent.allability' }),
-                                        },
-                                    ]
-                                }
-                                fieldProps={{
-                                    placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
-                                    size: 'small',
-                                }}
-                                disabled={
-                                    props?.data?.detailList?.agent?.agent_id == 0 ||
-                                    !props.data?.abilitiesList?.length
-                                }
-                                formItemProps={{
-                                    className: 'mb-0',
-                                }}
-                            />
-                            <Button
-                                icon={<DeleteOutlined />}
-                                disabled={props?.data?.detailList?.agent?.agent_id == 0}
-                                loading={clearingMemory}
-                                onClick={handleClearMemory}
-                                size="small"
-                            >
-                                {intl.formatMessage({ id: 'agent.chat.clear.memory' })}
-                            </Button>
-                            <Button
-                                icon={<UploadOutlined />}
-                                disabled={props?.data?.detailList?.agent?.agent_id == 0}
-                                onClick={handleUpload}
-                                size="small"
-                            >
-                                {intl.formatMessage({ id: 'agent.chat.upload.file' })}
-                            </Button>
-                        </div>
-                    </div>
-                </div> */}
+                    <ModelImageSupportProvider>
+                        <ChatRoomContent
+                            agentList={{
+                                current: [agentInfo],
+                            }}
+                            abilitiesList={props.data?.abilitiesList}
+                            agentChatRoomId={agentChatRoomId}
+                            chatStatus={props.data?.detailList?.chat_status}
+                        />
+                    </ModelImageSupportProvider>
+                </div>:<div className="flex items-center justify-center h-full">
+                <Empty  description={`等待创建智能体`}></Empty>
+            </div>}
+            
             </ProForm>
         </div>
     );
