@@ -4,28 +4,22 @@
 /*
  * @LastEditors: biz
  */
-import {
-    clearAgentMessageMemory,
-    getAgentMessageHistory,
-    postAgentChatMessage,
-    PutagentPublish,
-} from '@/api/agents';
+import { getAgentMessageHistory, postAgentChatMessage, PutagentPublish } from '@/api/agents';
 import { ChatRoomContent } from '@/components/ChatRoomContent';
-import FileListDisplay from '@/components/FileListDisplay';
+import { ModelImageSupportProvider } from '@/contexts/ModelImageSupportContext';
 import useFileUpload from '@/hooks/useFileUpload';
 import { createPromptFromObject } from '@/py2js/prompt.js';
 import useSocketStore from '@/store/websocket';
-import { ModelImageSupportProvider } from '@/contexts/ModelImageSupportContext';
 import { getAgentFullscreenState, setAgentFullscreenState } from '@/utils/fullscreenStorage';
-import { DownloadOutlined, ExclamationCircleFilled, FullscreenOutlined, FullscreenExitOutlined } from '@ant-design/icons';
+import { useModelSelect } from '@/store/modelList';
+import { findOption } from '@/components/WorkFlow/components/Form/Select';
+import { FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
-import { Button, Empty, Image, message, Modal, Spin } from 'antd';
+import { Button, Empty, message, Spin, Tag } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import rehypeHighlight from 'rehype-highlight';
 
 interface ApiResponse<T> {
     code: number;
@@ -131,8 +125,6 @@ interface HistoryResponse {
     total_pages: number;
 }
 
-
-
 export default memo((props: Props) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [hasMoreHistory, setHasMoreHistory] = useState(true);
@@ -156,7 +148,23 @@ export default memo((props: Props) => {
         (state as unknown as WebSocketStore).getTypedLastMessage('chat_message_llm_return'),
     );
     const [agentInfo, setAgentInfo] = useState(null);
+    const { options } = useModelSelect();
 
+    // Function to get model name by config ID
+    const getModelName = (modelConfigId: number | string): string => {
+        if (!modelConfigId || !options) return '未知模型';
+        
+        const modelOption = findOption(modelConfigId, { options });
+        return modelOption?.label || '未知模型';
+    };
+
+    // Function to check if model supports image understanding
+    const checkImageSupport = (modelConfigId: number | string): boolean => {
+        if (!modelConfigId || !options) return false;
+        
+        const modelOption = findOption(modelConfigId, { options });
+        return modelOption?.support_image === 1;
+    };
 
     const toggleFullscreen = () => {
         const agentId = props.data?.detailList?.agent?.agent_id;
@@ -190,22 +198,24 @@ export default memo((props: Props) => {
 
             const newAgentInfo = {
                 ...props.data.detailList.app,
-                agent:props.data.detailList.agent,
+                agent: props.data.detailList.agent,
                 agent_id: agentId,
             };
-            
+
             console.log('AgentInfo updated:', {
                 m_config_id: newAgentInfo.agent?.m_config_id,
                 agent_id: newAgentInfo.agent_id,
-                name: newAgentInfo.name
+                name: newAgentInfo.name,
             });
-            
+
             setAgentInfo(newAgentInfo);
 
             // 恢复该Agent的全屏状态
             if (agentId) {
                 const savedFullscreenState = getAgentFullscreenState(agentId);
-                console.log(`Restoring fullscreen state for agent ${agentId}: ${savedFullscreenState}`);
+                console.log(
+                    `Restoring fullscreen state for agent ${agentId}: ${savedFullscreenState}`,
+                );
                 setIsFullscreen(savedFullscreenState);
             }
 
@@ -215,7 +225,6 @@ export default memo((props: Props) => {
         }
     }, [props.data?.detailList?.app?.name, props.data?.detailList?.agent?.m_config_id]);
 
-    
     const {
         uploadedFiles,
         setUploadedFiles,
@@ -267,7 +276,6 @@ export default memo((props: Props) => {
     }, [listenMessage]);
 
     // useEffect(() => {
-  
 
     //     if (props.data?.detailList?.agent?.agent_id) {
     //         console.log(props);
@@ -329,7 +337,7 @@ export default memo((props: Props) => {
                 prompt,
                 file_list: uploadedFiles.map(file => file.file_id),
             });
-          
+
             clearFiles();
         } catch (error) {
             setIsWaitingForResponse(false);
@@ -408,13 +416,16 @@ export default memo((props: Props) => {
     return (
         <div
             ref={chatWrapperRef}
-            className={`${isFullscreen ? 'fixed inset-0 z-50 !h-screen  border border-gray-300 top-[55px] left-0 bg-white p-4' : '!h-[calc(100vh-65px)] p-4 !pb-0'} box-border transition-all duration-300`}
+            className={`${
+                isFullscreen
+                    ? 'fixed inset-0 z-50 !h-screen  border border-gray-300 top-[55px] left-0 bg-white p-4'
+                    : '!h-[calc(100vh-65px)] p-4 !pb-0'
+            } box-border transition-all duration-300`}
             style={{
                 height: isFullscreen ? 'calc(100vh - 265px)' : 'calc(100vh - 65px)',
-                backgroundColor: '#fff'
+                backgroundColor: '#fff',
             }}
         >
-            
             <ProForm
                 formRef={formRef}
                 submitter={false}
@@ -424,7 +435,9 @@ export default memo((props: Props) => {
                     ability_id: 0,
                 }}
                 style={{
-                    height: isFullscreen ? 'calc(100vh - 57px - 16px)' : 'calc(100vh - 57px - 16px)',
+                    height: isFullscreen
+                        ? 'calc(100vh - 57px - 16px)'
+                        : 'calc(100vh - 57px - 16px)',
                 }}
                 className="m-0 flex flex-col overflow-y-auto"
             >
@@ -447,6 +460,21 @@ export default memo((props: Props) => {
                     /> */}
                     <div className="flex-1 flex items-center font-bold text-base">
                         {props.data?.detailList?.app?.name}
+                        {isFullscreen && agentInfo?.agent?.m_config_id && (
+                            <div className="ml-3 flex items-center gap-2">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-blue-700 border shadow-sm">
+                                    {getModelName(agentInfo.agent.m_config_id)}{checkImageSupport(agentInfo.agent.m_config_id) && (
+                                    <Tag color="blue" className="text-xs">
+                                        {intl.formatMessage({
+                                            id: 'workflow.tag.imageUnderstanding',
+                                            defaultMessage: 'Image Understanding',
+                                        })}
+                                    </Tag>
+                                )}
+                                </span>
+                                
+                            </div>
+                        )}
                     </div>
 
                     <Button
@@ -454,7 +482,9 @@ export default memo((props: Props) => {
                         icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
                         onClick={toggleFullscreen}
                         title={intl.formatMessage({
-                            id: isFullscreen ? 'agent.chat.exit.fullscreen' : 'agent.chat.fullscreen'
+                            id: isFullscreen
+                                ? 'agent.chat.exit.fullscreen'
+                                : 'agent.chat.fullscreen',
                         })}
                     />
 
@@ -481,24 +511,31 @@ export default memo((props: Props) => {
                         </>
                     )}
                 </div>
-                {agentChatRoomId?<div
-                    className={`w-full flex-1 flex bg-[#fff] overflow-hidden overflow-x-auto ${isFullscreen ? 'max-w-[1400px] mx-auto justify-center' : ''}`}
-                    style={{ height: isFullscreen ? 'calc(100vh - 64px)' : 'calc(100vh - 56px)' }}
-                >
-                    <ModelImageSupportProvider>
-                        <ChatRoomContent
-                            agentList={{
-                                current: [agentInfo],
-                            }}
-                            abilitiesList={props.data?.abilitiesList}
-                            agentChatRoomId={agentChatRoomId}
-                            chatStatus={props.data?.detailList?.chat_status}
-                        />
-                    </ModelImageSupportProvider>
-                </div>:<div className="flex items-center justify-center h-full">
-                <Empty  description={`等待创建智能体`}></Empty>
-            </div>}
-            
+                {agentChatRoomId ? (
+                    <div
+                        className={`w-full flex-1 flex bg-[#fff] overflow-hidden overflow-x-auto ${
+                            isFullscreen ? 'max-w-[1400px] mx-auto justify-center' : ''
+                        }`}
+                        style={{
+                            height: isFullscreen ? 'calc(100vh - 64px)' : 'calc(100vh - 56px)',
+                        }}
+                    >
+                        <ModelImageSupportProvider>
+                            <ChatRoomContent
+                                agentList={{
+                                    current: [agentInfo],
+                                }}
+                                abilitiesList={props.data?.abilitiesList}
+                                agentChatRoomId={agentChatRoomId}
+                                chatStatus={props.data?.detailList?.chat_status}
+                            />
+                        </ModelImageSupportProvider>
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-center h-full">
+                        <Empty description={`等待创建智能体`}></Empty>
+                    </div>
+                )}
             </ProForm>
         </div>
     );
