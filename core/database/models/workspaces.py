@@ -110,31 +110,6 @@ class Workspaces(MySQL):
             ORDER BY app_runs.updated_time DESC
             LIMIT {check_page}, {page_size}
             """
-        # query = f"""
-        #     SELECT apps.id AS app_id,
-        #            app_runs.name AS process_name,
-        #            apps.name,
-        #            apps.icon,
-        #            apps.avatar,
-        #            apps.icon_background,
-        #            app_runs.workflow_id,
-        #            app_runs.chatroom_id,
-        #            app_runs.agent_id,
-        #            app_runs.id AS app_runs_id
-        #     FROM apps
-        #     INNER JOIN app_runs ON app_runs.app_id = apps.id
-        #     INNER JOIN (
-        #         SELECT MAX(id) AS max_id, app_id
-        #         FROM app_runs 
-        #         GROUP BY app_id
-        #     ) AS last_runs ON app_runs.id = last_runs.max_id
-        #     WHERE apps.user_id = {uid} AND
-        #           apps.team_id = {team_id} AND
-        #           apps.status IN ('1', '2') AND
-        #           (app_runs.agent_id != 0 OR app_runs.chatroom_id != 0 OR app_runs.workflow_id != 0)  AND apps.mode In('1','2','5')
-        #     ORDER BY app_runs.updated_time DESC
-        #     LIMIT {check_page}, {page_size}
-        #     """
         app_list_result = self.execute_query(query)
         app_list = app_list_result.mappings().all()
         if app_list:
@@ -151,17 +126,6 @@ class Workspaces(MySQL):
                     app["process_name"] = ''
                 if app["chatroom_id"] > 0:
                     app["type"] = 2
-                    # find_chatroom = Chatrooms().select_one(
-                    #     columns=["id"],
-                    #     conditions=[
-                    #         {"column": "id", "value": app['chatroom_id']},
-                    #         {'column': 'chat_agent_id', "value": "0"},
-                    #         {'column': 'is_temporary', "value": "0"}
-                    #     ]
-                    # )
-                    # if not find_chatroom:
-                    #     app_list.remove(app)
-                    #     continue
                     last_agent = ChatroomMessages().select_one(
                         joins=[
                             ["inner", "agents", 'agents.id = chatroom_messages.agent_id'],
