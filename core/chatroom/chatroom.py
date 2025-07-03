@@ -659,7 +659,7 @@ class Chatroom:
 
             mcp_tool_use_update_data['tool_name'] = mcp_tool_use['name']
 
-            if mcp_tool_use['args']:
+            if mcp_tool_use['args'].strip():
                 mcp_tool_use['args'] = json.loads(mcp_tool_use['args'])
             else:
                 mcp_tool_use['args'] = {}
