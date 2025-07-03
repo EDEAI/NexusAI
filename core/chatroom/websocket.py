@@ -331,7 +331,8 @@ class WorkflowWebSocketManager():
                 self._event_loop.create_task(self._start_connection(user_id))
             
             self._connection_status_by_user_id[user_id] = self.RUNNING
-            self._chatrooms_by_user_id.setdefault(user_id, set()).add(chatroom_id)
+            
+        self._chatrooms_by_user_id.setdefault(user_id, set()).add(chatroom_id)
     
     async def remove_chatroom(self, user_id: int, chatroom_id: int):
         connection_status = self._connection_status_by_user_id.get(user_id)
