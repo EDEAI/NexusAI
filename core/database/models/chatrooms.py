@@ -141,7 +141,7 @@ class Chatrooms(MySQL):
             conditions=conditions,
         )["count_id"]
 
-        list = self.select(
+        chatroom_list = self.select(
             columns=[
                 "apps.name",
                 "apps.description",
@@ -157,12 +157,12 @@ class Chatrooms(MySQL):
                 ["left", "apps", "chatrooms.app_id = apps.id"]
             ],
             conditions=conditions,
-            order_by="chatrooms.id DESC",
+            order_by="chatrooms.id DESC , chatrooms.last_chat_time DESC",
             limit=page_size,
             offset=(page - 1) * page_size
         )
 
-        for chat_item in list:
+        for chat_item in chatroom_list:
             chat_item['agent_list'] = []
             agent_list = ChatroomAgentRelation().select(
                 columns=["agent_id", "chatroom_id"],
@@ -175,15 +175,6 @@ class Chatrooms(MySQL):
             if agent_list:
                 for agent_item in agent_list:
                     if agent_item['agent_id'] > 0:
-                        # chat_item['agent_list'].append(Agents().select_one(
-                        #     columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id", "apps.icon", "apps.avatar", "apps.icon_background", "agents.obligations"],
-                        #     conditions=[
-                        #         {"column": "id", "value": agent_item['agent_id']}
-                        #     ],
-                        #     joins=[
-                        #         ["left", "apps", "apps.id = agents.app_id"],
-                        #     ]
-                        # ))
                         agent_data = Agents().select_one(
                             columns=["apps.name", "apps.description", "agents.id AS agent_id", 
                                    "agents.app_id", "apps.icon", "apps.avatar",
@@ -201,12 +192,12 @@ class Chatrooms(MySQL):
                             
                         chat_item['agent_list'].append(agent_data)
 
-        for room in list:
+        for room in chatroom_list:
             if 'agent_list' in room and isinstance(room['agent_list'], list):
                 room['agent_list'] = [a for a in room['agent_list'] if isinstance(a, dict)]
 
         return {
-            "list": list,
+            "list": chatroom_list,
             "total_count": total_count,
             "total_pages": math.ceil(total_count / page_size),
             "page": page,
