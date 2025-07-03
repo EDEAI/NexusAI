@@ -5,6 +5,7 @@ import math
 from typing import Any, Dict
 import os
 from config import settings
+from datetime import datetime
 
 
 class Chatrooms(MySQL):
@@ -332,8 +333,8 @@ class Chatrooms(MySQL):
             if 'agent_list' in room and isinstance(room['agent_list'], list):
                 room['agent_list'] = [a for a in room['agent_list'] if isinstance(a, dict)]
         
-        # 按last_chat_time降序排序
-        filtered_list = sorted(filtered_list, key=lambda x: x.get('last_chat_time') or '', reverse=True)
+        # 按last_chat_time降序排序，None用datetime.min
+        filtered_list = sorted(filtered_list, key=lambda x: x.get('last_chat_time') if x.get('last_chat_time') is not None else datetime.min, reverse=True)
         return {
             "list": filtered_list,
             "total_count": total,
