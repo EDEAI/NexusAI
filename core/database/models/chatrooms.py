@@ -326,6 +326,8 @@ class Chatrooms(MySQL):
             room for room in chat_list
             if len(room.get('agent_list', [])) == 1 and room['agent_list'][0]['agent_id'] == agent_id
         ]
+        # 按last_chat_time降序排序
+        filtered_list = sorted(filtered_list, key=lambda x: x.get('last_chat_time', ''), reverse=True)
         total = len(filtered_list)
         total_pages = 1 if show_all else ((total + page_size - 1) // page_size)
         for room in filtered_list:
