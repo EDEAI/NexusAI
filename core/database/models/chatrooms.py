@@ -321,13 +321,11 @@ class Chatrooms(MySQL):
                             agent_info['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_info['avatar']}"
                         chat_item['agent_list'].append(agent_info)
 
-        # Filter: only keep chatrooms where the agent list has exactly one agent and that agent's id equals agent_id.
+        # Filter: only keep chatrooms where the agent list has exactly one agent and that agent's id equals agent_id. 
         filtered_list = [
             room for room in chat_list
             if len(room.get('agent_list', [])) == 1 and room['agent_list'][0]['agent_id'] == agent_id
         ]
-        # 按last_chat_time降序排序
-        filtered_list = sorted(filtered_list, key=lambda x: x.get('last_chat_time', ''), reverse=True)
         total = len(filtered_list)
         total_pages = 1 if show_all else ((total + page_size - 1) // page_size)
         for room in filtered_list:
