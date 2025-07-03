@@ -114,8 +114,7 @@ class Workspaces(MySQL):
                         conditions=[
                             {"column": "id", "value": app['chatroom_id']},
                             {'column': 'chat_agent_id', "value": "0"},
-                            {'column': 'is_temporary', "value": "0"},
-                            {'column': 'status', "value": "1"}
+                            {'column': 'is_temporary', "value": "0"}
                         ]
                     )
                     if not find_chatroom:
