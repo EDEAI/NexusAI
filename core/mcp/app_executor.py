@@ -98,6 +98,7 @@ async def skill_run(
     if result["status"] != "success":
         return {
             "status": "failed",
+            "app_run_id": result["app_run_id"],
             "message": result["message"]
         }
 
@@ -109,6 +110,7 @@ async def skill_run(
     
     return {
         "status": "success",
+        "app_run_id": result["app_run_id"],
         "outputs": outputs,
         "file_list": file_list
     }

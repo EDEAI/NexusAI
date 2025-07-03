@@ -18,6 +18,7 @@ import os
 from config import settings
 from core.database.models.agents import Agents
 from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
+from core.database.models.chatrooms import Chatrooms
 
 
 class Workspaces(MySQL):
@@ -61,7 +62,15 @@ class Workspaces(MySQL):
                   apps.team_id = {team_id} AND
                   apps.status IN ('1', '2') AND
                   (app_runs.agent_id != 0 OR app_runs.chatroom_id != 0 OR app_runs.workflow_id != 0) AND
-                    apps.mode In('1','2','5')
+                    apps.mode In('1','2','5')AND (
+                        app_runs.chatroom_id = 0
+                        OR EXISTS (
+                            SELECT 1 FROM chatrooms
+                            WHERE chatrooms.id = app_runs.chatroom_id
+                            AND chatrooms.chat_agent_id = 0
+                            AND chatrooms.is_temporary = 0
+                        )
+                )
         """
         total_count_result = self.execute_query(query_count)
 
@@ -89,6 +98,15 @@ class Workspaces(MySQL):
                   apps.team_id = {team_id} AND
                   apps.status IN ('1', '2') AND
                   (app_runs.agent_id != 0 OR app_runs.chatroom_id != 0 OR app_runs.workflow_id != 0)  AND apps.mode In('1','2','5')
+                AND (
+                        app_runs.chatroom_id = 0
+                        OR EXISTS (
+                            SELECT 1 FROM chatrooms
+                            WHERE chatrooms.id = app_runs.chatroom_id
+                            AND chatrooms.chat_agent_id = 0
+                            AND chatrooms.is_temporary = 0
+                        )
+                )
             ORDER BY app_runs.updated_time DESC
             LIMIT {check_page}, {page_size}
             """
@@ -108,7 +126,6 @@ class Workspaces(MySQL):
                     app["process_name"] = ''
                 if app["chatroom_id"] > 0:
                     app["type"] = 2
-
                     last_agent = ChatroomMessages().select_one(
                         joins=[
                             ["inner", "agents", 'agents.id = chatroom_messages.agent_id'],

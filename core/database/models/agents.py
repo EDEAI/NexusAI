@@ -550,8 +550,27 @@ class Agents(MySQL):
                 agent_abilities_model.soft_delete([{"column": "agent_id", "value": agent_val["id"]},
                                                    {"column": "status", "op": "in", "value": [1, 2]}])
 
-                # delete chatroom agent relation
+                # delete chatroom agent relation 
                 chatroom_agent_relation_model = ChatroomAgentRelation()
+
+                chatroom_select_list = chatroom_agent_relation_model.select(
+                    columns=["chatroom_id"],
+                    conditions=[
+                        {"column": "agent_id", "value": agent_val["id"]}
+                    ]
+                )
+                for chat_item in chatroom_select_list:
+                    find_is_temporary = Chatrooms().select_one(
+                        columns=["is_temporary"],
+                        conditions=[
+                            {"column": "id", "value": chat_item["chatroom_id"]}
+                        ]
+                    )['is_temporary']
+                    if find_is_temporary > 0:
+                        Chatrooms().update(
+                            {"column": "id", "value": chat_item["chatroom_id"]},
+                            {"status": 3}
+                        )
                 chatroom_agent_relation_model.delete({"column": "agent_id", "value": agent_val["id"]})
 
                 # delete agent chatrooms
