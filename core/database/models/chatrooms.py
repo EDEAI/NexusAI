@@ -5,7 +5,6 @@ import math
 from typing import Any, Dict
 import os
 from config import settings
-from datetime import datetime
 
 
 class Chatrooms(MySQL):
@@ -322,7 +321,7 @@ class Chatrooms(MySQL):
                             agent_info['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_info['avatar']}"
                         chat_item['agent_list'].append(agent_info)
 
-        # Filter: only keep chatrooms where the agent list has exactly one agent and that agent's id equals agent_id. 
+        # Filter: only keep chatrooms where the agent list has exactly one agent and that agent's id equals agent_id.
         filtered_list = [
             room for room in chat_list
             if len(room.get('agent_list', [])) == 1 and room['agent_list'][0]['agent_id'] == agent_id
@@ -332,9 +331,6 @@ class Chatrooms(MySQL):
         for room in filtered_list:
             if 'agent_list' in room and isinstance(room['agent_list'], list):
                 room['agent_list'] = [a for a in room['agent_list'] if isinstance(a, dict)]
-        
-        # 按last_chat_time降序排序，None用datetime.min
-        filtered_list = sorted(filtered_list, key=lambda x: x.get('last_chat_time') if x.get('last_chat_time') is not None else datetime.min, reverse=True)
         return {
             "list": filtered_list,
             "total_count": total,
