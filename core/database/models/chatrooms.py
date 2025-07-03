@@ -201,6 +201,10 @@ class Chatrooms(MySQL):
                             
                         chat_item['agent_list'].append(agent_data)
 
+        for room in list:
+            if 'agent_list' in room and isinstance(room['agent_list'], list):
+                room['agent_list'] = [a for a in room['agent_list'] if isinstance(a, dict)]
+
         return {
             "list": list,
             "total_count": total_count,
@@ -324,6 +328,9 @@ class Chatrooms(MySQL):
         ]
         total = len(filtered_list)
         total_pages = 1 if show_all else ((total + page_size - 1) // page_size)
+        for room in filtered_list:
+            if 'agent_list' in room and isinstance(room['agent_list'], list):
+                room['agent_list'] = [a for a in room['agent_list'] if isinstance(a, dict)]
         return {
             "list": filtered_list,
             "total_count": total,
