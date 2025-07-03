@@ -18,6 +18,7 @@ import os
 from config import settings
 from core.database.models.agents import Agents
 from core.database.models.chatroom_agent_relation import ChatroomAgentRelation
+from core.database.models.chatrooms import Chatrooms
 
 
 class Workspaces(MySQL):
@@ -108,7 +109,17 @@ class Workspaces(MySQL):
                     app["process_name"] = ''
                 if app["chatroom_id"] > 0:
                     app["type"] = 2
-
+                    find_chatroom = Chatrooms().select_one(
+                        columns=["id"],
+                        conditions=[
+                            {"column": "id", "value": app['chatroom_id']},
+                            {'column': 'chat_agent_id', "value": 0},
+                            {'column': 'is_temporary', "value": 0}
+                        ]
+                    )
+                    if not find_chatroom:
+                        app_list.remove(app)
+                        continue
                     last_agent = ChatroomMessages().select_one(
                         joins=[
                             ["inner", "agents", 'agents.id = chatroom_messages.agent_id'],
