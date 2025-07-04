@@ -180,11 +180,11 @@ class WorkflowWebSocketManager():
     def __init__(
         self,
         event_loop: asyncio.BaseEventLoop,
-        set_workflow_confirmation_status_cb: Callable[['Chatroom', int, Dict[str, Any]], Awaitable[None]],
+        set_workflow_run_status_cb: Callable[['Chatroom', int, Dict[str, Any]], Awaitable[None]],
         set_workflow_result_cb: Callable[['Chatroom', int, str], Awaitable[None]]
     ):
         self._event_loop = event_loop
-        self._set_workflow_confirmation_status_cb = set_workflow_confirmation_status_cb
+        self._set_workflow_run_status_cb = set_workflow_run_status_cb
         self._set_workflow_result_cb = set_workflow_result_cb
         self._connection_status_by_user_id: Dict[int, Optional[int]] = {}
         self._connection_by_user_id: Dict[int, ServerConnection] = {}
@@ -251,7 +251,7 @@ class WorkflowWebSocketManager():
                                     'need_user_confirm': False,
                                     'show_todo_button': True
                                 }
-                                await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
+                                await self._set_workflow_run_status_cb(chatroom, mcp_tool_use_id, status)
                             elif message_type == self.WAITING_FOR_CONFIRMATION_MSG:
                                 logger.info(f'Connection {id(connection)} of user {user_id} received workflow message: {message}')
                                 user_names = [user['nickname'] for user in message_data['waiting_users']]
@@ -265,7 +265,7 @@ class WorkflowWebSocketManager():
                                     'show_todo_button': False,
                                     'confirmer_name': f'[{", ".join(user_names)}]'
                                 }
-                                await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
+                                await self._set_workflow_run_status_cb(chatroom, mcp_tool_use_id, status)
                             elif message_type == self.DEBUG_MSG:
                                 if message_data['status'] == 3:
                                     # Workflow execution failed
@@ -303,7 +303,7 @@ class WorkflowWebSocketManager():
                                                 'app_run_id': message_data['app_run_id'],
                                                 'node_exec_id': message_data['node_exec_data']['node_exec_id']
                                             }
-                                            await self._set_workflow_confirmation_status_cb(chatroom, mcp_tool_use_id, status)
+                                            await self._set_workflow_run_status_cb(chatroom, mcp_tool_use_id, status)
                         # Else ignore the message
                     except ConnectionClosed as e:
                         if e.rcvd.code == CloseCode.NORMAL_CLOSURE:

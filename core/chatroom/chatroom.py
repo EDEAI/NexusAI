@@ -588,7 +588,7 @@ class Chatroom:
             self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
         self._mcp_tool_use_lock.set()
 
-    async def set_workflow_confirmation_status(self, mcp_tool_use_id: int, status: Dict[str, Any]) -> None:
+    async def set_workflow_run_status(self, mcp_tool_use_id: int, status: Dict[str, Any]) -> None:
         if not self._mcp_tool_is_using:
             raise Exception('There is no MCP tool use!')
         mcp_tool_use = self._get_mcp_tool_use(mcp_tool_use_id)

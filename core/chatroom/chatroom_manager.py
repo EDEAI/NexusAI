@@ -45,7 +45,7 @@ class ChatroomManager:
         self._ws_manager = WebSocketManager(event_loop)
         self._workflow_ws_manager = WorkflowWebSocketManager(
             event_loop,
-            Chatroom.set_workflow_confirmation_status,
+            Chatroom.set_workflow_run_status,
             Chatroom.set_mcp_tool_result
         )
         self._mcp_client = MCPClient()
