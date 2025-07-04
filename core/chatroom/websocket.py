@@ -211,8 +211,7 @@ class WorkflowWebSocketManager():
                 connection = await connect(
                     f'ws://127.0.0.1:{settings.WEBSOCKET_PORT}/ws?token={token}',
                     open_timeout=1,
-                    ping_interval=None,  # Disable ping
-                    ping_timeout=None
+                    ping_timeout=1
                 )
             except ConnectionError as e:
                 logger.error(f'Workflow WebSocket connection of user {user_id} failed: {e}. Reconnecting...')
