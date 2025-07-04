@@ -37,7 +37,10 @@ class WebSocketManager:
         self._replying_status_by_connection_id: Dict[int, bool] = {}
         
     async def start(self, callback: Callable[[ServerConnection], Awaitable[Any]]):
-        async with serve(callback, '0.0.0.0', settings.CHATROOM_WEBSOCKET_PORT):
+        async with serve(
+            callback, '0.0.0.0', settings.CHATROOM_WEBSOCKET_PORT,
+            ping_timeout=2
+        ):
             await self._stop_future  # run forever
     
     def verify_connection(self, connection_path: str) -> int:
@@ -79,10 +82,11 @@ class WebSocketManager:
     def remove_connection(self, chatroom_id: int, connection: ServerConnection):
         if connections := self._connections_by_chatroom_id.get(chatroom_id):
             connections.discard(connection)
-            logger.debug(f'Connection {id(connection)} removed from chatroom {chatroom_id}')
+            logger.info(f'Connection {id(connection)} removed from chatroom {chatroom_id}. Remaining connections: {len(connections)}')
             del self._replying_status_by_connection_id[id(connection)]
             if not connections:
                 del self._connections_by_chatroom_id[chatroom_id]
+                logger.info(f'Chatroom {chatroom_id} has no more connections')
     
     def has_connections(self, chatroom_id: int) -> bool:
         return bool(self._connections_by_chatroom_id.get(chatroom_id))
@@ -331,7 +335,8 @@ class WorkflowWebSocketManager():
                 self._event_loop.create_task(self._start_connection(user_id))
             
             self._connection_status_by_user_id[user_id] = self.RUNNING
-            self._chatrooms_by_user_id.setdefault(user_id, set()).add(chatroom_id)
+            
+        self._chatrooms_by_user_id.setdefault(user_id, set()).add(chatroom_id)
     
     async def remove_chatroom(self, user_id: int, chatroom_id: int):
         connection_status = self._connection_status_by_user_id.get(user_id)

@@ -325,7 +325,7 @@ class Chatroom:
     async def _select_next_speaker(self) -> int:
         agent_id = None
         for message in reversed(self._history_messages):
-            if message['type'] == 'text':
+            if message['type'] in ['text', 'tool_use']:
                 last_speaker_id = message['agent_id']
                 break
         else:
@@ -1072,8 +1072,8 @@ class Chatroom:
         )
         if chatroom:
             if chatroom['chat_status'] == 0:
-                # Terminate chat if the user has pressed the stop button
-                logger.debug('Stop button pressed. The chat will terminate soon')
+                # Terminate chat
+                logger.debug('The chat will terminate soon')
                 return True
         else:
             # Terminate chat if the chatroom has been disabled or deleted
