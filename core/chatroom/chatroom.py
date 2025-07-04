@@ -890,6 +890,7 @@ class Chatroom:
                     prompt=prompt
                 )
 
+                logger.debug('Requesting LLM...')
                 new_text = True
                 async for chunk in agent_node.run_in_chatroom(
                     context=Context(),
