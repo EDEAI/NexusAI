@@ -157,19 +157,19 @@ def get_tokenizer(model_name: str, api_key: str) -> Union[tiktoken.Encoding, Ant
     Returns:
         Union[tiktoken.Encoding, Anthropic]: Tokenizer object
     """
-    if model_name.startswith('claude') and ANTHROPIC_AVAILABLE:
-        anthropic = Anthropic(api_key=api_key)
-        def anthropic_token_counter(text: str) -> int:
-            return anthropic.messages.count_tokens(
-                model=model_name,
-                messages=[{'role': 'user', 'content': text}],
-            ).input_tokens
-        return anthropic_token_counter
-    else:
-        try:
-            return tiktoken.encoding_for_model(model_name)
-        except:
-            return tiktoken.get_encoding("cl100k_base")
+    # if model_name.startswith('claude') and ANTHROPIC_AVAILABLE:
+    #     anthropic = Anthropic(api_key=api_key)
+    #     def anthropic_token_counter(text: str) -> int:
+    #         return anthropic.messages.count_tokens(
+    #             model=model_name,
+    #             messages=[{'role': 'user', 'content': text}],
+    #         ).input_tokens
+    #     return anthropic_token_counter
+    # else:
+    try:
+        return tiktoken.encoding_for_model(model_name)
+    except:
+        return tiktoken.get_encoding("cl100k_base")
 
 def count_tokens(tokenizer: Union[tiktoken.Encoding, Callable[[str], int]], text: str) -> int:
     """
