@@ -37,10 +37,7 @@ class WebSocketManager:
         self._replying_status_by_connection_id: Dict[int, bool] = {}
         
     async def start(self, callback: Callable[[ServerConnection], Awaitable[Any]]):
-        async with serve(
-            callback, '0.0.0.0', settings.CHATROOM_WEBSOCKET_PORT,
-            ping_timeout=1
-        ):
+        async with serve(callback, '0.0.0.0', settings.CHATROOM_WEBSOCKET_PORT):
             await self._stop_future  # run forever
     
     def verify_connection(self, connection_path: str) -> int:
@@ -210,8 +207,7 @@ class WorkflowWebSocketManager():
             try:
                 connection = await connect(
                     f'ws://127.0.0.1:{settings.WEBSOCKET_PORT}/ws?token={token}',
-                    open_timeout=1,
-                    ping_timeout=1
+                    open_timeout=1
                 )
             except ConnectionError as e:
                 logger.error(f'Workflow WebSocket connection of user {user_id} failed: {e}. Reconnecting...')

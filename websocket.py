@@ -28,4 +28,4 @@ def start_queue_processor():
 app.add_event_handler("startup", start_queue_processor)
 
 if __name__ == "__main__":
-    uvicorn.run("websocket:app", host="0.0.0.0", port=settings.WEBSOCKET_PORT, ws_ping_timeout=1)
+    uvicorn.run("websocket:app", host="0.0.0.0", port=settings.WEBSOCKET_PORT)
