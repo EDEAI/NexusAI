@@ -32,7 +32,7 @@ export default memo((props: NodeProps) => {
                 position={Position.Right}
             ></CustomHandle>
             <div className="flex flex-col gap-2 mb-2">
-                {data.model && (
+                {data.model &&modelList()?.length&& (
                     <div className=" -mr-2 p-2 flex bg-slate-100  rounded-md items-center gap-2 text-xs">
                         {modelList()}
                     </div>
