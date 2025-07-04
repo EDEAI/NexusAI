@@ -39,7 +39,7 @@ class WebSocketManager:
     async def start(self, callback: Callable[[ServerConnection], Awaitable[Any]]):
         async with serve(
             callback, '0.0.0.0', settings.CHATROOM_WEBSOCKET_PORT,
-            ping_timeout=2
+            ping_timeout=1
         ):
             await self._stop_future  # run forever
     
