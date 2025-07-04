@@ -175,6 +175,8 @@ class ChatroomManager:
                 }
             )
             user_message_id, user_message, topic = 0, user_input, None
+
+        chatroom_added_to_workflow_ws_manager = False
         try:
             # Get related agents
             agent_relations = chatroom_agent_relation.select(
@@ -226,6 +228,7 @@ class ChatroomManager:
                 )
                 self._chatrooms[chatroom_id] = chatroom
                 self._workflow_ws_manager.add_chatroom(user_id, chatroom_id)
+                chatroom_added_to_workflow_ws_manager = True
                 chatroom.load_history_messages(history_messages)
                 await chatroom.chat(user_input is None, file_list)
             end_time = time()
@@ -256,7 +259,8 @@ class ChatroomManager:
                 {'chat_status': 0}
             )
             self._chatrooms.pop(chatroom_id, None)
-            await self._workflow_ws_manager.remove_chatroom(user_id, chatroom_id)
+            if chatroom_added_to_workflow_ws_manager:
+                await self._workflow_ws_manager.remove_chatroom(user_id, chatroom_id)
         
     async def _handle_data_and_start_chatroom(
         self,

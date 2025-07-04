@@ -518,7 +518,51 @@ export const useMessageHandler = (
                         minTextLength: 1,
                     })
                 ) {
-                    updatedMessages = pre.concat(currentMessage);
+                    // --- begin: 同步 parsedContent、content ---
+                    let messageToSave = { ...currentMessage };
+                    if (
+                        messageToSave.activeMCPTools?.length > 0 ||
+                        messageToSave.contentBlocks?.length > 0
+                    ) {
+                        // Sync conversation-level MCP tool states back to message
+                        const updatedContentBlocks = syncMCPToolStatesToContentBlocks(
+                            messageToSave.contentBlocks || [],
+                            messageToSave.activeMCPTools || [],
+                            getMCPTool,
+                        );
+
+                        // Reconstruct content with updated MCP tool states
+                        if (getMCPTool && updatedContentBlocks.length > 0) {
+                            const reconstructedContent = reconstructContentWithUpdatedMCPTools(
+                                updatedContentBlocks,
+                                getMCPTool,
+                            );
+
+                            if (reconstructedContent) {
+                                messageToSave.content = reconstructedContent;
+                                messageToSave.parsedContent = parseMCPContent(reconstructedContent);
+                            } else {
+                                // Fallback: use existing content parsing
+                                if (messageToSave.content) {
+                                    messageToSave.parsedContent = parseMCPContent(
+                                        messageToSave.content,
+                                    );
+                                }
+                            }
+                        } else {
+                            // Fallback: use existing content parsing
+                            if (messageToSave.content) {
+                                messageToSave.parsedContent = parseMCPContent(messageToSave.content);
+                            }
+                        }
+
+                        // Preserve contentBlocks for rendering
+                        messageToSave.contentBlocks = updatedContentBlocks;
+                    } else if (messageToSave.content) {
+                        messageToSave.parsedContent = parseMCPContent(messageToSave.content);
+                    }
+                    // --- end: 同步 parsedContent、content ---
+                    updatedMessages = pre.concat(messageToSave);
                 }
                 agentText.current = '';
                 setCurrentMessage({
@@ -605,7 +649,8 @@ export const useMessageHandler = (
                 } else if (messageToSave.content) {
                     messageToSave.parsedContent = parseMCPContent(messageToSave.content);
                 }
-
+                console.log(messageToSave);
+                
                 setCurrentMessageContent((pre: any) => pre.concat(messageToSave));
             }
             setCurrentMessage({});
