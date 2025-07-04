@@ -22,7 +22,7 @@ class ChatroomMessages(MySQL):
     """
     Indicates whether the `chatroom_messages` table has an `update_time` column that tracks when a record was last updated.
     """
-    have_updated_time = False
+    have_updated_time = True
 
     def history_chatroom_messages(self, chatroom_id: int = 0, page: int = 1, page_size: int = 10):
         """

@@ -1,5 +1,4 @@
-from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages,
-                                  Agents, Workflows, ChatroomDrivenRecords, Models)
+from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows, ChatroomDrivenRecords, Models)
 from fastapi import APIRouter
 from api.utils.common import *
 from api.utils.jwt import *
@@ -23,7 +22,7 @@ models = Models()
 
 
 @router.get("/", response_model=ChatRoomListResponse, summary="Fetching the List of Chat Rooms")
-async def chatroom_list(page: int = 1, page_size: int = 10, name: str = "",
+async def chatroom_list(page: int = 1, page_size: int = 10, name: str = "",is_temporary: bool = False,
                         userinfo: TokenData = Depends(get_current_user)):
     """
     Fetch a list of all chat rooms.
@@ -42,7 +41,7 @@ async def chatroom_list(page: int = 1, page_size: int = 10, name: str = "",
     Raises:
     - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
     """
-    result = Chatrooms().all_chat_room_list(page, page_size, userinfo.uid, name)
+    result = Chatrooms().all_chat_room_list(page, page_size, userinfo.uid, name, is_temporary)
     return response_success(result)
 
 
@@ -223,13 +222,19 @@ async def show_chatroom_details(chatroom_id: int, userinfo: TokenData = Depends(
             agent['type'] = 'my_agent'
         else:
             agent['type'] = 'more_agent'
-
+        agent['support_image'] = Models().select_one(
+                columns=["support_image"],
+                conditions=[
+                    {"column": "id", "value": agent['model_config_id']}
+                ]
+            )['support_image']
     return response_success({
         'chat_info': chat_info,
         'agent_list': agent_list,
         'max_round': find_chatroom['max_round'],
         'smart_selection': find_chatroom['smart_selection'],
-        'chatroom_status': find_chatroom['chatroom_status']
+        'chatroom_status': find_chatroom['chatroom_status'],
+        'chat_status': find_chatroom['chat_status']
     })
 
 
@@ -450,7 +455,7 @@ async def toggle_auto_answer_switch(chatroom_id: int, agent_id: int, agent_setti
 
 @router.get("/{chatroom_id}/chatroom_message", response_model=ChatRoomResponseBase,
             summary="Get a list of historical messages")
-async def show_chatroom_details(chatroom_id: int, page: int = 1, page_size: int = 10,
+async def show_chatroom_messages(chatroom_id: int, page: int = 1, page_size: int = 10,
                                 userinfo: TokenData = Depends(get_current_user)):
     """
     Retrieve historical messages for a specific chat room.

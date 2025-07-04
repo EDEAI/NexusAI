@@ -13,7 +13,7 @@ export interface UploadedFile {
 }
 
 export const isImageFile = (fileName: string) => {
-    const extension = fileName.split('.').pop()?.toLowerCase();
+    const extension = fileName?.split('.').pop()?.toLowerCase();
     return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(extension || '');
 };
 

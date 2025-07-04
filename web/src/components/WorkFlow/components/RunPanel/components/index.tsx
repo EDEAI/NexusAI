@@ -9,6 +9,7 @@ import InputContent from './InputContent';
 import TrackContent from './TrackContent';
 import { useIntl } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
+import { Spin } from 'antd';
 
 const RunPanel = memo(() => {
   const intl = useIntl();
@@ -80,8 +81,8 @@ const RunPanel = memo(() => {
                   setFlowMessage={setFlowMessage}
                 />
               ) : (
-                <div className="p-4 text-gray-500">
-                  {intl.formatMessage({ id: 'workflow.noRunData' })}
+                <div className="text-center justify-center items-center flex">
+                  <Spin />
                 </div>
               )}
             </div>

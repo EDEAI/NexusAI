@@ -152,6 +152,7 @@ class SkillNode(SandboxBaseNode):
             )
             return {
                 'status': 'success',
+                'app_run_id': skill_run_id,
                 'message': 'custom_code node executed successfully.',
                 'data': {
                     'elapsed_time': elapsed_time,
@@ -162,6 +163,11 @@ class SkillNode(SandboxBaseNode):
             }
         except Exception as e:
             logger.exception('ERROR!!')
+            result = {
+                'status': 'failed',
+                'app_run_id': 0,
+                'message': str(e)
+            }
             if 'skill_run_id' in locals():
                 AppRuns().update(
                     {'column': 'id', 'value': skill_run_id},
@@ -170,7 +176,5 @@ class SkillNode(SandboxBaseNode):
                         'error': str(e)
                     }
                 )
-            return {
-                'status': 'failed',
-                'message': str(e)
-            }
+                result['app_run_id'] = skill_run_id
+            return result

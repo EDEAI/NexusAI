@@ -32,6 +32,7 @@ from .tool_authorizations import ToolAuthorizations
 from .chatrooms import Chatrooms
 from .chatroom_agent_relation import ChatroomAgentRelation
 from .chatroom_messages import ChatroomMessages
+from .mcp_tool_use_records import MCPToolUseRecords
 
 from .upload_files import UploadFiles
 
@@ -77,6 +78,7 @@ __all__ = [
     'ChatroomAgentRelation',
     'ChatroomMessages',
     'ChatroomDrivenRecords',
+    'MCPToolUseRecords',
     
     'UploadFiles',
     'Workspaces',

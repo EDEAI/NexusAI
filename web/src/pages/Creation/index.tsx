@@ -389,7 +389,7 @@ const Creation: React.FC = () => {
             className=" pb-[10px] flex flex-col"
             style={{ height: 'calc(-60px + 100vh)', width: '100%', margin: '0 auto' }}
         >
-            <div className="flex px-[30px] py-[20px] mx-[8px] items-center justify-between">
+            <div className="flex px-[30px] py-[20px] mx-[8px] items-center flex-wrap justify-between gap-2">
                 <div className="flex items-center">
                     {showTab
                         ? optionsModal.map((item: any, i: number) => {
@@ -428,7 +428,7 @@ const Creation: React.FC = () => {
                         : ''}
                 </div>
 
-                <div className="flex items-center">
+                <div className="flex items-center flex-wrap">
                     <div className="min-w-[200px] mr-4">
                         {/* <Select
                             mode="multiple"

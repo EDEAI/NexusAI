@@ -93,7 +93,7 @@ class Chatrooms(MySQL):
         """
         info = self.select_one(
             columns=[
-                'id', 'max_round', 'app_id', 'status', 'smart_selection', 'initial_message_id'
+                'id', 'max_round', 'app_id', 'status', 'chat_status', 'smart_selection', 'initial_message_id'
             ],
             conditions=[
                 {"column": "id", "value": chatroom_id},
@@ -102,11 +102,11 @@ class Chatrooms(MySQL):
             ]
         )
         if info is not None:
-            return {'status': 1, 'max_round': info['max_round'], 'app_id': info['app_id'], 'chatroom_status': info['status'], 'smart_selection': info['smart_selection'], 'initial_message_id': info['initial_message_id']}
+            return {'status': 1, 'chat_status':info['chat_status'] ,'max_round': info['max_round'], 'app_id': info['app_id'], 'chatroom_status': info['status'], 'smart_selection': info['smart_selection'], 'initial_message_id': info['initial_message_id']}
         else:
             return {'status': 0}
 
-    def all_chat_room_list(self, page: int = 1, page_size: int = 10, uid: int = 0, name: str = ""):
+    def all_chat_room_list(self, page: int = 1, page_size: int = 10, uid: int = 0, name: str = "", is_temporary: bool = False):
         """
         Retrieves a list of chat rooms with pagination, filtering by user ID and chat room name.
 
@@ -122,8 +122,13 @@ class Chatrooms(MySQL):
             {"column": "apps.mode", "value": 5},
             {"column": "chatrooms.user_id", "value": uid},
             {"column": "chatrooms.chat_agent_id", "value": 0},
-            {"column": "chatrooms.is_temporary", "value": 0},
         ]
+
+        if is_temporary:    
+            # conditions.append({"column": "chatrooms.is_temporary", "value": 1})
+            conditions.append({"column": "chatrooms.is_temporary", "op": "in", "value": [1, 0]})
+        else:
+            conditions.append({"column": "chatrooms.is_temporary", "value": 0})
 
         if name:
             conditions.append({"column": "apps.name", "op": "like", "value": "%" + name + "%"})
@@ -136,7 +141,7 @@ class Chatrooms(MySQL):
             conditions=conditions,
         )["count_id"]
 
-        list = self.select(
+        chatroom_list = self.select(
             columns=[
                 "apps.name",
                 "apps.description",
@@ -145,18 +150,19 @@ class Chatrooms(MySQL):
                 "chatrooms.active",
                 "chatrooms.status as chatroom_status",
                 "chatrooms.smart_selection",
+                "chatrooms.is_temporary",
                 "apps.id as app_id"
             ],
             joins=[
                 ["left", "apps", "chatrooms.app_id = apps.id"]
             ],
             conditions=conditions,
-            order_by="chatrooms.id DESC",
+            order_by="chatrooms.id DESC , chatrooms.last_chat_time DESC",
             limit=page_size,
             offset=(page - 1) * page_size
         )
 
-        for chat_item in list:
+        for chat_item in chatroom_list:
             chat_item['agent_list'] = []
             agent_list = ChatroomAgentRelation().select(
                 columns=["agent_id", "chatroom_id"],
@@ -169,15 +175,6 @@ class Chatrooms(MySQL):
             if agent_list:
                 for agent_item in agent_list:
                     if agent_item['agent_id'] > 0:
-                        # chat_item['agent_list'].append(Agents().select_one(
-                        #     columns=["apps.name", "apps.description", "agents.id AS agent_id", "agents.app_id", "apps.icon", "apps.avatar", "apps.icon_background", "agents.obligations"],
-                        #     conditions=[
-                        #         {"column": "id", "value": agent_item['agent_id']}
-                        #     ],
-                        #     joins=[
-                        #         ["left", "apps", "apps.id = agents.app_id"],
-                        #     ]
-                        # ))
                         agent_data = Agents().select_one(
                             columns=["apps.name", "apps.description", "agents.id AS agent_id", 
                                    "agents.app_id", "apps.icon", "apps.avatar",
@@ -195,8 +192,12 @@ class Chatrooms(MySQL):
                             
                         chat_item['agent_list'].append(agent_data)
 
+        for room in chatroom_list:
+            if 'agent_list' in room and isinstance(room['agent_list'], list):
+                room['agent_list'] = [a for a in room['agent_list'] if isinstance(a, dict)]
+
         return {
-            "list": list,
+            "list": chatroom_list,
             "total_count": total_count,
             "total_pages": math.ceil(total_count / page_size),
             "page": page,
@@ -228,7 +229,7 @@ class Chatrooms(MySQL):
                     FROM app_runs
                     GROUP BY chatroom_id
                 ) AS last_runs ON chatrooms.id = last_runs.chatroom_id
-                WHERE chatrooms.status = 1 AND chatrooms.is_temporary = 0 AND apps.status = 1 AND apps.mode = 5 AND chatrooms.user_id = {uid} AND chatrooms.id != {chatroom_id}
+                WHERE chatrooms.status = 1 AND chatrooms.is_temporary = 0 AND chatrooms.chat_agent_id = 0 AND apps.status = 1 AND apps.mode = 5 AND chatrooms.user_id = {uid} AND chatrooms.id != {chatroom_id}
                 ORDER BY last_run_time DESC
                 LIMIT 5
             """
@@ -270,22 +271,22 @@ class Chatrooms(MySQL):
                 columns=[
                     "apps.name", "apps.description", "chatrooms.id as chatroom_id", "chatrooms.chat_status",
                     "chatrooms.active", "chatrooms.status as chatroom_status", "chatrooms.smart_selection",
-                    "apps.id as app_id", "chatrooms.created_time"
+                    "apps.id as app_id", "chatrooms.created_time", "chatrooms.last_chat_time"
                 ],
                 joins=joins,
                 conditions=conditions,
-                order_by="chatrooms.id DESC"
+                order_by="chatrooms.id DESC,chatrooms.last_chat_time DESC"
             )
         else:
             chat_list = self.select(
                 columns=[
                     "apps.name", "apps.description", "chatrooms.id as chatroom_id", "chatrooms.chat_status",
                     "chatrooms.active", "chatrooms.status as chatroom_status", "chatrooms.smart_selection",
-                    "apps.id as app_id", "chatrooms.created_time"
+                    "apps.id as app_id", "chatrooms.created_time", "chatrooms.last_chat_time"
                 ],
                 joins=joins,
                 conditions=conditions,
-                order_by="chatrooms.id DESC",
+                order_by="chatrooms.id DESC , chatrooms.last_chat_time DESC",
                 limit=page_size,
                 offset=(page - 1) * page_size
             )
@@ -318,6 +319,9 @@ class Chatrooms(MySQL):
         ]
         total = len(filtered_list)
         total_pages = 1 if show_all else ((total + page_size - 1) // page_size)
+        for room in filtered_list:
+            if 'agent_list' in room and isinstance(room['agent_list'], list):
+                room['agent_list'] = [a for a in room['agent_list'] if isinstance(a, dict)]
         return {
             "list": filtered_list,
             "total_count": total,

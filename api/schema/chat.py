@@ -16,7 +16,7 @@ class ChatRoomInfoBase(BaseModel):
     active: Optional[int] = None
     chatroom_status: Optional[int] = None
     smart_selection: Optional[int] = None
-
+    is_temporary: Optional[int] = None
 
 
 class AgentModel(BaseModel):
@@ -112,6 +112,7 @@ class ChatRoomDetailAgentBase(BaseModel):
     avatar: Optional[str] = None
     icon: Optional[str] = None
     icon_background: Optional[str] = None
+    support_image: Optional[int] = None
 
 
 class RecentChatRoomInfoBase(BaseModel):
@@ -153,6 +154,7 @@ class ChatRoomDetailInfo(BaseModel):
     max_round: Optional[int] = None
     chatroom_status: Optional[int] = None
     smart_selection: Optional[int] = None
+    chat_status: Optional[int] = None
 
 class ChatRoomDetailResponse(ResponseBase):
     data: Optional[ChatRoomDetailInfo] = None

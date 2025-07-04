@@ -18,6 +18,7 @@ const contConfig = {
     CHAT_URL: myEnvVar.WEB_CHAT_URL || prevConfig.CHAT_URL,
     OUTPUT_PATH: myEnvVar.WEB_OUTPUT_PATH || prevConfig.OUTPUT_PATH,
 };
+console.log(`ENV: ${REACT_APP_ENV}`,contConfig);
 // const contConfig = prevConfig
 export default defineConfig({
     extraPostCSSPlugins: [require('tailwindcss'), require('autoprefixer')],

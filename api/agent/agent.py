@@ -1455,8 +1455,10 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
         processed_discussions = []
         for discussion_item in data["discussions"]:
             app_id = discussion_item.get("app_id")
-            current_discussion = discussion_item.copy()
+            current_discussion=[]
+            # current_discussion = discussion_item.copy()
             chatroom_id = discussion_item.get("chatroom_id")
+            processed_agent_list_cleaned = []
             if app_id:
                 # Query apps table for details and filter by status=1
                 app_info = apps_model.select_one(
@@ -1472,6 +1474,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     if app_info.get("avatar"):
                         app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                     # 更新name, description, avatar
+                    current_discussion = discussion_item.copy()
                     current_discussion["name"] = app_info.get("name", current_discussion.get("name"))
                     current_discussion["description"] = app_info.get("description", current_discussion.get("description"))
                     current_discussion["avatar"] = app_info.get("avatar", current_discussion.get("avatar"))
@@ -1483,7 +1486,8 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                         if item.get('avatar'):
                             item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                         processed_agent_list_cleaned.append(new_item)
-            current_discussion["agent_list"] = processed_agent_list_cleaned
+                    current_discussion["agent_list"] = processed_agent_list_cleaned
+                    processed_discussions.append(current_discussion)
             # if "agent_list" in current_discussion and isinstance(current_discussion["agent_list"], list):
             #     processed_agent_list = []
             #     for agent_list_item in current_discussion["agent_list"]:
@@ -1515,13 +1519,15 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
             #     current_discussion["agent_list"] = processed_agent_list
 
             # Discussion item is always added, even if app_id is not found or app_info is not found
-            processed_discussions.append(current_discussion)
 
         processed_data["discussions"] = processed_discussions
 
     # Skip "order" key and include it directly if present
     if "order" in data and isinstance(data["order"], list):
-        processed_data["order"] = data["order"]
+        if all(processed_data[key] == [] for key in ["discussions", "workflows", "assistants"]):
+            processed_data["order"] = []
+        else:
+            processed_data["order"] = data["order"]
 
     return response_success(processed_data, get_language_content("api_agent_success"))
 

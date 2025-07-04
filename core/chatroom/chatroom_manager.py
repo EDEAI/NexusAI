@@ -5,14 +5,13 @@ from pathlib import Path
 from time import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from exceptiongroup import ExceptionGroup
 from websockets import (
     ConnectionClosed,
-    WebSocketServerProtocol
+    ServerConnection
 )
 
 from .chatroom import Chatroom
-from .websocket import WebSocketManager
+from .websocket import WebSocketManager, WorkflowWebSocketManager
 from config import settings
 from core.database.models import (
     AppRuns,
@@ -44,6 +43,11 @@ class ChatroomManager:
     def __init__(self, event_loop: asyncio.BaseEventLoop):
         self._event_loop = event_loop
         self._ws_manager = WebSocketManager(event_loop)
+        self._workflow_ws_manager = WorkflowWebSocketManager(
+            event_loop,
+            Chatroom.set_workflow_run_status,
+            Chatroom.set_mcp_tool_result
+        )
         self._mcp_client = MCPClient()
         self._chatrooms: Dict[int, Chatroom] = {}
         self._ability_id_by_chatroom: Dict[int, int] = {}
@@ -171,6 +175,8 @@ class ChatroomManager:
                 }
             )
             user_message_id, user_message, topic = 0, user_input, None
+
+        chatroom_added_to_workflow_ws_manager = False
         try:
             # Get related agents
             agent_relations = chatroom_agent_relation.select(
@@ -212,7 +218,8 @@ class ChatroomManager:
                     user_id, team_id, chatroom_id, app_run_id, bool(chatroom_info['is_temporary']),
                     all_agent_ids, absent_agent_ids,
                     chatroom_info['max_round'], bool(chatroom_info['smart_selection']),
-                    self._ws_manager, user_message, user_message_id,
+                    self._ws_manager, self._workflow_ws_manager,
+                    user_message, user_message_id,
                     self._ability_id_by_chatroom.get(chatroom_id, 0),
                     topic,
                     self._mcp_client,
@@ -220,6 +227,8 @@ class ChatroomManager:
                     self._desktop_mcp_tool_list_by_chatroom.get(chatroom_id)
                 )
                 self._chatrooms[chatroom_id] = chatroom
+                self._workflow_ws_manager.add_chatroom(user_id, chatroom_id)
+                chatroom_added_to_workflow_ws_manager = True
                 chatroom.load_history_messages(history_messages)
                 await chatroom.chat(user_input is None, file_list)
             end_time = time()
@@ -249,7 +258,9 @@ class ChatroomManager:
                 {'column': 'id', 'value': chatroom_id},
                 {'chat_status': 0}
             )
-            self._chatrooms.pop(chatroom_id)
+            self._chatrooms.pop(chatroom_id, None)
+            if chatroom_added_to_workflow_ws_manager:
+                await self._workflow_ws_manager.remove_chatroom(user_id, chatroom_id)
         
     async def _handle_data_and_start_chatroom(
         self,
@@ -259,11 +270,11 @@ class ChatroomManager:
         user_input: Optional[str] = None
     ) -> None:
         try:
-            if chatroom_id in self._chatrooms:
+            # Interrupt all MCP tool uses and wait for the chatroom to be terminated, when the chatroom is resumed
+            if user_input is None and chatroom_id in self._chatrooms:
                 chatroom = self._chatrooms[chatroom_id]
                 if chatroom.mcp_tool_is_using:
-                    # Interrupt all MCP tool uses and wait for the chatroom to be terminated
-                    await chatroom.interrupt_all_mcp_tool_uses()
+                    await chatroom.stop_all_mcp_tool_uses('Interrupted')
                     while chatroom_id in self._chatrooms:
                         await asyncio.sleep(0.1)
 
@@ -277,9 +288,9 @@ class ChatroomManager:
             logger.exception('ERROR!!')
             await self._ws_manager.send_instruction(chatroom_id, 'ERROR', str(e))
         
-    async def _ws_handler(self, connection: WebSocketServerProtocol):
+    async def _ws_handler(self, connection: ServerConnection):
         try:
-            user_id = self._ws_manager.verify_connection(connection.path)
+            user_id = self._ws_manager.verify_connection(connection.request.path)
         except Exception as e:
             logger.exception('ERROR!!')
             await connection.send(str(e))
@@ -296,7 +307,7 @@ class ChatroomManager:
                 instruction_str = await connection.recv()
                 try:
                     cmd, data = self._ws_manager.parse_instruction(instruction_str)
-                    logger.info(f'cmd: {cmd}, data: {data}')
+                    logger.info(f'cmd: {cmd}, data: {str(data) if len(str(data)) < 500 else str(data)[:500] + "..."}')
                     match cmd:
                         case 'ENTER':
                             # Enter a chatroom
@@ -353,16 +364,9 @@ class ChatroomManager:
                                     await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                                 case 'MCPTOOLRESULT':
                                     assert isinstance(data, dict), 'MCP tool result should be a dictionary.'
-                                    assert isinstance(index := data['index'], int), f'Invalid MCP tool index: {index}'
+                                    assert isinstance(mcp_tool_use_id := data['id'], int), f'Invalid MCP tool use ID: {mcp_tool_use_id}'
                                     assert isinstance(result := data['result'], str), f'Invalid MCP tool result: {result}'
-                                    self._chatrooms[chatroom_id].set_mcp_tool_result(index, result)
-                                    await self._ws_manager.send_instruction(chatroom_id, 'WITHMCPTOOLRESULT', data)
-                                case 'WFCONFIRM':
-                                    assert isinstance(data, dict), 'Workflow confirmation data should be a dictionary.'
-                                    assert isinstance(index := data['index'], int), f'Invalid workflow index: {index}'
-                                    assert isinstance(status := data['status'], dict), f'Invalid workflow status: {status}'
-                                    self._chatrooms[chatroom_id].set_workflow_confirmation_status(index, status)
-                                    await self._ws_manager.send_instruction(chatroom_id, 'WITHWFCONFIRM', data)
+                                    await self._chatrooms[chatroom_id].set_mcp_tool_result(mcp_tool_use_id, result)
                                 case 'INPUT':
                                     # User input
                                     assert isinstance(data, str), 'User input should be a string.'
@@ -377,6 +381,9 @@ class ChatroomManager:
                                         {'chat_status': 0}
                                     )
                                     await self._ws_manager.send_instruction(chatroom_id, 'STOPPABLE', False)
+                                    chatroom = self._chatrooms[chatroom_id]
+                                    if chatroom.mcp_tool_is_using:
+                                        await chatroom.stop_all_mcp_tool_uses('Stopped by user')
                                 case _:
                                     raise Exception(f'Unknown command: {cmd}')
                 except Exception as e:

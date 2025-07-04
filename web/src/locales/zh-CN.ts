@@ -15,6 +15,7 @@ import settings from './zh-CN/settings';
 import skill from './zh-CN/skill';
 import user from './zh-CN/user';
 import workflow from './zh-CN/workflow';
+import chatroom from './zh-CN/chatroom';
 
 export default {
     'navBar.lang': '语言',
@@ -38,6 +39,7 @@ export default {
     ...createkb,
     ...user,
     ...plaza,
+    ...chatroom,
     'skill.downloadFiles': '输出文件',
     'skill.download': '下载',
     'app.workflow.log.filter.all': '全部日志',

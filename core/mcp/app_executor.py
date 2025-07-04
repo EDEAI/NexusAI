@@ -96,9 +96,11 @@ async def skill_run(
     
     result = task.get()
     if result["status"] != "success":
-        return {"outputs": {
-            'error': result["message"]
-        }}
+        return {
+            "status": "failed",
+            "app_run_id": result["app_run_id"],
+            "message": result["message"]
+        }
 
     outputs = result["data"]["outputs"]
     file_list = []
@@ -107,6 +109,8 @@ async def skill_run(
         file_list = extract_file_list_from_skill_output(outputs, skill["output_variables"])
     
     return {
+        "status": "success",
+        "app_run_id": result["app_run_id"],
         "outputs": outputs,
         "file_list": file_list
     }

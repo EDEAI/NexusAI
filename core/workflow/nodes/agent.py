@@ -756,6 +756,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'status': 2
                 }
             )
+            yield agent_run_id
+            
             replace_variable_value_with_context(self.data['input'], context)
 
             # Temporarily disable variable validation of Agent node in current version. 2024-10-22
@@ -823,14 +825,12 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     )
 
             all_mcp_tools = []
-            callable_skills, callable_workflows = [], []
-            if is_desktop:
-                callable_skills, callable_workflows = self._get_callable_items()
-                app_tools = convert_callable_items_to_mcp_tools(callable_skills, callable_workflows)
-                all_mcp_tools.extend(app_tools)
-
-                if mcp_tool_list:
-                    all_mcp_tools.extend(mcp_tool_list)
+            callable_skills, callable_workflows = self._get_callable_items()
+            app_tools = convert_callable_items_to_mcp_tools(callable_skills, callable_workflows)
+            all_mcp_tools.extend(app_tools)
+            
+            if is_desktop and mcp_tool_list:
+                all_mcp_tools.extend(mcp_tool_list)
             
             _, input_ = self._prepare_prompt(
                 agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets),
@@ -912,7 +912,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 chatroomdriven_info = ChatroomDrivenRecords().get_data_by_data_source_run_id(data_source_run_id)
                 if chatroomdriven_info:
                     ChatroomDrivenRecords().update_data_driven_run_id(chatroomdriven_info['id'],data_source_run_id, agent_run_id)
-            yield agent_run_id
         except Exception as e:
             logger.exception('ERROR!!')
             if 'agent_run_id' in locals():
