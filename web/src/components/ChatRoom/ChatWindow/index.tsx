@@ -107,6 +107,7 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
     useEffect(() => {
         if (setCurrentMessageFromHistory) {
             setCurrentMessageFromHistory(handleSetCurrentMessageFromHistory);
+            
         }
     }, [setCurrentMessageFromHistory, handleSetCurrentMessageFromHistory]);
 
