@@ -73,7 +73,7 @@ class ChatroomManager:
         )
         assert chatroom_info, get_language_content('chatroom_does_not_exist', user_id)
         if check_chat_status:
-            assert chatroom_info['chat_status'] == 0, 'You cannot start a new chat when the chat room is in a chat session!'
+            assert chatroom_info['chat_status'] == 0, 'Please wait for the current chat session to end!'
         return chatroom_info
     
     def _get_last_message_id(self, chatroom_id: int) -> Optional[int]:
