@@ -167,6 +167,7 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
                 if (!init) {
                     scrollDomload.current.style.display = 'none';
                 }
+               
                 setUserMessage(pre => {
                     const newMessages = res.data.list.reverse();
                     const processedMessages = processHistoricalMessages(newMessages);
