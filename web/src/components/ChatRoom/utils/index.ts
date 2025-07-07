@@ -221,7 +221,7 @@ export const checkLastAgentMessage = (
             if (message && 
                 message.is_agent === 1 && 
                 hasMessageContent(message, {
-                    checkText: true,
+                    checkText: false,
                     checkFiles: true,
                     checkMCPTools: true,
                     minTextLength: 1,

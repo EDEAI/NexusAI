@@ -19,6 +19,7 @@ import {
 import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
 import { Button, Form, Menu, message, Spin, Splitter } from 'antd';
+import _ from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 import AgentsFirst from '../components/AgentsFirst';
@@ -26,7 +27,6 @@ import AgentsFourthly from '../components/AgentsFourthly';
 import AgentsSecond from '../components/AgentsSecond';
 import Chat from './Chat';
 import Log from './Log';
-import _ from 'lodash';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -141,23 +141,22 @@ const Agents: React.FC = () => {
             return item.dataset_id;
         });
         setRepository(repositoryID);
-        if(res.data.callable_items){
-            res.data.agent.selected_skills=[]
-            res.data.agent.selected_workflows=[]
-            res.data.callable_items.forEach((item:any)=>{
-                if(item.item_type==1){
+        if (res.data.callable_items) {
+            res.data.agent.selected_skills = [];
+            res.data.agent.selected_workflows = [];
+            res.data.callable_items.forEach((item: any) => {
+                if (item.item_type == 1) {
                     res.data.agent.selected_skills.push({
                         ...item,
-                        mode:4
-                    })
-                }else{
+                        mode: 4,
+                    });
+                } else {
                     res.data.agent.selected_workflows.push({
                         ...item,
-                        mode:2
-                    })
+                        mode: 2,
+                    });
                 }
-            })
-            
+            });
         }
         setDetaillist(res.data);
         setOperationbentate(
@@ -278,24 +277,24 @@ const Agents: React.FC = () => {
         // if (!Ffromref.getFieldsValue().users[0]) {
         //     message.warning(intl.formatMessage({ id: 'agent.message.warning.variable' }));
         //     return true;
-        // } 
+        // }
         // else
         if (!Detaillist.agent.input_variables) {
             message.warning(intl.formatMessage({ id: 'agent.message.warning.variable' }));
             return true;
         }
-        if(_.isEmpty(Detaillist.agent.input_variables.properties)){
+        if (_.isEmpty(Detaillist.agent.input_variables.properties)) {
             message.warning(intl.formatMessage({ id: 'agent.message.warning.variable' }));
             return true;
         }
-        
-         if (!Fourthly_config_id) {
+
+        if (!Fourthly_config_id) {
             message.warning(intl.formatMessage({ id: 'agent.message.warning.LLM' }));
             return true;
         } else if (!Detaillist.agent.obligations) {
             message.warning(intl.formatMessage({ id: 'agent.message.warning.functiondescribe' }));
             return true;
-        }else if (hasDuplicateField(Ffromref.getFieldsValue().users, 'name')) {
+        } else if (hasDuplicateField(Ffromref.getFieldsValue().users, 'name')) {
             message.warning(intl.formatMessage({ id: 'agent.message.warning.repetition' }));
             return true;
         }
@@ -303,7 +302,7 @@ const Agents: React.FC = () => {
         // else if (firstusers.length !== 0) {
         //     message.warning(intl.formatMessage({ id: 'agent.message.warning.completevariable' }));
         //     return true;
-        // } 
+        // }
         return false;
     };
 
@@ -343,41 +342,41 @@ const Agents: React.FC = () => {
     const agentupdata = () => {
         setLoading(true);
         let creationagentid = 0;
-        return new Promise((resolve) => {
-            const handleAgentCreation = (appId) => {
+        return new Promise(resolve => {
+            const handleAgentCreation = appId => {
                 return GetagentInfo(appId, false)
-                    .then(value => {
+                    .then(async value => {
                         creationagentid = value.data.agent.agent_id;
-                        agentfirst(creationagentid);
-                        
+
+                        await agentfirst(creationagentid);
+
                         if (!creationappid) {
                             history.replace(`/Agents?app_id=${appId}&type=false`);
                         }
-                        
-                        setTimeout(() => {
-                            agentsecond(creationagentid);
+
+                        agentsecond(creationagentid).then(res => {
                             message.success(intl.formatMessage({ id: 'skill.conserve.success' }));
-                        }, 500);
-                        
-                        setTimeout(() => {
-                            getAgent(appId);
-                            if (!creationappid) {
-                                const createdData = {
-                                    ...createappdata('GET'),
-                                    app_id: appId,
-                                };
-                                createappdata('SET', createdData);
-                            }
-                        }, 1000);
-                        
-                        setNewagentid(creationagentid);
+                            setTimeout(() => {
+                                getAgent(appId);
+                                if (!creationappid) {
+                                    const createdData = {
+                                        ...createappdata('GET'),
+                                        app_id: appId,
+                                    };
+                                    createappdata('SET', createdData);
+                                }
+                            }, 1000);
+
+                            setNewagentid(creationagentid);
+                        });
+
                         return value;
                     })
                     .catch(() => {
                         return '';
                     });
             };
-            
+
             if (!creationappid) {
                 PostappsCreate(createappdata('GET'))
                     .then(res => {
@@ -405,100 +404,124 @@ const Agents: React.FC = () => {
         });
     };
 
-    const agentfirst = (agent_id: any, e?: any) => {
-        // debugger;
-        Ffromref.validateFields()
-            .then(value => {
-//                 "callable_list": [
-//     {
-//       "app_id": 0,
-//       "item_type": 0
-//     }
-//   ]
-                const callable_list=[...Detaillist.agent.selected_skills||[],...Detaillist.agent.selected_workflows||[]].map((item:any)=>{
-                    return {
-                        app_id:item.app_id,
-                        //1skill 2workflow
-                        item_type:item.mode==4?1:2
-                    }
-                })
-                
-                const putBasedata = {
-                    agent_id: agent_id,
-                    data: {
-                        is_public: Detaillist.app.is_public,
-                        enable_api: Detaillist.app.enable_api,
-                        attrs_are_visible: Detaillist.app.attrs_are_visible,
-                        obligations: Detaillist.agent.obligations,
-                        input_variables: Detaillist.agent.input_variables
-                            ? Detaillist.agent.input_variables
-                            : arraytoobject(Ffromref.getFieldsValue()),
-                        dataset_ids: repository,
-                        m_config_id: Fourthly_config_id,
-                        allow_upload_file: Detaillist.agent.allow_upload_file,
-                        default_output_format: Detaillist.agent.default_output_format,
-                        callable_list:callable_list
-                    },
-                };
-                if (Operationbentate == 'false') {
-                    AgentUpdate(putBasedata, 1);
-                    
-                }
+    const agentfirst = (agent_id: any, e?: any): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            Ffromref.validateFields()
+                .then(async value => {
+                    //                 "callable_list": [
+                    //     {
+                    //       "app_id": 0,
+                    //       "item_type": 0
+                    //     }
+                    //   ]
+                    const callable_list = [
+                        ...(Detaillist.agent.selected_skills || []),
+                        ...(Detaillist.agent.selected_workflows || []),
+                    ].map((item: any) => {
+                        return {
+                            app_id: item.app_id,
+                            //1skill 2workflow
+                            item_type: item.mode == 4 ? 1 : 2,
+                        };
+                    });
 
-                Fourthlyref.setFieldsValue(Ffromref.getFieldsValue());
-                const wordlist = Ffromref.getFieldsValue().users.map((item: any) => {
-                    return {
-                        value: `<<${CURRENT_NODE_ID}.inputs.${item.name}>>`,
-                        label: item.name,
+                    const putBasedata = {
+                        agent_id: agent_id,
+                        data: {
+                            is_public: Detaillist.app.is_public,
+                            enable_api: Detaillist.app.enable_api,
+                            attrs_are_visible: Detaillist.app.attrs_are_visible,
+                            obligations: Detaillist.agent.obligations,
+                            input_variables: Detaillist.agent.input_variables
+                                ? Detaillist.agent.input_variables
+                                : arraytoobject(Ffromref.getFieldsValue()),
+                            dataset_ids: repository,
+                            m_config_id: Fourthly_config_id,
+                            allow_upload_file: Detaillist.agent.allow_upload_file,
+                            default_output_format: Detaillist.agent.default_output_format,
+                            callable_list: callable_list,
+                        },
                     };
+                    if (Operationbentate == 'false') {
+                        await AgentUpdate(putBasedata, 1);
+                    }
+
+                    Fourthlyref.setFieldsValue(Ffromref.getFieldsValue());
+
+                    const wordlist =
+                        Ffromref.getFieldsValue()?.users?.map((item: any) => {
+                            return {
+                                value: `<<${CURRENT_NODE_ID}.inputs.${item.name}>>`,
+                                label: item.name,
+                            };
+                        }) || [];
+
+                    setCallwordlist(wordlist);
+
+                    if (e) {
+                        pageKeyfun(e.key);
+                    }
+
+                    resolve();
+                })
+                .catch(err => {
+                    reject(err);
                 });
-                setCallwordlist(wordlist);
-                // debugger;
-                if (e) {
-                    pageKeyfun(e.key);
-                }
-            })
-            .catch(err => {});
+        });
     };
 
-    const agentsecond = (agent_id: any) => {
-        const secondusersA = Sformref.getFieldsValue().users.filter((item: any) => {
-            return !!item;
-        });
-        const agent_abilities = secondusersA.map((item: any) => {
-            return {
-                ...item,
-                status: item.status == false ? 2 : 1,
-                agent_ability_id: item.agent_ability_id ? item.agent_ability_id : 0,
-                output_format: item.output_format ? item.output_format : 0,
+    const agentsecond = (agent_id: any): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            const secondusersA = Sformref.getFieldsValue().users.filter((item: any) => {
+                return !!item;
+            });
+            const agent_abilities = secondusersA.map((item: any) => {
+                return {
+                    ...item,
+                    status: item.status == false ? 2 : 1,
+                    agent_ability_id: item.agent_ability_id ? item.agent_ability_id : 0,
+                    output_format: item.output_format ? item.output_format : 0,
+                };
+            });
+            const params = {
+                agent_id: agent_id,
+                data: {
+                    auto_match_ability: Detaillist.agent.auto_match_ability,
+                    agent_abilities: agent_abilities,
+                },
             };
-        });
-        const params = {
-            agent_id: agent_id,
-            data: {
-                auto_match_ability: Detaillist.agent.auto_match_ability,
-                agent_abilities: agent_abilities,
-            },
-        };
-        if (Operationbentate == 'false') {
-            if (
-                agent_abilities.length == 1 &&
-                agent_abilities[0].name == '' &&
-                agent_abilities[0].content == ''
-            ) {
-                setAgentmunudisabled({ first: false, second: false, fourthly: false });
-                // pageKeyfun('4');
+            if (Operationbentate == 'false') {
+                if (
+                    agent_abilities.length == 1 &&
+                    agent_abilities[0].name == '' &&
+                    agent_abilities[0].content == ''
+                ) {
+                    setAgentmunudisabled({ first: false, second: false, fourthly: false });
+                    // pageKeyfun('4');
+                    resolve();
+                } else {
+                    PutagentAbilitiesset(params)
+                        .then(res => {
+                            if (res.code == 0) {
+                                setAgentmunudisabled({
+                                    first: false,
+                                    second: false,
+                                    fourthly: false,
+                                });
+                                // pageKeyfun('4');
+                                resolve();
+                            } else {
+                                reject(new Error(`API call failed with code: ${res.code}`));
+                            }
+                        })
+                        .catch(err => {
+                            reject(err);
+                        });
+                }
             } else {
-                PutagentAbilitiesset(params)
-                    .then(res => {
-                        if (res.code == 0) {
-                            setAgentmunudisabled({ first: false, second: false, fourthly: false });
-                            // pageKeyfun('4');
-                        }
-                    })
-                    .catch(err => {});
+                resolve();
             }
-        }
+        });
     };
 
     const AgentUpdate = async (values: any, id: number) => {
@@ -513,6 +536,7 @@ const Agents: React.FC = () => {
                 setLoading(false);
             }
         }
+        return true;
     };
 
     const hasDuplicateField = (array: any[], field: string) => {
