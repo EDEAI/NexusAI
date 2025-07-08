@@ -984,7 +984,7 @@ language_packs = {
                 "input_variables": [
                     {{
                         "name":"variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
-                        "type":"Variable type, including ['string', 'number', 'json'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python",
+                        "type":"Variable type, including ['string', 'number', 'json', 'file'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python, 'file' type variable value is a file path that can be directly used for file operations",
                         "required":"(bool type), whether the variable is required: True means required, False means non-required",
                         "display_name":"variable display name, which can be used as a description of the function and purpose of the variable"
                     }}
@@ -1038,7 +1038,7 @@ language_packs = {
                 "input_variables": [
                     {{
                         "name":"variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
-                        "type":"Variable type, including ['string', 'number', 'json'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python",
+                        "type":"Variable type, including ['string', 'number', 'json', 'file'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python, 'file' type variable value is a file path that can be directly used for file operations",
                         "required":"(bool type), whether the variable is required: True means required, False means non-required",
                         "display_name":"variable display name, which can be used as a description of the function and purpose of the variable"
                     }}
