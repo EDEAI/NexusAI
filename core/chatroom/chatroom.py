@@ -1104,7 +1104,16 @@ class Chatroom:
                     if (mode == 'image_only' and file_content['type'] != 'image') or (mode == 'document_only' and file_content['type'] != 'document'):
                         continue
                     if file_content[attr] == value:
-                        message['message'] += f'\n\n---\n\n##{file_content["name"]}\n\n**{attr}**: `{value}`\n\n```\n{file_content["content"]}\n```\n\n---\n\n'
+                        message['message'] += (
+                            '\n\n'
+                            '---\n\n'
+                            f'##{file_content["name"]}\n\n'
+                            f'**{attr}**: `{value}`\n\n'
+                            '```\n'
+                            f'{file_content["content"]}\n'
+                            '```\n\n'
+                            '---\n\n'
+                        )
 
     def _split_agent_message(self, message: Dict[str, Any]) -> List[Dict[str, Any]]:
         agent_id = message['agent_id']

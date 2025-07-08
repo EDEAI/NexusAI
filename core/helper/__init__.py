@@ -1,4 +1,4 @@
-import sys, json, uuid, base64, random, string
+import sys, json, uuid, base64, random, re, string
 from collections import deque
 from hashlib import md5
 from pathlib import Path
@@ -17,6 +17,8 @@ from core.database import redis
 
 import tiktoken
 from markitdown import MarkItDown
+from pdf2image import convert_from_path
+from pytesseract import image_to_string
 from typing import List, Dict, Any, Callable, Union
 try:
     from anthropic import Anthropic
@@ -291,6 +293,18 @@ def format_iso_time(dt: Union[datetime, None]) -> str:
     except Exception as e:
         return ""
     
+def convert_document_to_markdown(file_path: Path, keep_data_uris: bool = False) -> str:
+    result = md.convert(file_path, keep_data_uris=keep_data_uris).markdown
+    if file_path.suffix != '.pdf':
+        return result
+    if not re.search(r'\(cid:\d+\)', result):
+        return result
+    ocr_text = []
+    images = convert_from_path(file_path)
+    for image in images:
+        ocr_text.append(image_to_string(image, 'eng+chi_sim+chi_sim_vert'))
+    return '\n\n'.join(ocr_text)
+    
 def get_file_content_list(file_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     from core.database.models import UploadFiles
     from core.document import DocumentLoader
@@ -325,7 +339,7 @@ def get_file_content_list(file_list: List[Dict[str, Any]]) -> List[Dict[str, Any
             else:
                 # Use Markdown for document files
                 file_type = 'document'
-                file_content = md.convert(file_path).text_content
+                file_content = convert_document_to_markdown(file_path)
             file_content_list.append({
                 'id': file_id,
                 'name': file_name,
