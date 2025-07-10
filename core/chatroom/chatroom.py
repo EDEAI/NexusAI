@@ -913,7 +913,7 @@ class Chatroom:
                         self._current_agent_run_id = chunk
                         app_runs.set_chatroom_message_id(self._current_agent_run_id, self._current_agent_message_id)
                         continue
-                    if tool_call_chunks := chunk.tool_call_chunks:
+                    if hasattr(chunk, 'tool_call_chunks') and (tool_call_chunks := chunk.tool_call_chunks):
                         for tool_call_chunk in tool_call_chunks:
                             if tool_call_chunk['type'] == 'tool_call_chunk':
                                 mcp_tool_index = tool_call_chunk['index'] or 0
