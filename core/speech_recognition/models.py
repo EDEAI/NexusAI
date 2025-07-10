@@ -138,7 +138,6 @@ class SpeechRecognition:
                         file=audio_file,
                         **model_config
                     )
-                    print(response)
                 return self._process_openai_transcription_response(response, model_config)
             except Exception as e:
                 # Provide more detailed error information

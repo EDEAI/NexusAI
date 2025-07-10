@@ -391,7 +391,7 @@ class LLMBaseNode(Node):
                 } for tool in mcp_tool_list])
             for _ in range(5):
                 try:
-                    if model_info["supplier_name"] == "Anthropic":
+                    if model_info["supplier_name"] in ["Anthropic", "Google"]:
                         llm_aiter = llm_pipeline.astream_llm(llm_input)
                     else:
                         llm_aiter = llm_pipeline.astream_llm(llm_input, stream_usage=True)

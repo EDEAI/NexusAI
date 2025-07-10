@@ -916,7 +916,7 @@ class Chatroom:
                     if tool_call_chunks := chunk.tool_call_chunks:
                         for tool_call_chunk in tool_call_chunks:
                             if tool_call_chunk['type'] == 'tool_call_chunk':
-                                mcp_tool_index = tool_call_chunk['index']
+                                mcp_tool_index = tool_call_chunk['index'] or 0
                                 if mcp_tool_name := tool_call_chunk['name']:
                                     self._console_log(
                                         '\033[91mTool call: '
