@@ -11,10 +11,6 @@ from core.database import SQLDatabase
 from core.database.models import UploadFiles
 from core.workflow.variables import *
 
-from markitdown import MarkItDown
-
-md = MarkItDown(enable_plugins=False)
-
 project_root = Path(__file__).absolute().parent.parent.parent
 
 
