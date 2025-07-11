@@ -43,6 +43,9 @@ from .ai_tool_llm_records import AIToolLLMRecords
 from .chatroom_driven_records import ChatroomDrivenRecords
 
 from .mcp_servers import MCPServers
+from .roles import Roles
+from .permissions import Permission
+from .role_permission import RolePermission
 
 
 __all__ = [
@@ -83,5 +86,8 @@ __all__ = [
     'UploadFiles',
     'Workspaces',
     'AIToolLLMRecords',
-    'MCPServers'
+    'MCPServers',
+    'Roles',
+    'Permission',
+    'RolePermission'
 ]

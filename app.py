@@ -23,6 +23,7 @@ from api.workspace import router as workspace_router
 from api.chatroom.chatroom import router as chatroom_router
 from api.tags import router as tag_router
 from api.mcp_servers import router as mcp_servers_router
+from api.roles import router as roles_router
 from api.prompt_editor import router as prompt_editor_router
 
 from api.workflow.node import router as node_router
@@ -85,6 +86,7 @@ app.include_router(supplier_router, prefix='/v1/supplier', tags=["supplier"])
 app.include_router(icon_router, prefix='/v1/icon', tags=["icon"])
 app.include_router(tag_router, prefix='/v1/tag', tags=["tag"])
 app.include_router(mcp_servers_router, prefix='/v1/mcp-servers', tags=["mcp-servers"])
+app.include_router(roles_router, prefix='/v1/roles', tags=["roles"])
 app.include_router(prompt_editor_router, prefix='/prompt-editor', tags=["prompt-editor"])
 
 
