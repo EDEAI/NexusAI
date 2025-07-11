@@ -289,7 +289,7 @@ class LLMBaseNode(Node):
             agent_id=agent_id
         )
         
-        if model_info["supplier_name"] == "Anthropic":
+        if model_info["supplier_name"] in ["Anthropic", "Google"]:
             messages.reorganize_messages()
 
         messages_as_langchain_format = messages.to_langchain_format(
@@ -374,7 +374,7 @@ class LLMBaseNode(Node):
             override_rag_input=override_rag_input
         )
         
-        if model_info["supplier_name"] == "Anthropic":
+        if model_info["supplier_name"] in ["Anthropic", "Google"]:
             messages.reorganize_messages()
 
         async def ainvoke():

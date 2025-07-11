@@ -205,7 +205,7 @@ LLM_OUTPUT_SCHEMAS = {
                             },
                             "type": {
                                 "type": "string",
-                                "description": "Variable type: 'string' or 'number'"
+                                "description": "Variable type: 'string', 'number', 'json', 'file'"
                             },
                             "required": {
                                 "type": "boolean",
@@ -256,7 +256,7 @@ LLM_OUTPUT_SCHEMAS = {
                             },
                             "type": {
                                 "type": "string",
-                                "description": "Variable type: 'string', 'number', or 'json'"
+                                "description": "Variable type: 'string', 'number', 'json', 'file'"
                             },
                             "display_name": {
                                 "type": "string",
