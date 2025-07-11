@@ -913,10 +913,10 @@ class Chatroom:
                         self._current_agent_run_id = chunk
                         app_runs.set_chatroom_message_id(self._current_agent_run_id, self._current_agent_message_id)
                         continue
-                    if tool_call_chunks := chunk.tool_call_chunks:
+                    if hasattr(chunk, 'tool_call_chunks') and (tool_call_chunks := chunk.tool_call_chunks):
                         for tool_call_chunk in tool_call_chunks:
                             if tool_call_chunk['type'] == 'tool_call_chunk':
-                                mcp_tool_index = tool_call_chunk['index']
+                                mcp_tool_index = tool_call_chunk['index'] or 0
                                 if mcp_tool_name := tool_call_chunk['name']:
                                     self._console_log(
                                         '\033[91mTool call: '
@@ -1104,7 +1104,16 @@ class Chatroom:
                     if (mode == 'image_only' and file_content['type'] != 'image') or (mode == 'document_only' and file_content['type'] != 'document'):
                         continue
                     if file_content[attr] == value:
-                        message['message'] += f'\n\n---\n\n##{file_content["name"]}\n\n**{attr}**: `{value}`\n\n```\n{file_content["content"]}\n```\n\n---\n\n'
+                        message['message'] += (
+                            '\n\n'
+                            '---\n\n'
+                            f'##{file_content["name"]}\n\n'
+                            f'**{attr}**: `{value}`\n\n'
+                            '```\n'
+                            f'{file_content["content"]}\n'
+                            '```\n\n'
+                            '---\n\n'
+                        )
 
     def _split_agent_message(self, message: Dict[str, Any]) -> List[Dict[str, Any]]:
         agent_id = message['agent_id']

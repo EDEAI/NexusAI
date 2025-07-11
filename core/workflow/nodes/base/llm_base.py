@@ -133,8 +133,8 @@ class LLMBaseNode(Node):
                                 attr = 'path'
                                 if file_var_value[0] == '/':
                                     value = file_var_value[1:]
-                                    file_path = project_root.joinpath('storage').joinpath(value)
-                                    value = str(file_path)
+                                file_path = project_root.joinpath('storage').joinpath(value)
+                                value = str(file_path)
                             else:
                                 raise Exception('Unsupported value type!')
                             for file_content in message['file_content_list']:
@@ -144,15 +144,25 @@ class LLMBaseNode(Node):
                                             image_list.append(file_var_value)
                                         else:
                                             new_user_prompt += (
-                                                f'\n******Start of {file_content["name"]}******\n'
+                                                '\n\n'
+                                                '---\n\n'
+                                                f'##{file_content["name"]}\n\n'
+                                                f'**{attr}**: `{value}`\n\n'
+                                                '```\n'
                                                 f'{file_content["content"]}\n'
-                                                f'******End of {file_content["name"]}******\n'
+                                                '```\n\n'
+                                                '---\n\n'
                                             )
                                     else:
                                         message['message'] += (
-                                            f'\n******Start of {file_content["name"]}******\n'
+                                            '\n\n'
+                                            '---\n\n'
+                                            f'##{file_content["name"]}\n\n'
+                                            f'**{attr}**: `{value}`\n\n'
+                                            '```\n'
                                             f'{file_content["content"]}\n'
-                                            f'******End of {file_content["name"]}******\n'
+                                            '```\n\n'
+                                            '---\n\n'
                                         )
 
                 # Truncate Messages By Token Limit
@@ -381,7 +391,7 @@ class LLMBaseNode(Node):
                 } for tool in mcp_tool_list])
             for _ in range(5):
                 try:
-                    if model_info["supplier_name"] == "Anthropic":
+                    if model_info["supplier_name"] in ["Anthropic", "Google"]:
                         llm_aiter = llm_pipeline.astream_llm(llm_input)
                     else:
                         llm_aiter = llm_pipeline.astream_llm(llm_input, stream_usage=True)

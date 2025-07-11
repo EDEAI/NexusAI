@@ -223,7 +223,7 @@ export const checkLastAgentMessage = (
                 hasMessageContent(message, {
                     checkText: false,
                     checkFiles: true,
-                    checkMCPTools: true,
+                    checkMCPTools: false,
                     minTextLength: 1,
                     ...config
                 })) {

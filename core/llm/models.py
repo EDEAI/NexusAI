@@ -46,8 +46,8 @@ class LLMPipeline:
         if self.supplier == 'Anthropic':
             # Get schema if schema_key is provided
             schema = None
-            if schema_key and supplier in LLM_OUTPUT_SCHEMAS:
-                schema = LLM_OUTPUT_SCHEMAS[supplier].get(schema_key)
+            if schema_key:
+                schema = LLM_OUTPUT_SCHEMAS[schema_key]
 
             # Check if model_kwargs contains JSON response format configuration
             if config.get('model_kwargs', {}).get('response_format') == {"type": "json_object"}:
@@ -180,39 +180,20 @@ class LLMPipeline:
             '''
             self.llm = ChatCohere(**config)
         elif self.supplier == 'Google':
-            '''
-            config = {
-                "model": "your_model_name",  # The name of the model to use
-                                             # Supported examples:
-                                             # - gemini-pro
-                                             # - models/text-bison-001
+            # Get schema if schema_key is provided
+            schema = None
+            if schema_key:
+                schema = LLM_OUTPUT_SCHEMAS[schema_key]
 
-                "google_api_key": None,  # Optional Google API key
+            # Check if model_kwargs contains JSON response format configuration
+            if config.get('model_kwargs', {}).get('response_format') == {"type": "json_object"}:
+                config.pop('model_kwargs', None)
 
-                "credentials": None,  # Default custom credentials (google.auth.credentials.Credentials) to use
-                                      # when making API calls. If not provided, credentials will be 
-                                      # ascertained from the GOOGLE_API_KEY env var
-
-                "temperature": 0.7,  # Run inference with this temperature. Must be in the closed interval [0.0, 1.0]
-
-                "top_p": None,  # Decode using nucleus sampling: consider the smallest set of tokens whose
-                                # probability sum is at least top_p. Must be in the closed interval [0.0, 1.0]
-
-                "top_k": None,  # Decode using top-k sampling: consider the set of top_k most probable tokens.
-                                # Must be positive
-
-                "max_output_tokens": None,  # Maximum number of tokens to include in a candidate. 
-                                            # Must be greater than zero. If unset, will default to 64
-
-                "n": 1,  # Number of chat completions to generate for each prompt. Note that the API may
-                         # not return the full n completions if duplicates are generated
-
-                "max_retries": 6,  # The maximum number of retries to make when generating
-
-                "timeout": None  # The maximum number of seconds to wait for a response
-            }
-            '''
-            self.llm = ChatGoogleGenerativeAI(**config)
+            # Initialize Google with schema if available
+            if schema:
+                self.llm = ChatGoogleGenerativeAI(**config).with_structured_output(schema=schema, include_raw=True)
+            else:
+                self.llm = ChatGoogleGenerativeAI(**config)
         elif self.supplier == 'Groq':
             '''
              config = {
@@ -370,28 +351,6 @@ class LLMPipeline:
             '''
             self.llm = ChatOllama(**config)
         elif self.supplier in ['OpenAI', 'Doubao']:
-            '''
-            config = {
-                "model": "gpt-3.5-turbo",  # Model name to use.
-                "temperature": 0.7,  # What sampling temperature to use.
-                "model_kwargs": {},  # Holds any model parameters valid for `create` call not explicitly specified.
-                "api_key": None,  # Automatically inferred from env var `OPENAI_API_KEY` if not provided.
-                "base_url": None,  # Base URL path for API requests, leave blank if not using a proxy or service emulator.
-                "organization": None,  # Automatically inferred from env var `OPENAI_ORG_ID` if not provided.
-                "openai_proxy": None,  # To support explicit proxy for OpenAI.
-                "timeout": None,  # Timeout for requests to OpenAI completion API.
-                "max_retries": 2,  # Maximum number of retries to make when generating.
-                "streaming": False,  # Whether to stream the results or not.
-                "n": 1,  # Number of chat completions to generate for each prompt.
-                "max_tokens": None,  # Maximum number of tokens to generate.
-                "tiktoken_model_name": None,  # The model name to pass to tiktoken when using this class.
-                "default_headers": None,  # Default headers to use.
-                "default_query": None,  # Default query parameters to use.
-                "http_client": None,  # Optional httpx.Client for sync invocations.
-                "http_async_client": None,  # Optional httpx.AsyncClient for async invocations.
-                "stop_sequences": None  # Default stop sequences.
-            }
-            '''
             self.llm = ChatOpenAI(**config)
         elif self.supplier == 'Spark':
             '''
@@ -532,9 +491,9 @@ class LLMPipeline:
     def standardize_response(self, response):
         """
         Standardize the response format to match OpenAI's structure.
-        Handles two types of Anthropic responses:
-        1. Structured output with schema
-        2. Regular unstructured output
+        Handles different types of responses:
+        1. Anthropic responses (structured/unstructured output)
+        2. Google responses (structured output with tool calls)
         Other suppliers' responses are returned as-is.
 
         Args:
@@ -544,18 +503,19 @@ class LLMPipeline:
             A standardized response with content and token usage information.
         """
         if self.supplier == 'Anthropic':
-            # Handle structured output when schema is defined
+            # Handle structured output when schema is defined (include_raw=True format)
             if isinstance(response, dict) and 'raw' in response:
                 raw_response = response['raw']
                 usage_metadata = raw_response.usage_metadata
 
+                # Create standardized response
                 standardized_response = type('StandardizedResponse', (), {
                     'content': json.dumps(response['parsed'], ensure_ascii=False),
                     'response_metadata': {
                         'token_usage': {
-                            'prompt_tokens': usage_metadata['input_tokens'],
-                            'completion_tokens': usage_metadata['output_tokens'],
-                            'total_tokens': usage_metadata['total_tokens']
+                            'prompt_tokens': usage_metadata.get('input_tokens', 0),
+                            'completion_tokens': usage_metadata.get('output_tokens', 0),
+                            'total_tokens': usage_metadata.get('total_tokens', 0)
                         }
                     }
                 })
@@ -564,14 +524,56 @@ class LLMPipeline:
             # Handle regular unstructured output
             content = response.content
             usage_metadata = response.usage_metadata
-
+            
             standardized_response = type('StandardizedResponse', (), {
                 'content': content,
                 'response_metadata': {
                     'token_usage': {
-                        'prompt_tokens': usage_metadata['input_tokens'],
-                        'completion_tokens': usage_metadata['output_tokens'],
-                        'total_tokens': usage_metadata['total_tokens']
+                        'prompt_tokens': usage_metadata.get('input_tokens', 0),
+                        'completion_tokens': usage_metadata.get('output_tokens', 0),
+                        'total_tokens': usage_metadata.get('total_tokens', 0)
+                    }
+                }
+            })
+            return standardized_response
+
+        elif self.supplier == 'Google':
+            # Handle structured output when schema is defined (include_raw=True format)
+            if isinstance(response, dict) and 'raw' in response:
+                raw_response = response['raw']
+                usage_metadata = raw_response.usage_metadata
+                
+                # Extract content from raw response
+                content = ""
+                if hasattr(raw_response, 'additional_kwargs') and raw_response.additional_kwargs:
+                    function_call = raw_response.additional_kwargs.get('function_call')
+                    if function_call and 'arguments' in function_call:
+                        content = function_call['arguments']
+                
+                # Create standardized response
+                standardized_response = type('StandardizedResponse', (), {
+                    'content': content,
+                    'response_metadata': {
+                        'token_usage': {
+                            'prompt_tokens': usage_metadata.get('input_tokens', 0),
+                            'completion_tokens': usage_metadata.get('output_tokens', 0),
+                            'total_tokens': usage_metadata.get('total_tokens', 0)
+                        }
+                    }
+                })
+                return standardized_response
+            
+            # Handle regular unstructured output
+            content = response.content
+            usage_metadata = response.usage_metadata
+            
+            standardized_response = type('StandardizedResponse', (), {
+                'content': content,
+                'response_metadata': {
+                    'token_usage': {
+                        'prompt_tokens': usage_metadata.get('input_tokens', 0),
+                        'completion_tokens': usage_metadata.get('output_tokens', 0),
+                        'total_tokens': usage_metadata.get('total_tokens', 0)
                     }
                 }
             })
@@ -591,7 +593,6 @@ class LLMPipeline:
             The standardized output of the pipeline chain.
         """
         response = self.chain(messages).invoke(input)
-        print("Model response:", response)
         return self.standardize_response(response)
     
     def invoke_llm(self, messages, **kwargs):
@@ -605,6 +606,22 @@ class LLMPipeline:
         """
         Stream the LLM model with the provided prompt.
         """
-        response = self.llm.astream(messages, **kwargs)
-        return response
+        # Handle Google/Gemini supplier streaming issue
+        if self.supplier == 'Google':
+            # For Google, create async wrapper for synchronous streaming
+            async def async_stream_wrapper():
+                try:
+                    # Use synchronous streaming to avoid astream bug
+                    for chunk in self.llm.stream(messages, **kwargs):
+                        yield chunk
+                except Exception as e:
+                    # If streaming fails, fallback to regular invoke
+                    print(f"Google streaming error: {e}. Falling back to regular invoke.")
+                    result = self.llm.invoke(messages, **kwargs)
+                    yield result
+            
+            return async_stream_wrapper()
+        else:
+            response = self.llm.astream(messages, **kwargs)
+            return response
 

@@ -81,7 +81,7 @@ model_config = [
                 "secret": True,
                 "options": None,
                 "optional": False,
-                "description": "Automatically inferred from env var `OPENAI_API_KEY` if not provided.",
+                "description": "The API Key is an important credential for you to request the OpenAI model service.",
                 "default_value": ""
             }
         ],
@@ -1518,7 +1518,7 @@ model_config = [
                 "secret": True,
                 "options": None,
                 "optional": False,
-                "description": "Automatically inferred from env var `ANTHROPIC_API_KEY` if not provided.",
+                "description": "The API Key is an important credential for you to request the Anthropic model service.",
                 "default_value": ""
             }
         ],
@@ -2208,7 +2208,7 @@ model_config = [
             'moderation': []
         }
     },
-{
+    {
         'supplier': 'Doubao',
         'mode': 1,
         'config': [
@@ -2219,7 +2219,7 @@ model_config = [
                 "secret": True,
                 "options": None,
                 "optional": False,
-                "description": "The API Key is an important credential for you to request the Volcano Ark large model service.",
+                "description": "The API Key is an important credential for you to request the Doubao model service.",
                 "default_value": ""
             },
             {
@@ -3211,6 +3211,31 @@ model_config = [
                     ]
                 }
             ],
+            'embeddings': [],
+            'reranking': [],
+            'speech2text': [],
+            'tts': [],
+            'text2img': [],
+            'moderation': []
+        }
+    },
+    {
+        'supplier': 'Google',
+        'mode': 1,
+        'config': [
+            {
+                "key": "api_key",
+                "type": "str",
+                "value": "",
+                "secret": True,
+                "options": None,
+                "optional": False,
+                "description": "The API Key is an important credential for you to request the Google model service.",
+                "default_value": ""
+            }
+        ],
+        'models': {
+            'text-generation': [],
             'embeddings': [],
             'reranking': [],
             'speech2text': [],

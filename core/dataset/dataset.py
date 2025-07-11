@@ -13,7 +13,6 @@ import tiktoken
 from langchain_core.documents import Document
 from langchain_core.runnables import chain, Runnable
 from langchain_core.runnables.utils import Input, Output
-from markitdown import MarkItDown
 
 from config import enable_reranking_on_single_retrival, settings
 from core.database.models import (
@@ -30,6 +29,7 @@ from core.database.models import (
     Users
 )
 from core.document import DocumentLoader, TextSplitter
+from core.helper import convert_document_to_markdown
 from core.embeddings import Embeddings
 from core.reranker import Reranker
 from core.retriever import Retriever
@@ -53,8 +53,6 @@ models = Models()
 rag_records = RagRecords()
 upload_files = UploadFiles()
 users = Users()
-
-md = MarkItDown(enable_plugins=False)
 
 all_embeddings = {}
 all_rerankers = {}
@@ -182,12 +180,9 @@ class DatasetManagement:
         :param keep_data_uris: Whether to keep data URIs for embedded files
         :return: Processed markdown text with file references
         '''
-
-        # Initialize markitdown
-        md = MarkItDown(enable_plugins=False)
         
         # Convert document to markdown
-        markdown_text = md.convert(file_path, keep_data_uris=keep_data_uris).text_content
+        markdown_text = convert_document_to_markdown(Path(file_path), keep_data_uris=keep_data_uris)
         
         if not keep_data_uris:
             return markdown_text

@@ -73,6 +73,7 @@ dependencies:
   - openssl
   - pillow=10.4.0
   # - pip=24.0
+  - poppler=24.09.0
   # - python=3.10.13
   - pysocks=1.7.1
   - pytorch=2.3.1

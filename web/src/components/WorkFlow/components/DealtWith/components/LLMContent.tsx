@@ -64,12 +64,12 @@ const LLMContent = ({ dealtWithInfo, dealtWithData, execId, buttonLoading, onSub
     // Set success message and status
     setTimeout(() => {
       setSubmitting(false);
-      messageApi.success(
-        intl.formatMessage({
-          id: 'workflow.promptSubmitSuccessMsg',
-          defaultMessage: 'Prompt已提交，请点击确认完成待办',
-        })
-      );
+      // messageApi.success(
+      //   intl.formatMessage({
+      //     id: 'workflow.promptSubmitSuccessMsg',
+      //     defaultMessage: 'Prompt已提交，请点击确认完成待办',
+      //   })
+      // );
       // Set updating status after submission success, waiting for new results
       setUpdating(true);
     }, 500);
