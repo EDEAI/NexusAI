@@ -157,7 +157,7 @@ class Chatrooms(MySQL):
                 ["left", "apps", "chatrooms.app_id = apps.id"]
             ],
             conditions=conditions,
-            order_by="chatrooms.id DESC , chatrooms.last_chat_time DESC",
+            order_by="chatrooms.last_chat_time DESC",
             limit=page_size,
             offset=(page - 1) * page_size
         )
