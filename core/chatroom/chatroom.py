@@ -1286,7 +1286,7 @@ class Chatroom:
         chat_file_list: Optional[List[Union[int, str]]] = None
     ) -> None:
         for message in messages:
-            self._add_file_content_to_message(message, 'all', chat_file_list)
+            self._add_file_content_to_message(message, 'all')
             split_messages = self._split_agent_message(message)
             self._history_messages.extend(split_messages)
         if chat_file_list:
