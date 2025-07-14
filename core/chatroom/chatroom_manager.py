@@ -367,7 +367,7 @@ class ChatroomManager:
                                     # MCP tool files
                                     assert isinstance(data, dict), 'MCP tool files should be a dictionary.'
                                     assert isinstance(mcp_tool_use_id := data['id'], int), f'Invalid MCP tool use ID: {mcp_tool_use_id}'
-                                    assert isinstance(files_to_upload := data['files_to_upload'], dict), f'Invalid MCP tool files: {files_to_upload}'
+                                    assert isinstance(files_to_upload := data['files_to_upload'], list), f'Invalid MCP tool files: {files_to_upload}'
                                     await self._chatrooms[chatroom_id].set_mcp_tool_use_uploaded_files(mcp_tool_use_id, files_to_upload)
                                 case 'MCPTOOLRESULT':
                                     assert isinstance(data, dict), 'MCP tool result should be a dictionary.'
