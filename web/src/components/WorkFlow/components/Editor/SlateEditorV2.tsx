@@ -109,15 +109,17 @@ const MentionEditor = ({
         const valueChange = _.isEqual(oldPropsValue, value);
         if (valueChange) return;
 
-        if (value && value.length > 0) {
-            updateValue(value);
-        } else if (value && _.isArray(value) && value.length == 0) {
-            updateValue([
+        // 处理空值情况
+        if (!value || (Array.isArray(value) && value.length === 0)) {
+            const defaultValue = [
                 {
                     type: 'paragraph',
-                    children: [],
+                    children: [{ text: '' }],
                 },
-            ]);
+            ];
+            updateValue(defaultValue);
+        } else if (value && value.length > 0) {
+            updateValue(value);
         }
     }, [value, id]);
 
@@ -196,7 +198,21 @@ const MentionEditor = ({
         children.forEach(node => editor.apply({ type: 'remove_node', path: [0], node }));
 
         if (options.nodes) {
-            const nodes = Node.isNode(options.nodes) ? [options.nodes] : options.nodes;
+            let nodes: Node[];
+            
+            if (Node.isNode(options.nodes)) {
+                nodes = [options.nodes];
+            } else if (Array.isArray(options.nodes)) {
+                nodes = options.nodes;
+            } else {
+                // Handle invalid input by creating a default paragraph node
+                nodes = [
+                    {
+                        type: 'paragraph',
+                        children: [{ text: '' }],
+                    } as Node,
+                ];
+            }
 
             nodes.forEach((node, i) =>
                 editor.apply({ type: 'insert_node', path: [i], node: node }),
@@ -238,14 +254,19 @@ const MentionEditor = ({
         setTarget(null);
     };
 
+    const handleSlateChange = useCallback(
+        _.debounce((val) => {
+            onChange?.(val);
+            setTarget(null);
+        }, 200),
+        [onChange]
+    );
+
     return (
         <Slate
             editor={editor}
             initialValue={initialValue}
-            onChange={val => {
-                onChange?.(val);
-                setTarget(null);
-            }}
+            onChange={handleSlateChange}
         >
             <Editable
                 renderElement={renderElement}
@@ -336,7 +357,7 @@ const withMentions = editor => {
 };
 
 const insertMention = (editor, character) => {
-    const mention = {
+    const mention: any = {
         type: 'mention',
         id: character?.id || '',
         character: character.name,

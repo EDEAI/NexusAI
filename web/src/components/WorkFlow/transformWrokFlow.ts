@@ -26,7 +26,7 @@ import ToolNode from '@/py2js/nodes/tool.js';
 import VariableAggregationNode from '@/py2js/nodes/variable_aggregation.js';
 import { Prompt } from '@/py2js/prompt.js';
 import { ObjectVariable, Variable, createVariableFromObject } from '@/py2js/variables.js';
-import _ from 'lodash';
+import _, { clone, cloneDeep } from 'lodash';
 import useStore from './store';
 import { AppNode, BlockEnum } from './types';
 
@@ -901,12 +901,21 @@ export const transformer = {
             if (paramseters) {
                 paramseters.forEach(x => {
                     console.log(x, node);
-
+                    
+                    let value=''
+                    if(node?.data?.form?.[x.name]){
+                        value=serialize(node?.data?.form?.[x.name])
+                    }else if(x.default){
+                        value=x.default
+                    }
                     const vars = new Variable(
                         x.name,
                         x.type || 'string',
-                        node?.data?.form?.[x.name] || x.default || '',
+                        value,
+                        x.label.zh_Hans,
+                        x.required
                     );
+                    
                     input.addProperty(x.name, vars);
                 });
             }
@@ -917,6 +926,18 @@ export const transformer = {
             };
 
             return new ToolNode(params);
+        },
+        context(freeNode) {
+            console.log(freeNode);
+            const input = cloneDeep(freeNode.data.input);
+            Object.values(input.properties).forEach(x=>{
+                if(!x.required){
+                    delete input.properties[x.name]
+                }
+            })
+            return {
+                inputs:input,
+            };
         },
     },
     [BlockEnum.End]: {
