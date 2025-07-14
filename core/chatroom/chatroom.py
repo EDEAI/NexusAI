@@ -496,6 +496,7 @@ class Chatroom:
                 'id': mcp_tool_use['id'],
                 'name': mcp_tool_use['name'],
                 'skill_or_workflow_name': mcp_tool_use['skill_or_workflow_name'],
+                'files_to_upload': mcp_tool_use['files_to_upload'],
                 'workflow_run_id': mcp_tool_use['workflow_run_id'],
                 'workflow_confirmation_status': mcp_tool_use['workflow_confirmation_status'],
                 'args': mcp_tool_use['args'],
