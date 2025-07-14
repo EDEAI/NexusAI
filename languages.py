@@ -1111,6 +1111,10 @@ language_packs = {
         'api_agent_upload_invalid_json': 'Invalid JSON format',
         'api_agent_upload_success': 'File uploaded successfully',
         'api_agent_upload_failed': 'File upload failed',
+
+        'Permission_does_not_exist': 'Permission does not exist',
+        'role_delete_success': 'Role delete success',
+        'role_id_is_required': 'Role ID is required'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1436,6 +1440,10 @@ language_packs = {
         'api_agent_upload_invalid_json': '无效的JSON格式',
         'api_agent_upload_success': '文件上传成功',
         'api_agent_upload_failed': '文件上传失败',
+
+        'Permission_does_not_exist': '权限不存在',
+        'role_delete_success': '角色删除成功',
+        'role_id_is_required': '角色ID不能为空'
     }
 }
 

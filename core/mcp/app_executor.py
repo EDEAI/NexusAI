@@ -86,6 +86,15 @@ async def skill_run(
         
     input_obj = create_variable_from_dict(skill["input_variables"])
     for k, v in input_variables.items():
+        if k.startswith('file_parameter__'):
+            k = k[16:]  # Remove 'file_parameter__' prefix
+            # File parameter
+            try:
+                v = int(v)
+                # Int type
+            except ValueError:
+                # Str type
+                pass
         if var := input_obj.properties.get(k):
             var.value = v
 
@@ -170,6 +179,15 @@ async def workflow_run(
             raise ValueError(get_language_content("input_dict_format_error"))
         
         for k, v in input_variables.items():
+            if k.startswith('file_parameter__'):
+                k = k[16:]  # Remove 'file_parameter__' prefix
+                # File parameter
+                try:
+                    v = int(v)
+                    # Int type
+                except ValueError:
+                    # Str type
+                    pass
             if var := input_obj.properties.get(k):
                 var.value = v
         

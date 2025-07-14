@@ -7,23 +7,25 @@ from collections import deque
 from datetime import datetime
 from pathlib import Path
 from time import monotonic
-from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Sequence, Set, Tuple, Union
 from uuid import uuid4
 
 from langchain_core.messages import AIMessageChunk
 
 from .websocket import WebSocketManager, WorkflowWebSocketManager
+from config import settings
 from core.database.models import (
     AgentAbilities, Agents, AppRuns, Apps,
     ChatroomMessages, Chatrooms, CustomTools,
     Datasets, Models, MCPToolUseRecords,
-    Workflows
+    UploadFiles, Workflows
 )
 from core.helper import truncate_messages_by_token_limit, get_file_content_list
 from core.llm import Prompt
 from core.mcp.app_executor import skill_run, workflow_run
 from core.mcp.client import MCPClient
 from core.workflow.context import Context
+from core.workflow.graph import create_graph_from_dict
 from core.workflow.nodes import AgentNode, LLMNode
 from core.workflow.variables import create_variable_from_dict, ObjectVariable
 from languages import get_language_content
@@ -42,6 +44,7 @@ custom_tools = CustomTools()
 datasets = Datasets()
 mcp_tool_use_records = MCPToolUseRecords()
 models = Models()
+upload_files = UploadFiles()
 workflows = Workflows()
 
 skill_pattern = re.compile(r'nexusai__skill-(\d+)')
@@ -126,6 +129,7 @@ class Chatroom:
         # - topic: str
         self._history_messages: List[Dict[str, Union[int, str]]] = []
         self._image_list: Optional[List[Union[int, str]]] = None
+        self._chat_files: Set[Union[int, str]] = set()
         self._current_round = 0
         self._current_agent_message_id = 0
         self._current_agent_run_id = 0
@@ -522,10 +526,10 @@ class Chatroom:
         )
         return chatroom_message_id
     
-    def _update_chatroom_message(self, chatroom_message_id: int, message: str, update_last_chat_time: bool = True) -> None:
+    def _update_chatroom_message(self, update_last_chat_time: bool = True) -> None:
         chatroom_messages.update(
-            {'column': 'id', 'value': chatroom_message_id},
-            {'message': message}
+            {'column': 'id', 'value': self._current_agent_message_id},
+            {'message': self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)}
         )
         if update_last_chat_time:
             chatrooms.update(
@@ -550,6 +554,14 @@ class Chatroom:
             {'column': 'id', 'value': self._chatroom_id},
             {'last_chat_time': str(datetime.now())}
         )
+
+    def _update_chat_file_list(self, file_list: Optional[List[Union[int, str]]]) -> None:
+        if file_list:
+            self._chat_files.update(file_list)
+            chatrooms.update(
+                {'column': 'id', 'value': self._chatroom_id},
+                {'chat_file_list': list(self._chat_files)}
+            )
     
     async def set_mcp_tool_result(self, mcp_tool_use_id: int, result: str) -> None:
         if not self._mcp_tool_is_using:
@@ -561,20 +573,26 @@ class Chatroom:
         mcp_tool_use_update_data = {}
         mcp_tool_use['result'] = result
         mcp_tool_use_update_data['result'] = result
-        if workflow_pattern.fullmatch(mcp_tool_use['name']):
+        if (
+            skill_pattern.fullmatch(mcp_tool_use['name'])
+            or workflow_pattern.fullmatch(mcp_tool_use['name'])
+        ):
             mcp_tool_use['workflow_confirmation_status'] = None
             mcp_tool_use_update_data['workflow_run_status'] = None
             result_dict = json.loads(result)
             if result_dict['status'] == 'success':
                 mcp_tool_use_update_data['status'] = 4  # Success
+                # Generate file list
+                file_list = []
+                for file_info in result_dict['file_list']:
+                    relative_path = Path(file_info['file_path']).relative_to(f'{settings.STORAGE_URL}/file')
+                    file_list.append(str(relative_path))
+                self._update_chat_file_list(file_list)
             else:
                 mcp_tool_use_update_data['status'] = 5  # Failed
         else:
             mcp_tool_use_update_data['status'] = 4  # Finished
-        self._update_chatroom_message(
-            self._current_agent_message_id,
-            self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
-        )
+        self._update_chatroom_message()
         mcp_tool_use_records.update(
             {'column': 'id', 'value': mcp_tool_use_id},
             mcp_tool_use_update_data
@@ -586,6 +604,52 @@ class Chatroom:
         )
         if workflow_run_id := mcp_tool_use['workflow_run_id']:
             self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
+        self._mcp_tool_use_lock.set()
+
+    async def set_mcp_tool_use_uploaded_files(self, mcp_tool_use_id: int, files: Dict[str, Any]) -> None:
+        if not self._mcp_tool_is_using:
+            raise Exception('There is no MCP tool use!')
+        mcp_tool_use = self._get_mcp_tool_use(mcp_tool_use_id)
+        if mcp_tool_use['result'] is not None:
+            raise Exception('MCP tool use has finished!')
+        if not mcp_tool_use['files_to_upload']:
+            raise Exception('No files to be uploaded!')
+        input_variables: Dict[str, Any] = mcp_tool_use['args']['input_variables']
+        for variable_name, file_id in files.items():
+            if f'file_parameter__{variable_name}' in input_variables:
+                if input_variables[f'file_parameter__{variable_name}'] == 'need_upload':
+                    input_variables[f'file_parameter__{variable_name}'] = file_id
+                else:
+                    raise Exception(f'File parameter {variable_name} has been uploaded!')
+            else:
+                raise Exception(f'File parameter {variable_name} is not found!')
+            
+            file_data = upload_files.get_file_by_id(file_id)
+            file_name = file_data['name'] + file_data['extension']
+            file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
+            file_url = f'{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}'
+            for file_to_upload in mcp_tool_use['files_to_upload']:
+                if file_to_upload['name'] == variable_name:
+                    file_to_upload['id'] = file_id
+                    file_to_upload['file_name'] = file_name
+                    file_to_upload['file_path'] = file_url
+                    break
+            else:
+                raise Exception(f'File {variable_name} is not found!')
+        self._update_chatroom_message()
+        mcp_tool_use_records.update(
+            {'column': 'id', 'value': mcp_tool_use_id},
+            {'args': mcp_tool_use['args'], 'files_to_upload': mcp_tool_use['files_to_upload']}
+        )
+        await self._ws_manager.send_instruction(
+            self._chatroom_id,
+            'WITHMCPTOOLFILES', 
+            {
+                'id': mcp_tool_use_id,
+                'files_to_upload': mcp_tool_use['files_to_upload'],
+                'args': mcp_tool_use['args']
+            }
+        )
         self._mcp_tool_use_lock.set()
 
     async def set_workflow_run_status(self, mcp_tool_use_id: int, status: Dict[str, Any]) -> None:
@@ -600,10 +664,7 @@ class Chatroom:
             mcp_tool_use_update_data['status'] = 3  # Waiting for confirmation
         else:
             mcp_tool_use_update_data['status'] = 2  # Running
-        self._update_chatroom_message(
-            self._current_agent_message_id,
-            self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
-        )
+        self._update_chatroom_message()
         mcp_tool_use_records.update(
             {'column': 'id', 'value': mcp_tool_use_id},
             mcp_tool_use_update_data
@@ -634,11 +695,7 @@ class Chatroom:
                 mcp_tool_use['result'] = result
                 mcp_tool_use_update_data['result'] = result
                 mcp_tool_use_update_data['status'] = 5  # Stopped
-                self._update_chatroom_message(
-                    self._current_agent_message_id,
-                    self._get_agent_message_with_mcp_tool_uses(self._current_agent_message),
-                    update_last_chat_time=False
-                )
+                self._update_chatroom_message(update_last_chat_time=False)
                 mcp_tool_use_records.update(
                     {'column': 'id', 'value': mcp_tool_use['id']},
                     mcp_tool_use_update_data
@@ -683,6 +740,38 @@ class Chatroom:
                     app = apps.get_app_by_id(skill['app_id'])
                     mcp_tool_use['skill_or_workflow_name'] = app['name']
                     mcp_tool_use_update_data['skill_id'] = skill_id
+
+                    # Check if the skill has input variables that are files and need to be uploaded
+                    try:
+                        files_to_upload = []
+                        input_variables: Dict[str, Any] = mcp_tool_use['args']['input_variables']
+                        skill_input_variables = skill['input_variables']['properties']
+                        for k, v in input_variables.items():
+                            if k.startswith('file_parameter__') and v == 'need_upload':
+                                skill_var = skill_input_variables[k[16:]]
+                                assert skill_var['type'] == 'file', f'Skill input variable {k} is not a file'
+                                files_to_upload.append({
+                                    'name': skill_var['name'],
+                                    'variable_name': (
+                                        skill_var['display_name']
+                                        if skill_var.get('display_name')
+                                        else skill_var['name']
+                                    ),
+                                    'id': 0,
+                                    'file_name': None,
+                                    'file_path': None
+                                })
+                        mcp_tool_use['files_to_upload'] = files_to_upload
+                        mcp_tool_use_update_data['files_to_upload'] = files_to_upload
+                    except Exception as e:
+                        logger.exception('ERROR!!')
+                        result = json.dumps({
+                            'status': 'failed',
+                            'message': f'Error checking skill input variables: {e}'
+                        }, ensure_ascii=False)
+                        mcp_tool_use['result'] = result
+                        mcp_tool_use_update_data['result'] = result
+                        mcp_tool_use_update_data['status'] = 5  # Failed
             elif match := workflow_pattern.fullmatch(mcp_tool_use['name']):
                 workflow_id = int(match.group(1))
                 workflow = workflows.get_workflow_app(workflow_id)
@@ -698,10 +787,40 @@ class Chatroom:
                 else:
                     mcp_tool_use['skill_or_workflow_name'] = workflow['name']
                     mcp_tool_use_update_data['workflow_id'] = workflow_id
-            self._update_chatroom_message(
-                self._current_agent_message_id,
-                self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
-            )
+
+                    # Check if the workflow has input variables that are files and need to be uploaded
+                    try:
+                        files_to_upload = []
+                        input_variables: Dict[str, Any] = mcp_tool_use['args']['input_variables']
+                        graph = create_graph_from_dict(workflow['graph'])
+                        workflow_input_variables = graph.nodes.nodes[0].data['input'].to_dict()
+                        for k, v in workflow_input_variables.items():
+                            if k.startswith('file_parameter__') and v == 'need_upload':
+                                workflow_var = workflow_input_variables[k[16:]]
+                                assert workflow_var['type'] == 'file', f'Workflow input variable {k} is not a file'
+                                files_to_upload.append({
+                                    'name': workflow_var['name'],
+                                    'variable_name': (
+                                        workflow_var['display_name']
+                                        if workflow_var.get('display_name')
+                                        else workflow_var['name']
+                                    ),
+                                    'id': 0,
+                                    'file_name': None,
+                                    'file_path': None
+                                })
+                        mcp_tool_use['files_to_upload'] = files_to_upload
+                        mcp_tool_use_update_data['files_to_upload'] = files_to_upload
+                    except Exception as e:
+                        logger.exception('ERROR!!')
+                        result = json.dumps({
+                            'status': 'failed',
+                            'message': f'Error checking workflow input variables: {e}'
+                        }, ensure_ascii=False)
+                        mcp_tool_use['result'] = result
+                        mcp_tool_use_update_data['result'] = result
+                        mcp_tool_use_update_data['status'] = 5  # Failed
+            self._update_chatroom_message()
             mcp_tool_use_records.update(
                 {'column': 'id', 'value': mcp_tool_use['id']},
                 mcp_tool_use_update_data
@@ -710,6 +829,7 @@ class Chatroom:
                 'id': mcp_tool_use['id'],
                 'name': mcp_tool_use['name'],
                 'skill_or_workflow_name': mcp_tool_use['skill_or_workflow_name'],
+                'files_to_upload': mcp_tool_use['files_to_upload'],
                 'args': mcp_tool_use['args']
             }
             await self._ws_manager.send_instruction(
@@ -725,7 +845,7 @@ class Chatroom:
                 )
 
     async def _wait_for_mcp_tool_uses(self) -> None:
-        # Invoke the MCP tool(s) of the built-in MCP server
+        # Invoke skills and workflows
         for mcp_tool_use in self._mcp_tool_uses:
             mcp_tool_name = mcp_tool_use['name']
             mcp_tool_args = mcp_tool_use['args']
@@ -733,10 +853,20 @@ class Chatroom:
             workflow_match = workflow_pattern.fullmatch(mcp_tool_name)
             if skill_match or workflow_match:
                 if result := mcp_tool_use['result'] is None:
-                    mcp_tool_use_update_data = {}
                     try:
                         logger.debug('Invoking MCP tool: %s', mcp_tool_name)
                         logger.debug('MCP tool args: %s', mcp_tool_args)
+
+                        # Wait for the user to upload files
+                        input_variables: Dict[str, Any] = mcp_tool_args['input_variables']
+                        while any(v == 'need_upload' for k, v in input_variables.items() if k.startswith('file_parameter__')):
+                            try:
+                                self._mcp_tool_use_lock.clear()
+                                await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
+                            except asyncio.TimeoutError:
+                                await self.stop_all_mcp_tool_uses('Timeout')
+                                return
+                        
                         if skill_match:
                             result = await asyncio.wait_for(
                                 skill_run(
@@ -747,25 +877,12 @@ class Chatroom:
                                 timeout=3600
                             )
                             skill_run_id = result.pop('app_run_id')
-                            mcp_tool_use_update_data['app_run_id'] = skill_run_id
-                            result = json.dumps(result, ensure_ascii=False)
-                            logger.debug('MCP tool result: %s', result)
-                            mcp_tool_use['result'] = result
-                            mcp_tool_use_update_data['result'] = result
-                            mcp_tool_use_update_data['status'] = 4  # Finished
-                            self._update_chatroom_message(
-                                self._current_agent_message_id,
-                                self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
-                            )
                             mcp_tool_use_records.update(
                                 {'column': 'id', 'value': mcp_tool_use['id']},
-                                mcp_tool_use_update_data
+                                {'app_run_id': skill_run_id}
                             )
-                            await self._ws_manager.send_instruction(
-                                self._chatroom_id,
-                                'WITHMCPTOOLRESULT',
-                                {'id': mcp_tool_use['id'], 'result': result}
-                            )
+                            result = json.dumps(result, ensure_ascii=False)
+                            await self.set_mcp_tool_result(mcp_tool_use['id'], result)
                         elif workflow_match:
                             result_dict = await asyncio.wait_for(
                                 workflow_run(
@@ -778,7 +895,6 @@ class Chatroom:
                             logger.debug('Workflow run: %s', result_dict)
                             workflow_run_id = result_dict['app_run_id']
                             mcp_tool_use['workflow_run_id'] = workflow_run_id
-                            mcp_tool_use_update_data['app_run_id'] = workflow_run_id
                             self._workflow_ws_manager.add_workflow_run(
                                 self._user_id, workflow_run_id,
                                 self, mcp_tool_use['id']
@@ -786,11 +902,11 @@ class Chatroom:
                             result = json.dumps(result_dict, ensure_ascii=False)
                             mcp_tool_use_records.update(
                                 {'column': 'id', 'value': mcp_tool_use['id']},
-                                mcp_tool_use_update_data
+                                {'app_run_id': workflow_run_id}
                             )
                     except asyncio.TimeoutError:
                         await self.stop_all_mcp_tool_uses('Timeout')
-                        break
+                        return
                     except Exception as e:
                         logger.exception('ERROR!!')
                         result = {
@@ -798,24 +914,7 @@ class Chatroom:
                             'message': f'Error executing tool {mcp_tool_name}: {e}'
                         }
                         result = json.dumps(result, ensure_ascii=False)
-                        mcp_tool_use['result'] = result
-                        mcp_tool_use_update_data['result'] = result
-                        mcp_tool_use_update_data['status'] = 5  # Failed
-                        self._update_chatroom_message(
-                            self._current_agent_message_id,
-                            self._get_agent_message_with_mcp_tool_uses(self._current_agent_message)
-                        )
-                        mcp_tool_use_records.update(
-                            {'column': 'id', 'value': mcp_tool_use['id']},
-                            mcp_tool_use_update_data
-                        )
-                        await self._ws_manager.send_instruction(
-                            self._chatroom_id,
-                            'WITHMCPTOOLRESULT',
-                            {'id': mcp_tool_use['id'], 'result': result}
-                        )
-                        if workflow_run_id := mcp_tool_use['workflow_run_id']:
-                            self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
+                        await self.set_mcp_tool_result(mcp_tool_use['id'], result)
 
         # Wait for the MCP tool uses to finish
         while any(mcp_tool_use['result'] is None for mcp_tool_use in self._mcp_tool_uses):
@@ -825,7 +924,7 @@ class Chatroom:
                     await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
                 except asyncio.TimeoutError:
                     await self.stop_all_mcp_tool_uses('Timeout')
-                    break
+                    return
 
     def _append_mcp_tool_uses_to_history_messages(self, agent_id: int) -> None:
         # Append the tool use and tool result to the history messages
@@ -878,7 +977,8 @@ class Chatroom:
                     topic = self._topic,
                     user_message = user_message,
                     messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
-                    user_messages = user_messages
+                    user_messages = user_messages,
+                    chat_file_list = json.dumps([str(file) for file in self._chat_files], ensure_ascii=False)
                 )
                 prompt = Prompt(user=agent_user_subprompt)
                 agent_node = AgentNode(
@@ -938,6 +1038,7 @@ class Chatroom:
                                         'id': mcp_tool_use_id,
                                         'name': mcp_tool_name,
                                         'skill_or_workflow_name': None,
+                                        'files_to_upload': None,
                                         'workflow_run_id': 0,
                                         'workflow_confirmation_status': None,
                                         'args': '',
@@ -1179,11 +1280,17 @@ class Chatroom:
                 
         return result
     
-    def load_history_messages(self, messages: List[Dict[str, Any]]) -> None:
+    def load_history_messages(
+        self,
+        messages: List[Dict[str, Any]],
+        chat_file_list: Optional[List[Union[int, str]]] = None
+    ) -> None:
         for message in messages:
             self._add_file_content_to_message(message, 'all')
             split_messages = self._split_agent_message(message)
             self._history_messages.extend(split_messages)
+        if chat_file_list:
+            self._chat_files.update(chat_file_list)
 
     async def _generate_title(self):
         logger.debug('Generating title...')
@@ -1261,6 +1368,8 @@ class Chatroom:
         )
 
     async def chat(self, resume: bool, file_list: Optional[List[Union[int, str]]] = None) -> None:
+        self._update_chat_file_list(file_list)
+
         history_messages_count_on_start = len(self._history_messages)
         performed_rounds = 0
         if resume:
