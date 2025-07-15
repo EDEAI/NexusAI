@@ -252,6 +252,8 @@ language_packs = {
             Subtask list for reference only: {child_tasks}
             Related task content for reference only: {related_content}
         """,
+        "recursive_task_root_task": "Root Task",
+        "recursive_task_sub_task": "Sub Task",
 
         # HTTP requeust node
         'http_request_failed': 'HTTP request failed with status code {status_code}',
@@ -1122,6 +1124,8 @@ language_packs = {
         "agent_run_type_3": "圆桌：{app_name} 调用",
         "agent_run_type_4": "圆桌：{app_name} 导向执行",
 
+        "recursive_task_root_task": "根任务",
+        "recursive_task_sub_task": "子任务",
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
         'http_response_content_oversize': 'HTTP响应内容过大！最大不应超过{max_size}字节，而实际为{size}字节',
 

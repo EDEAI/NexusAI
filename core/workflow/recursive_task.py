@@ -70,7 +70,17 @@ class RecursiveTaskCategory:
         :return: A dictionary with the found RecursiveTaskCategory object, its parent, and its level, or None if not found.
         """
         def _get_next_task(category, parent, level):
-            if category.id not in ignored_ids:
+            # Check if current task should be skipped
+            should_skip_current = (
+                category.id in ignored_ids or
+                (
+                    category.id == 'task-root' and 
+                    category.description.strip() == '' and
+                    category.keywords.strip() == ''
+                )
+            )
+            
+            if not should_skip_current:
                 return {"current": category, "parent": parent, "level": level}
             
             for subcategory in category.subcategories:
