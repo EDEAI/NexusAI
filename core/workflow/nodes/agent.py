@@ -877,7 +877,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
 
             outputs = Variable(
                 name="text",
-                type="string",
+                type="string" if type(full_chunk.content) == str else "json",
                 value=full_chunk.content
             )
             if (
