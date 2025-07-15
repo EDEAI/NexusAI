@@ -496,6 +496,7 @@ class Chatroom:
                 'id': mcp_tool_use['id'],
                 'name': mcp_tool_use['name'],
                 'skill_or_workflow_name': mcp_tool_use['skill_or_workflow_name'],
+                'files_to_upload': mcp_tool_use['files_to_upload'],
                 'workflow_run_id': mcp_tool_use['workflow_run_id'],
                 'workflow_confirmation_status': mcp_tool_use['workflow_confirmation_status'],
                 'args': mcp_tool_use['args'],
@@ -606,7 +607,7 @@ class Chatroom:
             self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
         self._mcp_tool_use_lock.set()
 
-    async def set_mcp_tool_use_uploaded_files(self, mcp_tool_use_id: int, files: Dict[str, Any]) -> None:
+    async def set_mcp_tool_use_uploaded_files(self, mcp_tool_use_id: int, files: List[Dict[str, Any]]) -> None:
         if not self._mcp_tool_is_using:
             raise Exception('There is no MCP tool use!')
         mcp_tool_use = self._get_mcp_tool_use(mcp_tool_use_id)
@@ -615,7 +616,9 @@ class Chatroom:
         if not mcp_tool_use['files_to_upload']:
             raise Exception('No files to be uploaded!')
         input_variables: Dict[str, Any] = mcp_tool_use['args']['input_variables']
-        for variable_name, file_id in files.items():
+        for file in files:
+            variable_name = file['name']
+            file_id = file['id']
             if f'file_parameter__{variable_name}' in input_variables:
                 if input_variables[f'file_parameter__{variable_name}'] == 'need_upload':
                     input_variables[f'file_parameter__{variable_name}'] = file_id
