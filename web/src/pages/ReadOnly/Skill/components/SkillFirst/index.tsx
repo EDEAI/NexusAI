@@ -28,7 +28,7 @@ const SkillFirst: React.FC<ChildProps> = ({
         disabled: true,
     };
     return (
-        <div style={{ height: '100%' }}>
+        <div style={{ height: '100%', width: '100%' }}>
             <div className="flex align-center justify-between mt-[30px]">
                 <div className="text-base font-medium mb-[30px] text-[#333333]">
                     {intl.formatMessage({ id: 'skill.inputsetting' })}
@@ -39,7 +39,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                 onFinish={value => {
                     FirstValue(value);
                 }}
-                style={{ width: 900 }}
+                style={{ width: '100%' }}
                 autoComplete="off"
                 form={FirstSkillref}
             >

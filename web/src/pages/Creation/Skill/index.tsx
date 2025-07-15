@@ -1,5 +1,9 @@
 import { PostappsCreate } from '@/api/creation';
 import { GetskillInfo, PutskillUpdate } from '@/api/skill';
+import { skillDebug } from '@/api/workflow';
+import BeforeCreate from '@/components/SkillCreate/BeforeCreate';
+import CodeEditor from '@/components/WorkFlow/components/Editor/CodeEditor';
+import RenderInput from '@/components/WorkFlow/components/RunForm/RenderInput';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
 import { createappdata, skilldefault } from '@/utils/useUser';
 import {
@@ -9,15 +13,17 @@ import {
     FileDoneOutlined,
     FileTextOutlined,
 } from '@ant-design/icons';
+import { ProForm, ProFormInstance } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
-import { Button, Form, Menu, message, Spin } from 'antd';
+import { Button, Form, Menu, message, Spin, Splitter } from 'antd';
 import _ from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SkillFirst from './components/SkillFirst';
 import SkillSecond from './components/SkillSecond';
 import SkillThirdly from './components/SkillThirdly';
-import SkillFourthly from './components/SkillFourthly';
+import BugFix from './BugFix';
+import { useLatest } from 'ahooks';
 
 const Skill: React.FC = () => {
     const intl = useIntl();
@@ -35,12 +41,15 @@ const Skill: React.FC = () => {
     const [app_id, setApp_id] = useState<any>(null);
     const [skillid, setSkillid] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [isCreate, setIsCreate] = useState(false);
+
     const [skillmenudisabled, setskillmenudisabled] = useState({
         first: false,
         second: false,
         thirdly: false,
-        fourthly: false,
     });
+
+
 
     type MenuItem = Required<MenuProps>['items'][number];
     const items: MenuItem[] = [
@@ -92,34 +101,13 @@ const Skill: React.FC = () => {
                 color: pageKey == '3' ? '#1B64F3' : '#213044',
             },
         },
-        {
-            key: '4',
-            disabled: skillmenudisabled.fourthly,
-            icon: <FileTextOutlined />,
-            label: intl.formatMessage({ id: 'skill.menu.debug' }),
-            style: {
-                padding: '15px',
-                width: '100%',
-                margin: '0px',
-                // background: pageKey == '3' ? 'rgba(27,100,243,0.1)' : '#FAFAFA',
-                marginBottom: '10px',
-                fontSize: '16px',
-                fontWeight: '500',
-                color: pageKey == '4' ? '#1B64F3' : '#213044',
-            },
-        },
+
     ];
     useEffect(() => {
         setLoading(true);
         let params = new URLSearchParams(window.location.search);
-        if (!params.get('app_id')) {
-            setskillmenudisabled({
-                first: false,
-                second: true,
-                thirdly: true,
-                fourthly: true,
-            });
-        }
+        const isCreate=!!params.get('app_id')
+        setIsCreate(isCreate);
         getSkill();
     }, []);
 
@@ -138,24 +126,21 @@ const Skill: React.FC = () => {
         setLoading(false);
         if (res.code == 0) {
             setSkillInfo(res.data);
-            // setOperationbentate(res.data.publish_status === 1 ? 'true' : 'false')
-            // if (res.data.publish_status == 1) {
-            //     message.warning(intl.formatMessage({ id: 'skill.message.listwarning' }), 5);
-            // }
+           
             const firstvalue = objecttoarray(res.data.input_variables);
             FirstSkillref.setFieldsValue(firstvalue);
 
             setSkillRelyOn(res.data.dependencies ? res.data.dependencies.python3 : []);
             const Thirdlyvalue = objecttoarray(res.data.output_variables);
             Thirdlyref.setFieldsValue(Thirdlyvalue);
-            //
+            // Initialize fourth form values
             const param = objecttoarray(res.data.input_variables);
             Fourthlyref.setFieldsValue(param);
         } else {
             message.error(intl.formatMessage({ id: 'skill.message.listerror' }));
         }
     };
-    //
+    // Convert object format to array format for form display
     const objecttoarray = (obj?: any) => {
         const codeData = {
             users:
@@ -174,8 +159,6 @@ const Skill: React.FC = () => {
     };
 
     const Skill_update = async (value: any, newappId?: any) => {
-        // if (Operationbentate === 'false') {
-
         const param = {
             app_id: newappId ? newappId : app_id,
             data: value,
@@ -183,29 +166,24 @@ const Skill: React.FC = () => {
         const res = await PutskillUpdate(param);
         setLoading(false);
         if (res.code === 0) {
-            // skill.conserve.success{intl.formatMessage({ id: 'skill.back' })}
             message.success(intl.formatMessage({ id: 'skill.conserve.success' }));
-            getSkill(newappId ? newappId : app_id);
+            // Remove duplicate API call - no need to re-fetch data after successful save
+            // getSkill(newappId ? newappId : app_id);
             setLoading(false);
         }
+        return res; // Return API response result
     };
-    //
+    // Return to previous page
     const returnList = () => {
-        // SkillMenuClick({
-        //     key: pageKey,
-        //     keyPath: [],
-        //     item: undefined,
-        //     domEvent: undefined
-        // })
+
         history.back();
     };
 
     const FirstValue = (value: any, newappId?: any) => {
-       
         Skill_update(value, newappId);
-     
+
         const param = objecttoarray(value.input_variables);
-     
+
         Fourthlyref.setFieldsValue(param);
     };
 
@@ -228,154 +206,122 @@ const Skill: React.FC = () => {
     const SkillMenuClick: MenuProps['onClick'] = e => {
         pageKeyfun(e.key);
     };
-    //
-    const skillupdata = () => {
+    // Unified skill save/update logic
+    const skillupdata = async () => {
         // setLoading(true);
-        if (!app_id) {
-            PostappsCreate(createappdata('GET'))
-                .then(res => {
-                    setApp_id(res.data.app_id);
-                    GetskillInfo(res.data.app_id, false)
-                        .then(newres => {
-                            setSkillid(newres.data.id);
-                            var data = {};
-                            data = {
-                                input_variables: Skillinfo.input_variables
-                                    ? Skillinfo.input_variables
-                                    : arraytoobject(FirstSkillref.getFieldsValue()),
-                                is_public: Skillinfo.is_public,
-                                attrs_are_visible: Skillinfo.attrs_are_visible,
-                                dependencies: { python3: !!SkillRelyOn ? SkillRelyOn : [] },
-                                code: Newcode
-                                    ? Newcode
-                                    : Skillinfo.code
-                                    ? Skillinfo.code
-                                    : JSON.stringify({
-                                          python3: `def main(arg1: int) -> dict:
+        try {
+            if (!app_id) {
+                const res = await PostappsCreate(createappdata('GET'));
+                setApp_id(res.data.app_id);
+                
+                const newres = await GetskillInfo(res.data.app_id, false);
+                setSkillid(newres.data.id);
+                
+                const data = {
+                    input_variables: Skillinfo.input_variables
+                        ? Skillinfo.input_variables
+                        : arraytoobject(FirstSkillref.getFieldsValue()),
+                    is_public: Skillinfo.is_public,
+                    attrs_are_visible: Skillinfo.attrs_are_visible,
+                    dependencies: { python3: !!SkillRelyOn ? SkillRelyOn : [] },
+                    code: Newcode
+                        ? Newcode
+                        : Skillinfo.code
+                        ? Skillinfo.code
+                        : JSON.stringify({
+                              python3: `def main(arg1: int) -> dict:
     return {
         "result": (arg1 + 2) * 3,
     }`,
-                                      }),
-                                output_type: Skillinfo.output_type,
-                                output_variables: Skillinfo.output_variables
-                                    ? Skillinfo.output_variables
-                                    : arraytoobject(Thirdlyref.getFieldsValue()),
-                            };
-                            const param = objecttoarray(
-                                arraytoobject(FirstSkillref.getFieldsValue()),
-                            );
-                            Fourthlyref.setFieldsValue(param);
-                            Skill_update(data, res.data.app_id);
-                            const createdData = {
-                                ...createappdata('GET'),
-                                app_id: res.data.app_id,
-                            };
-                            createappdata('SET', createdData);
-                        
-                            pageKeyfun('4');
-                            setskillmenudisabled({ ...skillmenudisabled, fourthly: false });
-                            
-                        })
-                        .catch(err => {
+                          }),
+                    output_type: Skillinfo.output_type,
+                    output_variables: Skillinfo.output_variables
+                        ? Skillinfo.output_variables
+                        : arraytoobject(Thirdlyref.getFieldsValue()),
+                };
+                
+                const param = objecttoarray(arraytoobject(FirstSkillref.getFieldsValue()));
+                Fourthlyref.setFieldsValue(param);
+                
+                const updateResult = await Skill_update(data, res.data.app_id);
+                
+                const createdData = {
+                    ...createappdata('GET'),
+                    app_id: res.data.app_id,
+                };
+                createappdata('SET', createdData);
+                
+                // Update URL after successful creation, add app_id parameter
+                if (updateResult.code === 0) {
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('app_id', res.data.app_id);
+                    window.history.replaceState({}, '', currentUrl.toString());
+                }
+
+                // pageKeyfun('3');
+                // Return result containing latest skill_id
+                return {
+                    ...updateResult,
+                    skill_id: newres.data.id
+                };
+            } else {
+                const data = {
+                    input_variables: Skillinfo.input_variables
+                        ? Skillinfo.input_variables
+                        : arraytoobject(FirstSkillref.getFieldsValue()),
+                    is_public: Skillinfo.is_public,
+                    attrs_are_visible: Skillinfo.attrs_are_visible,
+                    dependencies: { python3: !!SkillRelyOn ? SkillRelyOn : [] },
+                    code: Newcode
+                        ? Newcode
+                        : Skillinfo.code
+                        ? Skillinfo.code
+                        : JSON.stringify({
+                              python3: `def main(arg1: int) -> dict:
+    return {
+        "result": (arg1 + 2) * 3,
+    }`,
+                          }),
+                    output_type: Skillinfo.output_type,
+                    output_variables: Skillinfo.output_variables
+                        ? Skillinfo.output_variables
+                        : arraytoobject(Thirdlyref.getFieldsValue()),
+                };
+                
+                const param = objecttoarray(arraytoobject(FirstSkillref.getFieldsValue()));
+                Fourthlyref.setFieldsValue(param);
+                
+                const updateResult = await Skill_update(data, app_id);
+                
+                // Ensure return result contains correct skill_id
+                if (updateResult.code === 0) {
+                    // If no skillid, get latest skill information
+                    if (!skillid) {
+                        const skillInfo = await GetskillInfo(app_id, false);
+                        if (skillInfo.code === 0) {
+                            setSkillid(skillInfo.data.id);
                             setLoading(false);
-                        });
-                })
-                .catch(err => {
-                    setLoading(false);
-                });
-        } else {
-            const data = {
-                input_variables: Skillinfo.input_variables
-                    ? Skillinfo.input_variables
-                    : arraytoobject(FirstSkillref.getFieldsValue()),
-                is_public: Skillinfo.is_public,
-                attrs_are_visible: Skillinfo.attrs_are_visible,
-                dependencies: { python3: !!SkillRelyOn ? SkillRelyOn : [] },
-                code: Newcode
-                    ? Newcode
-                    : Skillinfo.code
-                    ? Skillinfo.code
-                    : JSON.stringify({
-                          python3: `def main(arg1: int) -> dict:
-    return {
-        "result": (arg1 + 2) * 3,
-    }`,
-                      }),
-                output_type: Skillinfo.output_type,
-                output_variables: Skillinfo.output_variables
-                    ? Skillinfo.output_variables
-                    : arraytoobject(Thirdlyref.getFieldsValue()),
-            };
-            const param = objecttoarray(arraytoobject(FirstSkillref.getFieldsValue()));
-            Fourthlyref.setFieldsValue(param);
-            Skill_update(data, app_id);
+                            return {
+                                ...updateResult,
+                                skill_id: skillInfo.data.id
+                            };
+                        }
+                    }
+                }
+                
+                setLoading(false);
+
+                // pageKeyfun('3');
+                // Return result containing skill_id
+                return {
+                    ...updateResult,
+                    skill_id: skillid || Skillinfo.id
+                };
+            }
+        } catch (err) {
             setLoading(false);
-            
-            pageKeyfun('4');
-            setskillmenudisabled({ ...skillmenudisabled, fourthly: false });
-        
+            throw err; // Re-throw error for caller to handle
         }
-    };
-    const firstjudgingcondition = (users: any, id?: Number) => {
-        // const firstusers = users.filter((item: any) => {
-        //     return !item || !item.name || !item.content;
-        // });
-        // if (!users[0]) {
-        //     message.warning(
-        //         `${
-        //             id === 1
-        //                 ? intl.formatMessage({ id: 'skill.message.inputerror1' })
-        //                 : intl.formatMessage({ id: 'skill.message.inputerror2' })
-        //         }`,
-        //     );
-        //     return true;
-        // } else if (firstusers.length !== 0) {
-        //     message.warning(
-        //         `${
-        //             id === 1
-        //                 ? intl.formatMessage({ id: 'skill.message.inputerror3' })
-        //                 : intl.formatMessage({ id: 'skill.message.inputerror4' })
-        //         }`,
-        //     );
-        //     return true;
-        // }
-        console.log(id);
-        
-        if (id == 1) {
-            if (!Skillinfo.input_variables) {
-                message.warning(intl.formatMessage({ id: 'skill.message.inputerror1' }));
-                return true;
-            }
-            if (_.isEmpty(Skillinfo.input_variables.properties)) {
-                message.warning(intl.formatMessage({ id: 'skill.message.inputerror1' }));
-                return true;
-            }
-        }
-        if (id == 2) {
-            if (!Skillinfo.output_variables) {
-                message.warning(intl.formatMessage({ id: 'skill.message.inputerror2' }));
-                return true;
-            }
-            if (_.isEmpty(Skillinfo.output_variables.properties)) {
-                message.warning(intl.formatMessage({ id: 'skill.message.inputerror2' }));
-                return true;
-            }
-        }
-        if (hasDuplicateField(users, 'name')) {
-            message.warning(intl.formatMessage({ id: 'skill.message.inputerror5' }));
-            return true;
-        } else {
-            return false;
-        }
-    };
-    const hasDuplicateField = (array: any[], field: string) => {
-        const uniqueValues = new Set();
-        return array.some(item => {
-            const value = item[field];
-            return uniqueValues.has(value)
-                ? uniqueValues.add(value)
-                : uniqueValues.add(value) && false;
-        });
     };
     const arraytoobject = (value: any) => {
         const input_variables = new ObjectVariable('output', '', '');
@@ -392,8 +338,11 @@ const Skill: React.FC = () => {
         return input_variables;
     };
 
+
+
     return (
         <div className="flex bg-white" style={{ height: 'calc(100vh - 56px)' }}>
+          
             <div className="flex flex-col w-[300px]" style={{ height: 'calc(100vh - 56px)' }}>
                 <div className="flex w-full items-center bg-white px-[30px] pt-[30px] border-[#e5e7eb] border-solid border-r">
                     <Button
@@ -420,133 +369,150 @@ const Skill: React.FC = () => {
                     />
                 </div>
             </div>
-            <Spin spinning={loading} size="large" className="mt-[112px]">
-                <div
-                    className="flex flex-col "
-                    style={{
-                        height: 'calc(100vh - 56px)',
-                        width: 'calc(100vw - 230px)',
-                        overflowY: 'scroll',
-                        scrollbarWidth: 'none',
-                    }}
-                >
-                    <div
-                        className="px-[30px] "
-                        style={{ overflowX: 'auto', minWidth: '960px', height: '100%' }}
-                    >
-                        <div className="w-full flex justify-center  mt-[30px]">
-                            <div className="flex items-center  w-[900px] ">
-                                <div className="mr-[10px] w-[16px] h-[16px]">
-                                    <img
-                                        src="/icons/flag.svg"
-                                        alt=""
-                                        className="w-[16px] h-[16px]"
-                                    />
-                                </div>
-                                <div className="mr-[6px]  text-lg text-[#213044] font-medium">
-                                    {createappdata('GET')?.app_id
-                                        ? intl.formatMessage({ id: 'skill.Editingskill' })
-                                        : intl.formatMessage({ id: 'skill.Creatingskill' })}
-                                </div>
-                                {Skillinfo?.app_publish_status === 1 ? (
-                                    <div className="bg-[#1B64F3] text-[#fff] px-[7px] rounded font-normal text-xs flex items-center justify-center h-[18px]">
-                                        {intl.formatMessage({ id: 'skill.havepublished' })}
+
+            <div className="flex-1 relative w-[calc(100%-300px)]">
+                <Splitter style={{ height: '100%', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+                    <Splitter.Panel defaultSize="50%" min="40%" max="70%">
+                        <Spin spinning={loading} size="large" className="mt-[112px] mr-4">
+                            <div
+                                className="flex flex-col"
+                                style={{
+                                    height: 'calc(100vh - 56px)',
+                                    overflowY: 'scroll',
+                                    scrollbarWidth: 'none',
+                                }}
+                            >
+                                <div
+                                    className="px-[30px]"
+                                    style={{ overflowX: 'auto', height: '100%' }}
+                                >
+                                    <div className="w-full flex justify-center mt-[30px]">
+                                        <div className="flex items-center w-full">
+                                            <div className="mr-[10px] w-[16px] h-[16px]">
+                                                <img
+                                                    src="/icons/flag.svg"
+                                                    alt=""
+                                                    className="w-[16px] h-[16px]"
+                                                />
+                                            </div>
+                                            <div className="flex items-center">
+                                                <div className="mr-[6px] text-lg text-[#213044] font-medium">
+                                                    {createappdata('GET')?.app_id
+                                                        ? intl.formatMessage({
+                                                              id: 'skill.Editingskill',
+                                                          })
+                                                        : intl.formatMessage({
+                                                              id: 'skill.Creatingskill',
+                                                          })}
+                                                </div>
+                                                {Skillinfo?.app_publish_status === 1 ? (
+                                                    <div className="bg-[#1B64F3] text-[#fff] px-[7px] rounded font-normal text-xs flex items-center justify-center h-[18px]">
+                                                        {intl.formatMessage({
+                                                            id: 'skill.havepublished',
+                                                        })}
+                                                    </div>
+                                                ) : (
+                                                    <div className="bg-[#EEE] text-[#999] px-[7px] rounded font-normal text-xs flex items-center justify-center h-[18px]">
+                                                        {intl.formatMessage({
+                                                            id: 'skill.unpublish',
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                ) : (
-                                    <div className=" bg-[#EEE]  text-[#999] px-[7px] rounded font-normal text-xs flex items-center justify-center h-[18px]">
-                                        {intl.formatMessage({ id: 'skill.unpublish' })}
+
+                                    {/* Skill input settings page */}
+                                    <div
+                                        style={{
+                                            display: pageKey === '1' ? 'flex' : 'none',
+                                            height: 'calc(100vh - 146px)',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        {!loading && (
+                                            <SkillFirst
+                                                loading={loading}
+                                                FirstValue={FirstValue}
+                                                Skillinfo={Skillinfo}
+                                                setSkillInfo={setSkillInfo}
+                                                FirstSkillref={FirstSkillref}
+                                                Operationbentate={Operationbentate}
+                                                pageKeyfun={pageKeyfun}
+                                                skillmenudisabled={skillmenudisabled}
+                                                setskillmenudisabled={setskillmenudisabled}
+                                                isCreate={isCreate}
+                                            />
+                                        )}
                                     </div>
-                                )}
+                                    {/* Skill code settings page */}
+                                    <div
+                                        style={{
+                                            display: pageKey === '2' ? 'flex' : 'none',
+                                            height: 'calc(100vh - 146px)',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <SkillSecond
+                                            SecondValue={SecondValue}
+                                            handleBack={handleBack}
+                                            Skillinfo={Skillinfo}
+                                            setSkillInfo={setSkillInfo}
+                                            SkillRelyOn={SkillRelyOn}
+                                            setSkillRelyOn={setSkillRelyOn}
+                                            Secondref={Secondref}
+                                            setskillcodestate={setskillcodestate}
+                                            setNewcode={setNewcode}
+                                            pageKeyfun={pageKeyfun}
+                                            skillmenudisabled={skillmenudisabled}
+                                            setskillmenudisabled={setskillmenudisabled}
+                                        />
+                                    </div>
+                                    {/* Skill output settings page */}
+                                    <div
+                                        style={{
+                                            display: pageKey === '3' ? 'flex' : 'none',
+                                            height: 'calc(100vh - 146px)',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        {!loading && (
+                                            <SkillThirdly
+                                                loading={loading}
+                                                ThirdlyValue={ThirdlyValue}
+                                                handleBack={handleBack}
+                                                Thirdlyref={Thirdlyref}
+                                                Skillinfo={Skillinfo}
+                                                setSkillInfo={setSkillInfo}
+                                                Operationbentate={Operationbentate}
+                                                pageKeyfun={pageKeyfun}
+                                                skillmenudisabled={skillmenudisabled}
+                                                setskillmenudisabled={setskillmenudisabled}
+                                                skillupdata={skillupdata}
+                                            />
+                                        )}
+                                    </div>
+
+                                </div>
                             </div>
-                        </div>
-                        <div
-                            style={{
-                                display: pageKey === '1' ? 'flex' : 'none',
-                                height: 'calc(100vh - 146px)',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            {!loading && (
-                                <SkillFirst
-                                    loading={loading}
-                                    FirstValue={FirstValue}
-                                    Skillinfo={Skillinfo}
-                                    setSkillInfo={setSkillInfo}
-                                    FirstSkillref={FirstSkillref}
-                                    Operationbentate={Operationbentate}
-                                    firstjudgingcondition={firstjudgingcondition}
-                                    pageKeyfun={pageKeyfun}
-                                    skillmenudisabled={skillmenudisabled}
-                                    setskillmenudisabled={setskillmenudisabled}
-                                />
-                            )}
-                        </div>
-                        <div
-                            style={{
-                                display: pageKey === '2' ? 'flex' : 'none',
-                                height: 'calc(100vh - 146px)',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <SkillSecond
-                                SecondValue={SecondValue}
-                                handleBack={handleBack}
-                                Skillinfo={Skillinfo}
-                                setSkillInfo={setSkillInfo}
-                                SkillRelyOn={SkillRelyOn}
-                                setSkillRelyOn={setSkillRelyOn}
-                                Secondref={Secondref}
-                                setskillcodestate={setskillcodestate}
-                                setNewcode={setNewcode}
-                                pageKeyfun={pageKeyfun}
-                                skillmenudisabled={skillmenudisabled}
-                                setskillmenudisabled={setskillmenudisabled}
-                            />
-                        </div>
-                        <div
-                            style={{
-                                display: pageKey === '3' ? 'flex' : 'none',
-                                height: 'calc(100vh - 146px)',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            {!loading && (
-                                <SkillThirdly
-                                    loading={loading}
-                                    ThirdlyValue={ThirdlyValue}
-                                    handleBack={handleBack}
-                                    Thirdlyref={Thirdlyref}
-                                    Skillinfo={Skillinfo}
-                                    setSkillInfo={setSkillInfo}
-                                    Operationbentate={Operationbentate}
-                                    firstjudgingcondition={firstjudgingcondition}
-                                    pageKeyfun={pageKeyfun}
-                                    skillmenudisabled={skillmenudisabled}
-                                    setskillmenudisabled={setskillmenudisabled}
-                                    skillupdata={skillupdata}
-                                />
-                            )}
-                        </div>
-                        <div
-                            style={{
-                                display: pageKey === '4' ? 'flex' : 'none',
-                                height: 'calc(100vh - 146px)',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <SkillFourthly
-                                FourthlyValue={FourthlyValue}
-                                handleBack={handleBack}
-                                Fourthlyref={Fourthlyref}
-                                Skillinfo={Skillinfo}
-                                skillid={skillid}
-                                app_id={app_id}
-                                Operationbentate={Operationbentate}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </Spin>
+                        </Spin>
+                    </Splitter.Panel>
+                    <Splitter.Panel>
+                        <BugFix
+                            FourthlyValue={FourthlyValue}
+                            handleBack={handleBack}
+                            Fourthlyref={Fourthlyref}
+                            Skillinfo={Skillinfo}
+                            skillid={skillid}
+                            app_id={app_id}
+                            Operationbentate={Operationbentate}
+                            skillupdata={skillupdata}
+                            isCreate={isCreate}
+                            setSkillInfo={setSkillInfo}
+                        />
+                    </Splitter.Panel>
+                </Splitter>
+            </div>
         </div>
     );
 };

@@ -309,6 +309,7 @@ export default {
 
     'workflow.form.parameter.required': '请填写参数',
     'workflow.form.confirmer.required': '请选择确认人',
+    'workflow.form.parameter.json.invalid': '请输入有效的JSON格式',
 
     'agent.batch.count.tooltip': '选择单批次生成数量',
     'agent.batch.submit': '提交',
@@ -339,6 +340,7 @@ export default {
     'skill.debug.output.title': '调试输出',
     'skill.debug.output.error': '调试输出错误',
     'skill.debug.output.success': '调试成功',
+    'skill.debug.no.input.parameters': '该技能无输入参数',
     'skill.result.input.variables': '输入变量',
     'skill.result.output.variables': '输出变量',
     'skill.result.output.type': '输出类型',

@@ -157,6 +157,9 @@ export default memo((props: VariableList) => {
     };
     const editVariable = index => {
         const item = variables[index];
+        if(!item.required){
+            item.required = false
+        }
         formRef.current?.setFieldsValue(item);
         setIsModalOpen(true);
         setEditIndex(index);
