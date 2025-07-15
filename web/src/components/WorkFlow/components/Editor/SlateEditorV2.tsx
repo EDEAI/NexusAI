@@ -257,7 +257,6 @@ const MentionEditor = ({
     const handleSlateChange = useCallback(
         _.debounce((val) => {
             onChange?.(val);
-            setTarget(null);
         }, 200),
         [onChange]
     );
