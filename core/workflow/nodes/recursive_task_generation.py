@@ -100,16 +100,16 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
                 for index, requirement in enumerate(requirement_list):
                     subcategories.append({
                         'id': f'task-sub-{index}',
-                        'name': f'{get_language_content("recursive_task_sub_task", user_id=user_id, append_ret_lang_prompt=False)} {index + 1}',
+                        'name': f'{get_language_content("recursive_task_sub_task", uid=user_id, append_ret_lang_prompt=False)} {index + 1}',
                         'description': '',
                         'task': requirement
                     })
                 tasks = {
                     'id': 'task-root',
-                    'name': get_language_content("recursive_task_root_task", user_id=user_id, append_ret_lang_prompt=False),
+                    'name': get_language_content("recursive_task_root_task", uid=user_id, append_ret_lang_prompt=False),
                     'description': '',
                     'keywords': '',
-                    'task': get_language_content("recursive_task_root_task", user_id=user_id, append_ret_lang_prompt=False),
+                    'task': get_language_content("recursive_task_root_task", uid=user_id, append_ret_lang_prompt=False),
                     'subcategories': subcategories
                 }
                 
