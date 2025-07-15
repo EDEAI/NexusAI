@@ -150,11 +150,16 @@ const BugFix: React.FC<ChildProps> = ({
                 });
 
             if (errorMessages.length > 0) {
-                message.error(intl.formatMessage({ 
-                    id: 'skill.message.save.failed.validation' 
-                }, { 
-                    errors: errorMessages.join('\n') 
-                }));
+                message.error(
+                    intl.formatMessage(
+                        {
+                            id: 'skill.message.save.failed.validation',
+                        },
+                        {
+                            errors: errorMessages.join('\n'),
+                        },
+                    ),
+                );
                 return false; // Explicitly return false to indicate save failure
             }
 
@@ -164,11 +169,16 @@ const BugFix: React.FC<ChildProps> = ({
                 .map(error => error.message);
 
             if (warningMessages.length > 0) {
-                message.warning(intl.formatMessage({ 
-                    id: 'skill.message.save.failed.warnings' 
-                }, { 
-                    warnings: warningMessages.join('\n') 
-                }));
+                message.warning(
+                    intl.formatMessage(
+                        {
+                            id: 'skill.message.save.failed.warnings',
+                        },
+                        {
+                            warnings: warningMessages.join('\n'),
+                        },
+                    ),
+                );
             }
         }
 
@@ -211,7 +221,9 @@ const BugFix: React.FC<ChildProps> = ({
                                 hasHover={false}
                                 icon="/icons/agent_skill.svg"
                                 title={intl.formatMessage({ id: 'skill.debug.title' })}
-                                loadingText={intl.formatMessage({ id: 'skill.debug.no.input.parameters' })}
+                                loadingText={intl.formatMessage({
+                                    id: 'skill.debug.no.input.parameters',
+                                })}
                             />
                         </div>
                     )}
@@ -252,24 +264,13 @@ const BugFix: React.FC<ChildProps> = ({
                     size="small"
                     className="[&_.ant-collapse-content-box]:bg-transparent [&_.ant-collapse-content-box]:p-0"
                 />
-               
+
                 {showResult && (
                     <div className=" bg-gray-50 rounded-lg p-4">
                         <div className="text-[#555555] text-sm font-medium mb-4">
                             {intl.formatMessage({ id: 'skill.runpreview' })}
                         </div>
                         <div className="min-h-[calc(100vh-400px)] flex flex-col overflow-y-auto">
-                            <div className="mb-4 h-[calc(100vh-400px)]">
-                                <CodeEditor
-                                    language="python3"
-                                    value={skillRun && skillRun}
-                                    showMaximize={false}
-                                    readOnly
-                                    isJSONStringifyBeauty
-                                    onChange={() => {}}
-                                    title={<div>{intl.formatMessage({ id: 'skill.debug.output.title' })}</div>}
-                                />
-                            </div>
                             {fileList.length > 0 && (
                                 <div>
                                     <FileDownloadList
@@ -279,6 +280,21 @@ const BugFix: React.FC<ChildProps> = ({
                                     />
                                 </div>
                             )}
+                            <div className="mb-4 h-[calc(100vh-400px)]">
+                                <CodeEditor
+                                    language="python3"
+                                    value={skillRun && skillRun}
+                                    showMaximize={false}
+                                    readOnly
+                                    isJSONStringifyBeauty
+                                    onChange={() => {}}
+                                    title={
+                                        <div>
+                                            {intl.formatMessage({ id: 'skill.debug.output.title' })}
+                                        </div>
+                                    }
+                                />
+                            </div>
                         </div>
                     </div>
                 )}
