@@ -13,10 +13,10 @@ interface ChildProps {
     Skillinfo: any;
     setSkillInfo: any;
     Operationbentate: any;
-    firstjudgingcondition: any;
     pageKeyfun: any;
     skillmenudisabled: any;
     setskillmenudisabled: any;
+    isCreate: boolean;
 }
 const SkillFirst: React.FC<ChildProps> = ({
     loading,
@@ -25,14 +25,13 @@ const SkillFirst: React.FC<ChildProps> = ({
     Skillinfo,
     setSkillInfo,
     Operationbentate,
-    firstjudgingcondition,
     pageKeyfun,
     skillmenudisabled,
     setskillmenudisabled,
+    isCreate,
 }) => {
     const intl = useIntl();
-    useEffect(() => {}, []);
-    //
+
     const SkillFSwitch = (checked: any) => {
         setSkillInfo({ ...Skillinfo, is_public: checked ? 1 : 0 });
     };
@@ -63,20 +62,19 @@ const SkillFirst: React.FC<ChildProps> = ({
         FirstValue(data);
     };
 
-    //
+    // Save data and proceed to next step
     const updata = () => {
-        if (firstjudgingcondition(FirstSkillref.getFieldsValue().users, 1)) {
-        } else {
-            FirstSkillref.validateFields()
-                .then(value => {
-                    pageKeyfun('2');
-                    setskillmenudisabled({ ...skillmenudisabled, second: false });
-                })
-                .catch(err => {});
-        }
+        FirstSkillref.validateFields()
+            .then(value => {
+                pageKeyfun('2');
+                setskillmenudisabled({ ...skillmenudisabled, second: false });
+            })
+            .catch(err => {
+                console.error('Form validation failed:', err);
+            });
     };
     return (
-        <div style={{ height: '100%' }}>
+        <div style={{ height: '100%', width: '100%' }}>
             <div className="flex align-center justify-between mt-[30px]">
                 <div className="text-base font-medium mb-[30px] text-[#333333]">
                     {intl.formatMessage({ id: 'skill.inputsetting' })}
@@ -88,7 +86,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                 onFinish={value => {
                     FirstValue(value);
                 }}
-                style={{ width: 900 }}
+                style={{ width: '100%' }}
                 autoComplete="off"
                 form={FirstSkillref}
             >
@@ -145,27 +143,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                                     }
                                 />
                             </Form.Item>
-                            {/* <div className="mb-[11px] text-xs font-bold flex justify-between items-center">
-                                <div className="text-[#555555] text-xs font-medium">
-                                    <Callword
-                                        required={true}
-                                        name={intl.formatMessage({ id: 'skill.inputvariable' })}
-                                        title={intl.formatMessage({
-                                            id: 'skill.Callword.inputvariable',
-                                        })}
-                                    />
-                                </div>
-                                <div>
-                                    <Button
-                                        type="link"
-                                        onClick={() => add()}
-                                        block
-                                        icon={<PlusOutlined />}
-                                    >
-                                        {intl.formatMessage({ id: 'skill.add' })}
-                                    </Button>
-                                </div>
-                            </div> */}
+
                             {!loading && (
                                 <div className="mb-[30px]">
                                     <Variable
@@ -183,7 +161,7 @@ const SkillFirst: React.FC<ChildProps> = ({
                                                 />
                                             </div>
                                         }
-                                        variableTypes={['string', 'number', 'json']}
+                                        variableTypes={['string', 'number', 'json', 'file']}
                                         variables={Object.values(
                                             Skillinfo?.input_variables?.properties || {},
                                         )}
@@ -306,13 +284,13 @@ const SkillFirst: React.FC<ChildProps> = ({
                     >
                         {intl.formatMessage({ id: 'skill.btn.nextstep' })}
                     </Button>
-                    <Button
+                    {/* <Button
                         onClick={() => {
                             history.back();
                         }}
                     >
                         {intl.formatMessage({ id: 'skill.btn.back' })}
-                    </Button>
+                    </Button> */}
                 </div>
                 <div className="h-[30px] w-1"></div>
             </Form>

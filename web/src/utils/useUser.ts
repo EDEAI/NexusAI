@@ -1,4 +1,5 @@
 import { getModelList } from '@/api/workflow';
+import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
 let llm_model_list = [];
 
 export const userinfodata = (type: string, values?: any): any => {
@@ -166,6 +167,21 @@ export const agentdefault = (): any => {
 
 
 export const skilldefault = (): any => {
+
+    const input = new ObjectVariable('input_var', 'Input Object Variable');
+    const exampleVariable = new SkillVariable('arg1', 'number', '', 'arg1',true );
+    input.addProperty('arg1', exampleVariable); 
+
+    const output = new ObjectVariable('output_var', 'Output Object Variable');
+    const exampleVariable2 = new SkillVariable('result', 'number', '', 'result',true);
+    output.addProperty('result', exampleVariable2);
+
+    const code={
+        python3:`def main(arg1: int) -> dict:
+    return {
+        "result": (arg1 + 2) * 3,
+    }`
+    }
     const data = {
         code: 0,
         detail: 'success',
@@ -177,11 +193,11 @@ export const skilldefault = (): any => {
             name: createappdata('GET').name,
             description: createappdata('GET').description,
             config: null,
-            input_variables: null,
+            input_variables: input.toObject(),
             dependencies: null,
-            code: null,
+            code:JSON.stringify(code),
             output_type: 1,
-            output_variables: null,
+            output_variables: output.toObject(),
             publish_status: 0,
             published_time: null,
             created_time: '',
@@ -190,7 +206,7 @@ export const skilldefault = (): any => {
             is_public: 1,
             is_creator: 1,
             nickname: '',
-            attrs_are_visible:1,
+            attrs_are_visible: 1,
         },
     };
     return data;

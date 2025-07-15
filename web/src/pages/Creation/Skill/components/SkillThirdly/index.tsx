@@ -1,9 +1,8 @@
 import Callword from '@/components/callword';
 import Variable from '@/components/WorkFlow/components/Variable';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Form, Input, Radio, Select } from 'antd';
+import { Button, Form, Input, Radio } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 const { TextArea, Search } = Input;
@@ -16,7 +15,6 @@ interface ChildProps {
     Skillinfo: any;
     setSkillInfo: any;
     Operationbentate: any;
-    firstjudgingcondition: any;
     pageKeyfun: any;
     skillmenudisabled: any;
     setskillmenudisabled: any;
@@ -30,7 +28,6 @@ const SkillThirdly: React.FC<ChildProps> = ({
     Skillinfo,
     setSkillInfo,
     Operationbentate,
-    firstjudgingcondition,
     pageKeyfun,
     skillmenudisabled,
     setskillmenudisabled,
@@ -65,32 +62,28 @@ const SkillThirdly: React.FC<ChildProps> = ({
         };
         ThirdlyValue(data);
     };
-    //
+    // Save data
     const updata = () => {
-        if (firstjudgingcondition(Thirdlyref.getFieldsValue().users, 2)) {
-        } else {
-            Thirdlyref.validateFields()
-                .then(value => {
-                    skillupdata();
-                })
-                .catch(err => {});
-            // pageKeyfun('4')
-            // setskillmenudisabled({ ...skillmenudisabled, second: false, })
-        }
+        Thirdlyref.validateFields()
+            .then(value => {
+                skillupdata();
+            })
+            .catch(err => {
+                console.error('Form validation failed:', err);
+            });
     };
 
     return (
-        <div style={{ height: '100%' }}>
+        <div style={{ height: '100%', width: '100%' }}>
             <div className="flex align-center justify-between mt-[30px]">
                 <div className="text-base font-medium mb-[30px] text-[#333333]">
-                    {' '}
                     {intl.formatMessage({ id: 'skill.menu.output' })}
                 </div>
             </div>
             <Form
                 name="dynamic_form_nest_item"
                 onFinish={ThirdlyChange}
-                style={{ width: 900 }}
+                style={{ width: '100%' }}
                 autoComplete="off"
                 form={Thirdlyref}
             >
@@ -149,7 +142,7 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                                 />
                                             </div>
                                         }
-                                        variableTypes={['string', 'number', 'json','file']}
+                                        variableTypes={['string', 'number', 'json', 'file']}
                                         variables={Object.values(
                                             Skillinfo?.output_variables?.properties || {},
                                         )}
@@ -274,16 +267,15 @@ const SkillThirdly: React.FC<ChildProps> = ({
                             updata();
                         }}
                     >
-                        {' '}
-                        {intl.formatMessage({ id: 'skill.btn.savedebug' })}
+                        {intl.formatMessage({ id: 'skill.btn.save' })}
                     </Button>
-                    <Button
+                    {/* <Button
                         onClick={() => {
                             history.back();
                         }}
                     >
                         {intl.formatMessage({ id: 'skill.btn.back' })}
-                    </Button>
+                    </Button> */}
                 </div>
                 <div className="h-[30px] w-1"></div>
             </Form>

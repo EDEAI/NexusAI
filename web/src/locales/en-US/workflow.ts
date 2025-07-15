@@ -315,6 +315,7 @@ export default {
 
     'workflow.form.parameter.required': 'Please enter parameter',
     'workflow.form.confirmer.required': 'Please select confirmer',
+    'workflow.form.parameter.json.invalid': 'Please enter valid JSON format',
 
     'agent.batch.count.tooltip': 'Select batch generation count',
     'agent.batch.submit': 'Submit',
@@ -346,6 +347,7 @@ export default {
     'skill.debug.output.title': 'Debug Output',
     'skill.debug.output.error': 'Debug Output Error',
     'skill.debug.output.success': 'Debug Success',
+    'skill.debug.no.input.parameters': 'This skill has no input parameters',
     'skill.result.input.variables': 'Input Variables',
     'skill.result.output.variables': 'Output Variables',
     'skill.result.output.type': 'Output Type',

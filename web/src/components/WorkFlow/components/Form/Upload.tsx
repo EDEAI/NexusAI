@@ -17,7 +17,7 @@ interface UploadDraggerProps {
 }
 
 export const UploadDragger = ({
-    label=null,
+    label = null,
     name = 'file',
     required = false,
     accept = '.txt,.md,.pdf,.html,.xlsx,.pptx,.docx,.csv,.jpg,.png,.jpeg',
@@ -37,7 +37,7 @@ export const UploadDragger = ({
         rules: required ? [{ required: true, message: intl.formatMessage({ id: 'workflow.isRequire' }) }] : undefined,
         fieldProps: {
             listType: 'picture',
-            name:'file',
+            name: 'file',
             multiple,
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
