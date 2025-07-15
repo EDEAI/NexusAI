@@ -1,4 +1,5 @@
 import asyncio
+import builtins
 import json
 
 from copy import deepcopy
@@ -877,8 +878,12 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
 
             outputs = Variable(
                 name="text",
-                type="string" if type(full_chunk.content) == str else "json",
-                value=full_chunk.content
+                type="string" if builtins.type(full_chunk.content) == str else "json",
+                value=(
+                    full_chunk.content
+                    if builtins.type(full_chunk.content) == str
+                    else json.dumps(full_chunk.content, ensure_ascii=False)
+                )
             )
             if (
                 not self.data['manual_confirmation']
