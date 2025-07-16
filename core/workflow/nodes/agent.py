@@ -157,8 +157,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     abilities_content_and_output_format = []
                     for ability in abilities:
                         actual_output_format = default_output_format if ability['output_format'] == 0 else ability['output_format']
-                        if task:
-                            actual_output_format = 2
                         abilities_content_and_output_format.append(
                             (
                                 ability['id'],
@@ -189,8 +187,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         )
                 else:
                     output_format = default_output_format
-                    if task:
-                        output_format = 2
                     abilities_content = '\n'.join(ability['content'] for ability in abilities)
                     system_prompt = get_language_content(
                         'agent_system_prompt_with_abilities',
@@ -209,8 +205,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         )
             else:
                 output_format = default_output_format
-                if task:
-                    output_format = 2
                 system_prompt = get_language_content(
                     'agent_system_prompt_with_no_ability',
                     uid=user_id
@@ -230,8 +224,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             output_format = ability['output_format']
             if output_format == 0:
                 output_format = default_output_format
-            if task:
-                output_format = 2
             system_prompt = get_language_content(
                 'agent_system_prompt_with_abilities',
                 uid=user_id
@@ -247,7 +239,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'agent_reply_requirement_with_task_splitting_and_abilities',
                     append_ret_lang_prompt=False
                 )
-        if direct_output and not task:
+        if direct_output:
             output_format = 1
             
         user_prompt = self.data['prompt'].get_user()
