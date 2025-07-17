@@ -137,9 +137,9 @@ class ChatroomMessages(MySQL):
                         item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                     else:
                         if item['icon']:
-                            item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                            item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"
                         else:
-                            item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
+                            item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
 
                     if item['file_list']:
                         file_list = []
@@ -198,9 +198,9 @@ class ChatroomMessages(MySQL):
                             item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                         else:
                             if item['icon']:
-                                item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                                item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"
                             else:
-                                item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
+                                item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
                         
                         if item['file_list']:
                             file_list = []
