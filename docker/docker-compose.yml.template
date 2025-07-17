@@ -200,6 +200,7 @@ services:
       - ./nginx/websocket_proxy.conf:/etc/nginx/websocket_proxy.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ../assets/tool:/app/tool_icon
+      - ../assets/head:/app/head_icon
       - ./volumes/storage:/app/storage
       - ./volumes/upload_files:/app/upload_files
       - ./volumes/logs/nginx:/var/log/nginx
