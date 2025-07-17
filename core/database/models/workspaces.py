@@ -119,7 +119,8 @@ class Workspaces(MySQL):
                 if app.get('avatar'):
                     app['avatar'] = f"{settings.STORAGE_URL}/upload/{app['avatar']}"
                 else:
-                    app['avatar'] = f"{settings.ICON_URL}/head_icon/{app['icon']}.svg"
+                    if app['icon']:
+                        app['avatar'] = f"{settings.ICON_URL}/head_icon/{app['icon']}.svg"
                 app['last_agent_name'] = ''
                 if app["workflow_id"] > 0:
                     app["type"] = 3
@@ -168,9 +169,12 @@ class Workspaces(MySQL):
                             if agent.get('avatar'):
                                 avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
                             # else:
-                                # avatar_url = ''
+                            #     avatar_url = ''
                             else:
-                                avatar_url = f"{settings.ICON_URL}/head_icon/{agent['icon']}.svg"
+                                if agent['icon']:
+                                    avatar_url = f"{settings.ICON_URL}/head_icon/{agent['icon']}.svg"
+                                else:
+                                    avatar_url = ''
                             app['agents_data'].append({"avatar": avatar_url,"icon": agent.get("icon")})
                 if app["agent_id"] > 0:
                     app["type"] = 1
@@ -233,7 +237,8 @@ class Workspaces(MySQL):
                 if app_node.get('avatar'):
                     app_node['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node['avatar']}"
                 else:
-                    app_node['avatar'] = f"{settings.ICON_URL}/head_icon/{app_node['icon']}.svg"
+                    if app_node['icon']:
+                        app_node['avatar'] = f"{settings.ICON_URL}/head_icon/{app_node['icon']}.svg"
                 if app_node['need_human_confirm'] == 1:
                     users = Users()
                     app_node_user = AppNodeUserRelation()
@@ -462,7 +467,8 @@ class Workspaces(MySQL):
                 if log.get('avatar'):
                     log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
                 else:
-                    log['avatar'] = f"{settings.ICON_URL}/head_icon/{log['icon']}.svg"
+                    if log['icon']:
+                        log['avatar'] = f"{settings.ICON_URL}/head_icon/{log['icon']}.svg"
                 # Meeting-driven record - status 1
                 if log['app_id'] == 0 and log['chatroom_id'] > 0:
                     log['show_status'] = 1
@@ -521,7 +527,10 @@ class Workspaces(MySQL):
                             # else:
                             #     avatar_url = ''
                             else:
-                                avatar_url = f"{settings.ICON_URL}/head_icon/{agent['icon']}.svg"
+                                if agent['icon']:
+                                    avatar_url = f"{settings.ICON_URL}/head_icon/{agent['icon']}.svg"
+                                else:
+                                    avatar_url = ''
                             log['agents_data'].append({"avatar": avatar_url,"icon": agent.get("icon")})
                         # for agent in agents:
                         #     if agent.get('avatar'):
@@ -584,7 +593,8 @@ class Workspaces(MySQL):
                             if app_node_list.get('avatar'):
                                 app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
                             else:
-                                app_node_list['avatar'] = f"{settings.ICON_URL}/head_icon/{app_node_list['icon']}.svg"
+                                if app_node_list['icon']:
+                                    app_node_list['avatar'] = f"{settings.ICON_URL}/head_icon/{app_node_list['icon']}.svg"
                             if outputs := app_node_list.get('outputs'):
                                 app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
                                 
@@ -685,7 +695,8 @@ class Workspaces(MySQL):
                         if app_node_list.get('avatar'):
                             app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
                         else:
-                            app_node_list['avatar'] = f"{settings.ICON_URL}/head_icon/{app_node_list['icon']}.svg"
+                            if app_node_list['icon']:
+                                app_node_list['avatar'] = f"{settings.ICON_URL}/head_icon/{app_node_list['icon']}.svg"
                         if outputs := app_node_list.get('outputs'):
                             app_node_list['outputs'] = flatten_variable_with_values(create_variable_from_dict(outputs))
                             
@@ -793,7 +804,8 @@ class Workspaces(MySQL):
                 if log.get('avatar'):
                     log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
                 else:
-                    log['avatar'] = f"{settings.ICON_URL}/head_icon/{log['icon']}.svg"
+                    if log['icon']:
+                        log['avatar'] = f"{settings.ICON_URL}/head_icon/{log['icon']}.svg"
                 if 'app_runs_status' in log:
                     status = log['app_runs_status']
                     if status in (1, 2):
