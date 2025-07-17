@@ -192,6 +192,7 @@ def get_uid_user_info(uid:int):
     )
     if not user:
         return False
+    
     return user
 
 def update_uid_language(uid:int,language:str):
