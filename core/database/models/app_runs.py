@@ -62,9 +62,9 @@ class AppRuns(MySQL):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             else:
                 if item['icon']:
-                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"
                 else:
-                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
 
         return list
 
@@ -87,9 +87,9 @@ class AppRuns(MySQL):
             data['avatar'] = f"{settings.STORAGE_URL}/upload/{data['avatar']}"
         else:
             if data['icon']:
-                data['avatar'] = f"{settings.ICON_URL}/head_icon/{data['icon']}.svg"
+                data['avatar'] = f"{settings.ICON_URL}/head_icon/{data['icon']}.png"
             else:
-                data['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
+                data['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
         return data
 
     def get_running_app_run_ai(self, app_run_id: int) -> Dict[str, Any]:
@@ -173,9 +173,9 @@ class AppRuns(MySQL):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             else:
                 if item['icon']:
-                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"
                 else:
-                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
 
         # Add additional query to count records with need_human_confirm == 1
         human_confirm_total = self.select(
@@ -228,9 +228,9 @@ class AppRuns(MySQL):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             else:
                 if item['icon']:
-                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"
                 else:
-                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
 
         return list
 

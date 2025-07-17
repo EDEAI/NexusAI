@@ -187,9 +187,9 @@ class Apps(MySQL):
                     info_item['avatar'] = f"{settings.STORAGE_URL}/upload/{info_item['avatar']}"
                 else:
                     if info_item['icon']:
-                        info_item['avatar'] = f"{settings.ICON_URL}/head_icon/{info_item['icon']}.svg"
+                        info_item['avatar'] = f"{settings.ICON_URL}/head_icon/{info_item['icon']}.png"
                     else:
-                        info_item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
+                        info_item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
                 other_dict[info_item['app_id']].append(info_item)
 
         info_app = self.select(
@@ -213,9 +213,9 @@ class Apps(MySQL):
                     app_item['avatar'] = f"{settings.STORAGE_URL}/upload/{app_item['avatar']}"
                 else:
                     if app_item['icon']:
-                        app_item['avatar'] = f"{settings.ICON_URL}/head_icon/{app_item['icon']}.svg"
+                        app_item['avatar'] = f"{settings.ICON_URL}/head_icon/{app_item['icon']}.png"
                     else:
-                        app_item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
+                        app_item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
                 workflow_dict[app_item['workflow_app_id']].append(app_item)
 
         for data_item in all_app:
@@ -224,9 +224,9 @@ class Apps(MySQL):
                 data_item['avatar'] = f"{settings.STORAGE_URL}/upload/{data_item['avatar']}"
             else:
                 if data_item['icon']:
-                    data_item['avatar'] = f"{settings.ICON_URL}/head_icon/{data_item['icon']}.svg"
+                    data_item['avatar'] = f"{settings.ICON_URL}/head_icon/{data_item['icon']}.png"
                 else:
-                    data_item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
+                    data_item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
             if data_item['mode'] == 2:
                 data_item['list'] = workflow_dict[data_item['app_id']]
             else:
