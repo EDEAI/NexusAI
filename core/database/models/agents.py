@@ -128,6 +128,8 @@ class Agents(MySQL):
                 else:
                     if item['icon']:
                         item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                    else:
+                        item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
 
         return {
             "list": list,

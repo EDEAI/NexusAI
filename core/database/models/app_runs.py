@@ -63,6 +63,8 @@ class AppRuns(MySQL):
             else:
                 if item['icon']:
                     item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                else:
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
 
         return list
 
@@ -86,6 +88,8 @@ class AppRuns(MySQL):
         else:
             if data['icon']:
                 data['avatar'] = f"{settings.ICON_URL}/head_icon/{data['icon']}.svg"
+            else:
+                data['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
         return data
 
     def get_running_app_run_ai(self, app_run_id: int) -> Dict[str, Any]:
@@ -170,6 +174,8 @@ class AppRuns(MySQL):
             else:
                 if item['icon']:
                     item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                else:
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
 
         # Add additional query to count records with need_human_confirm == 1
         human_confirm_total = self.select(
@@ -223,6 +229,8 @@ class AppRuns(MySQL):
             else:
                 if item['icon']:
                     item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                else:
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
 
         return list
 

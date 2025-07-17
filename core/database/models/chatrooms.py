@@ -195,6 +195,8 @@ class Chatrooms(MySQL):
                         else:
                             if agent_data['icon']:
                                 agent_data['avatar'] = f"{settings.ICON_URL}/head_icon/{agent_data['icon']}.svg"
+                            else:
+                                agent_data['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
                             
                         chat_item['agent_list'].append(agent_data)
 
@@ -348,6 +350,8 @@ class Chatrooms(MySQL):
                         else:
                             if agent_info['icon']:
                                 agent_info['avatar'] = f"{settings.ICON_URL}/head_icon/{agent_info['icon']}.svg"
+                            else:
+                                agent_info['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
                         chat_item['agent_list'].append(agent_info)
 
         # Filter: only keep chatrooms where the agent list has exactly one agent and that agent's id equals agent_id.
