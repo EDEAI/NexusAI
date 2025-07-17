@@ -353,7 +353,7 @@ def replace_value_in_variable(
     """
     from core.database.models import UploadFiles
     
-    if var_name == context_variable.name:
+    if var_name == context_variable.name and isinstance(context_variable, Variable):
         if original_variable.type in ["string", "file", "json"]:
             if is_prompt:
                 # Keep the original variable type and replace the variable placeholder with the context variable value
