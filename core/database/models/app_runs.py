@@ -61,7 +61,8 @@ class AppRuns(MySQL):
             if item.get('avatar'):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             else:
-                item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                if item['icon']:
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
 
         return list
 
@@ -83,7 +84,8 @@ class AppRuns(MySQL):
         if data and data.get('avatar'):
             data['avatar'] = f"{settings.STORAGE_URL}/upload/{data['avatar']}"
         else:
-            data['avatar'] = f"{settings.ICON_URL}/head_icon/{data['icon']}.svg"
+            if data['icon']:
+                data['avatar'] = f"{settings.ICON_URL}/head_icon/{data['icon']}.svg"
         return data
 
     def get_running_app_run_ai(self, app_run_id: int) -> Dict[str, Any]:
@@ -166,7 +168,8 @@ class AppRuns(MySQL):
             if item.get('avatar'):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             else:
-                item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                if item['icon']:
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
 
         # Add additional query to count records with need_human_confirm == 1
         human_confirm_total = self.select(
@@ -218,7 +221,8 @@ class AppRuns(MySQL):
             if item.get('avatar'):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
             else:
-                item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                if item['icon']:
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
 
         return list
 

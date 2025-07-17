@@ -182,7 +182,8 @@ class CustomTools(MySQL):
                 if item.get('avatar'):
                     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                 else:
-                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                    if item['icon']:
+                        item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
 
         return {
             "list": list,
