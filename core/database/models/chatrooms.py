@@ -151,6 +151,7 @@ class Chatrooms(MySQL):
                 "chatrooms.status as chatroom_status",
                 "chatrooms.smart_selection",
                 "chatrooms.is_temporary",
+                "chatrooms.last_chat_time",
                 "apps.id as app_id"
             ],
             joins=[
