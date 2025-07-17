@@ -185,6 +185,8 @@ class Apps(MySQL):
             if info_item['app_id'] in other_dict:
                 if info_item['avatar']:
                     info_item['avatar'] = f"{settings.STORAGE_URL}/upload/{info_item['avatar']}"
+                else:
+                    info_item['avatar'] = f"{settings.ICON_URL}/head_icon/{info_item['icon']}.svg"
                 other_dict[info_item['app_id']].append(info_item)
 
         info_app = self.select(
@@ -206,12 +208,16 @@ class Apps(MySQL):
             if app_item['workflow_app_id'] in workflow_dict:
                 if app_item['avatar']:
                     app_item['avatar'] = f"{settings.STORAGE_URL}/upload/{app_item['avatar']}"
+                else:
+                    app_item['avatar'] = f"{settings.ICON_URL}/head_icon/{app_item['icon']}.svg"
                 workflow_dict[app_item['workflow_app_id']].append(app_item)
 
         for data_item in all_app:
             if data_item['avatar']:
                 # data_item['avatar'] = f"{os.getenv('STORAGE_URL', '')}/upload/{data_item['avatar']}"
                 data_item['avatar'] = f"{settings.STORAGE_URL}/upload/{data_item['avatar']}"
+            else:
+                data_item['avatar'] = f"{settings.ICON_URL}/head_icon/{data_item['icon']}.svg"
             if data_item['mode'] == 2:
                 data_item['list'] = workflow_dict[data_item['app_id']]
             else:

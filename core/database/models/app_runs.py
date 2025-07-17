@@ -60,6 +60,8 @@ class AppRuns(MySQL):
         for item in list:
             if item.get('avatar'):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+            else:
+                item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
 
         return list
 
@@ -72,7 +74,7 @@ class AppRuns(MySQL):
         """
         data = self.select_one(
             columns=['app_runs.id AS app_run_id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.workflow_id', 'app_runs.type', 'app_runs.level', 'app_runs.context', 'app_runs.completed_steps', 'app_runs.actual_completed_steps', 'app_runs.completed_edges', 'app_runs.status', 'app_runs.elapsed_time',
-                'app_runs.prompt_tokens', 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens', 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.finished_time' ,'apps.avatar'],
+                'app_runs.prompt_tokens', 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens', 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.finished_time' ,'apps.avatar' ,'apps.icon'],
             conditions=[{"column": "id", "value": app_run_id}, {"column": "status", "op": "in", "value": [2, 4]}],
             joins=[
                 ["left", "apps", "app_runs.app_id = apps.id"]
@@ -80,6 +82,8 @@ class AppRuns(MySQL):
         )
         if data and data.get('avatar'):
             data['avatar'] = f"{settings.STORAGE_URL}/upload/{data['avatar']}"
+        else:
+            data['avatar'] = f"{settings.ICON_URL}/head_icon/{data['icon']}.svg"
         return data
 
     def get_running_app_run_ai(self, app_run_id: int) -> Dict[str, Any]:
@@ -161,6 +165,8 @@ class AppRuns(MySQL):
         for item in list:
             if item.get('avatar'):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+            else:
+                item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
 
         # Add additional query to count records with need_human_confirm == 1
         human_confirm_total = self.select(
@@ -211,6 +217,8 @@ class AppRuns(MySQL):
         for item in list:
             if item.get('avatar'):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+            else:
+                item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
 
         return list
 
