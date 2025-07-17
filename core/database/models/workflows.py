@@ -201,6 +201,8 @@ class Workflows(MySQL):
             else:
                 if item['icon']:
                     item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
+                else:
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
             if item['publish_status'] == 1:
                 workflow_info = self.select_one(
                     columns=["published_time"],

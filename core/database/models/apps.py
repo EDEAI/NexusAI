@@ -188,6 +188,8 @@ class Apps(MySQL):
                 else:
                     if info_item['icon']:
                         info_item['avatar'] = f"{settings.ICON_URL}/head_icon/{info_item['icon']}.svg"
+                    else:
+                        info_item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
                 other_dict[info_item['app_id']].append(info_item)
 
         info_app = self.select(
@@ -212,6 +214,8 @@ class Apps(MySQL):
                 else:
                     if app_item['icon']:
                         app_item['avatar'] = f"{settings.ICON_URL}/head_icon/{app_item['icon']}.svg"
+                    else:
+                        app_item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
                 workflow_dict[app_item['workflow_app_id']].append(app_item)
 
         for data_item in all_app:
@@ -221,6 +225,8 @@ class Apps(MySQL):
             else:
                 if data_item['icon']:
                     data_item['avatar'] = f"{settings.ICON_URL}/head_icon/{data_item['icon']}.svg"
+                else:
+                    data_item['avatar'] = f"{settings.ICON_URL}/head_icon/1.svg"
             if data_item['mode'] == 2:
                 data_item['list'] = workflow_dict[data_item['app_id']]
             else:
