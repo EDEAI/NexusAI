@@ -40,7 +40,8 @@ class AgentCallableItems(MySQL):
                 'agent_callable_items.item_type',
                 'apps.name',
                 'apps.description',
-                'apps.avatar'
+                'apps.avatar',
+                'apps.icon'
             ],
             joins=[
                 ["left", "apps", "agent_callable_items.app_id = apps.id"]
@@ -54,5 +55,8 @@ class AgentCallableItems(MySQL):
         for item in result:
             if item.get('avatar'):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+            else:
+                if item['icon']:
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.svg"
 
         return result
