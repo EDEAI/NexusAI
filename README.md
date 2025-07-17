@@ -336,6 +336,8 @@ server {
             return 403;
         }
 
+        add_header Content-Disposition "attachment";
+
         try_files $uri =404;
     }
 }
