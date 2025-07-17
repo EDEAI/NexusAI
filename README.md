@@ -312,6 +312,16 @@ server {
 
         try_files $uri =404;
     }
+
+    location /head_icon {
+        alias NexusAI/assets/head; # Fill in the real path of the project
+
+        if ($request_filename ~ "/$|/[^\.]+$") {
+            return 403;
+        }
+
+        try_files $uri =404;
+    }
 }
 
 server {
