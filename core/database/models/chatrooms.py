@@ -207,6 +207,7 @@ class Chatrooms(MySQL):
             "page_size": page_size
         }
     
+    @staticmethod
     def format_wechat_time(dt: datetime) -> str:
         now = datetime.now()
         today = now.date()
