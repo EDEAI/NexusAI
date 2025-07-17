@@ -7,6 +7,7 @@ from config import *
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 from core.database import redis
+from core.database.models.users import Users
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/auth/login")
@@ -72,7 +73,17 @@ def verify_token(token: str, credentials_exception):
             redis_key = f"access_token:{uid}"
             
         stored_token = redis.get(redis_key)
-        
+
+        user_info = Users().get_user_by_id(uid)
+        if user_info['team_id']!= team_id:
+            user_update_data = {
+                "team_id":team_id
+            }
+            Users().update(
+                [{'column': 'id', 'value': uid}],
+                user_update_data
+            )
+
         # Verify if token matches
         if not stored_token or stored_token.decode('utf-8') != token:
             print(f"Token mismatch for user {uid}")

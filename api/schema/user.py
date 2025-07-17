@@ -59,6 +59,8 @@ class ThirdPartyLoginData(BaseModel):
     openid: str
     nickname: Optional[str] = None
     avatar: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
     language: Optional[str] = 'en'
 
 class ThirdPartyUserData(BaseModel):

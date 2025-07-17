@@ -5,7 +5,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter,Request
 from core.database.models import (
     Users,
-    Teams
+    Teams,
+    UserTeamRelations
 )
 from api.utils.auth import  is_valid_username, is_valid_email,authenticate_user,updata_login_ip,authenticate_third_party_user
 from api.utils.common import *
@@ -28,7 +29,28 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
+    team_type = Teams().select_one(
+        columns=["type"],
+        conditions=[
+            {"column": "id", "value": user['team_id']},
+            {"column": "status", "value": 1}
+        ]
+    )
+    if team_type !=1:
+        user['team_id'] = UserTeamRelations().select_one(
+            columns=["team_id"],
+            conditions=[
+                {"column": "user_id", "value": user['id']},
+                {"column": "team_id", "value": user['team_id'], "op": "!="}
+            ]
+        )["team_id"]
+        user_update_data = {
+            "team_id":user['team_id']
+        }
+        Users().update(
+            [{'column': 'id', 'value': user['id']}],
+            user_update_data
+        )
     # Check if a valid token already exists in Redis
     redis_key = f"access_token:{user['id']}"
     existing_token = redis.get(redis_key)
@@ -249,6 +271,7 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
                 url_list.append(
                     settings.WEB_URL + '/user/login?email=' + value['email']
                 )
+            UserTeamRelations().ensure_team_id_exists(userinfo.team_id, value['email'])
             email_list_res.append(value['email'])
     # Remove identical elements from two lists
     common_elements = set(email_list_res) & set(email_list)
@@ -271,6 +294,7 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
         user_id = Users().insert(user_data)
         if not user_id:
             return response_error(get_language_content('lnvitation_failed'))
+        UserTeamRelations().ensure_team_id_exists(userinfo.team_id, val)
         url_list.append(
             settings.WEB_URL + '/user/register?email=' + val + '&team=' + team['name']
         )
@@ -284,7 +308,22 @@ async def invite_user(team_id: int = 1,userinfo: TokenData = Depends(get_current
       team_id: int, team id.(Reserved fields may not be transmitted)
     """
     team_member_list = []
-    user_info_list = Users().select(columns='*', conditions=[{'column': 'team_id', 'value': team_id},{'column': 'status', 'value': 1}])
+    # user_info_list = Users().select(columns='*', conditions=[{'column': 'team_id', 'value': team_id},{'column': 'status', 'value': 1}])
+    user_info_list = UserTeamRelations().select(
+        columns=[
+            'users.email',
+            'users.last_login_time',
+            'users.id',
+            'users.avatar',
+            'users.nickname',
+            'users.role'
+        ],
+        conditions=[{'column': 'user_team_relations.team_id', 'value': team_id}],
+        joins=[
+            ["left", "users", "user_team_relations.user_id = users.id"]
+        ]
+    )
+
     team_data = Teams().select_one(columns='*', conditions=[{'column': 'id', 'value': team_id}])
     team_name = 'No team currently available'
     if team_data:
@@ -331,6 +370,73 @@ async def invite_user(team_id: int = 1,userinfo: TokenData = Depends(get_current
     SQLDatabase.close()
     return response_success({'team_name':team_name, 'team_member_list':team_member_list})
 
+@router.get('/user_teams', response_model=ResDictSchema)
+async def get_user_teams(platform: int, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Returns all teams for the current authenticated user by user_id, joined with the teams table.
+
+    Args:
+        platform (int): 1 for web, 2 for third-party.
+        userinfo (TokenData): The token data for the current authenticated user, obtained using the `get_current_user` dependency.
+
+    Returns:
+        A success response containing the list of teams the user belongs to.
+    """
+    user_id = userinfo.uid
+    # Get the id of the team with type=2 (personal workspace)
+    personal_team = Teams().select_one(columns=["id"], conditions=[{"column": "type", "value": 2}])
+    personal_team_id = personal_team["id"] if personal_team else None
+    conditions = [
+        {'column': 'user_team_relations.user_id', 'value': user_id}
+    ]
+    if platform == 1 and personal_team_id:
+        conditions.append({'column': 'user_team_relations.team_id', 'value': personal_team_id, 'op': '!='})
+    user_teams = UserTeamRelations().select(
+        columns=[
+            'teams.id',
+            'teams.name',
+            'teams.config',
+            'teams.created_time',
+            'teams.updated_time',
+            'teams.status',
+            'teams.type'
+        ],
+        conditions=conditions,
+        joins=[
+            ["left", "teams", "user_team_relations.team_id = teams.id"]
+        ]
+    )
+    return response_success({'teams': user_teams})
+
+@router.post('/switch_team', response_model=ResDictSchema)
+async def switch_user_team(team_id: int, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Switches the current user's team_id and saves it.
+
+    Args:
+        team_id (int): The ID of the team to switch to.
+        userinfo (TokenData): The token data for the current authenticated user, obtained using the `get_current_user` dependency.
+
+    Returns:
+        A success response with the new team_id if the switch is successful, otherwise an error response.
+    """
+    user_id = userinfo.uid
+    # Check if the user belongs to the specified team
+    relation = UserTeamRelations().select_one(
+        columns=["id"],
+        conditions=[
+            {"column": "user_id", "value": user_id},
+            {"column": "team_id", "value": team_id}
+        ]
+    )
+    if not relation:
+        return response_error(get_language_content('user_does_not_belong_to_this_team'))
+    Users().update(
+        [{"column": "id", "value": user_id}],
+        {"team_id": team_id}
+    )
+    return response_success({"team_id": team_id})
+
 @router.post('/third_party_login', response_model=ResThirdPartyLoginSchema)
 async def third_party_login(request: Request, login_data: ThirdPartyLoginData):
     """
@@ -370,7 +476,9 @@ async def third_party_login(request: Request, login_data: ThirdPartyLoginData):
         nickname=login_data.nickname,
         avatar=login_data.avatar,
         language=login_data.language or 'en',
-        client_ip=client_ip
+        client_ip=client_ip,
+        phone=login_data.phone,
+        email=login_data.email
     )
     
     if not user:

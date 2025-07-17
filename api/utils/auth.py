@@ -236,7 +236,7 @@ def get_current_language(uid:int = 0) -> str:
 
 def authenticate_third_party_user(platform: str, openid: str, nickname: str = None, 
                                   avatar: str = None, language: str = 'en', 
-                                  client_ip: str = None):
+                                  client_ip: str = None, phone: str = None, email: str = None):
     """
     Authenticate or register a third-party user.
     
@@ -258,9 +258,10 @@ def authenticate_third_party_user(platform: str, openid: str, nickname: str = No
             nickname=nickname,
             avatar=avatar,
             language=language,
-            last_login_ip=client_ip
+            last_login_ip=client_ip,
+            phone=phone,
+            email=email
         )
-        
         # Commit the transaction
         SQLDatabase.commit()
         SQLDatabase.close()
