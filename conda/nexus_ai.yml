@@ -287,7 +287,7 @@ dependencies:
       - pyarrow-hotfix==0.6
       - pyasn1==0.6.0
       - pyasn1-modules==0.4.0
-      - pyautogen==0.2.35
+      - ag2==0.2.35
       - pyautogui==0.9.54
       - pycocotools==2.0.8
       - pycparser==2.22
