@@ -7,6 +7,7 @@ from core.tool.errors import ToolProviderNotFoundError, ToolCertificateVerificat
 from core.tool.utils.yaml_utils import load_yaml_file
 from config import settings
 from typing import Any
+from core.workflow.variables import ObjectVariable,create_variable_from_dict
 
 
 class BuiltinTool:
@@ -252,6 +253,28 @@ def get_tool_providers_with_tools() -> dict[str, Any]:
                         for tool_file in tool_files:
                             tool_path = os.path.join(tool_dir, tool_file)
                             tool_yaml = load_yaml_file(tool_path, ignore_error=False)
+                            # Create an ObjectVariable to represent the output structure
+                            output_variable = ObjectVariable(name='output')
+                            # If the tool YAML defines an 'output' as a list, process each output item
+                            if 'output' in tool_yaml and isinstance(tool_yaml['output'], list):
+                                for item in tool_yaml['output']:
+                                    # Build a variable dictionary for each output item
+                                    var_dict = {
+                                        "name": item.get("name"),
+                                        "type": item.get("type"),
+                                    }
+                                    # Add any additional keys from the item to the variable dictionary
+                                    for key, value in item.items():
+                                        if key not in var_dict:
+                                            var_dict[key] = value
+                                    # Add the property to the output variable using the constructed variable
+                                    output_variable.add_property(item.get("name"), create_variable_from_dict(var_dict))
+                                # Replace the 'output' field in the tool YAML with the ObjectVariable's dictionary representation
+                                tool_yaml['output'] = output_variable.to_dict()
+                            else:
+                                # If no output is defined, set an empty output structure
+                                tool_yaml['output'] = output_variable.to_dict()
+                            # Add the processed tool YAML to the tools list
                             tools.append(tool_yaml)
 
                         provider_yaml['tools'] = tools
