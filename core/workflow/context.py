@@ -102,7 +102,7 @@ def create_context_from_dict(context_dict: List[Dict[str, Any]]) -> Context:
         })
     return context
 
-def replace_variable_value_with_context(original_variable: VariableTypes, context: Context):
+def replace_variable_value_with_context(original_variable: VariableTypes, context: Context, partial_replacement: bool = False):
     """
     Searches for placeholders in the original variable's value (if it's a Variable type) or in its properties/values
     (if it's an ObjectVariable or ArrayVariable type) and replaces them with actual values from the context based on node IDs and sources and variable names.
@@ -110,6 +110,7 @@ def replace_variable_value_with_context(original_variable: VariableTypes, contex
     Parameters:
     - original_variable: The variable (of type VariableTypes) containing placeholders to be replaced.
     - context: The context containing variables that may replace the placeholders.
+    - partial_replacement: Whether to perform partial replacement (only replace placeholders without changing variable type). Default is False.
 
     Returns:
     None. The function directly modifies the original_variable's value or its properties/values.
@@ -119,11 +120,11 @@ def replace_variable_value_with_context(original_variable: VariableTypes, contex
         for node_id, source, var_name in placeholders:
             for record in context.records:
                 if record['node_id'] == node_id:
-                    replace_value_in_variable(original_variable, record[source], node_id, source, var_name)
+                    replace_value_in_variable(original_variable, record[source], node_id, source, var_name, is_prompt=partial_replacement)
                     break
     elif isinstance(original_variable, ArrayVariable):
         for value in original_variable.values:
-            replace_variable_value_with_context(value, context)
+            replace_variable_value_with_context(value, context, partial_replacement)
     elif isinstance(original_variable, ObjectVariable):
         for value in original_variable.properties.values():
-            replace_variable_value_with_context(value, context)
+            replace_variable_value_with_context(value, context, partial_replacement)
