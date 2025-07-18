@@ -8,7 +8,7 @@ import { MeetingSummaryButton } from '../ActionButtons/MeetingSummaryButton';
 import { MessageItem } from '../MessageDisplay/MessageItem';
 import { CurrentConversation } from './CurrentConversation';
 import { MCPToolRuntimeData, MCPToolStatus, getMCPToolStatus } from '../types/mcp';
-import { parseMCPContent } from '../utils/mcpParser';
+import { parseMCPContent, inferUploadedFiles } from '../utils/mcpParser';
 
 interface ChatContentProps {
     instruction?: any;
@@ -140,7 +140,9 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
                                         result: toolData.result || null,
                                         status,
                                         isWorkflow: toolData.skill_or_workflow_name ? 
-                                            toolData.skill_or_workflow_name.toLowerCase().includes('workflow') : false
+                                            toolData.skill_or_workflow_name.toLowerCase().includes('workflow') : false,
+                                        files_to_upload: toolData.files_to_upload || [],
+                                        uploaded_files: inferUploadedFiles(toolData)
                                     }
                                 }));
                             }
@@ -305,6 +307,7 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
                             updateMCPTool={updateMCPTool}
                             getMCPTool={getMCPTool}
                             userMessage={userMessage}
+                            setInstruction={setInstruction}
                         />
                     </div>
                     <div className="w-full flex justify-center pb-[10px]">

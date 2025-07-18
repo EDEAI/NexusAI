@@ -22,6 +22,7 @@ interface MessageContentProps {
     mcpTools?: Record<string | number, MCPToolRuntimeData>;
     updateMCPTool?: (id: string | number, updates: Partial<MCPToolRuntimeData>) => void;
     getMCPTool?: (id: string | number) => MCPToolRuntimeData | null;
+    setInstruction?: (instruction: any) => void;
     item?: any;
     isCurrentMessage?: boolean;
     contentBlocks?: ContentBlock[];  // New: support for streaming content blocks
@@ -38,6 +39,7 @@ export const MessageContent: FC<MessageContentProps> = props => {
         mcpTools, 
         updateMCPTool, 
         getMCPTool,
+        setInstruction,
         item,
         contentBlocks
     } = props;
@@ -101,6 +103,8 @@ export const MessageContent: FC<MessageContentProps> = props => {
                                         }}
                                         intl={intl}
                                         runtimeData={getMCPTool(block.toolId)}
+                                        updateMCPTool={updateMCPTool}
+                                        setInstruction={setInstruction}
                                     />
                                 )
                             )}
@@ -125,6 +129,8 @@ export const MessageContent: FC<MessageContentProps> = props => {
                                         toolData={block.toolData}
                                         intl={intl}
                                         runtimeData={getMCPTool ? getMCPTool(block.toolData.id) : null}
+                                        updateMCPTool={updateMCPTool}
+                                        setInstruction={setInstruction}
                                     />
                                 )
                             )}
@@ -161,6 +167,8 @@ export const MessageContent: FC<MessageContentProps> = props => {
                                 }}
                                 intl={intl}
                                 runtimeData={toolData}
+                                updateMCPTool={updateMCPTool}
+                                setInstruction={setInstruction}
                             />
                         ))}
                 </div>

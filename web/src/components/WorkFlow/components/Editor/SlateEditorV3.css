@@ -1,0 +1,224 @@
+/* SlateEditorV3 Enhanced Styles */
+.mention-popup {
+    animation: slideIn 0.15s ease-out;
+    transform-origin: top left;
+    transition: top 0.1s ease-out, left 0.1s ease-out;
+    opacity: 0;
+}
+
+.mention-popup.positioned {
+    opacity: 1;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Enhanced hover effects for mention list items */
+.mention-popup .mention-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.mention-popup .mention-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    transition: left 0.3s ease;
+}
+
+.mention-popup .mention-item:hover::before {
+    left: 100%;
+}
+
+/* Pulse effect for selected state */
+.mention-selected {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+}
+
+/* Hover effects for variable type icons */
+.variable-icon {
+    transition: all 0.2s ease;
+}
+
+.mention-item:hover .variable-icon {
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar styling */
+.mention-popup .max-h-64::-webkit-scrollbar {
+    width: 4px;
+}
+
+.mention-popup .max-h-64::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 2px;
+}
+
+.mention-popup .max-h-64::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 2px;
+}
+
+.mention-popup .max-h-64::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ===== Variable Tag Styles in Editor ===== */
+
+/* Base variable tag styles */
+.mention-tag {
+    position: relative;
+    vertical-align: baseline;
+    max-width: 300px;
+    overflow: hidden;
+    margin: 0 1px;
+}
+
+.mention-tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.mention-icon {
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.mention-tag:hover .mention-icon {
+    transform: scale(1.1);
+}
+
+.mention-name {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.mention-meta {
+    flex-shrink: 0;
+    font-style: italic;
+}
+
+.mention-tag.input-variable {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #86efac;
+    box-shadow: 0 1px 3px rgba(34, 197, 94, 0.1);
+}
+
+.mention-tag.input-variable:hover {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    box-shadow: 0 4px 8px rgba(34, 197, 94, 0.15);
+}
+
+
+.mention-tag.output-variable {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-color: #93c5fd;
+    box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+}
+
+.mention-tag.output-variable:hover {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.15);
+}
+
+
+.mention-tag.selected {
+    animation: mentionPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes mentionPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+
+.mention-tag:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+
+.mention-prefix {
+    color: #6b7280;
+    font-weight: 500;
+    margin-right: 2px;
+}
+
+
+@media (max-width: 640px) {
+    .mention-tag {
+        font-size: 0.875rem;
+        padding: 2px 6px;
+    }
+
+    .mention-icon {
+        width: 12px;
+        height: 12px;
+        font-size: 0.625rem;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .mention-tag {
+        border-width: 2px;
+        font-weight: 600;
+    }
+
+    .mention-icon {
+        border: 1px solid currentColor;
+    }
+}
+
+
+@media (prefers-color-scheme: dark) {
+    .mention-tag.input-variable {
+        background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+        color: #6ee7b7;
+        border-color: #10b981;
+    }
+
+    .mention-tag.output-variable {
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        color: #93c5fd;
+        border-color: #3b82f6;
+    }
+}

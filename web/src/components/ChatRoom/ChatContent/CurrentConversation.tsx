@@ -23,6 +23,7 @@ interface CurrentConversationProps {
     mcpTools?: Record<string | number, MCPToolRuntimeData>;
     updateMCPTool?: (id: string | number, updates: Partial<MCPToolRuntimeData>) => void;
     getMCPTool?: (id: string | number) => MCPToolRuntimeData | null;
+    setInstruction?: (instruction: any) => void;
     userMessage?: any[];
 }
 
@@ -41,6 +42,7 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
         mcpTools,
         updateMCPTool,
         getMCPTool,
+        setInstruction,
         userMessage,
     } = props;
 
@@ -182,6 +184,7 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
                 setCurrentMessageFromHistory={(callback) => {
                     setCurrentMessageFromHistoryCallback.current = callback;
                 }}
+                setInstruction={setInstruction}
             />
         </>
     );

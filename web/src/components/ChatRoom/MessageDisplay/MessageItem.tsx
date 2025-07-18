@@ -22,6 +22,7 @@ interface MessageItemProps {
     mcpTools?: Record<string | number, MCPToolRuntimeData>;
     updateMCPTool?: (id: string | number, updates: Partial<MCPToolRuntimeData>) => void;
     getMCPTool?: (id: string | number) => MCPToolRuntimeData | null;
+    setInstruction?: (instruction: any) => void;
 }
 
 export const MessageItem: FC<MessageItemProps> = props => {
@@ -36,7 +37,8 @@ export const MessageItem: FC<MessageItemProps> = props => {
         cidName,
         mcpTools,
         updateMCPTool,
-        getMCPTool
+        getMCPTool,
+        setInstruction
     } = props;
     const intl = useIntl();
     const isAgent = item.is_agent === 1;
@@ -96,6 +98,7 @@ export const MessageItem: FC<MessageItemProps> = props => {
                         updateMCPTool={updateMCPTool}
                         getMCPTool={getMCPTool}
                         item={item}
+                        setInstruction={setInstruction}
                     />
                 </div>
                 <MessageActions

@@ -26,7 +26,7 @@ import ToolNode from '@/py2js/nodes/tool.js';
 import VariableAggregationNode from '@/py2js/nodes/variable_aggregation.js';
 import { Prompt } from '@/py2js/prompt.js';
 import { ObjectVariable, Variable, createVariableFromObject } from '@/py2js/variables.js';
-import _, { clone, cloneDeep } from 'lodash';
+import _, { cloneDeep } from 'lodash';
 import useStore from './store';
 import { AppNode, BlockEnum } from './types';
 
@@ -63,6 +63,9 @@ function transformOrigData(node: AppNode): OriNode {
 }
 
 const serialize = nodes => {
+    if (!Array.isArray(nodes)) {
+        return nodes;
+    }
     return nodes
         .map(node => {
             if (node.type === 'mention') {
@@ -719,7 +722,6 @@ export const transformer = {
             // if (data?.infoData?.output_variables?.length) {
             //     data.infoData.output_variables
             // }
-            console.log(1234, data);
 
             return data?.infoData?.output_variables?.properties || {};
         },
@@ -901,21 +903,22 @@ export const transformer = {
             if (paramseters) {
                 paramseters.forEach(x => {
                     console.log(x, node);
-                    
-                    let value=''
-                    if(node?.data?.form?.[x.name]){
-                        value=serialize(node?.data?.form?.[x.name])
-                    }else if(x.default){
-                        value=x.default
+
+                    let value = '';
+                    if (node?.data?.form?.[x.name]) {
+                        // debugger
+                        value = serialize(node?.data?.form?.[x.name]);
+                    } else if (x.default) {
+                        value = x.default;
                     }
                     const vars = new Variable(
                         x.name,
                         x.type || 'string',
                         value,
                         x.label.zh_Hans,
-                        x.required
+                        x.required,
                     );
-                    
+
                     input.addProperty(x.name, vars);
                 });
             }
@@ -927,16 +930,42 @@ export const transformer = {
 
             return new ToolNode(params);
         },
-        context(freeNode) {
+        context1(freeNode) {
             console.log(freeNode);
+            debugger;
             const input = cloneDeep(freeNode.data.input);
-            Object.values(input.properties).forEach(x=>{
-                if(!x.required){
-                    delete input.properties[x.name]
+            Object.values(input.properties).forEach(x => {
+                if (!x.required) {
+                    delete input.properties[x.name];
                 }
-            })
+            });
             return {
-                inputs:input,
+                inputs: input,
+            };
+        },
+        variables(data) {
+            // const output = new ObjectVariable('output');
+            // if (data?.infoData?.output_variables?.length) {
+            //     data.infoData.output_variables
+            // }
+
+            return data?.outputInfo?.properties || {};
+        },
+        context(freeNode) {
+            const prompt = freeNode.data.input.properties;
+            let context = [];
+
+            Object.values(prompt).forEach((x: object) => {
+                if (!x?.value) return;
+                const getVar = parseText(x.value);
+                context = [...context, ...getVar];
+            });
+            return {
+                // inputs: freeNode.data.input,
+                context: _.uniqWith(
+                    context,
+                    (a, b) => a.identifier === b.identifier && a.fieldName === b.fieldName,
+                ),
             };
         },
     },

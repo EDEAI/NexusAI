@@ -14,6 +14,7 @@ export interface MCPToolData {
     };
     result: any;
     id?: string | number;
+    files_to_upload?: import('./fileUpload').FileToUpload[];
 }
 
 export interface WorkflowConfirmationStatus {
@@ -32,6 +33,9 @@ export interface MCPToolRuntimeData extends MCPToolData {
     status: MCPToolStatus;
     workflow_confirmation?: WorkflowConfirmationStatus;
     isWorkflow?: boolean;
+    files_to_upload?: import('./fileUpload').FileToUpload[];
+    uploaded_files?: import('./fileUpload').FileToUpload[];
+    error?: string;
 }
 
 export interface ContentBlock {
@@ -50,7 +54,8 @@ export enum MCPToolStatus {
     RUNNING = 'running', 
     COMPLETED = 'completed',
     FAILED = 'failed',
-    WAITING_CONFIRMATION = 'waiting_confirmation'
+    WAITING_CONFIRMATION = 'waiting_confirmation',
+    WAITING_FILE_UPLOAD = 'waiting_file_upload'
 }
 
 export const getMCPToolStatus = (

@@ -9,6 +9,7 @@ import type { TabsProps } from 'antd';
 import { Input, Tabs, Tooltip, Typography } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
 import { getLocale, useIntl } from 'umi';
+import { ObjectVariable, Variable } from '@/py2js/variables.js';
 import UserCon from '../components/UserCon';
 import useOutsideClick from '../hooks/useOutsideClick';
 import useStore from '../store';
@@ -146,6 +147,19 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     icon: item?.icon,
                     baseData: item,
                 };
+                if(item.output){
+                    if(Array.isArray(item.output)&&item.output.length>0){
+                        const toolVariables = new ObjectVariable('output','object')
+                        item.output.forEach(item=>{
+                            const variable= new Variable(item.name,item.type)
+                            toolVariables.addProperty(item.name,variable)
+                        })
+                        createData.outputInfo = toolVariables.toObject();
+                    }else{
+                        createData.outputInfo = item.output;
+                    }
+                    
+                }
             } else {
                 createData = {
                     title: item.title,
@@ -156,6 +170,7 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     createData.icon = item.icon;
                 }
             }
+            
         }
 
         const newNode = storeCreateNode(createType || item.icon, {
@@ -250,7 +265,6 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                         })}
                         prefix={<SearchOutlined />}
                     />
-               
                     <Tabs
                         defaultActiveKey={tabIndex}
                         onChange={e => onTabChange(e)}

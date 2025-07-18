@@ -4,6 +4,7 @@
 import { memo, useState } from 'react';
 import SlateEditorV2, { MentionEditorProps } from './SlateEditorV2';
 import { getCharacterCount } from './components/slateEditorUtils';
+import SlateEditorV3Test from './SlateEditorV3Test';
 
 interface WrapperEditorProps {
     title?: string;
@@ -25,7 +26,9 @@ export default memo((props: WrapperEditorProps & MentionEditorProps) => {
                 <div className="text-blue-400">{len}</div>
             </div>
             <div className="max-h-48 min-h-24 overflow-y-auto">
-                <SlateEditorV2 onChange={handleChange} {...restProps}></SlateEditorV2>
+                {/* <SlateEditorV2 onChange={handleChange} {...restProps}></SlateEditorV2> */}
+                <SlateEditorV3Test onChange={handleChange} {...restProps}></SlateEditorV3Test>
+
             </div>
         </div>
     );

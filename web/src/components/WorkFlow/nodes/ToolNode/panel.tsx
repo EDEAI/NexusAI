@@ -12,11 +12,12 @@ import {
 import { useIntl } from '@umijs/max';
 import { useMount, useUpdateEffect } from 'ahooks';
 import Link from 'antd/lib/typography/Link';
-import { memo, useRef, useState, useEffect, useCallback } from 'react';
 import { debounce } from 'lodash';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import CodeEditor from '../../components/Editor/CodeEditor';
+import ProFormWrapperEditor from '../../components/Editor/ProFormWrapperEditor';
 import useStore from '../../store';
 import { AppNode } from '../../types';
-import ProFormWrapperEditor from '../../components/Editor/ProFormWrapperEditor';
 
 type PromptItem = {
     serializedContent: string;
@@ -37,6 +38,46 @@ interface CredentialsProviderItem {
     label?: { zh_Hans: string };
 }
 
+// Create JSONFormEditor component outside of render cycle to avoid recreation
+const JSONFormEditor = ({
+    value,
+    onChange,
+    fieldName,
+}: {
+    value?: string;
+    onChange?: (value: string) => void;
+    fieldName?: string;
+}) => {
+    const valueRef = useRef(value);
+
+    // Sync external value changes to internal reference
+    useEffect(() => {
+        valueRef.current = value;
+    }, [value]);
+
+    // Use useMemo to create stable CodeEditor instance
+    const CodeEditorMemo = useMemo(
+        () => (
+            <div className="h-[300px]">
+                <CodeEditor
+                    language="json"
+                    height={200}
+                    isJSONStringifyBeauty
+                    value={valueRef.current}
+                    onChange={newValue => {
+                        valueRef.current = newValue;
+                        onChange?.(newValue);
+                    }}
+                    showMaximize={true}
+                />
+            </div>
+        ),
+        [fieldName], // Only depend on field name to keep editor instance stable
+    );
+
+    return CodeEditorMemo;
+};
+
 export default memo(({ node }: { node: AppNode }) => {
     const formRef = useRef(null);
     const intl = useIntl();
@@ -44,7 +85,10 @@ export default memo(({ node }: { node: AppNode }) => {
     const getVariables = useStore(state => state.getOutputVariables);
     const [params, setParams] = useState<any>([]);
     const [authorizationStatus, setAuthorizationStatus] = useState<any>(1);
-    const [credentialsProvider, setCredentialsProvider] = useState<Record<string, CredentialsProviderItem> | null>(null);
+    const [credentialsProvider, setCredentialsProvider] = useState<Record<
+        string,
+        CredentialsProviderItem
+    > | null>(null);
     const [editorOptions, setEditorOptions] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -52,7 +96,6 @@ export default memo(({ node }: { node: AppNode }) => {
     const nodeIdRef = useRef(node.id);
     const loadingRef = useRef(loading);
 
-    // 保持引用最新
     useEffect(() => {
         updateNodeDataRef.current = updateNodeData;
         nodeIdRef.current = node.id;
@@ -65,10 +108,10 @@ export default memo(({ node }: { node: AppNode }) => {
         setParams(nodeData?.baseData?.parameters || []);
         setAuthorizationStatus(nodeData?.baseData?.authorization_status || 1);
         setCredentialsProvider(nodeData?.baseData?.credentials_for_provider || null);
-        
+
         const vars = getVariables(node.id);
         setEditorOptions(vars);
-        
+
         setTimeout(() => {
             const fieldNames = Object.keys(formRef?.current?.getFieldsValue() || {});
             if (!fieldNames?.length) {
@@ -76,9 +119,18 @@ export default memo(({ node }: { node: AppNode }) => {
                 return;
             }
             fieldNames
-                .filter(x => nodeData['form']?.[x])
+                // .filter(x => nodeData['form']?.[x])
                 .forEach(e => {
-                    formRef.current.setFieldsValue({ [e]: nodeData['form']?.[e] });
+                    if (nodeData['form']?.[e] && nodeData['form']?.[e] != '') {
+                        formRef.current.setFieldsValue({ [e]: nodeData['form']?.[e] });
+                    } else {
+                        const hasDefault = nodeData?.baseData?.parameters?.find(
+                            x => x.name == e && x.default,
+                        );
+                        if (hasDefault) {
+                            setEditorValue(e, hasDefault.default);
+                        }
+                    }
                 });
             setLoading(false);
         }, 200);
@@ -88,13 +140,12 @@ export default memo(({ node }: { node: AppNode }) => {
         setLoading(true);
         const vars = getVariables(node.id);
         setEditorOptions(vars);
-        
-        // 更新表单值
+
         const nodeData = node.data as any;
         if (formRef.current && nodeData?.form) {
             formRef.current.setFieldsValue(nodeData.form);
         }
-        
+
         setTimeout(() => {
             setLoading(false);
         }, 100);
@@ -109,7 +160,7 @@ export default memo(({ node }: { node: AppNode }) => {
                 form: allValue,
             });
         }, 300),
-        [], // 空依赖数组，避免重新创建debounce函数
+        [],
     );
 
     const getToolAuthorization = async e => {
@@ -125,6 +176,22 @@ export default memo(({ node }: { node: AppNode }) => {
             });
         }
     };
+
+    const setEditorValue = useCallback((name: string, value: string) => {
+        if (formRef.current) {
+            const newValue = [
+                {
+                    type: 'paragraph',
+                    children: [
+                        {
+                            text: value,
+                        },
+                    ],
+                },
+            ];
+            formRef.current.setFieldsValue({ [name]: newValue });
+        }
+    }, []);
 
     return (
         <>
@@ -205,11 +272,52 @@ export default memo(({ node }: { node: AppNode }) => {
                                 key: e.name,
                                 required: e.required,
                             };
-                            if (!e.required) return null;
-
+                            // if (e.default) {
+                            //     setTimeout(() => {
+                            //         setEditorValue(e.name, e.default);
+                            //     }, 200);
+                            // }
+                            // if (!e.required) return null;
+                            // debugger;
                             switch (e.type) {
                                 case 'object':
                                 case 'json':
+                                //  {
+                                // Create wrapper component to properly handle Form.Item value synchronization
+                                //     return (
+                                //         <ProFormItem
+                                //             name={e.name}
+                                //             label={e?.label?.zh_Hans}
+                                //             tooltip={e?.human_description?.zh_Hans}
+                                //             required={e.required}
+                                //             rules={[
+                                //                 {
+                                //                     required: e.required,
+                                //                     message: intl.formatMessage({
+                                //                         id: 'workflow.form.parameter.required',
+                                //                     }),
+                                //                 },
+                                //                 {
+                                //                     validator: (_, value) => {
+                                //                         if (!value) return Promise.resolve();
+                                //                         try {
+                                //                             JSON.parse(value);
+                                //                             return Promise.resolve();
+                                //                         } catch (error) {
+                                //                             return Promise.reject(
+                                //                                 new Error(intl.formatMessage({ id: 'workflow.form.parameter.json.invalid' })),
+                                //                             );
+                                //                         }
+                                //                     },
+                                //                 },
+                                //             ]}
+                                //             initialValue={{}}
+
+                                //         >
+                                //             <JSONFormEditor fieldName={e.name} />
+                                //         </ProFormItem>
+                                //     );
+                                // }
                                 case 'array':
                                 case 'string':
                                     return (
@@ -246,6 +354,8 @@ export default memo(({ node }: { node: AppNode }) => {
                                     );
                             }
                         })}
+
+                        <div className="h-80"></div>
                     </ProForm>
                 )}
             </div>

@@ -3,6 +3,7 @@
  */
 import { MCPToolData, ContentBlock, ParsedMCPContent, MCPToolRuntimeData } from '../types/mcp';
 import { ContentBlock as StreamingContentBlock } from '../types';
+import { FileToUpload } from '../types/fileUpload';
 
 const MCP_START_TAG = '<<<mcp-tool-start>>>';
 const MCP_END_TAG = '<<<mcp-tool-end>>>';
@@ -37,8 +38,14 @@ export const extractMCPTools = (content: string): { toolData: MCPToolData; start
                 workflow_run_id: rawData.workflow_run_id || 0,
                 workflow_confirmation_status: rawData.workflow_confirmation_status || null,
                 args: rawData.args || {},
-                result: rawData.result || null
+                result: rawData.result || null,
+                files_to_upload: rawData.files_to_upload || []
             };
+            
+            // Debug logging for file data extraction
+            if (rawData.files_to_upload && Array.isArray(rawData.files_to_upload) && rawData.files_to_upload.length > 0) {
+                console.log(`[MCP Parser] Extracted files_to_upload for tool ${toolData.id}:`, rawData.files_to_upload);
+            }
             
             tools.push({
                 toolData,
@@ -227,7 +234,8 @@ export const serializeMCPToolToContent = (toolData: MCPToolRuntimeData): string 
             workflow_run_id: toolData.workflow_run_id,
             workflow_confirmation_status: toolData.workflow_confirmation_status,
             args: toolData.args,
-            result: toolData.result
+            result: toolData.result,
+            files_to_upload: toolData.files_to_upload
         };
         
         const jsonContent = JSON.stringify(mcpToolData, null, 0);
@@ -235,6 +243,35 @@ export const serializeMCPToolToContent = (toolData: MCPToolRuntimeData): string 
     } catch (error) {
         console.error('Failed to serialize MCP tool:', error);
         return '';
+    }
+};
+
+/**
+ * Infer uploaded files from historical MCP tool data
+ */
+export const inferUploadedFiles = (toolData: MCPToolData): FileToUpload[] => {
+    try {
+        if (!toolData.files_to_upload || !Array.isArray(toolData.files_to_upload)) {
+            return [];
+        }
+        
+        // Validate and filter uploaded files based on file_path existence
+        return toolData.files_to_upload.filter(file => {
+            // Basic validation
+            if (!file || typeof file !== 'object') {
+                console.warn('Invalid file object in files_to_upload:', file);
+                return false;
+            }
+            
+            // Check if file has valid file_path (indicating it's uploaded)
+            return file.file_path && 
+                   typeof file.file_path === 'string' && 
+                   file.file_path.trim() !== '' &&
+                   (file.file_path.startsWith('http') || file.file_path.startsWith('/'));
+        });
+    } catch (error) {
+        console.error('Error inferring uploaded files:', error);
+        return [];
     }
 };
 

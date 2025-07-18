@@ -17,6 +17,7 @@ interface CurrentMessageProps {
     mcpTools?: Record<string | number, MCPToolRuntimeData>;
     updateMCPTool?: (id: string | number, updates: Partial<MCPToolRuntimeData>) => void;
     getMCPTool?: (id: string | number) => MCPToolRuntimeData | null;
+    setInstruction?: (instruction: any) => void;
 }
 
 export const CurrentMessage: FC<CurrentMessageProps> = props => {
@@ -26,7 +27,8 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
         intl, 
         mcpTools = {}, 
         updateMCPTool = () => {}, 
-        getMCPTool = () => null 
+        getMCPTool = () => null,
+        setInstruction
     } = props;
 
     if (!currentMessage.name) {
@@ -77,6 +79,7 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
                         mcpTools={mcpTools}
                         updateMCPTool={updateMCPTool}
                         getMCPTool={getMCPTool}
+                        setInstruction={setInstruction}
                         item={{
                             ...currentMessage,
                             parsedContent: parseMCPContent(currentMessage.content || '')

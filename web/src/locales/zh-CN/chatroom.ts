@@ -18,6 +18,7 @@ export default {
     'app.chatroom.mcptool.outputs': '输出结果',
     'app.chatroom.mcptool.noOutputs': '暂无输出',
     'app.chatroom.mcptool.files': '文件列表',
+  'app.chatroom.mcptool.inputFiles': '输入文件',
     'app.chatroom.mcptool.downloadFile': '下载文件',
     'app.chatroom.mcptool.parameters': '参数',
     'app.chatroom.mcptool.result': '结果',

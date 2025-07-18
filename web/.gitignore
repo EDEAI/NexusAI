@@ -39,3 +39,4 @@ screenshot
 .eslintcache
 .cursorrules
 build
+/.tasks/

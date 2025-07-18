@@ -18,6 +18,7 @@ export default {
     'app.chatroom.mcptool.outputs': 'Outputs',
     'app.chatroom.mcptool.noOutputs': 'No outputs available',
     'app.chatroom.mcptool.files': 'Files',
+  'app.chatroom.mcptool.inputFiles': 'Input Files',
     'app.chatroom.mcptool.downloadFile': 'Download File',
     'app.chatroom.mcptool.parameters': 'Parameters',
     'app.chatroom.mcptool.result': 'Result',
