@@ -5,6 +5,7 @@ import math
 from typing import Any, Dict
 import os
 from config import settings
+from datetime import datetime, timedelta
 
 
 class Chatrooms(MySQL):
@@ -151,6 +152,7 @@ class Chatrooms(MySQL):
                 "chatrooms.status as chatroom_status",
                 "chatrooms.smart_selection",
                 "chatrooms.is_temporary",
+                "chatrooms.last_chat_time",
                 "apps.id as app_id"
             ],
             joins=[
@@ -163,6 +165,7 @@ class Chatrooms(MySQL):
         )
 
         for chat_item in chatroom_list:
+            chat_item['last_chat_time_display'] = self.format_wechat_time(chat_item['last_chat_time'])
             chat_item['agent_list'] = []
             agent_list = ChatroomAgentRelation().select(
                 columns=["agent_id", "chatroom_id"],
@@ -189,6 +192,11 @@ class Chatrooms(MySQL):
                         
                         if agent_data and agent_data.get('avatar'):
                             agent_data['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_data['avatar']}"
+                        else:
+                            if agent_data['icon']:
+                                agent_data['avatar'] = f"{settings.ICON_URL}/head_icon/{agent_data['icon']}.png"
+                            else:
+                                agent_data['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
                             
                         chat_item['agent_list'].append(agent_data)
 
@@ -203,7 +211,36 @@ class Chatrooms(MySQL):
             "page": page,
             "page_size": page_size
         }
+    
+    @staticmethod
+    def format_wechat_time(dt: datetime) -> str:
+        now = datetime.now()
+        today = now.date()
+        if dt is None:
+            return ""
+        if isinstance(dt, str):
+            try:
+                dt = datetime.strptime(dt, "%Y-%m-%d %H:%M:%S")
+            except Exception:
+                return dt  # 保底返回原始字符串
 
+        delta = today - dt.date()
+        if delta.days == 0:
+            # 今天
+            hour = dt.hour
+            if hour < 12:
+                return f"上午 {dt.strftime('%H:%M')}"
+            else:
+                return f"下午 {dt.strftime('%H:%M')}"
+        elif delta.days == 1:
+            return "昨天"
+        elif delta.days == 2:
+            return "前天"
+        elif dt.year == now.year:
+            return dt.strftime("%m/%d")
+        else:
+            return dt.strftime("%Y/%m/%d")
+        
     def recent_chatroom_list(self, chatroom_id: int, uid: int = 0):
         """
         Retrieves a list of the most recently active chat rooms for a given user, excluding a specific chat room.
@@ -310,6 +347,11 @@ class Chatrooms(MySQL):
                     if agent_info:
                         if agent_info.get('avatar'):
                             agent_info['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_info['avatar']}"
+                        else:
+                            if agent_info['icon']:
+                                agent_info['avatar'] = f"{settings.ICON_URL}/head_icon/{agent_info['icon']}.png"
+                            else:
+                                agent_info['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
                         chat_item['agent_list'].append(agent_info)
 
         # Filter: only keep chatrooms where the agent list has exactly one agent and that agent's id equals agent_id.

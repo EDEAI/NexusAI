@@ -58,7 +58,7 @@ class ToolNode(Node):
             start_time = datetime.now()
             
             input = self.data['input']  
-            replace_variable_value_with_context(input, context)
+            replace_variable_value_with_context(input, context,partial_replacement=True)
             validate_required_variable(input)
             
             workflow = Workflows().select_one(

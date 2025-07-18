@@ -33,7 +33,8 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
         import_to_knowledge_base: Dict[str, bool] = {},
         knowledge_base_mapping: Dict[str, Dict[str, int]] = {},
         flow_data: Dict[str, Any] = {}, 
-        original_node_id: Optional[str] = None
+        original_node_id: Optional[str] = None,
+        split_task_by_line: bool = False
     ):
         """
         Initializes a RecursiveTaskGenerationNode object with typing enhancements and the ability to track the original node ID.
@@ -48,7 +49,8 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
             "manual_confirmation": manual_confirmation,
             "import_to_knowledge_base": import_to_knowledge_base,
             "knowledge_base_mapping": knowledge_base_mapping,
-            "flow_data": flow_data
+            "flow_data": flow_data,
+            "split_task_by_line": True  # Currently, only split by line is supported
         }
         if original_node_id is not None:
             init_kwargs["original_node_id"] = original_node_id
@@ -58,6 +60,7 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
     def run(
         self,
         context: Context,
+        user_id: int = 0,
         app_run_id: int = 0,
         node_exec_id: int = 0,
         edge_id: str = '',
@@ -85,22 +88,50 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
                 )
             )
             
-            invoke_input = {'requirement': get_first_variable_value(input)}
-            if self.data["prompt"]:
-                invoke_input["task_generation_goals"] = self.duplicate_braces(self.data["prompt"].get_system())
+            if self.data['split_task_by_line']:
+                requirement_str: str = get_first_variable_value(input)
+                requirement_list = []
+                for requirement in requirement_str.split('\n'):
+                    requirement = requirement.strip()
+                    if requirement:
+                        requirement_list.append(requirement)
                 
-            prompt_config = get_language_content("recursive_task_generation")
-            self.schema_key = "recursive_task_generation"
-            self.data["prompt"] = Prompt(system=prompt_config["system"], user=prompt_config["user"])
-            
-            model_data, tasks, prompt_tokens, completion_tokens, total_tokens = self.invoke(
-                app_run_id=app_run_id, 
-                edge_id=edge_id,
-                context=context, 
-                input=invoke_input,
-                return_json=True,
-                correct_llm_output=correct_llm_output
-            )
+                subcategories = []
+                for index, requirement in enumerate(requirement_list):
+                    subcategories.append({
+                        'id': f'task-sub-{index}',
+                        'name': f'{get_language_content("recursive_task_sub_task", uid=user_id, append_ret_lang_prompt=False)} {index + 1}',
+                        'description': '',
+                        'task': requirement
+                    })
+                tasks = {
+                    'id': 'task-root',
+                    'name': get_language_content("recursive_task_root_task", uid=user_id, append_ret_lang_prompt=False),
+                    'description': '',
+                    'keywords': '',
+                    'task': get_language_content("recursive_task_root_task", uid=user_id, append_ret_lang_prompt=False),
+                    'subcategories': subcategories
+                }
+                
+                model_data = None
+                prompt_tokens = completion_tokens = total_tokens = 0
+            else:
+                invoke_input = {'requirement': get_first_variable_value(input)}
+                if self.data["prompt"]:
+                    invoke_input["task_generation_goals"] = self.duplicate_braces(self.data["prompt"].get_system())
+                    
+                prompt_config = get_language_content("recursive_task_generation")
+                self.schema_key = "recursive_task_generation"
+                self.data["prompt"] = Prompt(system=prompt_config["system"], user=prompt_config["user"])
+                
+                model_data, tasks, prompt_tokens, completion_tokens, total_tokens = self.invoke(
+                    app_run_id=app_run_id, 
+                    edge_id=edge_id,
+                    context=context, 
+                    input=invoke_input,
+                    return_json=True,
+                    correct_llm_output=correct_llm_output
+                )
             
             recursive_task = create_recursive_task_category_from_dict(tasks)
             outputs = Variable(name="output", type="json", value=json.dumps(recursive_task.to_dict(), ensure_ascii=False))

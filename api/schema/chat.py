@@ -17,6 +17,8 @@ class ChatRoomInfoBase(BaseModel):
     chatroom_status: Optional[int] = None
     smart_selection: Optional[int] = None
     is_temporary: Optional[int] = None
+    last_chat_time: Optional[datetime] = None
+    last_chat_time_display: Optional[str] = None
 
 
 class AgentModel(BaseModel):

@@ -198,6 +198,11 @@ class Workflows(MySQL):
         for item in list:
             if item.get('avatar'):
                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+            else:
+                if item['icon']:
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"
+                else:
+                    item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
             if item['publish_status'] == 1:
                 workflow_info = self.select_one(
                     columns=["published_time"],
