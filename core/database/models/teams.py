@@ -28,3 +28,20 @@ class Teams(MySQL):
         if team:
             return team["id"]
         return None
+
+    def get_team_type_by_id(self, team_id: int) -> int:
+        """
+        根据team_id查询对应的type字段。
+        :param team_id: 团队ID
+        :return: type字段的值，如果未找到则返回None。
+        """
+        team = self.select_one(
+            columns=["type"],
+            conditions=[
+                {"column": "id", "value": team_id},
+                {"column": "status", "value": 1}
+            ]
+        )
+        if team:
+            return team["type"]
+        return None

@@ -1117,7 +1117,8 @@ language_packs = {
         'Permission_does_not_exist': 'Permission does not exist',
         'role_delete_success': 'Role delete success',
         'role_id_is_required': 'Role ID is required',
-        'user_does_not_belong_to_this_team': 'User does not belong to this team.'
+        'user_does_not_belong_to_this_team': 'User does not belong to this team.',
+        'the_current_user_does_not_have_permission': 'The current user does not have permission'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1449,7 +1450,8 @@ language_packs = {
         'Permission_does_not_exist': '权限不存在',
         'role_delete_success': '角色删除成功',
         'role_id_is_required': '角色ID不能为空',
-        'user_does_not_belong_to_this_team': '用户不属于该团队，无法进行切换'
+        'user_does_not_belong_to_this_team': '用户不属于该团队，无法进行切换',
+        'the_current_user_does_not_have_permission': '当前用户暂无权限'
     }
 }
 

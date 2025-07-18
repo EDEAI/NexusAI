@@ -13,6 +13,7 @@ class UserData(BaseModel):
     email: Optional[str] = None
     role: Optional[int] = None
     language: Optional[str] = None
+    team_type: Optional[int] = None
     
 class RegisterTeamData(BaseModel):
     team_id: Optional[int] = 1

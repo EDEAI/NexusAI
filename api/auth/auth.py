@@ -209,6 +209,17 @@ async def get_user_info(userinfo: TokenData = Depends(get_current_user)):
             user_info['user_type'] = 'third_party'
         else:
             user_info['user_type'] = 'regular'
+        if user_info['team_id']:
+            team_type = Teams().select_one(
+                columns=['type'], 
+                conditions=[
+                    {'column': 'id', 'value': user_info['team_id']}, 
+                    {'column': 'status', 'value': 1}
+                ]
+            )['type']
+            user_info['team_type'] = team_type
+        else:
+            user_info['team_type'] = 1
     else:
         return response_error("User not found")
     
