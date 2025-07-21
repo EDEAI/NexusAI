@@ -789,6 +789,7 @@ export const transformer = {
                 input: new Variable('input', 'string', node.data['variable'] || ''),
                 model_config_id: node.data['model'] || getDefaultModelId(),
                 manual_confirmation: node.data['manual_confirmation'] || false,
+                split_task_by_line: node.data['split_task_by_line'] || false,
                 // category_purpose: node.data['category_purpose'] || 0,
                 requirement_category: null,
                 requires_upload: false,
@@ -802,6 +803,7 @@ export const transformer = {
                     output: {},
                 },
             };
+            
             // params.category_purpose=parseInt(params.category_purpose)
             getVarFromData(node, 'import_to_knowledge_base.')?.forEach(({ key, value, output }) => {
                 if (!value) return;

@@ -8,6 +8,7 @@ import { MessageItem } from '../MessageDisplay/MessageItem';
 import { MCPToolRuntimeData } from '../types/mcp';
 import { WaitingReplyIndicator } from './WaitingReplyIndicator';
 import { checkLastAgentMessage } from '../utils';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 
 interface CurrentConversationProps {
     messageApi?: any;
@@ -23,7 +24,6 @@ interface CurrentConversationProps {
     mcpTools?: Record<string | number, MCPToolRuntimeData>;
     updateMCPTool?: (id: string | number, updates: Partial<MCPToolRuntimeData>) => void;
     getMCPTool?: (id: string | number) => MCPToolRuntimeData | null;
-    setInstruction?: (instruction: any) => void;
     userMessage?: any[];
 }
 
@@ -42,9 +42,11 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
         mcpTools,
         updateMCPTool,
         getMCPTool,
-        setInstruction,
         userMessage,
     } = props;
+    
+    // Use context for setInstruction
+    const { setInstruction } = useChatRoomContext();
 
     const [currentMessageContent, setCurrentMessageContent]: any = useState([]);
     const [isEnd, setisEnd] = useState(false);
@@ -157,6 +159,7 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
                         cidName="currentChilContent"
                         mcpTools={mcpTools}
                         updateMCPTool={updateMCPTool}
+                        setInstruction={setInstruction}
                         getMCPTool={getMCPTool}
                     />
                 ))

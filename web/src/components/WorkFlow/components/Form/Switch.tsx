@@ -25,6 +25,11 @@ const switchConfigs = {
         label: '',
         tooltip: '',
     },
+    split_task_by_line: {
+        name: 'split_task_by_line',
+        label: '',
+        tooltip: '',
+    },
 } as const;
 
 type FieldName = keyof typeof switchConfigs;
@@ -79,6 +84,14 @@ export const SwitchImportToKnowledgeBase = () => {
 export const SwitchManualConfirmation = () => {
     return <SwitchGroup fields={['manual_confirmation']} />;
 };
+/**
+ * Render the switch for splitting tasks by line
+ * @returns {JSX.Element} ProFormSwitch component
+ */
+export const SwitchSplitTaskByLine = () => {
+    return <SwitchGroup fields={['split_task_by_line']} />;
+};
+
 
 /**
  * Render the switch for waiting for all predecessor nodes

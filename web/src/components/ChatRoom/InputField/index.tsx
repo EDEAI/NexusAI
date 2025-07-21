@@ -13,9 +13,9 @@ import useFileUpload from '@/hooks/useFileUpload';
 import { FileUploadArea } from './FileUploadArea';
 import { AbilityControls } from './AbilityControls';
 import { MessageInput } from './MessageInput';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 
 interface inputFieldParameters {
-    setInstruction?: any;
     messageApi?: any;
     isStop?: any;
     scrollDomRef?: any;
@@ -28,7 +28,6 @@ interface inputFieldParameters {
 
 export const InputField: FC<inputFieldParameters> = memo(props => {
     const {
-        setInstruction,
         messageApi,
         isStop,
         scrollDomRef,
@@ -38,6 +37,9 @@ export const InputField: FC<inputFieldParameters> = memo(props => {
         agentChatRoomId,
         chatStatus,
     } = props;
+    
+    // Use context for setInstruction
+    const { setInstruction } = useChatRoomContext();
     
     const intl = useIntl();
     const disableInput = useChatroomStore(state => state.disableInput);

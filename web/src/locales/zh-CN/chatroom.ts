@@ -3,6 +3,7 @@ export default {
     'app.chatroom.mcptool.status.completed': '已完成',
     'app.chatroom.mcptool.status.running': '运行中',
     'app.chatroom.mcptool.status.waiting': '等待确认',
+    'app.chatroom.mcptool.status.waitingFileUpload': '等待文件上传',
     'app.chatroom.mcptool.status.failed': '失败',
     'app.chatroom.mcptool.status.pending': '待处理',
     

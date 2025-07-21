@@ -23,6 +23,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import { createRenderers } from '../MarkdownRenderer';
 import { getMCPToolStatus, MCPToolData, MCPToolRuntimeData, MCPToolStatus } from '../types/mcp';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 import FileUploadSection from './FileUploadSection';
 
 const { Text, Paragraph } = Typography;
@@ -124,7 +125,6 @@ interface MCPToolDisplayProps {
     intl: any;
     runtimeData?: MCPToolRuntimeData | null;
     updateMCPTool?: (id: string | number, updates: Partial<MCPToolRuntimeData>) => void;
-    setInstruction?: (instruction: any) => void;
 }
 
 const StatusIcon: FC<{ status: MCPToolStatus }> = ({ status }) => {
@@ -449,8 +449,9 @@ export const MCPToolDisplay: FC<MCPToolDisplayProps> = ({
     intl,
     runtimeData,
     updateMCPTool,
-    setInstruction,
 }) => {
+    // Use context for setInstruction
+    const { setInstruction } = useChatRoomContext();
     // Use runtime status if available, otherwise calculate from existing data
     const status =
         runtimeData?.status ||
@@ -529,6 +530,7 @@ export const MCPToolDisplay: FC<MCPToolDisplayProps> = ({
                 sendInstructionQueue(instructions);
             
             }
+            debugger
         } catch (error) {
             console.error('Error handling file upload completion:', error);
             message.error('Failed to process file upload completion');

@@ -9,6 +9,7 @@ import { parseMCPContent } from '../utils/mcpParser';
 import { MCPToolRuntimeData } from '../types/mcp';
 import { hasMessageContent } from '../utils';
 import { Tag } from 'antd';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 
 interface CurrentMessageProps {
     currentMessage: any;
@@ -17,7 +18,6 @@ interface CurrentMessageProps {
     mcpTools?: Record<string | number, MCPToolRuntimeData>;
     updateMCPTool?: (id: string | number, updates: Partial<MCPToolRuntimeData>) => void;
     getMCPTool?: (id: string | number) => MCPToolRuntimeData | null;
-    setInstruction?: (instruction: any) => void;
 }
 
 export const CurrentMessage: FC<CurrentMessageProps> = props => {
@@ -27,9 +27,11 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
         intl, 
         mcpTools = {}, 
         updateMCPTool = () => {}, 
-        getMCPTool = () => null,
-        setInstruction
+        getMCPTool = () => null
     } = props;
+    
+    // Use context for setInstruction
+    const { setInstruction } = useChatRoomContext();
 
     if (!currentMessage.name) {
         return null;
@@ -68,7 +70,6 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
                         currentMessage.is_agent == 1 ? 'flex-row' : 'flex-row-reverse'
                     }`}
                 >
-                 
                     <MessageContent
                         content={currentMessage.content || ''}
                         fileList={currentMessage.file_list}
@@ -79,7 +80,6 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
                         mcpTools={mcpTools}
                         updateMCPTool={updateMCPTool}
                         getMCPTool={getMCPTool}
-                        setInstruction={setInstruction}
                         item={{
                             ...currentMessage,
                             parsedContent: parseMCPContent(currentMessage.content || '')

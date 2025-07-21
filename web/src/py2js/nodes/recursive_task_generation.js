@@ -18,6 +18,7 @@ class RecursiveTaskGenerationNode extends Node {
  * @param {number} model_config_id - The model configuration ID.
  * @param {number} category_purpose - The category purpose.
  * @param {Prompt} prompt - The prompt object.
+ * @param {boolean} split_task_by_line - Whether to split tasks by line.
  * @param {boolean} requires_upload - Whether the node requires uploading.
  * @param {boolean} manual_confirmation - Whether manual confirmation is required.
  * @param {Object.<string, boolean>} import_to_knowledge_base - Whether to import to the knowledge base.
@@ -34,6 +35,7 @@ class RecursiveTaskGenerationNode extends Node {
         prompt = null,
         requires_upload = false,
         manual_confirmation = false,
+        split_task_by_line = false,
         import_to_knowledge_base = {},
         knowledge_base_mapping = {},
         flow_data = {},
@@ -49,6 +51,7 @@ class RecursiveTaskGenerationNode extends Node {
             prompt: prompt,
             requires_upload: requires_upload,
             manual_confirmation: manual_confirmation,
+            split_task_by_line: split_task_by_line,
             import_to_knowledge_base: import_to_knowledge_base,
             knowledge_base_mapping: knowledge_base_mapping,
             flow_data: flow_data,

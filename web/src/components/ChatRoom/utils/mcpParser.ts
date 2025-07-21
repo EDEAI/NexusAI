@@ -1,12 +1,48 @@
 /*
  * @LastEditors: biz
  */
-import { MCPToolData, ContentBlock, ParsedMCPContent, MCPToolRuntimeData } from '../types/mcp';
+import { MCPToolData, ContentBlock, ParsedMCPContent, MCPToolRuntimeData, MCPToolStatus, getMCPToolStatus } from '../types/mcp';
 import { ContentBlock as StreamingContentBlock } from '../types';
 import { FileToUpload } from '../types/fileUpload';
 
 const MCP_START_TAG = '<<<mcp-tool-start>>>';
 const MCP_END_TAG = '<<<mcp-tool-end>>>';
+
+// Helper function to infer MCP tool status from historical data
+const inferMCPToolStatus = (rawData: any): MCPToolStatus => {
+    // Check if tool needs file upload based on files_to_upload or args.input_variables
+    const hasFilesToUpload = rawData.files_to_upload && Array.isArray(rawData.files_to_upload) && rawData.files_to_upload.length > 0;
+    const hasNeedUploadInArgs = rawData.args?.input_variables && 
+        Object.values(rawData.args.input_variables).some((value: any) => value === 'need_upload');
+    
+    // If tool has files to upload or need_upload in args, and no result, it's waiting for file upload
+    if ((hasFilesToUpload || hasNeedUploadInArgs) && !rawData.result) {
+        return MCPToolStatus.WAITING_FILE_UPLOAD;
+    }
+    
+    // Use existing status inference logic
+    return getMCPToolStatus(rawData.workflow_confirmation_status, rawData.result);
+};
+
+// Helper function to process historical file upload data
+const processHistoricalFileUpload = (rawData: any): FileToUpload[] => {
+    if (!rawData.files_to_upload || !Array.isArray(rawData.files_to_upload)) {
+        return [];
+    }
+    
+    return rawData.files_to_upload.map((file: any) => ({
+        name: file.name || '',
+        variable_name: file.variable_name || '',
+        id: file.id || 0,
+        file_name: file.file_name || null,
+        file_path: file.file_path || null,
+        required: true, // Historical files are typically required
+        accept: undefined,
+        maxSize: undefined,
+        description: undefined,
+        accepted_types: undefined
+    }));
+};
 
 export const extractMCPTools = (content: string): { toolData: MCPToolData; startIndex: number; endIndex: number }[] => {
     // Parameter validation
@@ -30,6 +66,10 @@ export const extractMCPTools = (content: string): { toolData: MCPToolData; start
 
         try {
             const rawData = JSON.parse(jsonContent);
+            
+            // Process historical file upload data
+            const processedFilesToUpload = processHistoricalFileUpload(rawData);
+            
             // Adapt the data structure to match MCPToolData interface
             const toolData: MCPToolData = {
                 id: rawData.id,
@@ -39,12 +79,12 @@ export const extractMCPTools = (content: string): { toolData: MCPToolData; start
                 workflow_confirmation_status: rawData.workflow_confirmation_status || null,
                 args: rawData.args || {},
                 result: rawData.result || null,
-                files_to_upload: rawData.files_to_upload || []
+                files_to_upload: processedFilesToUpload
             };
             
             // Debug logging for file data extraction
-            if (rawData.files_to_upload && Array.isArray(rawData.files_to_upload) && rawData.files_to_upload.length > 0) {
-                console.log(`[MCP Parser] Extracted files_to_upload for tool ${toolData.id}:`, rawData.files_to_upload);
+            if (processedFilesToUpload.length > 0) {
+                console.log(`[MCP Parser] Extracted files_to_upload for tool ${toolData.id}:`, processedFilesToUpload);
             }
             
             tools.push({

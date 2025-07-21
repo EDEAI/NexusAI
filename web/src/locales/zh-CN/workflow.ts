@@ -379,4 +379,8 @@ export default {
     'workflow.tag.imageUnderstanding': '图片理解',
 
     'workflow.context': '上下文',
+    'workflow.form.splitTaskByLine.label': '是否按行拆分任务',
+    'workflow.form.splitTaskByLine.tooltip': '如果开启，则直接将输入变量按行拆分成任务，不再通过大语言模型进行分析和拆分',
+    'workflow.split_task_by_line': '是否按行拆分任务',
+    'workflow.split_task_by_lineDes': '如果开启，则直接将输入变量按行拆分成任务，不再通过大语言模型进行分析和拆分',
 };

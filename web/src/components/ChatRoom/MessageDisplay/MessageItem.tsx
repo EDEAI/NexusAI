@@ -9,6 +9,7 @@ import { MessageContent } from './MessageContent';
 import { MessageActions } from './MessageActions';
 import { MCPToolRuntimeData } from '../types/mcp';
 import { hasMessageContent } from '../utils';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 
 interface MessageItemProps {
     item: any;
@@ -22,7 +23,6 @@ interface MessageItemProps {
     mcpTools?: Record<string | number, MCPToolRuntimeData>;
     updateMCPTool?: (id: string | number, updates: Partial<MCPToolRuntimeData>) => void;
     getMCPTool?: (id: string | number) => MCPToolRuntimeData | null;
-    setInstruction?: (instruction: any) => void;
 }
 
 export const MessageItem: FC<MessageItemProps> = props => {
@@ -37,8 +37,7 @@ export const MessageItem: FC<MessageItemProps> = props => {
         cidName,
         mcpTools,
         updateMCPTool,
-        getMCPTool,
-        setInstruction
+        getMCPTool
     } = props;
     const intl = useIntl();
     const isAgent = item.is_agent === 1;
@@ -98,7 +97,6 @@ export const MessageItem: FC<MessageItemProps> = props => {
                         updateMCPTool={updateMCPTool}
                         getMCPTool={getMCPTool}
                         item={item}
-                        setInstruction={setInstruction}
                     />
                 </div>
                 <MessageActions
