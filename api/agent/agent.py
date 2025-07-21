@@ -11,7 +11,7 @@ from core.database.models.agent_abilities import AgentAbilities
 from core.database.models.agent_chat_messages import AgentChatMessages
 from core.database.models.agent_callable_items import AgentCallableItems
 
-from core.database.models import ChatroomAgentRelation
+from core.database.models import ChatroomAgentRelation, CustomTools, MCPToolUseRecords, Workflows
 from core.workflow.nodes import AgentNode
 from core.workflow.variables import create_variable_from_dict
 from core.llm.prompt import create_prompt_from_dict, Prompt
@@ -1167,6 +1167,8 @@ async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = 
         ]
         
     )
+    if not result:
+        return response_error(get_language_content("app_run_error"))
 
     if 'status' in result:
         result_status = result['status']
@@ -1195,8 +1197,45 @@ async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = 
     # result['prompt_data'] = {}
     # result['prompt_data'] = messages
     result['prompt_data'] = []
-    if not result:
-        return response_error(get_language_content("app_run_error"))
+
+    mcp_tool_use_records = []
+    for record in MCPToolUseRecords().get_mcp_tool_use_records_by_agent_run_id(app_run_id):
+        mcp_tool_use_record = {
+            'id': record['id'],
+            'name': record['tool_name'],
+            'files_to_upload': record['files_to_upload'],
+            'workflow_run_id': (
+                record['workflow_run_id']
+                if record['tool_name'].startswith('nexusai__workflow-')
+                else 0
+            ),
+            'workflow_confirmation_status': record['workflow_run_status'],
+            'args': record['args'],
+            'result': record['result']
+        }
+        # Get skill or workflow name
+        if record['tool_name'].startswith('nexusai__skill-'):
+            skill_id = record['skill_id']
+            skill = CustomTools().get_skill_by_id(skill_id)
+            if not skill:
+                mcp_tool_use_record['skill_or_workflow_name'] = 'Not found'
+            else:
+                app = Apps().get_app_by_id(skill['app_id'])
+                mcp_tool_use_record['skill_or_workflow_name'] = app['name']
+        elif record['tool_name'].startswith('nexusai__workflow-'):
+            workflow_id = record['workflow_id']
+            workflow = Workflows().get_workflow_app(workflow_id)
+            if not workflow:
+                mcp_tool_use_record['skill_or_workflow_name'] = 'Not found'
+            else:
+                mcp_tool_use_record['skill_or_workflow_name'] = workflow['name']
+        else:
+            mcp_tool_use_record['skill_or_workflow_name'] = None
+        
+        mcp_tool_use_records.append(mcp_tool_use_record)
+
+    result['mcp_tool_use_records'] = mcp_tool_use_records
+
     return response_success(result)
 
 
