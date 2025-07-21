@@ -364,9 +364,9 @@ Start the sandbox container
 docker pull edeai/sandbox:<tag>
 
 # SANDBOX_PORT should be consistent with `.env`
-# The mounted local storage directory should be changed to the real path
+# The mounted local directory should be changed to the real path
 # SANDBOX_FASTAPI_WORKERS: The number of workers for the sandbox service
-docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -v NexusAI/upload_files:/upload_files -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<tag>
+docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -v NexusAI/upload_files:/upload_files -v NexusAI/docker/volumes/venv_cache:/app/venv_cache -v NexusAI/docker/sandbox/tools:/app/tools:ro -v NexusAI/docker/volumes/logs/sandbox:/app/logs -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<tag>
 ```
 
 ## WEB deployment
@@ -459,9 +459,9 @@ docker rmi edeai/sandbox:<old tag>
 docker pull edeai/sandbox:<new tag>
 
 # SANDBOX_PORT should be consistent with `.env`
-# The mounted local storage directory should be changed to the real path
+# The mounted local directory should be changed to the real path
 # SANDBOX_FASTAPI_WORKERS: The number of workers for the sandbox service
-docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -v NexusAI/upload_files:/upload_files -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<new tag>
+docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -v NexusAI/upload_files:/upload_files -v NexusAI/docker/volumes/venv_cache:/app/venv_cache -v NexusAI/docker/sandbox/tools:/app/tools:ro -v NexusAI/docker/volumes/logs/sandbox:/app/logs -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<new tag>
 ```
 
 4. Note that the updated content in `.env.template` is synchronized to `.env`, and the updated content in `web/config/envConfig.ts.template` is synchronized to `web/config/envConfig.ts`

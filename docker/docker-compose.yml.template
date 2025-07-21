@@ -92,6 +92,9 @@ services:
     volumes:
       - ./volumes/storage:/storage
       - ./volumes/upload_files:/upload_files
+      - ./volumes/venv_cache:/app/venv_cache
+      - ./sandbox/tools:/app/tools:ro
+      - ./volumes/logs/sandbox:/app/logs
     ports:
       - "9464:8001"
     networks:

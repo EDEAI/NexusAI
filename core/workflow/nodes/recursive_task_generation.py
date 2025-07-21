@@ -50,7 +50,7 @@ class RecursiveTaskGenerationNode(ImportToKBBaseNode, LLMBaseNode):
             "import_to_knowledge_base": import_to_knowledge_base,
             "knowledge_base_mapping": knowledge_base_mapping,
             "flow_data": flow_data,
-            "split_task_by_line": True  # Currently, only split by line is supported
+            "split_task_by_line": split_task_by_line
         }
         if original_node_id is not None:
             init_kwargs["original_node_id"] = original_node_id
