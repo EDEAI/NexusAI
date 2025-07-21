@@ -1,0 +1,1411 @@
+description:
+  human:
+    en_US: A tool to retrieve job titles, company names and description from Google
+      Jobs engine.
+    zh_Hans: 一个从 Google 招聘引擎检索职位名称、公司名称和描述的工具。
+  llm: A tool to retrieve job titles, company names and description from Google Jobs
+    engine.
+extra:
+  python:
+    source: tools/google_jobs.py
+identity:
+  author: SearchApi
+  label:
+    en_US: Google Jobs API
+    zh_Hans: Google Jobs API
+  name: google_jobs_api
+parameters:
+- form: llm
+  human_description:
+    en_US: Defines the query you want to search.
+    zh_Hans: 定义您要搜索的查询。
+  label:
+    en_US: Query
+    zh_Hans: 询问
+  llm_description: Defines the search query you want to search.
+  name: query
+  required: true
+  type: string
+- default: text
+  form: form
+  human_description:
+    en_US: used for selecting the result type, text or link
+    zh_Hans: 用于选择结果类型，使用文本还是链接进行展示
+  label:
+    en_US: Result type
+    zh_Hans: 结果类型
+  name: result_type
+  options:
+  - label:
+      en_US: text
+      zh_Hans: 文本
+    value: text
+  - label:
+      en_US: link
+      zh_Hans: 链接
+    value: link
+  required: true
+  type: select
+- form: llm
+  human_description:
+    en_US: Defines from where you want the search to originate. (For example - New
+      York)
+    zh_Hans: 定义您想要搜索的起始位置。 （例如 - 纽约）
+  label:
+    en_US: Location
+    zh_Hans: 询问
+  llm_description: Defines from where you want the search to originate. (For example
+    - New York)
+  name: location
+  required: false
+  type: string
+- default: US
+  form: form
+  human_description:
+    en_US: Defines the country of the search. Default is "US".
+    zh_Hans: 定义搜索的国家/地区。默认为“美国”。
+  label:
+    en_US: Country
+    zh_Hans: 国家
+  llm_description: Defines the gl parameter of the Google search.
+  name: gl
+  options:
+  - label:
+      en_US: Algeria
+      pt_BR: Algeria
+      zh_Hans: 阿尔及利亚
+    value: DZ
+  - label:
+      en_US: American Samoa
+      pt_BR: American Samoa
+      zh_Hans: 美属萨摩亚
+    value: AS
+  - label:
+      en_US: Angola
+      pt_BR: Angola
+      zh_Hans: 安哥拉
+    value: AO
+  - label:
+      en_US: Anguilla
+      pt_BR: Anguilla
+      zh_Hans: 安圭拉
+    value: AI
+  - label:
+      en_US: Antigua and Barbuda
+      pt_BR: Antigua and Barbuda
+      zh_Hans: 安提瓜和巴布达
+    value: AG
+  - label:
+      en_US: Aruba
+      pt_BR: Aruba
+      zh_Hans: 阿鲁巴
+    value: AW
+  - label:
+      en_US: Austria
+      pt_BR: Austria
+      zh_Hans: 奥地利
+    value: AT
+  - label:
+      en_US: Bahamas
+      pt_BR: Bahamas
+      zh_Hans: 巴哈马
+    value: BS
+  - label:
+      en_US: Bahrain
+      pt_BR: Bahrain
+      zh_Hans: 巴林
+    value: BH
+  - label:
+      en_US: Bangladesh
+      pt_BR: Bangladesh
+      zh_Hans: 孟加拉国
+    value: BD
+  - label:
+      en_US: Belarus
+      pt_BR: Belarus
+      zh_Hans: 白俄罗斯
+    value: BY
+  - label:
+      en_US: Belgium
+      pt_BR: Belgium
+      zh_Hans: 比利时
+    value: BE
+  - label:
+      en_US: Belize
+      pt_BR: Belize
+      zh_Hans: 伯利兹
+    value: BZ
+  - label:
+      en_US: Benin
+      pt_BR: Benin
+      zh_Hans: 贝宁
+    value: BJ
+  - label:
+      en_US: Bermuda
+      pt_BR: Bermuda
+      zh_Hans: 百慕大
+    value: BM
+  - label:
+      en_US: Bolivia
+      pt_BR: Bolivia
+      zh_Hans: 玻利维亚
+    value: BO
+  - label:
+      en_US: Botswana
+      pt_BR: Botswana
+      zh_Hans: 博茨瓦纳
+    value: BW
+  - label:
+      en_US: Brazil
+      pt_BR: Brazil
+      zh_Hans: 巴西
+    value: BR
+  - label:
+      en_US: British Indian Ocean Territory
+      pt_BR: British Indian Ocean Territory
+      zh_Hans: 英属印度洋领地
+    value: IO
+  - label:
+      en_US: Burkina Faso
+      pt_BR: Burkina Faso
+      zh_Hans: 布基纳法索
+    value: BF
+  - label:
+      en_US: Burundi
+      pt_BR: Burundi
+      zh_Hans: 布隆迪
+    value: BI
+  - label:
+      en_US: Cameroon
+      pt_BR: Cameroon
+      zh_Hans: 喀麦隆
+    value: CM
+  - label:
+      en_US: Canada
+      pt_BR: Canada
+      zh_Hans: 加拿大
+    value: CA
+  - label:
+      en_US: Cape Verde
+      pt_BR: Cape Verde
+      zh_Hans: 佛得角
+    value: CV
+  - label:
+      en_US: Cayman Islands
+      pt_BR: Cayman Islands
+      zh_Hans: 开曼群岛
+    value: KY
+  - label:
+      en_US: Central African Republic
+      pt_BR: Central African Republic
+      zh_Hans: 中非共和国
+    value: CF
+  - label:
+      en_US: Chad
+      pt_BR: Chad
+      zh_Hans: 乍得
+    value: TD
+  - label:
+      en_US: Chile
+      pt_BR: Chile
+      zh_Hans: 智利
+    value: CL
+  - label:
+      en_US: Colombia
+      pt_BR: Colombia
+      zh_Hans: 哥伦比亚
+    value: CO
+  - label:
+      en_US: Congo, the Democratic Republic of the
+      pt_BR: Congo, the Democratic Republic of the
+      zh_Hans: 刚果民主共和国
+    value: CD
+  - label:
+      en_US: Costa Rica
+      pt_BR: Costa Rica
+      zh_Hans: 哥斯达黎加
+    value: CR
+  - label:
+      en_US: Cote D'ivoire
+      pt_BR: Cote D'ivoire
+      zh_Hans: 科特迪瓦
+    value: CI
+  - label:
+      en_US: Cuba
+      pt_BR: Cuba
+      zh_Hans: 古巴
+    value: CU
+  - label:
+      en_US: Denmark
+      pt_BR: Denmark
+      zh_Hans: 丹麦
+    value: DK
+  - label:
+      en_US: Djibouti
+      pt_BR: Djibouti
+      zh_Hans: 吉布提
+    value: DJ
+  - label:
+      en_US: Dominica
+      pt_BR: Dominica
+      zh_Hans: 多米尼克
+    value: DM
+  - label:
+      en_US: Dominican Republic
+      pt_BR: Dominican Republic
+      zh_Hans: 多米尼加共和国
+    value: DO
+  - label:
+      en_US: Ecuador
+      pt_BR: Ecuador
+      zh_Hans: 厄瓜多尔
+    value: EC
+  - label:
+      en_US: Egypt
+      pt_BR: Egypt
+      zh_Hans: 埃及
+    value: EG
+  - label:
+      en_US: El Salvador
+      pt_BR: El Salvador
+      zh_Hans: 萨尔瓦多
+    value: SV
+  - label:
+      en_US: Ethiopia
+      pt_BR: Ethiopia
+      zh_Hans: 埃塞俄比亚
+    value: ET
+  - label:
+      en_US: Falkland Islands (Malvinas)
+      pt_BR: Falkland Islands (Malvinas)
+      zh_Hans: 福克兰群岛（马尔维纳斯）
+    value: FK
+  - label:
+      en_US: France
+      pt_BR: France
+      zh_Hans: 法国
+    value: FR
+  - label:
+      en_US: French Guiana
+      pt_BR: French Guiana
+      zh_Hans: 法属圭亚那
+    value: GF
+  - label:
+      en_US: French Polynesia
+      pt_BR: French Polynesia
+      zh_Hans: 法属波利尼西亚
+    value: PF
+  - label:
+      en_US: French Southern Territories
+      pt_BR: French Southern Territories
+      zh_Hans: 法属南部领地
+    value: TF
+  - label:
+      en_US: Gabon
+      pt_BR: Gabon
+      zh_Hans: 加蓬
+    value: GA
+  - label:
+      en_US: Gambia
+      pt_BR: Gambia
+      zh_Hans: 冈比亚
+    value: GM
+  - label:
+      en_US: Germany
+      pt_BR: Germany
+      zh_Hans: 德国
+    value: DE
+  - label:
+      en_US: Ghana
+      pt_BR: Ghana
+      zh_Hans: 加纳
+    value: GH
+  - label:
+      en_US: Greece
+      pt_BR: Greece
+      zh_Hans: 希腊
+    value: GR
+  - label:
+      en_US: Guadeloupe
+      pt_BR: Guadeloupe
+      zh_Hans: 瓜德罗普
+    value: GP
+  - label:
+      en_US: Guatemala
+      pt_BR: Guatemala
+      zh_Hans: 危地马拉
+    value: GT
+  - label:
+      en_US: Guyana
+      pt_BR: Guyana
+      zh_Hans: 圭亚那
+    value: GY
+  - label:
+      en_US: Haiti
+      pt_BR: Haiti
+      zh_Hans: 海地
+    value: HT
+  - label:
+      en_US: Honduras
+      pt_BR: Honduras
+      zh_Hans: 洪都拉斯
+    value: HN
+  - label:
+      en_US: Hong Kong
+      pt_BR: Hong Kong
+      zh_Hans: 香港
+    value: HK
+  - label:
+      en_US: India
+      pt_BR: India
+      zh_Hans: 印度
+    value: IN
+  - label:
+      en_US: Indonesia
+      pt_BR: Indonesia
+      zh_Hans: 印度尼西亚
+    value: ID
+  - label:
+      en_US: Iraq
+      pt_BR: Iraq
+      zh_Hans: 伊拉克
+    value: IQ
+  - label:
+      en_US: Italy
+      pt_BR: Italy
+      zh_Hans: 意大利
+    value: IT
+  - label:
+      en_US: Jamaica
+      pt_BR: Jamaica
+      zh_Hans: 牙买加
+    value: JM
+  - label:
+      en_US: Japan
+      pt_BR: Japan
+      zh_Hans: 日本
+    value: JP
+  - label:
+      en_US: Jordan
+      pt_BR: Jordan
+      zh_Hans: 约旦
+    value: JO
+  - label:
+      en_US: Kazakhstan
+      pt_BR: Kazakhstan
+      zh_Hans: 哈萨克斯坦
+    value: KZ
+  - label:
+      en_US: Kenya
+      pt_BR: Kenya
+      zh_Hans: 肯尼亚
+    value: KE
+  - label:
+      en_US: Kuwait
+      pt_BR: Kuwait
+      zh_Hans: 科威特
+    value: KW
+  - label:
+      en_US: Kyrgyzstan
+      pt_BR: Kyrgyzstan
+      zh_Hans: 吉尔吉斯斯坦
+    value: KG
+  - label:
+      en_US: Lebanon
+      pt_BR: Lebanon
+      zh_Hans: 黎巴嫩
+    value: LB
+  - label:
+      en_US: Lesotho
+      pt_BR: Lesotho
+      zh_Hans: 莱索托
+    value: LS
+  - label:
+      en_US: Libyan Arab Jamahiriya
+      pt_BR: Libyan Arab Jamahiriya
+      zh_Hans: 利比亚
+    value: LY
+  - label:
+      en_US: Madagascar
+      pt_BR: Madagascar
+      zh_Hans: 马达加斯加
+    value: MG
+  - label:
+      en_US: Malawi
+      pt_BR: Malawi
+      zh_Hans: 马拉维
+    value: MW
+  - label:
+      en_US: Malaysia
+      pt_BR: Malaysia
+      zh_Hans: 马来西亚
+    value: MY
+  - label:
+      en_US: Mali
+      pt_BR: Mali
+      zh_Hans: 马里
+    value: ML
+  - label:
+      en_US: Martinique
+      pt_BR: Martinique
+      zh_Hans: 马提尼克
+    value: MQ
+  - label:
+      en_US: Mauritius
+      pt_BR: Mauritius
+      zh_Hans: 毛里求斯
+    value: MU
+  - label:
+      en_US: Mayotte
+      pt_BR: Mayotte
+      zh_Hans: 马约特
+    value: YT
+  - label:
+      en_US: Mexico
+      pt_BR: Mexico
+      zh_Hans: 墨西哥
+    value: MX
+  - label:
+      en_US: Montserrat
+      pt_BR: Montserrat
+      zh_Hans: 蒙特塞拉特
+    value: MS
+  - label:
+      en_US: Morocco
+      pt_BR: Morocco
+      zh_Hans: 摩洛哥
+    value: MA
+  - label:
+      en_US: Mozambique
+      pt_BR: Mozambique
+      zh_Hans: 莫桑比克
+    value: MZ
+  - label:
+      en_US: Namibia
+      pt_BR: Namibia
+      zh_Hans: 纳米比亚
+    value: NA
+  - label:
+      en_US: Netherlands
+      pt_BR: Netherlands
+      zh_Hans: 荷兰
+    value: NL
+  - label:
+      en_US: New Caledonia
+      pt_BR: New Caledonia
+      zh_Hans: 新喀里多尼亚
+    value: NC
+  - label:
+      en_US: Nicaragua
+      pt_BR: Nicaragua
+      zh_Hans: 尼加拉瓜
+    value: NI
+  - label:
+      en_US: Niger
+      pt_BR: Niger
+      zh_Hans: 尼日尔
+    value: NE
+  - label:
+      en_US: Nigeria
+      pt_BR: Nigeria
+      zh_Hans: 尼日利亚
+    value: NG
+  - label:
+      en_US: Oman
+      pt_BR: Oman
+      zh_Hans: 阿曼
+    value: OM
+  - label:
+      en_US: Pakistan
+      pt_BR: Pakistan
+      zh_Hans: 巴基斯坦
+    value: PK
+  - label:
+      en_US: Palestinian Territory, Occupied
+      pt_BR: Palestinian Territory, Occupied
+      zh_Hans: 巴勒斯坦领土
+    value: PS
+  - label:
+      en_US: Panama
+      pt_BR: Panama
+      zh_Hans: 巴拿马
+    value: PA
+  - label:
+      en_US: Paraguay
+      pt_BR: Paraguay
+      zh_Hans: 巴拉圭
+    value: PY
+  - label:
+      en_US: Peru
+      pt_BR: Peru
+      zh_Hans: 秘鲁
+    value: PE
+  - label:
+      en_US: Philippines
+      pt_BR: Philippines
+      zh_Hans: 菲律宾
+    value: PH
+  - label:
+      en_US: Portugal
+      pt_BR: Portugal
+      zh_Hans: 葡萄牙
+    value: PT
+  - label:
+      en_US: Puerto Rico
+      pt_BR: Puerto Rico
+      zh_Hans: 波多黎各
+    value: PR
+  - label:
+      en_US: Qatar
+      pt_BR: Qatar
+      zh_Hans: 卡塔尔
+    value: QA
+  - label:
+      en_US: Reunion
+      pt_BR: Reunion
+      zh_Hans: 留尼旺
+    value: RE
+  - label:
+      en_US: Russian Federation
+      pt_BR: Russian Federation
+      zh_Hans: 俄罗斯联邦
+    value: RU
+  - label:
+      en_US: Rwanda
+      pt_BR: Rwanda
+      zh_Hans: 卢旺达
+    value: RW
+  - label:
+      en_US: Saint Helena
+      pt_BR: Saint Helena
+      zh_Hans: 圣赫勒拿
+    value: SH
+  - label:
+      en_US: Saint Pierre and Miquelon
+      pt_BR: Saint Pierre and Miquelon
+      zh_Hans: 圣皮埃尔和密克隆
+    value: PM
+  - label:
+      en_US: Saint Vincent and the Grenadines
+      pt_BR: Saint Vincent and the Grenadines
+      zh_Hans: 圣文森特和格林纳丁斯
+    value: VC
+  - label:
+      en_US: Sao Tome and Principe
+      pt_BR: Sao Tome and Principe
+      zh_Hans: 圣多美和普林西比
+    value: ST
+  - label:
+      en_US: Saudi Arabia
+      pt_BR: Saudi Arabia
+      zh_Hans: 沙特阿拉伯
+    value: SA
+  - label:
+      en_US: Senegal
+      pt_BR: Senegal
+      zh_Hans: 塞内加尔
+    value: SN
+  - label:
+      en_US: Seychelles
+      pt_BR: Seychelles
+      zh_Hans: 塞舌尔
+    value: SC
+  - label:
+      en_US: Sierra Leone
+      pt_BR: Sierra Leone
+      zh_Hans: 塞拉利昂
+    value: SL
+  - label:
+      en_US: Singapore
+      pt_BR: Singapore
+      zh_Hans: 新加坡
+    value: SG
+  - label:
+      en_US: Somalia
+      pt_BR: Somalia
+      zh_Hans: 索马里
+    value: SO
+  - label:
+      en_US: South Africa
+      pt_BR: South Africa
+      zh_Hans: 南非
+    value: ZA
+  - label:
+      en_US: South Georgia and the South Sandwich Islands
+      pt_BR: South Georgia and the South Sandwich Islands
+      zh_Hans: 南乔治亚和南桑威奇群岛
+    value: GS
+  - label:
+      en_US: Spain
+      pt_BR: Spain
+      zh_Hans: 西班牙
+    value: ES
+  - label:
+      en_US: Sri Lanka
+      pt_BR: Sri Lanka
+      zh_Hans: 斯里兰卡
+    value: LK
+  - label:
+      en_US: Suriname
+      pt_BR: Suriname
+      zh_Hans: 苏里南
+    value: SR
+  - label:
+      en_US: Switzerland
+      pt_BR: Switzerland
+      zh_Hans: 瑞士
+    value: CH
+  - label:
+      en_US: Taiwan, Province of China
+      pt_BR: Taiwan, Province of China
+      zh_Hans: 中国台湾省
+    value: TW
+  - label:
+      en_US: Tanzania, United Republic of
+      pt_BR: Tanzania, United Republic of
+      zh_Hans: 坦桑尼亚联合共和国
+    value: TZ
+  - label:
+      en_US: Thailand
+      pt_BR: Thailand
+      zh_Hans: 泰国
+    value: TH
+  - label:
+      en_US: Togo
+      pt_BR: Togo
+      zh_Hans: 多哥
+    value: TG
+  - label:
+      en_US: Trinidad and Tobago
+      pt_BR: Trinidad and Tobago
+      zh_Hans: 特立尼达和多巴哥
+    value: TT
+  - label:
+      en_US: Tunisia
+      pt_BR: Tunisia
+      zh_Hans: 突尼斯
+    value: TN
+  - label:
+      en_US: Turks and Caicos Islands
+      pt_BR: Turks and Caicos Islands
+      zh_Hans: 特克斯和凯科斯群岛
+    value: TC
+  - label:
+      en_US: Uganda
+      pt_BR: Uganda
+      zh_Hans: 乌干达
+    value: UG
+  - label:
+      en_US: United Arab Emirates
+      pt_BR: United Arab Emirates
+      zh_Hans: 阿联酋
+    value: AE
+  - label:
+      en_US: United Kingdom
+      pt_BR: United Kingdom
+      zh_Hans: 英国
+    value: UK
+  - label:
+      en_US: United Kingdom
+      pt_BR: United Kingdom
+      zh_Hans: 英国
+    value: GB
+  - label:
+      en_US: United States
+      pt_BR: United States
+      zh_Hans: 美国
+    value: US
+  - label:
+      en_US: Uruguay
+      pt_BR: Uruguay
+      zh_Hans: 乌拉圭
+    value: UY
+  - label:
+      en_US: Uzbekistan
+      pt_BR: Uzbekistan
+      zh_Hans: 乌兹别克斯坦
+    value: UZ
+  - label:
+      en_US: Venezuela
+      pt_BR: Venezuela
+      zh_Hans: 委内瑞拉
+    value: VE
+  - label:
+      en_US: Viet Nam
+      pt_BR: Viet Nam
+      zh_Hans: 越南
+    value: VN
+  - label:
+      en_US: Virgin Islands, British
+      pt_BR: Virgin Islands, British
+      zh_Hans: 英属维尔京群岛
+    value: VG
+  - label:
+      en_US: Virgin Islands, U.S.
+      pt_BR: Virgin Islands, U.S.
+      zh_Hans: 美属维尔京群岛
+    value: VI
+  - label:
+      en_US: Zambia
+      pt_BR: Zambia
+      zh_Hans: 赞比亚
+    value: ZM
+  - label:
+      en_US: Zimbabwe
+      pt_BR: Zimbabwe
+      zh_Hans: 津巴布韦
+    value: ZW
+  required: false
+  type: select
+- default: en
+  form: form
+  human_description:
+    en_US: Defines the interface language of the search. Default is "en".
+    zh_Hans: 定义搜索的界面语言。默认为“en”。
+  label:
+    en_US: Language
+    zh_Hans: 语言
+  name: hl
+  options:
+  - label:
+      en_US: Afrikaans
+      zh_Hans: 南非语
+    value: af
+  - label:
+      en_US: Akan
+      zh_Hans: 阿坎语
+    value: ak
+  - label:
+      en_US: Albanian
+      zh_Hans: 阿尔巴尼亚语
+    value: sq
+  - label:
+      en_US: Samoa
+      zh_Hans: 萨摩亚语
+    value: ws
+  - label:
+      en_US: Amharic
+      zh_Hans: 阿姆哈拉语
+    value: am
+  - label:
+      en_US: Arabic
+      zh_Hans: 阿拉伯语
+    value: ar
+  - label:
+      en_US: Armenian
+      zh_Hans: 亚美尼亚语
+    value: hy
+  - label:
+      en_US: Azerbaijani
+      zh_Hans: 阿塞拜疆语
+    value: az
+  - label:
+      en_US: Basque
+      zh_Hans: 巴斯克语
+    value: eu
+  - label:
+      en_US: Belarusian
+      zh_Hans: 白俄罗斯语
+    value: be
+  - label:
+      en_US: Bemba
+      zh_Hans: 班巴语
+    value: bem
+  - label:
+      en_US: Bengali
+      zh_Hans: 孟加拉语
+    value: bn
+  - label:
+      en_US: Bihari
+      zh_Hans: 比哈尔语
+    value: bh
+  - label:
+      en_US: Bork, bork, bork!
+      zh_Hans: 博克语
+    value: xx-bork
+  - label:
+      en_US: Bosnian
+      zh_Hans: 波斯尼亚语
+    value: bs
+  - label:
+      en_US: Breton
+      zh_Hans: 布列塔尼语
+    value: br
+  - label:
+      en_US: Bulgarian
+      zh_Hans: 保加利亚语
+    value: bg
+  - label:
+      en_US: Bhutanese
+      zh_Hans: 不丹语
+    value: bt
+  - label:
+      en_US: Cambodian
+      zh_Hans: 高棉语
+    value: km
+  - label:
+      en_US: Catalan
+      zh_Hans: 加泰罗尼亚语
+    value: ca
+  - label:
+      en_US: Cherokee
+      zh_Hans: 切罗基语
+    value: chr
+  - label:
+      en_US: Chichewa
+      zh_Hans: 齐切瓦语
+    value: ny
+  - label:
+      en_US: Chinese (Simplified)
+      zh_Hans: 中文（简体）
+    value: zh-cn
+  - label:
+      en_US: Chinese (Traditional)
+      zh_Hans: 中文（繁体）
+    value: zh-tw
+  - label:
+      en_US: Corsican
+      zh_Hans: 科西嘉语
+    value: co
+  - label:
+      en_US: Croatian
+      zh_Hans: 克罗地亚语
+    value: hr
+  - label:
+      en_US: Czech
+      zh_Hans: 捷克语
+    value: cs
+  - label:
+      en_US: Danish
+      zh_Hans: 丹麦语
+    value: da
+  - label:
+      en_US: Dutch
+      zh_Hans: 荷兰语
+    value: nl
+  - label:
+      en_US: Elmer Fudd
+      zh_Hans: 艾尔默福德语
+    value: xx-elmer
+  - label:
+      en_US: English
+      zh_Hans: 英语
+    value: en
+  - label:
+      en_US: Esperanto
+      zh_Hans: 世界语
+    value: eo
+  - label:
+      en_US: Estonian
+      zh_Hans: 爱沙尼亚语
+    value: et
+  - label:
+      en_US: Ewe
+      zh_Hans: 埃维语
+    value: ee
+  - label:
+      en_US: Faroese
+      zh_Hans: 法罗语
+    value: fo
+  - label:
+      en_US: Filipino
+      zh_Hans: 菲律宾语
+    value: tl
+  - label:
+      en_US: Finnish
+      zh_Hans: 芬兰语
+    value: fi
+  - label:
+      en_US: French
+      zh_Hans: 法语
+    value: fr
+  - label:
+      en_US: Frisian
+      zh_Hans: 弗里西亚语
+    value: fy
+  - label:
+      en_US: Ga
+      zh_Hans: 加语
+    value: gaa
+  - label:
+      en_US: Galician
+      zh_Hans: 加利西亚语
+    value: gl
+  - label:
+      en_US: Georgian
+      zh_Hans: 格鲁吉亚语
+    value: ka
+  - label:
+      en_US: German
+      zh_Hans: 德语
+    value: de
+  - label:
+      en_US: Greek
+      zh_Hans: 希腊语
+    value: el
+  - label:
+      en_US: Greenlandic
+      zh_Hans: 格陵兰语
+    value: kl
+  - label:
+      en_US: Guarani
+      zh_Hans: 瓜拉尼语
+    value: gn
+  - label:
+      en_US: Gujarati
+      zh_Hans: 古吉拉特语
+    value: gu
+  - label:
+      en_US: Hacker
+      zh_Hans: 黑客语
+    value: xx-hacker
+  - label:
+      en_US: Haitian Creole
+      zh_Hans: 海地克里奥尔语
+    value: ht
+  - label:
+      en_US: Hausa
+      zh_Hans: 豪萨语
+    value: ha
+  - label:
+      en_US: Hawaiian
+      zh_Hans: 夏威夷语
+    value: haw
+  - label:
+      en_US: Hebrew
+      zh_Hans: 希伯来语
+    value: iw
+  - label:
+      en_US: Hindi
+      zh_Hans: 印地语
+    value: hi
+  - label:
+      en_US: Hungarian
+      zh_Hans: 匈牙利语
+    value: hu
+  - label:
+      en_US: Icelandic
+      zh_Hans: 冰岛语
+    value: is
+  - label:
+      en_US: Igbo
+      zh_Hans: 伊博语
+    value: ig
+  - label:
+      en_US: Indonesian
+      zh_Hans: 印尼语
+    value: id
+  - label:
+      en_US: Interlingua
+      zh_Hans: 国际语
+    value: ia
+  - label:
+      en_US: Irish
+      zh_Hans: 爱尔兰语
+    value: ga
+  - label:
+      en_US: Italian
+      zh_Hans: 意大利语
+    value: it
+  - label:
+      en_US: Japanese
+      zh_Hans: 日语
+    value: ja
+  - label:
+      en_US: Javanese
+      zh_Hans: 爪哇语
+    value: jw
+  - label:
+      en_US: Kannada
+      zh_Hans: 卡纳达语
+    value: kn
+  - label:
+      en_US: Kazakh
+      zh_Hans: 哈萨克语
+    value: kk
+  - label:
+      en_US: Kinyarwanda
+      zh_Hans: 基尼亚卢旺达语
+    value: rw
+  - label:
+      en_US: Kirundi
+      zh_Hans: 基隆迪语
+    value: rn
+  - label:
+      en_US: Klingon
+      zh_Hans: 克林贡语
+    value: xx-klingon
+  - label:
+      en_US: Kongo
+      zh_Hans: 刚果语
+    value: kg
+  - label:
+      en_US: Korean
+      zh_Hans: 韩语
+    value: ko
+  - label:
+      en_US: Krio (Sierra Leone)
+      zh_Hans: 塞拉利昂克里奥尔语
+    value: kri
+  - label:
+      en_US: Kurdish
+      zh_Hans: 库尔德语
+    value: ku
+  - label:
+      en_US: Kurdish (Soranî)
+      zh_Hans: 库尔德语（索拉尼）
+    value: ckb
+  - label:
+      en_US: Kyrgyz
+      zh_Hans: 吉尔吉斯语
+    value: ky
+  - label:
+      en_US: Laothian
+      zh_Hans: 老挝语
+    value: lo
+  - label:
+      en_US: Latin
+      zh_Hans: 拉丁语
+    value: la
+  - label:
+      en_US: Latvian
+      zh_Hans: 拉脱维亚语
+    value: lv
+  - label:
+      en_US: Lingala
+      zh_Hans: 林加拉语
+    value: ln
+  - label:
+      en_US: Lithuanian
+      zh_Hans: 立陶宛语
+    value: lt
+  - label:
+      en_US: Lozi
+      zh_Hans: 洛齐语
+    value: loz
+  - label:
+      en_US: Luganda
+      zh_Hans: 卢干达语
+    value: lg
+  - label:
+      en_US: Luo
+      zh_Hans: 卢奥语
+    value: ach
+  - label:
+      en_US: Macedonian
+      zh_Hans: 马其顿语
+    value: mk
+  - label:
+      en_US: Malagasy
+      zh_Hans: 马尔加什语
+    value: mg
+  - label:
+      en_US: Malay
+      zh_Hans: 马来语
+    value: my
+  - label:
+      en_US: Malayalam
+      zh_Hans: 马拉雅拉姆语
+    value: ml
+  - label:
+      en_US: Maltese
+      zh_Hans: 马耳他语
+    value: mt
+  - label:
+      en_US: Maldives
+      zh_Hans: 马尔代夫语
+    value: mv
+  - label:
+      en_US: Maori
+      zh_Hans: 毛利语
+    value: mi
+  - label:
+      en_US: Marathi
+      zh_Hans: 马拉地语
+    value: mr
+  - label:
+      en_US: Mauritian Creole
+      zh_Hans: 毛里求斯克里奥尔语
+    value: mfe
+  - label:
+      en_US: Moldavian
+      zh_Hans: 摩尔达维亚语
+    value: mo
+  - label:
+      en_US: Mongolian
+      zh_Hans: 蒙古语
+    value: mn
+  - label:
+      en_US: Montenegrin
+      zh_Hans: 黑山语
+    value: sr-me
+  - label:
+      en_US: Nepali
+      zh_Hans: 尼泊尔语
+    value: ne
+  - label:
+      en_US: Nigerian Pidgin
+      zh_Hans: 尼日利亚皮钦语
+    value: pcm
+  - label:
+      en_US: Northern Sotho
+      zh_Hans: 北索托语
+    value: nso
+  - label:
+      en_US: Norwegian
+      zh_Hans: 挪威语
+    value: 'no'
+  - label:
+      en_US: Norwegian (Nynorsk)
+      zh_Hans: 挪威语（尼诺斯克语）
+    value: nn
+  - label:
+      en_US: Occitan
+      zh_Hans: 奥克语
+    value: oc
+  - label:
+      en_US: Oriya
+      zh_Hans: 奥里亚语
+    value: or
+  - label:
+      en_US: Oromo
+      zh_Hans: 奥罗莫语
+    value: om
+  - label:
+      en_US: Pashto
+      zh_Hans: 普什图语
+    value: ps
+  - label:
+      en_US: Persian
+      zh_Hans: 波斯语
+    value: fa
+  - label:
+      en_US: Pirate
+      zh_Hans: 海盗语
+    value: xx-pirate
+  - label:
+      en_US: Polish
+      zh_Hans: 波兰语
+    value: pl
+  - label:
+      en_US: Portuguese
+      zh_Hans: 葡萄牙语
+    value: pt
+  - label:
+      en_US: Portuguese (Brazil)
+      zh_Hans: 葡萄牙语（巴西）
+    value: pt-br
+  - label:
+      en_US: Portuguese (Portugal)
+      zh_Hans: 葡萄牙语（葡萄牙）
+    value: pt-pt
+  - label:
+      en_US: Punjabi
+      zh_Hans: 旁遮普语
+    value: pa
+  - label:
+      en_US: Quechua
+      zh_Hans: 克丘亚语
+    value: qu
+  - label:
+      en_US: Romanian
+      zh_Hans: 罗马尼亚语
+    value: ro
+  - label:
+      en_US: Romansh
+      zh_Hans: 罗曼什语
+    value: rm
+  - label:
+      en_US: Runyakitara
+      zh_Hans: 卢尼亚基塔拉语
+    value: nyn
+  - label:
+      en_US: Russian
+      zh_Hans: 俄语
+    value: ru
+  - label:
+      en_US: Scots Gaelic
+      zh_Hans: 苏格兰盖尔语
+    value: gd
+  - label:
+      en_US: Serbian
+      zh_Hans: 塞尔维亚语
+    value: sr
+  - label:
+      en_US: Serbo-Croatian
+      zh_Hans: 塞尔维亚-克罗地亚语
+    value: sh
+  - label:
+      en_US: Sesotho
+      zh_Hans: 塞索托语
+    value: st
+  - label:
+      en_US: Setswana
+      zh_Hans: 塞茨瓦纳语
+    value: tn
+  - label:
+      en_US: Seychellois Creole
+      zh_Hans: 塞舌尔克里奥尔语
+    value: crs
+  - label:
+      en_US: Shona
+      zh_Hans: 绍纳语
+    value: sn
+  - label:
+      en_US: Sindhi
+      zh_Hans: 信德语
+    value: sd
+  - label:
+      en_US: Sinhalese
+      zh_Hans: 僧伽罗语
+    value: si
+  - label:
+      en_US: Slovak
+      zh_Hans: 斯洛伐克语
+    value: sk
+  - label:
+      en_US: Slovenian
+      zh_Hans: 斯洛文尼亚语
+    value: sl
+  - label:
+      en_US: Somali
+      zh_Hans: 索马里语
+    value: so
+  - label:
+      en_US: Spanish
+      zh_Hans: 西班牙语
+    value: es
+  - label:
+      en_US: Spanish (Latin American)
+      zh_Hans: 西班牙语（拉丁美洲）
+    value: es-419
+  - label:
+      en_US: Sundanese
+      zh_Hans: 巽他语
+    value: su
+  - label:
+      en_US: Swahili
+      zh_Hans: 斯瓦希里语
+    value: sw
+  - label:
+      en_US: Swedish
+      zh_Hans: 瑞典语
+    value: sv
+  - label:
+      en_US: Tajik
+      zh_Hans: 塔吉克语
+    value: tg
+  - label:
+      en_US: Tamil
+      zh_Hans: 泰米尔语
+    value: ta
+  - label:
+      en_US: Tatar
+      zh_Hans: 鞑靼语
+    value: tt
+  - label:
+      en_US: Telugu
+      zh_Hans: 泰卢固语
+    value: te
+  - label:
+      en_US: Thai
+      zh_Hans: 泰语
+    value: th
+  - label:
+      en_US: Tigrinya
+      zh_Hans: 提格利尼亚语
+    value: ti
+  - label:
+      en_US: Tonga
+      zh_Hans: 汤加语
+    value: to
+  - label:
+      en_US: Tshiluba
+      zh_Hans: 卢巴语
+    value: lua
+  - label:
+      en_US: Tumbuka
+      zh_Hans: 图布卡语
+    value: tum
+  - label:
+      en_US: Turkish
+      zh_Hans: 土耳其语
+    value: tr
+  - label:
+      en_US: Turkmen
+      zh_Hans: 土库曼语
+    value: tk
+  - label:
+      en_US: Twi
+      zh_Hans: 契维语
+    value: tw
+  - label:
+      en_US: Uighur
+      zh_Hans: 维吾尔语
+    value: ug
+  - label:
+      en_US: Ukrainian
+      zh_Hans: 乌克兰语
+    value: uk
+  - label:
+      en_US: Urdu
+      zh_Hans: 乌尔都语
+    value: ur
+  - label:
+      en_US: Uzbek
+      zh_Hans: 乌兹别克语
+    value: uz
+  - label:
+      en_US: Vanuatu
+      zh_Hans: 瓦努阿图语
+    value: vu
+  - label:
+      en_US: Vietnamese
+      zh_Hans: 越南语
+    value: vi
+  - label:
+      en_US: Welsh
+      zh_Hans: 威尔士语
+    value: cy
+  - label:
+      en_US: Wolof
+      zh_Hans: 沃洛夫语
+    value: wo
+  - label:
+      en_US: Xhosa
+      zh_Hans: 科萨语
+    value: xh
+  - label:
+      en_US: Yiddish
+      zh_Hans: 意第绪语
+    value: yi
+  - label:
+      en_US: Yoruba
+      zh_Hans: 约鲁巴语
+    value: yo
+  - label:
+      en_US: Zulu
+      zh_Hans: 祖鲁语
+    value: zu
+  required: false
+  type: select
+- form: form
+  human_description:
+    en_US: Filter results based on the work arrangement. Set it to true to find jobs
+      that offer work from home or remote work opportunities.
+    zh_Hans: 根据工作安排过滤结果。将其设置为 true 可查找提供在家工作或远程工作机会的工作。
+  label:
+    en_US: is_remote
+    zh_Hans: 很遥远
+  name: is_remote
+  options:
+  - label:
+      en_US: 'true'
+      zh_Hans: 'true'
+    value: 'true'
+  - label:
+      en_US: 'false'
+      zh_Hans: 'false'
+    value: 'false'
+  required: false
+  type: select

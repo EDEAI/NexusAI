@@ -15,7 +15,7 @@ conda/*.sh
 docker/volumes
 envConfig.ts
 docker/docker-compose.yml
-scripts/test*.py
+scripts/test*
 /supervisord.conf
 /docker-compose.yml
 .history
