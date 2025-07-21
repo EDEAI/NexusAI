@@ -7,32 +7,23 @@ const { Title, Text } = Typography;
 
 const MentionStyleDemo: React.FC = () => {
     const intl = useIntl();
-    // 模拟不同类型的变量数据
+    // 模拟不同类型的变量数据 (包含更多项目来测试滚动)
     const mockVariables = [
-        {
-            type: 'input',
-            name: '用户输入',
-            meta: 'user_input',
-            title: '用户输入变量'
-        },
-        {
-            type: 'output',
-            name: '模型输出',
-            meta: null,
-            title: '模型输出变量'
-        },
-        {
-            type: 'input',
-            name: '系统提示',
-            meta: 'system_prompt',
-            title: '系统提示变量'
-        },
-        {
-            type: 'output',
-            name: '长变量名称示例测试',
-            meta: null,
-            title: '这是一个很长的变量名称用于测试省略效果'
-        }
+        { type: 'input', name: '用户输入', meta: 'user_input', title: '用户输入变量' },
+        { type: 'output', name: '模型输出', meta: null, title: '模型输出变量' },
+        { type: 'input', name: '系统提示', meta: 'system_prompt', title: '系统提示变量' },
+        { type: 'output', name: '长变量名称示例测试', meta: null, title: '这是一个很长的变量名称用于测试省略效果' },
+        { type: 'input', name: '数据源', meta: 'data_source', title: '数据源变量' },
+        { type: 'output', name: '处理结果', meta: null, title: '处理结果变量' },
+        { type: 'input', name: '配置参数', meta: 'config_params', title: '配置参数变量' },
+        { type: 'output', name: '分析报告', meta: null, title: '分析报告变量' },
+        { type: 'input', name: '用户偏好', meta: 'user_preferences', title: '用户偏好设置' },
+        { type: 'output', name: '推荐列表', meta: null, title: '推荐内容列表' },
+        { type: 'input', name: '查询条件', meta: 'search_criteria', title: '搜索查询条件' },
+        { type: 'output', name: '搜索结果', meta: null, title: '搜索返回结果' },
+        { type: 'input', name: '文件路径', meta: 'file_path', title: '文件路径变量' },
+        { type: 'output', name: '文件内容', meta: null, title: '读取的文件内容' },
+        { type: 'input', name: '时间范围', meta: 'time_range', title: '时间范围选择' },
     ];
 
     const renderMockMention = (variable: any, index: number) => {

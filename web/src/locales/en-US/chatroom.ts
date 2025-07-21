@@ -3,6 +3,7 @@ export default {
     'app.chatroom.mcptool.status.completed': 'Completed',
     'app.chatroom.mcptool.status.running': 'Running',
     'app.chatroom.mcptool.status.waiting': 'Waiting Confirmation',
+    'app.chatroom.mcptool.status.waitingFileUpload': 'Waiting File Upload',
     'app.chatroom.mcptool.status.failed': 'Failed',
     'app.chatroom.mcptool.status.pending': 'Pending',
     

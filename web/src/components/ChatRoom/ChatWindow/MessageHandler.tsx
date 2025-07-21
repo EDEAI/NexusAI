@@ -442,12 +442,12 @@ export const useMessageHandler = (
         },
 
         WITHMCPTOOLFILES: (data: any) => {
-            const { id, files_to_upload } = data;
-            
-            // Update tool data with uploaded files
+            const { id, files_to_upload, args } = data;
+            // Update tool data with uploaded files and input_variables
             updateMCPToolState(id, {
                 uploaded_files: files_to_upload || [],
-                status: MCPToolStatus.COMPLETED
+                status: MCPToolStatus.COMPLETED,
+                ...(args ? { args } : {})
             });
         },
     };

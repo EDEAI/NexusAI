@@ -140,7 +140,7 @@ export const hasMessageContent = (
                 return false;
             }
         };
-
+        
         // Comprehensive content check: any dimension with content = true
         return hasTextContent() || hasFileContent() || hasMCPContent() || hasStreamingContent();
     } catch (error) {
@@ -214,22 +214,36 @@ export const checkLastAgentMessage = (
         }
 
         // Find the last Agent message (messages already in reverse chronological order)
-        for (const message of messages) {
-            if (
-                message &&
-                message.is_agent === 1 &&
-                hasMessageContent(message, {
-                    checkText: false,
-                    checkFiles: true,
-                    checkMCPTools: false,
-                    minTextLength: 1,
-                    ...config,
-                })
-            ) {
-                return message;
-            }
+        const toLastMessage=messages[0]
+        if(toLastMessage.is_agent===1&&toLastMessage.content!=''){
+            return toLastMessage
         }
-
+        // for (const message of messages) {
+        //     console.log( message ,
+        //         message.is_agent === 1 ,
+        //         hasMessageContent(message, {
+        //             checkText: true,
+        //             checkFiles: false,
+        //             checkMCPTools: false,
+        //             minTextLength: 1
+        //         }));
+            
+        //     if (
+        //         message &&
+        //         message.is_agent === 1 &&
+        //         hasMessageContent(message, {
+        //             checkText: true,
+        //             checkFiles: false,
+        //             checkMCPTools: false,
+        //             minTextLength: 1,
+        //             ...config,
+        //         })
+        //     ) {
+                
+        //         return message;
+        //     }
+        // }
+        
         return null;
     } catch (error) {
         console.error('checkLastAgentMessage error:', error);

@@ -247,6 +247,24 @@ const useMentionFeature = (
     const [target, setTarget] = useState<Range | undefined>();
     const [index, setIndex] = useState(0);
     const [search, setSearch] = useState('');
+    const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    // Reset item refs when variables change
+    useEffect(() => {
+        itemRefs.current = [];
+    }, [availableVariables]);
+
+    // Reset index and scroll when target changes
+    useEffect(() => {
+        if (target) {
+            setIndex(0);
+            // Scroll to top when popup opens
+            const container = ref.current?.querySelector('.max-h-64.overflow-y-auto') as HTMLElement;
+            if (container) {
+                container.scrollTop = 0;
+            }
+        }
+    }, [target]);
 
     // Show mention options
     const showMentionOptions = useCallback(() => {
@@ -282,6 +300,38 @@ const useMentionFeature = (
         setTarget(null);
     }, [editor, target]);
 
+    // Scroll to selected item
+    const scrollToIndex = useCallback((targetIndex: number) => {
+        // Use requestAnimationFrame to ensure DOM is updated
+        requestAnimationFrame(() => {
+            const container = ref.current?.querySelector('.max-h-64.overflow-y-auto') as HTMLElement;
+            const targetItem = itemRefs.current[targetIndex];
+            
+            if (!container || !targetItem) return;
+
+            const containerTop = container.scrollTop;
+            const containerBottom = containerTop + container.clientHeight;
+            
+            const itemTop = targetItem.offsetTop;
+            const itemBottom = itemTop + targetItem.offsetHeight;
+            
+            // Check if item is above visible area
+            if (itemTop < containerTop) {
+                container.scrollTo({
+                    top: Math.max(0, itemTop - 8), // Add some padding, ensure not negative
+                    behavior: 'smooth'
+                });
+            }
+            // Check if item is below visible area
+            else if (itemBottom > containerBottom) {
+                container.scrollTo({
+                    top: itemBottom - container.clientHeight + 8, // Add some padding
+                    behavior: 'smooth'
+                });
+            }
+        });
+    }, []);
+
     // Handle keyboard events
     const handleMentionKeyDown = useCallback(
         (event: React.KeyboardEvent) => {
@@ -290,11 +340,17 @@ const useMentionFeature = (
             switch (event.key) {
                 case 'ArrowDown':
                     event.preventDefault();
-                    setIndex(prev => (prev >= availableVariables.length - 1 ? 0 : prev + 1));
+                    const nextIndex = index >= availableVariables.length - 1 ? 0 : index + 1;
+                    setIndex(nextIndex);
+                    // Scroll to the newly selected item
+                    scrollToIndex(nextIndex);
                     return true;
                 case 'ArrowUp':
                     event.preventDefault();
-                    setIndex(prev => (prev <= 0 ? availableVariables.length - 1 : prev - 1));
+                    const prevIndex = index <= 0 ? availableVariables.length - 1 : index - 1;
+                    setIndex(prevIndex);
+                    // Scroll to the newly selected item
+                    scrollToIndex(prevIndex);
                     return true;
                 case 'Tab':
                 case 'Enter':
@@ -309,7 +365,7 @@ const useMentionFeature = (
                     return false;
             }
         },
-        [target, availableVariables, index, insertMention]
+        [target, availableVariables, index, insertMention, scrollToIndex]
     );
 
     // Smart position calculation
@@ -349,6 +405,8 @@ const useMentionFeature = (
         showMentionOptions,
         insertMention,
         handleMentionKeyDown,
+        itemRefs,
+        closeMention: () => setTarget(null), // 新增
     };
 };
 
@@ -486,6 +544,8 @@ const SlateEditorV3: React.FC<MentionEditorProps> = ({
         showMentionOptions,
         insertMention,
         handleMentionKeyDown,
+        itemRefs,
+        closeMention, // 新增
     } = useMentionFeature(editor, availableVariables);
 
     // Editor value management
@@ -547,6 +607,9 @@ const SlateEditorV3: React.FC<MentionEditorProps> = ({
                         defaultMessage: 'Enter content, use @ to mention variables',
                     })
                 }
+                onBlur={() => {
+                    closeMention();
+                }}
             />
             {target && availableVariables.length > 0 && (
                 <Portal>
@@ -558,6 +621,7 @@ const SlateEditorV3: React.FC<MentionEditorProps> = ({
                         }}
                         className="mention-popup"
                         data-cy="mentions-portal"
+                        onMouseDown={e => e.preventDefault()} 
                     >
                         <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-48 max-w-80 max-h-64 overflow-y-auto">
                             <div className="px-3 py-1 text-xs text-gray-500 font-medium border-b border-gray-100 mb-1">
@@ -569,6 +633,9 @@ const SlateEditorV3: React.FC<MentionEditorProps> = ({
                             {availableVariables.map((variable, i) => (
                                 <div
                                     key={`${variable.name}-${i}`}
+                                    ref={(el) => {
+                                        itemRefs.current[i] = el;
+                                    }}
                                     onClick={() => insertMention(variable)}
                                     className={`
                                         mention-item flex items-center justify-between px-3 py-2 mx-1 rounded-md cursor-pointer

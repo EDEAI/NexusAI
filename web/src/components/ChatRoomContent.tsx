@@ -5,7 +5,7 @@ import { message } from 'antd';
 import 'highlight.js/styles/atom-one-dark.css';
 import React, { FC, memo, useEffect } from 'react';
 import { ChatContent } from './ChatRoom/ChatContent';
-import { useChatRoom } from './ChatRoom/hooks/useChatRoom';
+import { ChatRoomProvider, useChatRoomContext } from './ChatRoom/context/ChatRoomContext';
 import { InputField } from './ChatRoom/InputField';
 
 interface ChatRoomContentProps {
@@ -14,10 +14,11 @@ interface ChatRoomContentProps {
     abilitiesList?: any;
     chatStatus?: any;
 }
-export const ChatRoomContent: FC<ChatRoomContentProps> = memo(props => {
+
+const ChatRoomContentInner: FC<ChatRoomContentProps> = memo(props => {
     const { agentList, agentChatRoomId, abilitiesList, chatStatus } = props;
     
-    // Use custom hook for chat room state management
+    // Use context for chat room state management
     const {
         scrollDomRef,
         upButtonDom,
@@ -25,7 +26,8 @@ export const ChatRoomContent: FC<ChatRoomContentProps> = memo(props => {
         setIsStop,
         instruction,
         setInstruction,
-    } = useChatRoom(agentChatRoomId);
+    } = useChatRoomContext();
+    
     useEffect(() => {
         console.log(chatStatus);
         if (chatStatus == 1) {
@@ -46,7 +48,6 @@ export const ChatRoomContent: FC<ChatRoomContentProps> = memo(props => {
                 <div className="flex flex-col w-full h-full">
                     <ChatContent
                         instruction={instruction}
-                        setInstruction={setInstruction}
                         messageApi={messageApi}
                         scrollDomRef={scrollDomRef}
                         setIsStop={setIsStop}
@@ -56,7 +57,6 @@ export const ChatRoomContent: FC<ChatRoomContentProps> = memo(props => {
                         abilitiesList={abilitiesList}
                     />
                     <InputField
-                        setInstruction={setInstruction}
                         messageApi={messageApi}
                         isStop={isStop}
                         upButtonDom={upButtonDom}
@@ -69,5 +69,13 @@ export const ChatRoomContent: FC<ChatRoomContentProps> = memo(props => {
                 </div>
             </div>
         </>
+    );
+});
+
+export const ChatRoomContent: FC<ChatRoomContentProps> = memo(props => {
+    return (
+        <ChatRoomProvider agentChatRoomId={props.agentChatRoomId}>
+            <ChatRoomContentInner {...props} />
+        </ChatRoomProvider>
     );
 });

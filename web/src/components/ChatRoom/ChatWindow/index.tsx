@@ -10,6 +10,7 @@ import { useMessageHandler } from './MessageHandler';
 import { CurrentMessage } from './CurrentMessage';
 import { MCPToolRuntimeData } from '../types/mcp';
 import { prepareHistoryMessageForCurrent } from '../utils';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 
 interface chatwindowParameters {
     setisEnd?: any;
@@ -29,7 +30,6 @@ interface chatwindowParameters {
     setIsWaitingReply?: (waiting: boolean) => void;
     removeHistoryMessage?: (message: any) => void;
     setCurrentMessageFromHistory?: (message: any) => void;
-    setInstruction?: (instruction: any) => void;
 }
 
 export const Chatwindow: FC<chatwindowParameters> = memo(props => {
@@ -51,8 +51,10 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
         setIsWaitingReply,
         removeHistoryMessage,
         setCurrentMessageFromHistory,
-        setInstruction,
     } = props;
+    
+    // Use context for setInstruction
+    const { setInstruction } = useChatRoomContext();
     
     const intl = useIntl();
     const { id: urlParamId } = useParams<{ id: string }>();
@@ -163,7 +165,6 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
             mcpTools={mcpTools}
             updateMCPTool={updateMCPTool}
             getMCPTool={getMCPTool}
-            setInstruction={setInstruction}
         />
     );
 }); 

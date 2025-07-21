@@ -9,10 +9,10 @@ import { MessageItem } from '../MessageDisplay/MessageItem';
 import { CurrentConversation } from './CurrentConversation';
 import { MCPToolRuntimeData, MCPToolStatus, getMCPToolStatus } from '../types/mcp';
 import { parseMCPContent, inferUploadedFiles } from '../utils/mcpParser';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 
 interface ChatContentProps {
     instruction?: any;
-    setInstruction?: any;
     messageApi?: any;
     scrollDomRef?: any;
     setIsStop?: any;
@@ -29,11 +29,13 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
         instruction,
         setIsStop,
         upButtonDom,
-        setInstruction,
         agentList,
         agentChatRoomId,
         abilitiesList,
     } = props;
+    
+    // Use context for setInstruction
+    const { setInstruction } = useChatRoomContext();
 
     const intl = useIntl();
     const [bminWidth, setbminWidth] = useState(860);
@@ -104,6 +106,22 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
         return mcpTools[id] || null;
     };
 
+    // Helper function to infer MCP tool status from historical data
+    const inferHistoricalMCPToolStatus = (toolData: any): MCPToolStatus => {
+        // Check if tool needs file upload based on files_to_upload or args.input_variables
+        const hasFilesToUpload = toolData.files_to_upload && Array.isArray(toolData.files_to_upload) && toolData.files_to_upload.length > 0;
+        const hasNeedUploadInArgs = toolData.args?.input_variables && 
+            Object.values(toolData.args.input_variables).some((value: any) => value === 'need_upload');
+        
+        // If tool has files to upload or need_upload in args, and no result, it's waiting for file upload
+        if ((hasFilesToUpload || hasNeedUploadInArgs) && !toolData.result) {
+            return MCPToolStatus.WAITING_FILE_UPLOAD;
+        }
+        
+        // Use existing status inference logic
+        return getMCPToolStatus(toolData.workflow_confirmation_status, toolData.result);
+    };
+
     // Process historical messages to extract and register MCP tools
     const processHistoricalMessages = (messages: any[]): any[] => {
         const processedMessages = messages.map(message => {
@@ -123,10 +141,7 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
                             
                             // Register MCP tool in conversation state if not already exists
                             if (!mcpTools[toolData.id]) {
-                                const status = getMCPToolStatus(
-                                    toolData.workflow_confirmation_status, 
-                                    toolData.result
-                                );
+                                const status = inferHistoricalMCPToolStatus(toolData);
                                 
                                 setMcpTools(prev => ({
                                     ...prev,
@@ -164,6 +179,7 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
                 page: roomMessagepage.current,
                 page_size: 10,
             });
+          
             if (res.code == 0) {
                 roomMessageContentpage.current = res.data.total_pages;
                 if (!init) {
@@ -307,7 +323,6 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
                             updateMCPTool={updateMCPTool}
                             getMCPTool={getMCPTool}
                             userMessage={userMessage}
-                            setInstruction={setInstruction}
                         />
                     </div>
                     <div className="w-full flex justify-center pb-[10px]">

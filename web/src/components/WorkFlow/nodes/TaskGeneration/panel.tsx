@@ -15,6 +15,7 @@ import { SelectModelConfigId, SelectVariable } from '../../components/Form/Selec
 import {
     SwitchImportToKnowledgeBase,
     SwitchManualConfirmation,
+    SwitchSplitTaskByLine,
     SwitchWaitForAllPredecessors,
 } from '../../components/Form/Switch';
 import useStore from '../../store';
@@ -123,6 +124,7 @@ export default memo(({ node }: { node: AppNode }) => {
                         <SwitchWaitForAllPredecessors></SwitchWaitForAllPredecessors>
                         <SwitchManualConfirmation></SwitchManualConfirmation>
                         <SwitchImportToKnowledgeBase></SwitchImportToKnowledgeBase>
+                        <SwitchSplitTaskByLine></SwitchSplitTaskByLine>
                     </div>
                     <ProFormDependency name={['import_to_knowledge_base']}>
                         {({ import_to_knowledge_base }) => {
