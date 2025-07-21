@@ -406,6 +406,7 @@ const useMentionFeature = (
         insertMention,
         handleMentionKeyDown,
         itemRefs,
+        closeMention: () => setTarget(null), // 新增
     };
 };
 
@@ -544,6 +545,7 @@ const SlateEditorV3: React.FC<MentionEditorProps> = ({
         insertMention,
         handleMentionKeyDown,
         itemRefs,
+        closeMention, // 新增
     } = useMentionFeature(editor, availableVariables);
 
     // Editor value management
@@ -605,6 +607,9 @@ const SlateEditorV3: React.FC<MentionEditorProps> = ({
                         defaultMessage: 'Enter content, use @ to mention variables',
                     })
                 }
+                onBlur={() => {
+                    closeMention();
+                }}
             />
             {target && availableVariables.length > 0 && (
                 <Portal>
@@ -616,6 +621,7 @@ const SlateEditorV3: React.FC<MentionEditorProps> = ({
                         }}
                         className="mention-popup"
                         data-cy="mentions-portal"
+                        onMouseDown={e => e.preventDefault()} 
                     >
                         <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-48 max-w-80 max-h-64 overflow-y-auto">
                             <div className="px-3 py-1 text-xs text-gray-500 font-medium border-b border-gray-100 mb-1">
