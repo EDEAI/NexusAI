@@ -2,6 +2,7 @@ import os
 import sys
 import importlib
 from typing import Any
+from datetime import datetime
 
 # Dictionary to store language codes and their corresponding language names
 language_names = {
@@ -1763,7 +1764,8 @@ def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = 
                     return None
         
         if append_ret_lang_prompt:
-            return_language_prompt = f"\n\nPlease note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction."
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            return_language_prompt = f"\n\nPlease note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction.\n\nThe current time is {current_time}."
             if isinstance(content, str):
                 content += return_language_prompt
             elif isinstance(content, dict):
