@@ -7,6 +7,7 @@ import { FileToUpload, FileUploadData } from '../types/fileUpload';
 import FileUploadItem from './FileUploadItem';
 import { Button, message } from 'antd';
 import { UploadedFile } from '@/hooks/useFileUpload';
+import { useIntl } from '@umijs/max';
 
 interface FileUploadSectionProps {
     toolData: MCPToolRuntimeData;
@@ -22,6 +23,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
     const filesToUpload = toolData.files_to_upload || [];
     // { [variableName]: FileUploadData }
     const [uploadMap, setUploadMap] = useState<Record<string, FileUploadData>>({});
+    const intl = useIntl();
 
  
     const allRequiredUploaded = filesToUpload.every(
@@ -57,7 +59,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
 
     const handleComplete = () => {
         if (!allRequiredUploaded) {
-            message.warning('Please upload all required files.');
+            message.warning(intl.formatMessage({ id: 'app.chatroom.mcptool.pleaseUploadAllRequiredFiles' }));
             return;
         }
         
@@ -71,14 +73,14 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
     }, [allRequiredUploaded, uploadMap, onFileUploadComplete]);
 
     return (
-        <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+        <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-blue-50">
             <div className="mb-3">
                 <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    Required Files
+                    {intl.formatMessage({ id: 'app.chatroom.mcptool.requiredFiles' })}
                 </h4>
             </div>
             {filesToUpload.length === 0 && (
-                <div className="text-xs text-gray-500">No files required.</div>
+                <div className="text-xs text-gray-500">{intl.formatMessage({ id: 'app.chatroom.mcptool.noFilesRequired' })}</div>
             )}
             {filesToUpload.map((fileConfig) => (
                 <FileUploadItem
@@ -94,7 +96,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                 disabled={!allRequiredUploaded}
                 onClick={handleComplete}
             >
-                Complete Upload
+                {intl.formatMessage({ id: 'app.chatroom.mcptool.completeUpload' })}
             </Button>
         </div>
     );

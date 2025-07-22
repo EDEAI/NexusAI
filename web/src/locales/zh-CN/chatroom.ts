@@ -37,4 +37,10 @@ export default {
     
     // Waiting Reply Indicator
     'app.chatroom.waitingReply': '等待回复中...',
+    'app.chatroom.mcptool.requiredFiles': '补充文件',
+    'app.chatroom.mcptool.completeUpload': '完成上传',
+    'app.chatroom.mcptool.noFilesRequired': '无需上传文件。',
+    'app.chatroom.mcptool.uploading': '上传中...',
+    'app.chatroom.mcptool.uploadFile': '上传文件',
+    'app.chatroom.mcptool.remove': '移除',
 }; 

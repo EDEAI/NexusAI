@@ -26,6 +26,9 @@ export default {
     'app.chatroom.mcptool.workflowDetails': 'Workflow Details',
     'app.chatroom.mcptool.handleTodo': 'Handle Todo',
     'app.chatroom.mcptool.error': 'Error',
+    'app.chatroom.mcptool.requiredFiles': 'Supplementary Files',
+    'app.chatroom.mcptool.completeUpload': 'Complete Upload',
+    'app.chatroom.mcptool.noFilesRequired': 'No files required.',
     
     // MCP Tool Display - Workflow Related
     'app.chatroom.mcptool.workflow': 'Workflow',
@@ -37,4 +40,7 @@ export default {
     
     // Waiting Reply Indicator
     'app.chatroom.waitingReply': 'Waiting for reply...',
+    'app.chatroom.mcptool.uploading': 'Uploading...',
+    'app.chatroom.mcptool.uploadFile': 'Upload File',
+    'app.chatroom.mcptool.remove': 'Remove',
 }; 
