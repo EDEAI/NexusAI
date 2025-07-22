@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import useFileUpload from '@/hooks/useFileUpload';
 import { FileToUpload, FileUploadData } from '../types/fileUpload';
 import { Button, Progress } from 'antd';
+import { useIntl } from '@umijs/max';
 
 interface FileUploadItemProps {
   fileConfig: FileToUpload;
@@ -25,6 +26,7 @@ const FileUploadItem: React.FC<FileUploadItemProps> = ({ fileConfig, value, onCh
     multiple: false
   });
 
+  const intl = useIntl();
  
   useEffect(() => {
     if (uploadedFiles.length > 0) {
@@ -63,7 +65,7 @@ const FileUploadItem: React.FC<FileUploadItemProps> = ({ fileConfig, value, onCh
             disabled={isUploading}
             className="w-48"
           >
-            {isUploading ? 'Uploading...' : 'Upload File'}
+            {isUploading ? intl.formatMessage({ id: 'app.chatroom.mcptool.uploading' }) : intl.formatMessage({ id: 'app.chatroom.mcptool.uploadFile' })}
           </Button>
         ) : (
           <>
@@ -75,7 +77,7 @@ const FileUploadItem: React.FC<FileUploadItemProps> = ({ fileConfig, value, onCh
               onClick={() => removeFile(uploadedFiles[uploadedFiles.length - 1].uid)}
               disabled={isUploading}
             >
-              Remove
+              {intl.formatMessage({ id: 'app.chatroom.mcptool.remove' })}
             </Button>
           </>
         )}
