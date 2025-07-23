@@ -41,6 +41,7 @@ export default memo(({ node }: { node: AppNode }) => {
     const [showEdit, setShowEdit] = useState(true);
     useMount(() => {
         const reset = resetFormNodes(formRef, node);
+        setShowEdit(!node.data.split_task_by_line);
         setTimeout(() => {
             reset();
         }, 200);
