@@ -1,0 +1,35 @@
+identity:
+  author: bdim
+  name: tianyancha
+  label:
+    en_US: Tianyancha
+    zh_Hans: 天眼查
+  description:
+    en_US: Access enterprise information and business data from Tianyancha API
+    zh_Hans: 通过天眼查 API 获取企业信息和商业数据
+  icon: icon.svg
+tools:
+  - tools/tianyancha_base_info.yaml
+  - tools/tianyancha_business_info.yaml
+  - tools/tianyancha_judicial_risk.yaml
+  - tools/tianyancha_guarantees.yaml
+  - tools/tianyancha_mortgage.yaml
+  - tools/tianyancha_illegal_info.yaml
+  - tools/tianyancha_public_notice.yaml
+extra:
+  python:
+    source: provider/tianyancha-dify-plugin.py
+credentials_for_provider:
+  token: 
+    type: secret-input
+    required: true
+    label: 
+      en_US: Tianyancha API Token
+      zh_Hans: 天眼查API Token
+    placeholder: 
+      en_US: Enter your Tianyancha API token
+      zh_Hans: 请输入您的天眼查 API 令牌
+    help: 
+      en_US: You can get your token from Tianyancha data center -> My APIs
+      zh_Hans: 你可以从天眼查的数据中心 -> 我的接口中获取 token
+    url: https://open.tianyancha.com/

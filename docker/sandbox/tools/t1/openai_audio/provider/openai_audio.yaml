@@ -1,0 +1,48 @@
+credentials_for_provider:
+  api_key:
+    help:
+      en_US: Your OpenAI API key. You can find it in your OpenAI account settings.
+      ja_JP: あなたのOpenAI APIキーです。OpenAIアカウント設定で確認できます。
+      pt_BR: Sua chave API da OpenAI. Você pode encontrá-la nas configurações da sua
+        conta OpenAI.
+      zh_Hans: 您的 OpenAI API 密钥。您可以在 OpenAI 账户设置中找到它。
+    label:
+      en_US: API Key
+      ja_JP: API キー
+      pt_BR: Chave API
+      zh_Hans: API 密钥
+    placeholder:
+      en_US: Please input your OpenAI API key
+      ja_JP: OpenAI API キーを入力してください
+      pt_BR: Por favor, insira sua chave API da OpenAI
+      zh_Hans: 请输入您的 OpenAI API 密钥
+    required: true
+    type: secret-input
+    url: https://platform.openai.com/api-keys
+extra:
+  python:
+    source: provider/openai_audio.py
+identity:
+  author: logicober
+  description:
+    en_US: Convert audio to text with OpenAI's Audio API, supporting transcription
+      and translation across multiple languages with high accuracy. Supports Whisper-1
+      model as well as GPT-4o Transcribe and GPT-4o Mini Transcribe models with streaming
+      output capability.
+    ja_JP: OpenAIのAudio APIを使用して音声をテキストに変換し、複数言語での高精度な文字起こしと翻訳をサポートします。Whisper-1モデルに加え、ストリーミング出力機能を備えたGPT-4o
+      TranscribeおよびGPT-4o Mini Transcribeモデルもサポートしています。
+    pt_BR: Converta áudio em texto com a API de Áudio da OpenAI, suportando transcrição
+      e tradução em vários idiomas com alta precisão. Suporta o modelo Whisper-1,
+      bem como os modelos GPT-4o Transcribe e GPT-4o Mini Transcribe com capacidade
+      de saída em streaming.
+    zh_Hans: 使用 OpenAI 的 Audio API 将音频转换为文本，支持多种语言的高精度转录和翻译。支持 Whisper-1 模型以及具有流式输出能力的
+      GPT-4o Transcribe 和 GPT-4o Mini Transcribe 模型。
+  icon: icon.svg
+  label:
+    en_US: OpenAI Audio STT
+    ja_JP: OpenAI Audio STT
+    pt_BR: OpenAI Audio STT
+    zh_Hans: OpenAI Audio STT
+  name: openai_audio
+tools:
+- tools/openai_audio.yaml

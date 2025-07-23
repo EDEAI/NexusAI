@@ -1,0 +1,47 @@
+identity:
+  author: itning
+  name: bark-notify
+  label:
+    en_US: BarkNotify
+    zh_Hans: Bark通知
+  description:
+    en_US: Used to push messages to the Bark application
+    zh_Hans: 用于推送消息到Bark应用程序中
+  icon: icon.png
+tools:
+  - tools/send_to_bark.yaml
+extra:
+  python:
+    source: provider/bark-notify.py
+tags:
+    - utilities
+credentials_for_provider:
+  bark-key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Bark KEY
+      zh_Hans: Bark KEY
+    description:
+      en_US: Your Bark KEY
+      zh_Hans: 你的Bark应用KEY
+    url: https://github.com/itning/dify-bark-notify-plugin/blob/master/HOW_TO_GET_KEY.md
+  server-url:
+    type: text-input
+    required: true
+    default: https://api.day.app
+    label:
+      en_US: Server URL
+      zh_Hans: 服务器地址
+    placeholder:
+      en_US: Please input your Bark server URL
+      zh_Hans: 请输入你的Bark服务器地址
+  default-query-params:
+    type: text-input
+    required: false
+    label:
+      en_US: Custom query parameters carried when initiating a request
+      zh_Hans: 发起请求时携带的自定义查询参数
+    placeholder:
+      en_US: '?sound=minuet&call=1&isArchive=1'
+      zh_Hans: '?sound=minuet&call=1&isArchive=1'

@@ -1,0 +1,27 @@
+identity:
+  name: playwright
+  author: hjlarry
+  label:
+    en_US: playwright
+    zh_Hans: playwright
+description:
+  human:
+    en_US: A tool can be used to automate the browser with playwright script.
+    zh_Hans: 一个可以使用 playwright 脚本自动化浏览器的工具
+  llm: A tool can be used to automate the browser with playwright script.
+parameters:
+  - name: script
+    type: string
+    required: true
+    label:
+      en_US: playwright script
+      zh_Hans: playwright 脚本
+    human_description:
+      en_US: script send to playwright to execute
+      zh_Hans: 发送给 playwright 执行的脚本
+    llm_description: | 
+      Send the python script to Playwright for execution, using `;` to separate commands. Assign the final output to the variable `result`(only support string and bytes). Utilize the `browser` variable to access the browser object. Example: page = browser.new_page(); page.goto("http://www.baidu.com"); result = page.screenshot(full_page=True);
+    form: llm
+extra:
+  python:
+    source: tools/playwright.py

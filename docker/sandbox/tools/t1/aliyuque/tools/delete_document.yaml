@@ -1,0 +1,39 @@
+description:
+  human:
+    en_US: Delete Document
+    zh_Hans: 根据id删除文档
+  llm: Delete document.
+extra:
+  python:
+    source: tools/delete_document.py
+identity:
+  author: 佐井
+  icon: icon.svg
+  label:
+    en_US: Delete Document
+    zh_Hans: 删除文档
+  name: aliyuque_delete_document
+parameters:
+- form: llm
+  human_description:
+    en_US: The unique identifier of the knowledge base where the document will be
+      created.
+    zh_Hans: 文档将被创建的知识库的唯一标识。
+  label:
+    en_US: Knowledge Base ID
+    zh_Hans: 知识库ID
+  llm_description: ID of the target knowledge base.
+  name: book_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Document ID or path.
+    zh_Hans: 文档 ID or 路径。
+  label:
+    en_US: Document ID or Path
+    zh_Hans: 文档 ID or 路径
+  llm_description: Document ID or path.
+  name: id
+  required: true
+  type: string

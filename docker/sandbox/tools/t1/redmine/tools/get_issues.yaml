@@ -1,0 +1,301 @@
+identity:
+  name: get_issues
+  author: yasu89
+  label:
+    en_US: Get List of Issues
+    zh_Hans: 获取问题列表
+    pt_BR: Obter Lista de Issues
+    ja_JP: チケットのリストを取得
+description:
+  human:
+    en_US: Returns a paginated list of issues from Redmine
+    zh_Hans: 从Redmine获取分页的问题列表
+    pt_BR: Retorna uma lista paginada de issues do Redmine
+    ja_JP: Redmineからページネーション付きのチケットリストを返す
+  llm: Retrieve and list issues from a Redmine project management system with filtering options
+parameters:
+  - name: offset
+    type: number
+    required: false
+    label:
+      en_US: Offset
+      zh_Hans: 偏移量
+      pt_BR: Deslocamento
+      ja_JP: オフセット
+    human_description:
+      en_US: Skip this number of issues in response
+      zh_Hans: 在响应中跳过此数量的问题
+      pt_BR: Pular este número de issues na resposta
+      ja_JP: レスポンスでスキップするチケット数
+    placeholder:
+      en_US: "0"
+      zh_Hans: "0"
+      pt_BR: "0"
+      ja_JP: "0"
+    llm_description: Skip this number of issues in response for pagination
+    form: llm
+  - name: limit
+    type: number
+    min: 1
+    max: 100
+    required: false
+    label:
+      en_US: Limit
+      zh_Hans: 限制数量
+      pt_BR: Limite
+      ja_JP: 取得件数制限
+    human_description:
+      en_US: "Maximum number of issues to retrieve (default: 25, max: 100)"
+      zh_Hans: 要检索的最大问题数量（默认：25，最大：100）
+      pt_BR: "Número máximo de issues para recuperar (padrão: 25, máx: 100)"
+      ja_JP: "取得するチケットの最大数（デフォルト：25、最大：100）"
+    placeholder:
+      en_US: "25"
+      zh_Hans: "25"
+      pt_BR: "25"
+      ja_JP: "25"
+    llm_description: Maximum number of issues to retrieve (default 25, maximum 100)
+    form: llm
+  - name: sort
+    type: string
+    required: false
+    label:
+      en_US: Sort
+      zh_Hans: 排序
+      pt_BR: Ordenar
+      ja_JP: ソート
+    human_description:
+      en_US: "Column to sort with. Append :desc to invert the order"
+      zh_Hans: "排序列。追加 :desc 来反转顺序"
+      pt_BR: "Coluna para ordenar. Adicione :desc para inverter a ordem"
+      ja_JP: "ソートする列。:descを追加して順序を反転"
+    placeholder:
+      en_US: "category:desc,updated_on"
+      zh_Hans: "category:desc,updated_on"
+      pt_BR: "category:desc,updated_on"
+      ja_JP: "category:desc,updated_on"
+    llm_description: Column to sort with, append :desc to invert the order
+    form: llm
+  - name: include
+    type: string
+    required: false
+    label:
+      en_US: Include Additional Data
+      zh_Hans: 包含额外数据
+      pt_BR: Incluir Dados Adicionais
+      ja_JP: 追加データを含める
+    human_description:
+      en_US: "Fetch associated data (comma-separated). Possible values: attachments, relations"
+      zh_Hans: "获取关联数据（逗号分隔）。可能的值：attachments, relations"
+      pt_BR: "Buscar dados associados (separados por vírgula). Valores possíveis: attachments, relations"
+      ja_JP: "関連データを取得（カンマ区切り）。可能な値：attachments, relations"
+    placeholder:
+      en_US: "attachments,relations"
+      zh_Hans: "attachments,relations"
+      pt_BR: "attachments,relations"
+      ja_JP: "attachments,relations"
+    llm_description: Fetch associated data (comma-separated values like attachments, relations)
+    form: llm
+  - name: issue_id
+    type: string
+    required: false
+    label:
+      en_US: Issue ID(s)
+      zh_Hans: 问题ID
+      pt_BR: ID(s) do Issue
+      ja_JP: チケットID
+    human_description:
+      en_US: "Get issue with the given id or multiple issues by id using ',' to separate"
+      zh_Hans: "获取给定ID的问题或使用','分隔多个问题ID"
+      pt_BR: "Obter issue com o ID dado ou múltiples issues usando ',' para separar"
+      ja_JP: "指定されたIDのチケットまたは','で区切って複数のチケットIDを取得"
+    placeholder:
+      en_US: "123,456"
+      zh_Hans: "123,456"
+      pt_BR: "123,456"
+      ja_JP: "123,456"
+    llm_description: Get issue with specific ID or multiple issues using comma separation
+    form: llm
+  - name: project_id
+    type: string
+    required: false
+    label:
+      en_US: Project ID
+      zh_Hans: 项目ID
+      pt_BR: ID do Projeto
+      ja_JP: プロジェクトID
+    human_description:
+      en_US: Numeric project ID or project identifier to filter issues
+      zh_Hans: 数字项目ID或项目标识符来过滤问题
+      pt_BR: ID numérico do projeto ou identificador do projeto para filtrar issues
+      ja_JP: チケットをフィルタリングするための数値プロジェクトIDまたはプロジェクト識別子
+    placeholder:
+      en_US: "project123"
+      zh_Hans: "项目123"
+      pt_BR: "projeto123"
+      ja_JP: "プロジェクト123"
+    llm_description: Project ID (numeric) or project identifier to filter issues by specific project
+    form: llm
+  - name: subproject_id
+    type: string
+    required: false
+    label:
+      en_US: Subproject ID
+      zh_Hans: 子项目ID
+      pt_BR: ID do Subprojeto
+      ja_JP: サブプロジェクトID
+    human_description:
+      en_US: "Get issues from the subproject with the given id"
+      zh_Hans: "从给定ID的子项目获取问题"
+      pt_BR: "Obter issues do subprojeto com o ID dado"
+      ja_JP: "指定されたIDのサブプロジェクトからチケットを取得"
+    placeholder:
+      en_US: "456"
+      zh_Hans: "456"
+      pt_BR: "456"
+      ja_JP: "456"
+    llm_description: Get issues from specific subproject ID
+    form: llm
+  - name: tracker_id
+    type: string
+    required: false
+    label:
+      en_US: Tracker ID
+      zh_Hans: 跟踪器ID
+      pt_BR: ID do Tracker
+      ja_JP: トラッカーID
+    human_description:
+      en_US: "Get issues from the tracker with the given id"
+      zh_Hans: "从给定ID的跟踪器获取问题"
+      pt_BR: "Obter issues do tracker com o ID dado"
+      ja_JP: "指定されたIDのトラッカーからチケットを取得"
+    placeholder:
+      en_US: "1"
+      zh_Hans: "1"
+      pt_BR: "1"
+      ja_JP: "1"
+    llm_description: Get issues from specific tracker ID
+    form: llm
+  - name: status_id
+    type: string
+    required: false
+    label:
+      en_US: Status ID
+      zh_Hans: 状态ID
+      pt_BR: ID do Status
+      ja_JP: ステータスID
+    human_description:
+      en_US: Issue status ID to filter by (1=New, 2=In Progress, 3=Resolved, 4=Feedback, 5=Closed, 6=Rejected)
+      zh_Hans: 按状态ID过滤问题（1=新建, 2=进行中, 3=已解决, 4=反馈, 5=已关闭, 6=已拒绝）
+      pt_BR: ID do status do issue para filtrar (1=Novo, 2=Em Progresso, 3=Resolvido, 4=Feedback, 5=Fechado, 6=Rejeitado)
+      ja_JP: フィルタリングするステータスID（1=新規, 2=進行中, 3=解決済み, 4=フィードバック, 5=終了, 6=却下）
+    placeholder:
+      en_US: "1"
+      zh_Hans: "1"
+      pt_BR: "1"
+      ja_JP: "1"
+    llm_description: Filter issues by status ID (1=New, 2=In Progress, 3=Resolved, 4=Feedback, 5=Closed, 6=Rejected)
+    form: llm
+  - name: assigned_to_id
+    type: string
+    required: false
+    label:
+      en_US: Assigned To ID
+      zh_Hans: 分配给用户ID
+      pt_BR: ID do Responsável
+      ja_JP: 担当者ID
+    human_description:
+      en_US: User ID to filter issues assigned to specific user
+      zh_Hans: 用户ID来过滤分配给特定用户的问题
+      pt_BR: ID do usuário para filtrar issues atribuídas a usuário específico
+      ja_JP: 特定のユーザーに割り当てられたチケットをフィルタリングするためのユーザーID
+    placeholder:
+      en_US: "123"
+      zh_Hans: "123"
+      pt_BR: "123"
+      ja_JP: "123"
+    llm_description: Filter issues by assignee user ID
+    form: llm
+  - name: parent_id
+    type: string
+    required: false
+    label:
+      en_US: Parent Issue ID
+      zh_Hans: 父问题ID
+      pt_BR: ID do Issue Pai
+      ja_JP: 親チケットID
+    human_description:
+      en_US: "Get issues whose parent issue is given id"
+      zh_Hans: "获取父问题为给定ID的问题"
+      pt_BR: "Obter issues cujo issue pai é o ID dado"
+      ja_JP: "指定されたIDが親となるチケットを取得"
+    placeholder:
+      en_US: "789"
+      zh_Hans: "789"
+      pt_BR: "789"
+      ja_JP: "789"
+    llm_description: Get issues whose parent issue matches the given ID
+    form: llm
+  - name: created_on
+    type: string
+    required: false
+    label:
+      en_US: Created On Filter
+      zh_Hans: 创建时间过滤器
+      pt_BR: Filtro de Data de Criação
+      ja_JP: 作成日フィルター
+    human_description:
+      en_US: "Date range filter for issue creation (e.g., >=2024-01-01 or ><2024-01-01|2024-12-31)"
+      zh_Hans: "问题创建的日期范围过滤器（例如：>=2024-01-01 或 ><2024-01-01|2024-12-31）"
+      pt_BR: "Filtro de intervalo de datas para criação de issues (ex: >=2024-01-01 ou ><2024-01-01|2024-12-31)"
+      ja_JP: "チケット作成日の日付範囲フィルター（例：>=2024-01-01 または ><2024-01-01|2024-12-31）"
+    placeholder:
+      en_US: ">=2024-01-01"
+      zh_Hans: ">=2024-01-01"
+      pt_BR: ">=2024-01-01"
+      ja_JP: ">=2024-01-01"
+    llm_description: Date range filter for issue creation date (use operators like >=, <=, ><)
+    form: llm
+  - name: updated_on
+    type: string
+    required: false
+    label:
+      en_US: Updated On Filter
+      zh_Hans: 更新时间过滤器
+      pt_BR: Filtro de Data de Atualização
+      ja_JP: 更新日フィルター
+    human_description:
+      en_US: "Date range filter for issue updates (e.g., >=2024-01-01 or ><2024-01-01|2024-12-31)"
+      zh_Hans: "问题更新的日期范围过滤器（例如：>=2024-01-01 或 ><2024-01-01|2024-12-31）"
+      pt_BR: "Filtro de intervalo de datas para atualizações de issues (ex: >=2024-01-01 ou ><2024-01-01|2024-12-31)"
+      ja_JP: "チケット更新日の日付範囲フィルター（例：>=2024-01-01 または ><2024-01-01|2024-12-31）"
+    placeholder:
+      en_US: ">=2024-01-01"
+      zh_Hans: ">=2024-01-01"
+      pt_BR: ">=2024-01-01"
+      ja_JP: ">=2024-01-01"
+    llm_description: Date range filter for issue update date (use operators like >=, <=, ><)
+    form: llm
+  - name: custom_fields
+    type: string
+    required: false
+    label:
+      en_US: Additional Query Parameters
+      zh_Hans: 附加查询参数
+      pt_BR: Parâmetros de Consulta Adicionais
+      ja_JP: 追加クエリパラメータ
+    human_description:
+      en_US: "Additional query parameters for filtering (e.g., cf_1=value&fixed_version_id=2&category_id=3)"
+      zh_Hans: "用于过滤的附加查询参数（例如：cf_1=value&fixed_version_id=2&category_id=3）"
+      pt_BR: "Parâmetros de consulta adicionais para filtragem (ex: cf_1=value&fixed_version_id=2&category_id=3)"
+      ja_JP: "フィルタリング用の追加クエリパラメータ（例：cf_1=value&fixed_version_id=2&category_id=3）"
+    placeholder:
+      en_US: "cf_1=abcdef&fixed_version_id=2&category_id=3"
+      zh_Hans: "cf_1=abcdef&fixed_version_id=2&category_id=3"
+      pt_BR: "cf_1=abcdef&fixed_version_id=2&category_id=3"
+      ja_JP: "cf_1=abcdef&fixed_version_id=2&category_id=3"
+    llm_description: Additional query parameters for filtering using & separated format (supports custom fields, fixed_version_id, category_id, etc.)
+    form: llm
+extra:
+  python:
+    source: tools/get_issues.py

@@ -1,0 +1,33 @@
+credentials_for_provider:
+  mistral_api_key:
+    help:
+      en_US: Get your Mistral API key from Mistral AI
+      zh_Hans: 从 Mistral AI 获取您的 Mistral API key
+    label:
+      en_US: Mistral API key
+      zh_Hans: Mistral API key
+    placeholder:
+      en_US: Please input your Mistral API key
+      zh_Hans: 请输入您的 Mistral API key
+    required: true
+    type: secret-input
+    url: https://console.mistral.ai/api-keys/
+extra:
+  python:
+    source: provider/mistral_ocr.py
+identity:
+  author: inlei
+  description:
+    en_US: Mistral OCR
+    zh_Hans: Mistral OCR
+  icon: icon.svg
+  label:
+    en_US: Mistral OCR
+    zh_Hans: Mistral OCR
+  name: mistral_ocr
+  tags:
+    - image
+    - productivity
+    - other
+tools:
+  - tools/mistral_ocr_tool.yaml

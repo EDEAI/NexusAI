@@ -1,0 +1,38 @@
+identity:
+  name: text_to_voice
+  author: zzm_t
+  label:
+    en_US: text to voice
+    zh_Hans: 文本转语音
+    pt_BR: Texto para voz
+description:
+  human:
+    en_US: text to voice
+    zh_Hans: 文本转语音
+    pt_BR: Texto para voz
+  llm: text to voice
+parameters:
+ - name: text
+   type: string
+   required: true
+   label:
+       en_US: text
+       zh_Hans: 文本
+   human_description:
+       en_US: Text content of the to-be-replaced speech.
+       zh_Hans: 待转语音的文字内容。
+   form: llm
+ - name: voice_name
+   type: string
+   required: true
+   label:
+       en_US: voice_name
+       zh_Hans: 语音模型
+   human_description:
+       en_US: voice name(https://speech.azure.cn/portal/voicegallery)
+       zh_Hans: 语音模型(详见https://speech.azure.cn/portal/voicegallery)
+   form: form
+
+extra:
+  python:
+    source: tools/edge_tts.py

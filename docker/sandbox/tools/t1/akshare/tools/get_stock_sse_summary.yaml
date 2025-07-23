@@ -1,0 +1,17 @@
+identity:
+  author: jingfelix
+  name: get_stock_sse_summary
+  label:
+    zh_Hans: 上证指数全貌
+    en_US: SSE Index Summary
+    zh_Hant: 上證指數全貌
+description:
+  human:
+    zh_Hans: 查询上证指数的整体行情概况。
+    en_US: Query the overall market summary of the SSE Index.
+    zh_Hant: 查詢上證指數的整體行情概況。
+  llm: 查询上证指数的整体行情概况，返回指数点位、涨跌幅、成交量等信息。
+parameters: []
+extra:
+  python: 
+    source: tools/get_stock_sse_summary.py

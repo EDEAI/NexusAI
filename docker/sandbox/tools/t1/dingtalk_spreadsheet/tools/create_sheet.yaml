@@ -1,0 +1,48 @@
+description:
+  human:
+    en_US: Create Sheet
+    zh_Hans: 创建工作表
+  llm: A tool for creating Sheet. (创建工作表)
+extra:
+  python:
+    source: tools/create_sheet.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: Create Sheet
+    zh_Hans: 创建工作表Sheet
+  name: create_sheet
+parameters:
+- form: llm
+  human_description:
+    en_US: The title of the sheet
+    zh_Hans: 工作表的标题
+  label:
+    en_US: sheet Title
+    zh_Hans: 工作表的标题
+  llm_description: 工作表的标题
+  name: title
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID of the table, supports table URL input, e.g., https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+    zh_Hans: 表格的ID，支持表格 URL 输入，如：https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+  label:
+    en_US: Table ID
+    zh_Hans: 表格的链接
+  llm_description: 表格的ID，支持表格 URL 输入，如：https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+  name: table_id
+  required: true
+  type: string

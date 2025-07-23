@@ -1,0 +1,36 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <!-- Grid Background -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M20 0 H0 V20" fill="none" stroke="#e0e0e0" stroke-width="1"></path>
+    </pattern>
+  </defs>
+  <rect width="240" height="240" fill="#ffffff"></rect>
+  <rect width="240" height="240" fill="url(#grid)" opacity="0.2"></rect>
+
+  <!-- Candlestick Chart -->
+  <line x1="60" y1="90" x2="60" y2="140" stroke="#2E7D32" stroke-width="4"></line>
+  <rect x="55" y="100" width="10" height="30" fill="#66BB6A"></rect>
+  
+  <line x1="90" y1="80" x2="90" y2="130" stroke="#C62828" stroke-width="4"></line>
+  <rect x="85" y="110" width="10" height="20" fill="#EF5350"></rect>
+  
+  <line x1="120" y1="85" x2="120" y2="135" stroke="#2E7D32" stroke-width="4"></line>
+  <rect x="115" y="100" width="10" height="25" fill="#66BB6A"></rect>
+  
+  <line x1="150" y1="75" x2="150" y2="125" stroke="#C62828" stroke-width="4"></line>
+  <rect x="145" y="105" width="10" height="15" fill="#EF5350"></rect>
+
+  <!-- Magnifying Glass -->
+  <circle cx="180" cy="180" r="20" stroke="#333" stroke-width="4" fill="none"></circle>
+  <line x1="193" y1="193" x2="210" y2="210" stroke="#333" stroke-width="4" stroke-linecap="round"></line>
+
+  <!-- Plugin Prongs -->
+  <rect x="30" y="200" width="10" height="25" rx="2" fill="#333"></rect>
+  <rect x="48" y="200" width="10" height="25" rx="2" fill="#333"></rect>
+
+  <!-- Optional Text -->
+  <!-- <text x="120" y="230" font-size="14" font-family="Segoe UI, sans-serif" text-anchor="middle" fill="#333">
+    Stock Research Plugin
+  </text> -->
+</svg>

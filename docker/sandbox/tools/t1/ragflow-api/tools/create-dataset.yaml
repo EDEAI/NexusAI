@@ -1,0 +1,37 @@
+identity:
+  name: create-dataset
+  author: witmeng
+  label:
+    en_US: Create Dataset
+    zh_Hans: 創建數據集
+description:
+  human:
+    en_US: Create a new dataset in RagFlow
+    zh_Hans: 在RagFlow中創建新的數據集
+  llm: Create a new dataset in RagFlow
+parameters:
+  - form: llm
+    human_description:
+      en_US: Dataset name
+      zh_Hans: 數據集名稱
+    label:
+      en_US: name
+      zh_Hans: 名稱
+    llm_description: 數據集名稱（必填）
+    name: name
+    required: true
+    type: string
+  - form: llm
+    human_description:
+      en_US: Dataset description
+      zh_Hans: 數據集描述
+    label:
+      en_US: description
+      zh_Hans: 描述
+    llm_description: 數據集描述（選填）
+    name: description
+    required: false
+    type: string
+extra:
+  python:
+    source: tools/create-dataset.py

@@ -1,0 +1,90 @@
+description:
+  human:
+    en_US: Generate videos from images with Doubao (豆包) AI.
+    zh_CN: 使用豆包 AI 由图片生成视频。
+  llm: This tool is used to generate videos from images and text prompts using Doubao (豆包) AI, powered by Volcengine/ByteDance.
+extra:
+  python:
+    source: tools/image2video.py
+identity:
+  author: Allen Writer
+  icon: icon.svg
+  label:
+    en_US: Image to Video
+    zh_CN: 图生视频
+  name: image2video
+parameters:
+- form: llm
+  human_description:
+    en_US: The text prompt used to generate the video. Doubao will generate a video based on this prompt and the input image.
+    zh_CN: 用于生成视频的文本提示。豆包将根据此提示和输入图片生成视频。
+  label:
+    en_US: Prompt
+    zh_CN: 提示词
+  llm_description: This prompt text will be used to guide the video generation from the input image.
+  name: prompt
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The image file to be used for video generation.
+    zh_CN: 用于生成视频的图片文件。
+  label:
+    en_US: Image
+    zh_CN: 图片文件
+  llm_description: Image file that will be transformed into a video.
+  name: image
+  required: true
+  type: file
+- form: form
+  human_description:
+    en_US: The aspect ratio of the generated video. Note that Doubao API currently only supports adaptive ratio.
+    zh_CN: 生成视频的宽高比。请注意，豆包API当前仅支持自适应比例。
+  label:
+    en_US: Aspect Ratio (Reference Only)
+    zh_CN: 宽高比（仅供参考）
+  name: ratio
+  options:
+  - label:
+      en_US: Adaptive (Auto)
+      zh_CN: 自适应（自动）
+    value: "adaptive"
+  - label:
+      en_US: 16:9 (Landscape)
+      zh_CN: 16:9 (横向)
+    value: "16:9"
+  - label:
+      en_US: 9:16 (Portrait)
+      zh_CN: 9:16 (纵向)
+    value: "9:16"
+  - label:
+      en_US: 4:3 (Classic)
+      zh_CN: 4:3 (经典)
+    value: "4:3"
+  - label:
+      en_US: 1:1 (Square)
+      zh_CN: 1:1 (正方形)
+    value: "1:1"
+  required: false
+  type: select
+  default: "adaptive"
+- form: form
+  human_description:
+    en_US: The duration of the generated video in seconds.
+    zh_CN: 生成视频的时长（秒）。
+  label:
+    en_US: Duration (seconds)
+    zh_CN: 时长（秒）
+  name: duration
+  options:
+  - label:
+      en_US: 5 seconds
+      zh_CN: 5秒
+    value: "5"
+  - label:
+      en_US: 10 seconds
+      zh_CN: 10秒
+    value: "10"
+  required: false
+  type: select
+  default: "5"

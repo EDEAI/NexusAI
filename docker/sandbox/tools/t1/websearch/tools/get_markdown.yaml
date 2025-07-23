@@ -1,0 +1,103 @@
+description:
+  human:
+    en_US: A tool to perform convert a webpage to markdown to make it easier for LLMs
+      to understand.
+    zh_Hans: 一个将网页转换为 Markdown 的工具，以便模型更容易理解
+  llm: A tool to perform convert a webpage to markdown to make it easier for LLMs
+    to understand.
+extra:
+  python:
+    source: tools/get_markdown.py
+identity:
+  author: langgenius
+  label:
+    en_US: Get Markdown API
+    zh_Hans: Get Markdown API
+  name: get_markdown
+parameters:
+- form: llm
+  human_description:
+    en_US: URL that you want to grab the content from
+    zh_Hans: 您要从中获取内容的 URL
+  label:
+    en_US: URL
+    zh_Hans: URL
+  llm_description: Defines the link want to grab content from.
+  name: url
+  required: true
+  type: string
+- default: US
+  form: form
+  human_description:
+    en_US: Defines from where you want the search to originate. (For example - New
+      York)
+    zh_Hans: 定义您想要搜索的起始位置。 （例如 - 纽约）
+  label:
+    en_US: Location
+    zh_Hans: 询问
+  llm_description: Defines from where you want the search to originate. (For example
+    - New York)
+  name: location
+  options:
+  - label:
+      en_US: Australia
+      pt_BR: Australia
+      zh_Hans: 澳大利亚
+    value: AU
+  - label:
+      en_US: Brazil
+      pt_BR: Brazil
+      zh_Hans: 巴西
+    value: BR
+  - label:
+      en_US: Canada
+      pt_BR: Canada
+      zh_Hans: 加拿大
+    value: CA
+  - label:
+      en_US: Germany
+      pt_BR: Germany
+      zh_Hans: 德国
+    value: DE
+  - label:
+      en_US: France
+      pt_BR: France
+      zh_Hans: 法国
+    value: FR
+  - label:
+      en_US: United Kingdom
+      pt_BR: United Kingdom
+      zh_Hans: 英国
+    value: GB
+  - label:
+      en_US: United States
+      pt_BR: United States
+      zh_Hans: 美国
+    value: US
+  - label:
+      en_US: Japan
+      pt_BR: Japan
+      zh_Hans: 日本
+    value: JP
+  - label:
+      en_US: India
+      pt_BR: India
+      zh_Hans: 印度
+    value: IN
+  - label:
+      en_US: Korea
+      pt_BR: Korea
+      zh_Hans: 韩国
+    value: KR
+  - label:
+      en_US: Singapore
+      pt_BR: Singapore
+      zh_Hans: 新加坡
+    value: SG
+  - label:
+      en_US: Sweden
+      pt_BR: Sweden
+      zh_Hans: 瑞典
+    value: SE
+  required: false
+  type: string

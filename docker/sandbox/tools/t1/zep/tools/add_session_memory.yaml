@@ -1,0 +1,50 @@
+identity:
+  name: add_session_memory
+  author: obadakhalili
+  label:
+    en_US: Add message to session
+
+description:
+  human:
+    en_US: Add a new message to the session memory
+  llm: Add a new message to the session memory
+
+parameters:
+  - name: session_id
+    type: string
+    required: true
+    label:
+      en_US: Session ID
+    human_description:
+      en_US: The session ID to add the message to
+    llm_description: The session ID to add the message to
+    form: llm
+  - name: message
+    type: string
+    required: true
+    label:
+      en_US: Message Content
+    human_description:
+      en_US: The content of the message to store
+    llm_description: The content of the message to store
+    form: llm
+  - name: role_type
+    type: select
+    required: true
+    options:
+      - value: user
+        label:
+          en_US: User
+      - value: assistant
+        label:
+          en_US: Assistant
+    label:
+      en_US: Role Type
+    human_description:
+      en_US: The role of the message sender (user/assistant)
+    llm_description: The role of the message sender (user/assistant)
+    form: llm
+
+extra:
+  python:
+    source: tools/add_session_memory.py

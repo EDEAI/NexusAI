@@ -1,0 +1,112 @@
+identity:
+  name: save_as_file
+  author: kurokobo
+  label:
+    en_US: Save as File
+    ja_JP: ファイルとして保存
+    zh_Hans: 保存为文件
+    pt_BR: Salvar como Arquivo
+
+description:
+  human:
+    en_US: Save input text or base64 encoded binary data as a file with specified file name and MIME type.
+    ja_JP: 入力テキストまたは Base64 エンコードされたバイナリデータを、指定されたファイル名と MIME タイプでファイルとして保存します。
+    zh_Hans: 将输入文本或 Base64 编码的二进制数据保存为具有指定文件名和 MIME 类型的文件。
+    pt_BR: Salva texto de entrada ou dados binários codificados em Base64 como um arquivo com nome de arquivo e tipo MIME especificados.
+  llm: Save input text or base64 encoded binary data as a file with specified file name and MIME type.
+
+parameters:
+
+  - name: content
+    type: string
+    label:
+      en_US: Content to save
+    human_description:
+      en_US: >-
+        The content to save as a file. This can be plain text or base64 encoded binary data.
+        Choose the appropriate format in the "format" parameter.
+      ja_JP: >-
+        ファイルとして保存するコンテンツ。プレーンテキストまたは Base64 エンコードされたバイナリデータ。
+        "format" パラメータで適切な形式を選択する。
+      zh_Hans: >-
+        要保存为文件的内容。可以是纯文本或 Base64 编码的二进制数据。
+        在 "format" 参数中选择适当的格式。
+      pt_BR: >-
+        O conteúdo a ser salvo como arquivo. Pode ser texto simples ou dados binários codificados em Base64.
+        Escolha o formato apropriado no parâmetro "format".
+    required: true
+    form: llm
+
+  - name: filename
+    type: string
+    label:
+      en_US: File name to save as
+    human_description:
+      en_US: >-
+        The name of the file to save the content as.
+        This should include the file extension (e.g., "output.txt").
+      ja_JP: >-
+        保存するファイル名。
+        ファイル拡張子を含める（例："output.txt"）。
+      zh_Hans: >-
+        保存内容的文件名。
+        应包含文件扩展名（例如："output.txt"）。
+      pt_BR: >-
+        O nome do arquivo para salvar o conteúdo.
+        Deve incluir a extensão do arquivo (por exemplo, "output.txt").
+    required: true
+    default: "output.txt"
+    form: llm
+
+  - name: mime_type
+    type: string
+    label:
+      en_US: MIME type of the file
+    human_description:
+      en_US: >-
+        The MIME type of the file. If not provided, it will be guessed from the file name.
+      ja_JP: >-
+        ファイルの MIME タイプ。提供されない場合、ファイル名から推測される。
+      zh_Hans: >-
+        文件的 MIME 类型。如果未提供，将从文件名猜测。
+      pt_BR: >-
+        O tipo MIME do arquivo. Se não fornecido, será adivinhado a partir do nome do arquivo.
+    required: false
+    default: ""
+    form: llm
+
+  - name: format
+    type: select
+    label:
+      en_US: Format of the content
+    human_description:
+      en_US: >-
+        The format of the content to save.
+        Select "text" to save passed string content as is,
+        or "base64" to save passed content after decoding it from base64.
+      ja_JP: >-
+        コンテンツの形式。
+        渡された文字列コンテンツをそのまま保存する場合は "text" を選択し、
+        Base64 からデコードして保存する場合は "base64" を選択する。
+      zh_Hans: >-
+        要保存的内容格式。
+        选择 "text" 按原样保存传递的字符串内容，
+        或选择 "base64" 在从 Base64 解码后保存传递的内容。
+      pt_BR: >-
+        O formato do conteúdo a ser salvo.
+        Selecione "text" para salvar o conteúdo da string passada como está,
+        ou "base64" para salvar o conteúdo passado após decodificá-lo do Base64.
+    options:
+      - value: "text"
+        label:
+          en_US: "text"
+      - value: "base64"
+        label:
+          en_US: "base64"
+    required: false
+    default: "text"
+    form: form
+
+extra:
+  python:
+    source: tools/save_as_file/save_as_file.py

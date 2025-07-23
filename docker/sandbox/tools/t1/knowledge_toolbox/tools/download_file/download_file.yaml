@@ -1,0 +1,147 @@
+identity:
+  name: download_file
+  author: kurokobo
+  label:
+    en_US: Download File
+    ja_JP: ファイルをダウンロード
+    zh_Hans: 下载文件
+    pt_BR: Baixar arquivo
+
+description:
+  human:
+    en_US: Retrieve the uploaded file in Knowledge as a JSON, download URL, file object, or file content.
+    ja_JP: ナレッジにアップロードしたファイルを JSON、ダウンロード URL、ファイルオブジェクト、またはファイル内容として取得します。
+    zh_Hans: 以 JSON、下载链接、文件对象或文件内容的形式获取已上传到知识库的文件。
+    pt_BR: Recupere o arquivo enviado no Knowledge como JSON, URL de download, objeto de arquivo ou conteúdo do arquivo.
+  llm: Retrieve the uploaded file in Knowledge as a JSON, download URL, file object, or file content.
+
+parameters:
+
+  - name: api_base_url
+    type: string
+    label:
+      en_US: API Base URL
+    human_description:
+      en_US: >-
+        The base URL of the Knowledge API, with trailing "/v1".
+        Example: "https://api.dify.ai/v1", "http://api:5001/v1".
+      ja_JP: >-
+        ナレッジ API のベース URL（末尾に "/v1" を付ける）。
+        例: "https://api.dify.ai/v1", "http://api:5001/v1"。
+      zh_Hans: >-
+        Knowledge API 的基础 URL，结尾带有 "/v1"。
+        例如: "https://api.dify.ai/v1", "http://api:5001/v1"。
+      pt_BR: >-
+        A URL base da API do Knowledge, terminando com "/v1".
+        Exemplo: "https://api.dify.ai/v1", "http://api:5001/v1".
+    required: true
+    default: ""
+    form: llm
+
+  - name: api_key
+    type: secret-input
+    label:
+      en_US: API Key
+    human_description:
+      en_US: >-
+        The API key for the Knowledge API.
+        You can generate it at "Knowledge" -> "API Access" -> "API Key" in the Dify Console.
+      ja_JP: >-
+        ナレッジ API の API キー。
+        Dify のコンソールの "Knowledge" -> "API Access" -> "API Key" で発行できる。
+      zh_Hans: >-
+        Knowledge API 的 API 密钥。
+        可以在 Dify 控制台的“Knowledge”->“API Access”->“API Key”中生成。
+      pt_BR: >-
+        A chave de API para o Knowledge API。
+        Você pode gerá-la em "Knowledge" -> "API Access" -> "API Key" no Console Dify.
+    required: true
+    default: ""
+    form: llm
+
+  - name: knowledge_id
+    type: string
+    label:
+      en_US: Knowledge ID
+    human_description:
+      en_US: >-
+        The ID of the Knowledge to retrieve the uploaded file from.
+        You can find this ID in the URL of each Knowledge page (/datasets/<knowledge_id>).
+      ja_JP: >-
+        アップロードしたファイルを取得するナレッジの ID。
+        各ナレッジのページの URL（/datasets/<knowledge_id>）で確認できる。
+      zh_Hans: >-
+        要获取已上传文件的知识库 ID。
+        可以在每个知识库页面的 URL（/datasets/<knowledge_id>）中找到。
+      pt_BR: >-
+        O ID do Knowledge de onde recuperar o arquivo enviado。
+        Você pode encontrar esse ID na URL de cada página do Knowledge (/datasets/<knowledge_id>)。
+    required: true
+    default: ""
+    form: llm
+
+  - name: document_id
+    type: string
+    label:
+      en_US: Document ID
+    human_description:
+      en_US: >-
+        The ID of the document in the Knowledge to retrieve.
+        You can find this ID in the URL of each document page (/datasets/<knowledge_id>/documents/<document_id>).
+      ja_JP: >-
+        取得するドキュメントの ID。
+        各ドキュメントページの URL（/datasets/<knowledge_id>/documents/<document_id>）で確認できる。
+      zh_Hans: >-
+        要获取的知识库中文档的 ID。
+        可以在每个文档页面的 URL（/datasets/<knowledge_id>/documents/<document_id>）中找到。
+      pt_BR: >-
+        O ID do documento no Knowledge a ser recuperado。
+        Você pode encontrar esse ID na URL de cada página de documento (/datasets/<knowledge_id>/documents/<document_id>)。
+    required: true
+    default: ""
+    form: llm
+
+  - name: format
+    type: select
+    label:
+      en_US: Format of the output
+    human_description:
+      en_US: >-
+        Format of the output.
+        "json" for JSON string, "url" for download URL, "link" for Markdown download link, "file" for file object, "content" for file content.
+        Default is "url".
+      ja_JP: >-
+        出力のフォーマット。
+        "json" は JSON 文字列、"url" はダウンロード URL、"link" は Markdown のダウンロードリンク、"file" はファイルオブジェクト、"content" はファイル内容。
+        デフォルトは "url"。
+      zh_Hans: >-
+        输出的格式。
+        "json" 表示 JSON 字符串，"url" 表示下载链接，"link" 表示 Markdown 下载链接，"file" 表示文件对象，"content" 表示文件内容。
+        默认是 "url"。
+      pt_BR: >-
+        Formato da saída.
+        "json" para string JSON, "url" para URL de download, "link" para link de download em Markdown, "file" para objeto de arquivo, "content" para conteúdo do arquivo.
+        O padrão é "url"。
+    options:
+      - value: "json"
+        label:
+          en_US: "json"
+      - value: "url"
+        label:
+          en_US: "url"
+      - value: "link"
+        label:
+          en_US: "link"
+      - value: "file"
+        label:
+          en_US: "file"
+      - value: "content"
+        label:
+          en_US: "content"
+    required: true
+    default: "url"
+    form: form
+
+extra:
+  python:
+    source: tools/download_file/download_file.py

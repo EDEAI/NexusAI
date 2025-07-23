@@ -1,0 +1,13 @@
+identity:
+  author: mystery0
+  name: remove_markdown
+  label:
+    en_US: Remove Markdown
+  description:
+    en_US: Remove Markdown formatting from LLM output
+  icon: icon.svg
+tools:
+  - tools/remove_markdown.yaml
+extra:
+  python:
+    source: provider/remove_markdown.py

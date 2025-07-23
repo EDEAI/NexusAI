@@ -1,0 +1,19 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background square -->
+  <rect width="100" height="100" fill="#2563eb" rx="8"/>
+
+  <!-- JSON brackets -->
+  <path d="M20 30 Q15 30 15 35 L15 45 Q15 50 10 50 Q15 50 15 55 L15 65 Q15 70 20 70"
+        stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <path d="M80 30 Q85 30 85 35 L85 45 Q85 50 90 50 Q85 50 85 55 L85 65 Q85 70 80 70"
+        stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <!-- Hammer icon in center -->
+  <g transform="translate(50,50) rotate(-45)">
+    <!-- Handle -->
+    <rect x="-1.5" y="-8" width="3" height="16" fill="white" rx="1.5"/>
+    <!-- Hammer head -->
+    <rect x="-6" y="-12" width="12" height="6" fill="white" rx="1"/>
+  </g>
+</svg>

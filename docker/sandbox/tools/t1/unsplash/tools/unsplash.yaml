@@ -1,0 +1,162 @@
+identity:
+  name: search
+  author: stvlynn
+  label:
+    en_US: Search Photos
+    zh_Hans: 搜索图片
+    pt_BR: Pesquisar Fotos
+description:
+  human:
+    en_US: Search for high-quality photos on Unsplash based on keywords
+    zh_Hans: 根据关键词在Unsplash上搜索高质量图片
+    pt_BR: Pesquise fotos de alta qualidade no Unsplash com base em palavras-chave
+  llm: A tool for searching high-quality photos on Unsplash. Input should be a search query or keywords.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Search Query
+      zh_Hans: 搜索关键词
+      pt_BR: Consulta de Pesquisa
+    human_description:
+      en_US: Keywords to search for photos
+      zh_Hans: 用于搜索图片的关键词
+      pt_BR: Palavras-chave para pesquisar fotos
+    llm_description: The search query or keywords to find photos on Unsplash
+    form: llm
+  - name: per_page
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Results Per Page
+      zh_Hans: 每页结果数
+      pt_BR: Resultados Por Página
+    human_description:
+      en_US: Number of photos to return (max 30)
+      zh_Hans: 返回的图片数量（最多30张）
+      pt_BR: Número de fotos a retornar (máximo 30)
+    llm_description: Number of photos to return in the results (maximum 30)
+    form: llm
+  - name: orientation
+    type: select
+    required: false
+    label:
+      en_US: Orientation
+      zh_Hans: 图片方向
+      pt_BR: Orientação
+    human_description:
+      en_US: Filter by photo orientation
+      zh_Hans: 按照图片方向过滤
+      pt_BR: Filtrar por orientação de foto
+    llm_description: Filter photos by orientation (landscape, portrait, squarish)
+    form: form
+    options:
+      - label:
+          en_US: Landscape
+          zh_Hans: 横向
+          pt_BR: Paisagem
+        value: landscape
+      - label:
+          en_US: Portrait
+          zh_Hans: 纵向
+          pt_BR: Retrato
+        value: portrait
+      - label:
+          en_US: Square
+          zh_Hans: 方形
+          pt_BR: Quadrado
+        value: squarish
+  - name: color
+    type: select
+    required: false
+    label:
+      en_US: Color
+      zh_Hans: 颜色
+      pt_BR: Cor
+    human_description:
+      en_US: Filter by dominant color in the photo
+      zh_Hans: 按照图片主色调过滤
+      pt_BR: Filtrar pela cor dominante na foto
+    llm_description: Filter results by color
+    form: form
+    options:
+      - label:
+          en_US: Black and White
+          zh_Hans: 黑白
+          pt_BR: Preto e Branco
+        value: black_and_white
+      - label:
+          en_US: Black
+          zh_Hans: 黑色
+          pt_BR: Preto
+        value: black
+      - label:
+          en_US: White
+          zh_Hans: 白色
+          pt_BR: Branco
+        value: white
+      - label:
+          en_US: Yellow
+          zh_Hans: 黄色
+          pt_BR: Amarelo
+        value: yellow
+      - label:
+          en_US: Orange
+          zh_Hans: 橙色
+          pt_BR: Laranja
+        value: orange
+      - label:
+          en_US: Red
+          zh_Hans: 红色
+          pt_BR: Vermelho
+        value: red
+      - label:
+          en_US: Purple
+          zh_Hans: 紫色
+          pt_BR: Roxo
+        value: purple
+      - label:
+          en_US: Magenta
+          zh_Hans: 品红
+          pt_BR: Magenta
+        value: magenta
+      - label:
+          en_US: Green
+          zh_Hans: 绿色
+          pt_BR: Verde
+        value: green
+      - label:
+          en_US: Teal
+          zh_Hans: 青色
+          pt_BR: Azul-petróleo
+        value: teal
+      - label:
+          en_US: Blue
+          zh_Hans: 蓝色
+          pt_BR: Azul
+        value: blue
+output_schema:
+  type: object
+  properties:
+    photos:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          description:
+            type: string
+          alt_description:
+            type: string
+          urls:
+            type: object
+          user:
+            type: object
+          links:
+            type: object
+extra:
+  python:
+    source: tools/unsplash.py

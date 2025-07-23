@@ -1,0 +1,82 @@
+identity:
+  name: search-flights
+  author: ayush3941
+  label:
+    en_US: Search Flights
+    zh_Hans: 搜索航班
+    pt_BR: Buscar Voos
+  icon: "icon.png"
+  description:
+    en_US: Search available flights using the Amadeus API.
+    zh_Hans: 使用 Amadeus API 搜索可用航班。
+    pt_BR: Pesquise voos disponíveis usando a API Amadeus.
+
+description:
+  human:
+    en_US: Search available flights between two locations
+    zh_Hans: 搜索两个地点之间的航班
+    pt_BR: Buscar voos disponíveis entre dois locais
+  llm: Search for flights from origin to destination
+
+parameters:
+  - name: origin
+    type: string
+    required: true
+    label:
+      en_US: Origin Airport Code
+      zh_Hans: 出发机场代码
+      pt_BR: Código do aeroporto de origem
+    human_description:
+      en_US: 3-letter IATA code for departure airport
+      zh_Hans: 出发机场的3字母IATA代码
+      pt_BR: Código IATA de 3 letras do aeroporto de partida
+    llm_description: Departure airport IATA code
+    form: llm
+
+  - name: destination
+    type: string
+    required: true
+    label:
+      en_US: Destination Airport Code
+      zh_Hans: 目的地机场代码
+      pt_BR: Código do aeroporto de destino
+    human_description:
+      en_US: 3-letter IATA code for arrival airport
+      zh_Hans: 到达机场的3字母IATA代码
+      pt_BR: Código IATA de 3 letras do aeroporto de destino
+    llm_description: Arrival airport IATA code
+    form: llm
+
+  - name: departure_date
+    type: string
+    required: true
+    label:
+      en_US: Departure Date
+      zh_Hans: 出发日期
+      pt_BR: Data de partida
+    human_description:
+      en_US: Date of departure in YYYY-MM-DD format
+      zh_Hans: 出发日期（格式：YYYY-MM-DD）
+      pt_BR: Data de partida no formato AAAA-MM-DD
+    llm_description: Date of flight departure
+    form: llm
+
+  - name: adults
+    type: number
+    required: false
+    label:
+      en_US: Number of Adults
+      zh_Hans: 成人数量
+      pt_BR: Número de adultos
+    human_description:
+      en_US: Number of adult passengers
+      zh_Hans: 成人乘客数量
+      pt_BR: Número de passageiros adultos
+    llm_description: Total number of adults
+    form: llm
+
+
+
+extra:
+  python:
+    source: tools/search-flights.py

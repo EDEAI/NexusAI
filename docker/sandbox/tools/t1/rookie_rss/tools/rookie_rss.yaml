@@ -1,0 +1,80 @@
+identity:
+  name: rookie_rss
+  author: jaguarliuu
+  label:
+    en_US: rookie_rss
+    zh_Hans: rookie_rss
+    pt_BR: rookie_rss
+description:
+  human:
+    en_US: rookie rss 多平台新闻聚合插件
+    zh_Hans: rookie rss 多平台新闻聚合插件
+    pt_BR: rookie rss 多平台新闻聚合插件
+  llm: rookie rss 多平台新闻聚合插件
+parameters:
+  - name: platform
+    type: select
+    required: true
+    form: form
+    description: 平台名称
+    llm_description: 平台名称
+    human_description: 
+      en_US: platform name
+      zh_Hans: 平台名称
+    label:
+      en_US: platform
+      zh_Hans: 平台名称
+    options:
+      - label:
+          en_US: zhihu
+          zh_Hans: 知乎
+        value: zhihu
+      - label:
+          en_US: juejin
+          zh_Hans: 掘金
+        value: juejin
+      - label:
+          en_US: bilibili
+          zh_Hans: bilibili
+        value: bilibili
+      - label:
+          en_US: ac_fun
+          zh_Hans: ac_fun
+        value: acfun
+      - label:
+          en_US: weibo
+          zh_Hans: 微博
+        value: weibo
+      - label:
+          en_US: toutiao
+          zh_Hans: 今日头条
+        value: toutiao
+      - label:
+          en_US: 36kr
+          zh_Hans: 36kr
+        value: 36kr
+      - label:
+          en_US: huxiu  
+          zh_Hans: 虎嗅
+        value: huxiu
+      - label:
+          en_US: hellogithub
+          zh_Hans: hellogithub
+        value: hellogithub
+  - name: result_num
+    type: number
+    required: true
+    min: 1
+    max: 10
+    form: form
+    description: 返回结果数量
+    llm_description:  返回结果数量
+    human_description: 
+      en_US: result number
+      zh_Hans: 返回结果数量
+    label:
+      en_US:  result number
+      zh_Hans: 返回结果数量
+extra:
+  python:
+    source: tools/rookie_rss.py

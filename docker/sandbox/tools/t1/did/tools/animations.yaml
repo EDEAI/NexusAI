@@ -1,0 +1,97 @@
+description:
+  human:
+    en_US: Animations enables to create videos matching head movements, expressions,
+      emotions, and voice from a driver video and image.
+  llm: Animations enables to create videos matching head movements, expressions, emotions,
+    and voice from a driver video and image.
+extra:
+  python:
+    source: tools/animations.py
+identity:
+  author: Matri Qi
+  label:
+    en_US: Animations
+  name: animations
+parameters:
+- form: llm
+  human_description:
+    en_US: The URL of the source image to be animated by the driver video, or a selection
+      from the list of provided studio actors.
+  label:
+    en_US: source url
+  llm_description: The URL of the source image to be animated by the driver video,
+    or a selection from the list of provided studio actors.
+  name: source_url
+  required: true
+  type: string
+- form: form
+  human_description:
+    en_US: The URL of the driver video to drive the animation, or a provided driver
+      name from D-ID.
+  label:
+    en_US: driver url
+  name: driver_url
+  required: false
+  type: string
+- form: form
+  human_description:
+    en_US: Mutes the driver sound in the animated video result, defaults to true
+  label:
+    en_US: mute
+  name: mute
+  required: false
+  type: boolean
+- form: form
+  human_description:
+    en_US: If enabled, the driver video will be stitched with the animationing head
+      video.
+  label:
+    en_US: stitch
+  name: stitch
+  required: false
+  type: boolean
+- form: form
+  human_description:
+    en_US: The URL of the logo image to be added to the animation video.
+  label:
+    en_US: logo url
+  name: logo_url
+  required: false
+  type: string
+- form: form
+  human_description:
+    en_US: The x position of the logo image in the animation video. It's required
+      when logo url is provided.
+  label:
+    en_US: logo position x
+  name: logo_x
+  required: false
+  type: number
+- form: form
+  human_description:
+    en_US: The y position of the logo image in the animation video. It's required
+      when logo url is provided.
+  label:
+    en_US: logo position y
+  name: logo_y
+  required: false
+  type: number
+- default: mp4
+  form: form
+  human_description:
+    en_US: The format of the result video.
+  label:
+    en_US: result format
+  name: result_format
+  options:
+  - label:
+      en_US: mp4
+    value: mp4
+  - label:
+      en_US: gif
+    value: gif
+  - label:
+      en_US: mov
+    value: mov
+  required: false
+  type: string

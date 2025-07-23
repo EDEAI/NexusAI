@@ -1,0 +1,20 @@
+identity:
+  author: kurokobo
+  name: knowledge_toolbox
+  label:
+    en_US: Knowledge Toolbox
+  description:
+    en_US: Small tools for working with Dify Knowledge API.
+    ja_JP: Dify のナレッジ API を操作する小さなツール集。
+    zh_Hans: 用于操作 Dify Knowledge API 的小工具集。
+    pt_BR: Pequenas ferramentas para trabalhar com a Dify Knowledge API.
+  icon: icon.svg
+
+tools:
+  - tools/add_file_url_to_citations/add_file_url_to_citations.yaml
+  - tools/download_file/download_file.yaml
+  - tools/get_full_doc/get_full_doc.yaml
+
+extra:
+  python:
+    source: provider/knowledge_toolbox.py

@@ -1,0 +1,81 @@
+description:
+  human:
+    en_US: List Records in AI Table Sheet
+    zh_Hans: 获取AI表格数据表中的记录列表
+  llm: A tool for listing records in an AI Table sheet. (获取AI表格数据表中的记录列表)
+extra:
+  python:
+    source: tools/list_records_ai.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: List Records in AI Table Sheet
+    zh_Hans: 获取AI表格数据表中的记录列表
+  name: list_records_ai
+parameters:
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID of the AI Table (baseId)
+    zh_Hans: AI表格的ID (baseId)
+  label:
+    en_US: Base ID
+    zh_Hans: AI表格ID
+  llm_description: AI表格的ID (baseId)
+  name: base_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID or name of the sheet
+    zh_Hans: 数据表ID或名称
+  label:
+    en_US: Sheet ID or Name
+    zh_Hans: 数据表ID或名称
+  llm_description: 数据表ID或名称
+  name: sheet_id_or_name
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Filter conditions for listing records, e.g., {"combination":"and","conditions":[{"field":"Field1","operator":"equal","value":["Value1"]}]}
+    zh_Hans: 记录列表的筛选条件JSON，例如：{"combination":"and","conditions":[{"field":"字段1","operator":"equal","value":["值1"]}]}
+  label:
+    en_US: filter
+    zh_Hans: 筛选条件
+  llm_description: 筛选条件JSON对象，包含combination（and/or）和conditions数组，例如：{"combination":"and","conditions":[{"field":"字段1","operator":"equal","value":["值1"]}]}
+  name: filter
+  required: false
+  type: string 
+- form: llm
+  human_description:
+    en_US: Maximum number of records to return (default 100, max 100)
+    zh_Hans: 返回的最大记录数（默认100，最大100）
+  label:
+    en_US: Max Results
+    zh_Hans: 最大记录数
+  llm_description: 返回的最大记录数（默认100，最大100）
+  name: max_results
+  required: false
+  type: number
+- form: llm
+  human_description:
+    en_US: Token for pagination, use the nextToken from previous response
+    zh_Hans: 分页令牌，使用上一次响应中的nextToken，初次调用可不填
+  label:
+    en_US: Next Token
+    zh_Hans: 分页令牌
+  llm_description: 分页令牌，使用上一次响应中的nextToken，初次调用可不填
+  name: next_token
+  required: false
+  type: string 

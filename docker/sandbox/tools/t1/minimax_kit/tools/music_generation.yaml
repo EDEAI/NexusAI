@@ -1,0 +1,64 @@
+identity:
+  name: music_generation
+  author: quicksandzn
+  label:
+    en_US: Music Generation
+    zh_Hans: 音乐生成
+description:
+  human:
+    en_US: Music Generation
+    zh_Hans: 音乐生成
+  llm: Music Generation
+parameters:
+  - name: model
+    type: select
+    required: true
+    options:
+      - value: music-01
+        label:
+          en_US: music-01
+          zh_Hans: music-01
+    default: music-01
+    label:
+      en_US: Model Name
+      zh_Hans: 模型名称
+    human_description:
+      en_US: Model Name
+      zh_CN: 模型名称
+    form: form
+  - name: song
+    type: file
+    required: true
+    label:
+      en_US: Song File
+      zh_Hans: 歌曲文件
+    human_description:
+      en_US: Song File
+      zh_CN: 歌曲文件
+    form: llm
+  - name: refer_vocal
+    type: string
+    required: false
+    label:
+      en_US: Voice ID
+      zh_Hans: 声音ID
+    human_description:
+      en_US: The sound ID used to replace the generated music timbre when generating music
+      zh_CN: 生成音乐时用来替换生成音乐音色的声音ID
+    form: form
+  - name: lyrics
+    type: string
+    required: false
+    label:
+      en_US: Lyrics
+      zh_Hans: 歌词
+    help:
+        en_US: "Lyrics: Use line breaks (\n) to separate each line of lyrics. Use two consecutive line breaks (\n\n) to add pauses in the middle of the lyrics. Use double hyphens (##) at the beginning and end to add accompaniment. Supports up to 200 characters (each Chinese character, punctuation mark, and letter counts as one character)."
+        zh_CN: "歌词，使用换行符（\n）分隔每行歌词，使用两个连续换行符（\n\n）可以在歌词中间添加停顿，使用双井号（##）添加在首尾可以添加伴奏，支持最长200字符（每个汉字、标点和字母都算1个字符）。"
+    human_description:
+      en_US: Lyrics
+      zh_CN: 歌词
+    form: llm
+extra:
+  python:
+    source: tools/music_generation.py

@@ -1,0 +1,30 @@
+identity:
+  name: "baidu-ocr"
+  author: "bionhw"
+  label:
+    en_US: "baidu-ocr"
+    zh_Hans: "baidu-ocr"
+    pt_BR: "baidu-ocr"
+description:
+  human:
+    en_US: "Baidu OCR plugin for text recognition"
+    zh_Hans: "Baidu OCR plugin for text recognition"
+    pt_BR: "Baidu OCR plugin for text recognition"
+  llm: "Baidu OCR plugin for text recognition"
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: "Baidu OCR plugin for text recognition"
+      zh_Hans: "Baidu OCR plugin for text recognition"
+      pt_BR: "Baidu OCR plugin for text recognition"
+    llm_description: "Baidu OCR plugin for text recognition"
+    form: llm
+extra:
+  python:
+    source: tools/baidu-ocr.py

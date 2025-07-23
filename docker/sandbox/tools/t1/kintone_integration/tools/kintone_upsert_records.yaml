@@ -1,0 +1,66 @@
+identity:
+  name: kintone_upsert_records
+  author: r3-yamauchi
+  label:
+    en_US: kintone Upsert Records
+    zh_Hans: kintone Upsert Records
+    ja_JP: kintone レコード一括更新/追加
+    pt_BR: kintone Upsert Records
+description:
+  human:
+    en_US: Update or insert multiple records to kintone app
+    zh_Hans: Update or insert multiple records to kintone app
+    ja_JP: kintoneアプリに複数レコードを更新または追加
+    pt_BR: Update or insert multiple records to kintone app
+  llm: Update or insert multiple records to kintone app
+parameters:
+  - name: kintone_domain
+    type: string
+    required: true
+    label:
+      en_US: "kintone Domain"
+      ja_JP: "cybozu.com ドメイン"
+    human_description:
+      en_US: "Your kintone domain (e.g., your-subdomain.cybozu.com)"
+      ja_JP: "お使いのkintoneのURLのうち、https:// より後ろの部分（例: your-subdomain.cybozu.com）"
+    llm_description: kintone domain where the app is hosted
+    form: llm
+
+  - name: kintone_app_id
+    type: number
+    required: true
+    label:
+      en_US: "kintone App ID"
+      ja_JP: "kintone アプリID"
+    human_description:
+      en_US: "The ID of your kintone application"
+      ja_JP: "使用するkintoneアプリのID"
+    llm_description: ID of the kintone app to update or add records to
+    form: llm
+
+  - name: kintone_api_token
+    type: secret-input
+    required: true
+    label:
+      en_US: "kintone API Token"
+      ja_JP: "対象の kintoneアプリの APIトークン"
+    human_description:
+      en_US: "API token generated from your kintone app with update and add record permissions"
+      ja_JP: "kintone アプリで発行した更新・追加権限を持つAPIトークン"
+    llm_description: API token with update and add record permissions for the kintone app
+    form: llm
+
+  - name: records_data
+    type: string
+    required: true
+    label:
+      en_US: "Records Data"
+      ja_JP: "レコードデータ"
+    human_description:
+      en_US: "JSON format data for multiple records. For updates, include 'updateKey' field. Format: {\"records\": [{\"updateKey\": {\"field\": \"field_code\", \"value\": \"value\"}, \"record\": {\"field_code1\": {\"value\": \"value1\"}}}, ...]}"
+      ja_JP: "複数レコードのJSONフォーマットデータ。更新の場合は'updateKey'フィールドを含めてください。形式: {\"records\": [{\"updateKey\": {\"field\": \"フィールドコード\", \"value\": \"値\"}, \"record\": {\"フィールドコード1\": {\"value\": \"値1\"}}}, ...]}"
+    llm_description: "JSON format data for multiple records to update or insert in kintone. For updates, include 'updateKey' field."
+    form: llm
+extra:
+  python:
+    source: tools/kintone_upsert_records.py

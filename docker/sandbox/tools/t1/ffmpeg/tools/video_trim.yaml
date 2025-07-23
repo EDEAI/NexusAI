@@ -1,0 +1,56 @@
+identity:
+  name: video_trim
+  author: stvlynn
+  label:
+    en_US: Trim Video
+    zh_Hans: 视频裁剪
+    pt_BR: Cortar Vídeo
+description:
+  human:
+    en_US: Trim a video to extract a specific section
+    zh_Hans: 剪切视频以提取特定部分
+    pt_BR: Cortar um vídeo para extrair uma seção específica
+  llm: "Extracts a portion of a video between specified start and end times. Maintains the original video format and quality."
+parameters:
+  - name: video
+    type: file
+    required: true
+    label:
+      en_US: Video File
+      zh_Hans: 视频文件
+      pt_BR: Arquivo de Vídeo
+    human_description:
+      en_US: The video file to trim
+      zh_Hans: 要剪切的视频文件
+      pt_BR: O arquivo de vídeo para cortar
+    llm_description: "The video file to trim a section from"
+    form: llm
+  - name: start_time
+    type: string
+    required: true
+    label:
+      en_US: Start Time
+      zh_Hans: 开始时间
+      pt_BR: Tempo Inicial
+    human_description:
+      en_US: The start time in format HH:MM:SS or seconds
+      zh_Hans: 开始时间，格式为 HH:MM:SS 或秒数
+      pt_BR: O tempo inicial no formato HH:MM:SS ou em segundos
+    llm_description: "The start time of the trimmed section. Format can be HH:MM:SS or seconds (e.g. '00:01:30' or '90')"
+    form: llm
+  - name: end_time
+    type: string
+    required: true
+    label:
+      en_US: End Time
+      zh_Hans: 结束时间
+      pt_BR: Tempo Final
+    human_description:
+      en_US: The end time in format HH:MM:SS or seconds
+      zh_Hans: 结束时间，格式为 HH:MM:SS 或秒数
+      pt_BR: O tempo final no formato HH:MM:SS ou em segundos
+    llm_description: "The end time of the trimmed section. Format can be HH:MM:SS or seconds (e.g. '00:02:45' or '165')"
+    form: llm
+extra:
+  python:
+    source: tools/video_trim.py 

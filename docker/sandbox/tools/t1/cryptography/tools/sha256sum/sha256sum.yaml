@@ -1,0 +1,26 @@
+identity:
+  name: sha256sum
+  author: bowenliang123
+  label:
+    en_US: SHA256 File Checksum (sha256sum)
+    zh_Hans: SHA256 文件哈希 (sha256sum)
+description:
+  human:
+    en_US: Generate SHA-256 hash of file
+    zh_Hans: 生成文件的 SHA-256 哈希值
+  llm: Generate SHA-256 hash of file
+parameters:
+  - name: input_file
+    type: file
+    required: true
+    label:
+      en_US: Input File
+      zh_Hans: 输入文件
+    human_description:
+      en_US: Input File
+      zh_Hans: 输入文件
+    llm_description: The file to generate SHA-256 hash for
+    form: llm
+extra:
+  python:
+    source: tools/sha256sum/sha256sum.py

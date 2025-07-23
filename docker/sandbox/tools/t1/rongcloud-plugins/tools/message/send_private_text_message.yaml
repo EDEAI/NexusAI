@@ -1,0 +1,208 @@
+identity:
+  name: send_private_text_message
+  label:
+    en_US: Send Private Text Message
+    zh_Hans: 发送单聊文本消息
+  icon: rongcloud_logo.svg
+  author: rongcloud
+  version: 1.0.0
+  email: support@dify.ai
+
+description:
+  human:
+    en_US: Send a private text message via RongCloud, need to provide sender user ID, receiver user ID and message content, return 200 success, return message ID, receiver user ID supports multiple, up to 1000 per call, separated by commas, for example "123,456,789"
+    zh_Hans: 通过融云发送单聊文本消息, 需要提供发送者用户 ID、接收者用户 ID 和消息内容，返回 200 成功，同时返回消息 ID,接收者用户 ID 支持多个，最多不超过 1000 个，用逗号分隔，例如 "123,456,789"
+  llm: Send a private text message via RongCloud, need to provide sender user ID, receiver user ID and message content, return 200 success, return message ID, receiver user ID supports multiple, up to 1000 per call, separated by commas, for example "123,456,789"
+  
+extra:
+  python:
+    source: tools/message/send_private_text_message.py
+
+parameters:
+  - name: from_user_id
+    label:
+      en_US: Sender User ID
+      zh_Hans: 发送者用户 ID
+    human_description:
+      en_US: The user ID of the sender
+      zh_Hans: 发送消息的用户ID
+    llm_description: The user ID of the sender
+    form: llm
+    type: string
+    required: true
+  - name: to_user_id
+    label:
+      en_US: Receiver User ID
+      zh_Hans: 接收者用户 ID
+    human_description:
+      en_US: Recipient user IDs. Supports sending to multiple users, up to 1000 per call, separated by commas, for example "123,456,789"
+      zh_Hans: 接收消息的用户ID, 最多支持 1000 个用户 ID, 用逗号分隔, 例如 "123,456,789"
+    llm_description: Recipient user IDs. Supports sending to multiple users, up to 1000 per call, separated by commas, for example "123,456,789"
+    form: llm
+    type: string
+    required: true
+  # - name: object_name
+  #   label:
+  #     en_US: Message Type
+  #     zh_Hans: 消息类型
+  #   human_description:
+  #     en_US: The type of message to send
+  #     zh_Hans: 要发送的消息类型
+  #   llm_description: The type of message to send
+  #   form: llm
+  #   type: string
+  #   required: true
+  - name: content
+    label:
+      en_US: Message Content
+      zh_Hans: 消息内容
+    human_description:
+      en_US: The content of the message
+      zh_Hans: 消息内容
+    llm_description: The content of the message
+    form: llm
+    type: string
+    required: true
+  # - name: push_content
+  #   label:
+  #     en_US: Push Content
+  #     zh_Hans: 推送内容
+  #   human_description:
+  #     en_US: The content of the push message
+  #     zh_Hans: 推送内容
+  #   llm_description: The content of the push message
+  #   form: llm
+  #   type: string
+  #   required: false
+  # - name: push_data
+  #   label:
+  #     en_US: Push Data
+  #     zh_Hans: 推送数据
+  #   human_description:
+  #     en_US: The data of the push message
+  #     zh_Hans: 推送数据
+  #   llm_description: The data of the push message
+  #   form: llm
+  #   type: string
+  #   required: false
+  # - name: is_include_sender
+  #   label:
+  #     en_US: Include Sender
+  #     zh_Hans: 是否包含发送者
+  #   human_description:
+  #     en_US: Whether to include the sender in the message
+  #     zh_Hans: 是否包含发送者
+  #   llm_description: Whether to include the sender in the message
+  #   form: llm
+  #   type: number
+  #   required: false
+  # - name: count
+  #   label:
+  #     en_US: iOS Badge Count
+  #     zh_Hans: iOS 角标未读消息数量
+  #   human_description:
+  #     en_US: The number of unread messages for the iOS badge
+  #     zh_Hans: iOS 角标未读消息数量
+  #   llm_description: The number of unread messages for the iOS badge
+  #   form: llm
+  #   type: number
+  #   required: false
+  # - name: verify_blacklist
+  #   label:
+  #     en_US: Verify Blacklist
+  #     zh_Hans: 验证黑名单
+  #   human_description:
+  #     en_US: Whether to verify the blacklist
+  #     zh_Hans: 是否验证黑名单
+  #   llm_description: Whether to verify the blacklist
+  #   form: llm
+  #   type: number
+  #   required: false
+  # - name: is_persisted
+  #   label:
+  #     en_US: Is Persisted
+  #     zh_Hans: 是否存储 
+  #   human_description:
+  #     en_US: Whether to persist the message
+  #     zh_Hans: 是否存储消息
+  #   llm_description: Whether to persist the message
+  #   form: llm
+  #   type: number
+  #   required: false
+  # - name: content_available
+  #   label:
+  #     en_US: iOS Content Available
+  #     zh_Hans: iOS 静默推送
+  #   human_description:
+  #     en_US: Whether the content is available for silent push
+  #     zh_Hans: 内容是否可用静默推送
+  #   llm_description: Whether the content is available for silent push
+  #   form: llm
+  #   type: number
+  #   required: false
+  # - name: expansion
+  #   label:
+  #     en_US: Expansion
+  #     zh_Hans: 是否支持扩展
+  #   human_description:
+  #     en_US: Whether to support expansion
+  #     zh_Hans: 是否支持扩展
+  #   llm_description: Whether to support expansion
+  #   form: llm
+  #   type: boolean
+  #   required: false
+  # - name: extra_content
+  #   label:
+  #     en_US: Extra Content
+  #     zh_Hans: 消息扩展内容
+  #   human_description:
+  #     en_US: The extra content of the message
+  #     zh_Hans: 消息扩展内容
+  #   llm_description: The extra content of the message
+  #   form: llm
+  #   type: string
+  #   required: false
+  # - name: disable_push
+  #   label:
+  #     en_US: Disable Push
+  #     zh_Hans: 是否禁用推送
+  #   human_description:
+  #     en_US: Whether to disable push
+  #     zh_Hans: 是否禁用推送
+  #   llm_description: Whether to disable push
+  #   form: llm
+  #   type: boolean
+  #   required: false
+  # - name: push_ext
+  #   label:
+  #     en_US: Push Extra
+  #     zh_Hans: 推送扩展
+  #   human_description:
+  #     en_US: The extra of the push message
+  #     zh_Hans: 推送扩展
+  #   llm_description: The extra of the push message
+  #   form: llm
+  #   type: string
+  #   required: false
+  # - name: disable_update_last_msg
+  #   label:
+  #     en_US: Disable Update Last Message
+  #     zh_Hans:  是否禁止更新会话最后一条消息
+  #   human_description:
+  #     en_US: Whether to disable updating the last message of the conversation
+  #     zh_Hans: 是否禁止更新会话最后一条消息
+  #   llm_description: Whether to disable updating the last message
+  #   form: llm
+  #   type: boolean 
+  #   required: false
+  # - name: need_read_receipt
+  #   label:
+  #     en_US: Need Read Receipt
+  #     zh_Hans: 是否需要已读回执
+  #   human_description:
+  #     en_US: Whether to need read receipt
+  #     zh_Hans: 是否需要已读回执
+  #   llm_description: Whether to need read receipt
+  #   form: llm
+  #   type: number
+  #   required: false

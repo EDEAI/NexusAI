@@ -1,0 +1,29 @@
+identity:
+  author: xmindltd
+  name: mapify
+  label:
+    en_US: Mapify
+    zh_Hans: Mapify
+    pt_BR: Mapify
+  description:
+    en_US: Transform text, YouTube videos, and web content into beautiful mind maps using AI
+    zh_Hans: 使用AI将文本、YouTube视频和网页内容转化为精美的思维导图
+    pt_BR: Transform text, YouTube videos, and web content into beautiful mind maps using AI
+  icon: icon.svg
+credentials_for_provider:
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: API Key
+      zh_Hans: API密钥
+      pt_BR: API Key
+    human_description:
+      en_US: Enter your API key for the service
+      zh_Hans: 输入您的服务API密钥
+      pt_BR: Enter your API key for the service
+tools:
+  - tools/mapify.yaml
+extra:
+  python:
+    source: provider/mapify.py

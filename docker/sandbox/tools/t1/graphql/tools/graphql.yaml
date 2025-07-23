@@ -1,0 +1,85 @@
+identity:
+  author: jingfelix
+  name: graphql_request
+  label:
+    en_US: GraphQL Request
+    zh_Hans: GraphQL 请求
+description:
+  human:
+    en_US: Sends a custom GraphQL request to a specified endpoint and returns the response.
+    zh_Hans: 向指定的端点发送自定义 GraphQL 请求并返回响应。
+  llm: This tool allows you to send a custom GraphQL request. You need to provide the API endpoint, the GraphQL query, and optionally any variables or headers.
+parameters:
+  - name: endpoint
+    label:
+      en_US: GraphQL Endpoint
+      zh_Hans: GraphQL 端点
+    human_description:
+      en_US: The URL of the GraphQL API endpoint.
+      zh_Hans: GraphQL API 端点的 URL。
+    type: string
+    form: llm
+    required: true
+  - name: method
+    label:
+      en_US: GraphQL Method
+      zh_Hans: GraphQL 请求方法
+    human_description:
+      en_US: The HTTP method to use for the request.
+      zh_Hans: 请求中使用的 HTTP 方法。
+    type: select
+    form: form
+    options:
+      - value: GET
+        label:
+          en_US: GET
+          zh_Hans: GET
+      - value: POST
+        label:
+          en_US: POST
+          zh_Hans: POST
+    default: POST
+    required: true
+  - name: query
+    label:
+      en_US: GraphQL Query
+      zh_Hans: GraphQL 查询
+    human_description:
+      en_US: The GraphQL query string.
+      zh_Hans: GraphQL 查询字符串。
+    type: string
+    form: llm
+    # required: true
+  - name: variables
+    label:
+      en_US: Variables (JSON)
+      zh_Hans: 变量 (JSON)
+    human_description:
+      en_US: 'Optional JSON string of variables for the GraphQL query.'
+      zh_Hans: 'GraphQL 查询的可选 JSON 格式变量字符串。'
+    type: string
+    form: llm
+    required: false
+  - name: headers
+    label:
+      en_US: Headers (JSON)
+      zh_Hans: 请求头 (JSON)
+    human_description:
+      en_US: 'Optional JSON string of custom headers for the request (e.g., {"Authorization": "Bearer your_token"}).'
+      zh_Hans: '请求的可选 JSON 格式自定义请求头字符串（例如：{"Authorization": "Bearer your_token"}）。'
+    type: string
+    form: llm
+    required: false
+  - name: operation_name
+    label:
+      en_US: Operation Name
+      zh_Hans: 操作名称
+    human_description:
+      en_US: 'Optional name for the operation (e.g., "GetUser" or "CreatePost").'
+      zh_Hans: '操作的可选名称（例如："GetUser" 或 "CreatePost"）。'
+    type: string
+    form: llm
+    required: false
+extra:
+  python:
+    source: tools/graphql.py

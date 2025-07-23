@@ -1,0 +1,17 @@
+identity:
+  author: migege
+  name: json_repair
+  label:
+    en_US: json_repair
+    zh_Hans: json_repair
+    pt_BR: json_repair
+  description:
+    en_US: Fix invalid JSON data
+    zh_Hans: 修复无效的JSON数据
+    pt_BR: Corrigir dados JSON inválidos
+  icon: icon.svg
+tools:
+  - tools/json_repair.yaml
+extra:
+  python:
+    source: provider/json_repair.py

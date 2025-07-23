@@ -1,0 +1,220 @@
+description:
+  human:
+    en_US: The fastest way to get actionable insights from your database just by asking
+      questions.
+    zh_Hans: 一个基于大模型和RAG的Text2SQL工具。
+  llm: A tool for converting text to SQL.
+extra:
+  python:
+    source: tools/vanna.py
+identity:
+  author: QCTC
+  label:
+    en_US: Vanna.AI
+    zh_Hans: Vanna.AI
+  name: vanna
+parameters:
+- form: llm
+  human_description:
+    en_US: used for generating SQL
+    zh_Hans: 用于生成SQL
+  label:
+    en_US: Prompt
+    pt_BR: Prompt
+    zh_Hans: 提示词
+  llm_description: key words for generating SQL
+  name: prompt
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: RAG Model for your database DDL
+    zh_Hans: 存储数据库训练数据的RAG模型
+  label:
+    en_US: RAG Model
+    zh_Hans: RAG模型
+  llm_description: RAG Model for generating SQL
+  name: model
+  required: true
+  type: string
+- default: SQLite
+  form: form
+  human_description:
+    en_US: Database type.
+    zh_Hans: 选择要链接的数据库类型。
+  label:
+    en_US: DB Type
+    zh_Hans: 数据库类型
+  name: db_type
+  options:
+  - label:
+      en_US: SQLite
+      zh_Hans: SQLite
+    value: SQLite
+  - label:
+      en_US: Postgres
+      zh_Hans: Postgres
+    value: Postgres
+  - label:
+      en_US: DuckDB
+      zh_Hans: DuckDB
+    value: DuckDB
+  - label:
+      en_US: Microsoft SQL Server
+      zh_Hans: 微软 SQL Server
+    value: SQLServer
+  - label:
+      en_US: MySQL
+      zh_Hans: MySQL
+    value: MySQL
+  - label:
+      en_US: Oracle
+      zh_Hans: Oracle
+    value: Oracle
+  - label:
+      en_US: Hive
+      zh_Hans: Hive
+    value: Hive
+  - label:
+      en_US: ClickHouse
+      zh_Hans: ClickHouse
+    value: ClickHouse
+  required: true
+  type: select
+- form: form
+  human_description:
+    en_US: Please input depending on DB type, visit https://vanna.ai/docs/ for more
+      specification
+    zh_Hans: 请根据数据库类型，填入对应值，详情参考https://vanna.ai/docs/
+  label:
+    en_US: URL/Host/DSN
+    zh_Hans: URL/Host/DSN
+  name: url
+  required: true
+  type: string
+- form: form
+  human_description:
+    en_US: Database name
+    zh_Hans: 数据库名
+  label:
+    en_US: DB name
+    zh_Hans: 数据库名
+  name: db_name
+  required: false
+  type: string
+- form: form
+  human_description:
+    en_US: Username
+    zh_Hans: 用户名
+  label:
+    en_US: Username
+    zh_Hans: 用户名
+  name: username
+  required: false
+  type: string
+- form: form
+  human_description:
+    en_US: Password
+    zh_Hans: 密码
+  label:
+    en_US: Password
+    zh_Hans: 密码
+  name: password
+  required: false
+  type: secret-input
+- form: form
+  human_description:
+    en_US: Port
+    zh_Hans: 端口
+  label:
+    en_US: Port
+    zh_Hans: 端口
+  name: port
+  required: false
+  type: number
+- form: llm
+  human_description:
+    en_US: DDL statements for training data
+    zh_Hans: 用于训练RAG Model的建表语句
+  label:
+    en_US: Training DDL
+    zh_Hans: 训练DDL
+  name: ddl
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Question-SQL Pairs
+    zh_Hans: Question-SQL中的问题
+  label:
+    en_US: Training Question
+    zh_Hans: 训练问题
+  name: question
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: SQL queries to your training data
+    zh_Hans: 用于训练RAG Model的SQL语句
+  label:
+    en_US: Training SQL
+    zh_Hans: 训练SQL
+  name: sql
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Sometimes you may want to add documentation about your business terminology
+      or definitions
+    zh_Hans: 添加更多关于数据库的业务说明
+  label:
+    en_US: Training Memos
+    zh_Hans: 训练说明
+  name: memos
+  required: false
+  type: string
+- default: false
+  form: form
+  human_description:
+    en_US: You only need to train once. Do not train again unless you want to add
+      more training data
+    zh_Hans: 训练数据无更新时，训练一次即可
+  label:
+    en_US: Training Data
+    zh_Hans: 训练数据
+  name: enable_training
+  required: false
+  type: boolean
+- default: false
+  form: form
+  human_description:
+    en_US: Remove all training data in the current RAG Model
+    zh_Hans: 删除当前RAG Model中的所有训练数据
+  label:
+    en_US: Reset Training Data
+    zh_Hans: 重置训练数据
+  name: reset_training_data
+  required: false
+  type: boolean
+- default: false
+  form: form
+  human_description:
+    en_US: If enabled, it will attempt to train on the metadata of that database
+    zh_Hans: 是否自动从数据库获取元数据来训练
+  label:
+    en_US: Training Metadata
+    zh_Hans: 训练元数据
+  name: training_metadata
+  required: false
+  type: boolean
+- default: false
+  form: form
+  human_description:
+    en_US: Whether to allow the LLM to see the data
+    zh_Hans: 是否允许LLM查看数据
+  label:
+    en_US: Whether to allow the LLM to see the data
+    zh_Hans: 是否允许LLM查看数据
+  name: allow_llm_to_see_data
+  required: false
+  type: boolean

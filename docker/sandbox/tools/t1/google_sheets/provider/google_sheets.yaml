@@ -1,0 +1,40 @@
+identity:
+  author: omluc
+  name: google_sheets
+  label:
+    en_US: Google Sheets
+    zh_Hans: Google 表格
+    pt_BR: Google Planilhas
+    ja_JP: Google スプレッドシート
+  description:
+    en_US: Integration for Google Sheets to read and write data
+    zh_Hans: Google 表格集成，用于读取和写入数据
+    pt_BR: Integração com Google Sheets para ler e escrever dados
+    ja_JP: Google スプレッドシートのデータ読み取りと書き込みのための連携
+  icon: icon.svg
+tools:
+  - tools/batch_get.yaml
+  - tools/batch_update.yaml
+credentials_for_provider:
+  credentials_json:
+    type: secret-input
+    required: true
+    label:
+      en_US: Credentials JSON
+      zh_Hans: 凭证 JSON
+      pt_BR: Credenciais JSON
+      ja_JP: 認証情報 JSON
+    placeholder:
+      en_US: Enter your Google Sheets API credentials JSON
+      zh_Hans: 输入您的 Google Sheets API 凭证 JSON
+      pt_BR: Digite sua chave JSON de credenciais da API do Google Sheets
+      ja_JP: Google スプレッドシート API のサービスアカウント JSON キー
+    help:
+      en_US: The service account JSON key for Google Sheets API
+      zh_Hans: Google 表格 API 的服务账号 JSON 密钥
+      pt_BR: A chave JSON da conta de serviço para a API do Google Sheets
+      ja_JP: Google スプレッドシート API のサービスアカウント JSON キー
+    url: https://console.cloud.google.com/apis/credentials
+extra:
+  python:
+    source: provider/google_sheets.py

@@ -1,0 +1,39 @@
+description:
+  human:
+    en_US: Check the weather conditions temperature, humidity, AQI, weather, wind direction, etc.
+    zh_Hans: 查询天气情况,温度、湿度、AQI、天气、风向等。
+  llm: A tool to query weather for a city.
+extra:
+  python:
+    source: tools/weather.py
+identity:
+  author: leslie2046
+  label:
+    en_US: Weather
+    zh_Hans: 天气预报
+  name: weather
+parameters:
+- name: city
+  label:
+    en_US: City Name
+    zh_Hans: 城市名称
+  type: string
+  required: true
+  form: llm
+  default: 上海
+  human_description:
+    en_US: The city name or ID to be queried, such as Wenzhou, Shanghai, Beijing, must be UTF-8 URL encoded.
+    zh_Hans: 要查询的城市名称/id，城市名称如温州、上海、北京，需要utf8 urlencode。
+  llm_description: The name of the city to get the weather.
+
+- name: apiKey
+  label:
+    en_US: API KEY
+    zh_Hans: API密钥
+  type: secret-input
+  required: true
+  form: form
+  human_description:
+    en_US: The API key from Juhe.cn for accessing the weather data.
+    zh_Hans: 来自聚合数据用于访问天气信息的 API 密钥。
+  llm_description: API key for querying weather info from the provider.

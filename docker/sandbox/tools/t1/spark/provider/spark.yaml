@@ -1,0 +1,66 @@
+credentials_for_provider:
+  APIKey:
+    help:
+      en_US: Please input your Spark APIKey
+      pt_BR: Please input your Spark APIKey
+      zh_Hans: 请输入你的 APIKey
+    label:
+      en_US: Spark APIKey
+      pt_BR: Spark APIKey
+      zh_Hans: APIKey
+    placeholder:
+      en_US: Please input your Spark APIKey
+      pt_BR: Please input Spark APIKey
+      zh_Hans: 请输入你的 APIKey
+    required: true
+    type: secret-input
+    url: https://console.xfyun.cn/services
+  APISecret:
+    help:
+      en_US: Please input your Spark APISecret
+      pt_BR: Please input your Spark APISecret
+      zh_Hans: 请输入你的 APISecret
+    label:
+      en_US: Spark APISecret
+      pt_BR: Spark APISecret
+      zh_Hans: APISecret
+    placeholder:
+      en_US: Please input your Spark APISecret
+      pt_BR: Please input your Spark APISecret
+      zh_Hans: 请输入你的 APISecret
+    required: true
+    type: secret-input
+  APPID:
+    help:
+      en_US: Please input your  APPID
+      pt_BR: Please input your APPID
+      zh_Hans: 请输入你的 APPID
+    label:
+      en_US: Spark APPID
+      pt_BR: Spark APPID
+      zh_Hans: APPID
+    placeholder:
+      en_US: Please input your APPID
+      pt_BR: Please input your APPID
+      zh_Hans: 请输入你的 APPID
+    required: true
+    type: secret-input
+extra:
+  python:
+    source: provider/spark.py
+identity:
+  author: Onelevenvy
+  description:
+    en_US: Spark Platform Toolkit
+    pt_BR: Pacote de Ferramentas da Plataforma Spark
+    zh_Hans: 讯飞星火平台工具
+  icon: icon.svg
+  label:
+    en_US: Spark
+    pt_BR: Spark
+    zh_Hans: 讯飞星火
+  name: spark
+  tags:
+  - image
+tools:
+- tools/spark_img_generation.yaml

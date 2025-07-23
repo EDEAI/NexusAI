@@ -1,0 +1,37 @@
+identity:
+  name: rsa_keygen
+  author: bowenliang123
+  label:
+    en_US: RSA Keypair Generation
+    zh_Hans: RSA 密钥对生成
+description:
+  human:
+    en_US: Generate RSA Key Pair, including public and private keys in PKCS#8 format
+    zh_Hans: 生成 RSA 的公钥及密钥，分别输出为 PKCS#8 格式 pem文件
+  llm: Generate RSA Key Pair
+parameters:
+  - name: key_size
+    type: select
+    required: true
+    default: "2048"
+    options:
+      - value: "2048"
+        label:
+          en_US: "2048"
+      - value: "3072"
+        label:
+          en_US: "3072"
+      - value: "4096"
+        label:
+          en_US: "4096"
+    label:
+      en_US: Key Size
+      zh_Hans: 秘钥长度
+    human_description:
+      en_US: "RSA key size in bits (default: 2048)"
+      zh_Hans: "RSA 密钥大小（位），默认值为 2048"
+    llm_description: "RSA key size in bits (default: 2048)"
+    form: form
+extra:
+  python:
+    source: tools/rsa_keygen/rsa_keygen.py

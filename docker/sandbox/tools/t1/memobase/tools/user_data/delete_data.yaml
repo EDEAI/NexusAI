@@ -1,0 +1,48 @@
+identity:
+  name: delete_data
+  author: acane0320
+  label:
+    en_US: Delete Data
+    zh_Hans: 删除数据
+    ja_Jp: データを削除する
+    pt_BR: Excluir Dados
+description:
+  human:
+    en_US: Delete a specific Blob ID for a user from Memobase
+    zh_Hans: 删除用户的指定 Blob 数据 ID
+    ja_Jp: Memobase からユーザーの特定の Blob ID を削除します
+    pt_BR: Excluir um ID de blob específico de um usuário do Memobase
+  llm: Use this tool to delete a specific Blob ID for a user from Memobase. You need to provide both the user ID and the blob ID.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to delete data for
+      zh_Hans: 要删除数据的用户 ID
+      ja_Jp: データを削除するユーザーの ID
+      pt_BR: O ID do usuário para excluir dados
+    llm_description: The ID of the user to delete data for.
+    form: llm
+  - name: blob_id
+    type: string
+    required: true
+    label:
+      en_US: Blob ID
+      zh_Hans: Blob 数据 ID
+      ja_Jp: Blob ID
+    human_description:
+      en_US: The specific Blob ID to delete
+      zh_Hans: 要删除的特定 Blob 数据 ID
+      ja_Jp: 削除する特定の Blob ID
+      pt_BR: O ID de blob específico a ser excluído
+    llm_description: The specific Blob ID to delete.
+    form: llm
+extra:
+  python:
+    source: tools/user_data/delete_data.py

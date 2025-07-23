@@ -1,0 +1,48 @@
+identity:
+  author: aliyun-security
+  name: ai_guardrails
+  label:
+    en_US: Ai Guardrails
+    zh_Hans: AI安全护栏
+  description:
+    en_US: Ai Guardrails
+    zh_Hans: AI安全护栏
+  icon: icon.svg
+tools:
+  - tools/ai_guardrails.yaml
+extra:
+  python:
+    source: provider/ai_guardrails.py
+credentials_for_provider:
+    aliyun_access_key: # 这是凭证的内部名称，将在 Python 代码中使用
+        type: text-input # 输入类型为文本框
+        required: true # 此凭证是必需的
+        label: # 在 Dify UI 中显示的标签 (支持多语言)
+            en_US: Aliyun AccessKey ID
+            zh_Hans: 阿里云 AccessKey ID
+            # ... (其他语言)
+        placeholder: # 输入框的提示文字 (支持多语言)
+            en_US: Enter your aliyun accessKey id
+            zh_Hans: 请输入您的阿里云 AccessKey ID
+            # ... (其他语言)
+        help: # 帮助提示信息 (支持多语言)
+            en_US: How to get your aliyun accessKey id
+            zh_Hans: 如何获取阿里云 AccessKey ID
+            # ... (其他语言)
+        url: https://help.aliyun.com/zh/ram/user-guide/create-an-accesskey-pair # 点击帮助提示时跳转的 URL
+    aliyun_access_secret: # 这是凭证的内部名称，将在 Python 代码中使用
+      type: secret-input # 输入类型为密码框
+      required: true # 此凭证是必需的
+      label: # 在 Dify UI 中显示的标签 (支持多语言)
+          en_US: Aliyun AccessKey Secret
+          zh_Hans: 阿里云 AccessKey Secret
+          # ... (其他语言)
+      placeholder: # 输入框的提示文字 (支持多语言)
+          en_US: Enter your aliyun accessKey secret
+          zh_Hans: 请输入您的阿里云 AccessKey Secret
+          # ... (其他语言)
+      help: # 帮助提示信息 (支持多语言)
+          en_US: How to get your aliyun accessKey secret
+          zh_Hans: 如何获取阿里云 AccessKey Secret
+          # ... (其他语言)
+      url: https://help.aliyun.com/zh/ram/user-guide/create-an-accesskey-pair # 点击帮助提示时跳转的 URL

@@ -316,6 +316,8 @@ class SandboxBaseNode(Node):
             custom_code = self.data['custom_code']
             input = self.data['input']
             output = self.data.get('output')
+            tool_type = self.data.get('tool_type')  # Get tool_type if available
+            tool_name = self.data.get('tool_name')  # Get tool_name if available
 
             # Check the language of the provided custom code
             if 'python3' in custom_code:
@@ -331,12 +333,19 @@ class SandboxBaseNode(Node):
                     "language": "python3",
                     "pip_packages": packages  # Ensure required package is installed
                 }
+                
+                # Add tool_type and tool_name if available
+                if tool_type:
+                    data["tool_type"] = tool_type
+                if tool_name:
+                    data["tool_name"] = tool_name
             elif 'jinja2' in custom_code:
                 code = custom_code['jinja2']
                 # Prepare the input parameters for the Jinja2 template
                 input_params = {}
-                for key, value in input.properties.items():
-                    input_params[key] = value.value
+                if hasattr(input, 'properties') and input.properties:
+                    for key, value in input.properties.items():
+                        input_params[key] = value.value
                 data = {
                     "custom_unique_id": str(uuid.uuid4()),
                     "code": code,

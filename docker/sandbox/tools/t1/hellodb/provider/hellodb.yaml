@@ -1,0 +1,46 @@
+identity:
+  author: cdnxy
+  name: hellodb
+  label:
+    en_US: HelloDB
+    zh_Hans: HelloDB
+    pt_BR: HelloDB
+  description:
+    en_US: Database Query Assistant, let Dify connect to your database, understand your database, help you generate SQL and execute queries.
+    zh_Hans: 数据库查询助手，让Dify连接你的数据库，了解你的数据库，帮你生成SQL并执行查询。
+    pt_BR: Asistente de consulta de base de datos, deje que dify se conecte a su base de datos, conozca su base de datos, le ayude a generar SQL y ejecutar consultas.
+  icon: icon.svg
+  tags:
+    - productivity
+    - utilities
+credentials_for_provider: #添加 credentials_for_provider 字段
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: API key
+      zh_Hans: API key
+    placeholder:
+      en_US: Please input your API key
+      zh_Hans: 请输入你的 API key
+    help:
+      en_US: Get your API key from HelloDB
+      zh_Hans: 从 HelloDB 获取您的 API key
+    url: https://www.hellodb.cn/manage-api-key
+  api_base:
+    type: text-input
+    required: false
+    label:
+      en_US: API Base 地址
+      zh_Hans: API Base 地址
+    placeholder:
+      en_US: Please input your API Base Url
+      zh_Hans: 请输入你的 API Base 地址
+    help:
+      en_US: Get your API Base Url from HelloDB
+      zh_Hans: 从 HelloDB 获取您的 API Base 地址，默认为https://yun.sinapp.cn/api
+tools:
+  - tools/hellodb.yaml
+extra:
+  python:
+    source: provider/hellodb.py

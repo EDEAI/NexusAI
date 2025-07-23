@@ -1,0 +1,59 @@
+description:
+  human:
+    en_US: Delete Field in AI Table Sheet
+    zh_Hans: 删除AI表格数据表中的字段
+  llm: A tool for deleting a field in an AI Table sheet. (删除AI表格数据表中的字段)
+extra:
+  python:
+    source: tools/delete_field_ai.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: Delete Field in AI Table Sheet
+    zh_Hans: 删除AI表格数据表中的字段
+  name: delete_field_ai
+parameters:
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID of the AI Table (baseId)
+    zh_Hans: AI表格的ID (baseId)
+  label:
+    en_US: Base ID
+    zh_Hans: AI表格ID
+  llm_description: AI表格的ID (baseId)
+  name: base_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID or name of the sheet
+    zh_Hans: 数据表ID或名称
+  label:
+    en_US: Sheet ID or Name
+    zh_Hans: 数据表ID或名称
+  llm_description: 数据表ID或名称
+  name: sheet_id_or_name
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID or name of the field to delete
+    zh_Hans: 要删除的字段ID或名称
+  label:
+    en_US: Field ID or Name
+    zh_Hans: 字段ID或名称
+  llm_description: 要删除的字段ID或名称
+  name: field_id_or_name
+  required: true
+  type: string 

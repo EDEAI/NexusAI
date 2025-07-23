@@ -1,0 +1,71 @@
+identity:
+  name: list-chunks
+  author: witmeng
+  label:
+    en_US: list Chunks
+    zh_Hans: 查找數據塊
+description:
+  human:
+    en_US: list Chunks
+    zh_Hans: 根據關鍵詞查找數據塊
+  llm: list document
+parameters:
+  - form: llm
+    human_description:
+      en_US: datasets id
+      zh_Hans: 數據集ID
+    label:
+      en_US: datasets id
+      zh_Hans: 數據集ID
+    llm_description:  數據集ID
+    name: datasets_id
+    required: true
+    type: string 
+  - form: llm
+    human_description:
+      en_US: document id
+      zh_Hans: 文件ID
+    label:
+      en_US: document id
+      zh_Hans: 文件ID
+    llm_description:  文件ID
+    name: document_id
+    required: true
+    type: string 
+  - form: llm
+    human_description:
+      en_US: keywords
+      zh_Hans: 關鍵詞
+    label:
+      en_US: keywords
+      zh_Hans: 關鍵詞
+    llm_description: 關鍵詞
+    name: keywords
+    required: false
+    type: string
+  - form: llm
+    human_description:
+      en_US: page number
+      zh_Hans: 頁碼
+    label:
+      en_US: Page
+      zh_Hans: 頁碼
+    llm_description: Page number for pagination
+    name: page
+    required: false
+    type: number
+  - form: llm
+    human_description:
+      en_US: page size
+      zh_Hans: 每頁數量
+    label:
+      en_US: Page Size
+      zh_Hans: 每頁數量
+    llm_description: Number of items per page
+    name: page_size
+    required: false
+    type: number
+
+extra:
+  python:
+    source: tools/list-chunks.py

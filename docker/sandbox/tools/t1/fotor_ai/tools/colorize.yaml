@@ -1,0 +1,35 @@
+identity:
+  name: colorize
+  author: fotor
+  label:
+    en_US: Photo Colorize
+    zh_Hans: 照片上色
+
+description:
+  human:
+    en_US: Photo Colorize
+    zh_Hans: 照片上色
+  llm: This operation is usually called "Colorize", "Colorize old photos", "Colorize black and white photos", etc. Call the colorize API to colorize the black and white photos, colorize the old photos, colorize the black and white images, colorize the old images, colorize the black and white pictures, colorize the old pictures, colorize the black and white photographs, colorize the old photographs. This operation will not modify the original size of the image.
+
+parameters:
+  - name: userImageUrl
+    type: string
+    required: true
+    label:
+      en_US: userImageUrl
+      zh_Hans: 用户原图
+    human_description:
+      en_US: The URL or BASE64 encoded image of the original image provided by the user
+      zh_Hans: 用户提供的原图的URL或BASE64编码
+    llm_description: User Image URL, the URL or BASE64 encoding of the original image provided by the user.
+    form: llm
+
+output_schema:
+  type: object
+  properties:
+    result_url:
+      type: string
+
+extra:
+  python:
+    source: tools/colorize.py

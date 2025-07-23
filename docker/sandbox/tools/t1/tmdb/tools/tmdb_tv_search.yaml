@@ -1,0 +1,93 @@
+identity:
+  name: tmdb_tv_search
+  author: lcandy
+  label:
+    en_US: Search TV Shows
+    zh_Hans: 搜索电视节目
+    zh_Hant: 搜尋電視節目
+    ja_JP: テレビ番組を検索
+    pt_BR: Pesquisar Programas de TV
+description:
+  human:
+    en_US: Search for TV shows by title, keywords or phrases. Returns TV show details including title, overview, first air date, and ratings.
+    zh_Hans: 通过标题、关键词或短语搜索电视节目。返回电视节目详情，包括标题、概述、首播日期和评分。
+    zh_Hant: 透過標題、關鍵詞或短語搜尋電視節目。返回電視節目詳情，包括標題、概述、首播日期和評分。
+    ja_JP: タイトル、キーワード、またはフレーズでテレビ番組を検索します。タイトル、概要、初回放送日、評価などの詳細を返します。
+    pt_BR: Pesquise programas de TV por título, palavras-chave ou frases. Retorna detalhes do programa incluindo título, visão geral, data de estreia e classificações.
+  llm: Search for TV shows by title, keywords or phrases. This tool searches The Movie Database (TMDB) and returns TV show information.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: TV Show Title or Keywords
+      zh_Hans: 电视节目标题或关键词
+      zh_Hant: 電視節目標題或關鍵詞
+      ja_JP: テレビ番組のタイトルまたはキーワード
+      pt_BR: Título do Programa de TV ou Palavras-chave
+    human_description:
+      en_US: The title or keywords to search for TV shows
+      zh_Hans: 用于搜索电视节目的标题或关键词
+      zh_Hant: 用於搜尋電視節目的標題或關鍵詞
+      ja_JP: テレビ番組を検索するためのタイトルまたはキーワード
+      pt_BR: O título ou palavras-chave para pesquisar programas de TV
+    llm_description: The TV show title or keywords to search for in TMDB
+    form: llm
+  - name: language
+    type: string
+    required: false
+    default: en-US
+    label:
+      en_US: Language
+      zh_Hans: 语言
+      zh_Hant: 語言
+      ja_JP: 言語
+      pt_BR: Idioma
+    human_description:
+      en_US: The ISO 639-1 language code to search in (default is en-US)
+      zh_Hans: 要搜索的 ISO 639-1 语言代码（默认为 en-US）
+      zh_Hant: 要搜尋的 ISO 639-1 語言代碼（預設為 en-US）
+      ja_JP: 検索するISO 639-1言語コード（デフォルトはen-US）
+      pt_BR: O código de idioma ISO 639-1 para pesquisar (o padrão é en-US)
+    llm_description: The ISO 639-1 language code to search in (e.g., en-US, zh-CN, fr-FR)
+    form: form
+  - name: first_air_date_year
+    type: number
+    required: false
+    label:
+      en_US: First Air Date Year
+      zh_Hans: 首播年份
+      zh_Hant: 首播年份
+      ja_JP: 初回放送年
+      pt_BR: Ano de Estreia
+    human_description:
+      en_US: Filter results by specific first air date year
+      zh_Hans: 按特定首播年份筛选结果
+      zh_Hant: 按特定首播年份篩選結果
+      ja_JP: 特定の初回放送年で結果をフィルタリング
+      pt_BR: Filtrar resultados por ano específico de estreia
+    llm_description: Specify a year to filter results to TV shows that first aired in that year
+    form: llm
+  - name: results_limit
+    type: number
+    required: false
+    default: 5
+    min: 1
+    max: 20
+    label:
+      en_US: Number of Results
+      zh_Hans: 结果数量
+      zh_Hant: 結果數量
+      ja_JP: 結果の数
+      pt_BR: Número de Resultados
+    human_description:
+      en_US: Maximum number of results to return (1-20, default is 5)
+      zh_Hans: 要返回的最大结果数（1-20，默认为5）
+      zh_Hant: 要返回的最大結果數（1-20，預設為5）
+      ja_JP: 返す結果の最大数（1-20、デフォルトは5）
+      pt_BR: Número máximo de resultados a serem retornados (1-20, o padrão é 5)
+    llm_description: Maximum number of TV shows to return in results (1-20)
+    form: form
+extra:
+  python:
+    source: tools/tmdb_tv_search.py 

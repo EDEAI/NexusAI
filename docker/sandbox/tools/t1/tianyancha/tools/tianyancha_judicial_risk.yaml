@@ -1,0 +1,41 @@
+identity:
+  name: tianyancha-judicial-risk
+  author: bdim
+  label:
+    en_US: Judicial Risk
+    zh_Hans: 司法风险
+description:
+  en_US: Get judicial risk information for companies
+  zh_Hans: 获取企业司法风险信息
+  human:
+    en_US: Get judicial risk information
+    zh_Hans: 获取企业司法风险信息
+  llm: 可以通过公司名称或ID获取企业的司法风险信息，包括法律诉讼、法院公告、开庭公告、失信人、被执行人、立案信息、送达公告等维度的相关信息。
+parameters:
+  - name: company_keyword
+    type: string
+    required: true
+    label:
+      en_US: Company Keyword
+      zh_Hans: 公司关键词
+    human_description:
+      en_US: The name or ID of the company to search for
+      zh_Hans: 要查询的公司名称或ID
+    llm_description: 要查询的公司名称或ID，例如"北京瑞莱智慧科技有限公司"或"3217633851"
+    form: llm
+extra:
+  python:
+    source: tools/tianyancha_judicial_risk.py
+credentials:
+  - name: token
+    type: string
+    required: true
+    label: 
+      en_US: Tianyancha API Token
+      zh_Hans: 天眼查API Token
+    placeholder:
+      en_US: Enter your Tianyancha API token
+      zh_Hans: 输入你的天眼查API token
+    help:
+      en_US: You can get your token from Tianyancha data center -> My APIs
+      zh_Hans: 你可以从天眼查的数据中心 -> 我的接口中获取token

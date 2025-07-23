@@ -1,0 +1,5 @@
+dify_plugin~=0.0.1b72
+psycopg2-binary>=2.9.9
+sqlglotrs>=0.4.0
+sqlglot>=26.11.1
+jinja2>=3.1.6

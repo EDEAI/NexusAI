@@ -1,0 +1,246 @@
+identity:
+  name: creative_poster
+  author: caffbyte
+  label:
+    en_US: Creative Poster
+    zh_Hans: 创意海报
+    pt_BR: Creative Poster
+description:
+  human:
+    en_US: Generate an image based on a creative prompt.
+    zh_Hans: 根据创意提示生成图像。
+    pt_BR: Generate an image based on a creative prompt.
+  llm: Generate an image based on a creative prompt.
+parameters:
+  - name: model
+    type: select
+    required: true
+    default: wanx-poster-generation-v1
+    label:
+      en_US: Model Name
+      zh_Hans: 模型名称
+      pt_BR: Model Name
+    human_description:
+      en_US: The model name.
+      zh_Hans: 模型名称。
+      pt_BR: The model name.
+    llm_description: The model name.
+    form: form
+    options:
+      - label:
+          en_US: wanx-poster-generation-v1
+          zh_Hans: wanx-poster-generation-v1
+          pt_BR: wanx-poster-generation-v1
+        value: wanx-poster-generation-v1
+  - name: title
+    type: string
+    required: true
+    label:
+      en_US: Title
+      zh_Hans: 标题
+      pt_BR: Title
+    human_description:
+      en_US: Up to 30 characters. For example, "Happy Spring Festival".
+      zh_Hans: 最多30个字符。例如，"春节快乐"。
+      pt_BR: Up to 30 characters. For example, "Happy Spring Festival".
+    llm_description: Up to 30 characters. For example, "Happy Spring Festival".
+    form: llm
+  - name: sub_title
+    type: string
+    required: false
+    label:
+      en_US: Sub Title
+      zh_Hans: 副标题
+      pt_BR: Sub Title
+    human_description:
+      en_US: Up to 30 characters. For example, "Family reunion, sharing happiness".
+      zh_Hans: 最多30个字符。例如，“家庭团聚，共享天伦之乐"。
+      pt_BR: Up to 30 characters. For example, "Family reunion, sharing happiness".
+    llm_description: Up to 30 characters. For example, "Family reunion, sharing happiness".
+    form: llm
+  - name: body_text
+    type: string
+    required: false
+    label:
+      en_US: Body Text
+      zh_Hans: 正文
+      pt_BR: Body Text
+    human_description:
+      en_US: Up to 50 characters. For example, "The Spring Festival is one of the most important traditional festivals in China, symbolizing a new beginning and hope".
+      zh_Hans: 最多50个字符。例如："春节是中国最重要的传统节日之一，它象征着新的开始和希望"
+      pt_BR: Up to 50 characters. For example, "The Spring Festival is one of the most important traditional festivals in China, symbolizing a new beginning and hope".
+    llm_description: Up to 50 characters. For example, "The Spring Festival is one of the most important traditional festivals in China, symbolizing a new beginning and hope".
+    form: llm
+  - name: prompt_text_zh
+    type: string
+    required: false
+    label:
+      en_US: Chinese Prompt Text
+      zh_Hans: 中文提示词
+      pt_BR: Chinese Prompt Text
+    human_description:
+      en_US: Up to 50 characters. For example, "灯笼，小猫，梅花". Chinese and English prompt words must be set at least one, and both parameters are supported to be set at the same time. The total number of characters in the two fields is up to 50 characters/words.
+      zh_Hans: 例如，“灯笼，小猫，梅花"。中文和英文提示词至少二选一设置，支持两个参数同时设置。两个字段字符数加起来最多50个字/单词。
+      pt_BR: Up to 50 characters. For example, "灯笼，小猫，梅花". Chinese and English prompt words must be set at least one, and both parameters are supported to be set at the same time. The total number of characters in the two fields is up to 50 characters/words.
+    llm_description: Up to 50 characters. For example, "灯笼，小猫，梅花". Chinese and English prompt words must be set at least one, and both parameters are supported to be set at the same time. The total number of characters in the two fields is up to 50 characters/words.
+    form: llm
+  - name: prompt_text_en
+    type: string
+    required: false
+    label:
+      en_US: English Prompt Text
+      zh_Hans: 英文提示词
+      pt_BR: English Prompt Text
+    human_description:
+      en_US: Up to 50 characters. For example, "Lantern, kitten, plum blossom". Chinese and English prompt words must be set at least one, and both parameters are supported to be set at the same time. The total number of characters in the two fields is up to 50 characters/words.
+      zh_Hans: 例如："灯笼，小猫，梅花"。中文和英文提示词至少二选一设置，支持两个参数同时设置。两个字段字符数加起来最多50个字/单词。
+      pt_BR: Up to 50 characters. For example, "Lantern, kitten, plum blossom". Chinese and English prompt words must be set at least one, and both parameters are supported to be set at the same time. The total number of characters in the two fields is up to 50 characters/words.
+    llm_description: Up to 50 characters. For example, "Lantern, kitten, plum blossom". Chinese and English prompt words must be set at least one, and both parameters are supported to be set at the same time. The total number of characters in the two fields is up to 50 characters/words.
+    form: llm
+  - name: wh_ratios
+    type: select
+    required: true
+    default: 横版
+    label:
+      en_US: Poster Layout
+      zh_Hans: 生成海报的版式
+      pt_BR: Poster Layout
+    human_description:
+      en_US: The layout of the poster.
+      zh_Hans: 海报的版式。
+      pt_BR: The layout of the poster.
+    llm_description: The layout of the poster.
+    form: form
+    options:
+      - label:
+          en_US: 横版
+          zh_Hans: 横版
+          pt_BR: 横版
+        value: 横版
+      - label:
+          en_US: 竖版
+          zh_Hans: 竖版
+          pt_BR: 竖版
+        value: 竖版
+  - name: lora_name
+    type: select
+    required: true
+    default: 童话油画
+    label:
+      en_US: Poster Layout Name
+      zh_Hans: 海报风格名称
+      pt_BR: Poster Layout Name
+    human_description:
+      en_US: The layout name of the poster.
+      zh_Hans: 海报的风格名称。
+      pt_BR: The layout name of the poster.
+    llm_description: The layout name of the poster.
+    form: form
+    options:
+      - label:
+          en_US: 2D插画1
+          zh_Hans: 2D插画1
+          pt_BR: 2D插画1
+        value: 2D插画1
+      - label:
+          en_US: 2D插画2
+          zh_Hans: 2D插画2
+          pt_BR: 2D插画2
+        value: 2D插画2
+      - label:
+          en_US: 浩瀚星云
+          zh_Hans: 浩瀚星云
+          pt_BR: 浩瀚星云
+        value: 浩瀚星云
+      - label:
+          en_US: 浓郁色彩
+          zh_Hans: 浓郁色彩
+          pt_BR: 浓郁色彩
+        value: 浓郁色彩
+      - label:
+          en_US: 光线粒子
+          zh_Hans: 光线粒子
+          pt_BR: 光线粒子
+        value: 光线粒子
+      - label:
+          en_US: 透明玻璃
+          zh_Hans: 透明玻璃
+          pt_BR: 透明玻璃
+        value: 透明玻璃
+      - label:
+          en_US: 剪纸工艺
+          zh_Hans: 剪纸工艺
+          pt_BR: 剪纸工艺
+        value: 剪纸工艺
+      - label:
+          en_US: 折纸工艺
+          zh_Hans: 折纸工艺
+          pt_BR: 折纸工艺
+        value: 折纸工艺
+      - label:
+          en_US: 中国水墨
+          zh_Hans: 中国水墨
+          pt_BR: 中国水墨
+        value: 中国水墨
+      - label:
+          en_US: 中国刺绣
+          zh_Hans: 中国刺绣
+          pt_BR: 中国刺绣
+        value: 中国刺绣
+      - label:
+          en_US: 真实场景
+          zh_Hans: 真实场景
+          pt_BR: 真实场景
+        value: 真实场景
+      - label:
+          en_US: 2D卡通
+          zh_Hans: 2D卡通
+          pt_BR: 2D卡通
+        value: 2D卡通
+      - label:
+          en_US: 儿童水彩
+          zh_Hans: 儿童水彩
+          pt_BR: 儿童水彩
+        value: 儿童水彩
+      - label:
+          en_US: 赛博背景
+          zh_Hans: 赛博背景
+          pt_BR: 赛博背景
+        value: 赛博背景
+      - label:
+          en_US: 浅蓝抽象
+          zh_Hans: 浅蓝抽象
+          pt_BR: 浅蓝抽象
+        value: 浅蓝抽象
+      - label:
+          en_US: 深蓝抽象
+          zh_Hans: 深蓝抽象
+          pt_BR: 深蓝抽象
+        value: 深蓝抽象
+      - label:
+          en_US: 抽象点线
+          zh_Hans: 抽象点线
+          pt_BR: 抽象点线
+        value: 抽象点线
+      - label:
+          en_US: 童话油画
+          zh_Hans: 童话油画
+          pt_BR: 童话油画
+        value: 童话油画
+  - name: creative_title_layout
+    type: boolean
+    required: false
+    label:
+      en_US: Enable Creative Title Layout
+      zh_Hans: 标题是否启用创意排版。
+      pt_BR: Enable Creative Title Layout
+    human_description:
+      en_US: Enable creative title layout. Default is false.
+      zh_Hans: 是否启用创意标题排版。默认值为false。
+      pt_BR: Enable creative title layout. Default is false.
+    llm_description: Enable creative title layout. Default is false.
+    form: form
+    default: false
+extra:
+  python:
+    source: "tools/creative_poster.py"

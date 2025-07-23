@@ -1,0 +1,31 @@
+identity:
+  name: merge_to_multisheet
+  author: digitforce
+  label:
+    en_US: merge_to_multisheet
+    zh_Hans: 合成多sheet Excel
+    pt_BR: merge_to_multisheet
+description:
+  human:
+    en_US: Merge multiple files into a single Excel file with multiple sheets.
+    zh_Hans: 多个文件合成一个多sheet的Excel文件
+    pt_BR: Merge multiple files into a single Excel file with multiple sheets.
+  llm: Merge multiple files into a single Excel file with multiple sheets.
+parameters:
+  - name: csv_files
+    type: files
+    required: true
+    multiple: true
+    label:
+      en_US: Files
+      zh_Hans: 文件
+      pt_BR: Files
+    human_description:
+      en_US: The files to be merged into one Excel file.
+      zh_Hans: 需要合并的文件
+      pt_BR: The files to be merged into one Excel file.
+    llm_description: file(.xlsx/.xls/.csv)
+    form: llm
+extra:
+  python:
+    source: tools/merge_to_multisheet.py

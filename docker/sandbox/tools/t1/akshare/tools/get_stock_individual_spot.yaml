@@ -1,0 +1,29 @@
+identity:
+  author: jingfelix
+  name: get_stock_individual_spot
+  label:
+    zh_Hans: 个股实时行情
+    en_US: Stock Individual Spot
+    zh_Hant: 個股即時行情
+description:
+  human:
+    zh_Hans: 查询A股个股的实时行情数据。
+    en_US: Query real-time market data for an A-share stock.
+    zh_Hant: 查詢A股個股的即時行情數據。
+  llm: 查询A股个股的实时行情数据，输入股票代码，返回当前价格、涨跌幅等实时行情信息。
+parameters:
+  - name: symbol
+    label:
+      zh_Hans: 股票代码
+      en_US: Stock Symbol
+      zh_Hant: 股票代碼
+    human_description:
+      zh_Hans: 需要查询的A股股票代码，如“SH600519”（需包含交易所代码）。
+      en_US: The A-share stock symbol to query, e.g., "SH600519".
+      zh_Hant: 需要查詢的A股股票代碼，如“SH600519”（需包含交易所代码）。
+    type: string
+    form: llm
+    required: true
+extra:
+  python:
+    source: tools/get_stock_individual_spot.py

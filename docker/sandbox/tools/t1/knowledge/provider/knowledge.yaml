@@ -1,0 +1,38 @@
+identity:
+  author: hjlarry
+  name: knowledge
+  label:
+    en_US: knowledge
+    zh_Hans: knowledge
+  description:
+    en_US: Add the content produced by dify's workflow to its knowledge base
+    zh_Hans: 将dify的工作流生成的内容直接添加至其知识库
+  icon: icon.svg
+tools:
+  - tools/knowledge.yaml
+extra:
+  python:
+    source: provider/knowledge.py
+credentials_for_provider:
+  api_uri:
+    help:
+      en_US: For example `http://127.0.0.1:5001/v1`
+      zh_Hans: 例如 `http://127.0.0.1:5001/v1`
+    label:
+      en_US: API URI
+      zh_Hans: API 服务器地址
+    placeholder:
+      en_US: Please enter the API URI
+      zh_Hans: 请输入API URI
+    default: http://127.0.0.1:5001/v1
+    required: true
+    type: text-input
+  api_secret:
+    label:
+      en_US: API Secret
+      zh_Hans: API 密钥
+    placeholder:
+      en_US: Please enter the API URI
+      zh_Hans: 请输入API URI
+    required: true
+    type: secret-input

@@ -1,0 +1,30 @@
+identity:
+  name: Blinko
+  author: blinkosapce
+  label:
+    en_US: Blinko
+    zh_Hans: Blinko笔记
+    pt_BR: Blinko
+description:
+  human:
+    en_US: Save notes to Blinko
+    zh_Hans: 将笔记内容保存到Blinko
+    pt_BR: Save notes to Blinko
+  llm: A tool for saving notes to Blinko service
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Note content
+      zh_Hans: 笔记内容
+      pt_BR: Note content
+    human_description:
+      en_US: The content of the note to be saved
+      zh_Hans: 要保存的笔记内容
+      pt_BR: The content of the note to be saved
+    llm_description: The text content to be saved as a note in Blinko
+    form: llm
+extra:
+  python:
+    source: tools/blinko.py

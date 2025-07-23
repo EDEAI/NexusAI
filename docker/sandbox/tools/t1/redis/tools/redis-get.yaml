@@ -1,0 +1,43 @@
+identity:
+  name: redis-get
+  author: eft
+  label:
+    en_US: Redis GET
+    zh_Hans: Redis GET
+    pt_BR: Redis GET
+description:
+  human:
+    en_US: Redis GET
+    zh_Hans: Redis GET
+    pt_BR: Redis GET
+  llm: Redis GET
+parameters:
+  - name: 'name'
+    type: string
+    required: true
+    label:
+      en_US: 'Name'
+      zh_Hans: 'Name'
+      pt_BR: 'Name'
+    human_description:
+      en_US: 'Redis Name'
+      zh_Hans: 'Redis Name'
+      pt_BR: 'Redis Name'
+    llm_description: 'Redis Name'
+    form: llm
+  - name: 'key'
+    type: string
+    required: true
+    label:
+      en_US: 'Key'
+      zh_Hans: 'Key'
+      pt_BR: 'Key'
+    human_description:
+      en_US: 'Redis Key'
+      zh_Hans: 'Redis Key'
+      pt_BR: 'Redis Key'
+    llm_description: 'Redis Key'
+    form: llm
+extra:
+  python:
+    source: tools/redis-get.py

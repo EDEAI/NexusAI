@@ -1,0 +1,34 @@
+identity:
+  name: search_user_graph
+  author: obadakhalili
+  label:
+    en_US: Search user graph
+
+description:
+  human:
+    en_US: Search user graph for relevant memory using a custom query
+  llm: Search user graph for relevant memory using a custom query
+
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+    human_description:
+      en_US: The user ID to search the graph for
+    llm_description: The user ID to search the graph for
+    form: llm
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query
+    human_description:
+      en_US: The query to use to search the graph
+    llm_description: The query to use to search the graph
+    form: llm
+
+extra:
+  python:
+    source: tools/search_user_graph.py

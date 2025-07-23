@@ -1,0 +1,55 @@
+identity:
+  author: yizixuan
+  name: word_count
+  label:
+    en_US: Word Count
+    zh_Hans: 字数统计
+description:
+  human:
+    en_US: Count the number of lines, non-empty lines, characters, visible characters, Chinese characters, English words, English characters and non-punctuation characters in the input text.
+    zh_Hans: 统计输入文本中的行数、非空行数、字符数、可见字符数、汉字数、英文单词数、英文字符数和非标点符号的字符数（仅包含字母、数字和中文字符）。
+  llm: Count the number of lines, non-empty lines, characters (visible characters), Chinese characters, English words (continuous alphabetic sequences), English letters and non-punctuation characters (letters, digits and Chinese characters) in the input text.
+extra:
+  python:
+    source: tools/word_count.py
+parameters:
+  - name: text
+    type: string
+    label:
+      en_US: Input Text
+      zh_Hans: 输入文本
+    form: form
+    required: true
+    human_description:
+      en_US: The text to be counted.
+      zh_Hans: 要统计的文本。
+output_schema:
+  type: object
+  properties:
+    lines:
+      type: integer
+      description: Total number of lines
+    lines_non_empty:
+      type: integer
+      description: Number of non-empty lines
+    chars_total:
+      type: integer
+      description: Total number of characters
+    chars_visible:
+      type: integer
+      description: Number of visible characters
+    chars_non_whitespace:
+      type: integer
+      description: Number of characters excluding whitespace
+    chars_non_punctuation:
+      type: integer
+      description: Number of characters that are letters, digits or Chinese characters (excludes punctuation and special symbols)
+    chars_letter:
+      type: integer
+      description: Number of English letters
+    chinese_chars:
+      type: integer
+      description: Number of Chinese characters
+    english_words:
+      type: integer
+      description: Number of English words

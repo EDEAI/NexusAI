@@ -1,0 +1,26 @@
+description:
+  human:
+    en_US:  Shanghai Gold Exchange provides information on gold varieties, latest prices, opening prices, and highest prices.
+    zh_Hans: 上海黄金交易所黄金品种、最新价、开盘价、最高价等信息 。
+  llm: A tool to query gold varieties, latest prices, opening prices, and highest prices from Shanghai Gold Exchange.
+extra:
+  python:
+    source: tools/shgold.py
+identity:
+  author: leslie2046
+  label:
+    en_US: Shanghai Gold Exchange
+    zh_Hans: 上海黄金交易所
+  name: shgold
+parameters:
+- name: apiKey
+  label:
+    en_US: API KEY
+    zh_Hans: API密钥
+  type: secret-input
+  required: true
+  form: form
+  human_description:
+    en_US: The API key from Juhe.cn.
+    zh_Hans: 来自聚合数据API密钥。
+  llm_description: API key from the juhe provider.

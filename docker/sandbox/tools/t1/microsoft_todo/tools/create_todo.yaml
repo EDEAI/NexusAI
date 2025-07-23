@@ -1,0 +1,52 @@
+identity:
+  name: create_todo
+  author: ayush3941
+  label:
+    en_US: Create Todo Task
+    zh_Hans: 创建待办事项
+    pt_BR: Criar Tarefa
+  icon: "icon.png"
+  description:
+    en_US: Create a new task in Microsoft Todo using Graph API.
+    zh_Hans: 使用 Microsoft Graph API 创建新的待办任务。
+    pt_BR: Crie uma nova tarefa no Microsoft Todo usando a API Graph.
+
+description:
+  human:
+    en_US: Add a new todo task with a title and optional due date.
+    zh_Hans: 添加一个带有标题和可选截止日期的新待办事项。
+    pt_BR: Adicione uma nova tarefa com título e data de vencimento opcional.
+  llm: Create a Microsoft Todo task with title and optional due date.
+
+parameters:
+  - name: title
+    type: string
+    required: true
+    label:
+      en_US: Task Title
+      zh_Hans: 任务标题
+      pt_BR: Título da tarefa
+    human_description:
+      en_US: The title of the task you want to create.
+      zh_Hans: 您想要创建的任务标题。
+      pt_BR: O título da tarefa que você deseja criar.
+    llm_description: Title of the todo task.
+    form: llm
+
+  - name: due_date
+    type: string
+    required: false
+    label:
+      en_US: Due Date
+      zh_Hans: 截止日期
+      pt_BR: Data de vencimento
+    human_description:
+      en_US: Optional due date in ISO 8601 format (e.g., 2025-07-01T12:00:00).
+      zh_Hans: 可选的截止日期，使用 ISO 8601 格式（例如：2025-07-01T12:00:00）。
+      pt_BR: Data de vencimento opcional no formato ISO 8601 (ex- 2025-07-01T12:00:00).
+    llm_description: Optional ISO-formatted due date.
+    form: llm
+
+extra:
+  python:
+    source: tools/create_todo.py

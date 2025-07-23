@@ -1,0 +1,56 @@
+identity:
+  name: memory_init_cloudflare_d1
+  author: alterxyz
+  label:
+    en_US: Initialize Memory Base at Cloudflare D1
+    zh_Hans: 初始化记忆库 - Cloudflare D1
+    pt_BR: Inicializar Memória Base no Cloudflare D1
+description:
+  human:
+    en_US: Initialize Database at Cloudflare D1 that create tables such as Conversation and Message 
+    zh_Hans: 在 Cloudflare D1 初始化数据库，创建 Conversation 和 Message 等表
+    pt_BR: Inicializar Banco de Dados no Cloudflare D1 que cria tabelas como Conversation e Message
+  llm: Initialize Database at Cloudflare D1 that create tables such as Conversation and Message. Normally, this function is called only once.
+parameters:
+  - name: cloudflare_account_id
+    type: string
+    required: true
+    label:
+      en_US: Cloudflare Account ID
+      zh_Hans: Cloudflare 账户 ID
+      pt_BR: ID da Conta Cloudflare
+    human_description:
+      en_US: Cloudflare Account ID
+      zh_Hans: Cloudflare 账户 ID
+      pt_BR: ID da Conta Cloudflare
+    llm_description: Cloudflare Account ID, normally it is provided by Human.
+    form: llm
+  - name: cloudflare_d1_database_id
+    type: string
+    required: true
+    label:
+      en_US: Cloudflare Database ID
+      zh_Hans: Cloudflare 数据库 ID
+      pt_BR: ID do Banco de Dados Cloudflare
+    human_description:
+      en_US: Cloudflare Database ID
+      zh_Hans: Cloudflare 数据库 ID
+      pt_BR: ID do Banco de Dados Cloudflare
+    llm_description: Cloudflare Database ID, normally it is provided by Human.
+    form: llm
+  - name: cloudflare_api_token
+    type: string
+    required: true
+    label:
+      en_US: Cloudflare API Token
+      zh_Hans: Cloudflare API 令牌
+      pt_BR: Token de API Cloudflare
+    human_description:
+      en_US: Cloudflare API Token with D1 permissions
+      zh_Hans: 具有 D1 权限的 Cloudflare API 令牌
+      pt_BR: Token de API Cloudflare com permissões D1
+    llm_description: Cloudflare API Token with D1 permissions, normally it is provided by Human.
+    form: llm
+extra:
+  python:
+    source: tools/init.py

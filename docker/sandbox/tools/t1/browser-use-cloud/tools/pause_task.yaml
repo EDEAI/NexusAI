@@ -1,0 +1,34 @@
+identity:
+  name: pause_task
+  author: lysonober
+  label:
+    en_US: "Pause Task"
+    zh_Hans: "暂停任务"
+    ja_JP: "タスクを一時停止"
+    pt_BR: "Pausar Tarefa"
+description:
+  human:
+    en_US: "Pauses execution of a running task. The task can be resumed later using the resume_task tool. Useful for manual intervention or inspection."
+    zh_Hans: "暂停正在运行的任务执行。该任务可以稍后使用 resume_task 工具恢复。适用于手动干预或检查。"
+    ja_JP: "実行中のタスクの実行を一時停止します。タスクは後で resume_task ツールを使用して再開できます。手動での介入や検査に役立ちます。"
+    pt_BR: "Pausa a execução de uma tarefa em execução. A tarefa pode ser retomada posteriormente usando a ferramenta resume_task. Útil para intervenção manual ou inspeção."
+  llm: "This tool pauses the execution of a running browser automation task. It makes a PUT request to the /api/v1/pause-task endpoint with the task_id as a query parameter. The task will enter a 'paused' state and can be resumed later using the resume_task tool. This is useful when you need to temporarily halt a task for manual intervention, inspection, or to conserve resources. Only tasks in the 'running' state can be paused."
+parameters:
+  - name: task_id
+    type: string
+    required: true
+    label:
+      en_US: "Task ID"
+      zh_Hans: "任务 ID"
+      ja_JP: "タスク ID"
+      pt_BR: "ID da Tarefa"
+    human_description:
+      en_US: "The unique identifier of the task you want to pause. Must be a valid task ID from a previously created task."
+      zh_Hans: "您要暂停的任务的唯一标识符。必须是先前创建的任务的有效任务 ID。"
+      ja_JP: "一時停止したいタスクの一意の識別子。以前に作成されたタスクの有効なタスク ID である必要があります。"
+      pt_BR: "O identificador único da tarefa que você deseja pausar. Deve ser um ID de tarefa válido de uma tarefa criada anteriormente."
+    llm_description: "The unique identifier of the task to pause. This must be a valid task ID from a previously created task. Only tasks in the 'running' state can be paused."
+    form: llm
+extra:
+  python:
+    source: tools/pause_task.py

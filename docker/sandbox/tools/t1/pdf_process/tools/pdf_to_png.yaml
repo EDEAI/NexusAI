@@ -1,0 +1,38 @@
+description:
+  human:
+    en_US: A tool for converting PDF files to PNG images
+    zh_Hans: 一个将PDF文件转换为PNG图片的工具
+  llm: A tool that converts each page of a PDF document into a separate PNG image with configurable quality
+extra:
+  python:
+    source: tools/pdf_to_png.py
+identity:
+  author: kalochin
+  label:
+    en_US: PDF to PNG Converter
+    zh_Hans: PDF转PNG转换器
+  name: pdf_to_png
+parameters:
+- form: llm
+  human_description:
+    en_US: PDF file to convert to PNG images
+    zh_Hans: 要转换为PNG图片的PDF文件
+  label:
+    en_US: PDF Content
+    zh_Hans: PDF 内容
+  llm_description: PDF file content to be converted to PNG images
+  name: pdf_content
+  required: true
+  type: file
+- form: llm
+  human_description:
+    en_US: Zoom factor for image quality (default is 2)
+    zh_Hans: 图像质量的缩放因子（默认为2）
+  label:
+    en_US: Zoom Factor
+    zh_Hans: 缩放因子
+  llm_description: Zoom factor to control the quality of output PNG images
+  name: zoom
+  required: false
+  type: number
+  default: 2

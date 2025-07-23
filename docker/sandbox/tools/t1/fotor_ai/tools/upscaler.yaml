@@ -1,0 +1,74 @@
+identity:
+  name: upscaler
+  author: fotor
+  label:
+    en_US: Upscaler
+    zh_Hans: 图片超分
+
+description:
+  human:
+    en_US: Image Upscaler
+    zh_Hans: 图片超分
+  llm: Call the upscaler API to enhance and upscale image. The upscaler API is used to enhance image resolution and clarity, making them larger and clearer. This operation may change the size of the image.
+
+parameters:
+  - name: upscaling_resize
+    type: number
+    required: true
+    label:
+      en_US: Upscaler Factor
+      zh_Hans: 超分倍数
+    human_description:
+      en_US: Upscaler Factor
+      zh_Hans: 超分倍数
+    llm_description: Upscaling factor, the factor by which the image will be upscaled. For example, 2.0 means the image will be doubled in size.
+    form: llm
+    default: 2.0
+
+  - name: userImageUrl
+    type: string
+    required: true
+    label:
+      en_US: UserImageUrl
+      zh_Hans: 用户原图
+    human_description:
+      en_US: The URL or BASE64 encoded image of the original image provided by the user
+      zh_Hans: 用户提供的原图的URL或BASE64编码
+    llm_description: User Image URL, the URL or BASE64 encoding of the original image provided by the user.
+    form: llm
+
+  - name: max_image_width
+    type: number
+    required: true
+    label:
+      en_US: Max Width
+      zh_Hans: 最大宽度
+    human_description:
+      en_US: The maximum pixel width of the image after upscaling.
+      zh_Hans: 放大后图像的最大像素宽度
+    llm_description: Max Width, The maximum pixel width of the upscaled image. Default is 2048.
+    form: form
+    default: 2048
+
+  - name: max_image_height
+    type: number
+    required: true
+    label:
+      en_US: Max Height
+      zh_Hans: 最大高度
+    human_description:
+      en_US: The maximum pixel height of the image after upscaling
+      zh_Hans: 放大后图像的最大像素高度
+    llm_description: Max Height, The maximum pixel height of the upscaled image. Default is 2048.
+    form: form
+    default: 2048
+
+output_schema:
+  type: object
+  properties:
+    result_url:
+      type: string
+
+extra:
+  python:
+    source: tools/upscaler.py

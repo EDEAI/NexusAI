@@ -1,0 +1,37 @@
+identity:
+  name: aes_decrypt
+  author: bowenliang123
+  label:
+    en_US: AES Decryption
+    zh_Hans: AES 解密
+description:
+  human:
+    en_US: Use AES symmetric encryption algorithm to decrypt Base64-encoded ciphertext and output the plaintext
+    zh_Hans: 使用 AES 对称加密算法，对Base64 编码的密文进行解密，并输出原文文本
+  llm: AES Encrypt
+parameters:
+  - name: ciphertext
+    type: string
+    required: true
+    label:
+      en_US: Ciphertext
+      zh_Hans: 密文
+    human_description:
+      en_US: "Base64-encoded ciphertext"
+      zh_Hans: "Base64 编码的密文"
+    llm_description: "Plaintext"
+    form: llm
+  - name: key_text
+    type: string
+    required: true
+    label:
+      en_US: Decryption Key
+      zh_Hans: 解密秘钥
+    human_description:
+      en_US: Base64-encoded key text for decryption
+      zh_Hans: Base64 编码的解密密密钥文本
+    llm_description: Key Text
+    form: llm
+extra:
+  python:
+    source: tools/aes_decrypt/aes_decrypt.py

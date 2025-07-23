@@ -1,0 +1,95 @@
+description:
+  human:
+    en_US: Generate videos with Doubao (豆包) AI.
+    zh_CN: 使用豆包 AI 生成视频。
+  llm: This tool is used to generate videos from text prompts using Doubao (豆包) AI, powered by Volcengine/ByteDance.
+extra:
+  python:
+    source: tools/text2video.py
+identity:
+  author: Allen Writer
+  icon: icon.svg
+  label:
+    en_US: Text to Video
+    zh_CN: 文生视频
+  name: text2video
+parameters:
+- form: llm
+  human_description:
+    en_US: The text prompt used to generate the video. Doubao will generate a video based on this prompt.
+    zh_CN: 用于生成视频的文本提示。豆包将根据此提示生成视频。
+  label:
+    en_US: Prompt
+    zh_CN: 提示词
+  llm_description: This prompt text will be used to generate a video.
+  name: prompt
+  required: true
+  type: string
+- form: form
+  human_description:
+    en_US: The aspect ratio of the generated video.
+    zh_CN: 生成视频的宽高比。
+  label:
+    en_US: Aspect Ratio
+    zh_CN: 宽高比
+  name: ratio
+  options:
+  - label:
+      en_US: 16:9 (Landscape)
+      zh_CN: 16:9 (横向)
+    value: "16:9"
+  - label:
+      en_US: 9:16 (Portrait)
+      zh_CN: 9:16 (纵向)
+    value: "9:16"
+  - label:
+      en_US: 4:3 (Classic)
+      zh_CN: 4:3 (经典)
+    value: "4:3"
+  - label:
+      en_US: 1:1 (Square)
+      zh_CN: 1:1 (正方形)
+    value: "1:1"
+  required: false
+  type: select
+  default: "16:9"
+- form: form
+  human_description:
+    en_US: The duration of the generated video in seconds.
+    zh_CN: 生成视频的时长（秒）。
+  label:
+    en_US: Duration (seconds)
+    zh_CN: 时长（秒）
+  name: duration
+  options:
+  - label:
+      en_US: 5 seconds
+      zh_CN: 5秒
+    value: "5"
+  - label:
+      en_US: 10 seconds
+      zh_CN: 10秒
+    value: "10"
+  required: false
+  type: select
+  default: "5"
+- form: form
+  human_description:
+    en_US: Model version to use for video generation.
+    zh_CN: 用于视频生成的模型版本。
+  label:
+    en_US: Model Version
+    zh_CN: 模型版本
+  name: model
+  options:
+  - label:
+      en_US: Doubao Seedance 1.0 Lite
+      zh_CN: 豆包 Seedance 1.0 Lite
+    value: "doubao-seedance-1-0-lite-t2v-250428"
+  - label:
+      en_US: Doubao Seaweed
+      zh_CN: 豆包 Seaweed
+    value: "doubao-seaweed-241128"
+  required: false
+  type: select
+  default: "doubao-seedance-1-0-lite-t2v-250428"

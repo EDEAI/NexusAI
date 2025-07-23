@@ -1,0 +1,46 @@
+credentials_for_provider:
+  api_token:
+    help:
+      en_US: Get your Crawl4AI API token from your Crawl4AI installation
+      zh_Hans: 从您的Crawl4AI安装获取API令牌
+    label:
+      en_US: API Token
+      zh_Hans: API令牌
+    placeholder:
+      en_US: Please enter your Crawl4AI API token
+      zh_Hans: 请输入您的Crawl4AI API令牌
+    required: false
+    type: secret-input
+    url: https://docs.crawl4ai.com/core/docker-deployment/
+  server_url:
+    help:
+      en_US: Your Crawl4AI server URL (e.g. http://localhost:11235)
+      zh_Hans: 您的Crawl4AI服务器URL (例如 http://localhost:11235)
+    label:
+      en_US: Server URL
+      zh_Hans: 服务器URL
+    placeholder:
+      en_US: Please enter your Crawl4AI server URL
+      zh_Hans: 请输入您的Crawl4AI服务器URL
+    required: true
+    type: text-input
+    url: https://docs.crawl4ai.com/core/docker-deployment/
+extra:
+  python:
+    source: provider/crawl4ai.py
+identity:
+  author: "AGIMaster"
+  description:
+    en_US: Access Crawl4AI capabilities to extract content from web pages
+    zh_Hans: 访问Crawl4AI功能，从网页中提取内容
+  icon: icon.svg
+  label:
+    en_US: Crawl4AI
+    zh_Hans: Crawl4AI
+  name: crawl4ai
+  tags:
+  - search
+  - productivity
+tools:
+- tools/crawl_direct_legacy.yaml
+- tools/crawl.yaml

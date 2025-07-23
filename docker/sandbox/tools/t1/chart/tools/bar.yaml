@@ -1,0 +1,46 @@
+description:
+  human:
+    en_US: Bar chart
+    pt_BR: Gráfico de barras
+    zh_Hans: 柱状图
+  llm: generate a bar chart with input data
+extra:
+  python:
+    source: tools/bar.py
+identity:
+  author: langgenius
+  icon: icon.svg
+  label:
+    en_US: Bar Chart
+    pt_BR: Gráfico de barras
+    zh_Hans: 柱状图
+  name: bar_chart
+parameters:
+- form: llm
+  human_description:
+    en_US: data for generating chart, each number should be separated by ";"
+    pt_BR: dados para gerar gráfico de barras, cada número deve ser separado por ";"
+    zh_Hans: 用于生成柱状图的数据，每个数字之间用 ";" 分隔
+  label:
+    en_US: data
+    pt_BR: dados
+    zh_Hans: 数据
+  llm_description: data for generating bar chart, data should be a string contains
+    a list of numbers like "1;2;3;4;5"
+  name: data
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: X axis for chart, each text should be separated by ";"
+    pt_BR: Eixo X para gráfico de barras, cada texto deve ser separado por ";"
+    zh_Hans: 柱状图的 x 轴，每个文本之间用 ";" 分隔
+  label:
+    en_US: X Axis
+    pt_BR: Eixo X
+    zh_Hans: x 轴
+  llm_description: x axis for bar chart, x axis should be a string contains a list
+    of texts like "a;b;c;1;2" in order to match the data
+  name: x_axis
+  required: false
+  type: string

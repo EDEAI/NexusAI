@@ -1,0 +1,76 @@
+description:
+  human:
+    en_US: "Extract content from web pages using Crawl4AI's crawl_direct API. Supports CSS selectors for precise content extraction."
+    zh_Hans: "使用Crawl4AI的 crawl_direct API从网页提取内容。支持使用CSS选择器进行精确的内容提取。"
+  llm: A tool for extracting content from web pages. Input should be a URL. 
+    You can use CSS selectors to extract specific parts of the page.
+    Content will be returned in markdown or html format.
+extra:
+  python:
+    source: tools/crawl.py
+identity:
+  author: "AGIMaster"
+  label:
+    en_US: Web Content Extraction
+    zh_Hans: 网页内容提取
+  name: crawl
+parameters:
+- form: llm
+  human_description:
+    en_US: "The URL of the webpage to extract content from"
+    zh_Hans: "要提取内容的网页URL"
+  label:
+    en_US: URL
+    zh_Hans: 网址
+  llm_description: The URL of the webpage to crawl
+  name: url
+  required: true
+  type: string
+- form: form
+  human_description:
+    en_US: "CSS selector to target specific elements on the page (e.g. #article, .content)"
+    zh_Hans: "CSS选择器，用于定位页面上的特定元素（如 #article, .content）"
+  label:
+    en_US: CSS Selector
+    zh_Hans: CSS选择器
+  llm_description: CSS selector to target specific elements on the page
+  name: css_selector
+  required: false
+  type: string
+- default: "script,style,noscript"
+  form: form
+  human_description:
+    en_US: "HTML tags to exclude from extraction (comma-separated)"
+    zh_Hans: "从提取中排除的HTML标签（逗号分隔）"
+  label:
+    en_US: Excluded Tags
+    zh_Hans: 排除的标签
+  llm_description: HTML tags to exclude from extraction
+  name: excluded_tags
+  required: false
+  type: string
+- default: "markdown"
+  form: form
+  human_description:
+    en_US: "Output format (markdown or html)"
+    zh_Hans: "输出格式（markdown或html）"
+  label:
+    en_US: Output Format
+    zh_Hans: 输出格式
+  llm_description: Format for the extracted content
+  name: output_format
+  required: false
+  options:
+  - value: "markdown"
+    label:
+      en_US: Markdown
+      zh_Hans: Markdown
+  - value: "html"
+    label:
+      en_US: HTML
+      zh_Hans: HTML
+  - value: "cleaned_html"
+    label:
+      en_US: Cleaned HTML
+      zh_Hans: 干净的HTML
+  type: select

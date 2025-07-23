@@ -1,0 +1,77 @@
+identity:
+  name: get_model_by_hash
+  author: yt-koike
+  label:
+    en_US: Get model by hash
+description:
+  human:
+    en_US: Gets model by hash
+  llm: Gets model by hash
+parameters:
+  - name: model_hash
+    type: string
+    required: true
+    label:
+      en_US: Model Hash
+    human_description:
+      en_US: Gets a model by hash
+    llm_description: Gets a model by hash
+    form: llm
+extra:
+  python:
+    source: tools/get_model_by_hash.py
+output_schema:
+  type: object
+  properties:
+    model_id:
+      type: number
+      label:
+        en_US: Model ID
+    name:
+      type: string
+      label:
+        en_US: name
+    description:
+      type: string
+      label:
+        en_US: Type
+    type:
+      type: string
+      label:
+        en_US: Type
+    nsfw:
+      type: boolean
+      label:
+        en_US: NSFW
+    nsfw_level:
+      type: number
+      label:
+        en_US: NSFW Level
+    tags:
+      type: array[string]
+      label:
+        en_US: Tags
+    creator_name:
+      type: string
+      label:
+        en_US: Creator Name
+    creator_icon_url:
+      type: string
+      label:
+        en_US: Creator Image URL
+    version_ids:
+      type: array[number]
+      label:
+        en_US: Creator Image URL
+    download_count:
+      type: number
+      label:
+        en_US: Download Count
+    thumbs_up_count:
+      type: number
+      label:
+        en_US: Thumbs Up Count
+    thumbs_down_count:
+      type: number
+      label:
+        en_US: Thumbs Up Count

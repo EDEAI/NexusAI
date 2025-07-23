@@ -1,0 +1,83 @@
+identity:
+  name: rookie_data_alchemy
+  author: jaguarliuu
+  label:
+    en_US: rookie_data_alchemy
+    zh_Hans: rookie_data_alchemy
+    pt_BR: rookie_data_alchemy
+description:
+  human:
+    en_US: Visualizing structured data as charts
+    zh_Hans: Visualizing structured data as charts
+    pt_BR: Visualizing structured data as charts
+  llm: Visualizing structured data as charts
+parameters:
+  - name: model # the name of the model parameter
+    type: model-selector # model-type
+    scope: llm # the scope of the parameter
+    form: form
+    required: true
+    label:
+      en_US: Model
+      zh_Hans: 模型
+      pt_BR: Model
+    human_description:
+      en_US: LLM model for rookie_data_alchemy.
+      zh_Hans: LLM model for rookie_data_alchemy.
+      pt_BR: LLM model for rookie_data_alchemy.
+    llm_description: LLM model for text2data.
+  - name: data
+    type: string
+    required: false
+    label:
+      en_US: data
+      zh_Hans: 待处理的数据，建议为json格式或md
+      pt_BR: data
+    human_description:
+      en_US: wait for data
+      zh_Hans: 待处理的数据，建议为json格式或md
+      pt_BR: wait for data
+    llm_description: wait for data
+    form: llm
+  - name: title
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: title
+      zh_Hans: 图表标题，不填则大模型推理生成
+      pt_BR: title
+    human_description:
+      en_US: title
+      zh_Hans: 图表标题，不填则大模型推理生成
+      pt_BR: title
+    llm_description: title
+  - name: chart_type
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: chart type
+      zh_Hans: 图表类型
+      pt_BR: chart type
+    human_description:
+      en_US: chart type
+      zh_Hans: 图表类型
+      pt_BR: chart type
+    llm_description: chart type
+  - name: custom_requirements
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: custom requirements
+      zh_Hans: 自定义需求
+      pt_BR: custom requirements
+    human_description:
+      en_US: custom requirements
+      zh_Hans: 自定义需求
+      pt_BR: custom requirements
+    llm_description: custom requirements
+extra:
+  python:
+    source: tools/rookie_data_alchemy.py

@@ -1,0 +1,61 @@
+identity:
+  name: getMessage
+  author: ssssshql
+  label:
+    en_US: Retrieve Messages
+    zh_Hans: 取消息
+    pt_BR: Recuperar Mensagens
+description:
+  human:
+    en_US: Retrieve stored conversation messages
+    zh_Hans: 取消息
+    pt_BR: Recuperar mensagens armazenadas
+  llm: 取消息
+
+parameters:
+  - name: conversation_id
+    type: string
+    required: true
+    label:
+      en_US: Conversation ID
+      zh_Hans: 对话 ID
+      pt_BR: ID da Conversa
+    human_description:
+      en_US: Target conversation identifier
+      zh_Hans: 要获取消息的对话的唯一标识符
+      pt_BR: Identificador da conversa alvo
+    llm_description: The unique identifier of the target conversation
+    form: llm
+
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: Message owner identifier
+      zh_Hans: 消息所属用户的唯一标识
+      pt_BR: Identificador do dono da mensagem
+    llm_description: The unique identifier of the message owner
+    form: llm
+
+  - name: max_count
+    type: number
+    required: false
+    default: 50
+    label:
+      en_US: Max Results
+      zh_Hans: 最大数量(默认50)
+      pt_BR: Máximo de Resultados
+    human_description:
+      en_US: Maximum messages to retrieve (1-1000)
+      zh_Hans: 要检索的最大消息数
+      pt_BR: Número máximo de mensagens (1-1000)
+    llm_description: The maximum number of messages to retrieve [1-1000]
+    form: llm
+
+extra:
+  python:
+    source: tools/getMessage.py

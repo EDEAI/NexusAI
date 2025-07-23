@@ -1,0 +1,47 @@
+identity:
+  name: base64_encoder
+  author: bowenliang123
+  label:
+    en_US: Base64 Encoder
+    zh_Hans: Base64 编码
+description:
+  human:
+    en_US: A tool to encode text to Base64-encoded string
+    zh_Hans: 将文本编码为 Base64 编码的字符串的工具
+  llm: A tool to encode text to Base64-encoded string
+parameters:
+  - name: plain_text
+    type: string
+    required: true
+    label:
+      en_US: Raw Text
+      zh_Hans: 原始文本
+    human_description:
+      en_US: Text to encode
+      zh_Hans: 原始文本
+    llm_description: Text to encode
+    form: llm
+  - name: urlsafe_enabled
+    type: select
+    required: true
+    default: "false"
+    options:
+      - value: "true"
+        label:
+          en_US: "Yes"
+          zh_Hans: 是
+      - value: "false"
+        label:
+          en_US: "No"
+          zh_Hans: 否
+    label:
+      en_US: Whether to enable URL safe alphabet
+      zh_Hans: 是否启用URL安全字符
+    human_description:
+      en_US: Whether to enable URL safe alphabet
+      zh_Hans: 是否启用URL安全字符
+    llm_description: Whether to enable URL safe alphabet, default to "false"
+    form: form
+extra:
+  python:
+    source: tools/base64_encoder/base64_encoder.py

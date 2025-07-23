@@ -1,0 +1,72 @@
+identity:
+  name: minio_reader
+  author: aias00
+  label:
+    en_US: minio_reader
+    zh_Hans: MinIO读取工具
+    pt_BR: minio_reader
+description:
+  human:
+    en_US: A tool to read content from a MinIO bucket.
+    zh_Hans: 从MinIO存储桶读取内容的工具。
+    pt_BR: A tool to read content from a MinIO bucket.
+  llm: A tool to read content from a MinIO bucket.
+parameters:
+  - name: access_key
+    type: string
+    required: true
+    label:
+      en_US: MinIO Access Key
+      zh_Hans: MinIO访问密钥
+    human_description:
+      en_US: The access key for MinIO authentication.
+      zh_Hans: 用于MinIO身份验证的访问密钥。
+    llm_description: A tool to read content from a MinIO bucket.
+    form: form
+  - name: secret_key
+    type: string
+    required: true
+    label:
+      en_US: MinIO Secret Key
+      zh_Hans: MinIO秘密密钥
+    human_description:
+      en_US: The secret key for MinIO authentication.
+      zh_Hans: 用于MinIO身份验证的秘密密钥。
+    llm_description: A tool to read content from a MinIO bucket.
+    form: form
+  - name: endpoint
+    type: string
+    required: true
+    label:
+      en_US: MinIO Endpoint URL
+      zh_Hans: MinIO端点URL
+    human_description:
+      en_US: The endpoint URL of the MinIO server (e.g., http://localhost:9000).
+      zh_Hans: MinIO服务器的端点URL（例如 http://localhost:9000）。
+    llm_description: A tool to read content from a MinIO bucket.
+    form: form
+  - name: bucket_name
+    type: string
+    required: true
+    label:
+      en_US: Bucket Name
+      zh_Hans: 存储桶名称
+    human_description:
+      en_US: The name of the MinIO bucket to write to.
+      zh_Hans: 要写入的MinIO存储桶名称。
+    llm_description: A tool to read content from a MinIO bucket.
+    form: form
+  - name: object_name
+    type: string
+    required: true
+    label:
+      en_US: Object Name
+      zh_Hans: 对象名称
+    human_description:
+      en_US: The name of the object/file in the MinIO bucket.
+      zh_Hans: MinIO存储桶中的对象/文件名。
+    llm_description: A tool to read content from a MinIO bucket.
+    form: llm
+extra:
+  python:
+    source: tools/minio_reader.py

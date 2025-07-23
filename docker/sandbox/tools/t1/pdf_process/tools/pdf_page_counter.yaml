@@ -1,0 +1,47 @@
+description:
+  human:
+    en_US: A tool for counting pages in a PDF with customizable output format
+    zh_Hans: 一个计算 PDF 页数并可自定义输出格式的工具
+  llm: A tool for counting the total number of pages in a PDF document with option to output as number or JSON format
+extra:
+  python:
+    source: tools/pdf_page_counter.py
+identity:
+  author: kalochin
+  label:
+    en_US: PDF Page Counter
+    zh_Hans: PDF 页数计算器
+  name: pdf_page_counter
+parameters:
+- form: llm
+  human_description:
+    en_US: PDF file content (base64 encoded)
+    zh_Hans: PDF 文件内容（base64 编码）
+  label:
+    en_US: PDF Content
+    zh_Hans: PDF 内容
+  llm_description: PDF file content in base64 encoded format
+  name: pdf_content
+  required: true
+  type: file
+- form: llm
+  human_description:
+    en_US: Format of the output (number or json)
+    zh_Hans: 输出格式（数字或JSON）
+  label:
+    en_US: Output Format
+    zh_Hans: 输出格式
+  llm_description: Choose between simple number output or JSON format with page numbers
+  name: output_format
+  required: false
+  type: select
+  default: "number"
+  options:
+    - value: "number"
+      label:
+        en_US: "Number"
+        zh_Hans: "数字"
+    - value: "json"
+      label:
+        en_US: "JSON"
+        zh_Hans: "JSON"

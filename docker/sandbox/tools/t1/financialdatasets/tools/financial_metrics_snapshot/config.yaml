@@ -1,0 +1,34 @@
+identity:
+  name: financial_metrics_snapshot
+  author: financialai
+  label:
+    en_US: Financial Metrics Snapshot
+    zh_Hans: 财务指标快照
+    ja_Jp: 財務指標スナップショット
+    pt_BR: Instantâneo de Métricas Financeiras
+description:
+  human:
+    en_US: Get a real-time snapshot of key financial metrics and ratios for a ticker, including valuation, profitability, efficiency, liquidity, leverage, growth, and per share metrics.
+    zh_Hans: 获取股票代码的关键财务指标和比率的实时快照，包括估值、盈利能力、效率、流动性、杠杆、增长和每股指标。
+    ja_Jp: ティッカーの主要な財務指標と比率のリアルタイムスナップショットを取得します。これには、評価、収益性、効率、流動性、レバレッジ、成長、株価指標が含まれます。
+    pt_BR: Obtenha um instantâneo em tempo real das principais métricas e índices financeiros para um ticker, incluindo avaliação, lucratividade, eficiência, liquidez, alavancagem, crescimento e métricas por ação.
+  llm: Get a real-time snapshot of key financial metrics and ratios for a ticker, including valuation, profitability, efficiency, liquidity, leverage, growth, and per share metrics.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol of the company you want to get financial metrics for.
+      zh_Hans: 您想获取财务指标的公司的股票代码。
+      ja_Jp: 財務指標を取得したい会社のティッカーシンボル。
+      pt_BR: O símbolo do ticker da empresa para a qual você deseja obter métricas financeiras.
+    llm_description: The ticker symbol of the company you want to get financial metrics for.
+    form: llm
+extra:
+  python:
+    source: tools/financial_metrics_snapshot/invoke.py

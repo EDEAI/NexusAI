@@ -1,0 +1,70 @@
+description:
+  human:
+    zh_Hans: 删除单元格信息
+    en_US: Clear Cells content
+  llm: A tool for Clear the cells content. (读取单元格信息)
+extra:
+  python:
+    source: tools/clear_area.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: Clear Cells content
+    zh_Hans: 清除单元格信息
+  name: clear_area
+parameters:
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID of the table, supports table URL input, e.g., https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+    zh_Hans: 表格的ID，支持表格 URL 输入，如：https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+  label:
+    en_US: Table ID
+    zh_Hans: 表格的链接
+  llm_description: 表格的ID，支持表格 URL 输入，如：https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+  name: table_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Sheet ID, either sheet_id or sheet_name must be filled.
+    zh_Hans: 工作表 ID，与 sheet_name 二者其一必填。
+  label:
+    en_US: sheet_id
+    zh_Hans: 工作表 ID
+  llm_description: 工作表 ID，与 sheet_name 二者其一必填。
+  name: sheet_id
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Sheet name, either sheet_id or sheet_name must be filled.
+    zh_Hans: 工作表名称，与 sheet_id 二者其一必填。
+  label:
+    en_US: sheet_name
+    zh_Hans: 工作表名称
+  llm_description: 工作表名称，与 sheet_id 二者其一必填。
+  name: sheet_name
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: The area of the table, e.g., A1:B2
+    zh_Hans: 表格的区域，如：A1:B2
+  label:
+    en_US: area
+    zh_Hans: 表格的区域
+  llm_description: 表格的区域，如：A1:B2
+  name: area
+  required: true
+  type: string

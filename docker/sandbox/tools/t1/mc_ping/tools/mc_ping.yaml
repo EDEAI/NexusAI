@@ -1,0 +1,43 @@
+identity:
+  name: mc_ping
+  author: lzy123
+  label:
+    en_US: Minecraft Server Info
+    zh_Hans: Minecraft服务器信息
+    pt_BR: Informações do Servidor Minecraft
+description:
+  human:
+    en_US: Get information about a Minecraft server including version, players, and status
+    zh_Hans: 获取Minecraft服务器的版本、玩家数量和在线状态等信息
+    pt_BR: Obter informações sobre um servidor Minecraft, incluindo versão, jogadores e status
+  llm: This tool allows you to retrieve information about a Minecraft server such as its version, online status, player count, and other details by providing the server address.
+parameters:
+  - name: host
+    type: string
+    required: true
+    label:
+      en_US: Server Address
+      zh_Hans: 服务器地址
+      pt_BR: Endereço do Servidor
+    human_description:
+      en_US: Enter the Minecraft server address (e.g., mc.hypixel.net) to get information about it
+      zh_Hans: 输入Minecraft服务器地址（例如：mc.hypixel.net）以获取相关信息
+      pt_BR: Digite o endereço do servidor Minecraft (ex： mc.hypixel.net) para obter informações sobre ele
+    llm_description: The server address to query. This should be a valid Minecraft server address like 'mc.hypixel.net' or 'play.mydomain.com'. You can optionally include a port like 'mc.example.com:25565'.
+    form: llm
+  - name: port
+    type: number
+    required: false
+    label:
+      en_US: port
+      zh_Hans: 端口
+      pt_BR: Porta
+    human_description:
+      en_US: Optional port number for the Minecraft server (default is 25565)
+      zh_Hans: Minecraft服务器的可选端口号（默认是25565）
+      pt_BR: Número da porta opcional para o servidor Minecraft (padrão é 25565)
+    llm_description: Optional port number for the Minecraft server. If not specified, the default port 25565 will be used.
+    form: llm
+extra:
+  python:
+    source: tools/mc_ping.py

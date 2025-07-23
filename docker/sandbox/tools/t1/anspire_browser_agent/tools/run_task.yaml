@@ -1,0 +1,54 @@
+identity:
+  name: run_task
+  author: anspire
+  label:
+    en_US: Create and run a new browser automation task by providing instructions in natural language.
+    zh_Hans: 运行自动化任务
+description:
+  human:
+    en_US: Create and run a new browser automation task by providing instructions in natural language.
+    zh_Hans: 通过自然语言指令来创建和运行新的浏览器自动化任务
+  llm: This tool creates and runs a new browser automation task with Browser Agent.
+parameters:
+- name: instance_id
+  type: string
+  required: true
+  label:
+    en_US: instance id string
+    zh_Hans: 云资源实例标识
+    pt_BR: instance id string
+  human_description:
+    en_US: instance id
+    zh_Hans: 云资源实例标识
+    pt_BR: instance id
+  llm_description: cloud instance id
+  form: llm
+- name: task_prompt
+  type: string
+  required: true
+  label:
+    en_US: task prompt string
+    zh_Hans: 任务提示词
+    pt_BR: task prompt string
+  human_description:
+    en_US: task prompt
+    zh_Hans: 任务提示词
+    pt_BR: task prompt
+  llm_description: task prompt in natural language
+  form: llm
+- name: site_url
+  type: string
+  required: false
+  label:
+    en_US: task site url string
+    zh_Hans: 站点地址(示例值:https://www.bilibili.com)
+    pt_BR: task site url string
+  human_description:
+    en_US: task site url(eg:https://www.bilibili.com)
+    zh_Hans: 站点地址(示例值:https://www.bilibili.com)
+    pt_BR: ttask site url(eg:https://www.bilibili.com)
+  llm_description: task in site url
+  form: llm
+extra:
+  python:
+    source: tools/run_task.py

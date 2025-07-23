@@ -1,0 +1,50 @@
+credentials_for_provider:
+  digitforce_api_key:
+    help:
+      en_US: You can get the API key for free from www.digitforce.com.
+      zh_Hans: 从www.digitforce.com免费获取API key
+    label:
+      en_US: API key
+      zh_Hans: API key
+    placeholder:
+      en_US: Please input your API key
+      zh_Hans: 请输入你的API key
+    required: true
+    type: secret-input
+    url: https://www.digitforce.com/api/app?source=dify&intent=redect_api
+  tips:
+    default: https://www.digitforce.com/api/app?source=dify&intent=redect_api
+    label:
+      en_US: You can obtain your API key for free simply by providing your email.
+        The free sign - up URL is
+      pt_BR: You can obtain your API key for free simply by providing your email.
+        The free sign - up URL is
+      zh_Hans: 通过邮箱即可免费获取API key,免费获取网址：
+    required: false
+    type: text-input
+extra:
+  python:
+    source: provider/data_analysis.py
+identity:
+  author: digitforce
+  description:
+    en_US: An intelligent data analysis tool based on LLM and natural language interaction,
+      featuring built-in data query and data visualization, as well as report generation
+      capabilities.
+    pt_BR: An intelligent data analysis tool based on LLM and natural language interaction,
+      featuring built-in data query and data visualization, as well as report generation
+      capabilities.
+    zh_Hans: 基于大模型和自然语言交互的智能数据分析工具，内置数据查询和数据可视化（ChatBI），以及报告生成功能。
+  icon: icon.svg
+  label:
+    en_US: data_analysis
+    pt_BR: data_analysis
+    zh_Hans: 数据分析
+  name: data_analysis
+tools:
+- tools/data_analysis.yaml
+- tools/data_interpretation.yaml
+- tools/data_visualization.yaml
+- tools/time_identify.yaml
+- tools/query_database.yaml
+- tools/merge_to_multisheet.yaml

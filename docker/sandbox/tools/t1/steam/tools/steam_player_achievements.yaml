@@ -1,0 +1,50 @@
+identity:
+  name: steam_player_achievements
+  author: bdim
+  label:
+    en_US: Steam Player Achievements
+    zh_Hans: 玩家成就
+description:
+  human:
+    en_US: Get the achievements earned by a Steam user for a specific game
+    zh_Hans: 获取 Steam 用户在特定游戏中已解锁的成就
+  llm: Retrieve a comprehensive list of achievements for a specified Steam user in a particular game, including achievement names, descriptions, completion status, and unlock dates.
+parameters:
+  - name: steamid
+    type: string
+    required: true
+    label:
+      en_US: Steam ID
+      zh_Hans: Steam ID
+    human_description:
+      en_US: 64-bit Steam ID of the player
+      zh_Hans: 玩家的 64 位 Steam ID
+    llm_description: The 64-bit identifier for the Steam user whose achievements you want to retrieve. The user's game details must be public.
+    form: llm
+
+  - name: appid
+    type: string
+    required: true
+    label:
+      en_US: Game AppID
+      zh_Hans: 游戏AppID
+    human_description:
+      en_US: The AppID of the game you want achievements for
+      zh_Hans: 需要查询成就的游戏 AppID
+    llm_description: The unique identifier for the game on Steam. For example, 440 is the AppID for Team Fortress 2, 570 for Dota 2, 730 for CS:GO.
+    form: llm
+
+  - name: language
+    type: string
+    required: false
+    label:
+      en_US: Language
+      zh_Hans: 语言
+    human_description:
+      en_US: Language code for achievement names and descriptions (e.g., english, schinese)
+      zh_Hans: 成就名称和描述的语言代码（例如：english, schinese）
+    llm_description: Optional language code to retrieve localized achievement names and descriptions. Examples include 'english', 'schinese' (Simplified Chinese), 'tchinese' (Traditional Chinese), 'russian', etc.
+    form: llm
+extra:
+  python:
+    source: tools/steam_player_achievements.py

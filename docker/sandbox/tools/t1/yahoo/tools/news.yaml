@@ -1,0 +1,32 @@
+description:
+  human:
+    en_US: A tool for get news about a ticker from Yahoo Finance.
+    pt_BR: Uma ferramenta para obter notícias sobre um ticker da Yahoo Finance.
+    zh_Hans: 一个用于从雅虎财经获取新闻的工具。
+  llm: A tool for get news from Yahoo Finance. Input should be the ticker symbol like
+    AAPL.
+extra:
+  python:
+    source: tools/news.py
+identity:
+  author: langgenius
+  icon: icon.svg
+  label:
+    en_US: News
+    pt_BR: Notícias
+    zh_Hans: 新闻
+  name: yahoo_finance_news
+parameters:
+- form: llm
+  human_description:
+    en_US: The ticker symbol of the company you want to search.
+    pt_BR: O símbolo do ticker da empresa que você deseja pesquisar.
+    zh_Hans: 你想要搜索的公司的股票代码。
+  label:
+    en_US: Ticker symbol
+    pt_BR: Símbolo do ticker
+    zh_Hans: 股票代码
+  llm_description: The ticker symbol of the company you want to search.
+  name: symbol
+  required: true
+  type: string

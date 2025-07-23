@@ -1,0 +1,38 @@
+identity:
+  name: delete_todo
+  author: ayush3941
+  label:
+    en_US: Delete Todo Task
+    zh_Hans: 删除待办事项
+    pt_BR: Excluir Tarefa
+  icon: "icon.png"
+  description:
+    en_US: Delete a specific task from Microsoft Todo using the task ID.
+    zh_Hans: 使用任务 ID 从 Microsoft Todo 中删除特定任务。
+    pt_BR: Exclua uma tarefa específica do Microsoft Todo usando o ID da tarefa.
+
+description:
+  human:
+    en_US: Remove a todo task by specifying its unique task ID.
+    zh_Hans: 通过指定唯一的任务 ID 删除待办事项。
+    pt_BR: Remova uma tarefa especificando o ID único da tarefa.
+  llm: Delete a Microsoft Todo task using its ID.
+
+parameters:
+  - name: task_id
+    type: string
+    required: true
+    label:
+      en_US: Task ID
+      zh_Hans: 任务 ID
+      pt_BR: ID da Tarefa
+    human_description:
+      en_US: The unique identifier of the task to be deleted.
+      zh_Hans: 要删除的任务的唯一标识符。
+      pt_BR: O identificador único da tarefa a ser excluída.
+    llm_description: ID of the task to delete.
+    form: llm
+
+extra:
+  python:
+    source: tools/delete_todo.py

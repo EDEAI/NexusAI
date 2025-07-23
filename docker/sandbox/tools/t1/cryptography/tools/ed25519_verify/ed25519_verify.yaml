@@ -1,0 +1,48 @@
+identity:
+  name: ed25519_verify
+  author: bowenliang123
+  label:
+    en_US: Ed25519 Verification
+    zh_Hans: Ed25519 签名验证
+description:
+  human:
+    en_US: Using Ed25519 algorithm and public key, verify signature for the input plaintext
+    zh_Hans: 使用 Ed25519 算法及公钥，验证签名对原文的正确性
+  llm: Ed25519 Verification
+parameters:
+  - name: plaintext
+    type: string
+    required: true
+    label:
+      en_US: Plaintext
+      zh_Hans: 原文
+    human_description:
+      en_US: "Plaintext"
+      zh_Hans: "原文"
+    llm_description: "Plaintext"
+    form: llm
+  - name: signature
+    type: string
+    required: true
+    label:
+      en_US: Signature
+      zh_Hans: 签名
+    human_description:
+      en_US: Base64-encoded signature text
+      zh_Hans: Base64 编码的签名文本
+    llm_description: "Signature"
+    form: llm
+  - name: public_key_text
+    type: string
+    required: true
+    label:
+      en_US: Public Key Content
+      zh_Hans: 公钥文本
+    human_description:
+      en_US: "Starts with '-----BEGIN PUBLIC KEY-----'"
+      zh_Hans: "以 '-----BEGIN PUBLIC KEY-----' 开头"
+    llm_description: "Public Key File"
+    form: llm
+extra:
+  python:
+    source: tools/ed25519_verify/ed25519_verify.py

@@ -1,0 +1,126 @@
+identity:
+  name: video_generation
+  author: quicksandzn
+  label:
+    en_US: Video Generation
+    zh_Hans: 视频生成
+description:
+  human:
+    en_US: Video Generation
+    zh_Hans: 视频生成
+  llm: Video Generation
+parameters:
+  - name: model
+    type: select
+    required: true
+    options:
+      - value: MiniMax-Hailuo-02
+        label:
+          en_US: MiniMax-Hailuo-02
+          zh_Hans: MiniMax-Hailuo-02
+      - value: T2V-01-Director
+        label:
+          en_US: T2V-01-Director
+          zh_Hans: T2V-01-Director
+      - value: I2V-01-Director
+        label:
+          en_US: I2V-01-Director
+          zh_Hans: I2V-01-Director
+      - value: S2V-01
+        label:
+          en_US: S2V-01
+          zh_Hans: S2V-01
+      - value: I2V-01-live
+        label:
+          en_US: I2V-01-live
+          zh_Hans: I2V-01-live
+      - value: I2V-01
+        label:
+          en_US: I2V-01
+          zh_Hans: I2V-01
+      - value: T2V-01
+        label:
+          en_US: T2V-01
+          zh_Hans: T2V-01
+    default: MiniMax-Hailuo-02
+    label:
+      en_US: Model Name
+      zh_Hans: 模型名称
+    human_description:
+      en_US: Model Name
+      zh_CN: 模型名称
+    form: form
+  - name: prompt
+    type: string
+    required: false
+    label:
+      en_US: Prompt
+      zh_Hans: 文本提示词
+    human_description:
+      en_US: Generate the description of the video.
+      zh_CN: 生成视频的描述
+    form: llm
+  - name: prompt_optimizer
+    type: boolean
+    required: false
+    default: true
+    label:
+      en_US: Prompt Optimizer
+      zh_Hans: 提示词优化
+    human_description:
+      en_US: The model will automatically optimize the incoming prompt
+      zh_CN: 模型会自动优化传入的prompt
+    form: form
+  - name: duration
+    type: select
+    required: true
+    options:
+      - value: "6"
+        label:
+          en_US: "6"
+          zh_Hans: "6"
+      - value: "10"
+        label:
+          en_US: "10"
+          zh_Hans: "10"
+    default: "6"
+    label:
+      en_US: Video Duration
+      zh_Hans: 视频时长
+    human_description:
+      en_US: Generated video duration
+      zh_CN: 生成视频时长
+    form: form
+  - name: resolution
+    type: select
+    required: true
+    options:
+      - value: 768P
+        label:
+          en_US: 768P
+          zh_Hans: 768P
+      - value: 1080P
+        label:
+          en_US: 1080P
+          zh_Hans: 1080P
+    default: 768P
+    label:
+      en_US: Resolution
+      zh_Hans: 分辨率
+    human_description:
+      en_US: Resolution
+      zh_CN: 分辨率
+    form: form
+  - name: first_frame_image
+    type: string
+    required: false
+    label:
+      en_US: First Frame Image
+      zh_Hans: 首帧画面
+    human_description:
+      en_US: The model will generate a video based on the image passed in this parameter as the first frame
+      zh_CN: 模型将以此参数中传入的图片为首帧画面来生成视频
+    form: form
+extra:
+  python:
+    source: tools/video_generation.py

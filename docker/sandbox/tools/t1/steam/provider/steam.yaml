@@ -1,0 +1,76 @@
+identity:
+  author: bdim
+  name: steam
+  label:
+    en_US: Steam
+    zh_Hans: Steam
+  description:
+    en_US: Access Steam user information via the Steam Web API
+    zh_Hans: 通过 Steam Web API 访问 Steam
+  icon: icon.svg
+tools:
+  - tools/steam.yaml
+  - tools/steam_news.yaml
+  - tools/steam_achievements.yaml
+  - tools/steam_player_details.yaml
+  - tools/steam_friend_list.yaml
+  - tools/steam_player_achievements.yaml
+  - tools/steam_user_stats.yaml
+  - tools/steam_owned_games.yaml
+  - tools/steam_recently_played.yaml
+extra:
+  python:
+    source: provider/steam.py
+
+credentials_for_provider:
+  api_key: 
+    type: secret-input
+    required: true
+    label: 
+      en_US: Steam API Key
+      zh_Hans: Steam API密钥
+    placeholder: 
+      en_US: Enter your Steam Web API key
+      zh_Hans: 请输入您的Steam Web API密钥
+    help: 
+      en_US: You can get your API key from Steam developer website
+      zh_Hans: 您可以从Steam开发者网站获取API密钥
+    url: https://steamcommunity.com/dev/apikey
+  
+  steam_id:
+    type: text-input
+    required: true
+    label:
+      en_US: Steam ID
+      zh_Hans: Steam ID
+    placeholder:
+      en_US: Enter your 17-digit Steam ID
+      zh_Hans: 请输入您的17位数字Steam ID
+    help:
+      en_US: The Steam ID will be used to validate your API key
+      zh_Hans: Steam ID将用于验证您的API密钥
+
+credential_validation:
+  mode: required
+  credentials:
+    - name: api_key
+      label:
+        en_US: Steam API Key
+        zh_Hans: Steam API密钥
+      description:
+        en_US: Your Steam Web API key from https://steamcommunity.com/dev/apikey
+        zh_Hans: 从 https://steamcommunity.com/dev/apikey 获取的Steam Web API密钥
+      type: string
+      required: true
+      default: ""
+      
+    - name: steam_id
+      label:
+        en_US: Steam ID
+        zh_Hans: Steam ID
+      description:
+        en_US: The 17-digit Steam ID for validation
+        zh_Hans: 用于验证的17位数字Steam ID 
+      type: string
+      required: false
+      default: ""

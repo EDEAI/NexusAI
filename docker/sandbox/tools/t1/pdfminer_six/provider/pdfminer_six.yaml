@@ -1,0 +1,17 @@
+identity:
+  author: tavan
+  name: pdfminer_six
+  label:
+    en_US: pdfminer_six
+    zh_Hans: pdfminer_six
+    pt_BR: pdfminer_six
+  description:
+    en_US: pdfminer_six extracts the text from a page directly from the sourcecode of the PDF.
+    zh_Hans: pdfminer_six extracts the text from a page directly from the sourcecode of the PDF.
+    pt_BR: pdfminer_six extracts the text from a page directly from the sourcecode of the PDF.
+  icon: icon.jpg
+tools:
+  - tools/pdfminer_six.yaml
+extra:
+  python:
+    source: provider/pdfminer_six.py

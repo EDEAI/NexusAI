@@ -1,0 +1,19 @@
+identity:
+  author: yevanchen
+  name: pymupdf
+  label:
+    en_US: pymupdf
+    zh_Hans: pymupdf
+    pt_BR: pymupdf
+  description:
+    en_US: PyMuPDF is a high performance Python library for data extraction, analysis, conversion &amp; manipulation of PDF (and other) documents
+    zh_Hans: PyMuPDF is a high performance Python library for data extraction, analysis, conversion &amp; manipulation of PDF (and other) documents
+    pt_BR: PyMuPDF is a high performance Python library for data extraction, analysis, conversion &amp; manipulation of PDF (and other) documents
+  icon: pymupdf.png
+
+
+tools:
+  - tools/pymupdf.yaml
+extra:
+  python:
+    source: provider/pymupdf.py

@@ -1,0 +1,221 @@
+description:
+  human:
+    en_US: Update Book's Table of Contents.
+    zh_Hans: 更新知识库目录。
+  llm: Update Book's Table of Contents.
+extra:
+  python:
+    source: tools/update_book_table_of_contents.py
+identity:
+  author: 佐井
+  icon: icon.svg
+  label:
+    en_US: Update Book's Table of Contents
+    zh_Hans: 更新知识库目录
+  name: aliyuque_update_book_table_of_contents
+parameters:
+- form: llm
+  human_description:
+    en_US: Book ID.
+    zh_Hans: 知识库 ID。
+  label:
+    en_US: Book ID
+    zh_Hans: 知识库 ID
+  llm_description: Book ID.
+  name: book_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: In the operation scenario, sibling node prepending is not supported, deleting
+      a node doesn't remove associated documents, and node deletion has two modes,
+      'sibling' (delete current node) and 'child' (delete current node and its children).
+    zh_Hans: 操作，创建场景下不支持同级头插 prependNode，删除节点不会删除关联文档，删除节点时action_mode=sibling (删除当前节点),
+      action_mode=child (删除当前节点及子节点)
+  label:
+    en_US: Action Type
+    zh_Hans: 操作
+  llm_description: In the operation scenario, sibling node prepending is not supported,
+    deleting a node doesn't remove associated documents, and node deletion has two
+    modes, 'sibling' (delete current node) and 'child' (delete current node and its
+    children).
+  name: action
+  options:
+  - label:
+      en_US: appendNode
+      pt_BR: appendNode
+      zh_Hans: appendNode
+    value: appendNode
+  - label:
+      en_US: prependNode
+      pt_BR: prependNode
+      zh_Hans: prependNode
+    value: prependNode
+  - label:
+      en_US: editNode
+      pt_BR: editNode
+      zh_Hans: editNode
+    value: editNode
+  - label:
+      en_US: removeNode
+      pt_BR: removeNode
+      zh_Hans: removeNode
+    value: editNode
+  required: true
+  type: select
+- form: llm
+  human_description:
+    en_US: Operation mode (sibling:same level, child:child level).
+    zh_Hans: 操作模式 (sibling:同级, child:子级)。
+  label:
+    en_US: Action Type
+    zh_Hans: 操作
+  llm_description: Operation mode (sibling:same level, child:child level).
+  name: action_mode
+  options:
+  - label:
+      en_US: sibling
+      pt_BR: sibling
+      zh_Hans: 同级
+    value: sibling
+  - label:
+      en_US: child
+      pt_BR: child
+      zh_Hans: 子集
+    value: child
+  required: false
+  type: select
+- form: llm
+  human_description:
+    en_US: Target node UUID, defaults to root node if left empty.
+    zh_Hans: 目标节点 UUID, 不填默认为根节点。
+  label:
+    en_US: Target node UUID
+    zh_Hans: 目标节点 UUID
+  llm_description: Target node UUID, defaults to root node if left empty.
+  name: target_uuid
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Operation node UUID [required for move/update/delete].
+    zh_Hans: 操作节点 UUID [移动/更新/删除必填]。
+  label:
+    en_US: Node UUID
+    zh_Hans: 操作节点 UUID
+  llm_description: Operation node UUID [required for move/update/delete].
+  name: node_uuid
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Document IDs [required for creating documents], separate multiple IDs with
+      ','.
+    zh_Hans: 文档 IDs [创建文档必填]，多个用','分隔。
+  label:
+    en_US: Document IDs
+    zh_Hans: 文档id列表
+  llm_description: Document IDs [required for creating documents], separate multiple
+    IDs with ','.
+  name: doc_ids
+  required: false
+  type: string
+- default: DOC
+  form: llm
+  human_description:
+    en_US: Node type [required for creation] (DOC:document, LINK:external link, TITLE:group).
+    zh_Hans: 操节点类型 [创建必填] (DOC:文档, LINK:外链, TITLE:分组)。
+  label:
+    en_US: Node type
+    zh_Hans: 操节点类型
+  llm_description: Node type [required for creation] (DOC:document, LINK:external
+    link, TITLE:group).
+  name: type
+  options:
+  - label:
+      en_US: DOC
+      pt_BR: DOC
+      zh_Hans: 文档
+    value: DOC
+  - label:
+      en_US: LINK
+      pt_BR: LINK
+      zh_Hans: 链接
+    value: LINK
+  - label:
+      en_US: TITLE
+      pt_BR: TITLE
+      zh_Hans: 分组
+    value: TITLE
+  required: false
+  type: select
+- form: llm
+  human_description:
+    en_US: Node name [required for creating groups/external links].
+    zh_Hans: 节点名称 [创建分组/外链必填]。
+  label:
+    en_US: Node Name
+    zh_Hans: 节点名称
+  llm_description: Node name [required for creating groups/external links].
+  name: title
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Node URL [required for creating external links].
+    zh_Hans: 节点 URL [创建外链必填]。
+  label:
+    en_US: Node URL
+    zh_Hans: 节点URL
+  llm_description: Node URL [required for creating external links].
+  name: url
+  required: false
+  type: string
+- default: 0
+  form: llm
+  human_description:
+    en_US: Open in new window [optional for external links] (0:open in current page,
+      1:open in new window).
+    zh_Hans: 是否新窗口打开 [外链选填] (0:当前页打开, 1:新窗口打开)。
+  label:
+    en_US: Open in new window
+    zh_Hans: 是否新窗口打开
+  llm_description: Open in new window [optional for external links] (0:open in current
+    page, 1:open in new window).
+  name: open_window
+  options:
+  - label:
+      en_US: DOC
+      pt_BR: DOC
+      zh_Hans: Current Page
+    value: 0
+  - label:
+      en_US: LINK
+      pt_BR: LINK
+      zh_Hans: New Page
+    value: 1
+  required: false
+  type: select
+- default: 1
+  form: llm
+  human_description:
+    en_US: Visibility (0:invisible, 1:visible).
+    zh_Hans: 是否可见 (0:不可见, 1:可见)。
+  label:
+    en_US: Visibility
+    zh_Hans: 是否可见
+  llm_description: Visibility (0:invisible, 1:visible).
+  name: visible
+  options:
+  - label:
+      en_US: Invisible
+      pt_BR: Invisible
+      zh_Hans: 隐藏
+    value: 0
+  - label:
+      en_US: Visible
+      pt_BR: Visible
+      zh_Hans: 可见
+    value: 1
+  required: false
+  type: select

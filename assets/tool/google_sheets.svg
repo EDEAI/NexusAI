@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="67"
+   height="67"
+   viewBox="0 0 67 67"
+   version="1.1"
+   id="svg18"
+   sodipodi:docname="icon.svg"
+   inkscape:version="1.3 (0e150ed, 2023-07-21)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview18"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="3.5223881"
+     inkscape:cx="24.415254"
+     inkscape:cy="33.5"
+     inkscape:window-width="1440"
+     inkscape:window-height="431"
+     inkscape:window-x="41"
+     inkscape:window-y="372"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg18" />
+  <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+  <title
+     id="title1">Sheets-icon</title>
+  <desc
+     id="desc1">Created with Sketch.</desc>
+  <defs
+     id="defs4">
+    <path
+       d="M 29.583333,0 H 4.4375 C 1.996875,0 0,1.996875 0,4.4375 v 56.208333 c 0,2.440625 1.996875,4.4375 4.4375,4.4375 h 38.458333 c 2.440625,0 4.4375,-1.996875 4.4375,-4.4375 V 17.75 Z"
+       id="path-1" />
+    <path
+       d="M 29.583333,0 H 4.4375 C 1.996875,0 0,1.996875 0,4.4375 v 56.208333 c 0,2.440625 1.996875,4.4375 4.4375,4.4375 h 38.458333 c 2.440625,0 4.4375,-1.996875 4.4375,-4.4375 V 17.75 Z"
+       id="path-3" />
+    <path
+       d="M 29.583333,0 H 4.4375 C 1.996875,0 0,1.996875 0,4.4375 v 56.208333 c 0,2.440625 1.996875,4.4375 4.4375,4.4375 h 38.458333 c 2.440625,0 4.4375,-1.996875 4.4375,-4.4375 V 17.75 Z"
+       id="path-5" />
+    <linearGradient
+       x1="39.103809"
+       y1="17.86631"
+       x2="39.103809"
+       y2="32.906357"
+       id="linearGradient-7"
+       gradientTransform="scale(1.0001124,0.99988764)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         stop-color="#263238"
+         stop-opacity="0.2"
+         offset="0%"
+         id="stop1" />
+      <stop
+         stop-color="#263238"
+         stop-opacity="0.02"
+         offset="100%"
+         id="stop2" />
+    </linearGradient>
+    <path
+       d="M 29.583333,0 H 4.4375 C 1.996875,0 0,1.996875 0,4.4375 v 56.208333 c 0,2.440625 1.996875,4.4375 4.4375,4.4375 h 38.458333 c 2.440625,0 4.4375,-1.996875 4.4375,-4.4375 V 17.75 Z"
+       id="path-8" />
+    <path
+       d="M 29.583333,0 H 4.4375 C 1.996875,0 0,1.996875 0,4.4375 v 56.208333 c 0,2.440625 1.996875,4.4375 4.4375,4.4375 h 38.458333 c 2.440625,0 4.4375,-1.996875 4.4375,-4.4375 V 17.75 Z"
+       id="path-10" />
+    <path
+       d="M 29.583333,0 H 4.4375 C 1.996875,0 0,1.996875 0,4.4375 v 56.208333 c 0,2.440625 1.996875,4.4375 4.4375,4.4375 h 38.458333 c 2.440625,0 4.4375,-1.996875 4.4375,-4.4375 V 17.75 Z"
+       id="path-12" />
+    <path
+       d="M 29.583333,0 H 4.4375 C 1.996875,0 0,1.996875 0,4.4375 v 56.208333 c 0,2.440625 1.996875,4.4375 4.4375,4.4375 h 38.458333 c 2.440625,0 4.4375,-1.996875 4.4375,-4.4375 V 17.75 Z"
+       id="path-14" />
+    <radialGradient
+       cx="1.7583691"
+       cy="1.5082694"
+       fx="1.7583691"
+       fy="1.5082694"
+       r="89.498169"
+       gradientTransform="scale(0.85280286,1.1726039)"
+       id="radialGradient-16"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         stop-color="#FFFFFF"
+         stop-opacity="0.1"
+         offset="0%"
+         id="stop3" />
+      <stop
+         stop-color="#FFFFFF"
+         stop-opacity="0"
+         offset="100%"
+         id="stop4" />
+    </radialGradient>
+  </defs>
+  <g
+     id="Page-1"
+     stroke="none"
+     stroke-width="1"
+     fill="none"
+     fill-rule="evenodd"
+     transform="translate(9.0000035)">
+    <g
+       id="Consumer-Apps-Sheets-Large-VD-R8-"
+       transform="translate(-451,-451)">
+      <g
+         id="Hero"
+         transform="translate(0,63)">
+        <g
+           id="Personal"
+           transform="translate(277,299)">
+          <g
+             id="Sheets-icon"
+             transform="translate(174.83333,89.958333)">
+            <g
+               id="g18">
+              <g
+                 id="Clipped">
+                <mask
+                   id="mask-2"
+                   fill="#ffffff">
+                  <use
+                     xlink:href="#path-1"
+                     id="use4" />
+                </mask>
+                <g
+                   id="SVGID_1_" />
+                <path
+                   d="M 29.583333,0 H 4.4375 C 1.996875,0 0,1.996875 0,4.4375 v 56.208333 c 0,2.440625 1.996875,4.4375 4.4375,4.4375 h 38.458333 c 2.440625,0 4.4375,-1.996875 4.4375,-4.4375 V 17.75 L 36.979167,10.354167 Z"
+                   id="Path"
+                   fill="#0f9d58"
+                   fill-rule="nonzero"
+                   mask="url(#mask-2)" />
+              </g>
+              <g
+                 id="g6">
+                <mask
+                   id="mask-4"
+                   fill="#ffffff">
+                  <use
+                     xlink:href="#path-3"
+                     id="use5" />
+                </mask>
+                <g
+                   id="g5" />
+                <path
+                   d="M 11.833333,31.802083 V 53.25 H 35.5 V 31.802083 Z M 22.1875,50.291667 H 14.791667 V 46.59375 H 22.1875 Z m 0,-5.916667 H 14.791667 V 40.677083 H 22.1875 Z m 0,-5.916667 H 14.791667 V 34.760417 H 22.1875 Z M 32.541667,50.291667 H 25.145833 V 46.59375 h 7.395834 z m 0,-5.916667 h -7.395834 v -3.697917 h 7.395834 z m 0,-5.916667 h -7.395834 v -3.697916 h 7.395834 z"
+                   id="Shape"
+                   fill="#f1f1f1"
+                   fill-rule="nonzero"
+                   mask="url(#mask-4)" />
+              </g>
+              <g
+                 id="g8">
+                <mask
+                   id="mask-6"
+                   fill="#ffffff">
+                  <use
+                     xlink:href="#path-5"
+                     id="use6" />
+                </mask>
+                <g
+                   id="g7" />
+                <polygon
+                   id="polygon7"
+                   fill="url(#linearGradient-7)"
+                   fill-rule="nonzero"
+                   mask="url(#mask-6)"
+                   points="47.333333,17.75 30.881302,16.452031 47.333333,32.900365 "
+                   style="fill:url(#linearGradient-7)" />
+              </g>
+              <g
+                 id="g11">
+                <mask
+                   id="mask-9"
+                   fill="#ffffff">
+                  <use
+                     xlink:href="#path-8"
+                     id="use8" />
+                </mask>
+                <g
+                   id="g9" />
+                <g
+                   id="Group"
+                   mask="url(#mask-9)">
+                  <g
+                     transform="translate(26.625,-2.958333)"
+                     id="g10">
+                    <path
+                       d="M 2.9583333,2.9583333 V 16.270833 c 0,2.451719 1.9857813,4.4375 4.4375,4.4375 H 20.708333 Z"
+                       id="path9"
+                       fill="#87ceac"
+                       fill-rule="nonzero" />
+                  </g>
+                </g>
+              </g>
+              <g
+                 id="g13">
+                <mask
+                   id="mask-11"
+                   fill="#ffffff">
+                  <use
+                     xlink:href="#path-10"
+                     id="use11" />
+                </mask>
+                <g
+                   id="g12" />
+                <path
+                   d="M 4.4375,0 C 1.996875,0 0,1.996875 0,4.4375 V 4.8072917 C 0,2.3666667 1.996875,0.36979167 4.4375,0.36979167 H 29.583333 V 0 Z"
+                   id="path12"
+                   fill-opacity="0.2"
+                   fill="#ffffff"
+                   fill-rule="nonzero"
+                   mask="url(#mask-11)" />
+              </g>
+              <g
+                 id="g15">
+                <mask
+                   id="mask-13"
+                   fill="#ffffff">
+                  <use
+                     xlink:href="#path-12"
+                     id="use13" />
+                </mask>
+                <g
+                   id="g14" />
+                <path
+                   d="M 42.895833,64.713542 H 4.4375 C 1.996875,64.713542 0,62.716667 0,60.276042 v 0.369791 c 0,2.440625 1.996875,4.4375 4.4375,4.4375 h 38.458333 c 2.440625,0 4.4375,-1.996875 4.4375,-4.4375 v -0.369791 c 0,2.440625 -1.996875,4.4375 -4.4375,4.4375 z"
+                   id="path14"
+                   fill-opacity="0.2"
+                   fill="#263238"
+                   fill-rule="nonzero"
+                   mask="url(#mask-13)" />
+              </g>
+              <g
+                 id="g17">
+                <mask
+                   id="mask-15"
+                   fill="#ffffff">
+                  <use
+                     xlink:href="#path-14"
+                     id="use15" />
+                </mask>
+                <g
+                   id="g16" />
+                <path
+                   d="m 34.020833,17.75 c -2.451718,0 -4.4375,-1.985781 -4.4375,-4.4375 v 0.369792 c 0,2.451718 1.985782,4.4375 4.4375,4.4375 h 13.3125 V 17.75 Z"
+                   id="path16"
+                   fill-opacity="0.1"
+                   fill="#263238"
+                   fill-rule="nonzero"
+                   mask="url(#mask-15)" />
+              </g>
+            </g>
+            <path
+               d="M 29.583333,0 H 4.4375 C 1.996875,0 0,1.996875 0,4.4375 v 56.208333 c 0,2.440625 1.996875,4.4375 4.4375,4.4375 h 38.458333 c 2.440625,0 4.4375,-1.996875 4.4375,-4.4375 V 17.75 Z"
+               id="path18"
+               fill="url(#radialGradient-16)"
+               fill-rule="nonzero"
+               style="fill:url(#radialGradient-16)" />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Sheets-icon</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

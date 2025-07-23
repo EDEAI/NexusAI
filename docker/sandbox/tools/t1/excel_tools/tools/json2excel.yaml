@@ -1,0 +1,37 @@
+identity:
+  name: json2excel
+  author: qiangxinglin
+  label:
+    en_US: Json to Excel
+    zh_Hans: Json转Excel
+description:
+  human:
+    en_US: Convert Json to Excel.
+    zh_Hans: 将Json转换为Excel。
+  llm: Convert Json to Excel.
+parameters:
+  - name: json_str
+    type: string
+    required: true
+    label:
+      en_US: JSON String
+      zh_Hans: JSON字符串
+    human_description:
+      en_US: The JSON string to convert.
+      zh_Hans: 要转换的JSON字符串。
+    llm_description: The JSON string to convert.
+    form: llm
+  - name: filename
+    type: string
+    required: false
+    label:
+      en_US: Excel filename
+      zh_Hans: Excel文件名
+    human_description:
+      en_US: The filename for the generated Excel file
+      zh_Hans: 生成的Excel文件的文件名
+    llm_description: The filename that will be used for the generated Excel file
+    form: llm
+extra:
+  python:
+    source: tools/json2excel.py

@@ -1,0 +1,56 @@
+identity:
+  name: rabbit_send_plugin
+  author: zxp088
+  label:
+    en_US: rabbit_send_plugin
+    zh_Hans: rabbit发送插件
+    pt_BR: rabbit_send_plugin
+description:
+  human:
+    en_US: send data to rabbit server
+    zh_Hans: 发送数据到rabbitmq
+    pt_BR: send data to rabbit server
+  llm: send data to rabbit server
+parameters:
+  - name: Exchange
+    type: string
+    required: true
+    label:
+      en_US: ExchangeName
+      zh_Hans: 交换机
+      pt_BR: ExchangeName
+    human_description:
+      en_US: Exchange name
+      zh_Hans: 交换机名称
+      pt_BR: Exchange name
+    llm_description: Exchange name
+    form: llm
+  - name: RoutingKey
+    type: string
+    required: false
+    label:
+      en_US: RoutingKey
+      zh_Hans: 路由
+      pt_BR: RoutingKey
+    human_description:
+      en_US: Routing Key
+      zh_Hans: 路由键
+      pt_BR: Routing Key
+    llm_description: Routing Key
+    form: llm
+  - name: Message
+    type: string
+    required: true
+    label:
+      en_US: Message
+      zh_Hans: 消息
+      pt_BR: Message
+    human_description:
+      en_US: Message
+      zh_Hans: 发送的消息
+      pt_BR: Message
+    llm_description: Routing Key
+    form: llm
+extra:
+  python:
+    source: tools/rabbit_send_plugin.py

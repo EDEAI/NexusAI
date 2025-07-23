@@ -1,0 +1,17 @@
+identity:
+  author: qjzt_cn
+  name: sql-db
+  label:
+    en_US: sql-db
+    zh_Hans: sql-db
+    pt_BR: sql-db
+  description:
+    en_US: Database Query Tool
+    zh_Hans: Database Query Tool
+    pt_BR: Database Query Tool
+  icon: icon.svg
+tools:
+  - tools/sql-db.yaml
+extra:
+  python:
+    source: provider/sql-db.py

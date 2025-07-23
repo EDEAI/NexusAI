@@ -1,0 +1,23 @@
+identity:
+  author: s20ss
+  name: docling
+  label:
+    en_US: docling
+    zh_Hans: docling
+    pt_BR: docling
+  description:
+    en_US: Tool to convert files to markdown using Docling package
+    zh_Hans: 使用Docling包将文件转换为Markdown的工具
+    pt_BR: Ferramenta para converter arquivos em markdown usando o pacote Docling
+  icon: icon.png
+  tags:
+    - utilities
+tools:
+  - tools/convert_to_markdown_files.yaml
+  - tools/convert_to_markdown_text.yaml
+  - tools/convert_to_markdown_json.yaml
+  - tools/convert_to_chunks.yaml
+  - tools/table_extraction_from_pdf.yaml
+extra:
+  python:
+    source: provider/dify_plugin_dockling.py

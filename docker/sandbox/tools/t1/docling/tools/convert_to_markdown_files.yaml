@@ -1,0 +1,30 @@
+identity:
+  name: docling_convert_files_to_markdown_files
+  author: s20ss
+  label:
+    en_US: Docling Convert Files to Markdown Files
+    zh_Hans: Docling 将文件转换为 Markdown 文件
+    pt_BR: Docling Converter Arquivos para Markdown
+description:
+  human:
+    en_US: Tool to convert files to markdown files using Docling package
+    zh_Hans: 使用 Docling 包将文件转换为 Markdown 文件的工具
+    pt_BR: Ferramenta para converter arquivos em arquivos markdown usando o pacote Docling
+  llm: Tool to convert files to markdown files using Docling package
+parameters:
+  - name: files
+    type: files
+    required: true
+    label:
+      en_US: Files To Convert
+      zh_Hans: 要转换的文件
+      pt_BR: Arquivos para Converter
+    human_description:
+      en_US: Tool to convert files to markdown using Docling package
+      zh_Hans: 使用 Docling 包将文件转换为 Markdown 文件的工具
+      pt_BR: Ferramenta para converter arquivos em arquivos markdown usando o pacote Docling
+    llm_description: Tool to convert files to markdown using Docling package. Converts various files to markdown format.
+    form: llm
+extra:
+  python:
+    source: tools/convert_to_markdown_files.py

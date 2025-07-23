@@ -1,0 +1,67 @@
+identity:
+  name: media_tweet
+  author: stvlynn
+  label:
+    en_US: Post Media Tweet
+    ja_JP: メディア付きツイートを投稿
+    zh_Hans: 发送带媒体的推文
+description:
+  human:
+    en_US: Post a tweet with media (image or video) using X API
+    ja_JP: X APIを使用して画像や動画が含まれるツイートを投稿します
+    zh_Hans: 使用X API发送包含图片或视频的推文
+  llm: Post a tweet with media (image or video) using the X API V2 endpoints
+parameters:
+  - name: text
+    type: string
+    required: true
+    label:
+      en_US: Tweet Text
+      ja_JP: ツイート内容
+      zh_Hans: 推文内容
+    human_description:
+      en_US: The text content of your tweet (max 280 characters)
+      ja_JP: ツイートの内容（最大280文字）
+      zh_Hans: 推文的内容（最多280个字符）
+    llm_description: The text content of the tweet, limited to 280 characters.
+    form: llm
+  - name: media
+    type: file
+    required: true
+    label:
+      en_US: Media File
+      ja_JP: メディアファイル
+      zh_Hans: 媒体文件
+    human_description:
+      en_US: Image or video file to attach to the tweet
+      ja_JP: ツイートに添付する画像または動画ファイル
+      zh_Hans: 添加到推文的图片或视频文件
+    llm_description: Image (.jpg, .png, .gif) or video (.mp4) to attach to the tweet. Supported formats for X platform.
+    form: llm
+response:
+  success:
+    description:
+      en_US: The media tweet was successfully posted
+      ja_JP: メディア付きツイートが正常に投稿されました
+      zh_Hans: 带媒体的推文已成功发送
+    schema:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Success status
+        tweet_id:
+          type: string
+          description: The ID of the posted tweet
+        text:
+          type: string
+          description: The text content of the posted tweet
+        media_id:
+          type: string
+          description: The ID of the attached media
+        message:
+          type: string
+          description: Success message with tweet ID
+extra:
+  python:
+    source: tools/media_tweet.py 

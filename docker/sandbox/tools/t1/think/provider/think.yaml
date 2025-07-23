@@ -1,0 +1,15 @@
+identity:
+  author: kalochin
+  name: think
+  label:
+    en_US: The "Think" Tool
+    zh_Hans: The "Think" Tool
+  description:
+    en_US: A tool that enables step-by-step reasoning, helping non-reasoning LLMs solve problems methodically.
+    zh_Hans: 一个通过逐步推理帮助非推理LLM有条理地解决问题的工具。
+  icon: icon.svg
+tools:
+  - tools/think.yaml
+extra:
+  python:
+    source: provider/think.py

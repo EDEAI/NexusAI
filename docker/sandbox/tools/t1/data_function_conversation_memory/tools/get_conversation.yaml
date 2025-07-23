@@ -1,0 +1,111 @@
+identity:
+  name: get_conversation
+  author: alterxyz
+  label:
+    en_US: Load Conversation
+    zh_Hans: 加载对话
+    pt_BR: Carregar Conversa
+description:
+  human:
+    en_US: Retrieve conversation history from the conversation memory database in XML format
+    zh_Hans: 从对话记忆数据库中以XML格式获取会话历史
+    pt_BR: Recuperar histórico de conversa do banco de dados de memória de conversação em formato XML
+  llm: Retrieve conversation history from the conversation memory database at Cloudflare D1 in XML format.
+parameters:
+  - name: cloudflare_account_id
+    type: string
+    required: true
+    label:
+      en_US: Cloudflare Account ID
+      zh_Hans: Cloudflare 账户 ID
+      pt_BR: ID da Conta Cloudflare
+    human_description:
+      en_US: Cloudflare Account ID
+      zh_Hans: Cloudflare 账户 ID
+      pt_BR: ID da Conta Cloudflare
+    llm_description: Cloudflare Account ID, normally it is provided by Human.
+    form: llm
+  - name: cloudflare_d1_database_id
+    type: string
+    required: true
+    label:
+      en_US: Cloudflare Database ID
+      zh_Hans: Cloudflare 数据库 ID
+      pt_BR: ID do Banco de Dados Cloudflare
+    human_description:
+      en_US: Cloudflare Database ID
+      zh_Hans: Cloudflare 数据库 ID
+      pt_BR: ID do Banco de Dados Cloudflare
+    llm_description: Cloudflare Database ID, normally it is provided by Human.
+    form: llm
+  - name: cloudflare_api_token
+    type: string
+    required: true
+    label:
+      en_US: Cloudflare API Token
+      zh_Hans: Cloudflare API 令牌
+      pt_BR: Token de API Cloudflare
+    human_description:
+      en_US: Cloudflare API Token with D1 permissions
+      zh_Hans: 具有 D1 权限的 Cloudflare API 令牌
+      pt_BR: Token de API Cloudflare com permissões D1
+    llm_description: Cloudflare API Token with D1 permissions, normally it is provided by Human.
+    form: llm
+  - name: conversation_id
+    type: string
+    required: true
+    label:
+      en_US: Conversation ID
+      zh_Hans: 对话 ID
+    human_description:
+      en_US: The unique identifier of the conversation to retrieve
+      zh_Hans: 要获取的对话的唯一标识符
+    llm_description: The unique identifier of the conversation to retrieve
+    form: llm
+  - name: max_round
+    type: number
+    required: false
+    label:
+      en_US: Maximum Message Rounds
+      zh_Hans: 最大消息轮数
+    human_description:
+      en_US: Maximum number of message rounds to return (default 50)
+      zh_Hans: 返回的最大消息轮数（默认为 50）
+    llm_description: Maximum number of message rounds to return. Default is 50 if not specified.
+    form: llm
+    default: 50
+  - name: user_input
+    type: string
+    required: false
+    label:
+      en_US: User Input
+      zh_Hans: 用户输入
+    human_description:
+      en_US: Optional user input to append to conversation
+      zh_Hans: 可选的用户输入，将添加到对话末尾
+    llm_description: Optional user input text to append to the end of the conversation as a new message
+    form: llm
+  - name: format
+    type: select
+    required: true
+    label:
+      en_US: Output Format
+      zh_Hans: 输出格式
+    human_description:
+      en_US: Choose the format of conversation output (XML or JSON)
+      zh_Hans: 选择对话输出格式（XML或JSON）
+    llm_description: The format of conversation output, can be 'xml' or 'json'
+    form: form
+    options:
+      - value: xml
+        label:
+          en_US: XML Format
+          zh_Hans: XML格式
+      - value: json
+        label:
+          en_US: JSON Format
+          zh_Hans: JSON格式
+    default: xml
+extra:
+  python:
+    source: tools/get_conversation.py

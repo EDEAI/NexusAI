@@ -1,0 +1,39 @@
+credentials_for_provider:
+  api_key:
+    help:
+      en_US: Get your API Key from Autonavi
+      pt_BR: Obtenha sua chave de API do Autonavi
+      zh_Hans: 从高德获取您的 API Key
+    label:
+      en_US: API Key
+      pt_BR: Fogo a chave
+      zh_Hans: API Key
+    placeholder:
+      en_US: Please enter your Autonavi API Key
+      pt_BR: Insira sua chave de API Autonavi
+      zh_Hans: 请输入你的高德开放平台 API Key
+    required: true
+    type: secret-input
+    url: https://console.amap.com/dev/key/app
+extra:
+  python:
+    source: provider/gaode.py
+identity:
+  author: CharlieWei
+  description:
+    en_US: Autonavi Open Platform service toolkit.
+    pt_BR: Kit de ferramentas de serviço Autonavi Open Platform.
+    zh_Hans: 高德开放平台服务工具包。
+  icon: icon.svg
+  label:
+    en_US: Autonavi
+    pt_BR: Autonavi
+    zh_Hans: 高德
+  name: gaode
+  tags:
+  - utilities
+  - productivity
+  - travel
+  - weather
+tools:
+- tools/gaode_weather.yaml

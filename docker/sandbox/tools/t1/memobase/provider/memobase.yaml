@@ -1,0 +1,76 @@
+identity:
+  author: acane0320
+  name: memobase
+  label:
+    en_US: memobase
+    zh_Hans: memobase
+    ja_Jp: memobase
+    pt_BR: memobase
+  description:
+    en_US: Memobase is a user profile-based memory system designed to bring long-term user memory to your Generative AI (GenAI) applications.
+    zh_Hans: Memobase 是一个用户档案基础的记忆系统，旨在为您的生成式AI（GenAI）应用程序带来长期用户记忆。
+    ja_Jp: Memobaseは、ユーザープロファイルベースのメモリシステムであり、生成AI（GenAI）アプリケーションに長期的なユーザーメモリを提供することを目的としています。
+    pt_BR: Memobase é um sistema de memória baseado em perfil de usuário projetado para trazer memória de usuário de longo prazo para suas aplicações de IA generativa (GenAI).
+  icon: memobase.svg
+credentials_for_provider:
+  memobase_url:
+    type: text-input
+    required: true
+    label:
+      en_US: Memobase URL
+      zh_Hans: Memobase URL
+      ja_Jp: Memobase URL
+      pt_BR: Memobase URL
+    placeholder:
+      en_US: Please input your Memobase URL
+      zh_Hans: 请输入你的 Memobase URL
+      ja_Jp: MemobaseのURLを入力してください
+      pt_BR: Insira sua URL do Memobase
+    help:
+      en_US: Get your Memobase URL from Memobase
+      zh_Hans: 从 Memobase 获取您的 Memobase URL
+      ja_Jp: MemobaseのURLをMemobaseから取得してください
+      pt_BR: Obtenha sua URL do Memobase no Memobase
+  memobase_api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Memobase API Key
+      zh_Hans: Memobase API Key
+      ja_Jp: Memobase API Key
+      pt_BR: Memobase API Key
+    placeholder:
+      en_US: Please input your Memobase API Key
+      zh_Hans: 请输入你的 Memobase API Key
+      ja_Jp: Memobase APIキーを入力してください
+      pt_BR: Insira sua chave de API do Memobase
+    help:
+      en_US: Get your Memobase API Key from Memobase
+      zh_Hans: 从 Memobase 获取您的 Memobase API Key
+      ja_Jp: MemobaseのAPIキーをMemobaseから取得してください
+      pt_BR: Obtenha sua chave de API do Memobase no Memobase
+    url: https://www.memobase.io/en/dashboard
+tools:
+  - tools/user/get_or_create_user.yaml
+  - tools/user/add_user.yaml
+  - tools/user/get_user.yaml
+  - tools/user/update_user.yaml
+  - tools/user/delete_user.yaml
+  - tools/user_data/get_user_context.yaml
+  - tools/user_data/insert_data.yaml
+  - tools/user_data/get_data.yaml
+  - tools/user_data/delete_data.yaml
+  - tools/user_profile/flush_buffer.yaml
+  - tools/user_profile/get_profile.yaml
+  - tools/user_profile/add_profile.yaml
+  - tools/user_profile/update_profile.yaml
+  - tools/user_profile/delete_profile.yaml
+  - tools/user_profile/get_profile_config.yaml
+  - tools/user_profile/update_profile_config.yaml
+  - tools/user_event/get_recent_event.yaml
+  - tools/user_event/search_event.yaml
+  - tools/user_event/update_event.yaml
+  - tools/user_event/delete_event.yaml
+extra:
+  python:
+    source: provider/memobase.py

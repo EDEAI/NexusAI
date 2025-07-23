@@ -1,0 +1,18 @@
+identity:
+  author: hjlarry
+  name: zip
+  label:
+    en_US: zip
+    zh_Hans: zip
+    pt_BR: zip
+  description:
+    en_US: zip multi files and unzip file
+    zh_Hans: zip multi files and unzip file
+    pt_BR: zip multi files and unzip file
+  icon: icon.svg
+tools:
+  - tools/zip.yaml
+  - tools/unzip.yaml
+extra:
+  python:
+    source: provider/zip.py

@@ -1,0 +1,83 @@
+description:
+  human:
+    en_US: Weather forecast inquiry
+    pt_BR: Inquérito sobre previsão meteorológica
+    zh_Hans: 天气查询
+  llm: A tool when you want to ask about the weather or weather-related question
+extra:
+  python:
+    source: tools/weather.py
+identity:
+  author: Onelevenvy
+  icon: icon.svg
+  label:
+    en_US: Open Weather Query
+    pt_BR: Previsão do tempo
+    zh_Hans: 天气查询
+  name: weather
+parameters:
+- form: llm
+  human_description:
+    en_US: Target city for weather forecast query
+    pt_BR: Cidade de destino para consulta de previsão do tempo
+    zh_Hans: 天气预报查询的目标城市
+  label:
+    en_US: city
+    pt_BR: cidade
+    zh_Hans: 城市
+  llm_description: If you don't know you can extract the city name from the question
+    or you can reply：Please tell me your city. You have to extract the Chinese city
+    name from the question.If the input region is in Chinese characters for China,
+    it should be replaced with the corresponding English name, such as '北京' for correct
+    input is 'Beijing'
+  name: city
+  required: true
+  type: string
+- default: zh_cn
+  form: form
+  human_description:
+    en_US: language
+    pt_BR: language
+    zh_Hans: 语言
+  label:
+    en_US: language
+    pt_BR: language
+    zh_Hans: 语言
+  name: lang
+  options:
+  - label:
+      en_US: cn
+      pt_BR: cn
+      zh_Hans: 中国
+    value: zh_cn
+  - label:
+      en_US: usa
+      pt_BR: usa
+      zh_Hans: 美国
+    value: en_us
+  required: true
+  type: select
+- default: metric
+  form: form
+  human_description:
+    en_US: units for temperature
+    pt_BR: units for temperature
+    zh_Hans: 温度单位
+  label:
+    en_US: units
+    pt_BR: units
+    zh_Hans: 单位
+  name: units
+  options:
+  - label:
+      en_US: metric
+      pt_BR: metric
+      zh_Hans: ℃
+    value: metric
+  - label:
+      en_US: imperial
+      pt_BR: imperial
+      zh_Hans: ℉
+    value: imperial
+  required: true
+  type: select

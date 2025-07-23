@@ -1,0 +1,88 @@
+identity:
+  name: postgres_node_5
+  author: spance
+  label:
+    en_US: PostgreSQL Client(5)
+    zh_Hans: PostgreSQL 客户端(5)
+description:
+  human:
+    en_US: PostgreSQL Client
+    zh_Hans: 读写PostgreSQL客户端，最多5个参数。
+  llm: A Dify plugin tool to operate PostgreSQL database.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: SQL Query
+      zh_Hans: SQL查询
+    human_description:
+      en_US: The SQL query to execute (allow literal arg, or `$arg0~N` as parameters)
+      zh_Hans: 要执行的SQL查询（参数使用变量`$arg0~N`表示，或使用字面值）
+    form: llm
+  - name: arg0
+    type: string
+    required: false
+    label:
+      en_US: arg0
+      zh_Hans: 参数0
+    human_description:
+      en_US: Enter the parameter corresponding to the SQL variables.
+      zh_Hans: 输入变量对应的参数。
+    form: llm
+  - name: arg1
+    type: string
+    required: false
+    label:
+      en_US: arg1
+      zh_Hans: 参数1
+    human_description:
+      en_US: Enter the parameter corresponding to the SQL variables.
+      zh_Hans: 输入变量对应的参数。
+    form: llm
+  - name: arg2
+    type: string
+    required: false
+    label:
+      en_US: arg2
+      zh_Hans: 参数2
+    human_description:
+      en_US: Enter the parameter corresponding to the SQL variables.
+      zh_Hans: 输入变量对应的参数。
+    form: llm
+  - name: arg3
+    type: string
+    required: false
+    label:
+      en_US: arg3
+      zh_Hans: 参数3
+    human_description:
+      en_US: Enter the parameter corresponding to the SQL variables.
+      zh_Hans: 输入变量对应的参数。
+    form: llm
+  - name: arg4
+    type: string
+    required: false
+    label:
+      en_US: arg4
+      zh_Hans: 参数4
+    human_description:
+      en_US: Enter the parameter corresponding to the SQL variables.
+      zh_Hans: 输入变量对应的参数。
+    form: llm
+output_schema:
+  type: object
+  properties:
+    data:
+      type: array
+      items: 
+        type: object
+    columns:
+      type: array
+      items: 
+        type: string
+    affected_rows:
+      type: number
+extra:
+  python:
+    source: tools/pg_node.py

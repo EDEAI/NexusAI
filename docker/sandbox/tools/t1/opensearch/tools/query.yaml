@@ -1,0 +1,81 @@
+identity:
+  author: mark
+  name: opensearch
+  label:
+    en_US: OpenSearch Query
+    zh_Hans: OpenSearch查询
+    pt_BR: OpenSearch Query
+description:
+  human:
+    en_US: search information by OpenSearch
+    zh_Hans: 使用 OpenSearch 检索信息
+    pt_BR: search information by OpenSearch
+  llm: search information by OpenSearch
+parameters:
+  - name: index
+    type: string
+    required: true
+    label:
+      en_US: Index Name
+      zh_Hans: 索引名称
+      pt_BR: Index Name
+    human_description:
+      en_US: Index Name
+      zh_Hans: 索引名称
+      pt_BR: Index Name
+    llm_description: index name
+    form: llm
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: DSL Query
+      zh_Hans: 查询DSL
+      pt_BR: DSL Query
+    human_description:
+      en_US: DSL Query
+      zh_Hans: 查询DSL
+      pt_BR: DSL Query
+    llm_description: DSL Query
+    form: llm
+  - name: from
+    type: number
+    required: false
+    default: 0
+    label:
+      en_US: From
+      zh_Hans: 查询的起始位置(用于分页)
+    human_description:
+      en_US: From
+      zh_Hans: 查询的起始位置(用于分页)
+      pt_BR: From
+    llm_description: OpenSearch Query from
+    form: llm
+  - name: size
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Size
+      zh_Hans: 最大返回文档数量
+      pt_BR: Size
+    human_description:
+      en_US: Size
+      zh_Hans: 最大返回文档数量
+      pt_BR: Size
+    llm_description: OpenSearch Query Size
+    form: llm
+extra:
+  python:
+    source: tools/query.py
+output_schema:
+  type: object
+  properties:
+    total:
+      type: number
+    message:
+      type: string
+    result:
+      type: array
+      items:
+        type: object

@@ -1,0 +1,21 @@
+identity:
+  author: kurokobo
+  name: file_tools
+  label:
+    en_US: File Tools
+  description:
+    en_US: A collection of various tools for handling file object.
+    ja_JP: ファイルオブジェクトを扱うためのさまざまなツールのコレクション。
+    zh_Hans: 用于处理文件对象的各种工具集合。
+    pt_BR: Uma coleção de várias ferramentas para manipular objetos de arquivo.
+  icon: icon.svg
+
+tools:
+  - tools/dump_to_json/dump_to_json.yaml
+  - tools/embed_as_base64/embed_as_base64.yaml
+  - tools/get_download_url/get_download_url.yaml
+  - tools/save_as_file/save_as_file.yaml
+
+extra:
+  python:
+    source: provider/file_tools.py

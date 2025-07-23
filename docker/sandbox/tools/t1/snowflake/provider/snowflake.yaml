@@ -1,0 +1,131 @@
+identity:
+  author: hankookncompany
+  name: snowflake
+  label:
+    en_US: snowflake
+    zh_Hans: snowflake
+    pt_BR: snowflake
+  description:
+    en_US: Snowflake Connector
+    zh_Hans: Snowflake Connector
+  icon: icon.svg
+tools:
+  - tools/sql.yaml
+  - tools/cortex_analyst.yaml
+extra:
+  python:
+    source: provider/snowflake.py
+credentials_for_provider:
+  account:
+    type: text-input
+    required: true
+    label:
+      en_US: Account ID
+      ja_JP: アカウントID
+      zh_Hans: 账户ID
+      ko_KR: 계정 ID
+    placeholder:
+      en_US: AB123456 or AB123456.us-east-1.privatelink
+      ja_JP: AB123456 or AB123456.us-east-1.privatelink
+      zh_Hans: AB123456 or AB123456.us-east-1.privatelink
+      ko_KR: AB123456 또는 AB123456.us-east-1.privatelink
+    help:
+      en_US: The account ID of your Snowflake account. It can be found in the URL of your Snowflake account.
+      ja_JP: SnowflakeアカウントのアカウントID。SnowflakeアカウントのURLに記載されています。
+      zh_Hans: 您的Snowflake帐户的帐户ID。可以在Snowflake帐户的URL中找到。
+      ko_KR: Snowflake 계정의 계정 ID입니다. Snowflake 계정의 URL에서 찾을 수 있습니다.
+
+  user:
+    type: text-input
+    required: true
+    label:
+      en_US: User ID
+      ja_JP: ユーザーID
+      zh_Hans: 用户ID
+      ko_KR: 사용자 ID
+    placeholder:
+      en_US: Your Snowflake user ID
+      ja_JP: SnowflakeのユーザーID
+      zh_Hans: 您的Snowflake用户ID
+      ko_KR: Snowflake 사용자 ID입니다.
+    help:
+      en_US: The user ID of your Snowflake account.
+      ja_JP: SnowflakeアカウントのユーザーID。
+      zh_Hans: 您的Snowflake帐户的用户ID。
+      ko_KR: Snowflake 계정의 사용자 ID입니다.
+
+  password:
+    type: secret-input
+    required: true
+    label:
+      en_US: Password
+      ja_JP: パスワード
+      zh_Hans: 密码
+      ko_KR: 비밀번호
+    placeholder:
+      en_US: Your Snowflake password
+      ja_JP: Snowflakeのパスワード
+      zh_Hans: 您的Snowflake密码
+      ko_KR: Snowflake 비밀번호입니다.
+    help:
+      en_US: The password of your Snowflake account.
+      ja_JP: Snowflakeアカウントのパスワード。
+      zh_Hans: 您的Snowflake帐户的密码。
+      ko_KR: Snowflake 계정의 비밀번호입니다.
+
+  pat:
+    type: secret-input
+    required: false
+    label:
+      en_US: Programmatic Access Token
+      ja_JP: プログラムによるアクセス トークン
+      zh_Hans: 程序访问令牌
+      ko_KR: 프로그래밍 액세스 토큰
+    placeholder:
+      en_US: Your Snowflake programmatic access token
+      ja_JP: Snowflakeのプログラムによるアクセス トークン
+      zh_Hans: 您的Snowflake程序访问令牌
+      ko_KR: Snowflake 프로그래밍 액세스 토큰입니다.
+    help:
+      en_US: The programmatic access token of your Snowflake account. Required if you want to a cortex analyst.
+      ja_JP: Cortexアナリストを使用している場合は必須のSnowflakeアカウントのプログラムによるアクセス トークン。
+      zh_Hans: 您的Snowflake帐户的程序访问令牌。如果您使用的是cortex分析仪，则需要。
+      ko_KR: Cortex 분석기를 사용하는 경우 필수인 Snowflake 계정의 프로그래밍 액세스 토큰입니다.
+
+  warehouse:
+    type: text-input
+    required: false
+    label:
+      en_US: Warehouse
+      ja_JP: ウェアハウス
+      zh_Hans: 仓库
+      ko_KR: 창고
+    placeholder:
+      en_US: SMALL_WH
+      ja_JP: SMALL_WH
+      zh_Hans: SMALL_WH
+      ko_KR: SMALL_WH
+    help:
+      en_US: The name of the Snowflake warehouse to use for computing.
+      ja_JP: 計算に使用するSnowflakeウェアハウスの名前。
+      zh_Hans: 用于计算的Snowflake仓库的名称。
+      ko_KR: 연산에 사용할 Snowflake 웨어하우스의 이름입니다.
+
+  role:
+    type: text-input
+    required: false
+    label:
+      en_US: Role
+      ja_JP: ロール
+      zh_Hans: 角色
+      ko_KR: 역할
+    placeholder:
+      en_US: CORTEX_USER
+      ja_JP: CORTEX_USER
+      zh_Hans: CORTEX_USER
+      ko_KR: CORTEX_USER
+    help:
+      en_US: The name of the Snowflake role to use for the connection.
+      ja_JP: 接続に使用するSnowflakeロールの名前。
+      zh_Hans: 用于连接的Snowflake角色的名称。
+      ko_KR: 연결에 사용할 Snowflake 역할의 이름입니다.

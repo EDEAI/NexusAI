@@ -1,0 +1,31 @@
+identity:
+  name: shopify_get_product
+  author: chekun
+  label:
+    en_US: Get Product Information
+    zh_Hans: 获取产品信息
+    ja_JP: 製品情報の取得
+    pt_BR: Obter informações do produto
+description:
+  human:
+    en_US: Get product information by product ID or product handle.
+    zh_Hans: 根据产品ID或产品handle获取产品信息.
+    pt_BR: Obtenha informações do produto por ID do produto ou handle do produto.
+  llm: Get product information by product ID or product handle.
+parameters:
+  - name: identifier
+    type: string
+    required: true
+    label:
+      en_US: Identifier
+      zh_Hans: 标识符
+      pt_BR: Identificador
+    human_description:
+      en_US: Product ID or product handle
+      zh_Hans: 产品ID或产品handle
+      pt_BR: ID do produto ou handle do produto
+    llm_description: Product ID or product handle
+    form: llm
+extra:
+  python:
+    source: tools/get_product.py

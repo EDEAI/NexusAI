@@ -1,0 +1,56 @@
+identity:
+  name: airtable_insert
+  author: chenzeng
+  label:
+    en_US: airtable_insert
+    zh_Hans: 增加记录
+    pt_BR: airtable
+description:
+  human:
+    en_US: Create a record in Airtable
+    zh_Hans: 在Airtable中创建记录
+    pt_BR: Criando um registro no Airtable
+  llm: Create a record in Airtable
+parameters:
+  - name: baseId
+    type: string
+    required: true
+    label:
+      en_US: Base ID
+      zh_Hans: Base ID
+      pt_BR: Base ID
+    human_description:
+      en_US: you can find it here https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+      zh_Hans: 你可以在这里找到它 https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+      pt_BR: you can find it here https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+    llm_description: workspace Base id
+    form: llm
+  - name: tableId
+    type: string
+    required: true
+    label:
+      en_US: Table ID
+      zh_Hans: Table ID
+      pt_BR:  Table ID
+    human_description:
+      en_US: you can find it here https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+      zh_Hans: 你可以在这里找到它 https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+      pt_BR: you can find it here https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+    llm_description: workspace Table id
+    form: llm
+  - name: record
+    type: string
+    required: true
+    label:
+      en_US: record
+      zh_Hans: 记录
+      pt_BR:  registos
+    human_description:
+      en_US: Records to be created
+      zh_Hans: 需要创建的记录
+      pt_BR: Registros a serem criados
+    llm_description: Records to be created
+    form: llm
+extra:
+  python:
+    source: tools/insert/invoke.py

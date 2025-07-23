@@ -1,0 +1,47 @@
+identity:
+  name: base64_to_hex
+  author: bowenliang123
+  label:
+    en_US: Base64 to Hex
+    zh_Hans: Base64 转 十六进制
+description:
+  human:
+    en_US: Convert Base64 text to Hexadecimal text
+    zh_Hans: 转换Base64文本为十六进制文本
+  llm: Convert Base64 text to Hexadecimal text
+parameters:
+  - name: encoded_text
+    type: string
+    required: true
+    label:
+      en_US: Base64 encoded Text
+      zh_Hans: 已 Base64 编码的文本
+    human_description:
+      en_US: Base64-encoded text
+      zh_Hans: Base64 编码的文本
+    llm_description: A tool for decoding Base64-encoded text to plain text
+    form: llm
+  - name: urlsafe_enabled
+    type: select
+    required: true
+    default: "false"
+    options:
+      - value: "true"
+        label:
+          en_US: "Yes"
+          zh_Hans: 是
+      - value: "false"
+        label:
+          en_US: "No"
+          zh_Hans: 否
+    label:
+      en_US: Whether to enable URL safe alphabet
+      zh_Hans: 是否启用URL安全字符
+    human_description:
+      en_US: Whether to enable URL safe alphabet
+      zh_Hans: 是否启用URL安全字符
+    llm_description: Whether to enable URL safe alphabet, default to "false"
+    form: form
+extra:
+  python:
+    source: tools/base64_to_hex/base64_to_hex.py

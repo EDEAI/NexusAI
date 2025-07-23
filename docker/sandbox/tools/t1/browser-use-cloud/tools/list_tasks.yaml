@@ -1,0 +1,51 @@
+identity:
+  name: list_tasks
+  author: lysonober
+  label:
+    en_US: "List Tasks"
+    zh_Hans: "列出任务"
+    ja_JP: "タスク一覧"
+    pt_BR: "Listar Tarefas"
+description:
+  human:
+    en_US: "Get a paginated list of all your browser automation tasks, ordered by creation date. Each task includes basic information like status and creation time."
+    zh_Hans: "获取按创建日期排序的所有浏览器自动化任务的分页列表。每个任务包括状态和创建时间等基本信息。"
+    ja_JP: "作成日順に並べられた、すべてのブラウザ自動化タスクのページ分割されたリストを取得します。各タスクにはステータスや作成時間などの基本情報が含まれます。"
+    pt_BR: "Obtenha uma lista paginada de todas as suas tarefas de automação de navegador, ordenadas por data de criação. Cada tarefa inclui informações básicas como status e hora de criação."
+  llm: "This tool retrieves a paginated list of all browser automation tasks belonging to the user, ordered by creation date (newest first). It makes a GET request to the /api/v1/tasks endpoint with optional page and limit parameters for pagination control. Each task in the response includes basic information like ID, description, status, creation time, and live URL. This is useful for getting an overview of all tasks, both active and completed. For detailed information about a specific task, use the get_task tool with the task ID."
+parameters:
+  - name: page
+    type: number
+    required: false
+    default: 1
+    label:
+      en_US: "Page Number"
+      zh_Hans: "页码"
+      ja_JP: "ページ番号"
+      pt_BR: "Número da Página"
+    human_description:
+      en_US: "The page number to retrieve (starts at 1). Use this for pagination when there are many tasks."
+      zh_Hans: "要检索的页码（从 1 开始）。当有很多任务时，使用此参数进行分页。"
+      ja_JP: "取得するページ番号（1から始まる）。タスクが多い場合、ページ分割のためにこれを使用します。"
+      pt_BR: "O número da página a ser recuperada (começa em 1). Use isso para paginação quando houver muitas tarefas."
+    llm_description: "The page number to retrieve, starting from 1. Used for pagination when there are many tasks. Default is 1 (first page)."
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: "Results Per Page"
+      zh_Hans: "每页结果数"
+      ja_JP: "1ページあたりの結果数"
+      pt_BR: "Resultados Por Página"
+    human_description:
+      en_US: "The number of tasks to show per page (default: 10). Higher values return more tasks at once."
+      zh_Hans: "每页显示的任务数量（默认值：10）。较高的值会一次返回更多任务。"
+      ja_JP: "1ページあたりに表示するタスクの数（デフォルト：10）。より高い値を設定すると、一度により多くのタスクが返されます。"
+      pt_BR: "O número de tarefas a serem mostradas por página (padrão: 10). Valores mais altos retornam mais tarefas de uma vez."
+    llm_description: "The number of tasks to show per page. Minimum value is 1. Default is 10. Higher values return more tasks at once but may increase response time."
+    form: llm
+extra:
+  python:
+    source: tools/list_tasks.py

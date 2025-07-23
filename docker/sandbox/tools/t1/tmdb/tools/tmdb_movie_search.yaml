@@ -1,0 +1,93 @@
+identity:
+  name: tmdb_movie_search
+  author: lcandy
+  label:
+    en_US: Search Movies
+    zh_Hans: 搜索电影
+    zh_Hant: 搜尋電影
+    ja_JP: 映画を検索
+    pt_BR: Pesquisar Filmes
+description:
+  human:
+    en_US: Search for movies by title, keywords or phrases. Returns movie details including title, overview, release date, and ratings.
+    zh_Hans: 通过标题、关键词或短语搜索电影。返回电影详情，包括标题、概述、发行日期和评分。
+    zh_Hant: 透過標題、關鍵詞或短語搜尋電影。返回電影詳情，包括標題、概述、發行日期和評分。
+    ja_JP: タイトル、キーワード、またはフレーズで映画を検索します。タイトル、概要、公開日、評価などの映画詳細を返します。
+    pt_BR: Pesquise filmes por título, palavras-chave ou frases. Retorna detalhes do filme incluindo título, visão geral, data de lançamento e classificações.
+  llm: Search for movies by title, keywords or phrases. This tool searches The Movie Database (TMDB) and returns movie information.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Movie Title or Keywords
+      zh_Hans: 电影标题或关键词
+      zh_Hant: 電影標題或關鍵詞
+      ja_JP: 映画のタイトルまたはキーワード
+      pt_BR: Título do Filme ou Palavras-chave
+    human_description:
+      en_US: The title or keywords to search for movies
+      zh_Hans: 用于搜索电影的标题或关键词
+      zh_Hant: 用於搜尋電影的標題或關鍵詞
+      ja_JP: 映画を検索するためのタイトルまたはキーワード
+      pt_BR: O título ou palavras-chave para pesquisar filmes
+    llm_description: The movie title or keywords to search for in TMDB
+    form: llm
+  - name: language
+    type: string
+    required: false
+    default: en-US
+    label:
+      en_US: Language
+      zh_Hans: 语言
+      zh_Hant: 語言
+      ja_JP: 言語
+      pt_BR: Idioma
+    human_description:
+      en_US: The ISO 639-1 language code to search in (default is en-US)
+      zh_Hans: 要搜索的 ISO 639-1 语言代码（默认为 en-US）
+      zh_Hant: 要搜尋的 ISO 639-1 語言代碼（預設為 en-US）
+      ja_JP: 検索するISO 639-1言語コード（デフォルトはen-US）
+      pt_BR: O código de idioma ISO 639-1 para pesquisar (o padrão é en-US)
+    llm_description: The ISO 639-1 language code to search in (e.g., en-US, zh-CN, fr-FR)
+    form: form
+  - name: year
+    type: number
+    required: false
+    label:
+      en_US: Release Year
+      zh_Hans: 发行年份
+      zh_Hant: 發行年份
+      ja_JP: 公開年
+      pt_BR: Ano de Lançamento
+    human_description:
+      en_US: Filter results by specific release year
+      zh_Hans: 按特定发行年份筛选结果
+      zh_Hant: 按特定發行年份篩選結果
+      ja_JP: 特定の公開年で結果をフィルタリング
+      pt_BR: Filtrar resultados por ano específico de lançamento
+    llm_description: Specify a year to filter results to movies released in that year
+    form: llm
+  - name: results_limit
+    type: number
+    required: false
+    default: 5
+    min: 1
+    max: 20
+    label:
+      en_US: Number of Results
+      zh_Hans: 结果数量
+      zh_Hant: 結果數量
+      ja_JP: 結果の数
+      pt_BR: Número de Resultados
+    human_description:
+      en_US: Maximum number of results to return (1-20, default is 5)
+      zh_Hans: 要返回的最大结果数（1-20，默认为5）
+      zh_Hant: 要返回的最大結果數（1-20，預設為5）
+      ja_JP: 返す結果の最大数（1-20、デフォルトは5）
+      pt_BR: Número máximo de resultados a serem retornados (1-20, o padrão é 5)
+    llm_description: Maximum number of movies to return in results (1-20)
+    form: form
+extra:
+  python:
+    source: tools/tmdb_movie_search.py 

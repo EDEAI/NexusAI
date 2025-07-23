@@ -1,0 +1,97 @@
+identity:
+  name: search_event
+  author: acane0320
+  label:
+    en_US: Search User Events
+    zh_Hans: 搜索用户事件
+    ja_Jp: ユーザーイベントを検索する
+    pt_BR: Pesquisar Eventos do Usuário
+description:
+  human:
+    en_US: Search for specific events in the user's history based on a query
+    zh_Hans: 基于查询在用户的历史记录中搜索特定事件
+    ja_Jp: クエリに基づいてユーザーの履歴から特定のイベントを検索します
+    pt_BR: Pesquisar eventos específicos no histórico do usuário com base em uma consulta
+  llm: Use this tool to search for specific events in the user's history based on a semantic search query. This is useful for finding relevant past interactions or activities.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to search events for
+      zh_Hans: 要搜索事件的用户 ID
+      ja_Jp: イベントを検索するユーザーの ID
+      pt_BR: O ID do usuário para pesquisar eventos
+    llm_description: The ID of the user to search events for.
+    form: llm
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Search Query
+      zh_Hans: 搜索查询
+      ja_Jp: 検索クエリ
+      pt_BR: Consulta de Pesquisa
+    human_description:
+      en_US: The search query to find relevant events
+      zh_Hans: 用于查找相关事件的搜索查询
+      ja_Jp: 関連するイベントを見つけるための検索クエリ
+      pt_BR: A consulta de pesquisa para encontrar eventos relevantes
+    llm_description: The search query to find relevant events.
+    form: llm
+  - name: topk
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Top K
+      zh_Hans: 前 K 条
+      ja_Jp: トップ K
+      pt_BR: Top K
+    human_description:
+      en_US: The number of most relevant events to retrieve
+      zh_Hans: 要获取的最相关事件的数量
+      ja_Jp: 取得する最も関連性の高いイベントの数
+      pt_BR: O número de eventos mais relevantes a serem recuperados
+    llm_description: The number of most relevant events to retrieve.
+    form: llm
+  - name: similarity_threshold
+    type: number
+    required: false
+    default: 0.5
+    label:
+      en_US: Similarity Threshold
+      zh_Hans: 相似度阈值
+      ja_Jp: 類似度のしきい値
+      pt_BR: Limiar de Similaridade
+    human_description:
+      en_US: The minimum similarity score required for an event to be returned
+      zh_Hans: 事件被返回所需的最小相似度分数
+      ja_Jp: イベントが返されるために必要な最小の類似度スコア
+      pt_BR: A pontuação mínima de similaridade necessária para que um evento seja retornado
+    llm_description: The minimum similarity score required for an event to be returned.
+    form: llm
+  - name: time_range_in_days
+    type: number
+    required: false
+    default: 7
+    label:
+      en_US: Time Range (Days)
+      zh_Hans: 时间范围（天）
+      ja_Jp: 時間範囲（日）
+      pt_BR: Intervalo de Tempo (Dias)
+    human_description:
+      en_US: The number of days in the past to search for events
+      zh_Hans: 搜索过去多少天内的事件
+      ja_Jp: 過去のイベントを検索する日数
+      pt_BR: O número de dias no passado para pesquisar eventos
+    llm_description: The number of days in the past to search for events.
+    form: llm
+extra:
+  python:
+    source: tools/user_event/search_event.py

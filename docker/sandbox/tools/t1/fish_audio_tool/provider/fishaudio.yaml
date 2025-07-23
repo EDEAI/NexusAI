@@ -1,0 +1,55 @@
+identity:
+  author: langgenius
+  name: fishaudio
+  label:
+    en_US: Fish Audio Tool
+    zh_Hans: Fish Audio Tool
+    pt_BR: Fish Audio Tool
+  description:
+    en_US: TTS tools provided by Fish Audio.
+    zh_Hans: Fish Audio 提供的 TTS 工具。
+    pt_BR: TTS tools provided by Fish Audio.
+  icon: fishaudio.jpeg
+  tags:
+    - utilities
+credentials_for_provider:
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Fish Audio api key
+      zh_Hans: Fish Audio api key
+      pt_BR: Fish Audio api key
+    placeholder:
+      en_US: Please input your Fish Audio api key
+      zh_Hans: 请输入你的 Fish Audio api key
+      pt_BR: Please input your Fish Audio api key
+    help:
+      en_US: Get your api key from Fish Audio
+      zh_Hans: 获取您的 Fish Audio api key
+      pt_BR: Get your api key from Fish Audio
+    url: https://fish.audio/zh-CN/go-api/api-keys
+  api_base:
+    type: text-input
+    required: true
+    label:
+      en_US: Fish Audio endpoint
+      zh_Hans: Fish Audio endpoint
+      pt_BR: Fish Audio endpoint
+    placeholder:
+      en_US: Please input your Fish Audio endpoint
+      zh_Hans: 请输入你的 Fish Audio 端点
+      pt_BR: Please input your Fish Audio endpoint
+    help:
+      en_US: An endpoint is like "https://api.fish.audio"
+      zh_Hans: 例如 "https://api.fish.audio"
+      pt_BR: An endpoint is like "https://api.fish.audio"
+    default: https://api.fish.audio
+
+tools:
+  - tools/tts.yaml
+  - tools/list_model.yaml
+  - tools/create_model.yaml
+extra:
+  python:
+    source: provider/fishaudio.py

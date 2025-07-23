@@ -1,0 +1,186 @@
+description:
+  human:
+    en_US: Updates a Trello board's settings based on the provided ID and parameters.
+      Allows for changing the board's name, description, status, and other preferences.
+    pt_BR: Atualiza as configurações de um quadro Trello com base no ID fornecido
+      e nos parâmetros. Permite alterar o nome, descrição, status e outras preferências
+      do quadro.
+    zh_Hans: 根据提供的 ID 和参数更新 Trello 看板的设置。允许更改看板的名称、描述、状态和其他偏好设置。
+  llm: Modify a Trello board's attributes like its name, description, and visibility
+    settings using the board's ID. This tool streamlines board customization and management.
+extra:
+  python:
+    source: tools/update_board.py
+identity:
+  author: Yash Parmar
+  label:
+    en_US: Update Board by ID
+    pt_BR: Atualizar Quadro por ID
+    zh_Hans: 通过 ID 更新看板
+  name: update_board_by_id
+parameters:
+- form: llm
+  human_description:
+    en_US: The unique identifier of the Trello board you want to update. Ensures targeted
+      and precise updates.
+    pt_BR: O identificador único do quadro Trello que você deseja atualizar. Garante
+      atualizações direcionadas e precisas.
+    zh_Hans: 您要更新的 Trello 看板的唯一标识符。确保目标准确和更新精确。
+  label:
+    en_US: Board ID
+    pt_BR: ID do Quadro
+    zh_Hans: 看板 ID
+  llm_description: Provide the specific ID of the Trello board you aim to update to
+    ensure accuracy in modification process.
+  name: boardId
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The new name for the board.
+    pt_BR: Opcional. O novo nome para o quadro.
+    zh_Hans: 可选。看板的新名称。
+  label:
+    en_US: Board Name
+    pt_BR: Nome do Quadro
+    zh_Hans: 看板名称
+  llm_description: Enter a new name for the board if you wish to change it; this name
+    identifies the board in Trello.
+  name: name
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The new description for the board.
+    pt_BR: Opcional. A nova descrição para o quadro.
+    zh_Hans: 可选。看板的新描述。
+  label:
+    en_US: Board Description
+    pt_BR: Descrição do Quadro
+    zh_Hans: 看板描述
+  llm_description: Provide a new description for the board if you wish to update it;
+    this description provides additional context about the board.
+  name: desc
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. Set to true to close the board, or false to keep it open.
+    pt_BR: Opcional. Defina como true para fechar o quadro ou como false para mantê-lo
+      aberto.
+    zh_Hans: 可选。设置为 true 以关闭看板，或设置为 false 以保持打开。
+  label:
+    en_US: Closed
+    pt_BR: Fechado
+    zh_Hans: 已关闭
+  llm_description: Specify whether the board should be closed or kept open by setting
+    this parameter to true or false.
+  name: closed
+  required: false
+  type: boolean
+- form: llm
+  human_description:
+    en_US: Optional. Set to true to subscribe to the board, or false to unsubscribe.
+    pt_BR: Opcional. Defina como true para se inscrever no quadro ou como false para
+      cancelar a inscrição.
+    zh_Hans: 可选。设置为 true 以订阅看板，或设置为 false 以取消订阅。
+  label:
+    en_US: Subscribed
+    pt_BR: Inscrito
+    zh_Hans: 订阅
+  llm_description: Choose to subscribe or unsubscribe from the board by setting this
+    parameter to true or false.
+  name: subscribed
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The ID of the organization to which the board belongs.
+    pt_BR: Opcional. O ID da organização à qual o quadro pertence.
+    zh_Hans: 可选。看板所属组织的 ID。
+  label:
+    en_US: Organization ID
+    pt_BR: ID da Organização
+    zh_Hans: 组织 ID
+  llm_description: Input the ID of the organization to which the board is associated,
+    if applicable.
+  name: idOrganization
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The permission level for the board. Valid values are 'private',
+      'org', or 'public'.
+    pt_BR: Opcional. O nível de permissão para o quadro. Os valores válidos são 'private',
+      'org' ou 'public'.
+    zh_Hans: 可选。看板的权限级别。有效值为 'private'、'org' 或 'public'。
+  label:
+    en_US: Permission Level
+    pt_BR: Nível de Permissão
+    zh_Hans: 权限级别
+  llm_description: Specify the permission level for the board by choosing from 'private',
+    'org', or 'public'.
+  name: prefs_permissionLevel
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. Set to true to allow members to join the board without an invitation,
+      or false to require an invitation.
+    pt_BR: Opcional. Defina como true para permitir que os membros se inscrevam no
+      quadro sem um convite, ou como false para exigir um convite.
+    zh_Hans: 可选。设置为 true 以允许成员加入看板而无需邀请，或设置为 false 以要求邀请。
+  label:
+    en_US: Allow Self-Join
+    pt_BR: Permitir Auto-Inscrição
+    zh_Hans: 允许自行加入
+  llm_description: Choose whether to allow members to join the board without an invitation
+    by setting this parameter to true or false.
+  name: prefs_selfJoin
+  required: false
+  type: boolean
+- form: llm
+  human_description:
+    en_US: Optional. Set to true to enable card covers, or false to disable them.
+    pt_BR: Opcional. Defina como true para habilitar capas de cartão ou como false
+      para desabilitá-las.
+    zh_Hans: 可选。设置为 true 以启用卡片封面，或设置为 false 以禁用卡片封面。
+  label:
+    en_US: Card Covers
+    pt_BR: Capas de Cartão
+    zh_Hans: 卡片封面
+  llm_description: Enable or disable card covers by setting this parameter to true
+    or false.
+  name: prefs_cardCovers
+  required: false
+  type: boolean
+- form: llm
+  human_description:
+    en_US: Optional. Set to true to hide votes, or false to show them.
+    pt_BR: Opcional. Defina como true para ocultar votos ou como false para mostrá-los.
+    zh_Hans: 可选。设置为 true 以隐藏投票，或设置为 false 以显示投票。
+  label:
+    en_US: Hide Votes
+    pt_BR: Ocultar Votos
+    zh_Hans: 隐藏投票
+  llm_description: Choose to hide or show votes by setting this parameter to true
+    or false.
+  name: prefs_hideVotes
+  required: false
+  type: boolean
+- form: llm
+  human_description:
+    en_US: Optional. Set to 'members' to allow only board members to send invitations,
+      or 'admins' to allow admins to send invitations.
+    pt_BR: Opcional. Defina como 'members' para permitir que apenas membros do quadro
+      enviem convites, ou 'admins' para permitir que os administradores enviem convites.
+    zh_Hans: 可选。设置为 'members' 以仅允许看板成员发送邀请，或设置为 'admins' 以允许管理员发送邀请。
+  label:
+    en_US: Invitations
+    pt_BR: Convites
+    zh_Hans: 邀请
+  llm_description: Choose who can send invitations by setting this parameter to 'members'
+    or 'admins'.
+  name: prefs_invitations
+  required: false
+  type: string

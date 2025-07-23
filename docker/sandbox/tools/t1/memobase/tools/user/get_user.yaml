@@ -1,0 +1,34 @@
+identity:
+  name: get_user
+  author: acane0320
+  label:
+    en_US: Get User
+    zh_Hans: 获取用户
+    ja_Jp: ユーザーを取得
+    pt_BR: Obter Usuário
+description:
+  human:
+    en_US: Get user information from Memobase
+    zh_Hans: 从 Memobase 获取用户信息
+    ja_Jp: Memobaseからユーザー情報を取得
+    pt_BR: Obter informações do usuário do Memobase
+  llm: Use this tool to retrieve information about a user from Memobase. You need to provide the user ID.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户ID
+      ja_Jp: ユーザーID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to retrieve
+      zh_Hans: 要检索的用户的ID
+      ja_Jp: 取得するユーザーのID
+      pt_BR: O ID do usuário a ser recuperado
+    llm_description: The ID of the user to retrieve.
+    form: llm
+extra:
+  python:
+    source: tools/user/get_user.py

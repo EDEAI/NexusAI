@@ -1,0 +1,37 @@
+identity:
+  name: ed25519_sign
+  author: bowenliang123
+  label:
+    en_US: Ed25519 Signing
+    zh_Hans: Ed25519 签名生成
+description:
+  human:
+    en_US: Using Ed25519 algorithm and private key, generate a signature for the input plaintext
+    zh_Hans: 使用 Ed25519 算法及私钥，生成输入原文的签名
+  llm: Ed25519 Signing
+parameters:
+  - name: plaintext
+    type: string
+    required: true
+    label:
+      en_US: Plaintext
+      zh_Hans: 原文
+    human_description:
+      en_US: "Plaintext"
+      zh_Hans: "原文"
+    llm_description: "Plaintext"
+    form: llm
+  - name: private_key_text
+    type: string
+    required: true
+    label:
+      en_US: Private Key Text
+      zh_Hans: 私钥文本
+    human_description:
+      en_US: "Starts with '-----BEGIN PRIVATE KEY-----'"
+      zh_Hans: "以 '-----BEGIN PRIVATE KEY-----' 开头"
+    llm_description: "Private Key Text"
+    form: llm
+extra:
+  python:
+    source: tools/ed25519_sign/ed25519_sign.py

@@ -1,0 +1,52 @@
+identity:
+  name: search-hotels
+  author: ayush3941
+  label:
+    en_US: Search Hotels
+    zh_Hans: 搜索酒店
+    pt_BR: Buscar Hotéis
+  icon: "icon.png"
+  description:
+    en_US: Search available hotels using the Amadeus API.
+    zh_Hans: 使用 Amadeus API 搜索可用酒店。
+    pt_BR: Pesquise hotéis disponíveis usando a API Amadeus.
+
+description:
+  human:
+    en_US: Search available hotels in a city by IATA code
+    zh_Hans: 通过 IATA 代码搜索城市中的可用酒店
+    pt_BR: Pesquisar hotéis disponíveis em uma cidade usando o código IATA
+  llm: Find hotels in a city using the city IATA code
+
+parameters:
+  - name: city_code
+    type: string
+    required: true
+    label:
+      en_US: City Code
+      zh_Hans: 城市代码
+      pt_BR: Código da cidade
+    human_description:
+      en_US: IATA code for the destination city (e.g. PAR for Paris)
+      zh_Hans: 目的地城市的 IATA 代码（例如：PAR 表示巴黎）
+      pt_BR: Código IATA da cidade de destino (ex- PAR para Paris)
+    llm_description: 3-letter IATA code for the destination city
+    form: llm
+
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: Number of Results
+      zh_Hans: 结果数量
+      pt_BR: Número de resultados
+    human_description:
+      en_US: Maximum number of hotel results to return (default- 5)
+      zh_Hans: 返回的酒店结果最大数量（默认：5）
+      pt_BR: Número máximo de resultados de hotéis a retornar (padrão- 5)
+    llm_description: Number of hotel results to return
+    form: llm
+
+extra:
+  python:
+    source: tools/search-hotels.py

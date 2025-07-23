@@ -1,0 +1,26 @@
+identity:
+  author: "pragnyan_ramtha"
+  name: "stock_researcher"
+  label:
+    en_US: stock researcher
+    zh_Hans: 股票研究员
+    pt_BR: pesquisador de ações
+  description:
+    en_US: "This plugin will fetch the current stock price for a given stock symbol"
+    zh_Hans: "This plugin will fetch the current stock price for a given stock symbol"
+    pt_BR: "This plugin will fetch the current stock price for a given stock symbol"
+  icon: "icon.svg"
+credentials_for_provider:
+  financial_api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Financial API Key, Alpha Vantage
+    placeholder:
+      en_US: Enter your Alpha Vantage API key here
+    url: https://www.alphavantage.co/support/#api-key  
+tools:
+  - tools/stock_researcher.yaml
+extra:
+  python:
+    source: provider/stock_researcher.py

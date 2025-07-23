@@ -1,0 +1,34 @@
+identity:
+  name: crypto_snapshot
+  author: financialai
+  label:
+    en_US: Crypto Snapshot
+    zh_Hans: 加密货币快照
+    ja_Jp: 暗号通貨スナップショット
+    pt_BR: Instantâneo de Criptomoeda
+description:
+  human:
+    en_US: Get the real-time price snapshot for a cryptocurrency.
+    zh_Hans: 获取加密货币的实时价格快照。
+    ja_Jp: 暗号通貨のリアルタイム価格スナップショットを取得します。
+    pt_BR: Obtenha o instantâneo de preço em tempo real para uma criptomoeda.
+  llm: Get the real-time price snapshot for a cryptocurrency.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 加密货币代码
+      ja_Jp: 暗号通貨のティッカーシンボル
+      pt_BR: Símbolo do ticker da criptomoeda
+    human_description:
+      en_US: The cryptocurrency ticker symbol.
+      zh_Hans: 加密货币的代码。
+      ja_Jp: 暗号通貨のティッカーシンボル。
+      pt_BR: O símbolo do ticker da criptomoeda.
+    llm_description: The cryptocurrency ticker symbol.
+    form: llm
+extra:
+  python:
+    source: tools/crypto_snapshot/invoke.py

@@ -1,0 +1,44 @@
+identity:
+  name: encrypt_message
+  author: alterxyz
+  label:
+    en_US: GPG Encrypt Message
+    zh_Hans: GPG 加密消息
+description:
+  human:
+    en_US: Encrypts a text message using a recipient's GPG public key.
+    zh_Hans: 使用接收者的 GPG 公钥加密文本消息。
+  llm: Use this tool to encrypt a given plaintext message using the recipient's ASCII-armored GPG public key. Returns the encrypted message as an ASCII-armored string.
+parameters:
+  - name: plaintext
+    type: string
+    required: true
+    label:
+      en_US: Plaintext Message
+      zh_Hans: 明文消息
+    human_description:
+      en_US: The text message you want to encrypt.
+      zh_Hans: 你想要加密的文本消息。
+    llm_description: The plaintext content that needs to be encrypted.
+    form: llm
+  - name: recipient_pubkey_str
+    type: string
+    required: true
+    label:
+      en_US: Recipient Public Key
+      zh_Hans: 接收者公钥
+    human_description:
+      en_US: The recipient's ASCII-armored GPG public key string (starts with '-----BEGIN PGP PUBLIC KEY BLOCK-----').
+      zh_Hans: 接收者的 ASCII 封装 GPG 公钥字符串（以 '-----BEGIN PGP PUBLIC KEY BLOCK-----' 开头）。
+    llm_description: The full ASCII-armored PGP public key block of the intended recipient. It must start with '-----BEGIN PGP PUBLIC KEY BLOCK-----' and end with '-----END PGP PUBLIC KEY BLOCK-----'.
+    form: llm
+extra:
+  python:
+    source: tools/encrypt.py
+# Optional: Define output schema if needed, for now text output is fine.
+# output_schema:
+#   type: object
+#   properties:
+#     encrypted_message:
+#       type: string
+#       description: The encrypted message as an ASCII-armored string.

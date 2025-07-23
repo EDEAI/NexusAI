@@ -1,0 +1,17 @@
+identity:
+  author: wangha
+  name: mqtt
+  label:
+    en_US: mqtt
+    zh_Hans: mqtt
+    pt_BR: mqtt
+  description:
+    en_US: MQTT Tools
+    zh_Hans: MQTT Tools
+    pt_BR: MQTT Tools
+  icon: icon.svg
+tools:
+  - tools/mqtt.yaml
+extra:
+  python:
+    source: provider/mqtt.py

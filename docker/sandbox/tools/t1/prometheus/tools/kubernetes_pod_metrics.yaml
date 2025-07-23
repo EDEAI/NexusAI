@@ -1,0 +1,134 @@
+identity:
+  name: kubernetes_pod_metrics
+  author: lework
+  label:
+    en_US: Kubernetes Pod Metrics
+    zh_Hans: Kubernetes Pod 资源指标查询
+description:
+  human:
+    en_US: Get resource usage information for Kubernetes pods over a time period
+    zh_Hans: 获取一段时间内Kubernetes Pod的资源使用情况信息
+  llm: Get resource metrics (CPU, memory, restart count) for Kubernetes pods in a deployment over a specified time period and display as a Markdown table with statistics
+parameters:
+  - name: namespace
+    type: string
+    required: false
+    label:
+      en_US: Namespace
+      zh_Hans: 命名空间
+    human_description:
+      en_US: Kubernetes namespace to query (default is all namespaces)
+      zh_Hans: 要查询的Kubernetes命名空间（默认为所有命名空间）
+    llm_description: Kubernetes namespace to filter pods (leave empty for all namespaces)
+    form: llm
+  - name: selector
+    type: string
+    required: false
+    label:
+      en_US: Label Selector
+      zh_Hans: 标签选择器
+    human_description:
+      en_US: Label selector to filter pods (e.g. 'app=myapp')
+      zh_Hans: 用于过滤Pod的标签选择器（例如'app=myapp'）
+    llm_description: Kubernetes label selector to filter pods (e.g. 'app=myapp', 'component=database')
+    form: llm
+  - name: pod_name_pattern
+    type: string
+    required: false
+    label:
+      en_US: Pod Name Pattern
+      zh_Hans: Pod名称模式
+    human_description:
+      en_US: Regular expression to filter pods by name
+      zh_Hans: 用于按名称过滤Pod的正则表达式
+    llm_description: Regular expression to match pod names (e.g. 'frontend-.*' to match all pods starting with 'frontend-')
+    form: llm
+  - name: start_time
+    type: string
+    required: false
+    label:
+      en_US: Start Time
+      zh_Hans: 开始时间
+    human_description:
+      en_US: Start time for the metrics query (e.g. '1h' for 1 hour ago, '2d' for 2 days ago, or ISO timestamp)
+      zh_Hans: 指标查询的开始时间（例如'1h'表示1小时前，'2d'表示2天前，或ISO时间戳）
+    llm_description: The start time for the query period. Can be relative (e.g. '24h' for 24 hours ago) or absolute time in ISO format.
+    form: llm
+  - name: end_time
+    type: string
+    required: false
+    label:
+      en_US: End Time
+      zh_Hans: 结束时间
+    human_description:
+      en_US: End time for the metrics query (e.g. 'now' for current time, or ISO timestamp)
+      zh_Hans: 指标查询的结束时间（例如'now'表示当前时间，或ISO时间戳）
+    llm_description: The end time for the query period. Can be 'now' or absolute time in ISO format.
+    form: llm
+  - name: step
+    type: string
+    required: false
+    label:
+      en_US: Step
+      zh_Hans: 步长
+    human_description:
+      en_US: Step interval for time series data (e.g. '5m' for 5 minutes)
+      zh_Hans: 时间序列数据的步长间隔（例如'5m'表示5分钟）
+    llm_description: The step size between data points. Affects resolution and query performance.
+    form: llm
+    default: '15s'
+  - name: api_url
+    type: secret-input
+    required: false
+    label:
+      en_US: Prometheus API URL
+      zh_Hans: Prometheus API URL
+      pt_BR: URL da API do Prometheus
+    human_description:
+      en_US: The URL of the Prometheus API, if not configured, use the default value
+      zh_Hans: Prometheus API的URL, 如果未配置，则使用默认值
+      pt_BR: URL da API do Prometheus, se não configurado, use o valor padrão
+    llm_description: The URL of the Prometheus API, if not configured, use the default value
+    form: llm
+  - name: username
+    type: secret-input
+    required: false
+    label:
+      en_US: Prometheus API Username
+      zh_Hans: Prometheus API用户名
+      pt_BR: Nome de usuário da API do Prometheus
+    human_description:
+      en_US: Username for basic authentication (optional), if not configured, use the default value
+      zh_Hans: Prometheus API的基本认证的用户名（可选）, 如果未配置，则使用默认值
+      pt_BR: Nome de usuário para autenticação básica (opcional), se não configurado, use o valor padrão
+    llm_description: The username for basic authentication (optional), if not configured, use the default value
+    form: llm
+  - name: password
+    type: secret-input
+    required: false
+    label:
+      en_US: Prometheus API Password
+      zh_Hans: Prometheus API密码
+      pt_BR: Senha da API do Prometheus
+    human_description:
+      en_US: Password for basic authentication (optional), if not configured, use the default value
+      zh_Hans: Prometheus API的基本认证的密码（可选）, 如果未配置，则使用默认值
+      pt_BR: Senha para autenticação básica (opcional), se não configurado, use o valor padrão
+    llm_description: The password for basic authentication (optional), if not configured, use the default value
+    form: llm
+  - name: token
+    type: secret-input
+    required: false
+    label:
+      en_US: Prometheus API Token
+      zh_Hans: Prometheus API令牌
+      pt_BR: Token da API do Prometheus
+    human_description:
+      en_US: Token for basic authentication (optional), if not configured, use the default value
+      zh_Hans: Prometheus API的基本认证的令牌（可选）, 如果未配置，则使用默认值
+      pt_BR: Token para autenticação básica (opcional), se não configurado, use o valor padrão
+    llm_description: The token for basic authentication (optional), if not configured, use the default value
+    form: llm
+extra:
+  python:
+    source: tools/kubernetes_pod_metrics.py

@@ -1,0 +1,26 @@
+identity:
+  name: steam_achievements
+  author: bdim
+  label:
+    en_US: Game Achievements
+    zh_Hans: 游戏成就
+description:
+  human:
+    en_US: Get global achievement percentages for a specific game on Steam
+    zh_Hans: 获取特定 Steam 游戏的全球成就完成百分比
+  llm: Retrieve global achievement completion percentages for a Steam game by specifying its AppID.
+parameters:
+  - name: gameid
+    type: string
+    required: true
+    label:
+      en_US: Game AppID
+      zh_Hans: 游戏 AppID
+    human_description:
+      en_US: The AppID of the game you want achievement data for (e.g., 440 for Team Fortress 2)
+      zh_Hans: 您想获取成就数据的游戏 AppID（例如，440代表团队要塞2）
+    llm_description: The unique identifier for a game on Steam. For example, 440 is the AppID for Team Fortress 2, 570 for Dota 2, 730 for CS:GO.
+    form: llm
+extra:
+  python:
+    source: tools/steam_achievements.py

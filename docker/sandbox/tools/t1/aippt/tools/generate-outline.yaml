@@ -1,0 +1,261 @@
+identity:
+  name: generation-outline
+  author: aippt
+  label:
+    en_US: Generate Outline
+    zh_Hans: 生成大纲
+    pt_BR: Generate Outline
+description:
+  human:
+    en_US: Enter the title to generate a PPT in one click
+    zh_Hans: 输入标题，PPT一键生成
+    pt_BR: Enter the title to generate a PPT in one click
+  llm: Enter the title to generate a PPT in one click
+parameters:
+  - name: title
+    type: string
+    required: true
+    label:
+      en_US: PPT Topic
+      zh_Hans: PPT主题
+      pt_BR: PPT Topic
+    human_description:
+      en_US: Please enter the PPT topic, e.g., Development of New Energy Vehicles
+      zh_Hans: 请输入PPT主题，如：新能源汽车发展
+      pt_BR: Please enter the PPT topic, e.g., Development of New Energy Vehicles
+    llm_description: Please enter the PPT topic, e.g., Development of New Energy Vehicles
+    form: llm
+  - name: page
+    type: select
+    required: true
+    label:
+      en_US: Page Count
+      zh_Hans: 页数
+      pt_BR: Page Count
+    human_description:
+      en_US: Please select the total number of PPT pages
+      zh_Hans: 请选择PPT的总页数
+      pt_BR: Please select the total number of PPT pages
+    llm_description: Please select the total number of PPT pages
+    form: form
+    default: "3"
+    options:
+      - label:
+          en_US: 15 - 20 pages
+          zh_Hans: 15 - 20 页
+        value: "2"
+      - label:
+          en_US: 20 - 30 pages
+          zh_Hans: 20 - 30 页
+        value: "3"
+      - label:
+          en_US: 30 - 35 pages
+          zh_Hans: 30 - 35 页
+        value: "4"
+  - name: group
+    type: select
+    required: true
+    label:
+      en_US: Audience
+      zh_Hans: 受众
+      pt_BR: Audience
+    human_description:
+      en_US: Please select the target audience for the PPT
+      zh_Hans: 请选择PPT的受众人群
+      pt_BR: Please select the target audience for the PPT
+    llm_description: Please select the target audience for the PPT
+    form: form
+    default: "6"
+    options:
+      - label:
+          en_US: General Public
+          zh_Hans: 大众
+        value: "6"
+      - label:
+          en_US: Investors
+          zh_Hans: 投资者
+        value: "7"
+      - label:
+          en_US: Business
+          zh_Hans: 商业
+        value: "8"
+      - label:
+          en_US: Students
+          zh_Hans: 学生
+        value: "9"
+      - label:
+          en_US: Teachers
+          zh_Hans: 教师
+        value: "10"
+      - label:
+          en_US: Boss
+          zh_Hans: 老板
+        value: "11"
+      - label:
+          en_US: Interviewers
+          zh_Hans: 面试官
+        value: "12"
+      - label:
+          en_US: Employees
+          zh_Hans: 员工
+        value: "13"
+      - label:
+          en_US: Colleagues
+          zh_Hans: 同事同行
+        value: "14"
+      - label:
+          en_US: Online Visitors
+          zh_Hans: 在线访客
+        value: "15"
+      - label:
+          en_US: Team Members
+          zh_Hans: 组员
+        value: "16"
+  - name: scene
+    type: select
+    required: true
+    label:
+      en_US: Scenario
+      zh_Hans: 场景
+      pt_BR: Scenario
+    human_description:
+      en_US: Please select the usage scenario of the PPT
+      zh_Hans: 请选择PPT的使用场景
+      pt_BR: Please select the usage scenario of the PPT
+    llm_description: Please select the usage scenario of the PPT
+    form: form
+    default: "18"
+    options:
+      - label:
+          en_US: General
+          zh_Hans: 通用
+        value: "18"
+      - label:
+          en_US: Analysis Report
+          zh_Hans: 分析报告
+        value: "19"
+      - label:
+          en_US: Teaching Material
+          zh_Hans: 教学课件
+        value: "20"
+      - label:
+          en_US: Promotional Material
+          zh_Hans: 宣传材料
+        value: "21"
+      - label:
+          en_US: Public Speech
+          zh_Hans: 公众演讲
+        value: "22"
+      - label:
+          en_US: Online Media
+          zh_Hans: 在线媒体
+        value: "23"
+      - label:
+          en_US: Announcement
+          zh_Hans: 公告
+        value: "24"
+      - label:
+          en_US: Research Report
+          zh_Hans: 研究报告
+        value: "25"
+      - label:
+          en_US: Academic Conference
+          zh_Hans: 学术会议
+        value: "26"
+      - label:
+          en_US: Project Report
+          zh_Hans: 项目汇报
+        value: "27"
+      - label:
+          en_US: Personal Introduction
+          zh_Hans: 个人介绍
+        value: "28"
+      - label:
+          en_US: Business Plan
+          zh_Hans: 商业计划书
+        value: "29"
+      - label:
+          en_US: Solution
+          zh_Hans: 解决方案
+        value: "30"
+      - label:
+          en_US: Product Introduction
+          zh_Hans: 产品介绍
+        value: "31"
+      - label:
+          en_US: Meeting Agenda
+          zh_Hans: 会议流程
+        value: "32"
+      - label:
+          en_US: Annual Plan
+          zh_Hans: 年度计划
+        value: "33"
+      - label:
+          en_US: Annual Summary
+          zh_Hans: 年度总结
+        value: "34"
+      - label:
+          en_US: Health Education
+          zh_Hans: 健康科普
+        value: "35"
+      - label:
+          en_US: Financial Report
+          zh_Hans: 财务报告
+        value: "36"
+      - label:
+          en_US: Project Proposal
+          zh_Hans: 项目计划书
+        value: "37"
+      - label:
+          en_US: Business Blog
+          zh_Hans: 商业博文
+        value: "38"
+  - name: tone
+    type: select
+    required: true
+    label:
+      en_US: Tone
+      zh_Hans: 语气
+      pt_BR: Tone
+    human_description:
+      en_US: Please select the tone of the PPT
+      zh_Hans: 请选择PPT的语气
+      pt_BR: Please select the tone of the PPT
+    llm_description: Please select the tone of the PPT
+    form: form
+    default: "40"
+    options:
+      - label:
+          en_US: Professional
+          zh_Hans: 专业
+        value: "40"
+      - label:
+          en_US: Inspirational
+          zh_Hans: 励志
+        value: "41"
+      - label:
+          en_US: Humorous
+          zh_Hans: 幽默
+        value: "42"
+      - label:
+          en_US: Friendly
+          zh_Hans: 亲切
+        value: "43"
+      - label:
+          en_US: Confident
+          zh_Hans: 自信
+        value: "44"
+      - label:
+          en_US: Gentle
+          zh_Hans: 温柔
+        value: "45"
+output_schema:
+  type: object
+  properties:
+    outline:
+      type: string
+    task_id:
+      type: number
+extra:
+  python:
+    source: tools/generate-outline.py

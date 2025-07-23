@@ -1,0 +1,56 @@
+identity:
+  name: data_interpretation
+  author: digitforce
+  label:
+    en_US: data_interpretation
+    zh_Hans: 数据解读
+    pt_BR: data_interpretation
+description:
+  human:
+    en_US: Automated Insight Generation
+    zh_Hans: 自动生成分析结论
+    pt_BR: Automated Insight Generation
+  llm: Automated Insight Generation
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 用户的数据解读要求
+      pt_BR: Query string
+    human_description:
+      en_US: Query string
+      zh_Hans: 用户的数据解读要求
+      pt_BR: Query string
+    llm_description: Query string
+    form: llm
+  - name: input_data
+    type: string
+    required: false
+    label:
+      en_US: markdown data
+      zh_Hans: 表格通过文档提取器输出的markdown文本
+      pt_BR: markdown data
+    human_description:
+      en_US: markdown data
+      zh_Hans: 表格通过文档提取器输出的markdown文本
+      pt_BR: markdown data
+    llm_description: markdown text output by the table through the Doc Extractor. The "input_data" parameter and the "file" parameter only need to be passed in one. When both are passed in, only "file" is used
+    form: llm
+  - name: input_file
+    type: file
+    required: false
+    label:
+      en_US: file
+      zh_Hans: 上传的文件
+      pt_BR: file
+    human_description:
+      en_US: file(.xlsx/.xls/.csv)
+      zh_Hans: 上传的文件(.xlsx/.xls/.csv)
+      pt_BR: file(.xlsx/.xls/.csv)
+    llm_description: file(.xlsx/.xls/.csv). The "input_data" parameter and the "file" parameter only need to be passed in one. When both are passed in, only "file" is used
+    form: llm
+extra:
+  python:
+    source: tools/data_interpretation.py

@@ -1,0 +1,133 @@
+identity:
+  name: upstash-ratelimit
+  author: elifnurdeniz
+  label:
+    en_US: upstash-ratelimit
+    zh_Hans: upstash-ratelimit
+description:
+  human:
+    en_US: This plugin provides Upstash's Redis-based rate limiting service integrated with Dify AI platform.
+    zh_Hans: 该插件提供了基于 Upstash 的 Redis 与 Dify AI 平台集成的速率限制服务。
+  llm: This plugin provides Upstash's Redis-based rate limiting service integrated with Dify AI platform.
+parameters:
+  - name: window type
+    type: select
+    required: true
+    options:
+      - label:
+          en_US: Sliding Window
+          zh_Hans: 滑动窗口
+        value: sliding window
+      - label:
+          en_US: Fixed Window
+          zh_Hans: 固定窗口
+        value: fixed window
+    label:
+      en_US: Window Type
+      zh_Hans: 窗口类型
+    default: sliding window
+    description:
+      human:
+        en_US: The type of window to use for rate limiting
+        zh_Hans: 用于速率限制的窗口类型
+    llm_description: This parameter determines window type for rate limiting. The plugin supports two types of windows, sliding window and fixed window.
+    human_description: 
+      en_US: The type of window to use for rate limiting. The plugin supports two types of windows, sliding window and fixed window.
+      zh_Hans: 用于速率限制的窗口类型。插件支持两种窗口类型，滑动窗口和固定窗口。
+    form: form
+  - name: window size
+    type: number
+    required: true
+    min: 1
+    label:
+      en_US: Window Size
+      zh_Hans: 窗口大小
+    description:
+      human:
+        en_US: The size of the window in seconds
+        zh_Hans: 窗口的大小（以秒为单位）
+    llm_description: This parameter determines the size of the window in seconds.
+    human_description: 
+      en_US: The size of the window in seconds.
+      zh_Hans: 窗口的大小（以秒为单位）。
+    form: form
+  - name: max requests
+    type: number
+    required: true
+    min: 1
+    label:
+      en_US: Max Requests
+      zh_Hans: 最大请求数
+    description:
+      human:
+        en_US: The maximum number of requests allowed within the specified window size.
+        zh_Hans: 指定时间窗口内允许的最大请求数。
+    llm_description: Defines the maximum number of requests allowed within the specified window size.
+    human_description: 
+      en_US: The maximum number of requests allowed within the specified window size.
+      zh_Hans: 指定时间窗口内允许的最大请求数。
+    form: form
+  - name: rate limit scope
+    type: select
+    required: true
+    options:
+      - label:
+          en_US: Global
+          zh_Hans: 全局
+        value: global
+      - label:
+          en_US: Per User
+          zh_Hans: 每个用户
+        value: per user
+    label:
+      en_US: Rate Limit Scope
+      zh_Hans: 限速范围
+    default: global
+    description:
+      human:
+        en_US: Determines whether the rate limit applies globally or per user.
+        zh_Hans: 确定速率限制是全局的还是针对每个用户的。
+    llm_description: Defines whether the rate limit should be applied to all requests (global) or per individual user (user).
+    human_description:
+      en_US: Choose whether the rate limit should apply globally or per user.
+      zh_Hans: 选择速率限制是否适用于全局或每个用户。
+    form: form
+  - name: rate
+    type: number
+    required: false
+    label:
+      en_US: Rate
+      zh_Hans: 速率
+    default: 1
+    min: 1
+    description:
+      human:
+        en_US: The number of tokens/requests to subtract per operation.
+        zh_Hans: 每次操作要减少的令牌/请求数。
+    llm_description: Determines how many requests should be subtracted from the rate limit per action.
+    human_description: 
+      en_US: The number of tokens deducted per request. Defaults to 1 if not provided.
+      zh_Hans: 每次操作要减少的令牌数。如果未提供，则默认为 1。
+    form: form
+output_schema:
+  type: object
+  properties:
+    status:
+      type: string
+      description: "Indicates whether the request was allowed or blocked"
+      enum: ["success", "error"]
+    message:
+      type: string
+      description: "Provides a message about the rate limiting result"
+    limit:
+      type: integer
+      description: "The maximum number of requests allowed in the given time window"
+    remaining:
+      type: integer
+      description: "The number of remaining requests in the current window"
+    reset_time:
+      type: number
+      description: "The UNIX timestamp (in seconds) when the limit resets"
+extra:
+  python:
+    source: tools/upstash-ratelimit.py

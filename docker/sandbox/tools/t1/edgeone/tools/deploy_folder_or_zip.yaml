@@ -1,0 +1,71 @@
+identity:
+  name: deploy_folder_or_zip
+  author: stvlynn
+  label:
+    en_US: Deploy ZIP File
+    zh_Hans: 部署ZIP文件
+    pt_BR: Implantar Arquivo ZIP
+    ja_JP: ZIP展開
+    zh_Hant: 部署ZIP檔案
+description:
+  human:
+    en_US: Deploy a ZIP file to EdgeOne Pages and get a publicly accessible URL
+    zh_Hans: 将ZIP文件部署到EdgeOne Pages并获取公开访问URL
+    pt_BR: Implante um arquivo ZIP no EdgeOne Pages e obtenha uma URL publicamente acessível
+    ja_JP: ZIPファイルをEdgeOne Pagesにデプロイし、公開アクセス可能なURLを取得
+    zh_Hant: 將ZIP檔案部署到EdgeOne Pages並取得公開存取URL
+  llm: Deploys ZIP files to EdgeOne Pages with edge delivery. Requires API token for authentication. ZIP files are uploaded to EdgeOne COS, then deployed to the Pages platform. Supports both production and preview environments. Returns a publicly accessible URL with global edge delivery.
+parameters:
+  - name: zip_file
+    type: file
+    required: true
+    label:
+      en_US: ZIP File
+      zh_Hans: ZIP文件
+      pt_BR: Arquivo ZIP
+      ja_JP: ZIPファイル
+      zh_Hant: ZIP檔案
+    human_description:
+      en_US: ZIP file containing the website files to deploy
+      zh_Hans: 包含要部署的网站文件的ZIP文件
+      pt_BR: Arquivo ZIP contendo os arquivos do site para implantar
+      ja_JP: デプロイするウェブサイトファイルを含むZIPファイル
+      zh_Hant: 包含要部署的網站檔案的ZIP檔案
+    llm_description: A ZIP file containing the website files that should be deployed to EdgeOne Pages. The ZIP file will be uploaded and extracted automatically on the EdgeOne platform.
+    form: llm
+  - name: environment
+    type: select
+    required: false
+    default: Production
+    label:
+      en_US: Environment
+      zh_Hans: 环境
+      pt_BR: Ambiente
+      ja_JP: 環境
+      zh_Hant: 環境
+    human_description:
+      en_US: Deployment environment (Production or Preview)
+      zh_Hans: 部署环境（生产或预览）
+      pt_BR: Ambiente de implantação (Produção ou Visualização)
+      ja_JP: デプロイ環境（本番またはプレビュー）
+      zh_Hant: 部署環境（生產或預覽）
+    llm_description: The environment to deploy to. Choose 'Production' for live deployment or 'Preview' for testing. Default is 'Production'.
+    form: llm
+    options:
+      - value: Production
+        label:
+          en_US: Production
+          zh_Hans: 生产
+          pt_BR: Produção
+          ja_JP: 本番
+          zh_Hant: 生產
+      - value: Preview
+        label:
+          en_US: Preview
+          zh_Hans: 预览
+          pt_BR: Visualização
+          ja_JP: プレビュー
+          zh_Hant: 預覽
+extra:
+  python:
+    source: tools/deploy_folder_or_zip.py

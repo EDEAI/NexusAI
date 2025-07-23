@@ -1,0 +1,82 @@
+identity:
+  name: query_advanced
+  author: alterxyz
+  label:
+    en_US: Cloudflare D1 Advanced Query Executor
+    zh_Hans: Cloudflare D1 指令执行 拓展版
+    pt_BR: Executor de Consulta Avançada Cloudflare D1
+description:
+  human:
+    en_US: Executes parameterized SQL queries on Cloudflare D1 and returns the full result set. Connects to external data source - Cloudflare D1 platform.
+    zh_Hans: 在 Cloudflare D1 上执行带参数的 SQL 查询并返回完整结果集。连接到外部数据源 - Cloudflare D1 平台。
+    pt_BR: Executa consultas SQL parametrizadas no Cloudflare D1 e retorna o conjunto de resultados completo. Conecta-se à fonte de dados externa - plataforma Cloudflare D1.
+  llm: Execute parameterized SQL queries on Cloudflare D1 and retrieve the complete result set.
+parameters:
+  - name: database_id
+    type: string
+    required: true
+    label:
+      en_US: Database ID
+      zh_Hans: 数据库 ID
+      pt_BR: ID do banco de dados
+    human_description:
+      en_US: Cloudflare D1 database ID.
+      zh_Hans: Cloudflare D1 数据库 ID。
+      pt_BR: ID do banco de dados Cloudflare D1.
+    llm_description: Specify the Cloudflare D1 database ID to query.
+    form: form
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 执行语句
+      pt_BR: String de consulta
+    human_description:
+      en_US: SQL query to execute on Cloudflare D1. Use `?` as placeholders for parameters. **Primarily supports standard SQL syntax, with some SQLite-specific variations and extensions. Based on SQLite.**
+      zh_Hans: 在 Cloudflare D1 上执行的 SQL 查询。使用 `?` 作为参数占位符。**主要支持标准 SQL 语法，但存在一些 SQLite 特有的差异和扩展。基于 SQLite。**
+      pt_BR: Consulta SQL para executar no Cloudflare D1. Use `?` como marcadores de posição para parâmetros. **Suporta principalmente a sintaxe SQL padrão, com algumas variações e extensões específicas do SQLite. Baseado em SQLite.**
+    llm_description: Provide the SQL query to execute on Cloudflare D1. Use `?` as parameter placeholders.
+    form: llm
+  - name: params
+    type: string
+    required: false
+    label:
+      en_US: Query parameters (JSON array string)
+      zh_Hans: 查询参数 (JSON 数组字符串)
+      pt_BR: Parâmetros de consulta (string array JSON)
+    human_description:
+      en_US: Parameters for the SQL query.  Must be a JSON array string, e.g., `["value1", "value2"]`.
+      zh_Hans: SQL 查询的参数。必须是 JSON 数组字符串，例如：`["value1", "value2"]`。
+      pt_BR: Parâmetros para a consulta SQL. Deve ser uma string array JSON, por exemplo - `["valor1", "valor2"]`.
+    llm_description: Provide query parameters as a JSON array string. **Important:** Ensure the parameter order matches the `?` placeholders in your query. Example - `["firstParam", "secondParam"]`.
+    form: llm
+  - name: account_id
+    type: string
+    required: false
+    label:
+      en_US: Account ID (Optional)
+      zh_Hans: 账户 ID (可选)
+      pt_BR: ID da conta (Opcional)
+    human_description:
+      en_US: Optional Cloudflare account ID for D1 access.
+      zh_Hans: 可选的 Cloudflare 账户 ID，用于 D1 访问。
+      pt_BR: ID da conta Cloudflare opcional para acesso ao D1.
+    llm_description: Optional Cloudflare account ID. **Note:**  This and `api_token` are primarily for Dify variable support and should be configured by the user in their Dify settings.  If asked to provide these, use default empty string or question the user as incorrect values will prevent execution.
+    form: form
+  - name: api_token
+    type: string
+    required: false
+    label:
+      en_US: API Token (Optional)
+      zh_Hans: API 令牌 (可选)
+      pt_BR: Token de API (Opcional)
+    human_description:
+      en_US: Optional Cloudflare API token for D1 access.
+      zh_Hans: 可选的 Cloudflare API 令牌，用于 D1 访问。
+      pt_BR: Token de API Cloudflare opcional para acesso ao D1.
+    llm_description: Optional Cloudflare API Token. **Note:** This and `account_id` are primarily for Dify variable support and should be configured by the user in their Dify settings. If asked to provide these, use default empty string or question the user as incorrect values will prevent execution.
+    form: form
+extra:
+  python:
+    source: tools/query_advanced.py

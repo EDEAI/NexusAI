@@ -1,0 +1,49 @@
+identity:
+  name: markdown_to_docx_converter
+  author: stvlynn
+  label:
+    en_US: Markdown to DOCX Converter
+    zh_Hans: Markdown转DOCX转换器
+    ja_JP: Markdown から DOCX コンバーター
+    pt_BR: Conversor de Markdown para DOCX
+description:
+  human:
+    en_US: Convert Markdown content to a DOCX (Word) document
+    zh_Hans: 将Markdown内容转换为DOCX（Word）文档
+    ja_JP: Markdown コンテンツを DOCX（Word）ドキュメントに変換します
+    pt_BR: Converter conteúdo Markdown para um documento DOCX (Word)
+  llm: A tool that converts Markdown formatted text into Microsoft Word DOCX format documents, maintaining basic formatting and structure.
+parameters:
+  - name: markdown_content
+    type: string
+    required: true
+    label:
+      en_US: Markdown Content
+      zh_Hans: Markdown内容
+      ja_JP: Markdown コンテンツ
+      pt_BR: Conteúdo Markdown
+    human_description:
+      en_US: The Markdown content to be converted to Word document
+      zh_Hans: 要转换为Word文档的Markdown内容
+      ja_JP: Word ドキュメントに変換する Markdown コンテンツ
+      pt_BR: O conteúdo Markdown a ser convertido para documento Word
+    llm_description: The Markdown content that will be converted to a Word document
+    form: llm
+  - name: title
+    type: string
+    required: false
+    label:
+      en_US: Document Title
+      zh_Hans: 文档标题
+      ja_JP: ドキュメントタイトル
+      pt_BR: Título do Documento
+    human_description:
+      en_US: The title of the Word document
+      zh_Hans: Word文档的标题
+      ja_JP: Word ドキュメントのタイトル
+      pt_BR: O título do documento Word
+    llm_description: The title that will be displayed at the top of the Word document
+    form: llm
+extra:
+  python:
+    source: tools/doc.py

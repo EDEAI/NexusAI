@@ -1,0 +1,17 @@
+identity:
+  author: jaguarliuu
+  name: rookie_data_alchemy
+  label:
+    en_US: rookie_data_alchemy
+    zh_Hans: rookie_data_alchemy
+    pt_BR: rookie_data_alchemy
+  description:
+    en_US: Visualizing structured data as charts
+    zh_Hans: Visualizing structured data as charts
+    pt_BR: Visualizing structured data as charts
+  icon: analyze.svg
+tools:
+  - tools/rookie_data_alchemy.yaml
+extra:
+  python:
+    source: provider/rookie_data_alchemy.py

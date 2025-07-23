@@ -1,0 +1,66 @@
+identity:
+  name: kintone_add_record
+  author: r3-yamauchi
+  label:
+    en_US: kintone Add Record
+    zh_Hans: kintone Add Record
+    ja_JP: kintone レコード追加
+    pt_BR: kintone Add Record
+description:
+  human:
+    en_US: Add a record to kintone app
+    zh_Hans: Add a record to kintone app
+    ja_JP: kintoneアプリにレコードを追加
+    pt_BR: Add a record to kintone app
+  llm: Add a record to kintone app
+parameters:
+  - name: kintone_domain
+    type: string
+    required: true
+    label:
+      en_US: "kintone Domain"
+      ja_JP: "cybozu.com ドメイン"
+    human_description:
+      en_US: "Your kintone domain (e.g., your-subdomain.cybozu.com)"
+      ja_JP: "お使いのkintoneのURLのうち、https:// より後ろの部分（例: your-subdomain.cybozu.com）"
+    llm_description: kintone domain where the app is hosted
+    form: llm
+
+  - name: kintone_app_id
+    type: number
+    required: true
+    label:
+      en_US: "kintone App ID"
+      ja_JP: "kintone アプリID"
+    human_description:
+      en_US: "The ID of your kintone application"
+      ja_JP: "使用するkintoneアプリのID"
+    llm_description: ID of the kintone app to add records to
+    form: llm
+
+  - name: kintone_api_token
+    type: secret-input
+    required: true
+    label:
+      en_US: "kintone API Token"
+      ja_JP: "対象の kintoneアプリの APIトークン"
+    human_description:
+      en_US: "API token generated from your kintone app with add record permission"
+      ja_JP: "kintone アプリで発行した追加権限を持つAPIトークン"
+    llm_description: API token with add record permission for the kintone app
+    form: llm
+
+  - name: record_data
+    type: string
+    required: true
+    label:
+      en_US: "Record Data"
+      ja_JP: "レコードデータ"
+    human_description:
+      en_US: "JSON format data to add as a new record (e.g., {\"field_code1\": {\"value\": \"value1\"}, \"field_code2\": {\"value\": \"value2\"}})"
+      ja_JP: "新規レコードとして追加するJSONフォーマットのデータ（例: {\"フィールドコード1\": {\"value\": \"値1\"}, \"フィールドコード2\": {\"value\": \"値2\"}}）"
+    llm_description: "JSON format data to add as a new record in kintone"
+    form: llm
+extra:
+  python:
+    source: tools/kintone_add_record.py

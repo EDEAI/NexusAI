@@ -1,0 +1,109 @@
+identity:
+  name: voice_clone
+  author: quicksandzn
+  label:
+    en_US: Voice Clone
+    zh_Hans: 声音克隆
+description:
+  human:
+    en_US: Voice Clone
+    zh_Hans: 声音克隆
+  llm: Voice Clone
+parameters:
+  - name: text
+    type: string
+    required: false
+    label:
+      en_US: Text
+      zh_Hans: 试听文本
+    human_description:
+      en_US: Text
+      zh_CN: 试听文本
+    form: llm
+  - name: model
+    type: select
+    required: true
+    options:
+      - value: speech-02-hd
+        label:
+          en_US: speech-02-hd
+          zh_Hans: speech-02-hd
+      - value: speech-02-turbo
+        label:
+          en_US: speech-02-turbo
+          zh_Hans: speech-02-turbo
+      - value: speech-01-hd
+        label:
+          en_US: speech-01-hd
+          zh_Hans: speech-01-hd
+      - value: speech-01-turbo
+        label:
+          en_US: speech-01-turbo
+          zh_Hans: speech-01-turbo
+    default: speech-02-hd
+    label:
+      en_US: Model Name
+      zh_Hans: 模型名称
+    human_description:
+      en_US: Model Name
+      zh_CN: 模型名称
+    form: form
+  - name: ref_voice
+    type: file
+    required: true
+    label:
+      en_US: Reference Voice File
+      zh_Hans: 参考声音文件
+    human_description:
+      en_US: Reference Voice File
+      zh_CN: 参考声音文件
+    form: llm
+  - name: voice_id
+    type: string
+    required: false
+    label:
+      en_US: Voice ID （Customize）
+      zh_Hans: 声音ID (自定义)
+    human_description:
+      en_US: Voice ID, It will be automatically generated if it is empty
+      zh_CN: 声音ID，如果为空自动生成
+    form: form
+  - name: accuracy
+    type: number
+    required: false
+    min: 0.1
+    max: 1
+    default: 0.7
+    label:
+      en_US: Accuracy threshold
+      zh_Hans: 文本校验准确率阈值
+    human_description:
+      en_US: Accuracy threshold
+      zh_CN: 文本校验准确率阈值
+    form: form
+  - name: need_noise_reduction
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Noise reduction
+      zh_Hans: 是否开启降噪
+    human_description:
+      en_US: Noise reduction
+      zh_CN: 是否开启降噪
+    form: form
+  - name: need_volume_normalization
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Volume normalization
+      zh_Hans: 是否开启音量归一化
+    human_description:
+      en_US: Volume normalization
+      zh_CN: 是否开启音量归一化
+    form: form
+
+extra:
+  python:
+    source: tools/voice_clone.py

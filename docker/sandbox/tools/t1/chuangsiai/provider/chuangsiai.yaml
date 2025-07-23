@@ -1,0 +1,51 @@
+identity:
+  author: chuangsiaihub
+  name: chuangsiai
+  label:
+    zh_Hans: 创思大模型安全
+    en_US: Chuangsi LLM Safety
+  description:
+    zh_Hans: 创思大模型安全工具是一款面向大语言模型的内容安全防护系统，旨在识别和拦截LLM输入与输出中的潜在安全风险，包括涉政敏感、色情、违法违规行为、负面价值导向、辱骂言论及隐私泄露等内容。针对存在风险的输入，该工具还支持安全可信代答，助力用户实现大模型系统的安全合规。
+    en_US: The Chuangsi LLM Safety Toolkit is a comprehensive content security solution designed for large language models (LLMs). It is engineered to detect and mitigate potential safety risks in both model inputs and outputs, including politically sensitive content, explicit material, illegal or non-compliant information, harmful value orientation, abusive language, and privacy violations. The tool supports safe and trustworthy large language model capabilities to provide secure fallback responses for user inputs with security risks, assisting users in ensuring the safety and compliance of their LLM systems.
+  icon: icon.svg
+tools:
+  - tools/llm_input_safety_guardrails.yaml
+  - tools/llm_output_safety_guardrails.yaml
+extra:
+  python:
+    source: provider/chuangsiai.py
+
+credentials_for_provider:
+  chuangsi_access_key: # 这是凭证的内部名称，将在 Python 代码中使用
+    type: text-input # 输入类型为文本输入组件
+    required: true # 此凭证是必需的
+    label: # 在 Dify UI 中显示的标签 (支持多语言)
+      zh_Hans: 创思大模型安全 AccessKey
+      en_US: Chuangsi LLM Safety Access Key
+      # ... (其他语言)
+    placeholder: # 输入框的提示文字 (支持多语言)
+      zh_Hans: 请输入你的创思大模型安全AccessKey
+      en_US: Enter your Chuangsi LLM Safety Access Key
+      # ... (其他语言)
+    help: # 帮助提示信息 (支持多语言)
+      zh_Hans: 请前往创思大模型安全控制台获取 AccessKey
+      en_US: Visit the Chuangsi LLM Safety Console to get your Access Key
+      # ... (其他语言)
+    url: https://console.chuangsiai.com/#/profile/accessKey # 点击帮助提示时跳转的 URL
+  chuangsi_secret_key: # 这是凭证的内部名称，将在 Python 代码中使用
+    type: secret-input # 输入类型为密码框
+    required: true # 此凭证是必需的
+    label: # 在 Dify UI 中显示的标签 (支持多语言)
+      zh_Hans: 创思大模型安全 SecretKey
+      en_US: Chuangsi LLM Safety Secret Key
+      # ... (其他语言)
+    placeholder: # 输入框的提示文字 (支持多语言)
+      zh_Hans: 请输入你的创思大模型安全SecretKey
+      en_US: Enter your Chuangsi LLM Safety Secret Key
+      # ... (其他语言)
+    help: # 帮助提示信息 (支持多语言)
+      zh_Hans: 请前往创思大模型安全控制台获取 SecretKey
+      en_US: Visit the Chuangsi LLM Safety Console to get your Secret Key
+      # ... (其他语言)
+    url: https://console.chuangsiai.com/#/profile/accessKey # 点击帮助提示时跳转的 URL
+

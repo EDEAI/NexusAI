@@ -1,0 +1,18 @@
+identity:
+  name: get_profile_config
+  author: acane0320
+  label:
+    en_US: Returns the current profile config
+    zh_Hans: 返回当前的配置文件
+    ja_Jp: 現在のプロファイル設定を返します
+    pt_BR: Retorna a configuração de perfil atual
+description:
+  human:
+    en_US: Returns the current profile config
+    zh_Hans: 返回当前的配置文件
+    ja_Jp: 現在のプロファイル設定を返します
+    pt_BR: Retorna a configuração de perfil atual
+  llm: Use this tool to return the current profile config.
+extra:
+  python:
+    source: tools/user_profile/get_profile_config.py

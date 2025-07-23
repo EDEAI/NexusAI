@@ -1,0 +1,43 @@
+identity:
+  name: txtgenarator
+  author: xyy
+  label:
+    en_US: txtgenarator
+    zh_Hans: txtgenarator
+    pt_BR: txtgenarator
+description:
+  human:
+    en_US: generate txt file from input
+    zh_Hans: generate txt file from input
+    pt_BR: generate txt file from input
+  llm: generate txt file from input
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: generate txt file from input
+      zh_Hans: generate txt file from input
+      pt_BR: generate txt file from input
+    llm_description: generate txt file from input
+    form: llm
+  - name: title
+    type: string
+    required: true
+    label:
+      en_US: title
+      zh_Hans: 题目
+      pt_BR: title
+    human_description:
+      en_US: title
+      zh_Hans:  title
+      pt_BR: title
+    llm_description: title
+    form: llm
+extra:
+  python:
+    source: tools/txtgenarator.py

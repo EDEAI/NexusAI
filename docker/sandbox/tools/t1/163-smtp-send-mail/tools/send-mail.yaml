@@ -1,0 +1,82 @@
+identity:
+  name: 163-smtp-send-mail
+  author: wjdsg
+  label:
+    en_US: 163 e-mails para enviar um e-mail
+    zh_Hans: 163SMTP邮件发送
+    pt_BR: envio de email 163SMTP
+description:
+  human:
+    en_US: 163 e-mails para enviar um e-mail
+    zh_Hans: 163SMTP邮件发送
+    pt_BR: envio de email 163SMTP
+  llm: 163 e-mails para enviar um e-mail
+parameters:
+  - name: username_send
+    type: string
+    required: true
+    label:
+      en_US: Email username
+      zh_Hans: 邮箱用户名
+      pt_BR: Email username
+    human_description:
+      en_US: Email username
+      zh_Hans: 邮箱用户名
+      pt_BR: Email username
+    llm_description: Email username
+    form: llm
+  - name: authorization_code
+    type: string
+    required: true
+    label:
+      en_US: AUTHORIZE CODE
+      zh_Hans: 授权码
+      pt_BR: CODE DE AUTORIZAÇÃO
+    human_description:
+      en_US: AUTHORIZE CODE
+      zh_Hans: 授权码
+      pt_BR: CODE DE AUTORIZAÇÃO
+    llm_description: AUTHORIZE CODE
+    form: llm
+  - name: username_recv
+    type: string
+    required: true
+    label:
+      en_US: Recipient mailbox, multiple mailboxes separated by commas
+      zh_Hans: 收件人邮箱，多个邮箱逗号隔开
+      pt_BR: Recipiente de correio electrónico, endereços de correio electrónico múltiplos separados por vírgulas
+    human_description:
+      en_US: Recipient mailbox, multiple mailboxes separated by commas
+      zh_Hans: 收件人邮箱，多个邮箱逗号隔开
+      pt_BR: Recipiente de correio electrónico, endereços de correio electrónico múltiplos separados por vírgulas
+    llm_description: Recipient mailbox, multiple mailboxes separated by commas
+    form: llm
+  - name: subject
+    type: string
+    required: true
+    label:
+      en_US: subject
+      zh_Hans: 主题
+      pt_BR: tema
+    human_description:
+      en_US: subject
+      zh_Hans: 主题
+      pt_BR: tema
+    llm_description: subject
+    form: llm
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: content
+      zh_Hans: 内容
+      pt_BR: conteúdo
+    human_description:
+      en_US: content
+      zh_Hans: 内容
+      pt_BR: conteúdo
+    llm_description: 内容
+    form: llm
+extra:
+  python:
+    source: tools/send-mail.py

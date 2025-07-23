@@ -1,0 +1,48 @@
+description:
+  human:
+    en_US: A tool to retrieve job titles, company names and description from Google
+      Jobs engine.
+    zh_Hans: 一个从 Google 招聘引擎检索职位名称、公司名称和描述的工具。
+  llm: A tool to retrieve job titles, company names and description from Google Jobs
+    engine.
+extra:
+  python:
+    source: tools/job_search.py
+identity:
+  author: langgenius
+  label:
+    en_US: Job Search API
+    zh_Hans: Job Search API
+  name: job_search
+parameters:
+- form: llm
+  human_description:
+    en_US: Defines the query you want to search.
+    zh_Hans: 定义您要搜索的查询。
+  label:
+    en_US: Query
+    zh_Hans: 询问
+  llm_description: Defines the search query you want to search.
+  name: query
+  required: true
+  type: string
+- default: US
+  form: form
+  human_description:
+    en_US: Defines from where you want the search to originate. (For example - New
+      York)
+    zh_Hans: 定义您想要搜索的起始位置。 （例如 - 纽约）
+  label:
+    en_US: Location
+    zh_Hans: 询问
+  llm_description: Defines from where you want the search to originate. (For example
+    - New York)
+  name: location
+  options:
+  - label:
+      en_US: United States
+      pt_BR: United States
+      zh_Hans: 美国
+    value: US
+  required: false
+  type: string

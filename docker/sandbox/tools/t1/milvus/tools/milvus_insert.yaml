@@ -1,0 +1,56 @@
+identity:
+  name: "milvus_insert"
+  author: "zeroz-lab"
+  label:
+    en_US: "Milvus Data Insert"
+    zh_Hans: "Milvus 数据插入"
+    pt_BR: "Inserção de Dados Milvus"
+description:
+  human:
+    en_US: "Insert vector data and metadata into Milvus collections"
+    zh_Hans: "向 Milvus 集合中插入向量数据和元数据"
+    pt_BR: "Inserir dados vetoriais e metadados em coleções Milvus"
+  llm: "A tool for inserting vector data and associated metadata into Milvus collections"
+parameters:
+  - name: collection_name
+    type: string
+    required: true
+    label:
+      en_US: "Collection Name"
+      zh_Hans: "集合名称"
+      pt_BR: "Nome da Coleção"
+    human_description:
+      en_US: "The name of the collection to insert data into"
+      zh_Hans: "要插入数据的集合名称"
+      pt_BR: "O nome da coleção para inserir dados"
+    llm_description: "The name of the collection to insert data into"
+    form: llm
+  - name: data
+    type: string
+    required: true
+    label:
+      en_US: "Data"
+      zh_Hans: "数据"
+      pt_BR: "Dados"
+    human_description:
+      en_US: "JSON array of entities to insert (e.g., [{'id': 1, 'vector': [0.1, 0.2], 'metadata': 'value'}])"
+      zh_Hans: "要插入的实体JSON数组（例如：[{'id': 1, 'vector': [0.1, 0.2], 'metadata': 'value'}]）"
+      pt_BR: "Array JSON de entidades para inserir (ex: [{'id': 1, 'vector': [0.1, 0.2], 'metadata': 'value'}])"
+    llm_description: "JSON array of entities to insert, each entity should be a dictionary with vector and metadata fields"
+    form: llm
+  - name: partition_name
+    type: string
+    required: false
+    label:
+      en_US: "Partition Name"
+      zh_Hans: "分区名称"
+      pt_BR: "Nome da Partição"
+    human_description:
+      en_US: "Optional partition name to insert data into"
+      zh_Hans: "可选的分区名称，用于插入数据"
+      pt_BR: "Nome da partição opcional para inserir dados"
+    llm_description: "Optional partition name to insert data into (if not specified, data goes to default partition)"
+    form: llm
+extra:
+  python:
+    source: tools/milvus_insert.py 

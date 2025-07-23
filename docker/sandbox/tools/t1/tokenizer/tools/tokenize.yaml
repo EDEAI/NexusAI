@@ -1,0 +1,32 @@
+identity:
+  name: tokenize
+  author: jingfelix
+  label:
+    en_US: Tokenize Text
+description:
+  human:
+    en_US: Tokenizes the input text using the specified tokenizer.
+  llm: Tokenizes the input text using the specified tokenizer.
+parameters:
+- name: text
+  type: string
+  required: true
+  label:
+    en_US: Text
+  human_description:
+    en_US: The text to tokenize
+  llm_description: ''
+  form: llm
+- name: tokenizer
+  type: string
+  required: true
+  label:
+    en_US: Tokenizer
+  human_description:
+    en_US: The tokenizer to use for tokenization. For example, 'gpt2', etc. Default
+      is 'gpt2'.
+  llm_description: ''
+  form: form
+extra:
+  python:
+    source: tools/tokenize.py

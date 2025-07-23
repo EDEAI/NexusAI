@@ -1,0 +1,48 @@
+identity:
+  name: add-chunks
+  author: witmeng
+  label:
+    en_US: add Chunks
+    zh_Hans: 添加數據塊
+description:
+  human:
+    en_US: add Chunks
+    zh_Hans: 添加數據塊
+  llm: add document
+parameters:
+  - form: llm
+    human_description:
+      en_US: datasets id
+      zh_Hans: 數據集ID
+    label:
+      en_US: datasets id
+      zh_Hans: 數據集ID
+    llm_description:  數據集ID
+    name: datasets_id
+    required: true
+    type: string 
+  - form: llm
+    human_description:
+      en_US: document id
+      zh_Hans: 文件ID
+    label:
+      en_US: document id
+      zh_Hans: 文件ID
+    llm_description:  文件ID
+    name: document_id
+    required: true
+    type: string 
+  - form: llm
+    human_description:
+      en_US: content
+      zh_Hans: 內容
+    label:
+      en_US: content
+      zh_Hans: 內容
+    llm_description: 內容
+    name: content
+    required: false
+    type: string   
+extra:
+  python:
+    source: tools/add-chunks.py

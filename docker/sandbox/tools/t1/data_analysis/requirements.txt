@@ -1,0 +1,7 @@
+dify_plugin
+requests>=2.31.0
+python-docx==1.2.0
+pyecharts==2.0.8
+pandas==2.3.0
+xlsxwriter==3.2.5
+openpyxl==3.1.2

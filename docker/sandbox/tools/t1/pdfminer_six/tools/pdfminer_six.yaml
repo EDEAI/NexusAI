@@ -1,0 +1,65 @@
+identity:
+  name: pdfminer_six
+  author: tavan
+  label:
+    en_US: pdfminer_six
+    zh_Hans: pdfminer_six
+    pt_BR: pdfminer_six
+description:
+  human:
+    en_US: pdfminer_six extracts the text from a page directly from the sourcecode of the PDF.
+    zh_Hans: pdfminer_six extracts the text from a page directly from the sourcecode of the PDF.
+    pt_BR: pdfminer_six extracts the text from a page directly from the sourcecode of the PDF.
+  llm: pdfminer_six extracts the text from a page directly from the sourcecode of the PDF.
+parameters:
+  - form: llm
+    human_description:
+      en_US: Upload a file to extract text from the PDF.
+      zh_Hans: 上传要提取文本的PDF文件。
+    label:
+      en_US: File
+      zh_Hans: 文件
+    llm_description: 'File to extract text from the PDF.'
+    name: files
+    required: true
+    type: file
+  - form: form
+    human_description:
+      en_US: Select the output format.
+      zh_Hans: 选择输出格式。
+    label:
+      en_US: Output Format
+      zh_Hans: 输出格式
+    llm_description: 'Output format to extract text from the PDF.'
+    name: output_type
+    required: true
+    type: select
+    options:
+      - name: text
+        value: text
+        label:
+          en_US: text
+          zh_Hans: text
+      - name: xml
+        value: xml
+        label:
+          en_US: xml
+          zh_Hans: xml
+      - name: html
+        value: html
+        label:
+          en_US: html
+          zh_Hans: html
+      - name: tag
+        value: tag
+        label:
+          en_US: tag
+          zh_Hans: tag
+      - name: markdown
+        value: markdown
+        label:
+          en_US: markdown
+          zh_Hans: markdown
+extra:
+  python:
+    source: tools/pdfminer_six.py

@@ -1,0 +1,90 @@
+description:
+  human:
+    en_US: This feature produces images designed for seamless tiling, ideal for creating
+      continuous patterns in fabrics, wallpapers, and various textures.
+    zh_Hans: 该功能生成设计用于无缝平铺的图像，非常适合用于制作连续图案的织物、壁纸和各种纹理。
+  llm: A tool for create images designed for seamless tiling, ideal for creating continuous
+    patterns in fabrics, wallpapers, and various textures.
+extra:
+  python:
+    source: tools/novitaai_createtile.py
+identity:
+  author: Xiao Ley
+  label:
+    en_US: Novita AI Create Tile
+    zh_Hans: Novita AI 创建平铺图案
+  name: novitaai_createtile
+parameters:
+- form: llm
+  human_description:
+    en_US: Positive prompt word of the created tile, divided by `,`, Range [1, 512].
+      Only English input is allowed.
+    zh_Hans: 生成平铺图案的正向提示，用 `,` 分隔，范围 [1, 512]。仅允许输入英文。
+  label:
+    en_US: prompt
+    zh_Hans: 提示
+  llm_description: Image prompt of Novita AI, you should describe the image you want
+    to generate as a list of words as possible as detailed, divided by `,`, Range
+    [1, 512]. Only English input is allowed.
+  name: prompt
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Negtive prompt word of the created tile, divided by `,`, Range [1, 512].
+      Only English input is allowed.
+    zh_Hans: 生成平铺图案的负向提示，用 `,` 分隔，范围 [1, 512]。仅允许输入英文。
+  label:
+    en_US: negative prompt
+    zh_Hans: 负向提示
+  llm_description: Image negative prompt of Novita AI, divided by `,`, Range [1, 512].
+    Only English input is allowed.
+  name: negative_prompt
+  required: false
+  type: string
+- default: 256
+  form: form
+  human_description:
+    en_US: Image width, Range [128, 1024].
+    zh_Hans: 图像宽度，范围 [128, 1024]
+  label:
+    en_US: width
+    zh_Hans: 宽
+  max: 1024
+  min: 128
+  name: width
+  required: true
+  type: number
+- default: 256
+  form: form
+  human_description:
+    en_US: Image height, Range [128, 1024].
+    zh_Hans: 图像高度，范围 [128, 1024]
+  label:
+    en_US: height
+    zh_Hans: 高
+  max: 1024
+  min: 128
+  name: height
+  required: true
+  type: number
+- default: jpeg
+  form: form
+  human_description:
+    en_US: Response image type, png or jpeg
+    zh_Hans: 响应图像类型，png 或 jpeg
+  label:
+    en_US: response image type
+    zh_Hans: 响应图像类型
+  name: response_image_type
+  options:
+  - label:
+      en_US: jpeg
+      zh_Hans: jpeg
+    value: jpeg
+  - label:
+      en_US: png
+      zh_Hans: png
+    value: png
+  required: false
+  type: select

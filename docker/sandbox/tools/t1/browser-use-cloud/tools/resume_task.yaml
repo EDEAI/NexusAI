@@ -1,0 +1,34 @@
+identity:
+  name: resume_task
+  author: lysonober
+  label:
+    en_US: "Resume Task"
+    zh_Hans: "恢复任务"
+    ja_JP: "タスクを再開"
+    pt_BR: "Retomar Tarefa"
+description:
+  human:
+    en_US: "Resumes execution of a previously paused task. The task will continue from where it was paused. You can't resume a stopped task."
+    zh_Hans: "恢复先前暂停的任务的执行。任务将从暂停的位置继续。您无法恢复已停止的任务。"
+    ja_JP: "以前に一時停止されたタスクの実行を再開します。タスクは一時停止された場所から続行されます。停止されたタスクは再開できません。"
+    pt_BR: "Retoma a execução de uma tarefa previamente pausada. A tarefa continuará de onde foi pausada. Não é possível retomar uma tarefa interrompida."
+  llm: "This tool resumes the execution of a previously paused browser automation task. It makes a PUT request to the /api/v1/resume-task endpoint with the task_id as a query parameter. The task will continue from where it was paused and return to the 'running' state. This is useful when you want to continue a task after manual intervention or inspection. Note that only tasks in the 'paused' state can be resumed - tasks that were stopped (using stop_task) cannot be resumed."
+parameters:
+  - name: task_id
+    type: string
+    required: true
+    label:
+      en_US: "Task ID"
+      zh_Hans: "任务 ID"
+      ja_JP: "タスク ID"
+      pt_BR: "ID da Tarefa"
+    human_description:
+      en_US: "The unique identifier of the task you want to resume. Must be a valid task ID from a previously paused task."
+      zh_Hans: "您要恢复的任务的唯一标识符。必须是先前暂停的任务的有效任务 ID。"
+      ja_JP: "再開したいタスクの一意の識別子。以前に一時停止されたタスクの有効なタスク ID である必要があります。"
+      pt_BR: "O identificador único da tarefa que você deseja retomar. Deve ser um ID de tarefa válido de uma tarefa pausada anteriormente."
+    llm_description: "The unique identifier of the task to resume. This must be a valid task ID from a previously paused task. Only tasks in the 'paused' state can be resumed - tasks that were stopped cannot be resumed."
+    form: llm
+extra:
+  python:
+    source: tools/resume_task.py

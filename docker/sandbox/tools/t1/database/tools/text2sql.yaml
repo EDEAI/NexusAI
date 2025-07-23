@@ -1,0 +1,70 @@
+identity:
+  name: text2sql
+  author: hjlarry
+  label:
+    en_US: Text to SQL
+description:
+  human:
+    en_US: supply to LLM the context of the database and the user query to get a sql string.
+    zh_Hans: 提供数据库上下文和用户的问题，来得到一个 SQL 语句。
+  llm: supply to LLM the context of the database and the user query to get a sql string.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+    human_description:
+      en_US: The user query.
+      zh_Hans: 用户的问题。
+    llm_description: The user query.
+    form: llm
+  - name: tables
+    type: string
+    required: false
+    label:
+      en_US: Tables
+      zh_Hans: 表
+    human_description:
+      en_US: Specify which tables to provide to LLM as context. If not specified, all tables will be used. Multi tables use comma to separate.
+      zh_Hans: 指定哪些表用于提供给LLM作为上下文，如不指定，则使用所有表。多张表用半角逗号隔开。
+    llm_description: Specify which tables schema do you want to get as model context. Multi tables use comma to separate. Leave it blank if you want to get all tables schema.
+    form: llm
+  - name: model
+    type: model-selector
+    scope: llm
+    required: true
+    label:
+      en_US: Model
+      zh_Hans: 模型
+    human_description:
+      en_US: Choose the model.
+      zh_Hans: 选择模型。
+    form: form
+  - name: db_uri
+    type: secret-input
+    required: false
+    label:
+      en_US: DB URI
+    human_description:
+      en_US: Optional, Filling in this field will overwrite the database connection entered during authorization.
+      zh_Hans: 选填，填写后将覆盖授权时填写的数据库连接。
+    form: llm
+  - name: config_options
+    type: string
+    required: false
+    form: form
+    label:
+      en_US: DB Config Options
+      zh_Hans: 数据库连接配置选项
+    human_description:
+      en_US: | 
+        Optional. For example {"connect_args": {"ssl": {"ca": "/path/to/ca.pem"}}}
+        More connection options can be found at https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine
+      zh_Hans: |
+        选填项。例如 {"connect_args": {"ssl": {"ca": "/path/to/ca.pem"}}}
+        更多连接选项可参考 https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine
+extra:
+  python:
+      source: tools/text2sql.py

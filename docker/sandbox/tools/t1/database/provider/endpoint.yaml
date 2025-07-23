@@ -1,0 +1,3 @@
+settings: []
+endpoints:
+  - endpoints/sql_execute.yaml

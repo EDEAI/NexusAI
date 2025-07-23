@@ -1,0 +1,36 @@
+identity:
+  name: base64_image_decoder
+  author: bowenliang123
+  label:
+    en_US: Base64 Text to Image
+    zh_Hans: Base64 文本 转 图片
+description:
+  human:
+    en_US: Decode Base64-encoded text to an image file
+    zh_Hans: 将 Base64 编码文本转为 图片文件
+  llm: Decode Base64-encoded text to an image file
+parameters:
+  - name: encoded_text
+    type: string
+    required: true
+    label:
+      en_US: Base64 encoded Text
+      zh_Hans: 已 Base64 编码的图片字符串
+    human_description:
+      en_US: Base64 encoded image string, default convert to PNG, support PNG ("data:image/png;base64" prefix) and JPG ("data:image/jpeg;base64" prefix)
+      zh_Hans: Base64 编码的图片字符串，默认转为PNG格式，支持PNG格式（data:image/png;base64开头）及JPG格式（data:image/jpeg;base64开头）
+    llm_description: A tool for decoding Base64-encoded text to image file
+    form: llm
+  - name: output_filename
+    type: string
+    required: false
+    label:
+      en_US: Filename of the output file
+      zh_Hans: 输出文件名
+    human_description:
+      en_US: Filename of the output file
+      zh_Hans: 输出文件名
+    form: llm
+extra:
+  python:
+    source: tools/base64_image_decoder/base64_image_decoder.py

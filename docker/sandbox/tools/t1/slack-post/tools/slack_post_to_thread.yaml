@@ -1,0 +1,96 @@
+description:
+  human:
+    en_US: Sending a message to a Slack thread
+    pt_BR: Enviando uma mensagem para um thread do Slack
+    zh_Hans: 在 Slack 线程中发送消息
+    ja_JP: Slackスレッドへメッセージを投稿
+  llm: A tool for sending messages to a Slack thread.
+
+extra:
+  python:
+    source: tools/slack_post_to_thread.py
+
+identity:
+  author: solaoi
+  icon: icon.svg
+  label:
+    en_US: Slack Post to Thread
+    pt_BR: Slack Post to Thread
+    zh_Hans: Slack 发布到线程
+    ja_JP: Slack スレッドへの投稿
+  description:
+    en_US: Send a message to a Slack thread
+    pt_BR: Enviar uma mensagem para um thread do Slack
+    zh_Hans: 发送消息到 Slack 线程
+    ja_JP: Slack スレッドにメッセージを投稿
+  name: slack_post_to_thread
+
+parameters:
+  - name: thread_ts
+    type: string
+    required: true
+    label:
+      en_US: thread_ts
+      pt_BR: thread_ts
+      zh_Hans: thread_ts
+      ja_JP: thread_ts
+    human_description:
+      en_US: Slack thread TS
+      pt_BR: Slack thread TS
+      zh_Hans: Slack 线程TS
+      ja_JP: Slack スレッドTS
+    llm_description: The unique timestamp (TS) identifying the Slack thread where the message should be posted.
+    form: llm
+
+  - name: channel_id
+    type: string
+    required: true
+    label:
+      en_US: channel_id
+      pt_BR: channel_id
+      zh_Hans: channel_id
+      ja_JP: channel_id
+    human_description:
+      en_US: Slack channel ID
+      pt_BR: Slack channel ID
+      zh_Hans: Slack 频道ID
+      ja_JP: Slack チャンネルID
+    llm_description: The Slack channel ID in which the specified thread exists.
+    form: llm
+
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: content
+      pt_BR: content
+      zh_Hans: content
+      ja_JP: content
+    human_description:
+      en_US: Content to be sent to the thread
+      pt_BR: Conteúdo a ser enviado para o thread
+      zh_Hans: 要发送到线程的消息内容
+      ja_JP: スレッドに投稿するメッセージ内容
+    llm_description: The text message content to send to the specified Slack thread.
+    form: llm
+
+  - name: bot_token
+    type: secret-input
+    required: true
+    label:
+      en_US: "Bot Token"
+      zh_Hans: "Bot Token"
+      pt_BR: "Token do Bot"
+      ja_JP: "Bot Token"
+    placeholder:
+      en_US: "Please enter the Bot Token"
+      zh_Hans: "请输入 Bot Token"
+      pt_BR: "Por favor, insira o Token do Bot"
+      ja_JP: "Bot Tokenを入力してください"
+    human_description:
+      en_US: "An optional Bot Token for this specific usage."
+      zh_Hans: "可选的 Bot Token、用于本次使用。"
+      pt_BR: "Um Token do Bot opcional para este uso específico."
+      ja_JP: "今回利用する個別のBot Token。"
+    llm_description: "If provided, this Bot Token will be used for the current action."
+    form: form

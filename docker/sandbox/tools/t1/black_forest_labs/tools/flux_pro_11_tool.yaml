@@ -1,0 +1,175 @@
+identity:
+  name: flux_pro_11_tool
+  author: parkerwen
+  label:
+    en_US: flux_pro_11_tool
+    zh_Hans: FLUX 1.1 [pro] 工具
+    pt_BR: flux_pro_11_tool
+description:
+  human:
+    en_US: Submits an image generation task with the FLUX 1.1 [pro].
+    zh_Hans: 使用 FLUX 1.1 [pro] 提交图像生成任务。
+    pt_BR: Submits an image generation task with the FLUX 1.1 [pro].
+  llm: Submits an image generation task with the FLUX 1.1 [pro].
+parameters:
+  - name: prompt
+    type: string
+    required: true
+    label:
+      en_US: Prompt
+      zh_Hans: 提示词
+      pt_BR: Prompt
+    human_description:
+      en_US: Text prompt for image generation.
+      zh_Hans: 图像生成的文本提示。
+      pt_BR: Text prompt for image generation.
+    llm_description: Text prompt for image generation.
+    form: llm
+
+  - name: image_prompt
+    type: file
+    required: false
+    label:
+      en_US: Image Prompt
+      zh_Hans: 参考图片
+      pt_BR: Image Prompt
+    human_description:
+      en_US: Optional image to use as a prompt for generation.
+      zh_Hans: 可选的图像用作生成提示。
+      pt_BR: Optional image to use as a prompt for generation.
+    llm_description: Optional image to use as a prompt for generation.
+    form: llm
+
+  - name: width
+    type: number
+    required: false
+    label:
+      en_US: Width
+      zh_Hans: 宽度
+      pt_BR: Width
+    default: 1024
+    min: 256
+    max: 1448
+    human_description:
+      en_US: Width of the generated image in pixels. Must be a multiple of 32.
+      zh_Hans: 生成图像的宽度（以像素为单位）。必须是 32 的倍数。
+      pt_BR: Width of the generated image in pixels. Must be a multiple of 32.
+    llm_description: Width of the generated image in pixels. Must be a multiple of 32.
+    form: llm
+
+  - name: height
+    type: number
+    required: false
+    label:
+      en_US: Height
+      zh_Hans: 高度
+      pt_BR: Height
+    default: 768
+    min: 256
+    max: 1448
+    human_description:
+      en_US: Height of the generated image in pixels. Must be a multiple of 32.
+      zh_Hans: 生成图像的高度（以像素为单位）。必须是 32 的倍数。
+      pt_BR: Height of the generated image in pixels. Must be a multiple of 32.
+    llm_description: Height of the generated image in pixels. Must be a multiple of 32.
+    form: llm
+
+  - name: prompt_upsampling
+    type: boolean
+    required: false
+    label:
+      en_US: Prompt Upsampling
+      zh_Hans: 提示词上采样
+      pt_BR: Prompt Upsampling
+    default: false
+    human_description:
+      en_US: Whether to perform upsampling on the prompt. If active, automatically modifies the prompt for more creative generation.
+      zh_Hans: 是否对提示进行上采样。如果启用，则自动修改提示，以便生成更具创意的提示。
+      pt_BR: Whether to perform upsampling on the prompt. If active, automatically modifies the prompt for more creative generation.
+    llm_description: Whether to perform upsampling on the prompt. If active, automatically modifies the prompt for more creative generation.
+    form: form
+
+  - name: seed
+    type: number
+    required: false
+    label:
+      en_US: Seed
+      zh_Hans: 种子
+      pt_BR: Seed
+    default: 0
+    human_description:
+      en_US: Optional seed for reproducibility.
+      zh_Hans: 可选种子，用于再现性。
+      pt_BR: Optional seed for reproducibility.
+    llm_description: Optional seed for reproducibility.
+    form: llm
+
+  - name: safety_tolerance
+    type: number
+    required: false
+    label:
+      en_US: Safety Tolerance
+      zh_Hans: 安全容忍度
+      pt_BR: Safety Tolerance
+    default: 2
+    min: 0
+    max: 6
+    human_description:
+      en_US: Tolerance level for input and output moderation. Between 0 and 6, 0 being most strict, 6 being least strict.
+      zh_Hans: 输入和输出审核的容忍度。介于 0 到 6 之间，0 表示最严格，6 表示最不严格。
+      pt_BR: Tolerance level for input and output moderation. Between 0 and 6, 0 being most strict, 6 being least strict.
+    llm_description: Tolerance level for input and output moderation. Between 0 and 6, 0 being most strict, 6 being least strict.
+    form: llm
+
+  - name: output_format
+    type: select
+    required: false
+    label:
+      en_US: Output Format
+      zh_Hans: 输出格式
+      pt_BR: Output Format
+    default: jpeg
+    options:
+      - label:
+          en_US: JPEG
+        value: jpeg
+      - label:
+          en_US: PNG
+        value: png
+    human_description:
+      en_US: Output format for the generated image. Can be 'jpeg' or 'png'.
+      zh_Hans: 生成图像的输出格式。可以是“jpeg”或“png”。
+      pt_BR: Output format for the generated image. Can be 'jpeg' or 'png'.
+    llm_description: Output format for the generated image. Can be 'jpeg' or 'png'.
+    form: llm
+
+  - name: webhook_url
+    type: string
+    required: false
+    label:
+      en_US: Webhook URL
+      zh_Hans: Webhook URL
+      pt_BR: Webhook URL
+    human_description:
+      en_US: URL to receive webhook notifications.
+      zh_Hans: 接收 webhook 通知的 URL。
+      pt_BR: URL to receive webhook notifications.
+    llm_description: URL to receive webhook notifications.
+    form: llm
+
+  - name: webhook_secret
+    type: string
+    required: false
+    label:
+      en_US: Webhook Secret
+      zh_Hans: Webhook Secret
+      pt_BR: Webhook Secret
+    human_description:
+      en_US: Optional secret for webhook signature verificatio.
+      zh_Hans: 用于 webhook 签名验证的可选密钥。
+      pt_BR: Optional secret for webhook signature verification.
+    llm_description: Optional secret for webhook signature verification.
+    form: llm
+extra:
+  python:
+    source: tools/flux_pro_11_tool.py

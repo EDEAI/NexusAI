@@ -1,0 +1,48 @@
+description:
+  human:
+    en_US: Delete Sheet in AI Table
+    zh_Hans: 删除AI表格中的数据表
+  llm: A tool for deleting a sheet in an AI Table. (删除AI表格中的数据表)
+extra:
+  python:
+    source: tools/delete_sheet_ai.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: Delete Sheet in AI Table
+    zh_Hans: 删除AI表格中的数据表
+  name: delete_sheet_ai
+parameters:
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID of the AI Table (baseId)
+    zh_Hans: AI表格的ID (baseId)
+  label:
+    en_US: Base ID
+    zh_Hans: AI表格ID
+  llm_description: AI表格的ID (baseId)
+  name: base_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID or name of the sheet to delete
+    zh_Hans: 要删除的数据表ID或名称
+  label:
+    en_US: Sheet ID or Name
+    zh_Hans: 数据表ID或名称
+  llm_description: 要删除的数据表ID或名称
+  name: sheet_id_or_name
+  required: true
+  type: string 

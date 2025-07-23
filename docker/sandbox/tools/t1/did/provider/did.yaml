@@ -1,0 +1,35 @@
+credentials_for_provider:
+  base_url:
+    label:
+      en_US: D-ID server's Base URL
+    placeholder:
+      en_US: https://api.d-id.com
+    required: false
+    type: text-input
+  did_api_key:
+    help:
+      en_US: Get your D-ID API key from your D-ID account settings.
+    label:
+      en_US: D-ID API Key
+    placeholder:
+      en_US: Please input your D-ID API key
+    required: true
+    type: secret-input
+    url: https://studio.d-id.com/account-settings
+extra:
+  python:
+    source: provider/did.py
+identity:
+  author: Matri Qi
+  description:
+    en_US: D-ID is a tool enabling the creation of high-quality, custom videos of
+      Digital Humans from a single image.
+  icon: icon.svg
+  label:
+    en_US: D-ID
+  name: did
+  tags:
+  - videos
+tools:
+- tools/animations.yaml
+- tools/talks.yaml

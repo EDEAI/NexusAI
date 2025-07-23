@@ -1,0 +1,19 @@
+extra:
+  python:
+    source: provider/stackexchange.py
+identity:
+  author: Richards Tu
+  description:
+    en_US: Access questions and answers from the Stack Exchange and its sub-sites.
+    zh_Hans: 从 Stack Exchange 和其子论坛获取问题和答案。
+  icon: icon.svg
+  label:
+    en_US: Stack Exchange
+    zh_Hans: Stack Exchange
+  name: stackexchange
+  tags:
+  - search
+  - utilities
+tools:
+- tools/fetchAnsByStackExQuesID.yaml
+- tools/searchStackExQuestions.yaml

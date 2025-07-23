@@ -1,0 +1,34 @@
+credentials_for_provider:
+  tavily_api_key:
+    help:
+      en_US: Get your Tavily API key from Tavily
+      zh_Hans: 从 Tavily 获取您的 Tavily API key
+    label:
+      en_US: Tavily API key
+      zh_Hans: Tavily API key
+    placeholder:
+      en_US: Please input your Tavily API key
+      zh_Hans: 请输入你的 Tavily API key
+    required: true
+    type: secret-input
+    url: https://app.tavily.com/home
+extra:
+  python:
+    source: provider/tavily.py
+identity:
+  author: Yash Parmar, Kalo Chin
+  description:
+    en_US: A powerful AI-native search engine and web content extraction tool that
+      provides highly relevant search results and raw content extraction from web
+      pages.
+    zh_Hans: 一个强大的原生AI搜索引擎和网页内容提取工具，提供高度相关的搜索结果和网页原始内容提取。
+  icon: icon.png
+  label:
+    en_US: Tavily
+    zh_Hans: Tavily
+  name: tavily
+  tags:
+  - search
+tools:
+- tools/tavily_extract.yaml
+- tools/tavily_search.yaml

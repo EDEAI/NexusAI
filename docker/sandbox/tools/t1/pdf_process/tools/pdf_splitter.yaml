@@ -1,0 +1,26 @@
+description:
+  human:
+    en_US: A tool for splitting PDF files into individual pages
+    zh_Hans: 一个将PDF文件分割成单独页面的工具
+  llm: A tool for splitting a PDF document into individual pages, returning each page as a separate PDF file
+extra:
+  python:
+    source: tools/pdf_splitter.py
+identity:
+  author: kalochin
+  label:
+    en_US: PDF Splitter
+    zh_Hans: PDF 分割器
+  name: pdf_splitter
+parameters:
+- form: llm
+  human_description:
+    en_US: PDF file content to split into individual pages
+    zh_Hans: 要分割成单独页面的PDF文件内容
+  label:
+    en_US: PDF Content
+    zh_Hans: PDF 内容
+  llm_description: PDF file content in base64 encoded format or as a file object
+  name: pdf_content
+  required: true
+  type: file

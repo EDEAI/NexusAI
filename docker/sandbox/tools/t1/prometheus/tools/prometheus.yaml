@@ -1,0 +1,122 @@
+identity:
+  name: prometheus
+  author: lework
+  label:
+    en_US: Prometheus
+    zh_Hans: Prometheus 指标数据查询
+    pt_BR: Prometheus
+description:
+  human:
+    en_US: Query Prometheus metrics using PromQL
+    zh_Hans: 使用PromQL查询Prometheus指标数据
+    pt_BR: Query Prometheus metrics using PromQL
+  llm: Query Prometheus metrics with PromQL query and time range
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: PromQL Query
+      zh_Hans: PromQL查询语句
+      pt_BR: PromQL Query
+    human_description:
+      en_US: The PromQL query string to execute
+      zh_Hans: 要执行的PromQL查询语句
+      pt_BR: The PromQL query string to execute
+    llm_description: The Prometheus Query Language (PromQL) query string to execute
+    form: llm
+  - name: start_time
+    type: string
+    required: false
+    label:
+      en_US: Start Time
+      zh_Hans: 开始时间
+      pt_BR: Start Time
+    human_description:
+      en_US: Start time for the query in RFC3339 format or relative format (e.g. '1h', '2d')
+      zh_Hans: 查询的开始时间，RFC3339格式或相对格式（如'1h', '2d'）
+      pt_BR: Start time for the query in RFC3339 format or relative format
+    llm_description: Start time for the query in RFC3339 format or relative format (e.g. '1h', '2d')
+    form: llm
+  - name: end_time
+    type: string
+    required: false
+    label:
+      en_US: End Time
+      zh_Hans: 结束时间
+      pt_BR: End Time
+    human_description:
+      en_US: End time for the query in RFC3339 format or relative format (e.g. 'now')
+      zh_Hans: 查询的结束时间，RFC3339格式或相对格式（如'now'）
+      pt_BR: End time for the query in RFC3339 format or relative format
+    llm_description: End time for the query in RFC3339 format or relative format (e.g. 'now')
+    form: llm
+  - name: step
+    type: string
+    required: false
+    default: '15s'
+    label:
+      en_US: Step
+      zh_Hans: 步长
+      pt_BR: Step
+    human_description:
+      en_US: Query resolution step width in duration format (e.g. '15s', '1m', '1h')
+      zh_Hans: 查询分辨率步长，以持续时间格式表示（如'15s', '1m', '1h'）
+      pt_BR: Query resolution step width in duration format
+    llm_description: Query resolution step width in duration format (e.g. '15s', '1m', '1h')
+    form: llm
+  - name: api_url
+    type: secret-input
+    required: false
+    label:
+      en_US: Prometheus API URL
+      zh_Hans: Prometheus API URL
+      pt_BR: URL da API do Prometheus
+    human_description:
+      en_US: The URL of the Prometheus API, if not configured, use the default value
+      zh_Hans: Prometheus API的URL, 如果未配置，则使用默认值
+      pt_BR: URL da API do Prometheus, se não configurado, use o valor padrão
+    llm_description: The URL of the Prometheus API, if not configured, use the default value
+    form: llm
+  - name: username
+    type: secret-input
+    required: false
+    label:
+      en_US: Prometheus API Username
+      zh_Hans: Prometheus API用户名
+      pt_BR: Nome de usuário da API do Prometheus
+    human_description:
+      en_US: Username for basic authentication (optional), if not configured, use the default value
+      zh_Hans: Prometheus API的基本认证的用户名（可选）, 如果未配置，则使用默认值
+      pt_BR: Nome de usuário para autenticação básica (opcional), se não configurado, use o valor padrão
+    llm_description: The username for basic authentication (optional), if not configured, use the default value
+    form: llm
+  - name: password
+    type: secret-input
+    required: false
+    label:
+      en_US: Prometheus API Password
+      zh_Hans: Prometheus API密码
+      pt_BR: Senha da API do Prometheus
+    human_description:
+      en_US: Password for basic authentication (optional), if not configured, use the default value
+      zh_Hans: Prometheus API的基本认证的密码（可选）, 如果未配置，则使用默认值
+      pt_BR: Senha para autenticação básica (opcional), se não configurado, use o valor padrão
+    llm_description: The password for basic authentication (optional), if not configured, use the default value
+    form: llm
+  - name: token
+    type: secret-input
+    required: false
+    label:
+      en_US: Prometheus API Token
+      zh_Hans: Prometheus API令牌
+      pt_BR: Token da API do Prometheus
+    human_description:
+      en_US: Token for basic authentication (optional), if not configured, use the default value
+      zh_Hans: Prometheus API的基本认证的令牌（可选）, 如果未配置，则使用默认值
+      pt_BR: Token para autenticação básica (opcional), se não configurado, use o valor padrão
+    llm_description: The token for basic authentication (optional), if not configured, use the default value
+    form: llm
+extra:
+  python:
+    source: tools/prometheus.py

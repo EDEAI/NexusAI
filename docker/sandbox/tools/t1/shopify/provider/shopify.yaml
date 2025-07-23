@@ -1,0 +1,45 @@
+identity:
+  author: chekun
+  name: shopify
+  label:
+    en_US: Shopify
+    zh_Hans: Shopify
+    pt_BR: Shopify
+  description:
+    en_US: A collection of tools to interact with your Shopify Store.
+    ja_JP: Shopifyストアとのやり取りに使用するツールのコレクション.
+    zh_Hans: 用于和您的Shopify店铺数据交互的工具.
+    pt_BR: Uma coleção de ferramentas para interagir com sua loja Shopify.
+  icon: icon.svg
+tools:
+  - tools/get_product.yaml
+credentials_for_provider:
+  shopify_store_id:
+    type: text-input
+    required: true
+    label:
+      en_US: Store ID
+      zh_Hans: 店铺ID
+    placeholder:
+      en_US: Please input your store ID
+      zh_Hans: 请输入您店铺ID
+    help:
+      en_US: The store ID is the part after store/ in the browser URL after entering the store backend
+      zh_Hans: 进入店铺后台后浏览器网址中的store/后面的部分就是店铺ID
+    url: https://github.com/chekun/dify-plugin-shopify/blob/main/README.md
+  shopify_app_password:
+    type: secret-input
+    required: true
+    label:
+      en_US: APP API Password
+      zh_Hans: 应用API访问令牌
+    placeholder:
+      en_US: Please input your store app API password
+      zh_Hans: 请输入您店铺应用API访问令牌
+    help:
+      en_US: Get the app API access token from the Shopify store backend
+      zh_Hans: 从Shopify店铺后台获取应用API访问令牌
+    url: https://github.com/chekun/dify-plugin-shopify/blob/main/README.md
+extra:
+  python:
+    source: provider/shopify.py

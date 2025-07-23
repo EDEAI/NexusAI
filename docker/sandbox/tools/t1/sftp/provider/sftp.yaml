@@ -1,0 +1,18 @@
+extra:
+  python:
+    source: provider/sftp.py
+identity:
+  author: stvlynn
+  description:
+    en_US: Secure File Transfer Protocol operations
+    zh_Hans: 安全文件传输协议操作
+  icon: icon.png
+  label:
+    en_US: SFTP Operations
+    zh_Hans: SFTP 操作
+  name: sftp
+tools:
+- tools/list.yaml
+- tools/download.yaml
+- tools/upload.yaml
+- tools/manage.yaml

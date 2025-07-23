@@ -1,0 +1,132 @@
+identity:
+  name: ssh
+  author: stvlynn
+  label:
+    en_US: SSH Command Execution
+    zh_Hans: SSH命令执行
+    pt_BR: Execução de Comando SSH
+description:
+  human:
+    en_US: Execute commands on remote servers via SSH
+    zh_Hans: 通过SSH在远程服务器上执行命令
+    pt_BR: Execute comandos em servidores remotos via SSH
+  llm: A tool to execute commands on remote servers via SSH using either password or key-based authentication.
+parameters:
+  - name: host
+    type: string
+    required: true
+    label:
+      en_US: Host
+      zh_Hans: 主机
+      pt_BR: Host
+    human_description:
+      en_US: The hostname or IP address of the remote server
+      zh_Hans: 远程服务器的主机名或IP地址
+      pt_BR: O nome do host ou endereço IP do servidor remoto
+    llm_description: The hostname or IP address of the remote server to connect to via SSH.
+    form: llm
+  - name: port
+    type: number
+    required: true
+    label:
+      en_US: Port
+      zh_Hans: 端口
+      pt_BR: Porta
+    human_description:
+      en_US: The SSH port of the remote server (default: 22)
+      zh_Hans: 远程服务器的SSH端口（默认：22）
+      pt_BR: A porta SSH do servidor remoto (padrão: 22)
+    llm_description: The SSH port of the remote server. Default is 22.
+    form: llm
+  - name: username
+    type: string
+    required: true
+    label:
+      en_US: Username
+      zh_Hans: 用户名
+      pt_BR: Nome de usuário
+    human_description:
+      en_US: The username to authenticate with
+      zh_Hans: 用于认证的用户名
+      pt_BR: O nome de usuário para autenticação
+    llm_description: The username to authenticate with on the remote server.
+    form: llm
+  - name: auth_type
+    type: select
+    required: true
+    options:
+      - value: password
+        label:
+          en_US: Password
+          zh_Hans: 密码
+          pt_BR: Senha
+      - value: key
+        label:
+          en_US: Private Key
+          zh_Hans: 私钥
+          pt_BR: Chave Privada
+    label:
+      en_US: Authentication Type
+      zh_Hans: 认证类型
+      pt_BR: Tipo de Autenticação
+    human_description:
+      en_US: Choose between password or private key authentication
+      zh_Hans: 选择密码或私钥认证
+      pt_BR: Escolha entre autenticação por senha ou chave privada
+    llm_description: The authentication method to use (password or private key).
+    form: llm
+  - name: password
+    type: string
+    required: false
+    label:
+      en_US: Password
+      zh_Hans: 密码
+      pt_BR: Senha
+    human_description:
+      en_US: The password for password authentication (required if auth_type is password)
+      zh_Hans: 用于密码认证的密码（如果认证类型为密码则必填）
+      pt_BR: A senha para autenticação por senha (obrigatório se o tipo de autenticação for senha)
+    llm_description: The password for password authentication. Required if auth_type is 'password'.
+    form: llm
+  - name: private_key
+    type: string
+    required: false
+    label:
+      en_US: Private Key
+      zh_Hans: 私钥
+      pt_BR: Chave Privada
+    human_description:
+      en_US: The private key for key authentication (required if auth_type is key)
+      zh_Hans: 用于密钥认证的私钥（如果认证类型为私钥则必填）
+      pt_BR: A chave privada para autenticação por chave (obrigatório se o tipo de autenticação for chave)
+    llm_description: The private key content for key-based authentication. Required if auth_type is 'key'.
+    form: llm
+  - name: passphrase
+    type: string
+    required: false
+    label:
+      en_US: Passphrase
+      zh_Hans: 密钥口令
+      pt_BR: Frase-senha
+    human_description:
+      en_US: The passphrase for the private key (if the key is encrypted)
+      zh_Hans: 私钥的密码（如果私钥已加密）
+      pt_BR: A frase-senha para a chave privada (se a chave estiver criptografada)
+    llm_description: The passphrase for the private key if it is encrypted. Optional.
+    form: llm
+  - name: command
+    type: string
+    required: true
+    label:
+      en_US: Command
+      zh_Hans: 命令
+      pt_BR: Comando
+    human_description:
+      en_US: The command to execute on the remote server
+      zh_Hans: 在远程服务器上执行的命令
+      pt_BR: O comando a ser executado no servidor remoto
+    llm_description: The command to execute on the remote server.
+    form: llm
+extra:
+  python:
+    source: tools/ssh.py

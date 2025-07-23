@@ -1,0 +1,55 @@
+identity:
+  author: eft
+  name: redis
+  label:
+    en_US: Redis
+    zh_Hans: Redis
+    pt_BR: Redis
+  description:
+    en_US: Redis tools plugin for Dify, provide Redis SET and GET functions, Redis Cluster mode is supported too.
+    zh_Hans: 适用于 Dify 的 Redis 工具插件，提供 Redis SET 与 GET 功能，同时支持 Redis 单节点与集群模式。
+    pt_BR: Redis tools plugin for Dify, provide Redis SET and GET functions, Redis Cluster mode is supported too.
+  icon: icon.svg
+credentials_for_provider:
+  host:
+    type: text-input
+    required: false
+    label:
+      en_US: Host
+      zh_Hans: Host
+    placeholder:
+      en_US: 'default: 127.0.0.1'
+      zh_Hans: '默认: 127.0.0.1'
+  port:
+    type: text-input
+    required: false
+    label:
+      en_US: Port
+      zh_Hans: Port
+    placeholder:
+      en_US: 'default: 6379'
+      zh_Hans: '默认: 6379'
+  password:
+    type: secret-input
+    required: false
+    label:
+      en_US: Password
+      zh_Hans: Password
+    placeholder:
+      en_US: 'default: None'
+      zh_Hans: '默认: None'
+  cluster:
+    type: boolean
+    required: false
+    label:
+      en_US: Cluster
+      zh_Hans: '是否集群'
+    placeholder:
+      en_US: 'default: false'
+      zh_Hans: '默认: false'
+tools:
+  - tools/redis-set.yaml
+  - tools/redis-get.yaml
+extra:
+  python:
+    source: provider/redis-provider.py

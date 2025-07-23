@@ -1,0 +1,129 @@
+description:
+  human:
+    en_US: Search the web for information using WaterCrawl's search API.
+    zh_Hans: 使用WaterCrawl的搜索API在网络上搜索信息。
+  llm: This tool allows you to search the web for information. 
+       It supports configuring various search options such as language, country, time range, 
+       and depth of search.
+extra:
+  python:
+    source: tools/search.py
+identity:
+  author: watercrawl
+  label:
+    en_US: Search
+    zh_Hans: 搜索
+  name: search
+parameters:
+- form: llm
+  human_description:
+    en_US: The search query to use.
+    zh_Hans: 要使用的搜索查询。
+  label:
+    en_US: Search Query
+    zh_Hans: 搜索查询
+  llm_description: The search query string to use for web search. This is a required parameter.
+  name: query
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: If you choose not to wait, it will directly return a search request json object. You can use
+      this object uuid to check the search results or cancel the search task.
+    zh_Hans: 如果你选择不等待，它将直接返回搜索请求json对象。你可以使用这个对象uuid来检查搜索结果或取消搜索任务。
+  label:
+    en_US: Wait For Results
+    zh_Hans: 等待搜索结果
+  name: wait_for_results
+  type: boolean
+  default: true
+- form: llm
+  human_description:
+    en_US: The language code to use for search results (e.g., "en", "fr").
+    zh_Hans: 用于搜索结果的语言代码（例如，"en"，"fr"）。
+  label:
+    en_US: Language
+    zh_Hans: 语言
+  name: language
+  type: string
+  required: false
+- form: llm
+  human_description:
+    en_US: The country code to use for search results (e.g., "us", "fr").
+    zh_Hans: 用于搜索结果的国家代码（例如，"us"，"fr"）。
+  label:
+    en_US: Country
+    zh_Hans: 国家
+  name: country
+  type: string
+  required: false
+- form: llm
+  human_description:
+    en_US: The time range filter for search results.
+    zh_Hans: 搜索结果的时间范围过滤器。
+  label:
+    en_US: Time Range
+    zh_Hans: 时间范围
+  name: time_range
+  options:
+  - label:
+      en_US: Any time
+      zh_Hans: 任何时间
+    value: any
+  - label:
+      en_US: Past hour
+      zh_Hans: 过去一小时
+    value: hour
+  - label:
+      en_US: Past day
+      zh_Hans: 过去一天
+    value: day
+  - label:
+      en_US: Past week
+      zh_Hans: 过去一周
+    value: week
+  - label:
+      en_US: Past month
+      zh_Hans: 过去一个月
+    value: month
+  - label:
+      en_US: Past year
+      zh_Hans: 过去一年
+    value: year
+  type: select
+  default: any
+- form: form
+  human_description:
+    en_US: The search depth determines how comprehensive the search results will be.
+    zh_Hans: 搜索深度决定搜索结果的全面性。
+  label:
+    en_US: Search Depth
+    zh_Hans: 搜索深度
+  name: depth
+  options:
+  - label:
+      en_US: Basic
+      zh_Hans: 基础
+    value: basic
+  - label:
+      en_US: Advanced
+      zh_Hans: 高级
+    value: advanced
+  - label:
+      en_US: Ultimate
+      zh_Hans: 终极
+    value: ultimate
+  type: select
+  default: basic
+- form: llm
+  human_description:
+    en_US: Maximum number of search results to return.
+    zh_Hans: 要返回的最大搜索结果数。
+  label:
+    en_US: Result Limit
+    zh_Hans: 结果限制
+  min: 1
+  max: 20
+  name: result_limit
+  type: number
+  default: 5

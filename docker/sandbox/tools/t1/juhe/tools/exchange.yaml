@@ -1,0 +1,49 @@
+description:
+  human:
+    en_US: Real-time currency exchange rate query and conversion. The data is for reference only; actual transaction rates are based on the rates offered at bank counters. Exchange rates between certain currencies may not be available.
+    zh_Hans: 实时货币汇率查询换算，数据仅供参考，交易时以银行柜台成交价为准。部分货币之间的汇率，可能查询不到结果。
+  llm: A tool to query exchange rate between 2 currencies.
+extra:
+  python:
+    source: tools/exchange.py
+identity:
+  author: leslie2046
+  label:
+    en_US: Exchange
+    zh_Hans: 实时汇率查询换算
+  name: exchange
+parameters:
+- name: from
+  label:
+    en_US: from currency
+    zh_Hans: 兑换前的货币代码
+  type: string
+  required: true
+  form: llm
+  human_description:
+    en_US: Currency code before converting exchange rate.
+    zh_Hans: 转换汇率前的货币代码。
+  llm_description: Currency code before converting exchange rate,e.g USD/CNY.
+- name: to
+  label:
+    en_US: to currency
+    zh_Hans: 兑换后的货币代码
+  type: string
+  required: true
+  form: llm
+  human_description:
+    en_US: Currency code after converting exchange rate.
+    zh_Hans: 转换汇率后的货币代码。
+  llm_description: Currency code before converting exchange rate,e.g USD/CNY.
+
+- name: apiKey
+  label:
+    en_US: API KEY
+    zh_Hans: API密钥
+  type: secret-input
+  required: true
+  form: form
+  human_description:
+    en_US: The API key from Juhe.cn for accessing the currency exchange data.
+    zh_Hans: 来自聚合数据的API密钥。
+  llm_description: API key for querying currency exchange rate info from the provider.

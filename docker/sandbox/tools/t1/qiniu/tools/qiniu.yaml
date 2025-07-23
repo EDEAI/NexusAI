@@ -1,0 +1,83 @@
+identity:
+  name: qiniu
+  author: heavi
+  label:
+    en_US: Qiniu
+    zh_Hans: 七牛
+    pt_BR: Qiniu
+description:
+  human:
+    en_US: Qiniu API for file upload
+    zh_Hans: 七牛文件上传 API
+    pt_BR: API do Qiniu para upload de arquivos
+  llm: Qiniu API for file upload
+parameters:
+  - name: bucket_name
+    type: string
+    required: true
+    label:
+      en_US: Bucket Name
+      zh_Hans: 空间名
+      pt_BR: Nome do Bucket
+    human_description:
+      en_US: The name of the bucket to upload to
+      zh_Hans: 要上传的空间名
+      pt_BR: O nome do bucket para o qual enviar
+    llm_description: The name of the bucket to upload to
+    form: llm
+  - name: key
+    type: string
+    required: false
+    label:
+      en_US: File Key
+      zh_Hans: 上传后保存的文件名
+      pt_BR: Nome do Arquivo
+    human_description:
+      en_US: The file name to save as after upload
+      zh_Hans: 上传后保存的文件名
+      pt_BR: O nome do arquivo após o upload
+    llm_description: The file name to save as after upload
+    form: llm
+  - name: filePath
+    type: string
+    required: false
+    label:
+      en_US: Local File Path or file url
+      zh_Hans: 文件url或本地文件路径
+      pt_BR: Caminho do Arquivo Local ou url do arquivo
+    human_description:
+      en_US: The local path or file url of the file to upload, choose either this or the file list below
+      zh_Hans: 要上传文件的本地路径或者文件url,和下面文件列表二选一，
+      pt_BR: O caminho local ou url do arquivo a ser enviado, escolha este ou a lista de arquivos abaixo
+    llm_description: The local path or file url of the file to upload
+    form: llm
+  - name: upload_files
+    type: files
+    required: false
+    label:
+      en_US: Upload Files
+      zh_Hans: 上传文件列表
+      pt_BR: Lista de Arquivos para Upload
+    human_description:
+      en_US: List of files to upload, choose either this or the file url/local path above
+      zh_Hans: 要上传的文件列表，和上面文件url或本地文件路径二选一，
+      pt_BR: Lista de arquivos para enviar, escolha esta ou o caminho/url acima
+    llm_description: List of files to upload
+    form: llm
+  - name: base_url
+    type: string
+    required: false
+    label:
+      en_US: Base URL
+      zh_Hans: 基础链接
+      pt_BR: URL Base
+    human_description:
+      en_US: The base URL for accessing uploaded files
+      zh_Hans: 访问已上传文件的基础链接
+      pt_BR: A URL base para acessar arquivos enviados
+    llm_description: The base URL for accessing uploaded files
+    form: llm
+ 
+extra:
+  python:
+    source: tools/qiniu.py

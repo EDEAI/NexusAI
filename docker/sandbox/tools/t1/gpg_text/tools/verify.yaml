@@ -1,0 +1,54 @@
+identity:
+  name: verify_message # Corrected name
+  author: alterxyz
+  label:
+    en_US: GPG Verify Signature
+    zh_Hans: GPG 验证签名
+description:
+  human:
+    en_US: Verifies a detached GPG signature against an original message using the signer's public key.
+    zh_Hans: 使用签名者的公钥验证原始消息的独立 GPG 签名。
+  llm: Use this tool to verify if a detached GPG signature (ASCII-armored) is valid for a given original message and the signer's public key (ASCII-armored). Returns true if valid, false otherwise.
+parameters:
+  - name: original_message # Corrected parameter
+    type: string
+    required: true
+    label:
+      en_US: Original Message
+      zh_Hans: 原始消息
+    human_description:
+      en_US: The original plaintext message that was signed.
+      zh_Hans: 被签名的原始明文消息。
+    llm_description: The exact original plaintext message content that the signature corresponds to.
+    form: llm
+  - name: signature_blob # Corrected parameter
+    type: string
+    required: true
+    label:
+      en_US: Detached Signature
+      zh_Hans: 独立签名
+    human_description:
+      en_US: The ASCII-armored detached GPG signature string (starts with '-----BEGIN PGP SIGNATURE-----').
+      zh_Hans: ASCII 封装的独立 GPG 签名字符串（以 '-----BEGIN PGP SIGNATURE-----' 开头）。
+    llm_description: The full ASCII-armored PGP detached signature block.
+    form: llm
+  - name: signer_pubkey_str # Corrected parameter
+    type: string
+    required: true
+    label:
+      en_US: Signer Public Key
+      zh_Hans: 签名者公钥
+    human_description:
+      en_US: The signer's ASCII-armored GPG public key string (starts with '-----BEGIN PGP PUBLIC KEY BLOCK-----').
+      zh_Hans: 签名者的 ASCII 封装 GPG 公钥字符串（以 '-----BEGIN PGP PUBLIC KEY BLOCK-----' 开头）。
+    llm_description: The full ASCII-armored PGP public key block of the person or entity who supposedly signed the message.
+    form: llm
+extra:
+  python:
+    source: tools/verify.py # Corrected source path
+output_schema: # Added output schema
+  type: object
+  properties:
+    is_valid:
+      type: boolean
+      description: True if the signature is valid, False otherwise.

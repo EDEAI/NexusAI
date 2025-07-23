@@ -1,0 +1,309 @@
+identity:
+  name: exa_search
+  author: yevanchen
+  label:
+    en_US: Exa Search
+    zh_Hans: Exa 搜索
+    pt_BR: Pesquisa Exa
+    ja_JP: Exa 検索
+description:
+  human:
+    en_US: Perform semantic search on the web using Exa's AI-powered search engine to find relevant web content and documents.
+    zh_Hans: 使用 Exa 的人工智能搜索引擎在网络上执行语义搜索，查找相关网页内容和文档。
+    pt_BR: Realize pesquisas semânticas na web usando o mecanismo de busca com IA da Exa para encontrar conteúdo e documentos relevantes.
+    ja_JP: Exaの AI 搜索エンジンを使用してウェブ上で意味検索を実行し、関連コンテンツやドキュメントを検索します。
+  llm: A tool for performing semantic search on the web using Exa's AI-powered search engine to find relevant content, websites, and documents.
+output_schema:
+  type: object
+  description: The JSON response containing the search results, simplified to include only URLs and image URLs.
+  properties:
+    urls:
+      type: array
+      description: An array of URLs from the search results
+      items:
+        type: string
+    images:
+      type: array 
+      description: An array of image URLs from the search results
+      items:
+        type: string
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Search query
+      zh_Hans: 搜索查询
+      pt_BR: Consulta de pesquisa
+      ja_JP: 検索クエリ
+    human_description:
+      en_US: The search query you want to perform using Exa's search engine.
+      zh_Hans: 您想使用 Exa 搜索引擎执行的搜索查询。
+      pt_BR: A consulta de pesquisa que você deseja realizar usando o mecanismo de busca da Exa.
+      ja_JP: Exa の検索エンジンを使用して実行したい検索クエリ。
+    llm_description: The search query to find relevant information on the web.
+    form: llm
+  - name: search_type
+    type: select
+    required: false
+    default: neural
+    label:
+      en_US: Search Type
+      zh_Hans: 搜索类型
+      pt_BR: Tipo de pesquisa
+      ja_JP: 検索タイプ
+    human_description:
+      en_US: The type of search to perform - neural (semantic), keyword (traditional), or auto.
+      zh_Hans: 要执行的搜索类型 - 神经（语义），关键词（传统），或自动。
+      pt_BR: O tipo de pesquisa a ser realizada - neural (semântica), por palavra-chave (tradicional), ou auto.
+      ja_JP: 実行する検索のタイプ - ニューラル（意味的），キーワード（従来型），または自動。
+    llm_description: The type of search to perform - neural uses advanced AI for semantic understanding, keyword uses traditional search techniques, and auto dynamically selects the best approach.
+    options:
+      - label:
+          en_US: Neural
+          zh_Hans: 神经
+          pt_BR: Neural
+          ja_JP: ニューラル
+        value: neural
+      - label:
+          en_US: Keyword
+          zh_Hans: 关键词
+          pt_BR: Palavra-chave
+          ja_JP: キーワード
+        value: keyword
+      - label:
+          en_US: Auto
+          zh_Hans: 自动
+          pt_BR: Auto
+          ja_JP: 自動
+        value: auto
+    form: form
+  - name: num_results
+    type: number
+    required: false
+    default: 10
+    min: 1
+    max: 100
+    label:
+      en_US: Number of Results
+      zh_Hans: 结果数量
+      pt_BR: Número de resultados
+      ja_JP: 結果数
+    human_description:
+      en_US: The maximum number of search results to return (from 1 to 100).
+      zh_Hans: 要返回的最大搜索结果数（从1到100）。
+      pt_BR: O número máximo de resultados de pesquisa a serem retornados (de 1 a 100).
+      ja_JP: 返す検索結果の最大数（1〜100）。
+    llm_description: The maximum number of search results to return, ranging from 1 to 100.
+    form: form
+  - name: include_domains
+    type: string
+    required: false
+    label:
+      en_US: Include Domains
+      zh_Hans: 包含域名
+      pt_BR: Incluir domínios
+      ja_JP: 含めるドメイン
+    human_description:
+      en_US: A comma-separated list of domains to specifically include in the search results.
+      zh_Hans: 要在搜索结果中特别包含的域名的逗号分隔列表。
+      pt_BR: Uma lista separada por vírgulas de domínios para incluir especificamente nos resultados da pesquisa.
+      ja_JP: 検索結果に特に含めるドメインのカンマ区切りリスト。
+    llm_description: A comma-separated list of domains to specifically include in the search results.
+    form: llm
+  - name: exclude_domains
+    type: string
+    required: false
+    label:
+      en_US: Exclude Domains
+      zh_Hans: 排除域名
+      pt_BR: Excluir domínios
+      ja_JP: 除外するドメイン
+    human_description:
+      en_US: A comma-separated list of domains to specifically exclude from the search results.
+      zh_Hans: 要从搜索结果中特别排除的域名的逗号分隔列表。
+      pt_BR: Uma lista separada por vírgulas de domínios para excluir especificamente dos resultados da pesquisa.
+      ja_JP: 検索結果から特に除外するドメインのカンマ区切りリスト。
+    llm_description: A comma-separated list of domains to specifically exclude from the search results.
+    form: llm
+  - name: start_published_date
+    type: string
+    required: false
+    label:
+      en_US: Start Published Date
+      zh_Hans: 开始发布日期
+      pt_BR: Data de publicação inicial
+      ja_JP: 公開開始日
+    human_description:
+      en_US: Only include results published after this date (YYYY-MM-DD format).
+      zh_Hans: 仅包含在此日期之后发布的结果（YYYY-MM-DD 格式）。
+      pt_BR: Incluir apenas resultados publicados após esta data (formato AAAA-MM-DD).
+      ja_JP: この日付以降に公開された結果のみを含める（YYYY-MM-DD形式）。
+    llm_description: Only include results published after this date in YYYY-MM-DD format.
+    form: llm
+  - name: end_published_date
+    type: string
+    required: false
+    label:
+      en_US: End Published Date
+      zh_Hans: 结束发布日期
+      pt_BR: Data de publicação final
+      ja_JP: 公開終了日
+    human_description:
+      en_US: Only include results published before this date (YYYY-MM-DD format).
+      zh_Hans: 仅包含在此日期之前发布的结果（YYYY-MM-DD 格式）。
+      pt_BR: Incluir apenas resultados publicados antes desta data (formato AAAA-MM-DD).
+      ja_JP: この日付以前に公開された結果のみを含める（YYYY-MM-DD形式）。
+    llm_description: Only include results published before this date in YYYY-MM-DD format.
+    form: llm
+  - name: use_autoprompt
+    type: boolean
+    required: false
+    default: true
+    label:
+      en_US: Use Autoprompt
+      zh_Hans: 使用自动提示
+      pt_BR: Usar Autoprompt
+      ja_JP: 自動プロンプトを使用
+    human_description:
+      en_US: Whether to use Exa's prompt engineering to improve the query.
+      zh_Hans: 是否使用 Exa 的提示工程来改进查询。
+      pt_BR: Se deve usar a engenharia de prompt da Exa para melhorar a consulta.
+      ja_JP: Exaのプロンプトエンジニングを使用してクエリを改善するかどうか。
+    llm_description: Whether to use Exa's prompt engineering to improve the query. When true, Exa will automatically rewrite the query to improve search results.
+    form: form
+  - name: text_contents
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Include Text Contents
+      zh_Hans: 包含文本内容
+      pt_BR: Incluir conteúdo de texto
+      ja_JP: テキスト内容を含める
+    human_description:
+      en_US: Whether to include the text contents from each search result.
+      zh_Hans: 是否包含每个搜索结果的文本内容。
+      pt_BR: Se deve incluir o conteúdo de texto de cada resultado da pesquisa.
+      ja_JP: 各検索結果からテキスト内容を含めるかどうか。
+    llm_description: Whether to include the text contents from each search result. When true, the response will include the text content of each webpage.
+    form: form
+  - name: highlight_results
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Highlight Results
+      zh_Hans: 高亮结果
+      pt_BR: Destacar resultados
+      ja_JP: 結果をハイライト
+    human_description:
+      en_US: Whether to highlight relevant text snippets in the search results.
+      zh_Hans: 是否在搜索结果中高亮显示相关文本片段。
+      pt_BR: Se deve destacar trechos de texto relevantes nos resultados da pesquisa.
+      ja_JP: 検索結果内の関連テキスト部分をハイライトするかどうか。
+    llm_description: Whether to highlight relevant text snippets in the search results. When true, relevant sections of text will be highlighted.
+    form: form
+  - name: category
+    type: select
+    required: false
+    label:
+      en_US: Category
+      zh_Hans: 类别
+      pt_BR: Categoria
+      ja_JP: カテゴリ
+    human_description:
+      en_US: A data category to focus on.
+      zh_Hans: 要集中的数据类别。
+      pt_BR: Uma categoria de dados para se concentrar.
+      ja_JP: 集中するデータのカテゴリ。
+    llm_description: A data category to focus on.
+    options:
+      - label:
+          en_US: Company
+          zh_Hans: 公司
+          pt_BR: Empresa
+          ja_JP: 会社
+        value: company
+      - label:
+          en_US: Research Paper
+          zh_Hans: 研究论文
+          pt_BR: Artigo de Pesquisa
+          ja_JP: 研究論文
+        value: research paper
+      - label:
+          en_US: News
+          zh_Hans: 新闻
+          pt_BR: Notícias
+          ja_JP: ニュース
+        value: news
+      - label:
+          en_US: PDF
+          zh_Hans: PDF
+          pt_BR: PDF
+          ja_JP: PDF
+        value: pdf
+      - label:
+          en_US: GitHub
+          zh_Hans: GitHub
+          pt_BR: GitHub
+          ja_JP: GitHub
+        value: github
+      - label:
+          en_US: Tweet
+          zh_Hans: 推文
+          pt_BR: Tuite
+          ja_JP: ツイート
+        value: tweet
+      - label:
+          en_US: Personal Site
+          zh_Hans: 个人网站
+          pt_BR: Site Pessoal
+          ja_JP: 個人サイト
+        value: personal site
+      - label:
+          en_US: LinkedIn Profile
+          zh_Hans: LinkedIn 个人主页
+          pt_BR: Perfil do LinkedIn
+          ja_JP: LinkedInプロファイル
+        value: linkedin profile
+      - label:
+          en_US: Financial Report
+          zh_Hans: 财务报告
+          pt_BR: Relatório Financeiro
+          ja_JP: 財務報告
+        value: financial report
+    form: form
+  - name: includeText
+    type: string
+    required: false
+    label:
+      en_US: Include Text
+      zh_Hans: 包含文本
+      pt_BR: Incluir Texto
+      ja_JP: テキストを含める
+    human_description:
+      en_US: List of strings that must be present in webpage text of results. Currently, only 1 string is supported, of up to 5 words.
+      zh_Hans: 必须出现在结果的网页文本中的字符串列表。目前，只支持1个字符串，最多5个单词。
+      pt_BR: Lista de strings que devem estar presentes no texto da página dos resultados. Atualmente, apenas 1 string é suportada, de até 5 palavras.
+      ja_JP: 結果のウェブページテキストに存在する必要がある文字列のリスト。現在、最大5単語の1つの文字列のみがサポートされています。
+    llm_description: List of strings that must be present in webpage text of results. Currently, only 1 string is supported, of up to 5 words.
+    form: llm
+  - name: excludeText
+    type: string
+    required: false
+    label:
+      en_US: Exclude Text
+      zh_Hans: 排除文本
+      pt_BR: Excluir Texto
+      ja_JP: テキストを除外
+    human_description:
+      en_US: List of strings that must not be present in webpage text of results. Currently, only 1 string is supported, of up to 5 words.
+      zh_Hans: 不能出现在结果的网页文本中的字符串列表。目前，只支持1个字符串，最多5个单词。
+      pt_BR: Lista de strings que não devem estar presentes no texto da página dos resultados. Atualmente, apenas 1 string é suportada, de até 5 palavras.
+      ja_JP: 結果のウェブページテキストに存在してはならない文字列のリスト。現在、最大5単語の1つの文字列のみがサポートされています。
+    llm_description: List of strings that must not be present in webpage text of results. Currently, only 1 string is supported, of up to 5 words.
+    form: llm
+extra:
+  python:
+    source: tools/exa_search.py

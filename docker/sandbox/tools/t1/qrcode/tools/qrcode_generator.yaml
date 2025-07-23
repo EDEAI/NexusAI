@@ -1,0 +1,102 @@
+description:
+  human:
+    en_US: A tool for generating QR code image
+    pt_BR: A tool for generating QR code image
+    zh_Hans: 一个用于生成二维码的工具
+  llm: A tool for generating QR code image
+extra:
+  python:
+    source: tools/qrcode_generator.py
+identity:
+  author: Bowen Liang
+  label:
+    en_US: Generate QR Code
+    pt_BR: Generate QR Code
+    zh_Hans: 生成二维码
+  name: qrcode_generator
+parameters:
+- form: llm
+  human_description:
+    en_US: content text for QR code
+    pt_BR: 二维码文本内容
+    zh_Hans: 二维码文本内容
+  label:
+    en_US: content text for QR code
+    pt_BR: content text for QR code
+    zh_Hans: 二维码文本内容
+  name: content
+  required: true
+  type: string
+- default: M
+  form: form
+  human_description:
+    en_US: Error Correction in L, M, Q or H, from low to high, the bigger size of
+      generated QR code with the better error correction effect
+    pt_BR: Error Correction in L, M, Q or H, from low to high, the bigger size of
+      generated QR code with the better error correction effect
+    zh_Hans: 容错等级，可设置为低、中、偏高或高，从低到高，生成的二维码越大且容错效果越好
+  label:
+    en_US: Error Correction
+    pt_BR: Error Correction
+    zh_Hans: 容错等级
+  name: error_correction
+  options:
+  - label:
+      en_US: Low
+      pt_BR: Low
+      zh_Hans: 低
+    value: L
+  - label:
+      en_US: Medium
+      pt_BR: Medium
+      zh_Hans: 中
+    value: M
+  - label:
+      en_US: Quartile
+      pt_BR: Quartile
+      zh_Hans: 偏高
+    value: Q
+  - label:
+      en_US: High
+      pt_BR: High
+      zh_Hans: 高
+    value: H
+  required: true
+  type: select
+- default: 2
+  form: form
+  human_description:
+    en_US: border size（default to 2）
+    pt_BR: border size（default to 2）
+    zh_Hans: 边框粗细的格数（默认为2）
+  label:
+    en_US: border size
+    pt_BR: border size
+    zh_Hans: 边框粗细
+  llm: border size, default to 2
+  max: 100
+  min: 0
+  name: border
+  required: true
+  type: number
+- name: embedded_image
+  type: file
+  required: false
+  label:
+    en_US: Embedded Image
+    zh_Hans: 嵌入的图片
+  human_description:
+    en_US: Embedded Image
+    zh_Hans: 输入的图片
+  llm_description: An image to be embedded in the QR code
+  form: llm
+- name: output_filename
+  type: string
+  required: false
+  label:
+    en_US: Filename of the output file
+    zh_Hans: 输出文件名
+  human_description:
+    en_US: Filename of the output file
+    zh_Hans: 输出文件名
+  form: llm

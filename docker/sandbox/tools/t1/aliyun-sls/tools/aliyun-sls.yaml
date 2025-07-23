@@ -1,0 +1,134 @@
+identity:
+  name: aliyun-sls
+  author: lework
+  label:
+    en_US: aliyun-sls
+    zh_Hans: 阿里云SLS日志查询
+    pt_BR: aliyun-sls
+description:
+  human:
+    en_US: Query Aliyun SLS logs
+    zh_Hans: 查询阿里云SLS日志服务中的日志数据
+    pt_BR: Query Aliyun SLS logs
+  llm: 查询阿里云SLS日志服务中的日志数据，支持指定查询语句、日志库、时间范围等参数
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: The query string to search logs
+      zh_Hans: 用于搜索日志的查询语句，支持阿里云SLS查询语法
+      pt_BR: The query string to search logs
+    llm_description: 用于搜索日志的查询语句，支持阿里云SLS查询语法
+    form: llm
+  - name: project
+    type: string
+    required: false
+    label:
+      en_US: Project
+      zh_Hans: 项目名称
+      pt_BR: Project
+    human_description:
+      en_US: The name of the project to query
+      zh_Hans: 要查询的项目名称，如不提供则使用凭证中配置的默认项目
+      pt_BR: The name of the project to query
+    llm_description: 要查询的项目名称，如不提供则使用凭证中配置的默认项目
+    form: llm
+  - name: logstore
+    type: string
+    required: false
+    label:
+      en_US: Logstore
+      zh_Hans: 日志库
+      pt_BR: Logstore
+    human_description:
+      en_US: The name of the logstore to query
+      zh_Hans: 要查询的日志库名称，如不提供则使用凭证中配置的默认日志库
+      pt_BR: The name of the logstore to query
+    llm_description: 要查询的日志库名称，如不提供则使用凭证中配置的默认日志库
+    form: llm
+  - name: from_time
+    type: string
+    required: false
+    label:
+      en_US: From Time
+      zh_Hans: 开始时间
+      pt_BR: From Time
+    human_description:
+      en_US: The start time for the query (ISO format)
+      zh_Hans: 查询的开始时间（ISO格式），如不提供则默认为15分钟前
+      pt_BR: The start time for the query (ISO format)
+    llm_description: 查询的开始时间（ISO格式），如不提供则默认为15分钟前
+    form: llm
+  - name: to_time
+    type: string
+    required: false
+    label:
+      en_US: To Time
+      zh_Hans: 结束时间
+      pt_BR: To Time
+    human_description:
+      en_US: The end time for the query (ISO format)
+      zh_Hans: 查询的结束时间（ISO格式），如不提供则默认为当前时间
+      pt_BR: The end time for the query (ISO format)
+    llm_description: 查询的结束时间（ISO格式），如不提供则默认为当前时间
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: Limit
+      zh_Hans: 返回数量限制
+      pt_BR: Limit
+    human_description:
+      en_US: Maximum number of logs to return
+      zh_Hans: 最多返回的日志条数，默认为100
+      pt_BR: Maximum number of logs to return
+    llm_description: 最多返回的日志条数，默认为100
+    form: llm
+  - name: endpoint
+    type: string
+    required: false
+    label:
+      en_US: Endpoint
+      zh_Hans: 日志服务地址
+      pt_BR: Endpoint
+    human_description:
+      en_US: The endpoint of the log service
+      zh_Hans: 日志服务地址，如不提供则使用凭证中配置的默认地址
+      pt_BR: The endpoint of the log service
+    llm_description: 日志服务地址，如不提供则使用凭证中配置的默认地址
+    form: llm
+  - name: access_key_id
+    type: string
+    required: false
+    label:
+      en_US: Access Key ID
+      zh_Hans: 访问密钥ID
+      pt_BR: Access Key ID
+    human_description:
+      en_US: The access key ID of the log service
+      zh_Hans: 日志服务访问密钥ID，如不提供则使用凭证中配置的默认访问密钥ID
+      pt_BR: The access key ID of the log service
+    llm_description: 日志服务访问密钥ID，如不提供则使用凭证中配置的默认访问密钥ID
+    form: llm
+  - name: access_key_secret
+    type: string
+    required: false
+    label:
+      en_US: Access Key Secret
+      zh_Hans: 访问密钥
+      pt_BR: Access Key Secret
+    human_description:
+      en_US: The access key secret of the log service
+      zh_Hans: 日志服务访问密钥，如不提供则使用凭证中配置的默认访问密钥
+      pt_BR: The access key secret of the log service
+    llm_description: 日志服务访问密钥，如不提供则使用凭证中配置的默认访问密钥
+    form: llm
+extra:
+  python:
+    source: tools/aliyun-sls.py

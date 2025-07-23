@@ -1,0 +1,38 @@
+identity:
+  name: steam_recently_played
+  author: bdim
+  label:
+    en_US: Steam Recently Played Games
+    zh_Hans: 最近玩过的游戏
+description:
+  human:
+    en_US: Get a list of games played by a Steam user in the last two weeks
+    zh_Hans: 获取 Steam 用户在过去两周内玩过的游戏列表
+  llm: Retrieve a comprehensive list of games a Steam user has played in the last two weeks, including playtime statistics and game information.
+parameters:
+  - name: steamid
+    type: string
+    required: true
+    label:
+      en_US: Steam ID
+      zh_Hans: Steam ID
+    human_description:
+      en_US: 64-bit Steam ID of the user
+      zh_Hans: 用户的 64 位 Steam ID
+    llm_description: The 64-bit identifier for the Steam user whose recently played games you want to retrieve. The user's profile must be public unless you're requesting your own game data.
+    form: llm
+
+  - name: count
+    type: string
+    required: false
+    label:
+      en_US: Count Limit
+      zh_Hans: 数量限制
+    human_description:
+      en_US: Limit the number of games returned
+      zh_Hans: 限制返回的游戏数量
+    llm_description: Optional. Limit the results to a specific number of games. Most users only play a small number of games in a two-week period.
+    form: llm
+extra:
+  python:
+    source: tools/steam_recently_played.py

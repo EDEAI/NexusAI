@@ -1,0 +1,38 @@
+identity:
+  name: enrich_profile
+  author: ayush3941
+  label:
+    en_US: Enrich LinkedIn Profile
+    zh_Hans: 增强 LinkedIn 个人资料
+    pt_BR: Enriquecer Perfil do LinkedIn
+  icon: "icon.png"
+  description:
+    en_US: Use Proxycurl API to enrich a LinkedIn profile with public data.
+    zh_Hans: 使用 Proxycurl API 丰富 LinkedIn 个人资料的公开数据。
+    pt_BR: Use a API Proxycurl para enriquecer um perfil do LinkedIn com dados públicos.
+
+description:
+  human:
+    en_US: Enrich a LinkedIn profile with full name, job title, experience, education, and more.
+    zh_Hans: 增强 LinkedIn 个人资料，包括姓名、职位、经验、教育等信息。
+    pt_BR: Enriqueça um perfil do LinkedIn com nome completo, cargo, experiência, educação e mais.
+  llm: Given a LinkedIn URL, return detailed profile information using Proxycurl.
+
+parameters:
+  - name: linkedin_url
+    type: string
+    required: true
+    label:
+      en_US: LinkedIn Profile URL
+      zh_Hans: LinkedIn 个人资料链接
+      pt_BR: URL do Perfil do LinkedIn
+    human_description:
+      en_US: The full public LinkedIn profile URL of the person to enrich.
+      zh_Hans: 要增强的 LinkedIn 用户的完整公开个人资料链接。
+      pt_BR: A URL pública completa do perfil do LinkedIn da pessoa.
+    llm_description: The public LinkedIn URL to fetch enrichment data for.
+    form: llm
+
+extra:
+  python:
+    source: tools/enrich_profile.py

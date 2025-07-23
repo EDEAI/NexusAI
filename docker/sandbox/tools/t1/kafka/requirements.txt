@@ -1,0 +1,2 @@
+dify_plugin~=0.0.1b67
+confluent-kafka>=2.3.0

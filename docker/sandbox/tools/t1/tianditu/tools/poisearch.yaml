@@ -1,0 +1,41 @@
+description:
+  human:
+    en_US: Search for certain types of points of interest around a location
+    pt_BR: Search for certain types of points of interest around a location
+    zh_Hans: 搜索某个位置周边的5公里内某种类型的兴趣点
+  llm: A tool for searching for certain types of points of interest around a location
+extra:
+  python:
+    source: tools/poisearch.py
+identity:
+  author: Listeng
+  label:
+    en_US: Point of Interest search
+    pt_BR: Point of Interest search
+    zh_Hans: 兴趣点搜索
+  name: point_of_interest_search
+parameters:
+- form: llm
+  human_description:
+    en_US: poi keyword
+    pt_BR: poi keyword
+    zh_Hans: 兴趣点的关键字
+  label:
+    en_US: poi keyword
+    pt_BR: poi keyword
+    zh_Hans: 兴趣点的关键字
+  name: keyword
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: base current point
+    pt_BR: base current point
+    zh_Hans: 当前位置的关键字
+  label:
+    en_US: base current point
+    pt_BR: base current point
+    zh_Hans: 当前位置的关键字
+  name: baseAddress
+  required: true
+  type: string

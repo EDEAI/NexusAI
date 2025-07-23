@@ -1,0 +1,63 @@
+identity:
+  name: github_repo_intel
+  author: tushargururaj
+  label:
+    en_US: GitHub Repository Intelligence
+
+description:
+  human:
+    en_US: Analyze GitHub repositories using GitHub API with or without authentication
+  llm: Analyze GitHub repositories using GitHub API with or without authentication
+
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Search Query or Repository
+    human_description:
+      en_US: Enter a repository name owner slash repo or a search query or an analysis request
+    llm_description: Enter a repository name owner slash repo or a search query or an analysis request
+    form: llm
+  - name: analysis_type
+    type: select
+    required: false
+    default: auto
+    label:
+      en_US: Analysis Type
+    human_description:
+      en_US: Choose the type of analysis to perform auto detected if not specified
+    llm_description: Choose the type of analysis to perform auto detected if not specified
+    form: llm
+    options:
+      - value: auto
+        label:
+          en_US: Auto detect
+      - value: search
+        label:
+          en_US: Repository Search
+      - value: analyze
+        label:
+          en_US: Detailed Analysis
+      - value: trending
+        label:
+          en_US: Trending Analysis
+      - value: compare
+        label:
+          en_US: Repository Comparison
+  - name: limit
+    type: number
+    required: false
+    default: 10
+    min: 1
+    max: 50
+    label:
+      en_US: Result Limit
+    human_description:
+      en_US: Maximum number of results to return between 1 and 50
+    llm_description: Maximum number of results to return between 1 and 50
+    form: llm
+
+extra:
+  python:
+    source: tools/github_repo_intel.py

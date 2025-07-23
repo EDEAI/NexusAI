@@ -1,0 +1,20 @@
+extra:
+  python:
+    source: provider/dingtalk.py
+identity:
+  author: Bowen Liang & LiuHao
+  description:
+    en_US: DingTalk group robot
+    pt_BR: DingTalk group robot
+    zh_Hans: 钉钉群机器人
+  icon: icon.svg
+  label:
+    en_US: DingTalk
+    pt_BR: DingTalk
+    zh_Hans: 钉钉
+  name: dingtalk
+  tags:
+    - social
+    - productivity
+tools:
+  - tools/dingtalk_group_bot.yaml

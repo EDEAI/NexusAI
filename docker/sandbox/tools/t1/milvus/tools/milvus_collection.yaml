@@ -1,0 +1,75 @@
+identity:
+  name: "milvus_collection"
+  author: "zeroz-lab"
+  label:
+    en_US: "Milvus Collection Manager"
+    zh_Hans: "Milvus 集合管理器"
+    pt_BR: "Gerenciador de Coleções Milvus"
+description:
+  human:
+    en_US: "Manage Milvus collections: create, list, describe, delete and get information about collections"
+    zh_Hans: "管理 Milvus 集合：创建、列出、描述、删除和获取集合信息"
+    pt_BR: "Gerenciar coleções Milvus: criar, listar, descrever, excluir e obter informações sobre coleções"
+  llm: "A tool for comprehensive Milvus vector database collection management including creation, listing, information retrieval and deletion"
+parameters:
+  - name: operation
+    type: select
+    required: true
+    label:
+      en_US: "Operation"
+      zh_Hans: "操作"
+      pt_BR: "Operação"
+    human_description:
+      en_US: "The operation to perform on collections"
+      zh_Hans: "对集合执行的操作"
+      pt_BR: "A operação a ser executada nas coleções"
+    llm_description: "The type of operation to perform: list, describe, stats, exists, create, or drop"
+    form: form
+    options:
+      - value: list
+        label:
+          en_US: "List Collections"
+          zh_Hans: "列出集合"
+          pt_BR: "Listar Coleções"
+      - value: describe
+        label:
+          en_US: "Describe Collection"
+          zh_Hans: "描述集合"
+          pt_BR: "Descrever Coleção"
+      - value: stats
+        label:
+          en_US: "Collection Statistics"
+          zh_Hans: "集合统计"
+          pt_BR: "Estatísticas da Coleção"
+      - value: exists
+        label:
+          en_US: "Check Collection Exists"
+          zh_Hans: "检查集合是否存在"
+          pt_BR: "Verificar se a Coleção Existe"
+      # - value: create
+      #   label:
+      #     en_US: "Create Collection"
+      #     zh_Hans: "创建集合"
+      #     pt_BR: "Criar Coleção"
+      # - value: drop
+      #   label:
+      #     en_US: "Drop Collection"
+      #     zh_Hans: "删除集合"
+      #     pt_BR: "Excluir Coleção"
+  - name: collection_name
+    type: string
+    required: false
+    label:
+      en_US: "Collection Name"
+      zh_Hans: "集合名称"
+      pt_BR: "Nome da Coleção"
+    human_description:
+      en_US: "The name of the collection to operate on"
+      zh_Hans: "要操作的集合名称"
+      pt_BR: "O nome da coleção a ser operada"
+    llm_description: "The name of the collection (required for describe, stats, exists, create, drop operations)"
+    form: llm
+
+extra:
+  python:
+    source: tools/milvus_collection.py 

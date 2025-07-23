@@ -1,0 +1,224 @@
+identity:
+  name: create_user
+  author: yasu89
+  label:
+    en_US: Create a User
+    zh_Hans: 创建用户
+    pt_BR: Criar um Usuário
+    ja_JP: ユーザーを作成
+description:
+  human:
+    en_US: Create a new user in Redmine
+    zh_Hans: 在Redmine中创建新用户
+    pt_BR: Criar um novo usuário no Redmine
+    ja_JP: Redmineで新しいユーザーを作成
+  llm: Create a new user in a Redmine project management system with specified parameters
+parameters:
+  - name: login
+    type: string
+    required: true
+    label:
+      en_US: Login
+      zh_Hans: 登录名
+      pt_BR: Login
+      ja_JP: ログイン名
+    human_description:
+      en_US: User login name (unique identifier)
+      zh_Hans: 用户登录名（唯一标识符）
+      pt_BR: Nome de login do usuário (identificador único)
+      ja_JP: ユーザーログイン名（一意識別子）
+    placeholder:
+      en_US: "jsmith"
+      zh_Hans: "zhangsan"
+      pt_BR: "jsilva"
+      ja_JP: "tanaka"
+    llm_description: Unique login name for the new user
+    form: llm
+  - name: password
+    type: secret-input
+    required: false
+    label:
+      en_US: Password
+      zh_Hans: 密码
+      pt_BR: Senha
+      ja_JP: パスワード
+    human_description:
+      en_US: User's password (optional if using auth_source_id or generate_password)
+      zh_Hans: 用户密码（如果使用auth_source_id或generate_password则可选）
+      pt_BR: Senha do usuário (opcional se usar auth_source_id ou generate_password)
+      ja_JP: ユーザーのパスワード（auth_source_idまたはgenerate_passwordを使用する場合はオプション）
+    placeholder:
+      en_US: "SecurePassword123"
+      zh_Hans: "安全密码123"
+      pt_BR: "SenhaSegura123"
+      ja_JP: "安全なパスワード123"
+    llm_description: Password for the new user
+    form: llm
+  - name: firstname
+    type: string
+    required: true
+    label:
+      en_US: First Name
+      zh_Hans: 名字
+      pt_BR: Nome
+      ja_JP: 名前
+    human_description:
+      en_US: User's first name
+      zh_Hans: 用户的名字
+      pt_BR: Nome do usuário
+      ja_JP: ユーザーの名前
+    placeholder:
+      en_US: "John"
+      zh_Hans: "三"
+      pt_BR: "João"
+      ja_JP: "太郎"
+    llm_description: First name of the new user
+    form: llm
+  - name: lastname
+    type: string
+    required: true
+    label:
+      en_US: Last Name
+      zh_Hans: 姓氏
+      pt_BR: Sobrenome
+      ja_JP: 姓
+    human_description:
+      en_US: User's last name
+      zh_Hans: 用户的姓氏
+      pt_BR: Sobrenome do usuário
+      ja_JP: ユーザーの姓
+    placeholder:
+      en_US: "Smith"
+      zh_Hans: "张"
+      pt_BR: "Silva"
+      ja_JP: "田中"
+    llm_description: Last name of the new user
+    form: llm
+  - name: mail
+    type: string
+    required: true
+    label:
+      en_US: Email
+      zh_Hans: 邮箱
+      pt_BR: Email
+      ja_JP: メール
+    human_description:
+      en_US: User's email address
+      zh_Hans: 用户的邮箱地址
+      pt_BR: Endereço de email do usuário
+      ja_JP: ユーザーのメールアドレス
+    placeholder:
+      en_US: "john.smith@example.com"
+      zh_Hans: "zhangsan@example.com"
+      pt_BR: "joao.silva@example.com"
+      ja_JP: "tanaka@example.com"
+    llm_description: Email address for the new user
+    form: llm
+  - name: auth_source_id
+    type: string
+    required: false
+    label:
+      en_US: Auth Source ID
+      zh_Hans: 认证源ID
+      pt_BR: ID da Fonte de Autenticação
+      ja_JP: 認証ソースID
+    human_description:
+      en_US: Authentication source ID (for LDAP or other external auth)
+      zh_Hans: 认证源ID（用于LDAP或其他外部认证）
+      pt_BR: ID da fonte de autenticação (para LDAP ou outra autenticação externa)
+      ja_JP: 認証ソースID（LDAPまたはその他の外部認証用）
+    placeholder:
+      en_US: "2"
+      zh_Hans: "2"
+      pt_BR: "2"
+      ja_JP: "2"
+    llm_description: Authentication source ID for external authentication systems
+    form: llm
+  - name: mail_notification
+    type: string
+    required: false
+    label:
+      en_US: Mail Notification
+      zh_Hans: 邮件通知
+      pt_BR: Notificação por Email
+      ja_JP: メール通知
+    human_description:
+      en_US: "Email notification preference (only_my_events, none, all, selected, only_assigned, only_owner)"
+      zh_Hans: "邮件通知偏好（only_my_events, none, all, selected, only_assigned, only_owner）"
+      pt_BR: "Preferência de notificação por email (only_my_events, none, all, selected, only_assigned, only_owner)"
+      ja_JP: "メール通知設定（only_my_events, none, all, selected, only_assigned, only_owner）"
+    placeholder:
+      en_US: "only_my_events"
+      zh_Hans: "only_my_events"
+      pt_BR: "only_my_events"
+      ja_JP: "only_my_events"
+    llm_description: Email notification preference for the user
+    form: llm
+  - name: must_change_passwd
+    type: boolean
+    required: false
+    label:
+      en_US: Must Change Password
+      zh_Hans: 必须更改密码
+      pt_BR: Deve Alterar Senha
+      ja_JP: パスワード変更必須
+    human_description:
+      en_US: Whether user must change password on first login
+      zh_Hans: 用户是否必须在首次登录时更改密码
+      pt_BR: Se o usuário deve alterar a senha no primeiro login
+      ja_JP: ユーザーが初回ログイン時にパスワードを変更する必要があるかどうか
+    llm_description: Whether user must change password on first login
+    form: llm
+  - name: generate_password
+    type: boolean
+    required: false
+    label:
+      en_US: Generate Password
+      zh_Hans: 生成密码
+      pt_BR: Gerar Senha
+      ja_JP: パスワード生成
+    human_description:
+      en_US: Whether to automatically generate a password for the user
+      zh_Hans: 是否为用户自动生成密码
+      pt_BR: Se deve gerar automaticamente uma senha para o usuário
+      ja_JP: ユーザーのパスワードを自動生成するかどうか
+    llm_description: Whether to automatically generate a password for the user
+    form: llm
+  - name: custom_fields
+    type: string
+    required: false
+    label:
+      en_US: Custom Fields
+      zh_Hans: 自定义字段
+      pt_BR: Campos Personalizados
+      ja_JP: カスタムフィールド
+    human_description:
+      en_US: "Custom fields as JSON string (e.g., [{\"id\":1,\"value\":\"text\"},{\"id\":2,\"value\":[\"1\",\"2\"]}])"
+      zh_Hans: "自定义字段JSON字符串（例如：[{\"id\":1,\"value\":\"text\"},{\"id\":2,\"value\":[\"1\",\"2\"]}]）"
+      pt_BR: "Campos personalizados como string JSON (ex: [{\"id\":1,\"value\":\"text\"},{\"id\":2,\"value\":[\"1\",\"2\"]}])"
+      ja_JP: "カスタムフィールドのJSON文字列（例：[{\"id\":1,\"value\":\"text\"},{\"id\":2,\"value\":[\"1\",\"2\"]}]）"
+    placeholder:
+      en_US: "[{\"id\":1,\"value\":\"department A\"}]"
+      zh_Hans: "[{\"id\":1,\"value\":\"部门A\"}]"
+      pt_BR: "[{\"id\":1,\"value\":\"departamento A\"}]"
+      ja_JP: "[{\"id\":1,\"value\":\"部署A\"}]"
+    llm_description: Custom fields as JSON array with id and value pairs
+    form: llm
+  - name: send_information
+    type: boolean
+    required: false
+    label:
+      en_US: Send Information
+      zh_Hans: 发送信息
+      pt_BR: Enviar Informações
+      ja_JP: 情報送信
+    human_description:
+      en_US: Whether to send account information to the user via email
+      zh_Hans: 是否通过邮件向用户发送账户信息
+      pt_BR: Se deve enviar informações da conta para o usuário por email
+      ja_JP: ユーザーにアカウント情報をメールで送信するかどうか
+    llm_description: Whether to send account information to the user via email
+    form: llm
+extra:
+  python:
+    source: tools/create_user.py

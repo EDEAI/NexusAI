@@ -1,0 +1,50 @@
+identity:
+  name: steam_news
+  author: bdim
+  label:
+    en_US: Game News
+    zh_Hans: 游戏新闻
+description:
+  human:
+    en_US: Get the latest news for a specific game on Steam
+    zh_Hans: 获取特定游戏的最新新闻
+  llm: Retrieve the latest news articles for a Steam game by specifying its AppID.
+parameters:
+  - name: appid
+    type: string
+    required: true
+    label:
+      en_US: Game AppID
+      zh_Hans: 游戏 AppID
+    human_description:
+      en_US: The AppID of the game you want news for (e.g., 440 for Team Fortress 2)
+      zh_Hans: 您想获取新闻的游戏 AppID （例如，440代表团队要塞2）
+    llm_description: The unique identifier for a game on Steam. For example, 440 is the AppID for Team Fortress 2, 570 for Dota 2, 730 for CS:GO.
+    form: llm
+
+  - name: count
+    type: string
+    required: false
+    label:
+      en_US: News Count
+      zh_Hans: 新闻数量
+    human_description:
+      en_US: Number of news entries to return (default 3)
+      zh_Hans: 要返回的新闻条目数量（默认3）
+    llm_description: The number of news articles to retrieve. Default is 3 if not specified.
+    form: llm
+
+  - name: maxlength
+    type: string
+    required: false
+    label:
+      en_US: Max Length
+      zh_Hans: 最大长度
+    human_description:
+      en_US: Maximum length of each news entry (default 300)
+      zh_Hans: 每条新闻的最大长度（默认300）
+    llm_description: The maximum length in characters for each news content. Default is 300 if not specified.
+    form: llm
+extra:
+  python:
+    source: tools/steam_news.py

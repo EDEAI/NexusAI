@@ -1,0 +1,55 @@
+identity:
+  name: get_todos
+  author: ayush3941
+  label:
+    en_US: Get Todo Tasks
+    zh_Hans: 获取待办事项
+    pt_BR: Obter Tarefas
+  icon: "icon.png"
+  description:
+    en_US: Retrieve tasks from Microsoft Todo with options to include or exclude completed tasks.
+    zh_Hans: 从 Microsoft Todo 获取任务，并可选择包含或排除已完成的任务。
+    pt_BR: Recupere tarefas do Microsoft Todo com opções para incluir ou excluir tarefas concluídas.
+
+description:
+  human:
+    en_US: Fetch your todo tasks with the ability to include active, completed, or all tasks.
+    zh_Hans: 获取您的待办事项任务，可选择仅获取活动任务、已完成任务或所有任务。
+    pt_BR: Busque suas tarefas com a opção de incluir tarefas ativas, concluídas ou todas.
+
+  llm: Retrieve a list of Microsoft Todo tasks filtered by completion status.
+
+parameters:
+  - name: include_completed
+    type: select
+    required: false
+    label:
+      en_US: Task Completion Filter
+      zh_Hans: 任务完成筛选
+      pt_BR: Filtro de conclusão da tarefa
+    human_description:
+      en_US: Choose whether to show only completed tasks, only active tasks, or all tasks.
+      zh_Hans: 选择显示仅已完成、仅活动或所有任务。
+      pt_BR: Escolha se deseja mostrar apenas tarefas concluídas, ativas ou todas.
+    llm_description: Controls whether to include completed tasks, only show completed, or exclude them.
+    form: llm
+    options:
+      - label:
+          en_US: Only Active Tasks
+          zh_Hans: 仅活动任务
+          pt_BR: Apenas Tarefas Ativas
+        value: "false"
+      - label:
+          en_US: Only Completed Tasks
+          zh_Hans: 仅已完成任务
+          pt_BR: Apenas Tarefas Concluídas
+        value: "only"
+      - label:
+          en_US: All Tasks
+          zh_Hans: 所有任务
+          pt_BR: Todas as Tarefas
+        value: "true"
+
+extra:
+  python:
+    source: tools/get_todos.py

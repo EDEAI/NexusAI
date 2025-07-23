@@ -1,0 +1,31 @@
+credentials_for_provider:
+  fal_api_key:
+    label:
+      en_US: FAL API Key
+    placeholder:
+      en_US: Please input your FAL API key
+    required: true
+    type: secret-input
+    url: https://fal.ai/dashboard/keys
+extra:
+  python:
+    source: provider/fal.py
+identity:
+  author: Kalo Chin
+  description:
+    en_US: The image generation API provided by FAL.
+    zh_CN: FAL 提供的图像生成 API。
+  icon: icon.svg
+  label:
+    en_US: FAL
+    zh_CN: FAL
+  name: fal
+  tags:
+    - image
+tools:
+  - tools/flux_1_pro_new.yaml
+  - tools/flux_1_1_pro_ultra.yaml
+  - tools/flux_1_dev.yaml
+  - tools/flux_1_1_pro.yaml
+  - tools/wizper.yaml
+  - tools/clarity_upscaler.yaml

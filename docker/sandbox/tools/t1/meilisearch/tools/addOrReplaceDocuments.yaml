@@ -1,0 +1,49 @@
+description:
+  human:
+    en_US: Add or replace documents in the database.
+    zh_Hans: 添加或替换数据库中的文档.
+    zh_Hant: 添加或替換數據庫中的文檔.
+  llm: Add or replace documents in the database.
+extra:
+  python:
+    source: tools/addOrReplaceDocuments.py
+identity:
+  name: Add or Replace Documents
+  author: fernvenue
+  label:
+    en_US: Add or Replace Documents
+    zh_Hans: 添加或替换文档
+    zh_Hant: 添加或替換文檔
+  description:
+    human:
+      en_US: Add or replace documents in the database.
+      zh_Hans: 添加或替换数据库中的文档.
+      zh_Hant: 添加或替換數據庫中的文檔.
+    llm: Add or replace documents in the database.
+parameters:
+  - name: indexUid
+    type: string
+    required: true
+    label:
+      en_US: Index UID
+      zh_Hans: 索引 UID
+      zh_Hant: 索引 UID
+    human_description:
+      en_US: Index Unique Identifier.
+      zh_Hans: 索引唯一标识符.
+      zh_Hant: 索引唯一標識符.
+    llm_description: Index Unique Identifier.
+    form: form
+  - name: documents
+    type: string
+    required: true
+    label:
+      en_US: Documents
+      zh_Hans: 文档
+      zh_Hant: 文檔
+    human_description:
+      en_US: Documents to be added or replacedd in the database.
+      zh_Hans: 要添加或替换到数据库中的文档.
+      zh_Hant: 要添加或替換到數據庫中的文檔.
+    llm_description: Documents to be added or replacedd in the database.
+    form: llm

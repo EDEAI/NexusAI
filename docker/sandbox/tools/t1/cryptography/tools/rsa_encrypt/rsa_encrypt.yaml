@@ -1,0 +1,37 @@
+identity:
+  name: rsa_encrypt
+  author: bowenliang123
+  label:
+    en_US: RSA Encryption
+    zh_Hans: RSA 加密
+description:
+  human:
+    en_US: RSA Encryption
+    zh_Hans: RSA 加密
+  llm: RSA Encrypt
+parameters:
+  - name: plaintext
+    type: string
+    required: true
+    label:
+      en_US: Plaintext
+      zh_Hans: 原文
+    human_description:
+      en_US: "Plaintext"
+      zh_Hans: "原文"
+    llm_description: "Plaintext"
+    form: llm
+  - name: public_key_text
+    type: string
+    required: true
+    label:
+      en_US: Public Key Content
+      zh_Hans: 公钥文本
+    human_description:
+      en_US: "Starts with '-----BEGIN PUBLIC KEY-----'"
+      zh_Hans: "以 '-----BEGIN PUBLIC KEY-----' 开头"
+    llm_description: "Public Key File"
+    form: llm
+extra:
+  python:
+    source: tools/rsa_encrypt/rsa_encrypt.py

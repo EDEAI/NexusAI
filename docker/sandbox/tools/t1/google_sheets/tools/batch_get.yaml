@@ -1,0 +1,113 @@
+identity:
+  name: batch_get
+  author: omluc
+  label:
+    en_US: Batch Get
+    zh_Hans: 批量获取
+    pt_BR: Obter em Lote
+description:
+  human:
+    en_US: Retrieve data from multiple ranges in a Google Sheet
+    zh_Hans: 从 Google 表格中的多个范围检索数据
+    pt_BR: Recuperar dados de múltiplos intervalos em uma planilha Google
+  llm: Retrieve data from multiple ranges in a Google Sheet at once
+parameters:
+  - name: spreadsheet_id
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: Spreadsheet ID
+      zh_Hans: 表格 ID
+      pt_BR: ID da Planilha
+    human_description:
+      en_US: The ID of the Google Sheet (found in the URL)
+      zh_Hans: Google 表格的 ID（在 URL 中）
+      pt_BR: O ID da planilha Google (encontrado na URL)
+    llm_description: The ID of the Google Sheet, which can be found in the sheet's URL
+  - name: ranges
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: Ranges
+      zh_Hans: 范围列表
+      pt_BR: Intervalos
+    human_description:
+      en_US: List of ranges to retrieve (e.g. ["Sheet1!A1:C3", "Sheet2!B2:D4"])
+      zh_Hans: 要检索的范围列表（例如 ["Sheet1!A1:C3", "Sheet2!B2:D4"]）
+      pt_BR: Lista de intervalos para recuperar (ex. ["Sheet1!A1:C3", "Sheet2!B2:D4"])
+    llm_description: An array of range strings to retrieve in A1 notation or R1C1 notation (e.g. ["Sheet1!A1:C3", "Sheet2!B2:D4"])
+  - name: date_time_render_option
+    type: select
+    default: SERIAL_NUMBER
+    form: form
+    label:
+      en_US: Date Time Render Option
+      zh_Hans: 日期时间渲染选项
+      pt_BR: Opção de Renderização de Data e Hora
+    human_description:
+      en_US: How dates, times, and durations should be represented in the output
+      zh_Hans: 日期、时间和持续时间在输出中的表示方式
+      pt_BR: Como datas, horários e durações devem ser representados na saída
+    llm_description: How dates, times, and durations should be represented in the output
+    options:
+      - label:
+          en_US: SERIAL_NUMBER
+          zh_Hans: 序列号
+          pt_BR: NÚMERO DE SÉRIE
+        value: SERIAL_NUMBER
+      - label:
+          en_US: FORMATTED_STRING
+          zh_Hans: 格式化字符串
+          pt_BR: STRING FORMATADA
+        value: FORMATTED_STRING
+  - name: major_dimension
+    type: select
+    form: form
+    label:
+      en_US: Major Dimension
+      zh_Hans: 主要维度
+      pt_BR: Dimensão Principal
+    human_description:
+      en_US: The major dimension that results should use
+      zh_Hans: 结果应使用的主要维度
+      pt_BR: A dimensão principal que os resultados devem usar
+    llm_description: The major dimension that results should use (ROWS or COLUMNS)
+    options:
+      - label:
+          en_US: ROWS
+          zh_Hans: 行
+          pt_BR: LINHAS
+        value: ROWS
+      - label:
+          en_US: COLUMNS
+          zh_Hans: 列
+          pt_BR: COLUNAS
+        value: COLUMNS
+  - name: value_render_option
+    type: select
+    form: form
+    label:
+      en_US: Value Render Option
+      zh_Hans: 值渲染选项
+      pt_BR: Opção de Renderização de Valor
+    human_description:
+      en_US: How values should be represented in the output
+      zh_Hans: 值在输出中的表示方式
+      pt_BR: Como os valores devem ser representados na saída
+    llm_description: How values should be represented in the output
+    options:
+      - label:
+          en_US: FORMATTED_VALUE
+          zh_Hans: 格式化值
+          pt_BR: VALOR FORMATADO
+        value: FORMATTED_VALUE
+      - label:
+          en_US: FORMULA
+          zh_Hans: 公式
+          pt_BR: FÓRMULA
+        value: FORMULA
+extra:
+  python:
+    source: tools/batch_get.py

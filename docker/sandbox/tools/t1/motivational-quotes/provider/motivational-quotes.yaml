@@ -1,0 +1,17 @@
+identity:
+  author: "amandevelops"
+  name: "motivational-quotes"
+  label:
+    en_US: "Motivational Quotes"
+    zh_Hans: "励志名言"
+    pt_BR: "Citações Motivacionais"
+  description:
+    en_US: "A plugin that provides random motivational quotes to inspire and uplift you."
+    zh_Hans: "提供随机励志名言以激励和鼓舞您的插件。"
+    pt_BR: "Um plugin que fornece citações motivacionais aleatórias para inspirar e motivar você."
+  icon: "icon.svg"
+tools:
+  - tools/motivational-quotes.yaml
+extra:
+  python:
+    source: provider/motivational-quotes.py

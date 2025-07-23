@@ -1,0 +1,41 @@
+identity:
+  author: stvlynn
+  name: agentapi
+  label:
+    en_US: AgentAPI
+    zh_Hans: AgentAPI
+    pt_BR: AgentAPI
+    ja_JP: AgentAPI
+  description:
+    en_US: Control coding agents with an HTTP API.
+    zh_Hans: 通过 HTTP API 控制编码代理。
+    pt_BR: Controle agentes de codificação com uma API HTTP.
+    ja_JP: HTTP APIでコーディングエージェントを制御します。
+  icon: icon.png
+credentials_for_provider:
+  agentapi_url:
+    type: text-input
+    required: true
+    label:
+      en_US: AgentAPI Server URL
+      zh_Hans: AgentAPI 服务器 URL
+      pt_BR: URL do Servidor AgentAPI
+      ja_JP: AgentAPI サーバーの URL
+    placeholder:
+      en_US: Please input your AgentAPI server URL
+      zh_Hans: 请输入您的 AgentAPI 服务器 URL
+      pt_BR: Por favor, insira a URL do seu servidor AgentAPI
+      ja_JP: AgentAPI サーバーの URL を入力してください
+    help:
+      en_US: "The URL of the running AgentAPI server, e.g., http://localhost:3284"
+      zh_Hans: "正在运行的 AgentAPI 服务器的 URL，例如 http://localhost:3284"
+      pt_BR: "A URL do servidor AgentAPI em execução, por exemplo, http://localhost:3284"
+      ja_JP: "実行中の AgentAPI サーバーの URL、例: http://localhost:3284"
+    url: https://github.com/coder/agentapi
+tools:
+  - tools/get_status.yaml
+  - tools/get_messages.yaml
+  - tools/send_message.yaml
+extra:
+  python:
+    source: provider/agentapi.py

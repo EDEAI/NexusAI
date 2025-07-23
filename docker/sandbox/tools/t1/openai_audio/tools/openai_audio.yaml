@@ -1,0 +1,273 @@
+identity:
+  name: openai_audio_stt
+  author: logicober
+  label:
+    en_US: Audio Transcription
+    zh_Hans: 音频转录
+    pt_BR: Transcrição de Áudio
+    ja_JP: 音声文字起こし
+description:
+  human:
+    en_US: Transcribe or translate audio files to text using OpenAI's Audio API.
+    zh_Hans: 使用 OpenAI 的 Audio API 将音频文件转录或翻译为文本。
+    pt_BR: Transcreva ou traduza arquivos de áudio para texto usando a API de Áudio da OpenAI.
+    ja_JP: OpenAIのAudio APIを使用して音声ファイルをテキストに文字起こしまたは翻訳します。
+  llm: Transcribe or translate audio files to text using OpenAI's Audio API with high accuracy across multiple languages.
+parameters:
+  - name: file
+    type: file
+    required: true
+    form: llm
+    label:
+      en_US: Audio File
+      zh_Hans: 音频文件
+      pt_BR: Arquivo de Áudio
+      ja_JP: 音声ファイル
+    human_description:
+      en_US: The audio file to transcribe. Supported formats include mp3, mp4, mpeg, mpga, m4a, wav, and webm. Max 25MB.
+      zh_Hans: 要转录的音频文件。支持的格式包括 mp3、mp4、mpeg、mpga、m4a、wav 和 webm。最大 25MB。
+      pt_BR: O arquivo de áudio para transcrever. Formatos suportados incluem mp3, mp4, mpeg, mpga, m4a, wav e webm. Máximo 25MB.
+      ja_JP: 文字起こしする音声ファイル。サポートされている形式はmp3、mp4、mpeg、mpga、m4a、wav、webmです。最大サイズは25MBです。
+    llm_description: The audio file to transcribe. Supported formats include mp3, mp4, mpeg, mpga, m4a, wav, and webm. Maximum file size is 25MB.
+  
+  - name: transcription_type
+    type: select
+    required: false
+    form: form
+    label:
+      en_US: Transcription Type
+      zh_Hans: 转录类型
+      pt_BR: Tipo de Transcrição
+      ja_JP: 文字起こしタイプ
+    options:
+      - value: transcribe
+        label:
+          en_US: Transcribe (Keep Original Language)
+          zh_Hans: 转录（保持原始语言）
+          pt_BR: Transcrever (Manter Idioma Original)
+          ja_JP: 文字起こし（原語を維持）
+      - value: translate
+        label:
+          en_US: Translate to English
+          zh_Hans: 翻译成英语
+          pt_BR: Traduzir para Inglês
+          ja_JP: 英語に翻訳
+    default: transcribe
+    human_description:
+      en_US: Choose whether to transcribe the audio in its original language or translate it to English. Note that 'Translate to English' only supports the whisper-1 model and will disable streaming output.
+      zh_Hans: 选择是以原始语言转录音频还是将其翻译成英语。请注意，"翻译成英语"选项仅支持 whisper-1 模型，并且会禁用流式输出。
+      pt_BR: Escolha entre transcrever o áudio em seu idioma original ou traduzi-lo para inglês.
+      ja_JP: 音声を原語のまま文字起こしするか、英語に翻訳するかを選択します。「英語に翻訳」はwhisper-1モデルのみをサポートし、ストリーミング出力が無効になります。
+    llm_description: Choose whether to transcribe the audio in its original language or translate it to English. Note that translation only supports whisper-1 model.
+  
+  - name: model
+    type: select
+    required: false
+    form: form
+    label:
+      en_US: Model
+      zh_Hans: 模型
+      pt_BR: Modelo
+      ja_JP: モデル
+    options:
+      - value: gpt-4o-transcribe
+        label:
+          en_US: GPT-4o Transcribe (High Quality)
+          zh_Hans: GPT-4o Transcribe (高质量)
+          pt_BR: GPT-4o Transcribe (Alta Qualidade)
+          ja_JP: GPT-4o Transcribe (高品質)
+      - value: gpt-4o-mini-transcribe
+        label:
+          en_US: GPT-4o Mini Transcribe (Faster)
+          zh_Hans: GPT-4o Mini Transcribe (更快)
+          pt_BR: GPT-4o Mini Transcribe (Mais Rápido)
+          ja_JP: GPT-4o Mini Transcribe (高速)
+      - value: whisper-1
+        label:
+          en_US: Whisper-1 (Legacy, More Formats)
+          zh_Hans: Whisper-1 (旧版，更多格式)
+          ja_JP: Whisper-1 (レガシー、複数フォーマット対応)
+          pt_BR: Whisper-1 (Legado, Mais Formatos)
+    default: gpt-4o-transcribe
+    human_description:
+      en_US: Select the model to use. Note that translations only support whisper-1.
+      zh_Hans: 选择要使用的模型。请注意，翻译功能仅支持 whisper-1。
+      pt_BR: Selecione o modelo a ser usado. Note que traduções só suportam whisper-1.
+      ja_JP: 使用するモデルを選択します。翻訳機能はwhisper-1モデルのみをサポートしていることに注意してください。
+    llm_description: Select the model to use for transcription or translation. GPT-4o models provide higher quality but translations only support whisper-1.
+  
+  - name: response_format
+    type: select
+    required: false
+    form: form
+    label:
+      en_US: Response Format
+      zh_Hans: 响应格式
+      pt_BR: Formato de Resposta
+      ja_JP: レスポンスフォーマット
+    options:
+      - value: text
+        label:
+          en_US: Text
+          zh_Hans: 文本
+          ja_JP: テキスト
+          pt_BR: Texto
+      - value: json
+        label:
+          en_US: JSON
+          zh_Hans: JSON
+          pt_BR: JSON
+          ja_JP: JSON
+      - value: verbose_json
+        label:
+          en_US: Verbose JSON (Whisper-1 only)
+          zh_Hans: 详细 JSON (仅 Whisper-1)
+          pt_BR: JSON Detalhado (Apenas Whisper-1)
+          ja_JP: 詳細JSON (Whisper-1のみ)
+      - value: srt
+        label:
+          en_US: SRT Subtitles (Whisper-1 only)
+          zh_Hans: SRT 字幕 (仅 Whisper-1)
+          pt_BR: Legendas SRT (Apenas Whisper-1)
+          ja_JP: SRT字幕 (Whisper-1のみ)
+      - value: vtt
+        label:
+          en_US: VTT Subtitles (Whisper-1 only)
+          zh_Hans: VTT 字幕 (仅 Whisper-1)
+          pt_BR: Legendas VTT (Apenas Whisper-1)
+          ja_JP: VTT字幕 (Whisper-1のみ)
+    default: text
+    human_description:
+      en_US: The format of the transcript output. Note that some formats are only available with whisper-1.
+      zh_Hans: 转录输出的格式。请注意，某些格式仅适用于 whisper-1。
+      pt_BR: O formato da saída da transcrição. Note que alguns formatos só estão disponíveis com whisper-1.
+      ja_JP: 文字起こし出力のフォーマット。一部のフォーマットはWhisper-1モデルでのみ利用可能です。
+    llm_description: The format of the transcript output. verbose_json, srt, and vtt formats are only available with the whisper-1 model.
+  
+  - name: prompt
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: Prompt
+      zh_Hans: 提示词
+      pt_BR: Prompt
+      ja_JP: プロンプト
+    human_description:
+      en_US: Optional prompt to guide transcription. Can help with uncommon words, acronyms, or context.
+      zh_Hans: 可选的提示词，指导转录。有助于处理不常见的单词、缩写词或上下文。
+      pt_BR: Prompt opcional para guiar a transcrição. Pode ajudar com palavras incomuns, siglas ou contexto.
+    llm_description: Optional prompt to guide the model's transcription. This can help with uncommon words, acronyms, or providing context for better accuracy.
+  
+  - name: language
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: Language Code
+      zh_Hans: 语言代码
+      pt_BR: Código de Idioma
+      ja_JP: 言語コード
+    human_description:
+      en_US: ISO-639-1 language code (e.g. 'en', 'zh', 'ja'). Helps improve accuracy if audio language is known.
+      zh_Hans: ISO-639-1 语言代码（例如 'en'、'zh'、'ja'）。如果知道音频语言，有助于提高准确性。
+      pt_BR: Código de idioma ISO-639-1 (ex. 'en', 'pt', 'es'). Ajuda a melhorar a precisão se o idioma do áudio for conhecido.
+      ja_JP: ISO-639-1言語コード（例：'en'、'zh'、'ja'）。音声の言語が分かっている場合、精度を向上させるのに役立ちます。
+    llm_description: ISO-639-1 language code of the input audio. Supplying the input language will improve accuracy if the audio language is known.
+  
+  - name: timestamp_granularities
+    type: select
+    required: false
+    form: form
+    label:
+      en_US: Timestamp Granularities (Whisper-1 only)
+      zh_Hans: 时间戳粒度 (仅 Whisper-1)
+      pt_BR: Granularidade de Timestamp (Apenas Whisper-1)
+      ja_JP: タイムスタンプ粒度 (Whisper-1のみ)
+    options:
+      - value: none
+        label:
+          en_US: None
+          zh_Hans: 无
+          pt_BR: Nenhum
+          ja_JP: なし
+      - value: segment
+        label:
+          en_US: Segment
+          zh_Hans: 段落
+          pt_BR: Segmento
+          ja_JP: セグメント
+      - value: word
+        label:
+          en_US: Word
+          zh_Hans: 单词
+          pt_BR: Palavra
+          ja_JP: 単語
+      - value: segment_and_word
+        label:
+          en_US: Segment and Word
+          zh_Hans: 段落和单词
+          pt_BR: Segmento e Palavra
+          ja_JP: セグメントと単語
+    default: none
+    human_description:
+      en_US: Add timestamps to transcript. Only available with whisper-1 and verbose_json response format.
+      zh_Hans: 向转录添加时间戳。仅适用于 whisper-1 和 verbose_json 响应格式。
+      pt_BR: Adicionar marcações de tempo à transcrição. Disponível apenas com whisper-1 e formato de resposta verbose_json.
+      ja_JP: 文字起こしにタイムスタンプを追加します。Whisper-1モデルとverbose_jsonレスポンスフォーマットでのみ利用可能です。
+    llm_description: Add timestamps to the transcript at segment or word level. This is only available with the whisper-1 model and requires verbose_json response format.
+  
+  - name: stream
+    type: boolean
+    required: false
+    form: form
+    label:
+      en_US: Stream Output (GPT-4o models only)
+      zh_Hans: 流式输出 (仅 GPT-4o 模型)
+      pt_BR: Saída em Stream (Apenas modelos GPT-4o)
+      ja_JP: ストリーミング出力 (GPT-4oモデルのみ)
+    human_description:
+      en_US: Stream transcription results as they're generated. Only available with gpt-4o models.
+      zh_Hans: 在生成结果时流式输出转录内容。仅适用于 gpt-4o 模型。
+      pt_BR: Transmitir resultados da transcrição à medida que são gerados. Disponível apenas com modelos gpt-4o.
+      ja_JP: 生成されると同時に文字起こし結果をストリーミングします。GPT-4oモデルでのみ利用可能です。
+    llm_description: Stream transcription results as they're generated. This feature is only available with gpt-4o-transcribe and gpt-4o-mini-transcribe models.
+    default: true
+  
+  - name: output_format
+    type: select
+    required: false
+    form: form
+    label:
+      en_US: Output Format
+      zh_Hans: 输出格式
+      pt_BR: Formato de Saída
+      ja_JP: 出力形式
+    options:
+      - value: default
+        label:
+          en_US: Default (JSON + Text)
+          zh_Hans: 默认 (JSON + 文本)
+          pt_BR: Padrão (JSON + Texto)
+          ja_JP: デフォルト (JSON + テキスト)
+      - value: json_only
+        label:
+          en_US: JSON Only
+          zh_Hans: 仅 JSON
+          pt_BR: Apenas JSON
+          ja_JP: JSONのみ
+      - value: text_only
+        label:
+          en_US: Text Only
+          zh_Hans: 仅文本
+          pt_BR: Apenas Texto
+          ja_JP: テキストのみ
+    default: default
+    human_description:
+      en_US: Choose how the plugin should format its output in Dify. Default returns both JSON and text, while the other options return only one format.
+      zh_Hans: 选择插件在 Dify 中的输出格式。默认返回 JSON 和文本，而其他选项只能返回一种格式。
+      pt_BR: Escolha como o plug-in deve formatar sua saída no Dify. O padrão retorna ambos JSON e texto, enquanto as outras op es retornam apenas um formato.
+    llm_description: Choose how the plugin should format its output in Dify. Default returns both JSON and text, while the other options return only one format.
+extra:
+  python:
+    source: tools/openai_audio.py

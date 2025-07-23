@@ -1,0 +1,94 @@
+identity:
+  name: txt2img
+  author: fotor
+  label:
+    en_US: Text to Image
+    zh_Hans: 文生图
+
+description:
+  human:
+    en_US: Call the Text to Image API to generate image
+    zh_Hans: 调用文生图的API接口生成图片
+  llm: Call the Text to Image API to generate image
+
+parameters:
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: Prompt
+      zh_Hans: 提示词
+    human_description:
+      en_US: Positive prompt
+      zh_Hans: 正面提示词
+    llm_description: Image prompt, you should describe the image you want to generate as a list of words as possible as detailed, the prompt must be written in English.
+    form: llm
+
+  - name: sizeId
+    type: select
+    required: true
+    label:
+      en_US: Aspect Ratio
+      zh_Hans: 图片宽高比
+    human_description:
+      en_US: The aspect ratio of the generated image
+      zh_Hans: 生成的图片的宽高比
+    llm_description: Aspect Ratio, used to describes the proportional relationship between the width and height of an image. Aspect ratio can only be one of the following, 1:1, 4:3, 3:4, 16:9, 9:16.
+    form: form
+    options:
+      - label:
+          en_US: "1:1"
+          zh_Hans: "1:1"
+        value: "1:1"
+      - label:
+          en_US: "4:3"
+          zh_Hans: "4:3"
+        value: "4:3"
+      - label:
+          en_US: "3:4"
+          zh_Hans: "3:4"
+        value: "3:4"
+      - label:
+          en_US: "16:9"
+          zh_Hans: "16:9"
+        value: "16:9"
+      - label:
+          en_US: "9:16"
+          zh_Hans: "9:16"
+        value: "9:16"
+    default: "1:1"
+
+  - name: templateId
+    type: string
+    required: true
+    label:
+      en_US: Style ID
+      zh_Hans: 风格ID
+    human_description:
+      en_US: Style ID provided by Fotor AI,https://docs.fotor.com/reference/text2img/styles/
+      zh_Hans: Fotor AI 提供的风格ID，https://docs.fotor.com/reference/text2img/styles/
+    llm_description: Style ID, which is the ID of the image style used to specify the style of the generated image.
+    form: form
+
+  - name: negativePrompt
+    type: string
+    required: false
+    label:
+      en_US: Negative Prompt
+      zh_Hans: 负面提示词
+    human_description:
+      en_US: Negative Prompt
+      zh_Hans: 负面提示词
+    llm_description: Negative prompt, you should describe the image you don't want to generate as a list of words as possible as detailed, the prompt must be written in English.
+    form: form
+    default: ""
+
+output_schema:
+  type: object
+  properties:
+    result_url:
+      type: string
+
+extra:
+  python:
+    source: tools/txt2img.py

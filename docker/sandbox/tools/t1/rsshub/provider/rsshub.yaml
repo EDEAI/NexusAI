@@ -1,0 +1,22 @@
+identity:
+  author: stvlynn
+  name: rsshub
+  label:
+    en_US: RSSHub
+    zh_Hans: RSSHub订阅
+    ja_JP: RSSHub
+  description:
+    en_US: Get RSS feeds from RSSHub
+    zh_Hans: 获取RSSHub的RSS订阅源
+    ja_JP: RSSHubからRSSフィードを取得
+  icon: icon.svg
+tools:
+  - tools/custom_route.yaml
+  - tools/twitter.yaml
+  - tools/linkedin.yaml
+  - tools/threads.yaml
+  - tools/discord.yaml
+  - tools/google_news.yaml
+extra:
+  python:
+    source: provider/rsshub.py

@@ -1,0 +1,31 @@
+credentials_for_provider:
+  perplexity_api_key:
+    help:
+      en_US: Get your Perplexity API key from Perplexity
+      zh_Hans: 从 Perplexity 获取您的 Perplexity API key
+    label:
+      en_US: Perplexity API key
+      zh_Hans: Perplexity API key
+    placeholder:
+      en_US: Please input your Perplexity API key
+      zh_Hans: 请输入你的 Perplexity API key
+    required: true
+    type: secret-input
+    url: https://www.perplexity.ai/settings/api
+extra:
+  python:
+    source: provider/perplexity.py
+identity:
+  author: langgenius
+  description:
+    en_US: Perplexity.AI
+    zh_Hans: Perplexity.AI
+  icon: icon.svg
+  label:
+    en_US: Perplexity
+    zh_Hans: Perplexity
+  name: perplexity
+  tags:
+  - search
+tools:
+- tools/perplexity_search.yaml

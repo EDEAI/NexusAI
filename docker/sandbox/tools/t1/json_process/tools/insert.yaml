@@ -1,0 +1,104 @@
+description:
+  human:
+    en_US: A tool for inserting JSON content
+    pt_BR: A tool for inserting JSON content
+    zh_Hans: 一个插入 JSON 内容的工具
+  llm: A tool for inserting JSON content
+extra:
+  python:
+    source: tools/insert.py
+identity:
+  author: Mingwei_Zhang
+  label:
+    en_US: JSON Insert
+    pt_BR: JSON Insert
+    zh_Hans: JSON 插入
+  name: json_insert
+parameters:
+- form: llm
+  human_description:
+    en_US: JSON content
+    pt_BR: JSON content
+    zh_Hans: JSON 内容
+  label:
+    en_US: JSON content
+    pt_BR: JSON content
+    zh_Hans: JSON 内容
+  llm_description: JSON content to be processed
+  name: content
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Object to insert
+    pt_BR: Object to insert
+    zh_Hans: 待插入的对象
+  label:
+    en_US: Query
+    pt_BR: Query
+    zh_Hans: 查询
+  llm_description: JSONPath query to locate the element to insert
+  name: query
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: New Value
+    pt_BR: New Value
+    zh_Hans: 插入的新值
+  label:
+    en_US: New Value
+    pt_BR: New Value
+    zh_Hans: 新值
+  llm_description: New Value to insert
+  name: new_value
+  required: true
+  type: string
+- default: false
+  form: form
+  human_description:
+    en_US: Whether to decode the value to a JSON object
+    pt_BR: Whether to decode the value to a JSON object
+    zh_Hans: 是否将值解码为 JSON 对象
+  label:
+    en_US: Decode Value
+    pt_BR: Decode Value
+    zh_Hans: 解码值
+  name: value_decode
+  type: boolean
+- default: 'False'
+  form: form
+  human_description:
+    en_US: Whether to create a path when the path does not exist
+    pt_BR: Whether to create a path when the path does not exist
+    zh_Hans: 查询路径不存在时是否创建路径
+  label:
+    en_US: Whether to create a path
+    pt_BR: Whether to create a path
+    zh_Hans: 是否创建路径
+  name: create_path
+  options:
+  - label:
+      en_US: 'Yes'
+      pt_BR: 'Yes'
+      zh_Hans: 是
+    value: 'True'
+  - label:
+      en_US: 'No'
+      pt_BR: 'No'
+      zh_Hans: 否
+    value: 'False'
+  required: true
+  type: select
+- default: true
+  form: form
+  human_description:
+    en_US: Ensure the JSON output is ASCII encoded
+    pt_BR: Ensure the JSON output is ASCII encoded
+    zh_Hans: 确保输出的 JSON 是 ASCII 编码
+  label:
+    en_US: Ensure ASCII
+    pt_BR: Ensure ASCII
+    zh_Hans: 确保 ASCII
+  name: ensure_ascii
+  type: boolean
