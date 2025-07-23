@@ -265,10 +265,10 @@ export const validateSkillData = (skillData: SkillData): ValidationResult => {
     allErrors.push(...outputResult.errors);
 
     // Validate code
-    if (skillData.code) {
-        const codeResult = validateCode(skillData.code);
-        allErrors.push(...codeResult.errors);
-    }
+    // if (skillData.code) {
+    //     const codeResult = validateCode(skillData.code);
+    //     allErrors.push(...codeResult.errors);
+    // }
 
     return {
         isValid: allErrors.length === 0,

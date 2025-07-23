@@ -38,11 +38,15 @@ const BugFix = memo(({ open, onCancel, skillData }: BugFixProps) => {
         const variable = _.cloneDeep(skillData?.input_variables || {});
         Object.entries(val).forEach(([key, val]) => {
             if (variable?.properties?.hasOwnProperty?.(key)) {
-                variable.properties[key].value = val;
+                if (variable.properties[key].type === 'file') {
+                    variable.properties[key].value = val[0]?.response?.data?.file_id;
+                } else {
+                    variable.properties[key].value = val;
+                }
             }
         });
         console.log(variable);
-
+        
         const debugData = {
             ...skillData,
             code: JSON.stringify(skillData?.code || {}),
