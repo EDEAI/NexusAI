@@ -754,7 +754,7 @@ def task_delay_thread():
                     # Execute the node asynchronously using Celery
                     if not (target_node.data['type'] == 'human' and human_node_run_status != 3):
                         create_celery_task(team_id, app_id, run['app_name'], run['icon'], run['icon_background'], workflow_id, app_user_id, user_id, app_run_id, run_type, run['run_name'],
-                            exec_id, edge, target_node, task_level, task_data, task_operation, parent_exec_id, context, ancestor_context, correct_llm_output)
+                            exec_id, edge, target_node, task_level, task_data, task_operation, parent_exec_id, context, ancestor_context, correct_llm_output, override_rag_input)
 
                         if not (correct_llm_output or target_node.data['type'] == 'end' or (task_operation == 'assign_task' and task_level > 0)):
                             # Push a workflow debug message to the WebSocket message queue
