@@ -907,7 +907,12 @@ class DatasetRetrieval:
                     retrieval_result.extend(result)
                     for document_segment in result:
                         index_id = str(document_segment.metadata['index_id'])
-                        segment = document_segments.get_segment_by_index_id(index_id)
+                        try:
+                            segment = document_segments.get_segment_by_index_id(index_id)
+                        except AssertionError:
+                            logger.warning(f'Segment {index_id} not found! Deleting from vector database...')
+                            vdb.delete([index_id])
+                            continue
                         document = documents.get_document_by_id(segment['document_id'])
                         document_segments.increment_hit_count(segment['id'])
                         document_segment_rag_records.insert(
@@ -1023,7 +1028,12 @@ class DatasetRetrieval:
                     )
                     for document_segment in overall_result:
                         index_id = str(document_segment.metadata['index_id'])
-                        segment = document_segments.get_segment_by_index_id(index_id)
+                        try:
+                            segment = document_segments.get_segment_by_index_id(index_id)
+                        except AssertionError:
+                            logger.warning(f'Segment {index_id} not found! Deleting from vector database...')
+                            vdb.delete([index_id])
+                            continue
                         document = documents.get_document_by_id(segment['document_id'])
                         dataset = datasets.get_dataset_by_id(document['dataset_id'])
                         retrieval_result.setdefault(document['dataset_id'], []).append(document_segment)

@@ -105,7 +105,8 @@ def create_celery_task(
     parent_exec_id: int = 0,
     context: Optional[Context] = None,
     ancestor_context: Optional[Context] = None,
-    correct_llm_output: bool = False
+    correct_llm_output: bool = False,
+    override_rag_input: Optional[str] = None
 ):
     """
     Creates a Celery task to execute a node asynchronously.
@@ -129,6 +130,7 @@ def create_celery_task(
     :param context: The context object.
     :param ancestor_context: The ancestor context object.
     :param correct_llm_output: Flag to indicate if correct LLM output is found.
+    :param override_rag_input: The input to override the RAG input.
     """
     level = edge.level if edge else 0
     # Execute the node asynchronously using Celery
@@ -146,7 +148,8 @@ def create_celery_task(
         level=level,
         task_level=task_level,
         task=task_data,
-        correct_llm_output=correct_llm_output
+        correct_llm_output=correct_llm_output,
+        override_rag_input=override_rag_input
     )
     # Add task to global tasks list
     global_tasks.append((task, team_id, app_user_id, app_name, icon, icon_background, app_run_id, run_name, level, edge if edge else None, node, context if context else None, exec_id, task_operation, parent_exec_id))
@@ -603,6 +606,7 @@ def task_delay_thread():
                     task_data = None # task data
                     task_operation = '' # task operation
                     parent_exec_id = 0 # parent node execution ID
+                    override_rag_input = None # override RAG input
 
                     source_node_execution = app_node_exec.get_node_successful_execution(app_run_id, edge.source_node_id)
                     if not source_node_execution: # Check if the source node execution record exists
@@ -646,6 +650,8 @@ def task_delay_thread():
                             parent_output = create_variable_from_dict(task_condition['parent_output'])
                             task_data = json.loads(parent_output.properties['task'].value)
                             parent_exec_id = task_condition['first_execution_id']
+                            current_task_dict = task_data['current']
+                            override_rag_input = current_task_dict['keywords'] if current_task_dict['keywords'] else current_task_dict['task']
                     else:
                         target_node = graph.nodes.get_node(edge.target_node_id)
 
@@ -748,7 +754,7 @@ def task_delay_thread():
                     # Execute the node asynchronously using Celery
                     if not (target_node.data['type'] == 'human' and human_node_run_status != 3):
                         create_celery_task(team_id, app_id, run['app_name'], run['icon'], run['icon_background'], workflow_id, app_user_id, user_id, app_run_id, run_type, run['run_name'],
-                            exec_id, edge, target_node, task_level, task_data, task_operation, parent_exec_id, context, ancestor_context, correct_llm_output)
+                            exec_id, edge, target_node, task_level, task_data, task_operation, parent_exec_id, context, ancestor_context, correct_llm_output, override_rag_input)
 
                         if not (correct_llm_output or target_node.data['type'] == 'end' or (task_operation == 'assign_task' and task_level > 0)):
                             # Push a workflow debug message to the WebSocket message queue
