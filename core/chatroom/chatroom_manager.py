@@ -388,8 +388,7 @@ class ChatroomManager:
                                         {'chat_status': 0}
                                     )
                                     await self._ws_manager.send_instruction(chatroom_id, 'STOPPABLE', False)
-                                    chatroom = self._chatrooms[chatroom_id]
-                                    if chatroom.mcp_tool_is_using:
+                                    if (chatroom := self._chatrooms.get(chatroom_id)) and chatroom.mcp_tool_is_using:
                                         await chatroom.stop_all_mcp_tool_uses('Stopped by user')
                                 case _:
                                     raise Exception(f'Unknown command: {cmd}')
