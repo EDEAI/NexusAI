@@ -8,7 +8,7 @@ from core.database.models.workflows import Workflows
 from core.database.models import (
     Models,
     ModelConfigurations,
-
+    Teams
 )
 from config import *
 from log import Logger
@@ -262,7 +262,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     team_id = userinfo.team_id
     uid = userinfo.uid
-    team_type = Users().get_team_type_by_id(team_id)
+    team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
         return response_error(get_language_content("the_current_user_does_not_have_permission"))
     if avatar and avatar.startswith('upload_files/'):
@@ -386,7 +386,7 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
     icon_background = data['icon_background']
 
     team_id = userinfo['team_id']
-    team_type = Users().get_team_type_by_id(team_id)
+    team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
         return response_error(get_language_content("the_current_user_does_not_have_permission"))
 
