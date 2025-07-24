@@ -17,6 +17,10 @@ language_packs = {
         "agent_run_type_2": "Workflow: {app_name} Invocation",
         "agent_run_type_3": "Round Table: {app_name} Invocation",
         "agent_run_type_4": "Round Table: {app_name} Orientation",
+        # Virtual environment check messages
+        "venv_exists_true": "Virtual environment exists in cache",
+        "venv_exists_false": "Virtual environment does not exist in cache",
+        "venv_check_failed": "Failed to check virtual environment",
         "requirement_category": {
             "system": """
                 You are a content categorization assistant.
@@ -1124,6 +1128,11 @@ language_packs = {
         "agent_run_type_2": "工作流：{app_name} 调用",
         "agent_run_type_3": "圆桌：{app_name} 调用",
         "agent_run_type_4": "圆桌：{app_name} 导向执行",
+        
+        # Virtual environment check messages
+        "venv_exists_true": "虚拟环境已存在于缓存中",
+        "venv_exists_false": "虚拟环境在缓存中不存在",
+        "venv_check_failed": "检查虚拟环境失败",
 
         "recursive_task_root_task": "根任务",
         "recursive_task_sub_task": "子任务",

@@ -308,7 +308,7 @@ run_tool()
                 else:
                     raise Exception(response['data']['stderr'])
             else:
-                raise Exception(response['msg'])
+                raise Exception(response['data']['stderr'])
         else:
             raise Exception(response['detail'])
 
