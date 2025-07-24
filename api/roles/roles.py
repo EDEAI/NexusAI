@@ -27,8 +27,9 @@ async def roles_list(page: int = 1, page_size: int = 10, name: str = "", userinf
     Raises:
         HTTPException: When query execution fails.
     """
+    team_id = userinfo.team_id
     roles = Roles()
-    result = roles.get_roles_list(page, page_size, name)
+    result = roles.get_roles_list(page, page_size, name, team_id)
     return response_success(result)
 
 
@@ -47,7 +48,8 @@ async def permission_list(page: int = 1, page_size: int = 10, name: str = "", us
         HTTPException: When query execution fails.
     """
     permission = Permission()
-    result = permission.get_permission_list(page, page_size, name)
+    uid = userinfo.uid
+    result = permission.get_permission_list(page, page_size, uid, name)
     return response_success(result)
 
 
@@ -62,6 +64,7 @@ async def create_role(role_request: CreateRoleSchema, userinfo: TokenData = Depe
         Dict with result info, including the new role_id.
     """
     data = role_request.dict(exclude_unset=True)
+    team_id = userinfo.team_id
     perm_model = Permission()
     if not data['list'] or not perm_model.check_permissions_exist(data['list']):
         return response_error(get_language_content("Permission_does_not_exist"))
@@ -69,6 +72,7 @@ async def create_role(role_request: CreateRoleSchema, userinfo: TokenData = Depe
     roles = Roles()
     role_id = roles.insert({
         "name": data['name'],
+        "team_id": team_id,
         "description": data['description'],
         "created_at": datetime.now()
     })
