@@ -55,6 +55,7 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
             [{'column': 'id', 'value': user['id']}],
             user_update_data
         )
+        user['team_id'] = user_info['team_id']
     # Check if a valid token already exists in Redis
     redis_key = f"access_token:{user['id']}"
     existing_token = redis.get(redis_key)
@@ -63,7 +64,7 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
         access_token = existing_token.decode('utf-8')
     else:
         access_token = create_access_token(
-            data={"uid": user["id"], "team_id": user_info["team_id"], "nickname": user["nickname"], "phone": user["phone"],
+            data={"uid": user["id"], "team_id": user["team_id"], "nickname": user["nickname"], "phone": user["phone"],
                   "email": user["email"],"inviter_id": user["inviter_id"],"role": user["role"]}
         )
         # Store token in Redis
