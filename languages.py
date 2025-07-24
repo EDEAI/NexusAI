@@ -1117,7 +1117,15 @@ language_packs = {
 
         'Permission_does_not_exist': 'Permission does not exist',
         'role_delete_success': 'Role delete success',
-        'role_id_is_required': 'Role ID is required'
+        'role_id_is_required': 'Role ID is required',
+        'user_does_not_belong_to_this_team': 'User does not belong to this team.',
+        'the_current_user_does_not_have_permission': 'The current user does not have permission',
+        'comprehensive_administrator': 'Comprehensive administrator',
+        'agent_administrator': 'Agent administrator',
+        'workflow_administrator': 'Workflow administrator',
+        'skill_administrator': 'Skill administrator',
+        'roundtable_administrator': 'Roundtable administrator',
+        'knowledge_base_administrator': 'Knowledge_base administrator'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1448,7 +1456,15 @@ language_packs = {
 
         'Permission_does_not_exist': '权限不存在',
         'role_delete_success': '角色删除成功',
-        'role_id_is_required': '角色ID不能为空'
+        'role_id_is_required': '角色ID不能为空',
+        'user_does_not_belong_to_this_team': '用户不属于该团队，无法进行切换',
+        'the_current_user_does_not_have_permission': '当前用户暂无权限',
+        'comprehensive_administrator': '综合管理员',
+        'agent_administrator': '智能体管理员',
+        'workflow_administrator': '工作流管理员',
+        'skill_administrator': '技能管理员',
+        'roundtable_administrator': '圆桌管理员',
+        'knowledge_base_administrator': '知识库管理员'
     }
 }
 

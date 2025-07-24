@@ -46,6 +46,8 @@ from .mcp_servers import MCPServers
 from .roles import Roles
 from .permissions import Permission
 from .role_permission import RolePermission
+from .user_team_relations import UserTeamRelations
+
 
 
 __all__ = [
@@ -89,5 +91,6 @@ __all__ = [
     'MCPServers',
     'Roles',
     'Permission',
-    'RolePermission'
+    'RolePermission',
+    'UserTeamRelations'
 ]

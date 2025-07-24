@@ -24,8 +24,7 @@ class RolesListResponse(BaseModel):
 
 class PermissionInfo(BaseModel):
     id: int
-    title_cn: str
-    title_en: str
+    title: str
     status: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

@@ -13,6 +13,7 @@ class UserData(BaseModel):
     email: Optional[str] = None
     role: Optional[int] = None
     language: Optional[str] = None
+    team_type: Optional[int] = None
     
 class RegisterTeamData(BaseModel):
     team_id: Optional[int] = 1
@@ -47,7 +48,7 @@ class ResDictSchema(BaseModel):
     detail: str = 'OK'
     data: Dict[str, Any]
 class CreateDataEmailList(BaseModel):
-    role: int
+    role: str
     email_list: List[Any]
 # switch_the_language
 class SwitchLanguageSchema(BaseModel):
@@ -59,6 +60,8 @@ class ThirdPartyLoginData(BaseModel):
     openid: str
     nickname: Optional[str] = None
     avatar: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
     language: Optional[str] = 'en'
 
 class ThirdPartyUserData(BaseModel):
