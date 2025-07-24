@@ -164,12 +164,21 @@ class Users(MySQL):
                         'status':3
                     }
                 )
+
+                team_id = UserTeamRelations().select_one(columns=['team_id'], conditions=[{'column': 'user_id', 'value': existing_user['id']}])
+
                 UserTeamRelations().update(
                     [{'column': 'user_id', 'value': existing_user['id']}],
                     {
                         'user_id':user_id
                     }
                 )
+                
+                new_data['team_id'] =team_id['team_id']
+                new_data['role_id'] =1
+                new_data['role'] =2
+                new_data['inviter_id'] =0
+
                 self.update(
                     [{'column': 'id', 'value': user_id}],
                     new_data
@@ -189,6 +198,7 @@ class Users(MySQL):
             from datetime import datetime
             current_time = datetime.now()
             formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+            team_id = Teams().get_personal_workspace_team_id()
 
             update_data = {
                 'last_login_ip': last_login_ip,
@@ -206,15 +216,20 @@ class Users(MySQL):
                 update_data['email'] = email
             update_data['openid'] = openid
             update_data['platform'] = platform
+            update_data['team_id'] =team_id
+            update_data['role_id'] =1
+            update_data['role'] =2
+            update_data['inviter_id'] =0
             self.update(
                 [{'column': 'id', 'value': user_id}],
                 update_data
             )
 
-            team_id = Teams().get_personal_workspace_team_id()
+            
             user_team_data = {
                 'user_id':user_id,
                 'team_id':team_id,
+                'role_id':1,
                 'created_time': formatted_time
             }
             UserTeamRelations().insert(user_team_data)
@@ -228,6 +243,7 @@ class Users(MySQL):
             user_data = {
                 'team_id': 1,  # Third-party users are not associated with any team
                 'role': 2,     # Default role for third-party users
+                'role_id': 1,
                 'inviter_id': 0,
                 'nickname': nickname or f'{platform}_user',
                 'phone': phone,
@@ -249,6 +265,9 @@ class Users(MySQL):
             user_team_data = {
                 'user_id':user_id,
                 'team_id':team_id,
+                'role':2,
+                'role_id': 1,
+                'inviter_id': 0,
                 'created_time': formatted_time
             }
             UserTeamRelations().insert(user_team_data)

@@ -13,7 +13,7 @@ class UserTeamRelations(MySQL):
     """
     have_updated_time = False
 
-    def ensure_team_id_exists(self, team_id: int, email: str) -> None:
+    def ensure_team_id_exists(self, team_id: int, email: str, role: int, role_id: int) -> None:
         """
         Ensure the given team_id exists in the user_team_relations table. If not, insert it.
         :param team_id: The team ID to check/insert.
@@ -21,7 +21,7 @@ class UserTeamRelations(MySQL):
         """
         from core.database.models.users import Users
         current_time = datetime.now()
-        user_id = Users().select_one(columns=['id'], conditions=[{'column': 'email', 'value': email}, {'column': 'status', 'value': 1}])
+        user_id = Users().select_one(columns=['id','inviter_id'], conditions=[{'column': 'email', 'value': email}, {'column': 'status', 'value': 1}])
         if user_id:
             conditions = [
                 {"column": "team_id", "value": team_id},
@@ -32,6 +32,9 @@ class UserTeamRelations(MySQL):
                 data = {
                     "team_id": team_id,
                     "user_id": user_id['id'],
+                    "inviter_id": user_id['inviter_id'],
+                    "role": role,
+                    "role_id": role_id,
                     "created_time": current_time
                 }
                 self.insert(data)

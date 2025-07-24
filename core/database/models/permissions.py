@@ -1,6 +1,7 @@
 from typing import Dict, Any, List
 from core.database import MySQL
 import math
+from core.database.models.users import Users
 
 class Permission(MySQL):
     """
@@ -12,7 +13,7 @@ class Permission(MySQL):
     """
     have_updated_time = False
 
-    def get_permission_list(self, page: int = 1, page_size: int = 10, name: str = "") -> dict:
+    def get_permission_list(self, page: int = 1, page_size: int = 10, uid: int = 0, name: str = "") -> dict:
         """
         Retrieves a list of permissions with pagination and Chinese title filtering.
 
@@ -28,25 +29,39 @@ class Permission(MySQL):
             {"column": "status", "value": 1}  # Only query records with normal status
         ]
 
-        if name:
-            conditions.append({"column": "title_cn", "op": "like", "value": f"%{name}%"})
+        user_language = Users().get_user_language(uid)
+        if user_language == 'zh':
+            columns = [
+                "id",
+                "title_cn AS title",
+                "status",
+                "created_at",
+                "updated_at"
+            ]
+            if name:
+                conditions.append({"column": "title_cn", "op": "like", "value": f"%{name}%"})
+        else:
+            columns = [
+                "id",
+                "title_en AS title",
+                "status",
+                "created_at",
+                "updated_at"
+            ]
+            if name:
+                conditions.append({"column": "title_en", "op": "like", "value": f"%{name}%"})
+
+        
 
         # Get total count
         total_count = self.select_one(
             aggregates={"id": "count"},
             conditions=conditions
         )["count_id"]
-
+        
         # Get list data with time fields
         permission_list = self.select(
-            columns=[
-                "id",
-                "title_cn",
-                "title_en",
-                "status",
-                "created_at",
-                "updated_at"
-            ],
+            columns=columns,
             conditions=conditions,
             order_by="id DESC",
             limit=page_size,

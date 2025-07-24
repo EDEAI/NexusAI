@@ -48,7 +48,7 @@ class ResDictSchema(BaseModel):
     detail: str = 'OK'
     data: Dict[str, Any]
 class CreateDataEmailList(BaseModel):
-    role: int
+    role: str
     email_list: List[Any]
 # switch_the_language
 class SwitchLanguageSchema(BaseModel):

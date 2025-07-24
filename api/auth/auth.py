@@ -6,7 +6,8 @@ from fastapi import APIRouter,Request
 from core.database.models import (
     Users,
     Teams,
-    UserTeamRelations
+    UserTeamRelations,
+    Roles
 )
 from api.utils.auth import  is_valid_username, is_valid_email,authenticate_user,updata_login_ip,authenticate_third_party_user
 from api.utils.common import *
@@ -36,16 +37,19 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
             {"column": "status", "value": 1}
         ]
     )
-    if team_type !=1:
-        user['team_id'] = UserTeamRelations().select_one(
-            columns=["team_id"],
+    if team_type['type'] !=1:
+        user_info = UserTeamRelations().select_one(
+            columns="*",
             conditions=[
                 {"column": "user_id", "value": user['id']},
                 {"column": "team_id", "value": user['team_id'], "op": "!="}
             ]
-        )["team_id"]
+        )
         user_update_data = {
-            "team_id":user['team_id']
+            "team_id":user_info['team_id'], 
+            "role":user_info['role'], 
+            "inviter_id":user_info['inviter_id'], 
+            "role_id":user_info['role_id']
         }
         Users().update(
             [{'column': 'id', 'value': user['id']}],
@@ -59,7 +63,7 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
         access_token = existing_token.decode('utf-8')
     else:
         access_token = create_access_token(
-            data={"uid": user["id"], "team_id": user["team_id"], "nickname": user["nickname"], "phone": user["phone"],
+            data={"uid": user["id"], "team_id": user_info["team_id"], "nickname": user["nickname"], "phone": user["phone"],
                   "email": user["email"],"inviter_id": user["inviter_id"],"role": user["role"]}
         )
         # Store token in Redis
@@ -261,6 +265,12 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
     url_list = []
 
     role_id = invite_data.role
+    if role_id == 'admin_user':
+        role = 1
+        role_id = None
+    else:
+        role = 2
+        role_id = role_id
     email_list = invite_data.email_list
 
     if not email_list:
@@ -282,7 +292,7 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
                 url_list.append(
                     settings.WEB_URL + '/user/login?email=' + value['email']
                 )
-            UserTeamRelations().ensure_team_id_exists(userinfo.team_id, value['email'])
+            UserTeamRelations().ensure_team_id_exists(userinfo.team_id, value['email'], role, role_id)
             email_list_res.append(value['email'])
     # Remove identical elements from two lists
     common_elements = set(email_list_res) & set(email_list)
@@ -295,7 +305,8 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
                 'team_id': userinfo.team_id,
                 'inviter_id': userinfo.uid,
                 'nickname': '',
-                'role': role_id,
+                'role': role,
+                'role_id': role_id,
                 'phone': '',
                 'email': val,
                 'password': 'nexus_ai123456',
@@ -305,7 +316,7 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
         user_id = Users().insert(user_data)
         if not user_id:
             return response_error(get_language_content('lnvitation_failed'))
-        UserTeamRelations().ensure_team_id_exists(userinfo.team_id, val)
+        UserTeamRelations().ensure_team_id_exists(userinfo.team_id, val, role, role_id)
         url_list.append(
             settings.WEB_URL + '/user/register?email=' + val + '&team=' + team['name']
         )
@@ -317,6 +328,7 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
 async def invite_user(team_id: int = 1,userinfo: TokenData = Depends(get_current_user)):
     """
       team_id: int, team id.(Reserved fields may not be transmitted)
+      role: When role equals 1, use the frontend language pack; when role equals 2, use user_title.
     """
     team_member_list = []
     # user_info_list = Users().select(columns='*', conditions=[{'column': 'team_id', 'value': team_id},{'column': 'status', 'value': 1}])
@@ -327,7 +339,8 @@ async def invite_user(team_id: int = 1,userinfo: TokenData = Depends(get_current
             'users.id',
             'users.avatar',
             'users.nickname',
-            'users.role'
+            'users.role',
+            'users.role_id'
         ],
         conditions=[{'column': 'user_team_relations.team_id', 'value': team_id}],
         joins=[
@@ -342,6 +355,14 @@ async def invite_user(team_id: int = 1,userinfo: TokenData = Depends(get_current
     if user_info_list:
         now = datetime.now()
         for index, value in enumerate(user_info_list):
+            if value['role'] == 1:
+                user_title = '管理员'
+            else:
+                role_data = Roles().select_one(columns='*', conditions=[{'column': 'id', 'value': value['role_id']}])
+                if role_data['built_in'] == 1:
+                    user_title = get_language_content(role_data['name'])
+                else:
+                    user_title = role_data['name']
             if value['email']:
                 if value['last_login_time']:
                     delta = now - value['last_login_time']
@@ -374,6 +395,7 @@ async def invite_user(team_id: int = 1,userinfo: TokenData = Depends(get_current
                     'nickname': value['nickname'],
                     'email': value['email'],
                     'role': value['role'],
+                    'role_title': user_title,
                     'last_login_time': time_text
                 }
                 team_member_list.append(member_info)
@@ -434,7 +456,7 @@ async def switch_user_team(team_id: int, userinfo: TokenData = Depends(get_curre
     user_id = userinfo.uid
     # Check if the user belongs to the specified team
     relation = UserTeamRelations().select_one(
-        columns=["id"],
+        columns='*',
         conditions=[
             {"column": "user_id", "value": user_id},
             {"column": "team_id", "value": team_id}
@@ -444,7 +466,7 @@ async def switch_user_team(team_id: int, userinfo: TokenData = Depends(get_curre
         return response_error(get_language_content('user_does_not_belong_to_this_team'))
     Users().update(
         [{"column": "id", "value": user_id}],
-        {"team_id": team_id}
+        {"team_id": team_id, "role":relation['role'], "inviter_id":relation['inviter_id'], "role_id":relation['role_id']}
     )
     return response_success({"team_id": team_id})
 

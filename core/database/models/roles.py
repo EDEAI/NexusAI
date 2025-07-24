@@ -13,7 +13,7 @@ class Roles(MySQL):
     have_updated_time = False
     
 
-    def get_roles_list(self, page: int = 1, page_size: int = 10, name: str = "") -> dict:
+    def get_roles_list(self, page: int = 1, page_size: int = 10, name: str = "", team_id = int) -> dict:
         """
         Retrieves a list of roles with pagination and name filtering.
 
@@ -26,11 +26,13 @@ class Roles(MySQL):
             A dictionary containing the role list and pagination information
         """
         conditions = [
-            {"column": "status", "value": 1}  # Only query records with normal status
+            {"column": "status", "value": 1},  # Only query records with normal status
+            {"column": "team_id", "op": "in", "value": [team_id, 0]}
         ]
 
         if name:
             conditions.append({"column": "name", "op": "like", "value": f"%{name}%"})
+            conditions.append({"column": "built_in", "op": "!=", "value": 1})
 
         # Get total count
         total_count = self.select_one(
@@ -43,16 +45,22 @@ class Roles(MySQL):
             columns=[
                 "id",
                 "name",
+                "built_in",
                 "description",
                 "status",
                 "created_at",
                 "updated_at"
             ],
             conditions=conditions,
-            order_by="id DESC",
+            order_by="id ASC",
             limit=page_size,
             offset=(page - 1) * page_size
         )
+
+        from languages import get_language_content
+        for role in role_list:
+            if role.get('built_in') == 1:
+                role['name'] = get_language_content(role['name'])
 
         return {
             "list": role_list,
