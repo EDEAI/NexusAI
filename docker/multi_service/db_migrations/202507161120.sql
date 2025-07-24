@@ -61,12 +61,6 @@ INSERT INTO `permissions` (`title_cn`, `title_en`, `status`) VALUES
 ('创建知识库', 'Create Knowledge Base', 1);
 
 INSERT INTO `roles` (`team_id`, `built_in`, `name`, `description`, `status`) VALUES
--- ('综合管理员', 'Comprehensive administrator', 1),
--- ('智能体管理员', 'Agent administrator', 1),
--- ('工作流管理员', 'Workflow administrator', 1),
--- ('技能管理员', 'Skill administrator', 1),
--- ('圆桌管理员', 'Roundtable administrator', 1),
--- ('知识库管理员', 'Knowledge base administrator', 1);
 ('0','1','comprehensive_administrator', '', 1),
 ('0','1','agent_administrator', '', 1),
 ('0','1','workflow_administrator', '', 1),
@@ -123,9 +117,3 @@ WHERE team_id IS NOT NULL;
 UPDATE users
 SET role_id = 1
 WHERE role != 1;
-
-
--- INSERT INTO user_team_relations (user_id, team_id, role, role_id, inviter_id, created_time)
--- SELECT id, team_id, role, role_id, inviter_id, NOW()
--- FROM users
--- WHERE team_id IS NOT NULL;

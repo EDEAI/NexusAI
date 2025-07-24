@@ -174,11 +174,12 @@ class Users(MySQL):
                     }
                 )
                 
+                
                 new_data['team_id'] =team_id['team_id']
                 new_data['role_id'] =1
                 new_data['role'] =2
                 new_data['inviter_id'] =0
-
+                
                 self.update(
                     [{'column': 'id', 'value': user_id}],
                     new_data
