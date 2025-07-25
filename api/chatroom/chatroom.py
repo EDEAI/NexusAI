@@ -222,12 +222,14 @@ async def show_chatroom_details(chatroom_id: int, userinfo: TokenData = Depends(
             agent['type'] = 'my_agent'
         else:
             agent['type'] = 'more_agent'
-        agent['support_image'] = Models().select_one(
+        support_image = Models().select_one(
                 columns=["support_image"],
                 conditions=[
                     {"column": "id", "value": agent['model_config_id']}
                 ]
-            )['support_image']
+            )
+        if support_image:
+            agent['support_image'] = support_image['support_image']
     return response_success({
         'chat_info': chat_info,
         'agent_list': agent_list,
