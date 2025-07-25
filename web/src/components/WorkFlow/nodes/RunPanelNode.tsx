@@ -325,6 +325,11 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
         getArr('inputs').forEach(([key, val]) => {
             const name = key.split('.')[1];
             const item = inputs.find(x => x.name == name);
+            
+            let orVal=val
+            if(item?.type=='file'){
+                orVal=val[0]?.response?.data?.file_id
+            }
             const variable = new Variable(name, item?.type, val);
             input.addProperty(name, variable);
         });
@@ -359,7 +364,7 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
             node.outputs = output;
             return node;
         });
-
+        debugger
         const params = {
             node_id: selectNode?.currentId || selectNode.id,
             parent_node_id: selectNode?.currentId ? selectNode.id : null,
