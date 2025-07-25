@@ -126,13 +126,10 @@ class Roles(MySQL):
             columns=['name'],
             conditions=[
                 {"column": "id", "value": role_id},
-                {"column": "built_in", "value": 0},
+                {"column": "built_in", "value": 1},
                 {"column": "status", "value": 1}
             ]
         )
-        print('-------------------------------------------------------------------------------------------------------------------------------------')
-        print(role)
-        print('-------------------------------------------------------------------------------------------------------------------------------------')
         
         # If role not found or query returns None, return True (can be deleted)
         if not role:
