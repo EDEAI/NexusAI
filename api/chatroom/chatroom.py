@@ -71,7 +71,7 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
     is_temporary: int = chat_data.get('is_temporary', 0)
     mode: int = 5
 
-    team_id = userinfo['team_id']
+    team_id = userinfo.team_id
     team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
         return response_error(get_language_content("the_current_user_does_not_have_permission"))
@@ -351,7 +351,7 @@ async def update_chatroom(chatroom_id: int, chat_request: ReqChatroomUpdateSchem
             if missing_keys:
                 return response_error(get_language_content("chatroom_agent_item_missing_keys"))
 
-    team_id = userinfo['team_id']
+    team_id = userinfo.team_id
     team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
         return response_error(get_language_content("the_current_user_does_not_have_permission"))
