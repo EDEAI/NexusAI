@@ -8,7 +8,8 @@ from core.database.models.workflows import Workflows
 from core.database.models import (
     Models,
     ModelConfigurations,
-    Teams
+    Teams,
+    Roles
 )
 from config import *
 from log import Logger
@@ -19,6 +20,7 @@ from api.schema.apps import *
 from api.utils.jwt import *
 
 from languages import get_language_content
+from api.utils.auth import get_uid_user_info
 
 os.environ['DATABASE_AUTO_COMMIT'] = 'False'
 router = APIRouter()
@@ -265,6 +267,13 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
     team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
         return response_error(get_language_content("the_current_user_does_not_have_permission"))
+
+    user_info = get_uid_user_info(uid)
+    if user_info['role']!=1:
+        return_status = Roles().check_role_deletable(user_info['role_id'],mode)
+        if not return_status:
+            return response_error(get_language_content("the_current_user_does_not_have_permission"))
+
     if avatar and avatar.startswith('upload_files/'):
         avatar = avatar.split('upload_files/')[-1]
     if avatar and avatar.startswith(('http://', 'https://')):
@@ -389,6 +398,22 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
     team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
         return response_error(get_language_content("the_current_user_does_not_have_permission"))
+
+    user_info = get_uid_user_info(uid)
+    if user_info['role']!=1:
+        app_model = Apps()
+        appdata_mode = app_model.select_one(
+            columns=[
+                'mode'
+            ],
+            conditions=[
+
+                {"column": "id", "value": app_id},
+            ]
+        )
+        return_status = Roles().check_role_deletable(user_info['role_id'],appdata_mode['mode'])
+        if not return_status:
+            return response_error(get_language_content("the_current_user_does_not_have_permission"))
 
     if app_id <= 0:
         return response_error(get_language_content("app_id_is_required"))
