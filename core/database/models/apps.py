@@ -184,7 +184,7 @@ class Apps(MySQL):
         for info_item in info_workflow:
             if info_item['app_id'] in other_dict:
                 if info_item['avatar']:
-                    if 'head_icon' not in info_item['avatar']:
+                    if info_item['avatar'].find('head_icon') == -1:
                         info_item['avatar'] = f"{settings.STORAGE_URL}/upload/{info_item['avatar']}"
                 else:
                     if info_item['icon']:
