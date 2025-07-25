@@ -228,7 +228,7 @@ async def show_chatroom_details(chatroom_id: int, userinfo: TokenData = Depends(
                     {"column": "id", "value": agent['model_config_id']}
                 ]
             )
-        support_image = Models.select_one(
+        support_image = Models().select_one(
                 columns=["support_image"],
                 conditions=[
                     {"column": "id", "value": model_id['model_id']}
