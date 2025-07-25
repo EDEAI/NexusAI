@@ -84,7 +84,7 @@ def create_team(team_name, account, password):
             'password_salt': password_salt,
             'created_time': current_time,
             'status': 1,
-            'language': 'zh'
+            'language': 'en'
         }
         print(f"Creating user: {user_data}")
         user_id = Users().insert(user_data)
