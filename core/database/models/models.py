@@ -74,7 +74,7 @@ class Models(MySQL):
         assert model, get_language_content('api_vector_available_model')
         return model
 
-    def get_model_config_llm_list(self) -> list:
+    def get_model_config_llm_list(self,team_id: int) -> list:
         '''
         Find the list of LLM (type=1) model configurations,
         group by supplier and return supplier info with their model_list.
@@ -99,7 +99,7 @@ class Models(MySQL):
                         {'column': 'models.status', 'value': 1},
                         {'column': 'model_configurations.status', 'value': 1},
                         {'column': 'suppliers.status', 'value': 1},
-                        {'column': 'model_configurations.team_id', 'value': 1}
+                        {'column': 'model_configurations.team_id', 'value': team_id}
                         ],
             order_by="suppliers.id ASC, model_configurations.sort_order ASC"
         )
