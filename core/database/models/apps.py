@@ -184,13 +184,8 @@ class Apps(MySQL):
         for info_item in info_workflow:
             if info_item['app_id'] in other_dict:
                 if info_item['avatar']:
-                    if info_item['avatar'].startswith(('http://', 'https://')):
-                        info_item['avatar'] = info_item['avatar'].split('/upload/')[-1]
-
-                    if info_item['avatar'].startswith(('head_icon')):
-                        info_item['avatar'] = info_item['avatar'].split('/head_icon/')[-1]
-                        
-                    info_item['avatar'] = f"{settings.STORAGE_URL}/upload/{info_item['avatar']}"
+                    if not avatar.startswith(('http://', 'https://')):
+                        info_item['avatar'] = f"{settings.STORAGE_URL}/upload/{info_item['avatar']}"
                 else:
                     if info_item['icon']:
                         info_item['avatar'] = f"{settings.ICON_URL}/head_icon/{info_item['icon']}.png"
