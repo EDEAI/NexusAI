@@ -211,7 +211,8 @@ class Apps(MySQL):
         for app_item in info_app:
             if app_item['workflow_app_id'] in workflow_dict:
                 if app_item['avatar']:
-                    app_item['avatar'] = f"{settings.STORAGE_URL}/upload/{app_item['avatar']}"
+                    if app_item['avatar'].find('head_icon') == -1:
+                        app_item['avatar'] = f"{settings.STORAGE_URL}/upload/{app_item['avatar']}"
                 else:
                     if app_item['icon']:
                         app_item['avatar'] = f"{settings.ICON_URL}/head_icon/{app_item['icon']}.png"
@@ -222,7 +223,8 @@ class Apps(MySQL):
         for data_item in all_app:
             if data_item['avatar']:
                 # data_item['avatar'] = f"{os.getenv('STORAGE_URL', '')}/upload/{data_item['avatar']}"
-                data_item['avatar'] = f"{settings.STORAGE_URL}/upload/{data_item['avatar']}"
+                if data_item['avatar'].find('head_icon') == -1:
+                    data_item['avatar'] = f"{settings.STORAGE_URL}/upload/{data_item['avatar']}"
             else:
                 if data_item['icon']:
                     data_item['avatar'] = f"{settings.ICON_URL}/head_icon/{data_item['icon']}.png"
