@@ -330,7 +330,8 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
             if(item?.type=='file'){
                 orVal=val[0]?.response?.data?.file_id
             }
-            const variable = new Variable(name, item?.type, val);
+            
+            const variable = new Variable(name, item?.type, orVal);
             input.addProperty(name, variable);
         });
 
@@ -364,7 +365,7 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
             node.outputs = output;
             return node;
         });
-        debugger
+        
         const params = {
             node_id: selectNode?.currentId || selectNode.id,
             parent_node_id: selectNode?.currentId ? selectNode.id : null,
