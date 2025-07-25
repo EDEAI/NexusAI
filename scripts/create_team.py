@@ -79,6 +79,7 @@ def create_team(team_name, account, password):
             'role': 1,
             'inviter_id': 0,
             'email': account.strip(),
+            'nickname':'administrator',
             'password': password_with_salt,
             'password_salt': password_salt,
             'created_time': current_time,
