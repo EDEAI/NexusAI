@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional,Dict,Any,List
+from typing import Optional,Dict,Any,List,Union
 
 class Token(BaseModel):
     access_token: str
@@ -48,7 +48,7 @@ class ResDictSchema(BaseModel):
     detail: str = 'OK'
     data: Dict[str, Any]
 class CreateDataEmailList(BaseModel):
-    role: str
+    role: Union[str, int]
     email_list: List[Any]
 # switch_the_language
 class SwitchLanguageSchema(BaseModel):
