@@ -5,8 +5,10 @@ from api.utils.jwt import *
 from core.tool.provider.builtin_tool_provider import *
 from core.database.models.tool_authorizations import ToolAuthorizations
 from core.tool.provider.builtin_tool_provider import validate_credentials, BuiltinTool
+from core.workflow.nodes.base.sandbox_base import SandboxBaseNode
+from languages import get_language_content
 import math
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 router = APIRouter()
 
@@ -143,3 +145,37 @@ async def skill_delete(provider: str, userinfo: TokenData = Depends(get_current_
     except Exception as e:
         # Return error if an exception occurs.
         return response_error(str(e))
+
+
+# Endpoint to check if virtual environment exists for given pip packages
+@router.post("/check_venv_exists")
+async def check_venv_exists(
+    pip_packages: List[str] = Body(..., description="List of pip packages to check"),
+    use_type: str = Body(..., description="Type of use"),
+    userinfo: TokenData = Depends(get_current_user)
+):
+    """
+    Check if virtual environment exists in cache for given pip packages.
+    
+    Args:
+        pip_packages: List of pip packages to check
+        userinfo: Current user information
+        
+    Returns:
+        JSON response with exists status and message
+    """
+    try:
+        # Create sandbox base instance to access check_venv_exists method
+        sandbox_base = SandboxBaseNode(type=use_type, title="Virtual Environment Check")
+        
+        # Check if virtual environment exists
+        exists = sandbox_base.check_venv_exists(pip_packages)
+        
+        if exists:
+            return response_success({}, get_language_content("venv_exists_true"))
+        else:
+            return response_success({}, get_language_content("venv_exists_false"))
+            
+    except Exception as e:
+        print(f"Failed to check virtual environment: {e}")
+        return response_error(get_language_content("venv_check_failed"))
