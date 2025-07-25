@@ -1129,7 +1129,9 @@ language_packs = {
         'workflow_administrator': 'Workflow administrator',
         'skill_administrator': 'Skill administrator',
         'roundtable_administrator': 'Roundtable administrator',
-        'knowledge_base_administrator': 'Knowledge_base administrator'
+        'knowledge_base_administrator': 'Knowledge_base administrator',
+
+        'msg_preparing_environment': 'Need to initialize the runtime environment, please wait patiently'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1473,7 +1475,9 @@ language_packs = {
         'workflow_administrator': '工作流管理员',
         'skill_administrator': '技能管理员',
         'roundtable_administrator': '圆桌管理员',
-        'knowledge_base_administrator': '知识库管理员'
+        'knowledge_base_administrator': '知识库管理员',
+
+        'msg_preparing_environment': '需要初始化运行环境，请耐心等待'
     }
 }
 
