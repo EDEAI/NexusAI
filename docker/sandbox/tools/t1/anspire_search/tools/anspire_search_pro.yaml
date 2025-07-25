@@ -1,0 +1,92 @@
+identity:
+  name: anspire_search_pro
+  author: anspire
+  label:
+    en_US: anspire_search_pro
+    zh_Hans: 安思派联网搜索-PRO
+    pt_BR: anspire_search_pro
+description:
+  human:
+    en_US: The next generation of real-time intelligent search engine for AI provides multi-channel and full-network content in a user-friendly format for your applications.
+    zh_Hans: 安思派联网搜索插件面向AI的下一代实时智能搜索引擎，为您的应用提供格式友好的多渠道全网内容。
+    pt_BR: anspire net work search plugin
+  llm: anspire net work search plugin
+parameters:
+- name: query
+  type: string
+  required: true
+  label:
+    en_US: Search content
+    zh_Hans: 检索内容
+    pt_BR: Search content
+  human_description:
+    en_US: Search content
+    zh_Hans: 检索内容
+    pt_BR: Search content
+  llm_description: Search content
+  form: llm
+- name: top_k
+  type: number
+  required: false
+  default: 10
+  min: 10
+  max: 50
+  label:
+    en_US: Response number
+    zh_Hans: 结果条数控制
+    pt_BR: Response number
+  human_description:
+    en_US: Result number control
+    zh_Hans: 结果条数控制(示例值:10/20/30/40/50)
+    pt_BR: Result number control
+  llm_description: Result number control
+  form: llm
+- name: Insite
+  type: string
+  required: false
+  label:
+    en_US: Search the specified website
+    zh_Hans: 指定网站搜索
+    pt_BR: Search the specified website
+  human_description:
+    en_US: Search the specified website
+    zh_Hans: 指定网站搜索
+    pt_BR: Search the specified website
+  llm_description: Search the specified website
+  form: llm
+- name: FromTime
+  type: string
+  required: false
+  label:
+    en_US: Start time(eg:2025-01-01 00:00:00)
+    zh_Hans: 起始时间(示例值:2025-01-01 00:00:00)
+    pt_BR: Start time
+  human_description:
+    en_US: Start time(eg:2025-01-01 00:00:00)
+    zh_Hans: 起始时间(示例值:2025-01-01 00:00:00)
+    pt_BR: Start time
+  llm_description: Start time
+  form: llm
+- name: ToTime
+  type: string
+  required: false
+  label:
+    en_US: End time(eg:2025-01-01 00:00:00)
+    zh_Hans: 结束时间(示例值:2025-01-01 00:00:00)
+    pt_BR: End time
+  human_description:
+    en_US: End time(eg:2025-01-01 00:00:00)
+    zh_Hans: 结束时间(示例值:2025-01-01 00:00:00)
+    pt_BR: End time
+  llm_description: End time
+  form: llm
+output_schema:
+  type: object
+  properties:
+    anspire_search_result:
+      type: array
+      items:
+        type: object
+extra:
+  python:
+    source: tools/anspire_search_pro.py

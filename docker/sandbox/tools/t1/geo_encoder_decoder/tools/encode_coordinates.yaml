@@ -1,0 +1,38 @@
+identity:
+  name: encode-coordinates
+  author: ayush3941
+  label:
+    en_US: Encode Location to Coordinates
+    zh_Hans: 地址转坐标
+    pt_BR: Codificar Localização em Coordenadas
+  icon: "icon.png"
+  description:
+    en_US: Get the coordinates (latitude and longitude) for a location using the OpenCage API.
+    zh_Hans: 使用 OpenCage API 获取地址的坐标（纬度和经度）。
+    pt_BR: Obtenha as coordenadas (latitude e longitude) de um local usando a API OpenCage.
+
+description:
+  human:
+    en_US: Convert a location or place name into geographic coordinates
+    zh_Hans: 将地址或地点名称转换为地理坐标
+    pt_BR: Converta o nome de um local em coordenadas geográficas
+  llm: Convert a location name into latitude and longitude using forward geocoding
+
+parameters:
+  - name: location
+    type: string
+    required: true
+    label:
+      en_US: Location Name
+      zh_Hans: 地点名称
+      pt_BR: Nome da Localização
+    human_description:
+      en_US: The place or address you want to geocode (e.g. "Taj Mahal, India")
+      zh_Hans: 您想要进行地理编码的地点或地址（例如：“Taj Mahal, India”）
+      pt_BR: 'O local ou endereço que você deseja geocodificar (ex: "Taj Mahal, India")'
+    llm_description: A location or address to convert into coordinates
+    form: llm
+
+extra:
+  python:
+    source: tools/encode_coordinates.py

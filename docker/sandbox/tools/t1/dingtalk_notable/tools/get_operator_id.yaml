@@ -1,0 +1,37 @@
+description:
+  human:
+    en_US: Get the UNION ID of Operator, by user id or mobile, need permission： qyapi_get_member_by_mobile, qyapi_get_member
+    zh_Hans: 获取操作人UNION ID，通过钉钉ID或手机号获取，需要开权限：qyapi_get_member_by_mobile， qyapi_get_member
+  llm: A tool for getting the unionId of the operator. (获取操作人的unionId)
+extra:
+  python:
+    source: tools/get_operator_id.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: Get Operator UNION ID
+    zh_Hans: 获取操作人的UNION ID
+  name: get_operator_id
+parameters:
+- form: llm
+  human_description:
+    en_US: The user id of the operator
+    zh_Hans: 操作人的钉钉ID userId （钉钉ID和手机号二选一）
+  label:
+    en_US: user id 
+    zh_Hans: 钉钉userId
+  llm_description: 操作人的钉钉ID
+  name: user_id
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: The mobile of user, such as +86 13800138000
+    zh_Hans: 操作人的手机号 例如：+86 13800138000 （钉钉ID和手机号二选一）
+  label:
+    en_US: mobile 
+    zh_Hans: 钉钉手机号
+  llm_description: 操作人的手机号
+  name: mobile
+  required: false
+  type: string

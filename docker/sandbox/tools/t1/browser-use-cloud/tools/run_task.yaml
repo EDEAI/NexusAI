@@ -1,0 +1,50 @@
+identity:
+  name: run_task
+  author: lysonober
+  label:
+    en_US: "Run Task"
+    zh_Hans: "运行任务"
+    ja_JP: "タスクを実行"
+    pt_BR: "Executar Tarefa"
+description:
+  human:
+    en_US: "Create and run a new browser automation task by providing instructions in natural language."
+    zh_Hans: "通过提供自然语言指令来创建和运行新的浏览器自动化任务。"
+    ja_JP: "自然言語での指示を提供して、新しいブラウザ自動化タスクを作成して実行します。"
+    pt_BR: "Crie e execute uma nova tarefa de automação de navegador fornecendo instruções em linguagem natural."
+  llm: "This tool creates and runs a new browser automation task with Browser Use. It makes a POST request to the /api/v1/run-task endpoint with the task description and optional configuration. The task parameter should be a natural language instruction describing what the browser should do (e.g., 'Go to google.com and search for Browser Use'). You can optionally specify whether to save browser data (cookies, etc.) for future use. The response includes a task ID that can be used with other tools to track progress, get status updates, or retrieve media from the task."
+parameters:
+  - name: task
+    type: string
+    required: true
+    label:
+      en_US: "Task Description"
+      zh_Hans: "任务描述"
+      ja_JP: "タスクの説明"
+      pt_BR: "Descrição da Tarefa"
+    human_description:
+      en_US: "Describe what the browser should do in natural language (e.g., 'Go to google.com and search for Browser Use')."
+      zh_Hans: "用自然语言描述浏览器应该做什么（例如，'前往 google.com 并搜索 Browser Use'）。"
+      ja_JP: "ブラウザが何をすべきかを自然言語で説明します（例：'google.com にアクセスして Browser Use を検索する'）。"
+      pt_BR: "Descreva o que o navegador deve fazer em linguagem natural (por exemplo, 'Vá para google.com e pesquise por Browser Use')."
+    llm_description: "A natural language instruction describing what the browser should do. Be specific and clear about the websites to visit and actions to perform. For example: 'Go to google.com and search for Browser Use', or 'Log into twitter.com with username X and password Y, then post a tweet saying Hello World'."
+    form: llm
+  - name: save_browser_data
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: "Save Browser Data"
+      zh_Hans: "保存浏览器数据"
+      ja_JP: "ブラウザデータを保存"
+      pt_BR: "Salvar Dados do Navegador"
+    human_description:
+      en_US: "If enabled, browser cookies and other data will be saved (safely encrypted) for future tasks. For example, if you log into a website in one task, enabling this option allows future tasks to remain logged in without re-authentication."
+      zh_Hans: "如果启用，浏览器 cookies 和其他数据将被保存（安全加密）以供将来的任务使用。例如，如果您在一个任务中登录了某个网站，启用此选项可以让未来的任务保持登录状态，无需重新认证。"
+      ja_JP: "有効にすると、ブラウザのクッキーやその他のデータが将来のタスクのために（安全に暗号化されて）保存されます。例えば、あるタスクでウェブサイトにログインした場合、このオプションを有効にすると、将来のタスクで再認証なしでログイン状態を維持できます。"
+      pt_BR: "Se ativado, cookies do navegador e outros dados serão salvos (criptografados com segurança) para tarefas futuras. Por exemplo, se você fizer login em um site em uma tarefa, ativar esta opção permite que tarefas futuras permaneçam conectadas sem necessidade de reautenticação."
+    llm_description: "Boolean flag indicating whether to save browser cookies and other data. If set to true, the browser state (cookies, local storage, etc.) will be saved and can be reused in future tasks. This is useful for maintaining login sessions across multiple tasks. The data is safely encrypted before storing in the database."
+    form: form
+extra:
+  python:
+    source: tools/run_task.py

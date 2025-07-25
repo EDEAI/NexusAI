@@ -1,0 +1,48 @@
+description:
+  human:
+    en_US: Get All Fields in AI Table Sheet
+    zh_Hans: 获取AI表格数据表中的所有字段
+  llm: A tool for getting all fields in an AI Table sheet. (获取AI表格数据表中的所有字段)
+extra:
+  python:
+    source: tools/get_all_fields_ai.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: Get All Fields in AI Table Sheet
+    zh_Hans: 获取AI表格数据表中的所有字段
+  name: get_all_fields_ai
+parameters:
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID of the AI Table (baseId)
+    zh_Hans: AI表格的ID (baseId)
+  label:
+    en_US: Base ID
+    zh_Hans: AI表格ID
+  llm_description: AI表格的ID (baseId)
+  name: base_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID or name of the sheet
+    zh_Hans: 数据表ID或名称
+  label:
+    en_US: Sheet ID or Name
+    zh_Hans: 数据表ID或名称
+  llm_description: 数据表ID或名称
+  name: sheet_id_or_name
+  required: true
+  type: string 

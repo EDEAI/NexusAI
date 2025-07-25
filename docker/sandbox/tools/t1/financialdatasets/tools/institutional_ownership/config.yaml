@@ -1,0 +1,50 @@
+identity:
+  name: institutional_ownership
+  author: financialai
+  label:
+    en_US: Institutional Ownership
+    zh_Hans: 机构持股
+    ja_Jp: 機関投資家の保有率
+    pt_BR: Propriedade Institucional
+description:
+  human:
+    en_US: Get institutional ownership by investor or ticker. This quarterly data comes directly from Form 13F filings and includes tickers, share quantities, estimated holding prices, and market values.
+    zh_Hans: 通过投资者或股票获取机构持股。这些季度数据直接来自 13F 表格提交，并包括股票代码、股票数量、估计持有价格和市值。
+    ja_Jp: 投資家またはティッカーによる機関投資家の保有率を取得します。この四半期データは Form 13F 提出から直接取得され、ティッカー、株式数量、推定保有価格、時価総額が含まれています。
+    pt_BR: Obtenha a propriedade institucional por investidor ou ticker. Esses dados trimestrais vêm diretamente das declarações do Formulário 13F e incluem tickers, quantidades de ações, preços de manutenção estimados e valores de mercado.
+  llm: Get institutional ownership by investor or ticker. This quarterly data comes directly from Form 13F filings and includes tickers, share quantities, estimated holding prices, and market values.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol of the company you want to get institutional ownership for.
+      zh_Hans: 您想获取机构持股的公司的股票代码。
+      ja_Jp: 機関投資家の保有率を取得したい会社のティッカーシンボル。
+      pt_BR: O símbolo do ticker da empresa para a qual você deseja obter a propriedade institucional.
+    llm_description: The ticker symbol of the company you want to get institutional ownership for.
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    default: 1
+    label:
+      en_US: Limit
+      zh_Hans: 限制
+      ja_Jp: 制限
+      pt_BR: Limite
+    human_description:
+      en_US: "The maximum number of holdings to return (default: 10)."
+      zh_Hans: "要返回的持股数量的最大值（默认值：10）。"
+      ja_Jp: "返す保有数の最大数（デフォルト：10）。"
+      pt_BR: "O número máximo de participações a serem retornadas (padrão: 10)."
+    llm_description: "The maximum number of holdings to return (default: 10)."
+    form: llm
+extra:
+  python:
+    source: tools/institutional_ownership/invoke.py

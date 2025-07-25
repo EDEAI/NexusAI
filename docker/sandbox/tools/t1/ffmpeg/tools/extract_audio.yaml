@@ -1,0 +1,43 @@
+identity:
+  name: extract_audio
+  author: stvlynn
+  label:
+    en_US: Extract Audio
+    zh_Hans: 提取音频
+    pt_BR: Extrair Áudio
+description:
+  human:
+    en_US: Extract audio track from a video file
+    zh_Hans: 从视频文件中提取音频轨道
+    pt_BR: Extrair faixa de áudio de um arquivo de vídeo
+  llm: "Extracts the audio track from a video file and saves it as an audio file. Useful for getting just the sound from a video."
+parameters:
+  - name: video
+    type: file
+    required: true
+    label:
+      en_US: Video File
+      zh_Hans: 视频文件
+      pt_BR: Arquivo de Vídeo
+    human_description:
+      en_US: The video file to extract audio from
+      zh_Hans: 要从中提取音频的视频文件
+      pt_BR: O arquivo de vídeo para extrair o áudio
+    llm_description: "The video file to extract audio from"
+    form: llm
+  - name: audio_format
+    type: string
+    required: false
+    label:
+      en_US: Audio Format
+      zh_Hans: 音频格式
+      pt_BR: Formato de Áudio
+    human_description:
+      en_US: The format of the extracted audio (mp3, aac, wav, ogg, flac)
+      zh_Hans: 提取的音频格式（mp3、aac、wav、ogg、flac）
+      pt_BR: O formato do áudio extraído (mp3, aac, wav, ogg, flac)
+    llm_description: "The format to save the extracted audio in. Options are 'mp3', 'aac', 'wav', 'ogg', 'flac'. Default is 'mp3'."
+    form: llm
+extra:
+  python:
+    source: tools/extract_audio.py 

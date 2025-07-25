@@ -1,0 +1,3 @@
+dify_plugin~=0.0.1b72
+
+pillow~=11.1.0

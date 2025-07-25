@@ -1,0 +1,21 @@
+<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="160" height="160" rx="12" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
+
+  <!-- Markdown side (top) -->
+  <g>
+    <!-- Markdown "M" symbol -->
+    <text x="80" y="55" font-family="Monaco, 'Courier New', monospace" font-size="32" fill="#6f42c1" font-weight="bold" text-anchor="middle">M</text>
+  </g>
+
+  <!-- Arrow pointing down -->
+  <g transform="translate(75, 70)">
+    <path d="M5,0 L5,20 L2,17 M5,20 L8,17" stroke="#28a745" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- HTML side (bottom) -->
+  <g>
+    <!-- HTML angle brackets -->
+    <text x="80" y="125" font-family="Monaco, 'Courier New', monospace" font-size="32" fill="#dc3545" text-anchor="middle" font-weight="bold">&lt;/&gt;</text>
+  </g>
+</svg>

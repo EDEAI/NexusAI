@@ -1,0 +1,18 @@
+identity:
+  author: quicksandzn
+  name: elasticsearch_v2
+  label:
+    en_US: Elasticsearch (Non-Pre-Auth)
+    zh_Hans: Elasticsearch (非预授权)
+    pt_BR: Elasticsearch (Non-Pre-Auth)
+  description:
+    en_US: Elasticsearch (Non-Pre-Auth)
+    zh_Hans: Elasticsearch (非预授权)
+    pt_BR: Elasticsearch (Non-Pre-Auth)
+  icon: icon.svg
+tools:
+  - tools/query.yaml
+  - tools/create.yaml
+extra:
+  python:
+    source: provider/es.py

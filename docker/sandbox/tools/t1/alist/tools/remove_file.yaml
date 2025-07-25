@@ -1,0 +1,56 @@
+identity:
+  name: remove_file
+  author: iceyao
+  label:
+    en_US: Remove alist file
+    zh_Hans: 删除AList文件
+    pt_BR: Remove alist file
+description:
+  human:
+    en_US: Remove alist file
+    zh_Hans: 删除AList文件
+    pt_BR: Remove alist file
+  llm: A tool to remove alist file
+parameters:
+  - name: username
+    type: string
+    required: true
+    label:
+      en_US: username
+      zh_Hans: AList用户名
+      pt_BR: username
+    human_description:
+      en_US: The username of AList
+      zh_Hans: AList用户名
+      pt_BR: The username of AList
+    llm_description: AList用户名，用于获取AList token
+    form: llm
+  - name: password
+    type: string
+    required: true
+    label:
+      en_US: password
+      zh_Hans: AList用户密码
+      pt_BR: password
+    human_description:
+      en_US: The user password of AList
+      zh_Hans: AList用户密码
+      pt_BR: The user password of AList
+    llm_description: AList用户密码，用于获取AList token
+    form: llm
+  - name: path
+    type: string
+    required: false
+    label:
+      en_US: path
+      zh_Hans: AList文件路径
+      pt_BR: path
+    human_description:
+      en_US: The file path of AList
+      zh_Hans: AList文件路径，文件的唯一标识
+      pt_BR: The file path of AList
+    llm_description: AList文件路径，文件的唯一标识
+    form: llm
+extra:
+  python:
+    source: tools/remove_file.py

@@ -1,0 +1,30 @@
+identity:
+  name: delMessage
+  author: ssssshql
+  label:
+    en_US: Delete Message
+    zh_Hans: 删消息
+    pt_BR: Excluir Mensagem
+description:
+  human:
+    en_US: Delete specific message from conversation
+    zh_Hans: 删消息
+    pt_BR: Excluir mensagem específica da conversa
+  llm: 删消息
+parameters:
+  - name: conversation_id
+    type: string
+    required: true
+    label:
+      en_US: Conversation ID
+      zh_Hans: 对话 ID
+      pt_BR: ID da Conversa
+    human_description:
+      en_US: The unique identifier of the conversation to delete the message
+      zh_Hans: 要删除消息的对话的唯一标识符
+      pt_BR: Identificador único da conversa para exclusão da mensagem
+    llm_description: The unique identifier of the conversation to delete the message
+    form: llm
+extra:
+  python:
+    source: tools/delMessage.py

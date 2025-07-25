@@ -1,0 +1,83 @@
+identity:
+  name: mqtt_sub_pub
+  author: wangha
+  label:
+    en_US: MQTT Subscribe and Publish
+    zh_Hans: MQTT订阅和发布
+    pt_BR: MQTT assinar e publicar
+description:
+  human:
+    en_US: Subscribe messages from or publish messages to a MQTT Broker
+    zh_Hans: 向MQTT Broker订阅或者发布消息
+    pt_BR: Assinar mensagens de e publicar mensagens no MQTT Broker
+  llm: Subscribe messages from or publish messages to a MQTT Broker. Returns the messages received when subscribe. Returns `0` when publish is done.
+parameters:
+  - name: type
+    type: string
+    required: true
+    label:
+      en_US: Client type
+      zh_Hans: 客户端类型
+      pt_BR: Client tipo
+    human_description:
+      en_US: The type of the MQTT client. only pub or sub is allowed
+      zh_Hans: MQTT客户端的类型，只允许pub或者sub
+      pt_BR: O tipo do cliente mqtt. Somente `sub` ou `pub` são permitidos
+    llm_description: The type of MQTT client
+    form: llm
+  - name: broker
+    type: string
+    required: true
+    label:
+      en_US: Broker Address
+      zh_Hans: Broker地址
+      pt_BR: Broker endereço
+    human_description:
+      en_US: IP address of MQTT broker, example broker.emqx.io
+      zh_Hans: MQTT Broker的IP地址,例如broker.emqx.io
+      pt_BR: Endereço IP do MQTT Broker, por exemplo, broker.emqx.io
+    llm_description: MQTT Broker address
+    form: llm
+  - name: port
+    type: number
+    required: true
+    max: 65535
+    label:
+      en_US: Broker Port
+      zh_Hans: Broker端口
+      pt_BR: Broker porto
+    human_description:
+      en_US: Port of MQTT broker, example 1883
+      zh_Hans: MQTT Broker的目标端口，例如1883
+      pt_BR: Port do MQTT broker, por exemplo 1883
+    llm_description: MQTT Broker port
+    form: llm
+  - name: topic
+    type: string
+    required: true
+    label:
+      en_US: MQTT Topic
+      zh_Hans: MQTT topic主题
+      pt_BR: MQTT tópico
+    human_description:
+      en_US: The topic you want to subscribe to or forward to
+      zh_Hans: 你想要订阅或转发的主题
+      pt_BR: O tópico que você deseja assinar ou encaminhar
+    llm_description: MQTT Topic
+    form: llm
+  - name: payload
+    type: string
+    required: true
+    label:
+      en_US: MQTT Payload
+      zh_Hans: MQTT 消息内容
+      pt_BR: MQTT carga útil
+    human_description:
+      en_US: The data you want to send, it will be ignored when the client type is sub
+      zh_Hans: 你想要发送的数据，客户端类型为sub时，这个参数会被忽略
+      pt_BR: Os dados que você deseja enviar. Ele será ignorado quando o tipo de cliente for `sub`
+    llm_description: MQTT Payload
+    form: llm
+extra:
+  python:
+    source: tools/mqtt.py

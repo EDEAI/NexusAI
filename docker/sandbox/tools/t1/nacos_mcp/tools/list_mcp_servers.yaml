@@ -1,0 +1,50 @@
+identity:
+  name: list_mcp_servers
+  author: nacos
+  label:
+    en_US: Search MCP Servers list
+    zh_Hans: 查询 MCP Server 列表
+description:
+  human:
+    en_US: Query the list of registered MCP Servers in Nacos.
+    zh_Hans: 查询Nacos中注册的MCP Server列表.
+  llm: 该方法用于查询Nacos中注册的 MCP Server 可用的 MCP Server 列表，你需要在任务开始时优先调用该方法，根据用户的任务和返回的MCP Server的名字和描述，挑选和任务相关的需要使用的 MCP Server，并进一步查找MCP Server可用的工具.
+extra:
+  python:
+    source: tools/list_mcp_servers.py
+parameters:
+  - name: namespace_id
+    type: string
+    required: false
+    label:
+      en_US: namespace_id
+      zh_Hans: 命名空间ID
+    human_description:
+      en_US: Nacos namespaceId
+      zh_Hans: Nacos 命名空间ID
+    form: form
+    default: public
+  - name: page_no
+    type: number
+    required: false
+    label:
+      en_US: page_no
+      zh_Hans: 查询页码
+    human_description:
+      en_US: page_no
+      zh_Hans: 查询页码
+    llm_description: 想查询的 MCP Server 列表的页号
+    form: llm
+    default: 1
+  - name: page_size
+    type: number
+    required: false
+    label:
+      en_US: page_size
+      zh_Hans: 每页数量
+    human_description:
+      en_US: page_size
+      zh_Hans: 每页数量
+    llm_description: 想查询的每页的 MCP Server 列表的数量
+    form: llm
+    default: 10

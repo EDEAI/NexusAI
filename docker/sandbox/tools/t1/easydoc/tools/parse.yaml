@@ -1,0 +1,76 @@
+identity:
+  name: parse-file
+  author: easylink-ai
+  label:
+    en_US: Parse File
+    zh_Hans: Parse File
+    ja_JP: Parse File
+    fr_FR: Analyser le fichier
+description:
+  human:
+    en_US: a document parsing service developed by EasyLink AI, powered by its proprietary vision-language model. Designed for developers, EasyDoc offers accurate and efficient processing of unstructured documents across various formats (e.g., PDF, images, Word). It outputs structured data to empower the creation of intelligent and high-performance AI Agent applications across industries such as finance, legal, healthcare, and enterprise automation. 
+    zh_Hans: 一个用于解析文本，表格和图片的工具，支持pdf,pptx,docx等多种格式。支持英语，中文等多种语言
+    ja_JP: テキスト、テーブル、画像を解析するツールです。pdf、pptx、docxなどの複数の形式をサポートしています。英語、中国語などの複数の言語をサポートしています。
+    fr_FR: un outil pour analyser du texte, des tableaux et des images, prenant en charge plusieurs formats comme pdf, pptx, docx, etc., et de nombreuses langues comme l'anglais ou le chinois
+  llm: a tool for parsing text, tables, and images, supporting multiple formats such as pdf, pptx, docx, etc. supporting multiple languages such as English, Chinese, etc.
+parameters:
+  - name: parse_mode  
+    type: select
+    required: true
+    default: premium
+    label:
+      en_US: parse mode
+      zh_Hans: 解析模式
+      ja_JP: 解析模式
+      fr_FR: mode d'analyse
+    human_description:
+      en_US: Parsing mode. The specific mode depends on the account. Refer to https://platform.easylink-ai.com/workspace/parsemode for details.
+      zh_Hans: 解析模式，具体模式由账户决定。可参考 https://platform.easylink-ai.com/workspace/parsemode 获取详情。
+      ja_JP: 解析モードはアカウントによって異なります。詳細は https://platform.easylink-ai.com/workspace/parsemode を参照してください。
+      fr_FR: Mode d'analyse. Le mode spécifique dépend du compte. Voir https://platform.easylink-ai.com/workspace/parsemode pour plus d'informations.
+    llm_description: Parsing mode.
+    form: form
+    options:
+      - value: lite
+        label:
+          en_US: lite
+          zh_Hans: lite
+          ja_JP: lite
+          fr_FR: lite
+      - value: pro
+        label:
+          en_US: pro
+          zh_Hans: pro
+          ja_JP: pro
+          fr_FR: pro
+      - value: premium
+        label:
+          en_US: premium
+          zh_Hans: premium
+          ja_JP: premium
+          fr_FR: premium
+    placeholder:
+      en_US: Please select a parse method
+      zh_Hans: 请选择解析方法
+      ja_JP: 解析方法を選択してください
+      fr_FR: Veuillez sélectionner une méthode d'analyse
+ 
+
+  - name: file
+    type: file
+    required: true
+    label:
+      en_US: file
+      zh_Hans: file
+      ja_JP: file
+      fr_FR: fichier
+    human_description:
+      en_US:  the file to be parsed(support pdf, ppt, pptx, doc, docx, png, jpg, jpeg)
+      zh_Hans: 用于解析的文件(支持 pdf, ppt, pptx, doc, docx, png, jpg, jpeg)
+      ja_JP: 解析するファイル(pdf、ppt、pptx、doc、docx、png、jpg、jpegをサポート)
+      fr_FR: le fichier à analyser (prise en charge de pdf, ppt, pptx, doc, docx, png, jpg, jpeg)
+    llm_description: the file to be parsed (support pdf, ppt, pptx, doc, docx, png, jpg, jpeg)
+    form: llm
+extra:
+  python:
+    source: tools/parse.py

@@ -1,0 +1,26 @@
+credentials_for_provider:
+  api_url:
+    label:
+      en_US: Flomo API URL
+      zh_Hans: Flomo API URL
+    placeholder:
+      en_US: Please enter your Flomo API URL
+      zh_Hans: 请输入你的 Flomo API URL
+    required: true
+    type: secret-input
+    url: https://v.flomoapp.com/mine?source=incoming_webhook
+extra:
+  python:
+    source: provider/flomo.py
+identity:
+  author: crazywoola
+  description:
+    en_US: A flomo plugin to note down your thoughts
+    zh_Hans: 一个用于记录想法的 flomo 插件
+  icon: flomo.png
+  label:
+    en_US: Create Flomo Note
+    zh_Hans: 创建 Flomo 笔记
+  name: flomo
+tools:
+- tools/flomo.yaml

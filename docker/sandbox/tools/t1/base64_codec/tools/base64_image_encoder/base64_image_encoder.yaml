@@ -1,0 +1,26 @@
+identity:
+  name: base64_image_encoder
+  author: bowenliang123
+  label:
+    en_US: Image to Base64 Text
+    zh_Hans: 图片 转 Base64 文本
+description:
+  human:
+    en_US: Encode the image file to Base64-encoded text
+    zh_Hans: 将图片文件转为 Base64 编码文本
+  llm: Encode the image file to Base64-encoded text
+parameters:
+  - name: input_image
+    type: file
+    required: true
+    label:
+      en_US: Input Image File
+      zh_Hans: 输入的图片文件
+    human_description:
+      en_US: Input Image File
+      zh_Hans: 输入的图片文件
+    llm_description: A tool for encoding image file to Base64-encoded text
+    form: llm
+extra:
+  python:
+    source: tools/base64_image_encoder/base64_image_encoder.py

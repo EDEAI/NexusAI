@@ -1,0 +1,30 @@
+identity:
+  name: "openai_deep_research_get"
+  author: "alterxyz"
+  label:
+    en_US: "Get Deep Research Task Result"
+    zh_Hans: "获取深度研究任务结果"
+    pt_BR: "Obter Resultado da Tarefa de Pesquisa Profunda"
+description:
+  human:
+    en_US: "Retrieves the result or status of a deep research task."
+    zh_Hans: "获取深度研究任务的结果或当前执行状态。"
+    pt_BR: "Recupera o resultado ou status de uma tarefa de pesquisa profunda."
+  llm: "This tool retrieves the result or status of a deep research task using the OpenAI API. It takes a task ID as input and returns the task's status and result. If the task is still in progress or failed, it will indicate that the task is not yet complete with its status type (e.g. 'completed', 'in_progress', 'failed')."
+parameters:
+  - name: taskid
+    type: string
+    required: true
+    label:
+      en_US: Research Task ID
+      zh_Hans: 研究任务ID
+      pt_BR: ID da Tarefa de Pesquisa
+    human_description:
+      en_US: "The ID of the research task to retrieve."
+      zh_Hans: "要获取结果的深度研究任务的唯一标识符。"
+      pt_BR: "O ID da tarefa de pesquisa a ser recuperada."
+    llm_description: "The unique identifier for the deep research task whose result or status you want to retrieve. This ID was provided when the task was initially created."
+    form: llm
+extra:
+  python:
+    source: tools/openai_deep_research_get.py

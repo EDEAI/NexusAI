@@ -1,0 +1,37 @@
+identity:
+  author: dupdub-dify
+  name: dupdub
+  label:
+    en_US: DupDub
+    zh_Hans: DupDub
+    pt_BR: DupDub
+  description:
+    en_US: DupDub
+    zh_Hans: DupDub
+    pt_BR: DupDub
+  icon: icon.svg
+  tags:
+    - design
+    - productivity
+tools:
+  - tools/transcribe_speech.yaml
+  - tools/voice_cloning.yaml
+  - tools/get_speaker_id.yaml
+  - tools/dubbing.yaml
+extra:
+  python:
+    source: provider/dupdub.py
+
+credentials_for_provider:
+  dupdub_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: "DupDub token"
+      zh_Hans: "DupDub token"
+      pt_BR: "DupDub token"
+    description:
+      en_US: "Your DupDub token"
+      zh_Hans: "Your DupDub token"
+      pt_BR: "Your DupDub token"
+    url: https://www.dupdub.com/?utm_source=dify&utm_medium=dify&utm_campaign=dify&utm_id=20250211

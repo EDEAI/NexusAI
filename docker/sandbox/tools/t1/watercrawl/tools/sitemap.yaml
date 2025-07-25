@@ -1,0 +1,49 @@
+description:
+  human:
+    en_US: Retrieve the sitemap from a completed crawl request.
+    zh_Hans: 从已完成的爬取请求中获取网站地图。
+  llm: This tool retrieves the sitemap data from a completed crawl request. You can get the sitemap in different formats - as a standard data structure, as a graph for visualization, or as markdown content.
+extra:
+  python:
+    source: tools/sitemap.py
+identity:
+  author: watercrawl
+  label:
+    en_US: Sitemap
+    zh_Hans: 网站地图
+  name: sitemap
+parameters:
+- form: llm
+  human_description:
+    en_US: Enter the crawl request UUID to get its sitemap.
+    zh_Hans: 输入爬取请求UUID以获取其网站地图。
+  label:
+    en_US: Crawl Request UUID
+    zh_Hans: 爬取请求UUID
+  llm_description: The UUID of the crawl request for which to retrieve the sitemap. This is a required parameter.
+  name: crawl_request_uuid
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Choose the format in which to retrieve the sitemap.
+    zh_Hans: 选择获取网站地图的格式。
+  label:
+    en_US: Sitemap Type
+    zh_Hans: 网站地图类型
+  name: sitemap_type
+  options:
+  - label:
+      en_US: Default (JSON data structure)
+      zh_Hans: 默认 (JSON数据结构)
+    value: default
+  - label:
+      en_US: Graph (for visualization)
+      zh_Hans: 图表 (用于可视化)
+    value: graph
+  - label:
+      en_US: Markdown
+      zh_Hans: Markdown格式
+    value: markdown
+  type: select
+  default: default

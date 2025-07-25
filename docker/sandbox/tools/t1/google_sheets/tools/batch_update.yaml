@@ -1,0 +1,126 @@
+identity:
+  name: batch_update
+  author: omluc
+  label:
+    en_US: Batch Update
+    zh_Hans: 批量更新
+    pt_BR: Atualizar em Lote
+description:
+  human:
+    en_US: Update data in multiple ranges in a Google Sheet
+    zh_Hans: 更新 Google 表格中多个范围的数据
+    pt_BR: Atualizar dados em múltiplos intervalos em uma planilha Google
+  llm: Update data in multiple ranges in a Google Sheet at once
+parameters:
+  - name: spreadsheet_id
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: Spreadsheet ID
+      zh_Hans: 表格 ID
+      pt_BR: ID da Planilha
+    human_description:
+      en_US: The ID of the Google Sheet (found in the URL)
+      zh_Hans: Google 表格的 ID（在 URL 中）
+      pt_BR: O ID da planilha Google (encontrado na URL)
+    llm_description: The ID of the Google Sheet, which can be found in the sheet's URL
+  - name: data
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: Data
+      zh_Hans: 数据
+      pt_BR: Dados
+    human_description:
+      en_US: JSON array of objects, each with 'range' (A1 notation like 'Sheet1!A1:B5') and 'values' (2D array of cell values). Example - [{"range":"Sheet1!A1:B2", "values":[["Name","Age"],["John",30]]}]
+      zh_Hans: JSON 对象数组，每个对象包含 'range'（A1 表示法，如 'Sheet1!A1:B5'）和 'values'（单元格值的二维数组）。例如 - [{"range":"Sheet1!A1:B2", "values":[["姓名","年龄"],["约翰",30]]}]
+      pt_BR: Array JSON de objetos, cada um com 'range' (notação A1 como 'Sheet1!A1:B5') e 'values' (array 2D de valores de célula). Exemplo - [{"range":"Sheet1!A1:B2", "values":[["Nome","Idade"],["João",30]]}]
+    llm_description: "An array of objects to update in Google Sheets. Each object must contain - 1) 'range' - A string in A1 notation specifying the cells (e.g., 'A1:B5', 'Sheet1!A1:B5', or 'MyNamedRange'), and 2) 'values' - A 2D array representing row/column values to insert. Example - [{\"range\":\"Sheet1!A1:B2\", \"values\":[[\"Header1\",\"Header2\"],[\"Value1\",\"Value2\"]]}]. The dimensions of 'values' must match the range, and you can update multiple non-contiguous ranges in a single request."
+  - name: value_input_option
+    type: select
+    default: USER_ENTERED
+    form: form
+    label:
+      en_US: Value Input Option
+      zh_Hans: 值输入选项
+      pt_BR: Opção de Entrada de Valor
+    human_description:
+      en_US: How the input data should be interpreted
+      zh_Hans: 如何解释输入数据
+      pt_BR: Como os dados de entrada devem ser interpretados
+    llm_description: How the input data should be interpreted
+    options:
+      - label:
+          en_US: USER_ENTERED
+          zh_Hans: 用户输入
+          pt_BR: ENTRADA DO USUÁRIO
+        value: USER_ENTERED
+      - label:
+          en_US: RAW
+          zh_Hans: 原始
+          pt_BR: BRUTO
+        value: RAW
+  - name: include_values_in_response
+    type: boolean
+    default: false
+    form: form
+    label:
+      en_US: Include Values in Response
+      zh_Hans: 在响应中包含值
+      pt_BR: Incluir Valores na Resposta
+    human_description:
+      en_US: Whether to include the values in the response
+      zh_Hans: 是否在响应中包含值
+      pt_BR: Se deve incluir os valores na resposta
+    llm_description: Whether to include the values in the response
+  - name: response_value_render_option
+    type: select
+    form: form
+    label:
+      en_US: Response Value Render Option
+      zh_Hans: 响应值渲染选项
+      pt_BR: Opção de Renderização de Valor da Resposta
+    human_description:
+      en_US: How the values in the response should be rendered
+      zh_Hans: 响应中的值应如何渲染
+      pt_BR: Como os valores na resposta devem ser renderizados
+    llm_description: How the values in the response should be rendered
+    options:
+      - label:
+          en_US: FORMATTED_VALUE
+          zh_Hans: 格式化值
+          pt_BR: VALOR FORMATADO
+        value: FORMATTED_VALUE
+      - label:
+          en_US: FORMULA
+          zh_Hans: 公式
+          pt_BR: FÓRMULA
+        value: FORMULA
+  - name: response_date_time_render_option
+    type: select
+    form: form
+    label:
+      en_US: Response Date Time Render Option
+      zh_Hans: 响应日期时间渲染选项
+      pt_BR: Opção de Renderização de Data e Hora da Resposta
+    human_description:
+      en_US: How dates, times, and durations in the response should be rendered
+      zh_Hans: 响应中的日期、时间和持续时间应如何渲染
+      pt_BR: Como datas, horários e durações na resposta devem ser renderizados
+    llm_description: How dates, times, and durations in the response should be rendered
+    options:
+      - label:
+          en_US: SERIAL_NUMBER
+          zh_Hans: 序列号
+          pt_BR: NÚMERO DE SÉRIE
+        value: SERIAL_NUMBER
+      - label:
+          en_US: FORMATTED_STRING
+          zh_Hans: 格式化字符串
+          pt_BR: STRING FORMATADA
+        value: FORMATTED_STRING
+extra:
+  python:
+    source: tools/batch_update.py

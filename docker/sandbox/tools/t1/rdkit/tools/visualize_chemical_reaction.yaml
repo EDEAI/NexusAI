@@ -1,0 +1,26 @@
+description:
+  human:
+    en_US: A tool for Visualizing Chemical Reactions.
+    zh_Hans: 一个用于可视化化学反应的工具。
+  llm: A tool for Visualizing Chemical Reactions.
+extra:
+  python:
+    source: tools/visualize_chemical_reaction.py
+identity:
+  author: s20ss
+  label:
+    en_US: Visualize Chemical Reactions
+    zh_Hans: 可视化化学反应
+  name: visualize_chemical_reaction
+parameters:
+- form: llm
+  human_description:
+    en_US: A SMARTS string representing the chemical reaction.
+    zh_Hans: 一个表示化学反应的SMARTS字符串。
+  label:
+    en_US: SMARTS String
+    zh_Hans: SMARTS字符串
+  llm_description: "A SMARTS string representing the chemical reaction."
+  name: smarts
+  required: true
+  type: string

@@ -1,0 +1,48 @@
+identity:
+  author: yizixuan
+  name: hash_calculator
+  label:
+    en_US: Hash Calculator
+    zh_Hans: 哈希计算
+description:
+  human:
+    en_US: Calculate the hash value of the input text using various algorithms such as MD5, SHA256, and SHA1.
+    zh_Hans: 使用多种算法（如 MD5、SHA256 和 SHA1）计算输入文本的哈希值。
+  llm: A tool for calculating hash values using different algorithms.
+extra:
+  python:
+    source: tools/hash_calculator.py
+parameters:
+  - name: input_text
+    type: string
+    label:
+      en_US: Input text
+      zh_Hans: 输入文本
+    form: llm
+    required: true
+    human_description:
+      en_US: The text to calculate the hash value for.
+      zh_Hans: 要计算哈希值的文本。
+  - name: algorithm
+    type: select
+    label:
+      en_US: Algorithm
+      zh_Hans: 算法
+    form: form
+    required: true
+    options:
+      - value: md5
+        label:
+          en_US: MD5
+          zh_Hans: MD5
+      - value: sha256
+        label:
+          en_US: SHA256
+          zh_Hans: SHA256
+      - value: sha1
+        label:
+          en_US: SHA1
+          zh_Hans: SHA1
+    human_description:
+      en_US: Select the hashing algorithm to use.
+      zh_Hans: 选择要使用的哈希算法。

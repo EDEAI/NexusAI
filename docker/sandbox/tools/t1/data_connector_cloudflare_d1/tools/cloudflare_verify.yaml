@@ -1,0 +1,30 @@
+identity:
+  name: cloudflare_verify
+  author: alterxyz
+  label:
+    en_US: Cloudflare Token Verification
+    zh_Hans: Cloudflare 令牌验证
+    pt_BR: Verificação de Token Cloudflare
+description:
+  human:
+    en_US: A tool to verify the validity and status of Cloudflare API tokens
+    zh_Hans: 用于验证 Cloudflare API 令牌有效性和状态的工具
+    pt_BR: Uma ferramenta para verificar a validade e o status dos tokens da API Cloudflare
+  llm: This tool verifies the validity and active status of a Cloudflare API token. It can use either the default token from credentials or an alternative token provided as a parameter. The tool returns a JSON response with verification results including success status, messages, and token details.
+parameters:
+  - name: a_cloudflare_api_token
+    type: string
+    required: false
+    label:
+      en_US: Alternative API Token
+      zh_Hans: 替代 API 令牌
+      pt_BR: Token de API Alternativo
+    human_description:
+      en_US: An alternative Cloudflare API token to verify instead of using the default one
+      zh_Hans: 用于验证的替代 Cloudflare API 令牌，不使用默认令牌
+      pt_BR: Um token alternativo da API Cloudflare para verificar em vez de usar o padrão
+    llm_description: An optional alternative Cloudflare API token to verify. If provided, this token will be used for verification instead of the default token from credentials.
+    form: llm
+extra:
+  python:
+    source: tools/cloudflare_verify.py

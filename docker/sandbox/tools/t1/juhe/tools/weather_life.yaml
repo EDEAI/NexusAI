@@ -1,0 +1,39 @@
+description:
+  human:
+    en_US: Query the city living index by city name or city ID, such as sports index, UV index, clothing index, etc. Some indices may sometimes be empty.
+    zh_Hans: 通过城市名称或城市ID查询城市生活指数，如：运动指数、紫外线指数、穿衣指数等等。有些指数，有时可能为空。
+  llm: A tool to query weather life index for a city.
+extra:
+  python:
+    source: tools/weather_life.py
+identity:
+  author: leslie2046
+  label:
+    en_US: Weather Life
+    zh_Hans: 城市生活指数
+  name: weather_life
+parameters:
+- name: city
+  label:
+    en_US: City Name
+    zh_Hans: 城市名称
+  type: string
+  required: true
+  form: llm
+  default: 上海
+  human_description:
+    en_US: The city name or ID to be queried, such as Wenzhou, Shanghai, Beijing, must be UTF-8 URL encoded.
+    zh_Hans: 要查询的城市名称/id，城市名称如温州、上海、北京，需要utf8 urlencode。
+  llm_description: The name of the city to get the weather life index.
+
+- name: apiKey
+  label:
+    en_US: API KEY
+    zh_Hans: API密钥
+  type: secret-input
+  required: true
+  form: form
+  human_description:
+    en_US: The API key from Juhe.cn to get the weather life index.
+    zh_Hans: 来自聚合数据 API 密钥。
+  llm_description: API key from the provider.

@@ -1,0 +1,23 @@
+identity:
+  author: bowenliang123
+  name: base64_codec
+  label:
+    en_US: Base64
+    zh_Hans: Base64 编码解码
+  description:
+    en_US: Base64 conversion from / to Base64 text with plain text, binary files, image files
+    zh_Hans: Base64 编码解码，支持纯文本、二进制文件、图片文件与Base64文本的互相转换
+    ja_JP: Base64 テキスト、バイナリファイル、画像ファイルとの相互変換のための Base64
+  icon: icon.png
+tools:
+  - tools/base64_encoder/base64_encoder.yaml
+  - tools/base64_decoder/base64_decoder.yaml
+  - tools/base64_file_encoder/base64_file_encoder.yaml
+  - tools/base64_file_decoder/base64_file_decoder.yaml
+  - tools/base64_image_encoder/base64_image_encoder.yaml
+  - tools/base64_image_decoder/base64_image_decoder.yaml
+  - tools/base64_to_hex/base64_to_hex.yaml
+  - tools/hex_to_base64/hex_to_base64.yaml
+extra:
+  python:
+    source: provider/base64_codec.py

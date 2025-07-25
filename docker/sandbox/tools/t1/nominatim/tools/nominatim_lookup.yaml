@@ -1,0 +1,35 @@
+description:
+  human:
+    de_DE: Suchen Sie OSM-Objekte anhand ihrer IDs mit Nominatim
+    en_US: Look up OSM objects using their IDs with Nominatim
+    ja_JP: Nominatimを使用してIDでOSMオブジェクトを検索
+    zh_Hans: 使用Nominatim通过ID查找OSM对象
+  llm: A tool for looking up OpenStreetMap objects using their IDs with Nominatim.
+extra:
+  python:
+    source: tools/nominatim_lookup.py
+identity:
+  author: Charles Zhou
+  label:
+    de_DE: Nominatim OSM-Objektsuche
+    en_US: Nominatim OSM Lookup
+    ja_JP: Nominatim OSM ルックアップ
+    zh_Hans: Nominatim OSM 对象查找
+  name: nominatim_lookup
+parameters:
+- form: llm
+  human_description:
+    de_DE: Kommagetrennte Liste von OSM-IDs für die Suche (z.B. N123,W456,R789)
+    en_US: Comma-separated list of OSM IDs to lookup (e.g., N123,W456,R789)
+    ja_JP: 検索するOSM IDのカンマ区切りリスト（例：N123,W456,R789）
+    zh_Hans: 要查找的OSM ID的逗号分隔列表（例如：N123,W456,R789）
+  label:
+    de_DE: OSM-IDs
+    en_US: OSM IDs
+    ja_JP: OSM ID
+    zh_Hans: OSM ID
+  llm_description: A comma-separated list of OSM IDs (prefixed with N, W, or R) for
+    lookup.
+  name: osm_ids
+  required: true
+  type: string

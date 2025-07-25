@@ -1,0 +1,31 @@
+identity:
+  name: ParseVideoSource
+  author: dupdub-dify
+  label:
+    en_US: ParseVideoSource
+    zh_Hans: 解析视频源
+    pt_BR: ParseVideoSource
+description:
+  human:
+    en_US: ParseVideoSource
+    zh_Hans: 解析视频源
+    pt_BR: ParseVideoSource
+  llm: ParseVideoSource
+parameters:
+  - name: video_url
+    type: string
+    required: true
+    label:
+      en_US: Video URL
+      zh_Hans: 视频链接
+      pt_BR: URL do vídeo
+    human_description:
+      en_US: URL of the video to be parsed. Currently support following social media links:YouTube、TikTok、Facebook、Instagram、X(Twitter)
+      zh_Hans: 视频链接
+      pt_BR: URL of the video to be parsed. Currently support following social media links:YouTube、TikTok、Facebook、Instagram、X(Twitter)
+    llm_description: URL of the video
+    form: llm
+extra:
+  python:
+    source: tools/parse_video_source.py
+

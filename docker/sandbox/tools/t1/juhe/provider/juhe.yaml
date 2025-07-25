@@ -1,0 +1,24 @@
+identity:
+  author: leslie2046
+  name: juhe
+  label:
+    en_US: Juhe Data
+    zh_Hans: 聚合数据
+  description:
+    en_US: Juhe data apis as a toolbox(e.g weather 、exchange 、oil price and etc).
+    zh_Hans: 聚合数据API工具箱(天气、汇率、油价等)。
+  icon: icon.svg
+tools:
+  - tools/weather.yaml
+  - tools/exchange.yaml
+  - tools/currency_list.yaml
+  - tools/oil_price.yaml
+  - tools/weather_life.yaml
+  - tools/shgold.yaml
+  - tools/shfuture.yaml
+  - tools/stock_hs.yaml
+  - tools/stock_hk.yaml
+  - tools/stock_usa.yaml
+extra:
+  python:
+    source: provider/juhe.py

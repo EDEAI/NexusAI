@@ -1,0 +1,35 @@
+credentials_for_provider:
+  base_url:
+    label:
+      en_US: getimg.ai server's Base URL
+    placeholder:
+      en_US: https://api.getimg.ai/v1
+    required: false
+    type: text-input
+  getimg_api_key:
+    help:
+      en_US: Get your getimg.ai API key from your getimg.ai account settings. If you
+        are using a self-hosted version, you may enter any key at your convenience.
+    label:
+      en_US: getimg.ai API Key
+    placeholder:
+      en_US: Please input your getimg.ai API key
+    required: true
+    type: secret-input
+    url: https://dashboard.getimg.ai/api-keys
+extra:
+  python:
+    source: provider/getimgai.py
+identity:
+  author: Matri Qi
+  description:
+    en_US: GetImg API integration for image generation and scraping.
+  icon: icon.svg
+  label:
+    en_US: getimg.ai
+    zh_CN: getimg.ai
+  name: getimgai
+  tags:
+  - image
+tools:
+- tools/text2image.yaml

@@ -1,0 +1,81 @@
+identity:
+  name: dubbo_invoke
+  author: dify
+  label:
+    en_US: Invoke Dubbo Service
+    zh_Hans: 调用Dubbo服务
+description:
+  human:
+    en_US: Call Dubbo services through direct connection or service discovery via registry centers like ZooKeeper and Nacos. Supports complex parameter types including nested objects, collections, maps, and multi-parameter method calls with precise type specification.
+    zh_Hans: 通过直连或使用ZooKeeper、Nacos等注册中心调用Dubbo服务。支持复杂参数类型，包括嵌套对象、集合、Map以及多参数方法调用，并提供精确的类型指定功能。
+  llm: Call a Dubbo service by providing either registry center information or direct connection details. Supports complex parameter types including objects, collections, arrays, and multi-parameter method calls with precise Java type specification. Uses Hessian serialization for full compatibility with Java Dubbo services.
+extra:
+  python:
+    source: tools/dubbo_invoke.py
+parameters:
+  - name: registry_address
+    type: string
+    required: false
+    label:
+      en_US: Registry Address
+      zh_Hans: 注册中心地址
+    human_description:
+      en_US: The address of registry center (e.g. zookeeper://127.0.0.1:2181 or nacos://127.0.0.1:8848). Either this or service_uri must be provided.
+      zh_Hans: 注册中心地址，如 zookeeper://127.0.0.1:2181 或 nacos://127.0.0.1:8848。必须提供此参数或service_uri中的一个。
+    llm_description: Registry center address in format like zookeeper://host:port or nacos://host:port. Either this or service_uri must be provided.
+    form: llm
+  - name: service_uri
+    type: string
+    required: false
+    label:
+      en_US: Service URI
+      zh_Hans: 服务URI
+    human_description:
+      en_US: The direct URI of the Dubbo service including protocol (e.g. dubbo://127.0.0.1:20880). Either this or registry_address must be provided.
+      zh_Hans: Dubbo服务的直连URI，包含协议，如 dubbo://127.0.0.1:20880。必须提供此参数或registry_address中的一个。
+    llm_description: Direct service URI in format like protocol://host:port. Either this or registry_address must be provided.
+    form: llm
+  - name: interface
+    type: string
+    required: true
+    label:
+      en_US: Interface Name
+      zh_Hans: 接口名称
+    human_description:
+      en_US: The fully qualified name of the Dubbo interface (e.g. com.example.UserService).
+      zh_Hans: Dubbo接口的完整名称，如 com.example.UserService。
+    llm_description: The fully qualified name of the Dubbo interface.
+    form: llm
+  - name: method
+    type: string
+    required: true
+    label:
+      en_US: Method Name
+      zh_Hans: 方法名称
+    human_description:
+      en_US: The name of the method to call.
+      zh_Hans: 要调用的方法名。
+    llm_description: The name of the method to call.
+    form: llm
+  - name: parameter_types
+    type: string
+    required: false
+    label:
+      en_US: Parameter Types
+      zh_Hans: 参数类型
+    human_description:
+      en_US: Java types of parameters separated by commas. Supports all Java types including primitives, objects, generics, and arrays. Use full generic type specifications for complex collections.
+      zh_Hans: 参数的Java类型，用逗号分隔。支持所有Java类型，包括基本类型、对象、泛型和数组。对于复杂集合类型请使用完整的泛型类型规范。
+    llm_description: Comma-separated Java type names for method parameters. Supports all Java types including primitives, wrapper classes, custom objects, generic collections, and arrays. The parser correctly handles nested brackets in generic types. For complex collections, always specify the full generic type.
+    form: llm
+  - name: parameter_values
+    type: string
+    required: false
+    label:
+      en_US: Parameter Values
+      zh_Hans: 参数值
+    human_description:
+      en_US: JSON representation of parameter values. For single parameter use the value directly. For multiple parameters use a JSON array where each element corresponds to a parameter. Complex objects are automatically converted to proper Java objects based on parameter_types.
+      zh_Hans: 参数值的JSON表示。单个参数直接使用该值。多个参数使用JSON数组，每个元素对应一个参数。复杂对象会根据parameter_types自动转换为适当的Java对象。
+    llm_description: JSON representation of parameter values matching the parameter_types. For single parameter methods, provide the value directly. For multi-parameter methods, provide a JSON array where each element corresponds to one parameter in the same order as parameter_types.
+    form: llm

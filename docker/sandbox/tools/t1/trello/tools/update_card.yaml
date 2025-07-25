@@ -1,0 +1,91 @@
+description:
+  human:
+    en_US: Updates specified attributes of a Trello card, such as its name, description,
+      list ID, and board ID, by providing the card's unique ID.
+    pt_BR: Atualiza atributos específicos de um cartão Trello, como seu nome, descrição,
+      ID da lista e ID do quadro, fornecendo o ID único do cartão.
+    zh_Hans: 通过提供卡片的唯一 ID，更新 Trello 卡片的特定属性，如其名称、描述、列表 ID 和看板 ID。
+  llm: Modify a Trello card's key details, including name, description, and its placement
+    on the board, by using the card's ID. Enables precise and targeted updates to
+    card information.
+extra:
+  python:
+    source: tools/update_card.py
+identity:
+  author: Yash Parmar
+  label:
+    en_US: Update Card by ID
+    pt_BR: Atualizar Cartão por ID
+    zh_Hans: 通过 ID 更新卡片
+  name: update_card_by_id
+parameters:
+- form: llm
+  human_description:
+    en_US: The unique identifier of the Trello card you intend to update.
+    pt_BR: O identificador único do cartão Trello que você pretende atualizar.
+    zh_Hans: 您打算更新的 Trello 卡片的唯一标识符。
+  label:
+    en_US: Card ID
+    pt_BR: ID do Cartão
+    zh_Hans: 卡片 ID
+  llm_description: Input the ID of the Trello card to be updated to ensure the correct
+    card is targeted.
+  name: id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The new name to assign to the card.
+    pt_BR: Opcional. O novo nome a ser atribuído ao cartão.
+    zh_Hans: 可选。要分配给卡片的新名称。
+  label:
+    en_US: New Name
+    pt_BR: Novo Nome
+    zh_Hans: 新名称
+  llm_description: Specify a new name for the card if changing it. This name is what
+    will be displayed on the Trello board.
+  name: name
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The new description to assign to the card.
+    pt_BR: Opcional. A nova descrição a ser atribuída ao cartão.
+    zh_Hans: 可选。要分配给卡片的新描述。
+  label:
+    en_US: New Description
+    pt_BR: Nova Descrição
+    zh_Hans: 新描述
+  llm_description: Provide a new description for the card if you wish to update it;
+    this description provides additional context about the card.
+  name: desc
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The ID of the list to which the card should be moved.
+    pt_BR: Opcional. O ID da lista para a qual o cartão deve ser movido.
+    zh_Hans: 可选。卡片应移动到的列表的 ID。
+  label:
+    en_US: List ID
+    pt_BR: ID da Lista
+    zh_Hans: 列表 ID
+  llm_description: Enter the ID of the list where you want to move the card. This
+    action relocates the card to the specified list.
+  name: idList
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The ID of the board to which the card should be moved.
+    pt_BR: Opcional. O ID do quadro para o qual o cartão deve ser movido.
+    zh_Hans: 可选。卡片应移动到的看板的 ID。
+  label:
+    en_US: Board ID
+    pt_BR: ID do Quadro
+    zh_Hans: 看板 ID
+  llm_description: Provide the ID of the board where you want to move the card. This
+    action relocates the card to the specified board.
+  name: idBoard
+  required: false
+  type: string

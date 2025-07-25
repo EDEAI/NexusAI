@@ -1,0 +1,85 @@
+identity:
+  name: financial_statements
+  author: financialai
+  label:
+    en_US: Financial Statements
+    zh_Hans: 财务报表
+    ja_Jp: 財務諸表
+    pt_BR: Demonstrações Financeiras
+description:
+  human:
+    en_US: Get all financial statements for a ticker, including income statements, balance sheets, and cash flow statements.
+    zh_Hans: 获取股票代码的所有财务报表，包括损益表、资产负债表和现金流量表。
+    ja_Jp: ティッカーのすべての財務諸表を取得します。これには、損益計算書、貸借対照表、キャッシュフロー計算書が含まれます。
+    pt_BR: Obtenha todas as demonstrações financeiras para um ticker, incluindo demonstrações de resultados, balanços patrimoniais e demonstrações de fluxo de caixa.
+  llm: Get all financial statements for a ticker, including income statements, balance sheets, and cash flow statements.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol of the company you want to get financial statements for.
+      zh_Hans: 您想获取财务报表的公司的股票代码。
+      ja_Jp: 財務諸表を取得したい会社のティッカーシンボル。
+      pt_BR: O símbolo do ticker da empresa para a qual você deseja obter demonstrações financeiras.
+    llm_description: The ticker symbol of the company you want to get financial statements for.
+    form: llm
+  - name: period
+    type: select
+    required: true
+    default: annual
+    label:
+      en_US: Time period
+      zh_Hans: 时间段
+      ja_Jp: 期間
+      pt_BR: Período
+    human_description:
+      en_US: The time period for the financial statements.
+      zh_Hans: 财务报表的时间段。
+      ja_Jp: 財務諸表の期間。
+      pt_BR: O período das demonstrações financeiras.
+    llm_description: The time period for the financial statements.
+    form: llm
+    options:
+      - value: annual
+        label:
+          en_US: Annual
+          zh_Hans: 年度
+          ja_Jp: 年次
+          pt_BR: Anual
+      - value: quarterly
+        label:
+          en_US: Quarterly
+          zh_Hans: 季度
+          ja_Jp: 四半期
+          pt_BR: Trimestral
+      - value: ttm
+        label:
+          en_US: Trailing twelve months
+          zh_Hans: 过去十二个月
+          ja_Jp: 直近 12 か月
+          pt_BR: Últimos doze meses
+  - name: limit
+    type: number
+    required: false
+    default: 1
+    label:
+      en_US: Limit
+      zh_Hans: 限制
+      ja_Jp: 制限
+      pt_BR: Limite
+    human_description:
+      en_US: The number of financial statements to return.
+      zh_Hans: 要返回的财务报表数量。
+      ja_Jp: 返す財務諸表の数。
+      pt_BR: O número de demonstrações financeiras a serem retornadas.
+    llm_description: The number of financial statements to return.
+    form: llm
+extra:
+  python:
+    source: tools/financial_statements/invoke.py

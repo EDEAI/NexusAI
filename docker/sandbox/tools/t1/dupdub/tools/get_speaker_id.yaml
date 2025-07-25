@@ -1,0 +1,17 @@
+identity:
+  name: GetspeakerID
+  author: dupdub-dify
+  label:
+    en_US: Get speaker ID
+    zh_Hans: 获取发音人信息
+    pt_BR: Get speaker ID
+description:
+  human:
+    en_US: Get speaker ID
+    zh_Hans: 获取发音人信息
+    pt_BR: Get speaker ID
+  llm: Get speaker ID
+extra:
+  python:
+    source: tools/get_speaker_id.py
+

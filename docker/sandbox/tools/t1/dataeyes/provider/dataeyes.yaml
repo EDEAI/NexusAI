@@ -1,0 +1,42 @@
+credentials_for_provider:
+  base_url:
+    label:
+      en_US: DataEyes API URL
+      zh_Hans: DataEyes API地址
+    placeholder:
+      en_US: https://api.shuyanai.com
+      zh_Hans: https://api.shuyanai.com
+    required: false
+    type: text-input
+    default: https://api.shuyanai.com
+  dataeyes_api_key:
+    help:
+      en_US: Get your DataEyes API key from DataEyes
+      zh_Hans: 从 DataEyes 获取您的API密钥
+    label:
+      en_US: DataEyes API Key
+      zh_Hans: DataEyes API密钥
+    placeholder:
+      en_US: Please input your DataEyes API key
+      zh_Hans: 请输入您的 DataEyes API密钥
+    required: true
+    type: secret-input
+    url: https://shuyanai.com
+identity:
+  author: dataeyesai
+  name: dataeyes
+  label:
+    en_US: DataEyes
+    zh_Hans: DataEyes
+    pt_BR: DataEyes
+  description:
+    en_US: AI-Powered Web Content Extraction and Semantic Search Tool
+    zh_Hans: 基于计算机视觉模型的网页内容识别提取和智能语义理解联网搜索工具
+    pt_BR: Ferramenta de Extração de Conteúdo Web e Busca Semântica com IA
+  icon: icon.svg
+tools:
+  - tools/dataeyes_reader.yaml
+  - tools/dataeyes_search.yaml
+extra:
+  python:
+    source: provider/dataeyes.py

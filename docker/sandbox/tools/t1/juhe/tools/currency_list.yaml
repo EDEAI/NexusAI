@@ -1,0 +1,27 @@
+description:
+  human:
+    en_US:  Some common currency codes — some queries may return no results.
+    zh_Hans: 一些常见的货币代码，部分查询时可能无结果
+  llm: A tool to list all currency codes.
+extra:
+  python:
+    source: tools/currency_list.py
+identity:
+  author: leslie2046
+  label:
+    en_US: Currency List
+    zh_Hans: 货币列表
+  name: currency_list
+parameters:
+- name: apiKey
+  label:
+    en_US: API KEY
+    zh_Hans: API密钥
+  type: secret-input
+  required: true
+  form: form
+  human_description:
+    en_US: The API key from Juhe.cn.
+    zh_Hans: 来自聚合数据API密钥。
+  llm_description: API key from the juhe provider.
+  url: https://dashboard.juhe.cn/data/index/my

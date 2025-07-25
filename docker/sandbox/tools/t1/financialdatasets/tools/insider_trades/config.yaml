@@ -1,0 +1,50 @@
+identity:
+  name: insider_trades
+  author: financialai
+  label:
+    en_US: Insider Trades
+    zh_Hans: 内部交易
+    ja_Jp: インサイダートレード
+    pt_BR: Negociações Internas
+description:
+  human:
+    en_US: Get insider trades like buys and sells for a ticker by a company insider such as a CEO, CFO, or Director.
+    zh_Hans: 通过公司内部人员（如 CEO、CFO 或董事）获取股票的内部交易，如买入和卖出。
+    ja_Jp: CEO や CFO、取締役などの企業内部者によるティッカーの買い付けや売り付けなどのインサイダートレードを取得します。
+    pt_BR: Obtenha negociações internas, como compras e vendas, para um ticker por um insider da empresa, como um CEO, CFO ou Diretor.
+  llm: Get insider trades like buys and sells for a ticker by a company insider such as a CEO, CFO, or Director.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol of the company you want to get insider trades for.
+      zh_Hans: 您想获取内部交易的公司的股票代码。
+      ja_Jp: インサイダートレードを取得したい会社のティッカーシンボル。
+      pt_BR: O símbolo do ticker da empresa para a qual você deseja obter negociações internas.
+    llm_description: The ticker symbol of the company you want to get insider trades for.
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    default: 1
+    label:
+      en_US: Limit
+      zh_Hans: 限制
+      ja_Jp: 制限
+      pt_BR: Limite
+    human_description:
+      en_US: "The maximum number of transactions to return (default: 10)."
+      zh_Hans: "要返回的交易数量的最大值（默认值：10）。"
+      ja_Jp: "返す取引の最大数（デフォルト：10）。"
+      pt_BR: "O número máximo de transações a serem retornadas (padrão: 10)."
+    llm_description: "The maximum number of transactions to return (default: 10)."
+    form: llm
+extra:
+  python:
+    source: tools/insider_trades/invoke.py

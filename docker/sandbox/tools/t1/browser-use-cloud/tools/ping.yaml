@@ -1,0 +1,18 @@
+identity:
+  name: ping
+  author: lysonober
+  label:
+    en_US: "Ping Service"
+    zh_Hans: "测试连接"
+    ja_JP: "サービスをPing"
+    pt_BR: "Ping Serviço"
+description:
+  human:
+    en_US: "Check if the Browser Use API server is running and responding. This is a simple health check endpoint."
+    zh_Hans: "检查 Browser Use API 服务器是否正在运行和响应。这是一个简单的健康检查端点。"
+    ja_JP: "Browser Use API サーバーが実行中で応答しているかどうかを確認します。これは単純なヘルスチェックエンドポイントです。"
+    pt_BR: "Verifique se o servidor da API Browser Use está em execução e respondendo. Este é um endpoint simples de verificação de integridade."
+  llm: "This tool checks if the Browser Use API server is running and responding. It makes a simple GET request to the /api/v1/ping endpoint and returns the response. This is useful for verifying connectivity to the Browser Use service before attempting more complex operations. No parameters are required."
+extra:
+  python:
+    source: tools/ping.py

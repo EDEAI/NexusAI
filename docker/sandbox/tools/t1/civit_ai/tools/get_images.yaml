@@ -1,0 +1,222 @@
+identity:
+  name: get_images
+  author: yt-koike
+  label:
+    en_US: Images
+description:
+  human:
+    en_US: Gets images
+  llm: Gets images
+parameters:
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: Limit
+    human_description:
+      en_US: The number of results to be returned per page.
+    placeholder:
+      en_US: 20
+    llm_description: The number of results to be returned per page.
+    form: llm
+  - name: postId
+    type: number
+    required: false
+    label:
+      en_US: Post ID
+    human_description:
+      en_US: The ID of a post to get images from
+    llm_description: The ID of a post to get images from
+    form: llm
+  - name: modelId
+    type: number
+    required: false
+    label:
+      en_US: modelId
+    human_description:
+      en_US: The ID of a model to get images from (model gallery)
+    llm_description: The ID of a model to get images from (model gallery)
+    form: llm
+  - name: modelVersionId
+    type: number
+    required: false
+    label:
+      en_US: modelVersionId
+    human_description:
+      en_US: The ID of a model version to get images from (model gallery filtered to version)
+    llm_description: The ID of a model version to get images from (model gallery filtered to version)
+    form: llm
+  - name: username
+    type: string
+    required: false
+    label:
+      en_US: username
+    human_description:
+      en_US: Filter to images from a specific user
+    llm_description: Filter to images from a specific user
+    form: llm
+  - name: nsfw
+    form: form
+    label:
+      en_US: NSFW Filter
+    human_description:
+      en_US: Filter to images that contain mature content flags or not (undefined returns all)
+    llm_description: Filter to images that contain mature content flags or not (undefined returns all)
+    type: select
+    default: None
+    required: true
+    options:
+      - value: None
+        label:
+          en_US: None
+      - value: Soft
+        label:
+          en_US: Soft
+      - value: Mature
+        label:
+          en_US: Mature
+      - value: X
+        label:
+          en_US: X
+  - name: sort
+    form: form
+    label:
+      en_US: Sort
+    llm_description: Sort
+    type: select
+    human_description:
+      en_US: Type of model
+    default: Most Reactions
+    required: true
+    options:
+      - value: Most Reactions
+        label:
+          en_US: Most Reactions
+      - value: Most Comments
+        label:
+          en_US: Most Comments
+      - value: Most Collected
+        label:
+          en_US: Most Collected
+      - value: Newest
+        label:
+          en_US: Newest
+      - value: Oldest
+        label:
+          en_US: Oldest
+      - value: Random
+        label:
+          en_US: Random
+  - name: period
+    form: form
+    label:
+      en_US: Type of model
+    llm_description: The time frame in which the images will be sorted
+    type: select
+    human_description:
+      en_US: The time frame in which the images will be sorted
+    default: AllTime
+    required: true
+    options:
+      - value: AllTime
+        label:
+          en_US: All Time
+      - value: Year
+        label:
+          en_US: Year
+      - value: Month
+        label:
+          en_US: Month
+      - value: Week
+        label:
+          en_US: Week
+      - value: Day
+        label:
+          en_US: Day
+  - name: page
+    type: number
+    required: false
+    label:
+      en_US: page
+    human_description:
+      en_US: The page from which to start fetching creators
+    llm_description: The page from which to start fetching creators
+    form: llm
+extra:
+  python:
+    source: tools/get_images.py
+output_schema:
+  type: object
+  properties:
+    id:
+      type: array[number]
+      label:
+        en_US: id
+    url:
+      type: array[string]
+      label:
+        en_US: url
+    hash:
+      type: array[string]
+      label:
+        en_US: hash
+    width:
+      type: array[number]
+      label:
+        en_US: width
+    height:
+      type: array[number]
+      label:
+        en_US: height
+    nsfw:
+      type: array[boolean]
+      label:
+        en_US: nsfw
+    nsfwLevel:
+      type: array[string]
+      label:
+        en_US: nsfwLevel
+    postId:
+      type: array[string]
+      label:
+        en_US: postId
+    cryCount:
+      type: array[number]
+      label:
+        en_US: cryCount
+    laughCount:
+      type: array[number]
+      label:
+        en_US: laughCount
+    likeCount:
+      type: array[number]
+      label:
+        en_US: likeCount
+    heartCount:
+      type: array[number]
+      label:
+        en_US: heartCount
+    commentCount:
+      type: array[number]
+      label:
+        en_US: commentCount
+    username:
+      type: array[string]
+      label:
+        en_US: username
+    nextCursor:
+      type: array[number]
+      label:
+        en_US: nextCursor
+    currentPage:
+      type: array[number]
+      label:
+        en_US: currentPage
+    pageSize:
+      type: array[number]
+      label:
+        en_US: pageSize
+    nextPage:
+      type: array[string]
+      label:
+        en_US: nextPage

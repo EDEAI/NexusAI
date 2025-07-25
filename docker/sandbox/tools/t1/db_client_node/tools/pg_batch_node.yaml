@@ -1,0 +1,50 @@
+identity:
+  name: postgres_batch_node
+  author: spance
+  label:
+    en_US: PostgreSQL Batch Client
+    zh_Hans: PostgreSQL 批量客户端
+description:
+  human:
+    en_US: PostgreSQL Batch Client
+    zh_Hans: 读写PostgreSQL批量操作客户端
+  llm: A Dify plugin tool to operate PostgreSQL database.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: "SQL Query"
+      zh_Hans: "SQL查询"
+    human_description:
+      en_US: "The SQL batch query to execute (e.g. INSERT...values( ?, ?, ... ))"
+      zh_Hans: "批量Insert查询（e.g. INSERT...values( ?, ?, ... )）"
+    form: llm
+  - name: args
+    type: string
+    required: true
+    label:
+      en_US: Parameters
+      zh_Hans: 参数对象列表
+    human_description:
+      en_US: The data-list of the batch. e.g. List[List[Any]] or List[Dict[str, Any]]
+      zh_Hans: json序列化后的参数对象列表，形如：List[List[Any]] 或 List[Dict[str, Any]]
+    form: llm
+  - name: keys_of_obj
+    type: string
+    required: false
+    label:
+      en_US: Keys of a parameter
+      zh_Hans: 取值的键名
+    human_description:
+      en_US: extract values by the Keys from Dict[str, Any].
+      zh_Hans: 当参数元素为字典类型，提供一个键名列表用于从字典中提取值元素集合（逗号分隔）.
+    form: llm
+output_schema:
+  type: object
+  properties:
+    affected_rows:
+      type: number
+extra:
+  python:
+    source: tools/pg_batch_node.py

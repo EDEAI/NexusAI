@@ -1,0 +1,31 @@
+identity:
+  author: xyy
+  name: txtgenarator
+  label:
+    en_US: txtgenarator
+    zh_Hans: txtgenarator
+    pt_BR: txtgenarator
+  description:
+    en_US: generate txt file from input
+    zh_Hans: generate txt file from input
+    pt_BR: generate txt file from input
+  icon: icon.svg
+  "output_schema": {
+    "type": "binary",
+    "properties": {
+      "file_name": {
+        "type": "string",
+        "description": "The name of the generated file, e.g., result.txt"
+      },
+      "mime_type": {
+        "type": "string",
+        "description": "The MIME type of the file, e.g., text/plain"
+      }
+    },
+    "required": ["file_name", "mime_type"]
+  }
+tools:
+  - tools/txtgenarator.yaml
+extra:
+  python:
+    source: provider/txtgenarator.py

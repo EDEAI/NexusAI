@@ -1,0 +1,15 @@
+identity:
+  author: jingfelix
+  name: tokenizer
+  label:
+    en_US: Tokenizer
+  description:
+    en_US: Tokenizing text using various tokenizers. Returns the tokens and token
+      count.
+  icon: icon.svg
+credentials_for_provider: {}
+tools:
+- tools/tokenize.yaml
+extra:
+  python:
+    source: provider/tokenizer.py

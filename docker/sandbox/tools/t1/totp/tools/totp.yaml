@@ -1,0 +1,49 @@
+identity:
+  name: totp
+  author: alterxyz
+  label:
+    en_US: TOTP Validator
+    zh_Hans: TOTP 验证器
+    pt_BR: Validador TOTP
+description:
+  human:
+    en_US: Time-based one-time password (TOTP) validator
+    zh_Hans: 基于时间的一次性密码 (TOTP) 验证器
+    pt_BR: Validador de senha única baseado em tempo (TOTP)
+  llm: Time-based one-time password (TOTP) validator, this tool is used to validate a 6 digit TOTP code with a secret key or provisioning URI. You should keep the secret key secret, and warn the user to not share it with anyone and so on in best practices about cybersecurity.
+parameters:
+  - name: secret_key
+    type: string
+    required: true
+    label:
+      en_US: TOTP secret key or provisioning URI
+      zh_Hans: TOTP 私钥或 URI
+      pt_BR: Chave secreta TOTP ou URI de provisionamento
+    human_description:
+      en_US: The secret key or provisioning URI used to generate the TOTP
+      zh_Hans: 用于生成 TOTP 的私钥或 URI
+      pt_BR: A chave secreta ou URI de provisionamento usada para gerar o TOTP
+    llm_description: The secret key or provisioning URI (starting with 'otpauth://') used to generate the TOTP, this is highly sensitive and should be kept secret.
+    form: llm
+  - name: user_code
+    type: string
+    required: true
+    label:
+      en_US: 6 digit TOTP code to validate
+      zh_Hans: 要验证的 6 位 TOTP 代码
+      pt_BR: Código TOTP de 6 dígitos para validar
+    human_description:
+      en_US: 6 digit TOTP code to validate
+      zh_Hans: 要验证的 6 位 TOTP 代码
+      pt_BR: Código TOTP de 6 dígitos para validar
+    llm_description: 6 digit TOTP code to validate
+    form: llm
+extra:
+  python:
+    source: tools/totp.py
+output_schema:
+  type: object
+  properties:
+    True_or_False:
+      type: string
+      description: Whether the TOTP is valid or not, return in string format, "True" or "False".

@@ -1,0 +1,48 @@
+identity:
+  name: dataeyes_search
+  author: dataeyesai
+  label:
+    en_US: DataEyes Search
+    zh_Hans: 网页搜索
+    pt_BR: DataEyes Search
+
+description:
+  human:
+    en_US: Search the web and return relevant results
+    zh_Hans: 搜索互联网并返回相关网页摘要
+    pt_BR: Pesquise na web e retorne resultados relevantes
+  llm: Search the web for the given query and return a list of relevant web pages with summaries.
+
+parameters:
+  - name: q
+    type: string
+    required: true
+    label:
+      en_US: Query
+      zh_Hans: 搜索关键词
+      pt_BR: Consulta
+    human_description:
+      en_US: The search query keywords
+      zh_Hans: 搜索关键词
+      pt_BR: As palavras-chave da consulta de pesquisa
+    llm_description: The keywords or phrase to search for on the web
+    form: llm
+  - name: num
+    type: number
+    required: false
+    label:
+      en_US: Number of Results
+      zh_Hans: 返回条数
+      pt_BR: Número de resultados
+    human_description:
+      en_US: Number of search results to return (default 10)
+      zh_Hans: 返回的搜索结果数量（默认10）
+      pt_BR: Número de resultados de pesquisa a serem retornados (padrão 10)
+    llm_description: The number of search results to return (default 10)
+    form: llm
+    minimum: 1
+    maximum: 50
+
+extra:
+  python:
+    source: tools/dataeyes_search.py

@@ -1,0 +1,45 @@
+identity:
+  author: quicksandzn
+  name: minimax_kit
+  label:
+    en_US: MiniMax Kit
+    zh_Hans: MiniMax Kit
+  description:
+    en_US: MiniMax Kit
+    zh_Hans: MiniMax Kit
+  icon: icon.svg
+credentials_for_provider:
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Api Key
+      zh_Hans: Api Key
+    placeholder:
+      en_US: Please input your Api Key
+      zh_Hans: 请输入你的 Api Key
+    help:
+      en_US: Get your Api Key from MiniMax
+      zh_Hans: 从 MiniMax 获取您的 Api Key
+    url: https://platform.minimaxi.com/user-center/basic-information/interface-key
+  group_id:
+    type: secret-input
+    required: true
+    label:
+      en_US: Group ID
+      zh_Hans: Group ID
+    placeholder:
+      en_US: Please input your Group ID
+      zh_Hans: 请输入你的 Group ID
+    help:
+      en_US: Get your Group ID from MiniMax
+      zh_Hans: 从 MiniMax 获取您的 Group ID
+    url: https://platform.minimaxi.com/user-center/basic-information
+tools:
+  - tools/image_generation.yaml
+  - tools/music_generation.yaml
+  - tools/voice_clone.yaml
+  - tools/video_generation.yaml
+extra:
+  python:
+    source: provider/minimax.py

@@ -1,0 +1,2 @@
+dify-plugin>=0.2.2
+azure-cognitiveservices-speech>=1.43.0

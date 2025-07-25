@@ -1,0 +1,53 @@
+identity:
+  name: get_tags
+  author: yt-koike
+  label:
+    en_US: Tags
+description:
+  human:
+    en_US: Gets tags
+  llm: Gets tags
+parameters:
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: Limit
+    human_description:
+      en_US: The number of results to be returned per page.
+    placeholder:
+      en_US: 20
+    llm_description: The number of results to be returned per page.
+    form: llm
+  - name: page
+    type: number
+    required: false
+    label:
+      en_US: Page
+    human_description:
+      en_US: The page from which to start fetching creators
+    llm_description: The page from which to start fetching creators
+    form: llm
+  - name: query
+    type: string
+    required: false
+    label:
+      en_US: Query
+    human_description:
+      en_US: Search query to filter creators by username
+    llm_description: Search query to filter creators by username
+    form: llm
+extra:
+  python:
+    source: tools/get_tags.py
+output_schema:
+  type: object
+  properties:
+    name:
+      type: array[string]
+      label:
+        en_US: name
+    link:
+      type: array[string]
+      label:
+        en_US: link

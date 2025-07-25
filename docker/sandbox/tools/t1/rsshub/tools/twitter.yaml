@@ -1,0 +1,174 @@
+identity:
+  name: twitter
+  author: stvlynn
+  label:
+    en_US: X (Twitter)
+    zh_Hans: X (Twitter)
+    ja_JP: X (Twitter)
+description:
+  human:
+    en_US: Get RSS feeds from X (Twitter) via RSSHub
+    zh_Hans: 通过RSSHub获取X (Twitter)的RSS订阅源
+    ja_JP: RSSHubを通じてX (Twitter)のRSSフィードを取得
+  llm: "A tool to fetch RSS feeds from X (Twitter) using RSSHub as a proxy."
+parameters:
+  - name: route_type
+    type: select
+    required: true
+    default: "user"
+    label:
+      en_US: Route Type
+      zh_Hans: 路由类型
+      ja_JP: ルートタイプ
+    human_description:
+      en_US: "The type of Twitter route to use"
+      zh_Hans: "要使用的Twitter路由类型"
+      ja_JP: "使用するTwitterルートのタイプ"
+    llm_description: "The type of Twitter route to use"
+    form: form
+    options:
+      - value: user
+        label:
+          en_US: User Timeline
+          zh_Hans: 用户时间线
+          ja_JP: ユーザータイムライン
+      - value: keyword
+        label:
+          en_US: Keyword Search
+          zh_Hans: 关键词搜索
+          ja_JP: キーワード検索
+      - value: list
+        label:
+          en_US: List Timeline
+          zh_Hans: 列表时间线
+          ja_JP: リストタイムライン
+      - value: home
+        label:
+          en_US: Home Timeline
+          zh_Hans: 主页时间线
+          ja_JP: ホームタイムライン
+      - value: home_latest
+        label:
+          en_US: Latest Home Timeline
+          zh_Hans: 最新主页时间线
+          ja_JP: 最新ホームタイムライン
+      - value: likes
+        label:
+          en_US: User Likes
+          zh_Hans: 用户喜欢的推文
+          ja_JP: ユーザーのいいね
+      - value: media
+        label:
+          en_US: User Media
+          zh_Hans: 用户媒体推文
+          ja_JP: ユーザーメディア
+  - name: base_url
+    type: string
+    required: false
+    default: "https://rsshub.app"
+    label:
+      en_US: RSSHub Base URL
+      zh_Hans: RSSHub基础URL
+      ja_JP: RSSHubベースURL
+    human_description:
+      en_US: "The base URL of RSSHub instance (default is https://rsshub.app)"
+      zh_Hans: "RSSHub实例的基础URL（默认为https://rsshub.app）"
+      ja_JP: "RSSHubインスタンスのベースURL（デフォルトはhttps://rsshub.app）"
+    llm_description: "The base URL of RSSHub instance (default is https://rsshub.app)"
+    form: form
+  - name: access_key
+    type: string
+    required: false
+    label:
+      en_US: RSSHub Access Key
+      zh_Hans: RSSHub访问密钥
+      ja_JP: RSSHubアクセスキー
+    human_description:
+      en_US: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+      zh_Hans: "RSSHub路由的访问密钥（例如：ILoveRSSHub）。如不需要请留空。"
+      ja_JP: "RSSHubルートのアクセスキー（例：ILoveRSSHub）。必要ない場合は空のままにしてください。"
+    llm_description: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+    form: form
+  - name: username
+    type: string
+    required: false
+    label:
+      en_US: Twitter Username
+      zh_Hans: Twitter用户名
+      ja_JP: Twitterユーザー名
+    human_description:
+      en_US: "The Twitter username without @ (e.g. elonmusk). Required for user, likes, and media routes."
+      zh_Hans: "Twitter用户名，不包含@符号（例如：elonmusk）。用于用户、喜欢和媒体路由。"
+      ja_JP: "@なしのTwitterユーザー名（例：elonmusk）。ユーザー、いいね、メディアルートに必要。"
+    llm_description: "The Twitter username without @ (e.g. elonmusk). Required for user, likes, and media routes."
+    form: llm
+  - name: keyword
+    type: string
+    required: false
+    label:
+      en_US: Keyword
+      zh_Hans: 关键词
+      ja_JP: キーワード
+    human_description:
+      en_US: "The keyword to search for. Required for keyword route."
+      zh_Hans: "要搜索的关键词。关键词路由必填。"
+      ja_JP: "検索するキーワード。キーワードルートに必要。"
+    llm_description: "The keyword to search for. Required for keyword route."
+    form: llm
+  - name: list_id
+    type: string
+    required: false
+    label:
+      en_US: List ID
+      zh_Hans: 列表ID
+      ja_JP: リストID
+    human_description:
+      en_US: "The Twitter list ID. Required for list route."
+      zh_Hans: "Twitter列表ID。列表路由必填。"
+      ja_JP: "TwitterリストID。リストルートに必要。"
+    llm_description: "The Twitter list ID. Required for list route."
+    form: llm
+  - name: exclude_replies
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Exclude Replies
+      zh_Hans: 排除回复
+      ja_JP: 返信を除外
+    human_description:
+      en_US: "Whether to exclude replies from the timeline"
+      zh_Hans: "是否从时间线中排除回复"
+      ja_JP: "タイムラインから返信を除外するかどうか"
+    llm_description: "Whether to exclude replies from the timeline"
+    form: form
+  - name: exclude_rts
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Exclude Retweets
+      zh_Hans: 排除转发
+      ja_JP: リツイートを除外
+    human_description:
+      en_US: "Whether to exclude retweets from the timeline"
+      zh_Hans: "是否从时间线中排除转发"
+      ja_JP: "タイムラインからリツイートを除外するかどうか"
+    llm_description: "Whether to exclude retweets from the timeline"
+    form: form
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: Item Limit
+      zh_Hans: 条目数量限制
+      ja_JP: アイテム数制限
+    human_description:
+      en_US: "Maximum number of items to return (default: 10)"
+      zh_Hans: "返回的最大条目数量（默认：10）"
+      ja_JP: "返される最大アイテム数（デフォルト：10）"
+    llm_description: "Maximum number of items to return (default: 10)"
+    form: llm
+extra:
+  python:
+    source: tools/twitter.py 

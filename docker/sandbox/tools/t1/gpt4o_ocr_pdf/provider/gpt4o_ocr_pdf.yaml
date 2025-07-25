@@ -1,0 +1,87 @@
+identity:
+  author: kenwood
+  name: gpt4o_ocr_pdf
+  label:
+    en_US: GPT-4o OCR PDF to Markdown
+    zh_Hans: PDF文件OCR识别转Markdown格式
+  description:
+    en_US: Extract text from PDF files using GPT-4o's OCR capabilities and convert to Markdown format
+    zh_Hans: 使用 GPT-4o 的 OCR 功能从 PDF 文件中提取文本并转换为 Markdown 格式
+  icon: icon.svg
+credentials_for_provider:
+  api_type:
+    type: select
+    required: true
+    options:
+      - value: "azure"
+        label:
+          en_US: Azure OpenAI
+          zh_Hans: Azure OpenAI
+      - value: "openai"
+        label:
+          en_US: OpenAI
+          zh_Hans: OpenAI
+    label:
+      en_US: API Type
+      zh_Hans: API 类型
+    placeholder:
+      en_US: Select API Type
+      zh_Hans: 选择 API 类型
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: API Key
+      zh_Hans: API 密钥
+    placeholder:
+      en_US: Enter your API Key
+      zh_Hans: 输入您的 API 密钥
+  api_endpoint:
+    type: text-input
+    required: false
+    depends_on:
+      api_type: "azure"
+    label:
+      en_US: Azure API Endpoint
+      zh_Hans: Azure API 端点
+    placeholder:
+      en_US: Enter your Azure API Endpoint
+      zh_Hans: 输入您的 Azure API 端点
+  deployment_name:
+    type: text-input
+    required: false
+    depends_on:
+      api_type: "azure"
+    label:
+      en_US: Azure Deployment Name
+      zh_Hans: Azure 部署名称
+    placeholder:
+      en_US: Enter your Azure Deployment Name
+      zh_Hans: 输入您的 Azure 部署名称
+  api_version:
+    type: text-input
+    required: false
+    depends_on:
+      api_type: "azure"
+    label:
+      en_US: Azure API Version
+      zh_Hans: Azure API 版本
+    placeholder:
+      en_US: Enter your Azure API Version
+      zh_Hans: 输入您的 Azure API 版本
+  model_name:
+    type: text-input
+    required: false
+    depends_on:
+      api_type: "openai"
+    label:
+      en_US: OpenAI Model Name
+      zh_Hans: OpenAI 模型名称
+    placeholder:
+      en_US: Enter model name
+      zh_Hans: 输入模型名称
+tools:
+  - tools/gpt4o_ocr_pdf.yaml
+extra:
+  python:
+    source: provider/gpt4o_ocr_pdf.py

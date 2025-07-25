@@ -1,0 +1,21 @@
+identity:
+  author: stvlynn
+  name: ffmpeg
+  label:
+    en_US: FFmpeg
+    zh_Hans: FFmpeg
+    pt_BR: FFmpeg
+  description:
+    en_US: Process and convert video and audio files using FFmpeg
+    zh_Hans: 使用FFmpeg处理和转换视频和音频文件
+    pt_BR: Processar e converter arquivos de vídeo e áudio usando FFmpeg
+  icon: icon.svg
+tools:
+  - tools/video_info.yaml
+  - tools/video_convert.yaml
+  - tools/video_trim.yaml
+  - tools/video_compress.yaml
+  - tools/extract_audio.yaml
+extra:
+  python:
+    source: provider/ffmpeg.py 

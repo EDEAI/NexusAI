@@ -1,0 +1,99 @@
+identity:
+  name: sql-query
+  author: qjzt_cn
+  label:
+    en_US: SQL Database Query
+    zh_Hans: SQL数据库查询
+    pt_BR: Consulta de Banco de Dados SQL
+description:
+  human:
+    en_US: A tool for executing SQL queries on databases. Supports various SQL operations like SELECT.
+    zh_Hans: 用于执行SQL数据库查询的工具。支持SELECT查询操作。
+    pt_BR: Uma ferramenta para executar consultas SQL em bancos de dados. Suporta várias operações SQL.
+  llm: A tool for executing SQL queries on databases. You can use this tool to perform database operations including SELECT statements.
+parameters:
+  - name: sql_query
+    type: string
+    required: true
+    label:
+      en_US: SQL string
+      zh_Hans: SQL语句
+      pt_BR: SQL string
+    human_description:
+      en_US: Enter your SQL query statement (e.g., SELECT * FROM table_name)
+      zh_Hans: 输入要执行的SQL查询语句（例如：SELECT * FROM table_name）
+      pt_BR: Enter your SQL query statement (e.g., SELECT * FROM table_name)
+    llm_description: The SQL query to execute. Support standard SQL syntax including SELECT statements.
+    form: llm
+  - name: db_uri
+    type: string
+    required: true
+    label:
+      en_US: Database Connection URI
+      zh_Hans: 数据库连接地址
+      pt_BR: URI de Conexão do Banco de Dados
+    human_description:
+      en_US: Database connection string (e.g., postgresql://user:password@localhost:5432/dbname)
+      zh_Hans: 数据库连接字符串（例如：postgresql://user:password@localhost:5432/dbname）
+      pt_BR: tring de conexão do banco de dados postgresql://user:password@localhost:5432/dbname
+    llm_description: The database connection URI in the format of dialect+driver://username:password@host:port/database
+    form: llm 
+  - name: format
+    type: select
+    required: false
+    label:
+      en_US: Output format
+      zh_Hans: 输出格式
+    human_description:
+      en_US: Choose the output format.
+      zh_Hans: 选择输出格式。
+    form: form
+    default: json
+    options:
+      - value: json
+        label:
+          en_US: JSON
+          zh_Hans: JSON
+      - value: json rows arr
+        label:
+          en_US: JSON rows arr
+          zh_Hans: JSON rows arr     
+      - value: csv
+        label:
+          en_US: CSV to file
+          zh_Hans: CSV to file
+      - value: yaml to file
+        label:
+          en_US: YAML to file
+          zh_Hans: YAML to file
+      - value: yaml to string
+        label:
+          en_US: YAML to string
+          zh_Hans: YAML to string
+      - value: Markdown to file
+        label:
+          en_US: Markdown to file
+          zh_Hans: Markdown to file
+      - value: Markdown to string    
+        label:
+          en_US: Markdown to string
+          zh_Hans: Markdown to string
+      - value: xlsx to file
+        label:
+          en_US: xlsx to file
+          zh_Hans: xlsx to file
+      - value: xlsx to string
+        label:
+          en_US: xlsx to string
+          zh_Hans: xlsx to string
+      - value: html to file
+        label:
+          en_US: html to file
+          zh_Hans: html to file
+      - value: html to string    
+        label:
+          en_US: html to string
+          zh_Hans: html to string
+extra:
+  python:
+    source: tools/sql-db.py

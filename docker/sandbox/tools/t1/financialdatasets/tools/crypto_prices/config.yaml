@@ -1,0 +1,145 @@
+identity:
+  name: crypto_prices
+  author: financialai
+  label:
+    en_US: Crypto Prices
+    zh_Hans: 加密货币价格
+    ja_Jp: 暗号通貨価格
+    pt_BR: Preços de Criptomoedas
+description:
+  human:
+    en_US: Get ranged price data for a cryptocurrency to power price charts and analyze price movements.
+    zh_Hans: 获取加密货币的价格范围数据，以支持价格图表和分析价格走势。
+    ja_Jp: 価格チャートを作成し、価格変動を分析するための暗号通貨の範囲価格データを取得します。
+    pt_BR: Obtenha dados de preço variados para uma criptomoeda para alimentar gráficos de preços e analisar movimentos de preços.
+  llm: Get ranged price data for a cryptocurrency to power price charts and analyze price movements.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 加密货币代码
+      ja_Jp: 暗号通貨のティッカーシンボル
+      pt_BR: Símbolo do ticker da criptomoeda
+    human_description:
+      en_US: The ticker symbol of the cryptocurrency you want to get price data for.
+      zh_Hans: 您想获取价格数据的加密货币的股票代码。
+      ja_Jp: 価格データを取得したい暗号通貨のティッカーシンボル。
+      pt_BR: O símbolo do ticker da criptomoeda para a qual você deseja obter dados de preço.
+    llm_description: The ticker symbol of the cryptocurrency you want to get price data for.
+    form: llm
+  - name: interval
+    type: select
+    required: true
+    label:
+      en_US: Time interval
+      zh_Hans: 时间间隔
+      ja_Jp: 時間間隔
+      pt_BR: Intervalo de tempo
+    human_description:
+      en_US: The time interval for the price data.
+      zh_Hans: 价格数据的时间间隔。
+      ja_Jp: 価格データの時間間隔。
+      pt_BR: O intervalo de tempo para os dados de preço.
+    form: llm
+    llm_description: The time interval for the price data.
+    options:
+      - value: minute
+        label:
+          en_US: Minute
+          zh_Hans: 分钟
+          ja_Jp: 分
+          pt_BR: Minuto
+      - value: day
+        label:
+          en_US: Day
+          zh_Hans: 天
+          ja_Jp: 日
+          pt_BR: Dia
+      - value: week
+        label:
+          en_US: Week
+          zh_Hans: 周
+          ja_Jp: 週
+          pt_BR: Semana
+      - value: month
+        label:
+          en_US: Month
+          zh_Hans: 月
+          ja_Jp: 月
+          pt_BR: Mês
+      - value: year
+        label:
+          en_US: Year
+          zh_Hans: 年
+          ja_Jp: 年
+          pt_BR: Ano
+  - name: interval_multiplier
+    type: number
+    required: true
+    default: 1
+    min: 1
+    label:
+      en_US: Interval multiplier
+      zh_Hans: 时间间隔倍增器
+      ja_Jp: 時間間隔の乗数
+      pt_BR: Multiplicador de intervalo
+    human_description:
+      en_US: The multiplier for the time interval.
+      zh_Hans: 时间间隔的倍增器。
+      ja_Jp: 時間間隔の乗数。
+      pt_BR: O multiplicador para o intervalo de tempo.
+    llm_description: The multiplier for the time interval.
+    form: llm
+  - name: start_date
+    type: string
+    required: true
+    label:
+      en_US: Start date (YYYY-MM-DD)
+      zh_Hans: 开始日期 (YYYY-MM-DD)
+      ja_Jp: 開始日 (YYYY-MM-DD)
+      pt_BR: Data de início (AAAA-MM-DD)
+    human_description:
+      en_US: "The start date for the price data (format: YYYY-MM-DD)."
+      zh_Hans: 价格数据的开始日期（格式：YYYY-MM-DD）。
+      ja_Jp: 価格データの開始日（形式：YYYY-MM-DD）。
+      pt_BR: "A data de início para os dados de preço (formato: AAAA-MM-DD)."
+    llm_description: "The start date for the price data (format: YYYY-MM-DD)."
+    form: llm
+  - name: end_date
+    type: string
+    required: true
+    label:
+      en_US: End date (YYYY-MM-DD)
+      zh_Hans: 结束日期 (YYYY-MM-DD)
+      ja_Jp: 終了日 (YYYY-MM-DD)
+      pt_BR: Data final (AAAA-MM-DD)
+    human_description:
+      en_US: "The end date for the price data (format: YYYY-MM-DD)."
+      zh_Hans: 价格数据的结束日期（格式：YYYY-MM-DD）。
+      ja_Jp: 価格データの終了日（形式：YYYY-MM-DD）。
+      pt_BR: "A data final para os dados de preço (formato: AAAA-MM-DD)."
+    llm_description: "The end date for the price data (format: YYYY-MM-DD)."
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    default: 5000
+    min: 1
+    max: 5000
+    label:
+      en_US: Limit
+      zh_Hans: 限制
+      ja_Jp: 制限
+      pt_BR: Limite
+    human_description:
+      en_US: "The maximum number of price records to return (default: 5000, max: 5000)."
+      zh_Hans: 要返回的价格记录的最大数量（默认值：5000，最大值：5000）。
+      ja_Jp: 返す価格レコードの最大数（デフォルト：5000、最大：5000）。
+      pt_BR: "O número máximo de registros de preço a serem retornados (padrão: 5000, máximo: 5000)."
+    llm_description: "The maximum number of price records to return (default: 5000, max: 5000)."
+    form: llm
+extra:
+  python:
+    source: tools/crypto_prices/invoke.py

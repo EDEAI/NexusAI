@@ -1,0 +1,36 @@
+identity:
+  name: base64_file_decoder
+  author: bowenliang123
+  label:
+    en_US: Base64 Text to File
+    zh_Hans: Base64 文本 转 文件
+description:
+  human:
+    en_US: Decode Base64-encoded text to a binary file
+    zh_Hans: 将 Base64 编码文本转为 二进制文件
+  llm: Decode Base64-encoded text to a binary file
+parameters:
+  - name: encoded_text
+    type: string
+    required: true
+    label:
+      en_US: Base64 encoded Text
+      zh_Hans: 已 Base64 编码的文件字符串
+    human_description:
+      en_US: Base64 encoded file string
+      zh_Hans: Base64 编码的文件字符串
+    llm_description: A tool for decoding Base64-encoded text to file file
+    form: llm
+  - name: output_filename
+    type: string
+    required: false
+    label:
+      en_US: Filename of the output file
+      zh_Hans: 输出文件名
+    human_description:
+      en_US: Filename of the output file
+      zh_Hans: 输出文件名
+    form: llm
+extra:
+  python:
+    source: tools/base64_file_decoder/base64_file_decoder.py

@@ -1,0 +1,59 @@
+identity:
+  author: spance
+  name: db_client_node
+  label:
+    en_US: Database Client
+    zh_Hans: 数据库操作客户端
+  description:
+    en_US: Provide workflow nodes with the ability to read and write databases.
+    zh_Hans: 在工作流中提供读写数据库能力的节点。
+  icon: icon.svg
+  tags:
+    - utilities
+tools:
+  - tools/pg_node_5.yaml
+  - tools/pg_node_10.yaml
+  - tools/pg_batch_node.yaml
+credentials_for_provider:
+  db_host:
+    type: text-input
+    required: true
+    default: "localhost"
+    label:
+      en_US: "Host address of the database"
+      zh_Hans: "数据库的主机地址"
+  db_port:
+    type: text-input
+    required: true
+    default: "5432"
+    label:
+      en_US: "Port number of the database"
+      zh_Hans: "数据库的端口号"
+  db_name:
+    type: text-input
+    required: true
+    label:
+      en_US: "Name of the database"
+      zh_Hans: "数据库的名称"
+  db_user:
+    type: text-input
+    required: true
+    label:
+      en_US: "Username for database access"
+      zh_Hans: "数据库访问的用户名"
+  db_password:
+    type: secret-input
+    required: true
+    label:
+      en_US: "Password for database access"
+      zh_Hans: "数据库访问的密码"
+  max_fetched_rows:
+    type: text-input
+    required: false
+    default: "100"
+    label:
+      en_US: "Max fetched rows"
+      zh_Hans: "最大读取行数"
+extra:
+  python:
+    source: provider/dbcn_provider.py

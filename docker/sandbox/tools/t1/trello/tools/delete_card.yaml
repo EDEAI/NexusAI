@@ -1,0 +1,36 @@
+description:
+  human:
+    en_US: Deletes a Trello card using its unique ID. This tool facilitates the removal
+      of cards that are no longer needed, maintaining an organized board.
+    pt_BR: Exclui um cartão Trello usando seu ID único. Esta ferramenta facilita a
+      remoção de cartões que não são mais necessários, mantendo um quadro organizado.
+    zh_Hans: 使用其唯一 ID 删除 Trello 卡片。此工具便于删除不再需要的卡片，保持看板的有序。
+  llm: Remove a specific Trello card by providing its ID. Ideal for cleaning up and
+    organizing your Trello boards by eliminating unwanted cards.
+extra:
+  python:
+    source: tools/delete_card.py
+identity:
+  author: Yash Parmar
+  label:
+    en_US: Delete Card by ID
+    pt_BR: Deletar Cartão por ID
+    zh_Hans: 通过 ID 删除卡片
+  name: delete_card_by_id
+parameters:
+- form: llm
+  human_description:
+    en_US: The unique identifier of the Trello card you wish to delete. This ensures
+      the precise card is removed.
+    pt_BR: O identificador único do cartão Trello que você deseja excluir. Isso garante
+      que o cartão exato seja removido.
+    zh_Hans: 您希望删除的 Trello 卡片的唯一标识符。这确保了精确移除特定卡片。
+  label:
+    en_US: Card ID
+    pt_BR: ID do Cartão
+    zh_Hans: 卡片 ID
+  llm_description: Input the ID of the Trello card targeted for deletion to ensure
+    accurate and specific removal.
+  name: id
+  required: true
+  type: string

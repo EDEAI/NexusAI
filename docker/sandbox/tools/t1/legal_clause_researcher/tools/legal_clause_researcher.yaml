@@ -1,0 +1,30 @@
+identity:
+  name: "legal_clause_researcher"
+  author: "pragnyan_ramtha"
+  label:
+    en_US: legal clause researcher
+    zh_Hans: 法律条款研究者法律条款研究者
+    pt_BR: pesquisador de cláusulas legais
+description:
+  human:
+    en_US: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
+    zh_Hans: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
+    pt_BR: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
+  llm: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
+      zh_Hans: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
+      pt_BR: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
+    llm_description: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
+    form: llm
+extra:
+  python:
+    source: tools/legal_clause_researcher.py

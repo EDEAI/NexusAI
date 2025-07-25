@@ -1,0 +1,49 @@
+identity:
+  name: delete_profile
+  author: acane0320
+  label:
+    en_US: Delete User Memory Profile
+    zh_Hans: 删除用户记忆配置文件
+    ja_Jp: ユーザーの記憶プロファイルを削除
+    pt_BR: Excluir Perfil de Memória do Usuário
+description:
+  human:
+    en_US: Delete a profile entry from the user's memory profile
+    zh_Hans: 从用户记忆配置文件中删除配置项
+    ja_Jp: ユーザーの記憶プロファイルを削除
+    pt_BR: Excluir uma entrada de perfil do perfil de memória do usuário
+  llm: Use this tool to delete a profile entry from the user's memory profile. This is useful for removing persistent information about the user that is no longer needed.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to delete the profile data for
+      zh_Hans: 要删除配置文件数据的用户 ID
+      ja_Jp: プロファイルデータを削除するユーザーの ID
+      pt_BR: O ID do usuário para excluir os dados do perfil
+    llm_description: The ID of the user to delete the profile data for.
+    form: llm
+  - name: profile_id
+    type: string
+    required: true
+    label:
+      en_US: Profile ID
+      zh_Hans: 配置文件 ID
+      ja_Jp: プロファイル ID
+      pt_BR: ID do Perfil
+    human_description:
+      en_US: The ID of the profile to delete
+      zh_Hans: 要删除的配置文件 ID
+      ja_Jp: 削除するプロファイル ID
+      pt_BR: O ID do perfil a ser excluído
+    llm_description: The ID of the profile to delete.
+    form: llm
+extra:
+  python:
+    source: tools/user_profile/delete_profile.py

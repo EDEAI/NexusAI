@@ -1,0 +1,100 @@
+identity:
+  name: WaterCrawlScrap
+  author: watercrawl
+  label:
+    en_US: Scrape Single URL
+description:
+  human:
+    en_US: Transform a url to LLM ready text
+  llm: This tool is designed to scrape a single URL and output the content in selected format. The format can be markdown, html, json, or screenshot. If you choose screenshot, the output will be a screenshot of the page.
+parameters:
+  - form: llm
+    name: url
+    type: string
+    required: true
+    label:
+      en_US: URL
+    human_description:
+      en_US: Enter the URL you want to scrape
+    llm_description: The URL of the website that needs to be crawled. This is a required parameter.
+
+  - form: llm
+    name: include_html
+    type: boolean
+    default: false
+    required: false
+    label:
+      en_US: Include HTML
+    human_description:
+      en_US: Include HTML in the output
+    llm_description: Whether to include HTML in the output this HTML extracted from the page.
+
+  - form: llm
+    name: make_screenshot
+    type: boolean
+    default: false
+    required: false
+    label:
+      en_US: Make Screenshot
+    human_description:
+      en_US: Make Screenshot of the page
+    llm_description: Whether to make a screenshot of the page.
+
+  - form: llm
+    name: return_json
+    type: boolean
+    default: false
+    required: false
+    label:
+      en_US: Return JSON
+    human_description:
+      en_US: Return JSON in the output
+
+  - form: llm
+    name: include_links
+    type: boolean
+    default: false
+    required: false
+    label:
+      en_US: Include links
+    human_description:
+      en_US: Include links in the output
+    llm_description: Whether to include links in the output this link extracted from the page.
+
+  - form: form
+    name: timeout
+    type: number
+    default: 15000
+    required: false
+    label:
+      en_US: Timeout
+    human_description:
+      en_US: Set the timeout for the request
+    llm_description: The timeout for the request, in milliseconds. Default is 300ms.
+
+  - form: form
+    name: wait_time
+    type: number
+    default: 1000
+    required: false
+    label:
+      en_US: Wait Timeout
+    human_description:
+      en_US: After opening the page, wait for the page to load for the specified time
+    llm_description: The timeout for waiting for the page to load, in milliseconds. Default is 1000ms.
+
+output_schema:
+  type: object
+  properties:
+    html:
+      type: string
+      description: The HTML content of the page.
+    markdown:
+      type: string
+    links:
+      type: array
+      items:
+        type: string
+extra:
+  python:
+    source: tools/scrape.py

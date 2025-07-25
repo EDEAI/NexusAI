@@ -1,0 +1,38 @@
+identity:
+  name: mark_todo_completed
+  author: ayush3941
+  label:
+    en_US: Mark Todo as Completed
+    zh_Hans: 标记任务为已完成
+    pt_BR: Marcar Tarefa como Concluída
+  icon: "icon.png"
+  description:
+    en_US: Mark a specific Microsoft Todo task as completed using its task ID.
+    zh_Hans: 使用任务 ID 将 Microsoft Todo 中的任务标记为已完成。
+    pt_BR: Marque uma tarefa específica do Microsoft Todo como concluída usando seu ID.
+
+description:
+  human:
+    en_US: Mark a todo task as completed by providing its unique task ID.
+    zh_Hans: 通过提供唯一的任务 ID 将待办事项标记为已完成。
+    pt_BR: Marque uma tarefa como concluída fornecendo seu ID exclusivo.
+  llm: Update a Microsoft Todo task status to completed using its ID.
+
+parameters:
+  - name: task_id
+    type: string
+    required: true
+    label:
+      en_US: Task ID
+      zh_Hans: 任务 ID
+      pt_BR: ID da Tarefa
+    human_description:
+      en_US: The unique identifier of the task to mark as completed.
+      zh_Hans: 要标记为已完成的任务的唯一标识符。
+      pt_BR: O identificador exclusivo da tarefa a ser marcada como concluída.
+    llm_description: ID of the task to update.
+    form: llm
+
+extra:
+  python:
+    source: tools/mark_todo_completed.py

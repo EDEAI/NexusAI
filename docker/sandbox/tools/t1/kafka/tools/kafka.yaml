@@ -1,0 +1,121 @@
+identity:
+  name: kafka
+  author: lework
+  label:
+    en_US: kafka
+    zh_Hans: Kafka消息发送
+    pt_BR: kafka
+description:
+  human:
+    en_US: Send message to Kafka topic
+    zh_Hans: 发送消息到Kafka主题
+    pt_BR: Send message to Kafka topic
+  llm: Send message to Kafka topic
+parameters:
+  - name: topic
+    type: string
+    required: true
+    label:
+      en_US: Topic
+      zh_Hans: 主题
+      pt_BR: Topic
+    human_description:
+      en_US: Kafka topic name
+      zh_Hans: Kafka主题名称
+      pt_BR: Kafka topic name
+    llm_description: Kafka topic name to send message to
+    form: llm
+  - name: message
+    type: string
+    required: true
+    label:
+      en_US: Message
+      zh_Hans: 消息内容
+      pt_BR: Message
+    human_description:
+      en_US: Message content to send
+      zh_Hans: 要发送的消息内容
+      pt_BR: Message content to send
+    llm_description: Message content to send to Kafka topic
+    form: llm
+  - name: key
+    type: string
+    required: false
+    label:
+      en_US: Message Key
+      zh_Hans: 消息键
+      pt_BR: Message Key
+    human_description:
+      en_US: Optional message key
+      zh_Hans: 可选的消息键
+      pt_BR: Optional message key
+    llm_description: Optional message key for partitioning
+    form: llm
+  - name: bootstrap_servers
+    type: string
+    required: false
+    label:
+      en_US: Bootstrap Servers
+      zh_Hans: Kafka服务器
+      pt_BR: Bootstrap Servers
+    human_description:
+      en_US: Specific Kafka bootstrap servers, override credential setting
+      zh_Hans: 特定的Kafka服务器地址，覆盖凭证设置
+      pt_BR: Specific Kafka bootstrap servers, override credential setting
+    llm_description: Optional bootstrap servers to override credential setting
+    form: llm
+  - name: security_protocol
+    type: string
+    required: false
+    label:
+      en_US: Security Protocol
+      zh_Hans: 安全协议
+      pt_BR: Security Protocol
+    human_description:
+      en_US: Security protocol to use (PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL)
+      zh_Hans: 使用的安全协议 (PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL)
+      pt_BR: Security protocol to use (PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL)
+    llm_description: Optional security protocol to override credential setting
+    form: llm
+  - name: sasl_mechanism
+    type: string
+    required: false
+    label:
+      en_US: SASL Mechanism
+      zh_Hans: SASL机制
+      pt_BR: SASL Mechanism
+    human_description:
+      en_US: SASL mechanism to use (PLAIN, SCRAM-SHA-256, SCRAM-SHA-512)
+      zh_Hans: 使用的SASL机制 (PLAIN, SCRAM-SHA-256, SCRAM-SHA-512)
+      pt_BR: SASL mechanism to use (PLAIN, SCRAM-SHA-256, SCRAM-SHA-512)
+    llm_description: Optional SASL mechanism to override credential setting
+    form: llm
+  - name: sasl_username
+    type: string
+    required: false
+    label:
+      en_US: SASL Username
+      zh_Hans: SASL用户名
+      pt_BR: SASL Username
+    human_description:
+      en_US: SASL username for authentication
+      zh_Hans: SASL身份验证的用户名
+      pt_BR: SASL username for authentication
+    llm_description: Optional SASL username to override credential setting
+    form: llm
+  - name: sasl_password
+    type: string
+    required: false
+    label:
+      en_US: SASL Password
+      zh_Hans: SASL密码
+      pt_BR: SASL Password
+    human_description:
+      en_US: SASL password for authentication
+      zh_Hans: SASL身份验证的密码
+      pt_BR: SASL password for authentication
+    llm_description: Optional SASL password to override credential setting
+    form: llm
+extra:
+  python:
+    source: tools/kafka.py

@@ -1,0 +1,79 @@
+identity:
+  author: yizixuan
+  name: text_regex_extract
+  label:
+    en_US: Text Regex Extract
+    zh_Hans: 正则提取文本
+description:
+  human:
+    en_US: Use regular expressions to extract content from the text. For "text", output the first matching result, and for "json", output all matching results.
+    zh_Hans: 使用正则表达式从文本中提取内容，text 输出第一个匹配结果，json 输出所有匹配结果。
+  llm: A tool for extracting content from the given text using regular expressions.
+extra:
+  python:
+    source: tools/text_regex_extract.py
+parameters:
+  - name: input_text
+    type: string
+    label:
+      en_US: Input text
+      zh_Hans: 输入文本
+    form: llm
+    required: true
+    human_description:
+      en_US: Input text to extract content from.
+      zh_Hans: 要从中提取内容的输入文本。
+  - name: regex_pattern
+    type: string
+    label:
+      en_US: Regex pattern
+      zh_Hans: 正则表达式
+    form: llm
+    required: true
+    human_description:
+      en_US: Regular expression pattern to match.
+      zh_Hans: 用于匹配的正则表达式。
+  - name: regex_ignorecase
+    type: boolean
+    label:
+      en_US: RE.IGNORECASE
+      zh_Hans: RE.IGNORECASE
+    form: form
+    required: true
+    default: false
+    human_description:
+      en_US: When using regular expressions, ignore case.
+      zh_Hans: 使用正则表达式时，忽略大小写。
+  - name: regex_multiline
+    type: boolean
+    label:
+      en_US: RE.MULTILINE
+      zh_Hans: RE.MULTILINE
+    form: form
+    required: true
+    default: false
+    human_description:
+      en_US: When using regular expressions, make ^, $ take effect for each line.
+      zh_Hans: 使用正则表达式时，让 ^, $ 每行生效。
+  - name: regex_dotall
+    type: boolean
+    label:
+      en_US: RE.DOTALL
+      zh_Hans: RE.DOTALL
+    form: form
+    required: true
+    default: false
+    human_description:
+      en_US: When using regular expressions, make . match all characters including line breaks.
+      zh_Hans: 使用正则表达式时，让 . 匹配包括换行在内的所有字符。
+  - name: regex_ascii
+    type: boolean
+    label:
+      en_US: RE.ASCII
+      zh_Hans: RE.ASCII
+    form: form
+    required: true
+    default: false
+    human_description:
+      en_US: When using regular expressions, make \w, \d, \s match only ASCII, not Unicode.
+      zh_Hans: 使用正则表达式时，让 \w, \d, \s 只匹配 ASCII，而非 Unicode。

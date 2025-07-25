@@ -1,0 +1,13 @@
+identity:
+  name: random_uuid
+  author: bowenliang123
+  label:
+    en_US: Random UUID
+    zh_Hans: 生成随机UUID
+description:
+  human:
+    en_US: Generate a random UUID.
+  llm: Generate a random UUID.
+extra:
+  python:
+    source: tools/random_uuid/random_uuid.py

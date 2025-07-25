@@ -1,0 +1,18 @@
+extra:
+  python:
+    source: provider/pubmed.py
+identity:
+  author: Pink Banana
+  description:
+    en_US: A search engine for biomedical literature.
+    zh_Hans: 一款生物医学文献搜索引擎。
+  icon: icon.svg
+  label:
+    en_US: PubMed
+    zh_Hans: PubMed
+  name: pubmed
+  tags:
+  - medical
+  - search
+tools:
+- tools/pubmed_search.yaml

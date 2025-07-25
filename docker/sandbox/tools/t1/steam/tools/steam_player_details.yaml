@@ -1,0 +1,26 @@
+identity:
+  name: steam_player_details
+  author: bdim
+  label:
+    en_US: Steam Player Details
+    zh_Hans: 玩家详细资料
+description:
+  human:
+    en_US: Get detailed profile information for up to 100 Steam users
+    zh_Hans: 获取最多 100 个 Steam 用户的详细个人资料信息
+  llm: Retrieve comprehensive profile information for multiple Steam users (up to 100) by providing their 64-bit Steam IDs as a comma-separated list.
+parameters:
+  - name: steamids
+    type: string
+    required: true
+    label:
+      en_US: Steam IDs
+      zh_Hans: Steam ID列表
+    human_description:
+      en_US: Comma-separated list of 64-bit Steam IDs (up to 100)
+      zh_Hans: 逗号分隔的 64 位 Steam ID 列表（最多100个）
+    llm_description: A comma-separated list of 64-bit Steam IDs for which you want to retrieve profile information. You can include up to 100 IDs in a single request. Example format for a single ID - 76561197960435530, for multiple IDs - 76561197960435530,76561197960435531,76561197960435532
+    form: llm
+extra:
+  python:
+    source: tools/steam_player_details.py

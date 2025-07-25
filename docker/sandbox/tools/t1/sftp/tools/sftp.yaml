@@ -1,0 +1,162 @@
+identity:
+  name: sftp
+  author: stvlynn
+  label:
+    en_US: SFTP File Operations
+    zh_Hans: SFTP 文件操作
+description:
+  human:
+    en_US: Perform SFTP operations like uploading, downloading, and managing files on remote servers
+    zh_Hans: 执行SFTP操作，如上传、下载和管理远程服务器上的文件
+  llm: A tool for performing SFTP operations including file transfer and management on remote servers. Supports both password and key-based authentication.
+parameters:
+  - name: host
+    type: string
+    required: true
+    label:
+      en_US: Host
+      zh_Hans: 主机地址
+    human_description:
+      en_US: Remote server hostname or IP address
+      zh_Hans: 远程服务器主机名或IP地址
+    llm_description: The hostname or IP address of the remote SFTP server
+  
+  - name: port
+    type: number
+    required: false
+    default: 22
+    label:
+      en_US: Port
+      zh_Hans: 端口
+    human_description:
+      en_US: SFTP port number (default: 22)
+      zh_Hans: SFTP端口号（默认：22）
+    llm_description: The port number for the SFTP connection, defaults to 22
+  
+  - name: username
+    type: string
+    required: true
+    label:
+      en_US: Username
+      zh_Hans: 用户名
+    human_description:
+      en_US: Username for authentication
+      zh_Hans: 用于认证的用户名
+    llm_description: Username for authenticating with the SFTP server
+  
+  - name: auth_type
+    type: select
+    required: true
+    options:
+      - value: password
+        label:
+          en_US: Password
+          zh_Hans: 密码认证
+      - value: key
+        label:
+          en_US: Private Key
+          zh_Hans: 密钥认证
+    label:
+      en_US: Authentication Type
+      zh_Hans: 认证类型
+    human_description:
+      en_US: Choose authentication method (password or private key)
+      zh_Hans: 选择认证方式（密码或私钥）
+    llm_description: The type of authentication to use (password or private key)
+  
+  - name: password
+    type: string
+    required: false
+    label:
+      en_US: Password
+      zh_Hans: 密码
+    human_description:
+      en_US: Password for authentication (required if using password authentication)
+      zh_Hans: 用于认证的密码（使用密码认证时必填）
+    llm_description: Password for password-based authentication
+    form: security
+  
+  - name: private_key
+    type: string
+    required: false
+    label:
+      en_US: Private Key
+      zh_Hans: 私钥
+    human_description:
+      en_US: SSH private key for authentication (required if using key authentication)
+      zh_Hans: 用于认证的SSH私钥（使用密钥认证时必填）
+    llm_description: SSH private key content for key-based authentication
+    form: security
+  
+  - name: passphrase
+    type: string
+    required: false
+    label:
+      en_US: Private Key Passphrase
+      zh_Hans: 私钥密码
+    human_description:
+      en_US: Passphrase for encrypted private key (if applicable)
+      zh_Hans: 加密私钥的密码（如果有）
+    llm_description: Passphrase for decrypting the private key if it is encrypted
+    form: security
+  
+  - name: action
+    type: select
+    required: true
+    options:
+      - value: list
+        label:
+          en_US: List Directory
+          zh_Hans: 列出目录
+      - value: get
+        label:
+          en_US: Download File
+          zh_Hans: 下载文件
+      - value: put
+        label:
+          en_US: Upload File
+          zh_Hans: 上传文件
+      - value: mkdir
+        label:
+          en_US: Create Directory
+          zh_Hans: 创建目录
+      - value: rmdir
+        label:
+          en_US: Remove Directory
+          zh_Hans: 删除目录
+      - value: remove
+        label:
+          en_US: Remove File
+          zh_Hans: 删除文件
+    label:
+      en_US: Operation
+      zh_Hans: 操作类型
+    human_description:
+      en_US: Type of SFTP operation to perform
+      zh_Hans: 要执行的SFTP操作类型
+    llm_description: The type of SFTP operation to perform
+  
+  - name: remote_path
+    type: string
+    required: true
+    label:
+      en_US: Remote Path
+      zh_Hans: 远程路径
+    human_description:
+      en_US: Path on the remote server
+      zh_Hans: 远程服务器上的路径
+    llm_description: The path on the remote server for the SFTP operation
+  
+  - name: local_path
+    type: string
+    required: false
+    label:
+      en_US: Local Path
+      zh_Hans: 本地路径
+    human_description:
+      en_US: Local file path (required for upload/download operations)
+      zh_Hans: 本地文件路径（上传/下载操作时必填）
+    llm_description: The local file path for upload/download operations
+extra:
+  python:
+    source: tools/sftp.py

@@ -68,26 +68,33 @@ class ToolNode(Node):
             assert workflow, 'Invalid workflow ID!'
             provider = self.data['tool']['provider']
             tool_name = self.data['tool']['tool_name']
+            if 'tool_category' in self.data['tool']:
+                tool_category = self.data['tool']['tool_category']
+            else:
+                tool_category = 't1'
             credentials = {}
             tool = ToolAuthorizations().select_one(
                 columns=['encrypted_credentials'],
                 conditions=[
                     {'column': 'team_id', 'value': workflow['team_id']},
-                    {'column': 'provider', 'value': provider}
+                    {'column': 'provider', 'value': provider},
+                    {'column': 'tool_category', 'value': tool_category}
                 ]
             )
             if tool:
                 credentials = tool['encrypted_credentials']
-            if validate_credentials(provider=provider,credentials=credentials):
-                output: Variable = use_tool(
-                    provider=provider,
-                    tool_name=tool_name,
-                    parent_type=BuiltinTool,
-                    credentials=credentials,
-                    parameters=input
-                )
-            else:
-                raise Exception("Invalid credentials")
+            # if validate_credentials(provider=provider,credentials=credentials):
+            from core.tool.sandbox_tool_runner import SandboxToolRunner
+            runner = SandboxToolRunner()
+            output: Variable = runner.run_sandbox_tool(
+                category=tool_category,
+                provider=provider,
+                tool_name=tool_name,
+                credentials=credentials,
+                parameters=input
+            )
+            # else:
+            #     raise Exception("Invalid credentials")
             end_time = datetime.now()
             return {
                 'status': 'success',

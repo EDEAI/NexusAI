@@ -1,0 +1,152 @@
+identity:
+  name: query_database
+  author: digitforce
+  label:
+    en_US: query_database
+    zh_Hans: 查询数据库
+    pt_BR: query_database
+description:
+  human:
+    en_US: natural language based query database
+    zh_Hans: 通过自然语言查询数据库
+    pt_BR: natural language based query database
+  llm: natural language based query database
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 用户的查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: Query string
+      zh_Hans: 用户的查询语句
+      pt_BR: Query string
+    llm_description: Query string
+    form: llm
+  - name: database_type
+    type: select
+    required: false
+    label:
+      en_US: database type
+      zh_Hans: 数据库的类型
+      pt_BR: database type
+    human_description:
+      en_US: Select the database type, MySQL, PostgreSQL, StarRocks, or Doris.
+      zh_Hans: 选择数据库的类型，mysql、postgresql、starrocks或doris
+      pt_BR: Select the database type, MySQL, PostgreSQL, StarRocks, or Doris.
+    options:
+      - label:
+          en_US: mysql
+          zh_Hans: mysql
+          pt_BR: mysql
+        value: mysql
+      - label:
+          en_US: postgresql
+          zh_Hans: postgresql
+          pt_BR: postgresql
+        value: postgresql
+      - label:
+          en_US: starrocks
+          zh_Hans: starrocks
+          pt_BR: starrocks
+        value: starrocks
+      - label:
+          en_US: doris
+          zh_Hans: doris
+          pt_BR: doris
+        value: doris
+    default: mysql
+    llm_description: database type
+    form: llm
+  - name: database_leixing
+    type: string
+    required: true
+    label:
+      en_US: Database typeName
+      zh_Hans: 数据库类型名
+      pt_BR: Database typeName
+    human_description:
+      en_US: Name of the database/schema to connect to.
+      zh_Hans: 需要连接的数据库或Schema类
+      pt_BR: Name of the database/schema to connect to.
+    llm_description: Name of the database/schema to connect to
+    form: llm
+  - name: user
+    type: string
+    required: true
+    label:
+      en_US: Database User
+      zh_Hans: 数据库用户
+      pt_BR: Database User
+    human_description:
+      en_US: Username for database connection
+      zh_Hans: 用于数据库连接的用户名
+      pt_BR: Username for database connection
+    llm_description: Username for database connection
+    form: llm
+  - name: password
+    type: string
+    required: true
+    label:
+      en_US: Database Password
+      zh_Hans: 数据库密码
+      pt_BR: Database Password
+    human_description:
+      en_US: Password for database connection
+      zh_Hans: 用于数据库连接的密码
+      pt_BR: Password for database connection
+    llm_description: Password for database connection
+    form: llm
+  - name: IP
+    type: string
+    required: true
+    label:
+      en_US: Database IP
+      zh_Hans: 数据库IP地址
+      pt_BR: Database IP
+    human_description:
+      en_US: IP address of the database server
+      zh_Hans: 数据库服务器的IP地址
+      pt_BR: IP address of the database server
+    llm_description: IP address of the database server
+    form: llm
+  - name: port
+    type: string
+    required: true
+    label:
+      en_US: Database Port
+      zh_Hans: 数据库端口
+      pt_BR: Database Port
+    human_description:
+      en_US: Port number for database connection
+      zh_Hans: 用于数据库连接的端口号
+      pt_BR: Port number for database connection
+    llm_description: Port number for database connection
+    form: llm
+  - name: db_name
+    type: string
+    required: true
+    label:
+      en_US: Database Name
+      zh_Hans: 数据库名称
+      pt_BR: Database Name  
+    human_description:
+      en_US: |
+        Name of the database to connect to
+        Note: Please check the input parameters and do not leave them empty. The corresponding parts of the database URL are: {Database typeName}+pymysql://{Database User}:{Database Password}@{Database IP}:{Database Port}/{Database Name}?charset=utf8
+        If you still have issues, please go to the plugin details page to view examples.
+      zh_Hans: 需要连接的数据库名
+        注意检查上述填写，不要为空，填写的部分分别对应数据库url的部分为：{数据库类型名}+pymysql://{数据库用户}:{数据库密码}@{数据库IP地址}:{数据库端口}/{数据库名称}?charset=utf8                                 
+        若仍有问题，请转到插件详情页查看示例
+      pt_BR: |
+        Name of the database to connect to
+        Note: Please check the input parameters and do not leave them empty. The corresponding parts of the database URL are: {Database typeName}+pymysql://{Database User}:{Database Password}@{Database IP}:{Database Port}/{Database Name}?charset=utf8
+        If you still have issues, please go to the plugin details page to view examples.
+    llm_description: Name of the database to connect to
+    form: llm
+
+extra:
+  python:
+    source: tools/query_database.py

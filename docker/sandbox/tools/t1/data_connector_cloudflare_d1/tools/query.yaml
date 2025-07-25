@@ -1,0 +1,43 @@
+identity:
+  name: query
+  author: alterxyz
+  label:
+    en_US: Cloudflare D1 Query Executor
+    zh_Hans: Cloudflare D1 指令执行
+    pt_BR: Ferramenta de Execução Cloudflare D1
+description:
+  human:
+    en_US: Executes SQL statements on Cloudflare D1 and returns the full result set. Connects to the external data source - Cloudflare D1.
+    zh_Hans: 在 Cloudflare D1 上执行 SQL 语句并返回完整结果集。连接到外部数据源 - Cloudflare D1。
+    pt_BR: Executa instruções SQL no Cloudflare D1 e retorna o conjunto de resultados completo. Conecta-se à fonte de dados externa - Cloudflare D1.
+  llm: Execute SQL statements on Cloudflare D1 and retrieve the complete result set. Important:Process only one SQL statement per tool call.
+parameters:
+  - name: database_id
+    type: string
+    required: true
+    label:
+      en_US: Database ID
+      zh_Hans: 数据库 ID
+      pt_BR: ID do banco de dados
+    human_description:
+      en_US: Cloudflare D1 database ID.
+      zh_Hans: Cloudflare D1 数据库 ID。
+      pt_BR: ID do banco de dados Cloudflare D1.
+    llm_description: Specify the Cloudflare D1 database ID. Important:You MUST obtain this ID from the user if not already available.
+    form: form
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Statement
+      zh_Hans: SQL 语句
+      pt_BR: Instrução SQL
+    human_description:
+      en_US: SQL statement to execute on Cloudflare D1.
+      zh_Hans: 在 Cloudflare D1 上执行的 SQL 语句。
+      pt_BR: Instrução SQL para executar no Cloudflare D1.
+    llm_description: Provide a complete and valid SQL statement for Cloudflare D1 execution. Important:Ensure it is parameter-free (no placeholders like `?`, `:param`, etc.).
+    form: llm
+extra:
+  python:
+    source: tools/query.py

@@ -1,0 +1,60 @@
+identity:
+  name: video_compress
+  author: stvlynn
+  label:
+    en_US: Compress Video
+    zh_Hans: 视频压缩
+    pt_BR: Comprimir Vídeo
+description:
+  human:
+    en_US: Compress a video file to reduce its file size
+    zh_Hans: 压缩视频文件以减小文件大小
+    pt_BR: Comprimir um arquivo de vídeo para reduzir seu tamanho
+  llm: "Compresses a video file to reduce its size while attempting to maintain reasonable quality. Useful for sharing videos or saving storage space."
+parameters:
+  - name: video
+    type: file
+    required: true
+    label:
+      en_US: Video File
+      zh_Hans: 视频文件
+      pt_BR: Arquivo de Vídeo
+    human_description:
+      en_US: The video file to compress
+      zh_Hans: 要压缩的视频文件
+      pt_BR: O arquivo de vídeo para comprimir
+    llm_description: "The video file to compress"
+    form: llm
+  - name: compression_level
+    type: select
+    default: medium
+    required: false
+    label:
+      en_US: Compression Level
+      zh_Hans: 压缩级别
+      pt_BR: Nível de Compressão
+    human_description:
+      en_US: The compression level (low, medium, high)
+      zh_Hans: 压缩级别（低、中、高）
+      pt_BR: O nível de compressão (baixo, médio, alto)
+    llm_description: "The compression level to use. Options are 'low', 'medium', or 'high'. Default is 'medium'."
+    form: form
+    options:
+      - label:
+          en_US: Low (Better Quality)
+          zh_Hans: 低（更好的质量）
+          pt_BR: Baixo (Melhor Qualidade)
+        value: low
+      - label:
+          en_US: Medium (Balanced)
+          zh_Hans: 中（平衡）
+          pt_BR: Médio (Equilibrado)
+        value: medium
+      - label:
+          en_US: High (Smaller Size)
+          zh_Hans: 高（更小的体积）
+          pt_BR: Alto (Tamanho Menor)
+        value: high
+extra:
+  python:
+    source: tools/video_compress.py 

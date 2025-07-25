@@ -1,0 +1,40 @@
+identity:
+  name: chuangsi_llm_output_safety_guardrails # 工具的唯一内部名称
+  author: chuangsiaihub
+  label: # 在 Dify UI 中显示的工具名称 (多语言)
+    zh_Hans: 创思大模型回答安全护栏
+    en_US: Chuangsi LLM Answer Safety Guardrails
+description:
+  human: # 给人类用户看的工具描述 (多语言)
+    zh_Hans: 创思大模型回答安全护栏插件，旨在识别和拦截LLM回答中的潜在安全风险，包括涉政敏感、色情、违法违规行为、负面价值导向、辱骂言论及隐私泄露等内容。
+    en_US: The Chuangsi LLM Answer Safety Guardrail Plugin is designed to identify and intercept potential security risks in LLM answers, including politically sensitive content, pornography, illegal or non-compliant behavior, negative value orientation, abusive language, and privacy breaches.
+  llm: # 给 LLM 看的工具描述 (用于 Agent 模式)
+    创思大模型回答安全护栏插件，旨在识别和拦截LLM回答中的潜在安全风险，包括涉政敏感、色情、违法违规行为、负面价值导向、辱骂言论及隐私泄露等内容。输入是待审查文本，输出是相应的风险标签和处置结果。处置结果包括：block、review、pass, 其中 block代表需要拦截，review代表需要送审，pass代表无风险可通过。
+parameters: # 定义工具的输入参数列表
+  - name: content # 参数的内部名称，与 Python 代码中的 key 对应
+    type: string # 参数类型
+    required: true # 是否必需
+    label: # 在 Dify UI 中显示的参数标签 (多语言)
+      zh_Hans: 待审查文本内容
+      en_US: Content Awaiting Moderation
+    human_description: # 给人类用户看的参数描述 (多语言)
+      zh_Hans: 待审查文本内容
+      en_US: Content Awaiting Moderation
+    llm_description: # 给 LLM 看的参数描述 (指导 Agent 如何填充)
+      待审查文本内容
+    form: llm # 参数表单类型 ('llm' 或 'form')
+  - name: strategy_id
+    type: string
+    required: true
+    label:
+      zh_Hans: 大模型回答安全策略ID
+      en_US: LLM Answer Safety Policy ID
+    human_description:
+      zh_Hans: 在创思大模型安全控制台中配置的大模型回答安全护栏策略相应的策略ID
+      en_US: The corresponding policy ID of the LLM answer safety guardrail strategy configured in the Chuangsi LLM Security Console.
+    llm_description: # 强调格式要求对 LLM 很重要
+      大模型回答安全策略ID
+    form: form # 参数表单类型 ('llm' 或 'form')
+extra: # 额外配置
+  python:
+    source: tools/llm_output_safety_guardrails.py # 指向实现该工具逻辑的 Python 文件

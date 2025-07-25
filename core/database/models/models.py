@@ -60,8 +60,8 @@ class Models(MySQL):
             ],
             joins=[
                 ['inner', 'suppliers', 'models.supplier_id = suppliers.id'],
-                ['inner', 'supplier_configurations', 'suppliers.id = supplier_configurations.supplier_id'],
-                ['inner', 'model_configurations', 'models.id = model_configurations.model_id']
+                ['inner', 'model_configurations', 'models.id = model_configurations.model_id'],
+                ['inner', 'supplier_configurations', 'suppliers.id = supplier_configurations.supplier_id AND model_configurations.team_id = supplier_configurations.team_id']
             ],
             conditions=[
                 {'column': 'model_configurations.id', 'value': model_config_id},
@@ -74,7 +74,7 @@ class Models(MySQL):
         assert model, get_language_content('api_vector_available_model')
         return model
 
-    def get_model_config_llm_list(self) -> list:
+    def get_model_config_llm_list(self,team_id: int) -> list:
         '''
         Find the list of LLM (type=1) model configurations,
         group by supplier and return supplier info with their model_list.
@@ -99,7 +99,7 @@ class Models(MySQL):
                         {'column': 'models.status', 'value': 1},
                         {'column': 'model_configurations.status', 'value': 1},
                         {'column': 'suppliers.status', 'value': 1},
-                        {'column': 'model_configurations.team_id', 'value': 1}
+                        {'column': 'model_configurations.team_id', 'value': team_id}
                         ],
             order_by="suppliers.id ASC, model_configurations.sort_order ASC"
         )

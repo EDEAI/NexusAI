@@ -1,0 +1,222 @@
+identity:
+  name: template-list
+  author: aippt
+  label:
+    en_US: Choose Template
+    zh_Hans: 选择模板
+    pt_BR: Choose Template
+description:
+  human:
+    en_US: Choose a PPT template
+    zh_Hans: 选择PPT模板
+    pt_BR: Choose a PPT template
+  llm: Choose a PPT template
+parameters:
+  - name: page
+    type: number
+    required: true
+    default: "1"
+    label:
+      en_US: Template Page Number
+      zh_Hans: 模板页码
+      pt_BR: Template Page Number
+    human_description:
+      en_US: Defaults to the first page
+      zh_Hans: 默认是第一页
+      pt_BR: Defaults to the first page
+    llm_description: Defaults to the first page
+    form: form
+  - name: page_size
+    type: number
+    required: true
+    default: "20"
+    label:
+      en_US: Templates per Page
+      zh_Hans: 模板单页显示数量
+      pt_BR: Templates per Page
+    human_description:
+      en_US: Default is 20 templates
+      zh_Hans: 默认20个模板
+      pt_BR: Default is 20 templates
+    llm_description: Default is 20 templates
+    form: form
+  - name: colour
+    type: select
+    required: true
+    label:
+      en_US: Template Color
+      zh_Hans: 模板颜色
+      pt_BR: Template Color
+    human_description:
+      en_US: Default is orange
+      zh_Hans: 默认橙色
+      pt_BR: Default is orange
+    llm_description: Default is orange
+    form: form
+    default: "1"
+    options:
+      - label:
+          en_US: Orange
+          zh_Hans: 橙色
+        value: "1"
+      - label:
+          en_US: Yellow
+          zh_Hans: 黄色
+        value: "3"
+      - label:
+          en_US: Green
+          zh_Hans: 绿色
+        value: "4"
+      - label:
+          en_US: Pink
+          zh_Hans: 粉色
+        value: "13"
+      - label:
+          en_US: Cyan
+          zh_Hans: 青色
+        value: "5"
+      - label:
+          en_US: Purple
+          zh_Hans: 紫色
+        value: "6"
+      - label:
+          en_US: Blue
+          zh_Hans: 蓝色
+        value: "7"
+      - label:
+          en_US: Black
+          zh_Hans: 黑色
+        value: "8"
+      - label:
+          en_US: Gray
+          zh_Hans: 灰色
+        value: "9"
+      - label:
+          en_US: Brown
+          zh_Hans: 棕色
+        value: "11"
+      - label:
+          en_US: Red
+          zh_Hans: 红色
+        value: "2"
+  - name: suit_style
+    type: select
+    required: true
+    label:
+      en_US: Template Style
+      zh_Hans: 模板风格
+      pt_BR: Template Style
+    human_description:
+      en_US: Default is minimal
+      zh_Hans: 默认简约
+      pt_BR: Default is minimal
+    llm_description: Default is minimal
+    form: form
+    default: "1"
+    options:
+      - label:
+          en_US: Minimal
+          zh_Hans: 简约
+        value: "1"
+      - label:
+          en_US: Business
+          zh_Hans: 商务
+        value: "2"
+      - label:
+          en_US: Technology
+          zh_Hans: 科技
+        value: "7"
+      - label:
+          en_US: Illustration
+          zh_Hans: 插画
+        value: "4"
+      - label:
+          en_US: Government
+          zh_Hans: 政务
+        value: "5"
+      - label:
+          en_US: Diffuse
+          zh_Hans: 弥散
+        value: "3"
+      - label:
+          en_US: Trendy
+          zh_Hans: 潮流
+        value: "6"
+      - label:
+          en_US: Oriental
+          zh_Hans: 国风
+        value: "13"
+      - label:
+          en_US: 3D
+          zh_Hans: 立体
+        value: "10"
+      - label:
+          en_US: Retro
+          zh_Hans: 复古
+        value: "9"
+  - name: suit_scene
+    type: select
+    required: true
+    label:
+      en_US: Template Scene
+      zh_Hans: 模板场景
+      pt_BR: Template Scene
+    human_description:
+      en_US: Default is Summary Report
+      zh_Hans: 默认总结汇报
+      pt_BR: Default is Summary Report
+    llm_description: Default is Summary Report
+    form: form
+    default: "2"
+    options:
+      - label:
+          en_US: Summary Report
+          zh_Hans: 总结汇报
+        value: "2"
+      - label:
+          en_US: Education & Training
+          zh_Hans: 教育培训
+        value: "6"
+      - label:
+          en_US: Medical & Healthcare
+          zh_Hans: 医学医疗
+        value: "8"
+      - label:
+          en_US: Marketing & Promotion
+          zh_Hans: 营销推广
+        value: "7"
+      - label:
+          en_US: Business Plan
+          zh_Hans: 商业计划
+        value: "1"
+      - label:
+          en_US: University Zone
+          zh_Hans: 高校专区
+        value: "4"
+      - label:
+          en_US: Company Introduction
+          zh_Hans: 企业介绍
+        value: "3"
+      - label:
+          en_US: Government Promotion
+          zh_Hans: 党政宣传
+        value: "9"
+      - label:
+          en_US: Self Introduction
+          zh_Hans: 自我介绍
+        value: "12"
+      - label:
+          en_US: Analysis Report
+          zh_Hans: 分析报告
+        value: "15"
+      - label:
+          en_US: Press Conference
+          zh_Hans: 发布会
+        value: "5"
+      - label:
+          en_US: Public Welfare Promotion
+          zh_Hans: 公益宣传
+        value: "13"
+extra:
+  python:
+    source: tools/template-list.py

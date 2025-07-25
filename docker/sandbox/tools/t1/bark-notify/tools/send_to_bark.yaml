@@ -1,0 +1,67 @@
+identity:
+  name: send_to_bark
+  author: itning
+  label:
+    en_US: SendNotify
+    zh_Hans: 发送通知
+description:
+  human:
+    en_US: Used to push messages to the Bark application
+    zh_Hans: 用于推送消息到Bark应用程序中
+  llm: Used to push messages to the Bark application
+parameters:
+  - name: title
+    type: string
+    required: false
+    label:
+      en_US: Push title
+      zh_Hans: 推送标题
+    human_description:
+      en_US: Title that needs to be pushed to the Bark application
+      zh_Hans: 需要推送到Bark应用程序的标题
+    llm_description: Title that needs to be pushed to the Bark application (not required)
+    form: llm
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: Push content
+      zh_Hans: 推送内容
+    human_description:
+      en_US: Content that needs to be pushed to the Bark application
+      zh_Hans: 需要推送到Bark应用程序的内容
+    llm_description: Content that needs to be pushed to the Bark application (required)
+    form: llm
+  - name: query_params
+    type: string
+    required: false
+    label:
+      en_US: Custom Query Param
+      zh_Hans: 自定义查询参数
+    human_description:
+      en_US: The configuration here will override the query parameters configured during authorization by KEY. For example, if the configuration during authorization is ?sound=minuet&call=1&isArchive=1, and the configuration here is ?sound=alarm, then the final effective configuration will be ?sound=alarm&call=1&isArchive=1
+      zh_Hans: 此处配置会按KEY覆盖授权时配置的查询参数，例如授权时配置为?sound=minuet&call=1&isArchive=1，此处配置?sound=alarm，则最终生效为?sound=alarm&call=1&isArchive=1
+    form: form
+  - name: bark_key
+    type: secret-input
+    required: false
+    label:
+      en_US: Bark KEY
+      zh_Hans: Bark KEY
+    human_description:
+      en_US: The configuration here will override the KEY set during authorization
+      zh_Hans: 此处配置会覆盖授权时配置的KEY
+    form: form
+  - name: server_url
+    type: string
+    required: false
+    label:
+      en_US: Server URL
+      zh_Hans: 服务器地址
+    human_description:
+      en_US: The configuration here will override the Server URL set during authorization
+      zh_Hans: 此处配置会覆盖授权时配置的服务器地址
+    form: form
+extra:
+  python:
+    source: tools/send_to_bark.py

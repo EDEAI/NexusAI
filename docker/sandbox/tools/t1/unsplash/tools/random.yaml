@@ -1,0 +1,162 @@
+identity:
+  name: random_photo
+  author: stvlynn
+  label:
+    en_US: Random Photo
+    zh_Hans: 随机图片
+    pt_BR: Foto Aleatória
+description:
+  human:
+    en_US: Get a random high-quality photo from Unsplash
+    zh_Hans: 从Unsplash获取一张随机高质量图片
+    pt_BR: Obtenha uma foto aleatória de alta qualidade do Unsplash
+  llm: A tool for getting random high-quality photos from Unsplash. You can specify topics, orientation, and more.
+parameters:
+  - name: query
+    type: string
+    required: false
+    label:
+      en_US: Search Query
+      zh_Hans: 搜索关键词
+      pt_BR: Consulta de Pesquisa
+    human_description:
+      en_US: Optional keywords to filter random photos by topic
+      zh_Hans: 可选的关键词，用于按主题筛选随机图片
+      pt_BR: Palavras-chave opcionais para filtrar fotos aleatórias por tópico
+    llm_description: Optional keywords to filter random photos by topic or category
+    form: llm
+  - name: orientation
+    type: select
+    required: false
+    label:
+      en_US: Orientation
+      zh_Hans: 图片方向
+      pt_BR: Orientação
+    human_description:
+      en_US: Filter by photo orientation
+      zh_Hans: 按照图片方向过滤
+      pt_BR: Filtrar por orientação de foto
+    llm_description: Filter photos by orientation (landscape, portrait, squarish)
+    form: form
+    options:
+      - label:
+          en_US: Landscape
+          zh_Hans: 横向
+          pt_BR: Paisagem
+        value: landscape
+      - label:
+          en_US: Portrait
+          zh_Hans: 纵向
+          pt_BR: Retrato
+        value: portrait
+      - label:
+          en_US: Square
+          zh_Hans: 方形
+          pt_BR: Quadrado
+        value: squarish
+  - name: color
+    type: select
+    required: false
+    label:
+      en_US: Color
+      zh_Hans: 颜色
+      pt_BR: Cor
+    human_description:
+      en_US: Filter by dominant color in the photo
+      zh_Hans: 按照图片主色调过滤
+      pt_BR: Filtrar pela cor dominante na foto
+    llm_description: Filter results by color
+    form: form
+    options:
+      - label:
+          en_US: Black and White
+          zh_Hans: 黑白
+          pt_BR: Preto e Branco
+        value: black_and_white
+      - label:
+          en_US: Black
+          zh_Hans: 黑色
+          pt_BR: Preto
+        value: black
+      - label:
+          en_US: White
+          zh_Hans: 白色
+          pt_BR: Branco
+        value: white
+      - label:
+          en_US: Yellow
+          zh_Hans: 黄色
+          pt_BR: Amarelo
+        value: yellow
+      - label:
+          en_US: Orange
+          zh_Hans: 橙色
+          pt_BR: Laranja
+        value: orange
+      - label:
+          en_US: Red
+          zh_Hans: 红色
+          pt_BR: Vermelho
+        value: red
+      - label:
+          en_US: Purple
+          zh_Hans: 紫色
+          pt_BR: Roxo
+        value: purple
+      - label:
+          en_US: Magenta
+          zh_Hans: 品红
+          pt_BR: Magenta
+        value: magenta
+      - label:
+          en_US: Green
+          zh_Hans: 绿色
+          pt_BR: Verde
+        value: green
+      - label:
+          en_US: Teal
+          zh_Hans: 青色
+          pt_BR: Azul-petróleo
+        value: teal
+      - label:
+          en_US: Blue
+          zh_Hans: 蓝色
+          pt_BR: Azul
+        value: blue
+  - name: count
+    type: number
+    required: false
+    default: 1
+    label:
+      en_US: Count
+      zh_Hans: 数量
+      pt_BR: Quantidade
+    human_description:
+      en_US: Number of random photos to return (max 30)
+      zh_Hans: 返回的随机图片数量（最多30张）
+      pt_BR: Número de fotos aleatórias a retornar (máximo 30)
+    llm_description: Number of random photos to return (maximum 30)
+    form: llm
+output_schema:
+  type: object
+  properties:
+    photos:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          description:
+            type: string
+          alt_description:
+            type: string
+          urls:
+            type: object
+          user:
+            type: object
+          links:
+            type: object
+extra:
+  python:
+    source: tools/random.py

@@ -1,0 +1,273 @@
+identity:
+  name: get_models
+  author: yt-koike
+  label:
+    en_US: Models
+description:
+  human:
+    en_US: Gets models
+  llm: Gets models
+parameters:
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: Limit
+    human_description:
+      en_US: The number of results to be returned per page.
+    default: 100
+    llm_description: The number of results to be returned per page.
+    form: llm
+  - name: page
+    type: number
+    required: false
+    label:
+      en_US: page
+    human_description:
+      en_US: The number of results to be returned per page.
+    llm_description: The number of results to be returned per page.
+    form: llm
+  - name: query
+    type: string
+    required: false
+    label:
+      en_US: query
+    human_description:
+      en_US: The number of results to be returned per page.
+    llm_description: The number of results to be returned per page.
+    form: llm
+  - name: tag
+    type: string
+    required: false
+    label:
+      en_US: tag
+    human_description:
+      en_US: The number of results to be returned per page.
+    placeholder:
+      en_US: 20
+    llm_description: The number of results to be returned per page.
+    form: llm
+  - name: username
+    type: string
+    required: false
+    label:
+      en_US: Username
+    human_description:
+      en_US: The number of results to be returned per page.
+    placeholder:
+      en_US: 20
+    llm_description: The number of results to be returned per page.
+    form: llm
+  - name: type
+    form: form
+    label:
+      en_US: Type
+    llm_description: Type
+    type: select
+    human_description:
+      en_US: Type of model
+    default: All
+    required: true
+    options:
+      - value: All
+        label:
+          en_US: All
+      - value: Checkpoint
+        label:
+          en_US: Checkpoint
+      - value: TextualInversion
+        label:
+          en_US: TextualInversion
+      - value: Hypernetwork
+        label:
+          en_US: Hypernetwork
+      - value: AestheticGradient
+        label:
+          en_US: AestheticGradient
+      - value: LORA
+        label:
+          en_US: LORA
+      - value: Controlnet
+        label:
+          en_US: Controlnet
+      - value: Poses
+        label:
+          en_US: Poses
+  - name: sort
+    form: form
+    label:
+      en_US: Sort
+    llm_description: Sort
+    type: select
+    human_description:
+      en_US: Type of model
+    default: Highest Rated
+    required: true
+    options:
+      - value: Highest Rated
+        label:
+          en_US: Highest Rated
+      - value: Most Downloaded
+        label:
+          en_US: Most Downloaded
+      - value: Most Liked
+        label:
+          en_US: Most Liked
+      - value: Most Discussed
+        label:
+          en_US: Most Discussed
+      - value: Most Collected
+        label:
+          en_US: Most Collected
+      - value: Most Images
+        label:
+          en_US: Most Images
+      - value: Newest
+        label:
+          en_US: Newest
+      - value: Oldest
+        label:
+          en_US: Oldest
+  - name: period
+    form: form
+    label:
+      en_US: The time frame in which the images will be sorted
+    llm_description: The time frame in which the images will be sorted
+    type: select
+    human_description:
+      en_US: Type of model
+    default: AllTime
+    required: true
+    options:
+      - value: AllTime
+        label:
+          en_US: All Time
+      - value: Year
+        label:
+          en_US: Year
+      - value: Month
+        label:
+          en_US: Month
+      - value: Week
+        label:
+          en_US: Week
+      - value: Day
+        label:
+          en_US: Day
+  - name: favorites
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: favorites
+    human_description:
+      en_US: The number of results to be returned per page.
+    llm_description: The number of results to be returned per page.
+    form: form
+  - name: hidden
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: hidden
+    human_description:
+      en_US: The number of results to be returned per page.
+    llm_description: The number of results to be returned per page.
+    form: form
+  - name: primaryFileOnly
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: primaryFileOnly
+    human_description:
+      en_US: The number of results to be returned per page.
+    llm_description: The number of results to be returned per page.
+    form: form
+  #- name: allowNoCredit
+  #  type: boolean
+  #  required: false
+  #  default: false
+  #  label:
+  #    en_US: allowNoCredit
+  #  human_description:
+  #    en_US: The number of results to be returned per page.
+  #  llm_description: The number of results to be returned per page.
+  #  form: form
+  #- name: allowDerivatives
+  #  type: boolean
+  #  required: false
+  #  default: false
+  #  label:
+  #    en_US: allowDerivatives
+  #  human_description:
+  #    en_US: The number of results to be returned per page.
+  #  llm_description: The number of results to be returned per page.
+  #  form: form
+  - name: allowDifferentLicenses
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: allowDifferentLicenses
+    human_description:
+      en_US: The number of results to be returned per page.
+    llm_description: The number of results to be returned per page.
+    form: form
+  #- name: allowCommercialUse
+  #  form: form
+  #  label:
+  #    en_US: allowCommercialUse
+  #  llm_description: Sort
+  #  type: select
+  #  human_description:
+  #    en_US: Type of model
+  #  default: None
+  #  required: true
+  #  options:
+  #    - value: None
+  #      label:
+  #        en_US: None
+  #    - value: Image
+  #      label:
+  #        en_US: Image
+  #    - value: Rent
+  #      label:
+  #        en_US: Rent
+  #    - value: Sell
+  #      label:
+  #        en_US: Sell
+  - name: nsfw
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: nsfw
+    human_description:
+      en_US: The number of results to be returned per page.
+    llm_description: The number of results to be returned per page.
+    form: form
+  - name: supportsGeneration
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: supportsGeneration
+    human_description:
+      en_US: The number of results to be returned per page.
+    llm_description: The number of results to be returned per page.
+    form: form
+extra:
+  python:
+    source: tools/get_models.py
+output_schema:
+  type: object
+  properties:
+    ids:
+      type: array[number]
+      label:
+        en_US: id
+    names:
+      type: array[string]
+      label:
+        en_US: names

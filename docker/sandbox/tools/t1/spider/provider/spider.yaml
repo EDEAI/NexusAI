@@ -1,0 +1,33 @@
+credentials_for_provider:
+  spider_api_key:
+    help:
+      en_US: Get your Spider API key from your Spider dashboard
+      zh_CN: 从您的 Spider 仪表板中获取 Spider API 密钥。
+    label:
+      en_US: Spider API Key
+      zh_CN: Spider API 密钥
+    placeholder:
+      en_US: Please input your Spider API key
+      zh_CN: 请输入您的 Spider API 密钥
+    required: true
+    type: secret-input
+    url: https://spider.cloud/
+extra:
+  python:
+    source: provider/spider.py
+identity:
+  author: William Espegren
+  description:
+    en_US: Spider API integration, returning LLM-ready data by scraping & crawling
+      websites.
+    zh_CN: Spider API 集成，通过爬取和抓取网站返回 LLM-ready 数据。
+  icon: icon.svg
+  label:
+    en_US: Spider
+    zh_CN: Spider
+  name: spider
+  tags:
+  - search
+  - utilities
+tools:
+- tools/scraper_crawler.yaml

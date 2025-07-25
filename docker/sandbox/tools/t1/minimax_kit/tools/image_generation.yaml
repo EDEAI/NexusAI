@@ -1,0 +1,102 @@
+identity:
+  name: image_generation
+  author: quicksandzn
+  label:
+    en_US: Image Generation
+    zh_Hans: 图片生成
+description:
+  human:
+    en_US: Image Generation
+    zh_Hans: 图片生成
+  llm: Generate images using text prompt words
+parameters:
+  - name: model
+    type: select
+    required: true
+    options:
+      - value: image-01
+        label:
+          en_US: image-01
+          zh_Hans: image-01
+      - value: image-01-live
+        label:
+          en_US: image-01-live
+          zh_Hans: image-01-live
+    default: image-01
+    label:
+      en_US: Model Name
+      zh_Hans: 模型名称
+    human_description:
+      en_US: Model Name
+      zh_CN: 模型名称
+    form: form
+  - name: prompt
+    type: string
+    required: true
+    label:
+      en_US: Prompt
+      zh_Hans: 文本提示词
+    human_description:
+      en_US: Generate the description of the image.
+      zh_CN: 生成图像的描述
+    form: llm
+  - name: aspect_ratio
+    type: select
+    required: false
+    options:
+      - value: "1:1"
+        label:
+          en_US: "1:1"
+          zh_Hans: " 1:1"
+      - value: "16:9"
+        label:
+          en_US: "16:9"
+          zh_Hans: "16:9"
+      - value: "4:3"
+        label:
+          en_US: "4:3"
+          zh_Hans: "4:3"
+      - value: "3:2"
+        label:
+          en_US: "3:2"
+          zh_Hans: "3:2"
+      - value: "2:3"
+        label:
+          en_US: "2:3"
+          zh_Hans: "2:3"
+      - value: "3:4"
+        label:
+          en_US: "3:4"
+          zh_Hans: "3:4"
+      - value: "9:16"
+        label:
+          en_US: "9:16"
+          zh_Hans: "9:16"
+      - value: "21:9"
+        label:
+          en_US: "21:9"
+          zh_Hans: "21:9"
+    default: "1:1"
+    label:
+      en_US: Aspect Ratio
+      zh_Hans: 宽高比
+    human_description:
+      en_US: Used to control the aspect ratio of the generated image
+      zh_CN: 用于控制生成图像的宽高比
+    form: form
+  - name: n
+    type: number
+    required: false
+    default: 1
+    max: 9
+    min: 1
+    label:
+      en_US: Number of generated
+      zh_Hans: 生成数量
+    human_description:
+      en_US: Generate the description of the image.
+      zh_CN: Used to control the number of images generated in a single request
+    form: form
+extra:
+  python:
+    source: tools/image_generation.py

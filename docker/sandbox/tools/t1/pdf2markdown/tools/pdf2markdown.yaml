@@ -1,0 +1,64 @@
+identity:
+  name: pdf2markdown
+  author: textin
+  label:
+    en_US: pdf2markdown
+    zh_Hans: 通用文档解析
+
+description:
+  human:
+    en_US: Designed specifically for downstream tasks of large language models (LLMs), this service can recognize text from documents or images and intelligently restore the reading order of the content, outputting a standardized Markdown format. It supports OCR recognition across more than 10 common document layouts and over 52 languages, enabling LLMs to more efficiently utilize document content in scenarios such as understanding, generation, and question answering.
+    zh_Hans: 专为大语言模型（LLM）下游任务设计，能够识别文档或图片中的文字信息，并智能还原文档的阅读顺序，输出标准化的Markdown格式。服务支持OCR识别，覆盖10+种常见文档版式，支持52+种语言，助力各类大模型在理解、生成、问答等场景中更高效地利用文档内容。
+  llm: A tool to quickly and easily convert PDFs and images to markdown
+parameters:
+  - name: url
+    type: string
+    required: true
+    label:
+      en_US: Image or PDF URL
+      zh_Hans: 图片、PDF等文件在线链接地址
+    human_description:
+      en_US: Image or PDF URL
+      zh_Hans: 图片、PDF等文件在线链接地址
+    llm_description: Image or PDF URL
+    form: llm
+
+  - name: app_id
+    type: string
+    required: true
+    label:
+      en_US: x-ti-app-id
+      zh_Hans: textin开发者账号的 x-ti-app-id
+    human_description:
+      en_US: x-ti-app-id
+      zh_Hans: textin开发者账号的 x-ti-app-id
+    llm_description: x-ti-app-id
+    form: form
+
+  - name: secret_code
+    type: string
+    required: true
+    label:
+      en_US: x-ti-secret-code
+      zh_Hans: textin开发者账号的 x-ti-secret-code
+    human_description:
+      en_US: x-ti-secret-code
+      zh_Hans: textin开发者账号的 x-ti-secret-code
+    llm_description: x-ti-secret-code
+    form: form
+
+  - name: options
+    type: string
+    required: false
+    label:
+      en_US: Additional options (JSON string)
+      zh_Hans: 更多自定义参数，以 JSON 字符串传入，参考 textin 官方应用示例，如 '{"page_count":1}'
+    human_description:
+      en_US: Additional options (JSON string)
+      zh_Hans: 更多自定义参数，以 JSON 字符串传入，参考 textin 官方应用示例，如 '{"page_count":1}'
+    llm_description: Additional options (JSON string)
+    form: form
+
+extra:
+  python:
+    source: tools/pdf2markdown.py

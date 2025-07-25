@@ -1,0 +1,26 @@
+identity:
+  name: abstracts-index
+  author: bdim
+  label:
+    en_US: Academic Abstracts Search
+    zh_Hans: 学术摘要搜索
+description:
+  human:
+    en_US: Semantic search across 110 million academic publications using embeddings and FAISS indexing
+    zh_Hans: 使用嵌入向量和 FAISS 索引对 1.1 亿篇学术出版物进行语义搜索
+  llm: Semantic search engine for 110 million academic publications from OpenAlex dataset, powered by stella_en_1.5B_v5 embeddings and FAISS indexing
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Search Query
+      zh_Hans: 搜索查询
+    human_description:
+      en_US: Enter your search query to find relevant academic papers from 110 million publications
+      zh_Hans: 输入搜索查询以从 1.1 亿篇出版物中找到相关学术论文
+    llm_description: Natural language search query for finding relevant academic papers and abstracts from the OpenAlex dataset
+    form: llm
+extra:
+  python:
+    source: tools/abstracts-index.py

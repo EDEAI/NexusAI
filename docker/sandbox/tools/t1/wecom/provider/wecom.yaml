@@ -1,0 +1,19 @@
+extra:
+  python:
+    source: provider/wecom.py
+identity:
+  author: Bowen Liang
+  description:
+    en_US: Wecom group bot
+    pt_BR: Wecom group bot
+    zh_Hans: 企业微信群机器人
+  icon: icon.png
+  label:
+    en_US: Wecom
+    pt_BR: Wecom
+    zh_Hans: 企业微信
+  name: wecom
+  tags:
+  - social
+tools:
+- tools/wecom_group_bot.yaml

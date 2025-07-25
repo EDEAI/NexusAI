@@ -1,0 +1,29 @@
+identity:
+  author: jingfelix
+  name: get_stock_individual_basic_info
+  label:
+    zh_Hans: 个股信息查询
+    en_US: Stock Individual Basic Info
+    zh_Hant: 個股信息查詢
+description:
+  human:
+    zh_Hans: 查询A股个股的基本信息。
+    en_US: Query basic information of an A-share stock.
+    zh_Hant: 查詢A股個股的基本信息。
+  llm: 查询A股个股的基本信息，输入股票代码，返回公司名称、行业、上市日期等信息。
+parameters:
+  - name: symbol
+    label:
+      zh_Hans: 股票代码
+      en_US: Stock Symbol
+      zh_Hant: 股票代碼
+    human_description:
+      zh_Hans: 需要查询的A股股票代码，如“SH600519”（需包含交易所代码）。
+      en_US: The A-share stock symbol to query, e.g., "SH600519".
+      zh_Hant: 需要查詢的A股股票代碼，如“SH600519”（需包含交易所代码）。
+    type: string
+    form: llm
+    required: true
+extra:
+  python:
+    source: tools/get_stock_individual_basic_info.py

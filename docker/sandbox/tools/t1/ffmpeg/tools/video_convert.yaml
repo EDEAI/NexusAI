@@ -1,0 +1,43 @@
+identity:
+  name: video_convert
+  author: stvlynn
+  label:
+    en_US: Convert Video
+    zh_Hans: 视频格式转换
+    pt_BR: Converter Video
+description:
+  human:
+    en_US: Convert a video file to a different format
+    zh_Hans: 将视频文件转换为不同的格式
+    pt_BR: Converter um arquivo de video para um formato diferente
+  llm: Converts video files from one format to another. Supports common formats.
+parameters:
+  - name: video
+    type: file
+    required: true
+    label:
+      en_US: Video File
+      zh_Hans: 视频文件
+      pt_BR: Arquivo de Video
+    human_description:
+      en_US: The video file to convert
+      zh_Hans: 要转换的视频文件
+      pt_BR: O arquivo de video para converter
+    llm_description: The video file to convert to another format
+    form: llm
+  - name: target_format
+    type: string
+    required: true
+    label:
+      en_US: Target Format
+      zh_Hans: 目标格式
+      pt_BR: Formato Alvo
+    human_description:
+      en_US: The format to convert the video to
+      zh_Hans: 要将视频转换为的格式
+      pt_BR: O formato para converter o video
+    llm_description: The target format to convert the video to
+    form: llm
+extra:
+  python:
+    source: tools/video_convert.py

@@ -1,0 +1,44 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Grid -->
+  <rect width="240" height="240" fill="#ffffff"></rect>
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e0e0" stroke-width="1"></path>
+    </pattern>
+  </defs>
+  <rect width="240" height="240" fill="url(#grid)" opacity="0.3"></rect>
+
+  <!-- Pill Capsule -->
+  <g transform="translate(70, 60) rotate(-30)">
+    <rect x="0" y="0" width="80" height="30" rx="15" fill="#1976D2"></rect>
+    <rect x="0" y="0" width="40" height="30" rx="15" fill="#64B5F6"></rect>
+    <line x1="40" y1="0" x2="40" y2="30" stroke="#ffffff" stroke-width="1.5"></line>
+  </g>
+
+  <!-- Magnifying Glass -->
+  <circle cx="160" cy="160" r="24" stroke="#333" stroke-width="4" fill="none"></circle>
+  <line x1="176" y1="176" x2="195" y2="195" stroke="#333" stroke-width="4" stroke-linecap="round"></line>
+
+  <!-- Plugin Prongs -->
+  <rect x="30" y="200" width="10" height="25" rx="2" fill="#333"></rect>
+  <rect x="48" y="200" width="10" height="25" rx="2" fill="#333"></rect>
+
+  <!-- Microscope Silhouette -->
+  <path d="M190 60 h-8 v-20 h-10 v20 h-8 v8 h8 v25 h-6 v10 h20 v-10 h-6 v-25 h8 z" fill="#555"></path>
+
+  <!-- DNA Strand (Stylized Helix) -->
+  <path d="M120 60
+           C125 65, 125 75, 120 80
+           C115 85, 115 95, 120 100
+           C125 105, 125 115, 120 120
+           C115 125, 115 135, 120 140" stroke="#9C27B0" stroke-width="3" fill="none"></path>
+  <line x1="115" y1="65" x2="125" y2="65" stroke="#9C27B0" stroke-width="2"></line>
+  <line x1="115" y1="85" x2="125" y2="85" stroke="#9C27B0" stroke-width="2"></line>
+  <line x1="115" y1="105" x2="125" y2="105" stroke="#9C27B0" stroke-width="2"></line>
+  <line x1="115" y1="125" x2="125" y2="125" stroke="#9C27B0" stroke-width="2"></line>
+
+  <!-- Optional Text -->
+  <!-- <text x="120" y="230" font-size="14" font-family="Segoe UI, sans-serif" text-anchor="middle" fill="#333">
+    Drug Research Plugin
+  </text> -->
+</svg>

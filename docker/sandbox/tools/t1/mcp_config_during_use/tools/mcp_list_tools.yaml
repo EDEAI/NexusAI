@@ -1,0 +1,61 @@
+identity:
+  name: mcp_list_tools
+  author: arrenxxxxx
+  label:
+    en_US: List MCP Tools
+    zh_Hans: 列出MCP工具
+description:
+  human:
+    en_US: List tools from MCP Server through HTTP with SSE transport.
+    zh_Hans: 通过HTTP with SSE传输来列出MCP服务端工具。
+  llm: List all available tools from an MCP Server.
+extra:
+  python:
+    source: tools/mcp_list_tools.py
+parameters:
+  - name: server_url
+    type: string
+    required: true
+    label:
+      en_US: Server URL
+      zh_Hans: 服务器地址
+    human_description:
+      en_US: The URL of the MCP Server with SSE endpoint.
+      zh_Hans: MCP服务器的SSE端点URL。
+    llm_description: The URL of the MCP Server with SSE endpoint.
+    form: llm
+  - name: headers
+    type: string
+    required: false
+    label:
+      en_US: Headers
+      zh_Hans: 请求头
+    human_description:
+      en_US: HTTP headers in JSON format (e.g. {"Authorization":"Bearer token"}).
+      zh_Hans: HTTP请求头，JSON格式（例如：{"Authorization":"Bearer token"}）。
+    llm_description: HTTP headers in JSON format (e.g. {"Authorization":"Bearer token"}).
+    form: llm
+  - name: timeout
+    type: number
+    required: false
+    default: 60
+    label:
+      en_US: Timeout
+      zh_Hans: 超时时间
+    human_description:
+      en_US: HTTP request timeout in seconds.
+      zh_Hans: HTTP请求超时时间（秒）。
+    llm_description: HTTP request timeout in seconds.
+    form: llm
+  - name: sse_read_timeout
+    type: number
+    required: false
+    default: 300
+    label:
+      en_US: SSE Read Timeout
+      zh_Hans: SSE读取超时
+    human_description:
+      en_US: SSE read timeout in seconds (time to wait for SSE events).
+      zh_Hans: SSE读取超时时间（秒）（等待SSE事件的时间）。
+    llm_description: SSE read timeout in seconds (time to wait for SSE events).
+    form: llm 

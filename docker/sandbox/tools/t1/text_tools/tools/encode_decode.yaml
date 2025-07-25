@@ -1,0 +1,66 @@
+identity:
+  author: yizixuan
+  name: encode_decode
+  label:
+    en_US: Encode Decode
+    zh_Hans: 编码解码
+description:
+  human:
+    en_US: Encode or decode text using URL, Base64, or Unicode encoding/decoding.
+    zh_Hans: 使用 URL、Base64 或 Unicode 进行编码或解码。
+  llm: A tool for encoding or decoding text using various methods.
+extra:
+  python:
+    source: tools/encode_decode.py
+parameters:
+  - name: input_text
+    type: string
+    label:
+      en_US: Input text
+      zh_Hans: 输入文本
+    form: llm
+    required: true
+    human_description:
+      en_US: The text to be encoded or decoded.
+      zh_Hans: 要进行编码或解码的文本。
+  - name: operation
+    type: select
+    label:
+      en_US: Operation
+      zh_Hans: 操作
+    form: form
+    required: true
+    options:
+      - value: url_encode
+        label:
+          en_US: URL Encode
+          zh_Hans: URL 编码
+      - value: url_decode
+        label:
+          en_US: URL Decode
+          zh_Hans: URL 解码
+      - value: base64_encode
+        label:
+          en_US: Base64 Encode
+          zh_Hans: Base64 编码
+      - value: base64_decode
+        label:
+          en_US: Base64 Decode
+          zh_Hans: Base64 解码
+      - value: unicode_encode
+        label:
+          en_US: Unicode Encode
+          zh_Hans: Unicode 编码
+      - value: unicode_decode
+        label:
+          en_US: Unicode Decode
+          zh_Hans: Unicode 解码
+    human_description:
+      en_US: Select the encoding or decoding operation to perform.
+      zh_Hans: 选择要执行的编码或解码操作。
+output_schema:
+  type: object
+  properties:
+    result:
+      type: string
+      description: Encoded or decoded result

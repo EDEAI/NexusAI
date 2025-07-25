@@ -12,11 +12,12 @@ class ToolAuthorizations(MySQL):
     """
     have_updated_time = True
 
-    def get_tool_info(self,user_id: int, team_id: int,provider:str) -> Dict[str, Any]:
+    def get_tool_info(self,user_id: int, team_id: int,provider:str,tool_category:str='t1') -> Dict[str, Any]:
         tool = self.select_one(columns='*',
                                 conditions=[
                                     {"column": "user_id", "value": user_id},
                                     {"column": "team_id", "value": team_id},
+                                    {"column": "tool_category", "value": tool_category},
                                     {"column": "provider", "value": provider},
                                 ])
         if not tool:

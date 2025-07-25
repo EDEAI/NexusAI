@@ -1,0 +1,166 @@
+identity:
+  name: discord
+  author: stvlynn
+  label:
+    en_US: Discord
+    zh_Hans: Discord
+    ja_JP: Discord
+description:
+  human:
+    en_US: Get RSS feeds from Discord via RSSHub
+    zh_Hans: 通过RSSHub获取Discord的RSS订阅源
+    ja_JP: RSSHubを通じてDiscordのRSSフィードを取得
+  llm: "A tool to fetch RSS feeds from Discord using RSSHub as a proxy."
+parameters:
+  - name: route_type
+    type: select
+    required: true
+    default: "channel"
+    label:
+      en_US: Route Type
+      zh_Hans: 路由类型
+      ja_JP: ルートタイプ
+    human_description:
+      en_US: "The type of Discord route to use"
+      zh_Hans: "要使用的Discord路由类型"
+      ja_JP: "使用するDiscordルートのタイプ"
+    llm_description: "The type of Discord route to use"
+    form: form
+    options:
+      - value: channel
+        label:
+          en_US: Channel Messages
+          zh_Hans: 频道消息
+          ja_JP: チャンネルメッセージ
+      - value: search
+        label:
+          en_US: Guild Search
+          zh_Hans: 服务器搜索
+          ja_JP: サーバー検索
+  - name: base_url
+    type: string
+    required: false
+    default: "https://rsshub.app"
+    label:
+      en_US: RSSHub Base URL
+      zh_Hans: RSSHub基础URL
+      ja_JP: RSSHubベースURL
+    human_description:
+      en_US: "The base URL of RSSHub instance (default is https://rsshub.app)"
+      zh_Hans: "RSSHub实例的基础URL（默认为https://rsshub.app）"
+      ja_JP: "RSSHubインスタンスのベースURL（デフォルトはhttps://rsshub.app）"
+    llm_description: "The base URL of RSSHub instance (default is https://rsshub.app)"
+    form: form
+  - name: access_key
+    type: string
+    required: false
+    label:
+      en_US: RSSHub Access Key
+      zh_Hans: RSSHub访问密钥
+      ja_JP: RSSHubアクセスキー
+    human_description:
+      en_US: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+      zh_Hans: "RSSHub路由的访问密钥（例如：ILoveRSSHub）。如不需要请留空。"
+      ja_JP: "RSSHubルートのアクセスキー（例：ILoveRSSHub）。必要ない場合は空のままにしてください。"
+    llm_description: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+    form: form
+  - name: channel_id
+    type: string
+    required: false
+    label:
+      en_US: Channel ID
+      zh_Hans: 频道ID
+      ja_JP: チャンネルID
+    human_description:
+      en_US: "The ID of Discord channel (required for Channel Messages route type)"
+      zh_Hans: "Discord频道的ID（频道消息路由类型必填）"
+      ja_JP: "DiscordチャンネルのID（チャンネルメッセージルートタイプに必要）"
+    llm_description: "The ID of Discord channel (required for Channel Messages route type)"
+    form: llm
+  - name: guild_id
+    type: string
+    required: false
+    label:
+      en_US: Guild ID
+      zh_Hans: 服务器ID
+      ja_JP: サーバーID
+    human_description:
+      en_US: "The ID of Discord guild/server (required for Guild Search route type)"
+      zh_Hans: "Discord服务器的ID（服务器搜索路由类型必填）"
+      ja_JP: "Discordサーバーの ID（サーバー検索ルートタイプに必要）"
+    llm_description: "The ID of Discord guild/server (required for Guild Search route type)"
+    form: llm
+  - name: search_params
+    type: string
+    required: false
+    label:
+      en_US: Search Parameters
+      zh_Hans: 搜索参数
+      ja_JP: 検索パラメータ
+    human_description:
+      en_US: "Search parameters for Guild Search route type (e.g. content=friendly&has=image,video)"
+      zh_Hans: "服务器搜索路由类型的搜索参数（例如：content=friendly&has=image,video）"
+      ja_JP: "サーバー検索ルートタイプの検索パラメータ（例：content=friendly&has=image,video）"
+    llm_description: "Search parameters for Guild Search route type (e.g. content=friendly&has=image,video). Supports content, author_id, mentions, has, min_id, max_id, channel_id, pinned."
+    form: llm
+  - name: discord_authorization
+    type: string
+    required: false
+    label:
+      en_US: Discord Authorization
+      zh_Hans: Discord授权令牌
+      ja_JP: Discord認証トークン
+    human_description:
+      en_US: "Discord authorization header from the browser (required for both route types)"
+      zh_Hans: "从浏览器获取的Discord授权头（两种路由类型都需要）"
+      ja_JP: "ブラウザから取得したDiscord認証ヘッダー（両方のルートタイプに必要）"
+    llm_description: "Discord authorization header from the browser (required for both route types)"
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Item Limit
+      zh_Hans: 条目数量限制
+      ja_JP: アイテム数制限
+    human_description:
+      en_US: "Maximum number of items to return (default: 10)"
+      zh_Hans: "返回的最大条目数量（默认：10）"
+      ja_JP: "返される最大アイテム数（デフォルト：10）"
+    llm_description: "Maximum number of items to return (default: 10)"
+    form: llm
+extra:
+  python:
+    source: tools/discord.py
+output_variables:
+  - name: title
+    type: string
+    description:
+      en_US: The title of the RSS feed
+      zh_Hans: RSS订阅源的标题
+      ja_JP: RSSフィードのタイトル
+  - name: description
+    type: string
+    description:
+      en_US: The description of the RSS feed
+      zh_Hans: RSS订阅源的描述
+      ja_JP: RSSフィードの説明
+  - name: url
+    type: string
+    description:
+      en_US: The URL of the RSS feed
+      zh_Hans: RSS订阅源的URL
+      ja_JP: RSSフィードのURL
+  - name: entries
+    type: array
+    description:
+      en_US: The entries of the RSS feed
+      zh_Hans: RSS订阅源的条目
+      ja_JP: RSSフィードのエントリー
+  - name: route_info
+    type: object
+    description:
+      en_US: Information about the Discord route
+      zh_Hans: Discord路由的信息
+      ja_JP: Discordルートに関する情報 

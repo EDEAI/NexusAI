@@ -1,0 +1,224 @@
+identity:
+  name: rate_limiter_check
+  author: axdlee
+  description:
+    en_US: Check if the current request exceeds rate limits
+    zh_Hans: 检查当前请求是否超出频率限制
+  icon: icon.svg
+  label:
+    en_US: Rate Limiter Check
+    zh_Hans: 频率限制检查
+  tags:
+    - utilities
+
+description:
+  human:
+    en_US: Check if the current request is allowed based on rate limiting rules
+    zh_Hans: 根据速率限制规则检查当前请求是否允许
+  llm: Check if the current request is allowed based on configured rate limiting rules and algorithms
+
+extra:
+  python:
+    source: tools/rate_limiter_check.py
+
+parameters:
+  - name: unique_id
+    type: string
+    required: true
+    default: "default"
+    label:
+      en_US: Unique ID
+      zh_Hans: 唯一标识
+    help:
+      en_US: The unique identifier for the rate limit configuration, used to save and distinguish different rate limit configurations
+      zh_Hans: 频率限制的唯一标识, 用于分别保存并区分不同的频率限制配置
+    human_description:
+      en_US: Please provide the unique identifier for rate limit configuration
+      zh_Hans: 请提供需要进行频率限制配置的唯一标识
+    llm_description: The unique identifier to check rate limit against
+    form: llm
+
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户ID
+    help:
+      en_US: The ID of the user making the request
+      zh_Hans: 发起请求的用户ID
+    human_description:
+      en_US: Please provide the user ID for rate limit checking
+      zh_Hans: 请提供需要进行频率限制检查的用户ID
+    llm_description: The user identifier to check rate limit against
+    form: llm
+
+  - name: action_type
+    type: select
+    required: true
+    label:
+      en_US: Action Type
+      zh_Hans: 操作类型
+    help:
+      en_US: The type of action being performed
+      zh_Hans: 正在执行的操作类型
+    human_description:
+      en_US: Select the type of action to check rate limit for
+      zh_Hans: 选择需要进行频率限制检查的操作类型, 例如聊天或函数调用, 可以自定义
+    llm_description: The type of action to check rate limit for
+    form: llm
+    options:
+      - value: chat
+        label:
+          en_US: Chat
+          zh_Hans: 聊天
+      - value: function
+        label:
+          en_US: Function Call
+          zh_Hans: 函数调用
+
+  - name: algorithm_type
+    type: select
+    required: false
+    label:
+      en_US: Algorithm Type
+      zh_Hans: 算法类型
+    help:
+      en_US: The type of rate limiting algorithm to use, token bucket (token_bucket, token generation rate per second), fixed window (fixed_window, maximum number of requests allowed within the specified time window), sliding window (sliding_window, continuous moving time window), leaky bucket (leaky_bucket, request processing rate per second)
+      zh_Hans: 使用的限流算法类型, 令牌桶算法(token_bucket, 每秒生成令牌数)、固定窗口算法(fixed_window, 指定时间窗口内允许的最大请求数)、滑动窗口算法(sliding_window, 连续移动的时间窗口)、漏桶算法(leaky_bucket, 每秒处理请求数)
+    human_description:
+      en_US: Select the rate limiting algorithm to use, token bucket (token_bucket, token generation rate per second), fixed window (fixed_window, maximum number of requests allowed within the specified time window), sliding window (sliding_window, continuous moving time window), leaky bucket (leaky_bucket, request processing rate per second)
+      zh_Hans: 选择要使用的限流算法, 令牌桶算法(token_bucket, 每秒生成令牌数)、固定窗口算法(fixed_window, 指定时间窗口内允许的最大请求数)、滑动窗口算法(sliding_window, 连续移动的时间窗口)、漏桶算法(leaky_bucket, 每秒处理请求数)
+    llm_description: The type of rate limiting algorithm to use
+    default: token_bucket
+    options:
+      - value: token_bucket
+        label:
+          en_US: Token Bucket
+          zh_Hans: 令牌桶
+      - value: fixed_window
+        label:
+          en_US: Fixed Window
+          zh_Hans: 固定窗口
+      - value: sliding_window
+        label:
+          en_US: Sliding Window
+          zh_Hans: 滑动窗口
+      - value: leaky_bucket
+        label:
+          en_US: Leaky Bucket
+          zh_Hans: 漏桶
+      - value: multiple_buckets
+        label:
+          en_US: Multiple Buckets
+          zh_Hans: 混合窗口
+    form: form
+
+  - name: rate
+    type: number
+    required: false
+    label:
+      en_US: Rate
+      zh_Hans: 速率
+    help:
+      en_US: For token bucket - token generation rate per second; For leaky bucket - request processing rate per second; For multiple buckets - request processing rate per second
+      zh_Hans: 令牌桶算法 - 每秒生成令牌数; 漏桶算法 - 每秒处理请求数; 混合算法 - 每秒处理请求数
+    human_description:
+      en_US: For token bucket - how many tokens are generated per second; For leaky bucket - how many requests can be processed per second; For multiple buckets - how many requests can be processed per second
+      zh_Hans: 令牌桶算法 - 每秒生成多少令牌; 漏桶算法 - 每秒可以处理多少请求; 混合算法 - 每秒可以处理多少请求
+    llm_description: Rate parameter with different meanings for token bucket (token generation rate) and leaky bucket (request processing rate) and multiple buckets (request processing rate)
+    default: 10
+    form: form
+    dependencies:
+      algorithm_type:
+        values: ["token_bucket", "leaky_bucket", "multiple_buckets"]
+
+  - name: capacity
+    type: number
+    required: false
+    label:
+      en_US: Capacity
+      zh_Hans: 容量
+    help:
+      en_US: For token bucket - maximum tokens the bucket can hold; For leaky bucket - maximum requests in queue; For multiple buckets - maximum requests in queue and maximum tokens the bucket can hold
+      zh_Hans: 令牌桶算法 - 桶可以存储的最大令牌数; 漏桶算法 - 队列中可以等待的最大请求数; 混合算法 - 桶可以存储的最大令牌数及队列中可以等待的最大请求数
+    human_description:
+      en_US: For token bucket - maximum number of tokens that can be accumulated; For leaky bucket - maximum number of requests that can be queued; For multiple buckets - maximum requests in queue and maximum tokens the bucket can hold
+      zh_Hans: 令牌桶算法 - 可以累积的最大令牌数; 漏桶算法 - 可以排队的最大请求数; 混合算法 - 桶可以存储的最大令牌数及队列中可以等待的最大请求数
+    llm_description: Capacity parameter with different meanings for token bucket (max tokens) and leaky bucket (max queued requests) and multiple buckets (max queued requests and max tokens)
+    default: 100
+    form: form
+    dependencies:
+      algorithm_type:
+        values: ["token_bucket", "leaky_bucket", "multiple_buckets"]
+
+  - name: max_requests
+    type: number
+    required: false
+    label:
+      en_US: Max Requests
+      zh_Hans: 最大请求数
+    help:
+      en_US: Maximum number of requests allowed in the time window
+      zh_Hans: 时间窗口内允许的最大请求数
+    human_description:
+      en_US: For fixed/sliding/multiple buckets window - maximum number of requests allowed within the specified time window
+      zh_Hans: 固定/滑动/混合窗口算法 - 指定时间窗口内允许的最大请求数
+    llm_description: Maximum requests allowed in the window for fixed and sliding window algorithms and multiple buckets (maximum requests in queue)
+    default: 100
+    form: form
+    dependencies:
+      algorithm_type:
+        values: ["fixed_window", "sliding_window", "multiple_buckets"]
+
+  - name: window_size
+    type: number
+    required: false
+    label:
+      en_US: Window Size
+      zh_Hans: 窗口大小
+    help:
+      en_US: Time window size in seconds. Fixed window uses discrete intervals, sliding/multiple buckets window uses continuous intervals
+      zh_Hans: 时间窗口大小(秒)。固定窗口使用离散区间，滑动/混合窗口使用连续区间
+    human_description:
+      en_US: For fixed window - discrete time intervals (e.g. per minute); For sliding/multiple buckets window - continuous moving time window
+      zh_Hans: 固定窗口 - 离散的时间区间(如每分钟); 滑动/混合窗口 - 连续移动的时间窗口
+    llm_description: Window size with different behaviors for fixed window (discrete) and sliding/multiple buckets window (continuous) algorithms
+    default: 60
+    form: form
+    dependencies:
+      algorithm_type:
+        values: ["fixed_window", "sliding_window", "multiple_buckets"]
+
+output_schema:
+  $schema: http://json-schema.org/draft-07/schema#
+  type: object
+  required: ["allowed", "remaining", "reset_time"]
+  additionalProperties: false
+  properties:
+    allowed:
+      type: string
+      title: Allowed
+      description: Whether the request is allowed, "true" or "false"
+    remaining:
+      type: integer
+      title: Remaining Requests
+      minimum: 0
+      description: Number of remaining requests
+    reset_time:
+      type: integer
+      title: Reset Time
+      minimum: 0
+      description: Time until the next reset in seconds
+    reason:
+      type: string
+      title: Reason
+      description: Reason for the rate limit check
+    reason_cn:
+      type: string
+      title: Reason (Chinese)
+      description: Reason for the rate limit check in Chinese
+    reason_code:
+      type: string
+      title: Reason Code
+      description: Reason code for the rate limit check

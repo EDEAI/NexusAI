@@ -1,0 +1,26 @@
+identity:
+  name: gpt4o_ocr_pdf
+  author: kenwood
+  label:
+    en_US: GPT-4o PDF OCR to Markdown
+    zh_Hans: PDF文件OCR识别转Markdown格式
+description:
+  human:
+    en_US: Extract text from PDF files using GPT-4o's OCR capabilities and convert to Markdown format
+    zh_Hans: 使用 GPT-4o 的 OCR 功能从 PDF 文件中提取文本并转换为 Markdown 格式
+  llm: This tool uses Azure OpenAI's GPT-4o model to perform OCR on PDF files, extracting text and formatting it as Markdown. It preserves document structure including headings, paragraphs, lists, and tables.
+parameters:
+  - name: upload_file
+    type: file
+    required: true
+    label:
+      en_US: PDF File
+      zh_Hans: PDF 文件
+    human_description:
+      en_US: Upload a PDF file to extract text and convert to Markdown
+      zh_Hans: 上传 PDF 文件以提取文本并转换为 Markdown
+    llm_description: The PDF file to process with OCR and convert to Markdown format
+    form: llm
+extra:
+  python:
+    source: tools/gpt4o_ocr_pdf.py

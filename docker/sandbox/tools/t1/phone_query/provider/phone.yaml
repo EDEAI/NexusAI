@@ -1,0 +1,18 @@
+identity:
+  author: rainlzm
+  name: dify-plugin-phone
+  label:
+    en_US: phone number query
+    zh_Hans: 电话号码查询
+    pt_BR: phone number query
+  description:
+    en_US: please input phone or mobile number
+    zh_Hans: 请输入电话或手机号码
+    pt_BR: please input phone or mobile number
+  icon: phone.png
+tools:
+  - tools/region.yaml
+  - tools/identify.yaml
+extra:
+  python:
+    source: provider/phone.py

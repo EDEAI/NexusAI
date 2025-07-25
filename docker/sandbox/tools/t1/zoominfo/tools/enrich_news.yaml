@@ -1,0 +1,103 @@
+identity:
+  name: enrich_news
+  author: eric-2369
+  label:
+    en_US: Enrich News
+    zh_Hans: 丰富新闻信息
+    pt_BR: Enriquecer Notícias
+description:
+  human:
+    en_US: Get news articles related to a company using ZoomInfo API
+    zh_Hans: 使用 ZoomInfo API 获取与公司相关的新闻文章
+    pt_BR: Obter artigos de notícias relacionados a uma empresa usando a API ZoomInfo
+  llm: A tool that retrieves news articles related to a specific company using its ZoomInfo company ID. The company ID must be obtained first from the enrich_company tool. Use this when you need recent news and updates about a company for research or analysis.
+parameters:
+  - name: company_id
+    type: number
+    required: true
+    label:
+      en_US: Company ID
+      zh_Hans: 公司ID
+      pt_BR: ID da Empresa
+    human_description:
+      en_US: The ZoomInfo company ID (must be obtained from enrich_company tool)
+      zh_Hans: ZoomInfo 公司ID（必须从 enrich_company 工具获取）
+      pt_BR: O ID da empresa ZoomInfo (deve ser obtido da ferramenta enrich_company)
+    llm_description: The unique ZoomInfo company identifier. This must be retrieved first using the enrich_company tool by including "id" in the output_fields parameter.
+    form: llm
+  - name: limit
+    type: number
+    required: true
+    label:
+      en_US: Limit
+      zh_Hans: 限制数量
+      pt_BR: Limite
+    human_description:
+      en_US: Number of news items to retrieve (positive integer)
+      zh_Hans: 要检索的新闻项目数量（正整数）
+      pt_BR: Número de itens de notícias para recuperar (inteiro positivo)
+    llm_description: The number of news articles to retrieve. Must be a positive integer. Recommended values are between 1-50.
+    form: llm
+  - name: page
+    type: number
+    required: true
+    label:
+      en_US: Page
+      zh_Hans: 页码
+      pt_BR: Página
+    human_description:
+      en_US: Page number for pagination (positive integer, usually start with 1)
+      zh_Hans: 分页的页码（正整数，通常从1开始）
+      pt_BR: Número da página para paginação (inteiro positivo, geralmente começar com 1)
+    llm_description: The page number for pagination. Must be a positive integer. Start with 1 for the first page.
+    form: llm
+  - name: date_min
+    type: string
+    required: true
+    label:
+      en_US: Start Date
+      zh_Hans: 开始日期
+      pt_BR: Data de Início
+    human_description:
+      en_US: "Start date for filtering news (format: YYYY-MM-DD)"
+      zh_Hans: "过滤新闻的开始日期（格式：YYYY-MM-DD）"
+      pt_BR: "Data de início para filtrar notícias (formato: YYYY-MM-DD)"
+    llm_description: "The start date for filtering news articles in YYYY-MM-DD format (e.g., '2024-01-01'). Must be a valid date."
+    form: llm
+  - name: date_max
+    type: string
+    required: true
+    label:
+      en_US: End Date
+      zh_Hans: 结束日期
+      pt_BR: Data de Fim
+    human_description:
+      en_US: "End date for filtering news (format: YYYY-MM-DD)"
+      zh_Hans: "过滤新闻的结束日期（格式：YYYY-MM-DD）"
+      pt_BR: "Data de fim para filtrar notícias (formato: YYYY-MM-DD)"
+    llm_description: "The end date for filtering news articles in YYYY-MM-DD format (e.g., '2024-12-31'). Must be a valid date and should be after the start date."
+    form: llm
+extra:
+  python:
+    source: tools/enrich_news.py
+output_schema:
+  type: object
+  properties:
+    company_id:
+      type: number
+      description: The company ID that was searched
+    limit:
+      type: number
+      description: Number of news items requested
+    page:
+      type: number
+      description: Page number requested
+    date_range:
+      type: object
+      description: Date range for the news search
+    data:
+      type: object
+      description: News data returned by ZoomInfo API
+    status:
+      type: string
+      description: Status of the news request

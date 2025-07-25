@@ -1,0 +1,30 @@
+identity:
+  name: x
+  author: stvlynn
+  label:
+    en_US: x
+    zh_Hans: x
+    pt_BR: x
+description:
+  human:
+    en_US: x
+    zh_Hans: x
+    pt_BR: x
+  llm: x
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: x
+      zh_Hans: x
+      pt_BR: x
+    llm_description: x
+    form: llm
+extra:
+  python:
+    source: tools/x.py

@@ -1,0 +1,26 @@
+identity:
+  name: weather
+  author: baobaobao
+  label:
+    en_US: weather
+    zh_Hans: 天气查询
+description:
+  human:
+    en_US: weather
+    zh_Hans: 天气查询是一个用于获取实时天气数据和预报信息的服务接口。该API提供国内范围内的天气状况、预报和相关气象数据。
+  llm: weather
+parameters:
+  - name: city
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 城市拼音
+    human_description:
+      en_US: used for searching city weather
+      zh_Hans: 输入要查询的城市拼音, 如beijing
+    form: form
+    default: beijing
+extra:
+  python:
+    source: tools/weather.py

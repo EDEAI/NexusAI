@@ -1,0 +1,78 @@
+identity:
+  name: rongcloud-plugins
+  label:
+    en_US: RongCloud Plugins
+    zh_Hans: RongCloud Plugins
+  description:
+    en_US: Quickly integrate RongCloud Server API interfaces
+    zh_Hans: 快速集成融云 Server API 插件
+  icon: rongcloud_logo.svg
+  version: 0.1.1
+  author: Dify
+  homepage: https://www.rongcloud.cn/
+  license: MIT
+  repository: https://github.com/dify-ai/dify-plugins
+  email: huhangtao@rongcloud.cn
+
+
+credentials_for_provider:
+  host:
+    type: text-input
+    required: true
+    label:
+      en_US: Host
+      zh_Hans: 融云应用的 Host
+    placeholder:
+      en_US: Please input your Host
+      zh_Hans: 请输入您的 Host
+    help:
+      en_US: Get your Host from RongCloud
+      zh_Hans: 从融云获取您的 Host
+    url: https://docs.rongcloud.cn/platform-chat-api/base-url
+  app_key:
+    type: text-input
+    required: true
+    label:
+      en_US: AppKey
+      zh_Hans: 融云应用的 AppKey
+    placeholder:
+      en_US: Please input your AppKey
+      zh_Hans: 请输入您的 AppKey
+    help:
+      en_US: Get your AppKey from RongCloud
+      zh_Hans: 从融云获取您的 AppKey
+    url: https://console.rongcloud.cn/agile/dashboard/workplace
+  app_secret:
+    type: secret-input
+    required: true
+    label:
+      en_US: AppSecret  
+      zh_Hans: 融云应用的 AppSecret
+    placeholder:
+      en_US: Please input your AppSecret
+      zh_Hans: 请输入您的 AppSecret
+    help:
+      en_US: Get your AppSecret from RongCloud
+      zh_Hans: 从融云获取您的 AppSecret
+    url: https://console.rongcloud.cn/agile/dashboard/workplace
+
+extra:
+  python:
+    version: "3.12"
+    source: provider/rongcloud_plugins.py
+    requirements:
+      - requests>=2.31.0
+
+tools:
+  - tools/user/register_user.yaml
+  - tools/user/get_user_info.yaml
+  - tools/user/update_user_info.yaml
+  - tools/message/send_private_text_message.yaml
+  - tools/message/send_group_text_message.yaml
+  - tools/history/get_private_messages.yaml
+  - tools/history/get_group_messages.yaml
+  - tools/group/create_group.yaml
+  - tools/group/join_group.yaml
+  - tools/group/get_group_members.yaml
+  - tools/group/dismiss_group.yaml
+  - tools/group/quit_group.yaml

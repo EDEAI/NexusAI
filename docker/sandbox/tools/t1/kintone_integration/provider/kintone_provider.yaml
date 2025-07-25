@@ -1,0 +1,22 @@
+identity:
+  author: r3-yamauchi
+  name: kintone
+  label:
+    en_US: kintone
+    zh_Hans: kintone
+    pt_BR: kintone
+    ja_JP: kintone
+  description:
+    en_US: kintone Plugin
+    zh_Hans: kintone Plugin
+    pt_BR: kintone Plugin
+    ja_JP: kintone プラグイン
+  icon: icon.svg
+tools:
+  - tools/kintone_query.yaml
+  - tools/kintone_add_record.yaml
+  - tools/kintone_upsert_records.yaml
+  - tools/kintone_download_file.yaml
+extra:
+  python:
+    source: provider/kintone_provider.py

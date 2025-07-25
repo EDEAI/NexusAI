@@ -1,0 +1,7 @@
+dify_plugin~=0.0.1b72
+httpx~=0.27.2
+sqlalchemy>=2.0.0
+pymysql>=1.1.1
+oracledb==2.2.1
+pymssql==2.3.4
+psycopg2-binary>=2.9.9

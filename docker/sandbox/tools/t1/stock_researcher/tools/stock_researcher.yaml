@@ -1,0 +1,32 @@
+identity:
+  name: "stock_researcher"
+  author: "pragnyan_ramtha"
+  label:
+    en_US: stock researcher
+    zh_Hans: 股票研究员
+    pt_BR: pesquisador de ações
+description:
+  human:
+    en_US: "This plugin will fetch the current stock price for a given stock symbol"
+    zh_Hans: "This plugin will fetch the current stock price for a given stock symbol"
+    pt_BR: "This plugin will fetch the current stock price for a given stock symbol"
+  llm: "This plugin will fetch the current stock price for a given stock symbol"
+
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: "This plugin will fetch the current stock price for a given stock symbol"
+      zh_Hans: "This plugin will fetch the current stock price for a given stock symbol"
+      pt_BR: "This plugin will fetch the current stock price for a given stock symbol"
+    llm_description: "This plugin will fetch the current stock price for a given stock symbol"
+    form: llm
+
+extra:
+  python:
+    source: tools/stock_researcher.py

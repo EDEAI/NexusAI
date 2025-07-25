@@ -1,0 +1,159 @@
+identity:
+  name: voicemaker
+  author: heavi
+  label:
+    en_US: voicemaker
+    zh_Hans: voicemaker
+    pt_BR: voicemaker
+description:
+  human:
+    en_US: voicemaker is the voicemaker.in api
+    zh_Hans: voicemaker 是 voicemaker.in 的 API
+    pt_BR: voicemaker é a API do voicemaker.in
+  llm: voicemaker api
+parameters:
+  - name: engine
+    type: string
+    required: false
+    default: neural
+    label:
+      en_US: Engine
+      zh_Hans: 引擎
+      pt_BR: Motor
+    human_description:
+      en_US: The engine type for voice generation
+      zh_Hans: 语音生成引擎类型
+      pt_BR: O tipo de motor para geração de voz
+    llm_description: The engine type to use for voice generation (e.g. neural)
+    form: llm
+  - name: voiceId
+    type: string
+    required: false
+    default: ai3-Jony
+    label:
+      en_US: Voice ID
+      zh_Hans: 语音ID
+      pt_BR: ID da Voz
+    human_description:
+      en_US: The voice ID to use
+      zh_Hans: 要使用的语音ID
+      pt_BR: O ID da voz a ser usada
+    llm_description: The specific voice ID to use for generation
+    form: llm
+  - name: languageCode
+    type: string
+    required: false
+    default: en-US
+    label:
+      en_US: Language Code
+      zh_Hans: 语言代码
+      pt_BR: Código do Idioma
+    human_description:
+      en_US: The language code for the voice
+      zh_Hans: 语音的语言代码
+      pt_BR: O código do idioma para a voz
+    llm_description: The language code for the voice (e.g. en-US)
+    form: llm
+  - name: text
+    type: string
+    required: true
+    default: Welcome to the Air.
+    label:
+      en_US: Text
+      zh_Hans: 文本
+      pt_BR: Texto
+    human_description:
+      en_US: The text to convert to speech
+      zh_Hans: 要转换为语音的文本
+      pt_BR: O texto para converter em fala
+    llm_description: The input text to convert to speech
+    form: llm
+  - name: outputFormat
+    type: string
+    required: false
+    default: mp3
+    label:
+      en_US: Output Format
+      zh_Hans: 输出格式
+      pt_BR: Formato de Saída
+    human_description:
+      en_US: The audio output format
+      zh_Hans: 音频输出格式
+      pt_BR: O formato de saída do áudio
+    llm_description: The audio output format (e.g. mp3)
+    form: llm
+  - name: sampleRate
+    type: string
+    required: false
+    default: "48000"
+    label:
+      en_US: Sample Rate
+      zh_Hans: 采样率
+      pt_BR: Taxa de Amostragem
+    human_description:
+      en_US: The audio sample rate
+      zh_Hans: 音频采样率
+      pt_BR: A taxa de amostragem do áudio
+    llm_description: The sample rate for the audio output (e.g. 48000)
+    form: llm
+  - name: effect
+    type: string
+    required: false
+    default: default
+    label:
+      en_US: Effect
+      zh_Hans: 效果
+      pt_BR: Efeito
+    human_description:
+      en_US: The audio effect to apply
+      zh_Hans: 要应用的音频效果
+      pt_BR: O efeito de áudio a ser aplicado
+    llm_description: The audio effect to apply (e.g. default)
+    form: llm
+  - name: masterVolume
+    type: string
+    required: false
+    default: "0"
+    label:
+      en_US: Volume
+      zh_Hans: 音量
+      pt_BR: Volume
+    human_description:
+      en_US: The master volume level
+      zh_Hans: 主音量级别
+      pt_BR: O nível do volume principal
+    llm_description: The master volume adjustment
+    form: llm
+  - name: masterSpeed
+    type: string
+    required: false
+    default: "0"
+    label:
+      en_US: Speed
+      zh_Hans: 速度
+      pt_BR: Velocidade
+    human_description:
+      en_US: The speech speed
+      zh_Hans: 语音速度
+      pt_BR: A velocidade da fala
+    llm_description: The master speed adjustment
+    form: llm
+  - name: masterPitch
+    type: string
+    required: false
+    default: "0"
+    label:
+      en_US: masterPitch
+      zh_Hans: 速度
+      pt_BR: masterPitch
+    human_description:
+      en_US: The speech masterPitch
+      zh_Hans: 语音速度
+      pt_BR: A velocidade da fala
+    llm_description: The master masterPitch 
+    form: llm
+
+   
+extra:
+  python:
+    source: tools/voicemaker.py

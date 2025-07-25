@@ -1,0 +1,189 @@
+identity:
+  name: flux_pro_fill_tool
+  author: parkerwen
+  label:
+    en_US: flux_pro_fill_tool
+    zh_Hans: FLUX.1 Fill [pro] 工具
+    pt_BR: flux_pro_fill_tool
+description:
+  human:
+    en_US: Generate an image with FLUX.1 Fill [pro] using an input image and mask.
+    zh_Hans: 使用输入图像和掩码生成 FLUX.1 Fill [pro] 图像。
+    pt_BR: Generate an image with FLUX.1 Fill [pro] using an input image and mask.
+  llm: Generate an image with FLUX.1 Fill [pro] using an input image and mask.
+parameters:
+  - name: image
+    type: file
+    required: true
+    label:
+      en_US: Image
+      zh_Hans: 图片
+      pt_BR: Image
+    human_description:
+      en_US: Image you wish to modify. Can contain alpha mask if desired.
+      zh_Hans: 表示您希望修改的图像。如果需要，可以包含 alpha 遮罩。
+      pt_BR: Image you wish to modify. Can contain alpha mask if desired.
+    llm_description: Image you wish to modify. Can contain alpha mask if desired.
+    form: llm
+
+  - name: mask
+    type: file
+    required: true
+    label:
+      en_US: Mask
+      zh_Hans: 遮罩
+      pt_BR:  Mask
+    human_description:
+      en_US: A mask for the areas you want to modify in the image. The mask should be the same dimensions as the image and in black and white. Black areas (0%) indicate no modification, while white areas (100%) specify areas for inpainting. Optional if you provide an alpha mask in the original image.The endpoint verifies that the dimensions of the mask match the original image.
+      zh_Hans: 您希望修改图像的区域的遮罩。遮罩应与图像具有相同的尺寸，并且为黑白色。黑色区域（0%）表示不修改，而白色区域（100%）指定需要修复的区域。如果您在原始图像中提供了 alpha 遮罩，则此参数可选。端点会验证遮罩的尺寸是否与原始图像匹配。
+      pt_BR: A mask for the areas you want to modify in the image. The mask should be the same dimensions as the image and in black and white. Black areas (0%) indicate no modification, while white areas (100%) specify areas for inpainting. Optional if you provide an alpha mask in the original image.The endpoint verifies that the dimensions of the mask match the original image.
+    llm_description: A mask for the areas you want to modify in the image. The mask should be the same dimensions as the image and in black and white. Black areas (0%) indicate no modification, while white areas (100%) specify areas for inpainting. Optional if you provide an alpha mask in the original image.The endpoint verifies that the dimensions of the mask match the original image.
+    form: llm
+
+  - name: prompt
+    type: string
+    required: false
+    label:
+      en_US: Prompt
+      zh_Hans: 提示词
+      pt_BR: Prompt
+    human_description:
+      en_US: The description of the changes you want to make. This text guides the inpainting process, allowing you to specify features, styles, or modifications for the masked area.
+      zh_Hans: 您希望进行的更改的描述。此文本指导修复过程，使您能够指定特征、样式或对遮罩区域的修改。
+      pt_BR: The description of the changes you want to make. This text guides the inpainting process, allowing you to specify features, styles, or modifications for the masked area.
+    llm_description: The description of the changes you want to make. This text guides the inpainting process, allowing you to specify features, styles, or modifications for the masked area.
+    form: llm
+
+  - name: steps
+    type: number
+    required: false
+    label:
+      en_US: Steps
+      zh_Hans: 步数
+      pt_BR: Steps
+    default: 50
+    min: 15
+    max: 50
+    human_description:
+      en_US: Number of steps for the image generation process.
+      zh_Hans: 图像生成过程的步数。
+      pt_BR: Number of steps for the image generation process.
+    llm_description: Number of steps for the image generation process.
+    form: llm
+
+  - name: prompt_upsampling
+    type: boolean
+    required: false
+    label:
+      en_US: Prompt Upsampling
+      zh_Hans: 提示词上采样
+      pt_BR: Prompt Upsampling
+    default: false
+    human_description:
+      en_US: Whether to perform upsampling on the prompt. If active, automatically modifies the prompt for more creative generation.
+      zh_Hans: 是否对提示进行上采样。如果启用，则自动修改提示，以便生成更具创意的提示。
+      pt_BR: Whether to perform upsampling on the prompt. If active, automatically modifies the prompt for more creative generation.
+    llm_description: Whether to perform upsampling on the prompt. If active, automatically modifies the prompt for more creative generation.
+    form: form
+
+  - name: seed
+    type: number
+    required: false
+    label:
+      en_US: Seed
+      zh_Hans: 种子
+      pt_BR: Seed
+    default: 0
+    human_description:
+      en_US: Optional seed for reproducibility.
+      zh_Hans: 可选种子，用于再现性。
+      pt_BR: Optional seed for reproducibility.
+    llm_description: Optional seed for reproducibility.
+    form: llm
+
+  - name: guidance
+    type: number
+    required: false
+    label:
+      en_US: Guidance
+      zh_Hans: 引导
+      pt_BR: Guidance
+    default: 60
+    min: 1.5
+    max: 100
+    human_description:
+      en_US: Guidance strength for the image generation process.
+      zh_Hans: 图像生成过程的引导强度。
+      pt_BR: Guidance strength for the image generation process.
+    llm_description: Guidance strength for the image generation process.
+    form: llm
+
+  - name: safety_tolerance
+    type: number
+    required: false
+    label:
+      en_US: Safety Tolerance
+      zh_Hans: 安全容忍度
+      pt_BR: Safety Tolerance
+    default: 2
+    min: 0
+    max: 6
+    human_description:
+      en_US: Tolerance level for input and output moderation. Between 0 and 6, 0 being most strict, 6 being least strict.
+      zh_Hans: 输入和输出审核的容忍度。介于 0 到 6 之间，0 表示最严格，6 表示最不严格。
+      pt_BR: Tolerance level for input and output moderation. Between 0 and 6, 0 being most strict, 6 being least strict.
+    llm_description: Tolerance level for input and output moderation. Between 0 and 6, 0 being most strict, 6 being least strict.
+    form: llm
+
+  - name: output_format
+    type: select
+    required: false
+    label:
+      en_US: Output Format
+      zh_Hans: 输出格式
+      pt_BR: Output Format
+    default: jpeg
+    options:
+      - label:
+          en_US: JPEG
+        value: jpeg
+      - label:
+          en_US: PNG
+        value: png
+    human_description:
+      en_US: Output format for the generated image. Can be 'jpeg' or 'png'.
+      zh_Hans: 生成图像的输出格式。可以是“jpeg”或“png”。
+      pt_BR: Output format for the generated image. Can be 'jpeg' or 'png'.
+    llm_description: Output format for the generated image. Can be 'jpeg' or 'png'.
+    form: llm
+
+  - name: webhook_url
+    type: string
+    required: false
+    label:
+      en_US: Webhook URL
+      zh_Hans: Webhook URL
+      pt_BR: Webhook URL
+    human_description:
+      en_US: URL to receive webhook notifications.
+      zh_Hans: 接收 webhook 通知的 URL。
+      pt_BR: URL to receive webhook notifications.
+    llm_description: URL to receive webhook notifications.
+    form: llm
+
+  - name: webhook_secret
+    type: string
+    required: false
+    label:
+      en_US: Webhook Secret
+      zh_Hans: Webhook Secret
+      pt_BR: Webhook Secret
+    human_description:
+      en_US: Optional secret for webhook signature verificatio.
+      zh_Hans: 用于 webhook 签名验证的可选密钥。
+      pt_BR: Optional secret for webhook signature verification.
+    llm_description: Optional secret for webhook signature verification.
+    form: llm
+extra:
+  python:
+    source: tools/flux_pro_fill_tool.py

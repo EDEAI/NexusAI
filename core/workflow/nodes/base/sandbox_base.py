@@ -13,6 +13,7 @@ from . import Node
 from ... import Variable, ObjectVariable
 from config import settings
 from log import Logger
+import hashlib
 
 project_root = Path(__file__).absolute().parent.parent.parent.parent.parent
 logger = Logger.get_logger('celery-app')
@@ -295,7 +296,40 @@ class SandboxBaseNode(Node):
         except Exception as e:
             logger.exception('ERROR!!')
             raise ValueError(str(e))
+    
+    # Check if the virtual environment exists in the cache for the given pip packages
+    def check_venv_exists(self, pip_packages: list[str]) -> bool:
+        """
+        Check if a virtual environment exists in the cache for the specified pip packages.
 
+        Args:
+            pip_packages (list[str]): List of pip package names.
+
+        Returns:
+            bool: True if the virtual environment exists, False otherwise.
+        """
+        # Use relative path for local development, absolute path for production
+        VENV_CACHE_DIR = os.path.join(os.getcwd(), "docker", "volumes", "venv_cache")
+        # If pip_packages is empty, check for the base environment
+        if not pip_packages:
+            base_venv_path = os.path.join(VENV_CACHE_DIR, 'base')
+            # Check if the base venv directory and its python binary exist
+            return (os.path.exists(base_venv_path))
+
+        # Sort the package list to ensure consistent hash regardless of order
+        sorted_packages = sorted(pip_packages)
+        # Join the sorted package names into a single string separated by newlines
+        requirements_content = '\n'.join(sorted_packages)
+
+        # Calculate the SHA-256 hash of the requirements content
+        hasher = hashlib.sha256()
+        hasher.update(requirements_content.encode('utf-8'))
+        pip_packages_hash = hasher.hexdigest()
+        # Construct the path to the cached virtual environment
+        venv_path = os.path.join(VENV_CACHE_DIR, pip_packages_hash)
+        # Check if the venv directory and its python binary exist
+        return (os.path.exists(venv_path))
+        
     def run_custom_code(self):
         """
         Executes the custom code provided by the user, ensuring that necessary validations
@@ -316,6 +350,8 @@ class SandboxBaseNode(Node):
             custom_code = self.data['custom_code']
             input = self.data['input']
             output = self.data.get('output')
+            tool_type = self.data.get('tool_type')  # Get tool_type if available
+            tool_name = self.data.get('tool_name')  # Get tool_name if available
 
             # Check the language of the provided custom code
             if 'python3' in custom_code:
@@ -331,12 +367,19 @@ class SandboxBaseNode(Node):
                     "language": "python3",
                     "pip_packages": packages  # Ensure required package is installed
                 }
+                
+                # Add tool_type and tool_name if available
+                if tool_type:
+                    data["tool_type"] = tool_type
+                if tool_name:
+                    data["tool_name"] = tool_name
             elif 'jinja2' in custom_code:
                 code = custom_code['jinja2']
                 # Prepare the input parameters for the Jinja2 template
                 input_params = {}
-                for key, value in input.properties.items():
-                    input_params[key] = value.value
+                if hasattr(input, 'properties') and input.properties:
+                    for key, value in input.properties.items():
+                        input_params[key] = value.value
                 data = {
                     "custom_unique_id": str(uuid.uuid4()),
                     "code": code,

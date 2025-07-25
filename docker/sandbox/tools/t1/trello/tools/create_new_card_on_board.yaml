@@ -1,0 +1,169 @@
+description:
+  human:
+    en_US: Creates a new card on a Trello board with specified details like name,
+      description, list ID, and other optional parameters. Facilitates task addition
+      and project management within Trello.
+    pt_BR: Cria um novo cartão em um quadro Trello com detalhes especificados, como
+      nome, descrição, ID da lista e outros parâmetros opcionais. Facilita a adição
+      de tarefas e a gestão de projetos dentro do Trello.
+    zh_Hans: 用指定的详情（如名称、描述、列表 ID 和其他可选参数）在 Trello 看板上创建一个新卡片。便于在 Trello 中添加任务和管理项目。
+  llm: Initiate a new card on a Trello board by specifying essential details such
+    as the card's name, description, and the list it belongs to, among other settings.
+    Streamlines project task additions and organizational workflows.
+extra:
+  python:
+    source: tools/create_new_card_on_board.py
+identity:
+  author: Yash Parmar
+  label:
+    en_US: Create New Card on Board
+    pt_BR: Criar Novo Cartão no Quadro
+    zh_Hans: 在看板上创建新卡片
+  name: create_new_card_on_board
+parameters:
+- form: llm
+  human_description:
+    en_US: The name for the new card. Acts as the primary identifier and summary of
+      the card's purpose.
+    pt_BR: O nome para o novo cartão. Funciona como o identificador principal e resumo
+      do propósito do cartão.
+    zh_Hans: 新卡片的名称。作为卡片目的的主要标识和总结。
+  label:
+    en_US: Card Name
+    pt_BR: Nome do Cartão
+    zh_Hans: 卡片名称
+  llm_description: Provide a concise, descriptive name for the card, outlining its
+    main focus or task.
+  name: name
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. A brief description of the card's purpose or contents.
+    pt_BR: Opcional. Uma breve descrição do propósito ou conteúdo do cartão.
+    zh_Hans: 可选。卡片目的或内容的简要描述。
+  label:
+    en_US: Card Description
+    pt_BR: Descrição do Cartão
+    zh_Hans: 卡片描述
+  llm_description: Add a brief description to the card to provide context or additional
+    information about its purpose.
+  name: desc
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The position of the card in the list. Can be 'top', 'bottom',
+      or a positive number.
+    pt_BR: Opcional. A posição do cartão na lista. Pode ser 'top', 'bottom' ou um
+      número positivo.
+    zh_Hans: 可选。卡片在列表中的位置。可以是“top”、“bottom” 或正数。
+  label:
+    en_US: Position
+    pt_BR: Posição
+    zh_Hans: 位置
+  llm_description: Specify the position of the card within the list, either at the
+    top, bottom, or a specific numerical index.
+  name: pos
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The due date for the card in the format 'MM/DD/YYYY'.
+    pt_BR: Opcional. A data de vencimento do cartão no formato 'MM/DD/YYYY'.
+    zh_Hans: 可选。卡片的截止日期，格式为“MM/DD/YYYY”。
+  label:
+    en_US: Due Date
+    pt_BR: Data de Vencimento
+    zh_Hans: 截止日期
+  llm_description: Set a due date for the card to establish a deadline for completion
+    or action.
+  name: due
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The start date for the card in the format 'MM/DD/YYYY'.
+    pt_BR: Opcional. A data de início do cartão no formato 'MM/DD/YYYY'.
+    zh_Hans: 可选。卡片的开始日期，格式为“MM/DD/YYYY”。
+  label:
+    en_US: Start Date
+    pt_BR: Data de Início
+    zh_Hans: 开始日期
+  llm_description: Specify a start date for the card to mark the beginning of a task
+    or project phase.
+  name: start
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. Set to true if the due date has been completed, or false if it
+      is pending.
+    pt_BR: Opcional. Defina como true se a data de vencimento foi concluída, ou como
+      false se estiver pendente.
+    zh_Hans: 可选。如果截止日期已完成，则设置为 true；如果尚未完成，则设置为 false。
+  label:
+    en_US: Due Complete
+    pt_BR: Vencimento Concluído
+    zh_Hans: 截止日期已完成
+  llm_description: Indicate whether the due date for the card has been marked as complete
+    or is still pending.
+  name: dueComplete
+  required: false
+  type: boolean
+- form: llm
+  human_description:
+    en_US: The unique identifier of the list where the card will be added.
+    pt_BR: O identificador único da lista onde o cartão será adicionado.
+    zh_Hans: 卡片将被添加到的列表的唯一标识符。
+  label:
+    en_US: List ID
+    pt_BR: ID da Lista
+    zh_Hans: 列表 ID
+  llm_description: Input the ID of the list where the card should be placed, ensuring
+    it is added to the correct list.
+  name: idList
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The IDs of members to assign to the card.
+    pt_BR: Opcional. Os IDs dos membros a serem atribuídos ao cartão.
+    zh_Hans: 可选。要分配给卡片的成员的 ID。
+  label:
+    en_US: Member IDs
+    pt_BR: IDs de Membros
+    zh_Hans: 成员 ID
+  llm_description: Specify the IDs of members to assign to the card, allowing for
+    task delegation or collaboration.
+  name: idMembers
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The IDs of labels to assign to the card.
+    pt_BR: Opcional. Os IDs das etiquetas a serem atribuídos ao cartão.
+    zh_Hans: 可选。要分配给卡片的标签的 ID。
+  label:
+    en_US: Label IDs
+    pt_BR: IDs de Etiquetas
+    zh_Hans: 标签 ID
+  llm_description: Assign specific labels to the card by providing their IDs, aiding
+    in visual categorization or prioritization.
+  name: idLabels
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Optional. The URL to attach as the card's source.
+    pt_BR: Opcional. O URL a ser anexado como a fonte do cartão.
+    zh_Hans: 可选。要附加为卡片来源的 URL。
+  label:
+    en_US: Source URL
+    pt_BR: URL de Origem
+    zh_Hans: 来源 URL
+  llm_description: Provide a URL to serve as the source reference for the card, linking
+    to external resources or documents.
+  name: urlSource
+  required: false
+  type: string

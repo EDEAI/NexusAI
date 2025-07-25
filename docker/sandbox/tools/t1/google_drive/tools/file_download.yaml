@@ -1,0 +1,30 @@
+identity:
+  name: google-drive-file-download
+  author: assistant
+  label:
+    en_US: Download Google Drive file
+    zh_Hans: 下载 Google Drive 文件
+    pt_BR: Baixar arquivo do Google Drive
+description:
+  human:
+    en_US: Download a file from Google Drive by file ID
+    zh_Hans: 通过文件ID从 Google Drive 下载文件
+    pt_BR: Baixar um arquivo do Google Drive por ID do arquivo
+  llm: Download a file from Google Drive by providing the file ID. Returns the file content as a blob along with metadata.
+parameters:
+  - name: file_id
+    type: string
+    required: true
+    label:
+      en_US: File ID
+      zh_Hans: 文件ID
+      pt_BR: ID do arquivo
+    human_description:
+      en_US: The Google Drive file ID to download
+      zh_Hans: 要下载的 Google Drive 文件ID
+      pt_BR: O ID do arquivo do Google Drive para baixar
+    llm_description: The Google Drive file ID to download. This is the unique identifier for the file in Google Drive.
+    form: llm
+extra:
+  python:
+    source: tools/file_download.py 

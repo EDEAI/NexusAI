@@ -1,0 +1,67 @@
+description:
+  human:
+    en_US: Generate images with Doubao (豆包) AI.
+    zh_CN: 使用豆包 AI 生成图像。
+  llm: This tool is used to generate images from text prompts using Doubao (豆包) AI, powered by Volcengine/ByteDance.
+extra:
+  python:
+    source: tools/text2image.py
+identity:
+  author: Allen Writer
+  icon: icon.svg
+  label:
+    en_US: Text to Image
+    zh_CN: 文生图
+  name: text2image
+parameters:
+- form: llm
+  human_description:
+    en_US: The text prompt used to generate the image. Doubao will generate an image based on this prompt.
+    zh_CN: 用于生成图像的文本提示。豆包将根据此提示生成图像。
+  label:
+    en_US: Prompt
+    zh_CN: 提示词
+  llm_description: This prompt text will be used to generate image.
+  name: prompt
+  required: true
+  type: string
+- form: form
+  human_description:
+    en_US: The size of the generated image.
+    zh_CN: 生成图像的尺寸。
+  label:
+    en_US: Image Size
+    zh_CN: 图像尺寸
+  name: size
+  options:
+  - label:
+      en_US: 1024x1024 (Square)
+      zh_CN: 1024x1024 (正方形)
+    value: "1024x1024"
+  - label:
+      en_US: 1024x1792 (Portrait)
+      zh_CN: 1024x1792 (纵向)
+    value: "1024x1792"
+  - label:
+      en_US: 1792x1024 (Landscape)
+      zh_CN: 1792x1024 (横向)
+    value: "1792x1024"
+  required: false
+  type: select
+  default: "1024x1024"
+- form: form
+  human_description:
+    en_US: Model version to use for image generation.
+    zh_CN: 用于图像生成的模型版本。
+  label:
+    en_US: Model Version
+    zh_CN: 模型版本
+  name: model
+  options:
+  - label:
+      en_US: Doubao Seedream 3.0
+      zh_CN: 豆包 Seedream 3.0
+    value: "doubao-seedream-3-0-t2i-250415"
+  required: false
+  type: select
+  default: "doubao-seedream-3-0-t2i-250415"

@@ -1,0 +1,64 @@
+credentials_for_provider:
+  trello_api_key:
+    help:
+      en_US: Obtain your API key from Trello's website.
+      pt_BR: Obtenha sua chave API no site do Trello.
+      zh_Hans: 从 Trello 网站获取您的 API key。
+    label:
+      en_US: Trello API key
+      pt_BR: Trello API key
+      zh_Hans: Trello API key
+    placeholder:
+      en_US: Enter your Trello API key
+      pt_BR: Insira sua chave API do Trello
+      zh_Hans: 输入您的 Trello API key
+    required: true
+    type: secret-input
+    url: https://developer.atlassian.com/cloud/trello/guides/rest-api/api-introduction/
+  trello_api_token:
+    help:
+      en_US: Secure your API token from Trello's website.
+      pt_BR: Garanta seu token API no site do Trello.
+      zh_Hans: 从 Trello 网站获取您的 API token。
+    label:
+      en_US: Trello API token
+      pt_BR: Trello API token
+      zh_Hans: Trello API token
+    placeholder:
+      en_US: Enter your Trello API token
+      pt_BR: Insira seu token API do Trello
+      zh_Hans: 输入您的 Trello API token
+    required: true
+    type: secret-input
+    url: https://developer.atlassian.com/cloud/trello/guides/rest-api/api-introduction/
+extra:
+  python:
+    source: provider/trello.py
+identity:
+  author: Yash Parmar
+  description:
+    en_US: 'Trello: A visual tool for organizing your work and life.'
+    pt_BR: 'Trello: Uma ferramenta visual para organizar seu trabalho e vida.'
+    zh_Hans: 'Trello: 一个用于组织工作和生活的视觉工具。'
+  icon: icon.svg
+  label:
+    en_US: Trello
+    pt_BR: Trello
+    zh_Hans: Trello
+  name: trello
+  tags:
+  - productivity
+tools:
+- tools/update_card.yaml
+- tools/get_board_by_id.yaml
+- tools/get_filterd_board_cards.yaml
+- tools/create_list_on_board.yaml
+- tools/create_new_card_on_board.yaml
+- tools/get_board_cards.yaml
+- tools/update_board.yaml
+- tools/get_lists_on_board.yaml
+- tools/create_board.yaml
+- tools/delete_board.yaml
+- tools/delete_card.yaml
+- tools/fetch_all_boards.yaml
+- tools/get_board_actions.yaml

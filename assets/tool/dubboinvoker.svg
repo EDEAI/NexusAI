@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- 背景圆 -->
+  <circle cx="50" cy="50" r="45" fill="#2196F3" />
+  
+  <!-- 'D' 字母 -->
+  <path d="M30,30 L30,70 L50,70 C60,70 70,60 70,50 C70,40 60,30 50,30 Z" fill="#FFFFFF" />
+  <path d="M40,40 L40,60 L50,60 C55,60 60,55 60,50 C60,45 55,40 50,40 Z" fill="#2196F3" />
+  
+  <!-- 围绕的点 - 表示服务发现 -->
+  <circle cx="25" cy="25" r="5" fill="#FFC107" />
+  <circle cx="75" cy="25" r="5" fill="#FFC107" />
+  <circle cx="75" cy="75" r="5" fill="#FFC107" />
+  <circle cx="25" cy="75" r="5" fill="#FFC107" />
+  
+  <!-- 连接线 - 表示RPC调用 -->
+  <line x1="25" y1="25" x2="75" y2="75" stroke="#FFFFFF" stroke-width="2" />
+  <line x1="75" y1="25" x2="25" y2="75" stroke="#FFFFFF" stroke-width="2" />
+</svg> 

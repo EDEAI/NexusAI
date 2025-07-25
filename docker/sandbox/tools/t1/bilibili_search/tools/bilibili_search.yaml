@@ -1,0 +1,43 @@
+identity:
+  name: bilibili_search
+  author: jingfelix
+  label:
+    en_US: Bilibili Search
+    zh_Hans: 哔哩哔哩搜索
+    pt_BR: Pesquisa Bilibili
+description:
+  human:
+    en_US: Search for videos on Bilibili
+    zh_Hans: 在哔哩哔哩上搜索视频
+    pt_BR: Pesquisar vídeos no Bilibili
+  llm: Search for videos on Bilibili platform. Returns search results including titles, authors, descriptions and other metadata.
+parameters:
+  - name: keyword
+    type: string
+    required: true
+    label:
+      en_US: Search Keyword
+      zh_Hans: 搜索关键词
+      pt_BR: Palavra-chave
+    human_description:
+      en_US: Enter the keywords you want to search on Bilibili
+      zh_Hans: 输入您想在哔哩哔哩上搜索的关键词
+      pt_BR: Digite as palavras-chave que você deseja pesquisar no Bilibili
+    llm_description: The keywords to search for on Bilibili platform. This can be video titles, usernames, or any other searchable content.
+    form: llm
+  - name: page
+    type: number
+    required: false
+    label:
+      en_US: Page Number
+      zh_Hans: 页码
+      pt_BR: Número da Página
+    human_description:
+      en_US: The page number of search results (default is 1)
+      zh_Hans: 搜索结果的页码（默认为第1页）
+      pt_BR: O número da página dos resultados da pesquisa (padrão é 1)
+    llm_description: The page number of search results to retrieve. Each page contains multiple results. Defaults to 1 if not specified.
+    form: llm
+extra:
+  python:
+    source: tools/bilibili_search.py

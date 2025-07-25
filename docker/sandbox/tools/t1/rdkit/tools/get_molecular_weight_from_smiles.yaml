@@ -1,0 +1,26 @@
+description:
+  human:
+    en_US: A tool for getting molecular weight from a SMILES string.
+    zh_Hans: 一个用于从SMILES字符串获取分子量的工具。
+  llm: A tool for getting molecular weight from a SMILES string.
+extra:
+  python:
+    source: tools/get_molecular_weight_from_smiles.py
+identity:
+  author: s20ss
+  label:
+    en_US: Molecular Weight from SMILES
+    zh_Hans: 从SMILES获取分子量
+  name: molecular_weight_from_smiles
+parameters:
+- form: llm
+  human_description:
+    en_US: A string containing the chemical structure in SMILES format.
+    zh_Hans: 一个包含化学结构的SMILES格式字符串。
+  label:
+    en_US: SMILES String
+    zh_Hans: SMILES字符串
+  llm_description: "A string containing the chemical structure in SMILES format."
+  name: smiles
+  required: true
+  type: string

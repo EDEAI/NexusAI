@@ -1,0 +1,30 @@
+identity:
+  name: unzip
+  author: hjlarry
+  label:
+    en_US: unzip
+    zh_Hans: unzip
+    pt_BR: unzip
+description:
+  human:
+    en_US: unzip the zip file
+    zh_Hans: 解压 zip 文件
+    pt_BR: descompactar o arquivo zip
+  llm: unzip the zip file
+parameters:
+  - name: file
+    type: file
+    required: true
+    label:
+      en_US: File
+      zh_Hans: 文件
+      pt_BR: Arquivos
+    human_description:
+      en_US: the files you want to unzip
+      zh_Hans: 你想解压缩的文件
+      pt_BR: os arquivos que você deseja compactar
+    llm_description: the files you want to unzip
+    form: llm
+extra:
+  python:
+    source: tools/unzip.py

@@ -1,0 +1,397 @@
+description:
+  human:
+    en_US: Search for documents matching a specific query in the given index.
+    zh_Hans: 从指定的索引中搜索与特定查询匹配的文档.
+    zh_Hant: 從指定的索引中搜索與特定查詢匹配的檔.
+  llm: Search for documents matching a specific query in the given index.
+extra:
+  python:
+    source: tools/search.py
+identity:
+  name: search
+  author: fernvenue
+  label:
+    en_US: Search
+    zh_Hans: 搜索
+    zh_Hant: 搜寻
+  description:
+    human:
+      en_US: Search for documents matching a specific query in the given index.
+      zh_Hans: 从指定的索引中搜索与特定查询匹配的文档.
+      zh_Hant: 從指定的索引中搜索與特定查詢匹配的檔.
+    llm: Search for documents matching a specific query in the given index.
+parameters:
+  - name: indexUid
+    type: string
+    required: true
+    label:
+      en_US: Index UID
+      zh_Hans: 索引 UID
+      zh_Hant: 索引 UID
+    human_description:
+      en_US: Index Unique Identifier.
+      zh_Hans: 索引唯一标识符.
+      zh_Hant: 索引唯一標識符.
+    llm_description: Index Unique Identifier.
+    form: form
+  - name: q
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询字符
+      zh_Hant: 查詢字符
+    human_description:
+      en_US: The query string to search for in the index.
+      zh_Hans: 指定在索引中搜索的字符串.
+      zh_Hant: 指定在索引中搜索的字符串.
+    llm_description: The query string to search for in the index.
+    form: llm
+    default: ""
+  - name: offset
+    type: number
+    required: false
+    label:
+      en_US: Offset
+      zh_Hans: 偏移量
+      zh_Hant: 偏移量
+    human_description:
+      en_US: Number of documents to skip.
+      zh_Hans: 指定跳过的文档数量.
+      zh_Hant: 指定跳過的檔數量.
+    llm_description: Number of documents to skip.
+    form: form
+    default: 0
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: Limit
+      zh_Hans: 限制
+      zh_Hant: 限制
+    human_description:
+      en_US: Maximum number of documents returned.
+      zh_Hans: 返回的最大文档数量.
+      zh_Hant: 返回的最大檔數量.
+    llm_description: Maximum number of documents returned.
+    form: form
+    default: 20
+  - name: hitsPerPage
+    type: number
+    required: false
+    label:
+      en_US: Hits per page
+      zh_Hans: 每页命中数
+      zh_Hant: 每頁命中數
+    human_description:
+      en_US: Maximum number of documents returned for a page.
+      zh_Hans: 每页返回的最大文档数量.
+      zh_Hant: 每頁返回的最大檔數量.
+    llm_description: Number of hits per page.
+    form: form
+    default: 1
+  - name: page
+    type: number
+    required: false
+    label:
+      en_US: Page
+      zh_Hans: 页码
+      zh_Hant: 頁碼
+    human_description:
+      en_US: Request a specific page of results.
+      zh_Hans: 请求特定页的结果.
+      zh_Hant: 請求特定頁的結果.
+    llm_description: Request a specific page of results.
+    form: form
+    default: 1
+  - name: filter
+    type: string
+    required: false
+    label:
+      en_US: Filter
+      zh_Hans: 过滤器
+      zh_Hant: 過濾器
+    human_description:
+      en_US: Filter queries by an attribute's value.
+      zh_Hans: 按属性值过滤查询.
+      zh_Hant: 按屬性值過濾查詢.
+    llm_description: Filter queries by an attribute's value.
+    form: form
+  - name: facets
+    type: string
+    required: false
+    label:
+      en_US: Facets
+      zh_Hans: 分面
+      zh_Hant: 分面
+    human_description:
+      en_US: Display the count of matches per facet.
+      zh_Hans: 显示每个分面的匹配数.
+      zh_Hant: 顯示每個分面的匹配數.
+    llm_description: Display the count of matches per facet.
+    form: form
+  - name: attributesToRetrieve
+    type: string
+    required: false
+    label:
+      en_US: Attributes to retrieve
+      zh_Hans: 指定检索的属性
+      zh_Hant: 指定檢索的屬性
+    human_description:
+      en_US: Attributes to display in the returned documents.
+      zh_Hans: 指定在返回的文档中显示的属性.
+      zh_Hant: 指定在返回的檔中顯示的屬性.
+    llm_description: Attributes to display in the returned documents.
+    form: form
+    default: "['*']"
+  - name: attributesToCrop
+    type: string
+    required: false
+    label:
+      en_US: Attributes to crop
+      zh_Hans: 指定裁剪的属性
+      zh_Hant: 指定裁剪的屬性
+    human_description:
+      en_US: Attributes whose values have to be cropped.
+      zh_Hans: 需要截断其值的属性.
+      zh_Hant: 需要截斷其值的屬性.
+    llm_description: Attributes whose values have to be cropped.
+    form: form
+  - name: cropLength
+    type: number
+    required: false
+    label:
+      en_US: Crop length
+      zh_Hans: 裁剪长度
+      zh_Hant: 裁剪長度
+    human_description:
+      en_US: Maximum length of cropped value in words.
+      zh_Hans: 截断值的最大长度, 以字为单位.
+      zh_Hant: 截斷值的最大長度, 以字為單位.
+    llm_description: Maximum length of cropped value in words.
+    form: form
+    default: 10
+  - name: cropMarker
+    type: string
+    required: false
+    label:
+      en_US: Crop marker
+      zh_Hans: 裁剪标记
+      zh_Hant: 裁剪標記
+    human_description:
+      en_US: String marking crop boundaries.
+      zh_Hans: 标记截断边界的字符串.
+      zh_Hant: 標記截斷邊界的字符串.
+    llm_description: String marking crop boundaries.
+    form: form
+    default: "…"
+  - name: attributesToHighlight
+    type: string
+    required: false
+    label:
+      en_US: Attributes to highlight
+      zh_Hans: 指定高亮显示的属性
+      zh_Hant: 指定高亮顯示的屬性
+    human_description:
+      en_US: Highlight matching terms contained in an attribute.
+      zh_Hans: 需要高亮匹配项的属性.
+      zh_Hant: 需要高亮匹配項的屬性.
+    llm_description: Highlight matching terms contained in an attribute.
+    form: form
+  - name: highlightPreTag
+    type: string
+    required: false
+    label:
+      en_US: Highlight pre-tag
+      zh_Hans: 高亮显示前标记
+      zh_Hant: 高亮顯示前標記
+    human_description:
+      en_US: String inserted at the start of a highlighted term.
+      zh_Hans: 插入到高亮项开头的字符串.
+      zh_Hant: 插入到高亮項開頭的字符串.
+    llm_description: String inserted at the start of a highlighted term.
+    form: form
+    default: "<em>"
+  - name: highlightPostTag
+    type: string
+    required: false
+    label:
+      en_US: Highlight post-tag
+      zh_Hans: 高亮显示后标记
+      zh_Hant: 高亮顯示後標記
+    human_description:
+      en_US: String inserted at the end of a highlighted term.
+      zh_Hans: 插入到高亮项结尾的字符串.
+      zh_Hant: 插入到高亮項結尾的字符串.
+    llm_description: String inserted at the end of a highlighted term.
+    form: form
+    default: "</em>"
+  - name: showMatchesPosition
+    type: boolean
+    required: false
+    label:
+      en_US: Show matches position
+      zh_Hans: 显示匹配位置
+      zh_Hant: 顯示匹配位置
+    human_description:
+      en_US: Return matching terms location.
+      zh_Hans: 是否返回匹配项的位置.
+      zh_Hant: 是否返回匹配項的位置.
+    llm_description: Return matching terms location.
+    form: form
+    default: false
+  - name: sort
+    type: string
+    required: false
+    label:
+      en_US: Sort
+      zh_Hans: 排序
+      zh_Hant: 排序
+    human_description:
+      en_US: Sort search results by an attribute's value.
+      zh_Hans: 对搜索结果进行排序时使用的属性.
+      zh_Hant: 對搜索結果進行排序時使用的屬性.
+    llm_description: Sort search results by an attribute's value.
+    form: form
+  - name: matchingStrategy
+    type: select
+    required: false
+    options:
+      - value: last
+        label:
+          en_US: Last
+          zh_Hans: 末位淘汰
+          zh_Hant: 末位淘汰
+        human_description:
+          en_US: Matches the last word of the query
+          zh_Hans: 匹配查询的最后一个词
+          zh_Hant: 匹配查詢的最後一個詞
+      - value: all
+        label:
+          en_US: All
+          zh_Hans: 完全匹配
+          zh_Hant: 完整匹配
+      - value: frequency
+        label:
+          en_US: Frequency
+          zh_Hans: 按频剔除
+          zh_Hant: 按頻剔除
+    label:
+      en_US: Matching strategy
+      zh_Hans: 匹配策略
+      zh_Hant: 匹配策略
+    human_description:
+      en_US: Defines the strategy used to match query terms in documents.
+      zh_Hans: 定义用于在文档中匹配查询词的策略.
+      zh_Hant: 定義用於在文檔中匹配查詢詞的策略.
+    llm_description: Strategy used to match query terms within documents
+    form: form
+    default: last
+  - name: showRankingScore
+    type: boolean
+    required: false
+    label:
+      en_US: Show ranking score
+      zh_Hans: 显示排名分数
+      zh_Hant: 顯示排名分數
+    human_description:
+      en_US: Return the ranking score of each document.
+      zh_Hans: 是否返回每个文档的排名分数.
+      zh_Hant: 是否返回每個文檔的排名分數.
+    llm_description: Return the ranking score of each document.
+    form: form
+    default: false
+  - name: showRankingScoreDetails
+    type: boolean
+    required: false
+    label:
+      en_US: Show ranking score details
+      zh_Hans: 显示排名分数详情
+      zh_Hant: 顯示排名分數詳情
+    human_description:
+      en_US: Adds a detailed global ranking score field.
+      zh_Hans: 是否添加一个详细的全局排名分数字段.
+      zh_Hant: 是否添加一個詳細的全局排名分數字段.
+    llm_description: Adds a detailed global ranking score field.
+    form: form
+    default: false
+  - name: rankingScoreThreshold
+    type: number
+    required: false
+    label:
+      en_US: Ranking score threshold
+      zh_Hans: 排名分数阈值
+      zh_Hant: 排名分數閾值
+    human_description:
+      en_US: Excludes results with low ranking scores.
+      zh_Hans: 排除排名分数低于此的结果.
+      zh_Hant: 排除排名分數低於此的結果.
+    llm_description: Excludes results with low ranking scores.
+    form: form
+  - name: attributesToSearchOn
+    type: string
+    required: false
+    label:
+      en_US: Attributes to search on
+      zh_Hans: 指定搜索属性
+      zh_Hant: 指定搜索屬性
+    human_description:
+      en_US: Restrict search to the specified attributes.
+      zh_Hans: 搜索指定的属性.
+      zh_Hant: 搜索指定的屬性.
+    llm_description: Restrict search to the specified attributes.
+    form: form
+    default: "['*']"
+  - name: hybrid
+    type: string
+    required: false
+    label:
+      en_US: Hybrid
+      zh_Hans: 聚合
+      zh_Hant: 聚合
+    human_description:
+      en_US: Return results based on query keywords and meaning.
+      zh_Hans: 根据查询词及其含义返回结果.
+      zh_Hant: 根據查詢詞及其含義返回結果.
+    llm_description: Return results based on query keywords and meaning.
+    form: form
+  - name: vector
+    type: string
+    required: false
+    label:
+      en_US: Vector
+      zh_Hans: 向量
+      zh_Hant: 向量
+    human_description:
+      en_US: Search using a custom query vector.
+      zh_Hans: 使用自定义查询向量进行搜索.
+      zh_Hant: 使用自定義查詢向量進行搜索.
+    llm_description: Search using a custom query vector.
+    form: form
+  - name: retrieveVectors
+    type: boolean
+    required: false
+    label:
+      en_US: Retrieve vectors
+      zh_Hans: 检索向量
+      zh_Hant: 檢索向量
+    human_description:
+      en_US: Return document vector data.
+      zh_Hans: 是否返回文档向量数据.
+      zh_Hant: 是否返回文檔向量數據.
+    llm_description: Return document vector data.
+    form: form
+    default: false
+  - name: locales
+    type: string
+    required: false
+    label:
+      en_US: Locales
+      zh_Hans: 地区
+      zh_Hant: 地區
+    human_description:
+      en_US: Explicitly specify languages used in a query.
+      zh_Hans: 明确指定查询中使用的语言.
+      zh_Hant: 明確指定查詢中使用的語言.
+    llm_description: Explicitly specify languages used in a query.
+    form: form

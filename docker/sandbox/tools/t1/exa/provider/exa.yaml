@@ -1,0 +1,37 @@
+identity:
+  author: yevanchen
+  name: exa
+  label:
+    en_US: exa
+    zh_Hans: exa
+    pt_BR: exa
+  description:
+    en_US: Search designed for AI Business-grade search and crawling for any web data
+    zh_Hans: Search designed for AI Business-grade search and crawling for any web data
+    pt_BR: Search designed for AI Business-grade search and crawling for any web data
+  icon: exa.jpg
+credentials_for_provider:
+  exa_api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Exa API key
+      zh_Hans: Exa API Key
+      pt_BR: Exa API key
+    placeholder:
+      en_US: Please input your Exa API key
+      zh_Hans: 请输入你的 Exa API Key
+      pt_BR: Please input your Exa API key
+    help:
+      en_US: Please visit the Exa AI Dashboard to register an account and apply for an API key
+      zh_Hans: 请访问 Exa AI 仪表板注册账号并获取 API Key
+      pt_BR: Please visit the Exa AI Dashboard to register an account and apply for an API key
+    url: https://dashboard.exa.ai/playground
+tools:
+  - tools/exa_search.yaml
+  - tools/exa_contents.yaml
+  - tools/exa_similar.yaml
+  - tools/exa_anwser.yaml
+extra:
+  python:
+    source: provider/exa.py

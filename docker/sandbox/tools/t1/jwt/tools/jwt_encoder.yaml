@@ -1,0 +1,77 @@
+identity:
+  name: jwt_encoder
+  author: bowenliang123
+  label:
+    en_US: JWT Encoder
+    zh_Hans: JWT 编码
+description:
+  human:
+    en_US: Generate encoded JWT (JSON Web Token).
+    zh_Hans: 生成 JWT (JSON Web Token).
+  llm: A tool to encode JWT (JSON Web Token).
+parameters:
+  - name: payload
+    type: string
+    required: true
+    default: "{}"
+    label:
+      en_US: Payload
+      zh_Hans: 载荷
+    human_description:
+      en_US: JSON object string for payload
+      zh_Hans: 表示载荷的JSON对象字符串
+    llm_description: payload JSON string
+    form: llm
+  - name: algorithm
+    required: true
+    label:
+      en_US: encryption algorithm
+      zh_Hans: 加密算法
+    human_description:
+      en_US: one of supported algorithms in HS256, RS256, PS256, EdDSA, ES256
+      zh_Hans: 其中一个支持的加密算法 HS256, RS256, PS256, EdDSA, ES256
+    default: HS256
+    type: select
+    options:
+      - value: HS256
+        label:
+          en_US: HS256
+      - value: RS256
+        label:
+          en_US: RS256 (RSA)
+      - value: PS256
+        label:
+          en_US: PS256 (RSA)
+      - value: EdDSA
+        label:
+          en_US: EdDSA (Ed25519)
+      - value: ES256
+        label:
+          en_US: ES256 (ECDSA)
+    llm_description: encryption algorithm
+    form: form
+  - name: key
+    type: secret-input
+    required: true
+    label:
+      en_US: Encryption key
+      zh_Hans: 加密秘钥
+    human_description:
+      en_US: "Secret key for encryption. For HS256, it is a string; For RS256, PS256, EdDSA, ES256, it is a string starting with \"-----BEGIN PRIVATE KEY-----\""
+      zh_Hans: "加密秘钥, 对于HS256, 是一个秘钥字符串; 对于RS256, PS256, EdDSA, ES256, 是一个\"-----BEGIN PRIVATE KEY-----\"开头的秘钥字符串"
+    llm_description: secret key for encryption
+    form: llm
+  - name: headers
+    type: string
+    required: false
+    label:
+      en_US: Headers
+      zh_Hans: Headers
+    human_description:
+      en_US: JSON object string for headers
+      zh_Hans: 用于表示Header的JSON对象字符串
+    llm_description: Headers JSON string
+    form: llm
+extra:
+  python:
+    source: tools/jwt_encoder.py

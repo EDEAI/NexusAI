@@ -1,0 +1,49 @@
+identity:
+  name: BochaAISearch
+  author: seekerliu
+  label:
+    en_US: Bocha AI Search
+    ja_JP: Bocha AI Search
+    zh_Hans: Bocha AI Search
+    pt_BR: Bocha AI Search
+description:
+  human:
+    en_US: Search with Bocha AI Search, recognizes the semantics of search terms and additionally returns structured modal cards with content from vertical domains
+    ja_JP: Bocha AI Searchで検索し、検索語の意味を認識し、さらに垂直領域のコンテンツを含む構造化されたモーダルカードを返します
+    zh_Hans: 在博查网页搜索的基础上，AI识别搜索词语义并额外返回垂直领域内容的结构化模态卡，例如天气卡、日历卡、百科卡等
+    pt_BR: Pesquise com o Bocha AI Search, reconhece a semântica dos termos de pesquisa e retorna cartões modais estruturados com conteúdo de domínios verticais
+  llm: 使用博查AI搜索引擎(AI Search API)搜索互联网网页，输入应为搜索查询字符串，输出将返回搜索结果的详细信息，包括网页、图片以及垂直领域内容的模态卡
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: query
+      ja_JP: query
+      zh_Hans: query
+      pt_BR: query
+    human_description:
+      en_US: The keywords or phrases to search
+      ja_JP: 検索キーワードまたはフレーズ
+      zh_Hans: 搜索关键词或语句，例如：北京天气
+      pt_BR: As palavras-chave ou frases para pesquisar
+    llm_description: 搜索关键词或语句，例如：北京天气
+    form: llm
+  - name: freshness
+    type: string
+    label:
+      en_US: freshness
+      ja_JP: freshness
+      zh_Hans: freshness
+      pt_BR: freshness
+    human_description:
+      en_US: The time range for the search results. Available options noLimit, oneYear, oneMonth, oneWeek, oneDay. Default is noLimit
+      ja_JP: 検索結果の時間範囲。利用可能なオプションは noLimit, oneYear, oneMonth, oneWeek, oneDay です。デフォルトは noLimit です
+      zh_Hans: 搜索的时间范围，可选值为 noLimit, oneYear, oneMonth, oneWeek, oneDay。默认为 noLimit
+      pt_BR: O intervalo de tempo para os resultados da pesquisa. Opções disponíveis noLimit, oneYear, oneMonth, oneWeek, oneDay. O padrão é noLimit
+    llm_description: 搜索的时间范围，可选值为 noLimit, oneYear, oneMonth, oneWeek, oneDay。默认为 noLimit
+    form: llm
+    default: noLimit
+extra:
+  python:
+    source: tools/bocha_ai_search.py

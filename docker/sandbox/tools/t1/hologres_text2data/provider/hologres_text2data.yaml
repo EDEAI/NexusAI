@@ -1,0 +1,18 @@
+identity:
+  author: hologres_dev
+  name: hologres_text2data
+  label:
+    en_US: hologres_text2data
+    zh_Hans: hologres_text2data
+    pt_BR: hologres_text2data
+  description:
+    en_US: Fetching data from the database using natural language.
+    zh_Hans: 使用自然语言获取 Hologres 数据库数据.
+    pt_BR: Fetching data from the database using natural language.
+  icon: hologram.svg
+tools:
+  - tools/hologres_text2data.yaml
+  - tools/hologres_excute_sql.yaml
+extra:
+  python:
+    source: provider/hologres_text2data.py

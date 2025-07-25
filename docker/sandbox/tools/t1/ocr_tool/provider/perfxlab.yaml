@@ -1,0 +1,17 @@
+identity:
+  author: PerfXLab
+  name: ocr_tool
+  label:
+    en_US: OCR recognition service
+    zh_Hans: OCR识别服务
+    pt_BR: OCR recognition service
+  description:
+    en_US: an OCR recognition service tool that supports PDF, image, and other files
+    zh_Hans: 一种支持PDF、图片等文件的OCR识别服务工具
+    pt_BR: an OCR recognition service tool that supports PDF, image, and other files
+  icon: icon.svg
+tools:
+  - tools/ocr_to_markdown.yaml
+extra:
+  python:
+    source: provider/perfxlab.py

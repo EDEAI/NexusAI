@@ -1,0 +1,80 @@
+description:
+  human:
+    en_US: Sending a message to a Slack channel
+    pt_BR: Enviando uma mensagem para um canal do Slack
+    zh_Hans: 在 Slack 频道中发送消息
+    ja_JP: Slackチャンネルへメッセージを投稿
+  llm: A tool for sending messages to a Slack channel.
+
+extra:
+  python:
+    source: tools/slack_post_to_channel.py
+
+identity:
+  author: solaoi
+  icon: icon.svg
+  label:
+    en_US: Slack Post to Channel
+    pt_BR: Slack Post to Channel
+    zh_Hans: Slack 发布到频道
+    ja_JP: Slack チャンネルへの投稿
+  description:
+    en_US: Send a message to a Slack channel
+    pt_BR: Enviar uma mensagem para um canal do Slack
+    zh_Hans: 发送消息到 Slack 频道
+    ja_JP: Slack チャンネルにメッセージを投稿
+  name: slack_post_to_channel
+
+parameters:
+  - name: channel_id
+    type: string
+    required: true
+    label:
+      en_US: channel_id
+      pt_BR: channel_id
+      zh_Hans: channel_id
+      ja_JP: channel_id
+    human_description:
+      en_US: Slack channel ID
+      pt_BR: Slack channel ID
+      zh_Hans: Slack 频道ID
+      ja_JP: Slack チャンネルID
+    llm_description: The unique identifier of the Slack channel where the message will be posted.
+    form: llm
+
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: content
+      pt_BR: content
+      zh_Hans: content
+      ja_JP: content
+    human_description:
+      en_US: Content to be sent to the channel
+      pt_BR: Conteúdo a ser enviado para o canal
+      zh_Hans: 要发送到频道的消息内容
+      ja_JP: チャンネルに投稿するメッセージ内容
+    llm_description: The text message content to send to the specified Slack channel.
+    form: llm
+
+  - name: bot_token
+    type: secret-input
+    required: true
+    label:
+      en_US: "Bot Token"
+      zh_Hans: "Bot Token"
+      pt_BR: "Token do Bot"
+      ja_JP: "Bot Token"
+    placeholder:
+      en_US: "Please enter the Bot Token"
+      zh_Hans: "请输入 Bot Token"
+      pt_BR: "Por favor, insira o Token do Bot"
+      ja_JP: "Bot Tokenを入力してください"
+    human_description:
+      en_US: "An optional Bot Token for this specific usage."
+      zh_Hans: "可选的 Bot Token、用于本次使用。"
+      pt_BR: "Um Token do Bot opcional para este uso específico."
+      ja_JP: "今回利用する個別のBot Token。"
+    llm_description: "If provided, this Bot Token will be used for the current action."
+    form: form

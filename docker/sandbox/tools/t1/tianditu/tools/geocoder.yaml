@@ -1,0 +1,29 @@
+description:
+  human:
+    en_US: Geocoder
+    pt_BR: Geocoder
+    zh_Hans: 中国区域地理编码查询
+  llm: A tool for geocoder in China
+extra:
+  python:
+    source: tools/geocoder.py
+identity:
+  author: Listeng
+  label:
+    en_US: Get coords converted from address name
+    pt_BR: Get coords converted from address name
+    zh_Hans: 地理编码
+  name: geocoder
+parameters:
+- form: llm
+  human_description:
+    en_US: keyword
+    pt_BR: keyword
+    zh_Hans: 搜索的关键字
+  label:
+    en_US: keyword
+    pt_BR: keyword
+    zh_Hans: 搜索的关键字
+  name: keyword
+  required: true
+  type: string

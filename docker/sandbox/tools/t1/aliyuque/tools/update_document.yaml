@@ -1,0 +1,88 @@
+description:
+  human:
+    en_US: Update an existing document within a specified knowledge base by providing
+      the document ID or path.
+    zh_Hans: 通过提供文档ID或路径，更新指定知识库中的现有文档。
+  llm: Update doc in a knowledge base via ID/path.
+extra:
+  python:
+    source: tools/update_document.py
+identity:
+  author: 佐井
+  icon: icon.svg
+  label:
+    en_US: Update Document
+    zh_Hans: 更新文档
+  name: aliyuque_update_document
+parameters:
+- form: llm
+  human_description:
+    en_US: The unique identifier of the knowledge base where the document resides.
+    zh_Hans: 文档所属知识库的ID。
+  label:
+    en_US: Knowledge Base ID
+    zh_Hans: 知识库 ID
+  llm_description: ID of the knowledge base holding the doc.
+  name: book_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The unique identifier or the path of the document to be updated.
+    zh_Hans: 要更新的文档的唯一ID或路径。
+  label:
+    en_US: Document ID or Path
+    zh_Hans: 文档 ID 或 路径
+  llm_description: Doc's ID or path for update.
+  name: id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The title of the document, defaults to 'Untitled' if not provided.
+    zh_Hans: 文档标题，默认为'无标题'如未提供。
+  label:
+    en_US: Title
+    zh_Hans: 标题
+  llm_description: Title of the document, defaults to 'Untitled'.
+  name: title
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Format of the document content (markdown, HTML, Lake).
+    zh_Hans: 文档内容格式（markdown, HTML, Lake）。
+  label:
+    en_US: Content Format
+    zh_Hans: 内容格式
+  llm_description: Content format choices, markdown, HTML, Lake.
+  name: format
+  options:
+  - label:
+      en_US: markdown
+      pt_BR: markdown
+      zh_Hans: markdown
+    value: markdown
+  - label:
+      en_US: html
+      pt_BR: html
+      zh_Hans: html
+    value: html
+  - label:
+      en_US: lake
+      pt_BR: lake
+      zh_Hans: lake
+    value: lake
+  required: false
+  type: select
+- form: llm
+  human_description:
+    en_US: The actual content of the document.
+    zh_Hans: 文档的实际内容。
+  label:
+    en_US: Body Content
+    zh_Hans: 正文内容
+  llm_description: Content of the document.
+  name: body
+  required: true
+  type: string

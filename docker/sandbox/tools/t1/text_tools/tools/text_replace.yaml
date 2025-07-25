@@ -1,0 +1,100 @@
+identity:
+  author: yizixuan
+  name: text_replace
+  label:
+    en_US: Text Replace
+    zh_Hans: 文本替换
+description:
+  human:
+    en_US: Replace all matches of a string with the target string.
+    zh_Hans: 将字符串的所有匹配项替换为目标字符串
+  llm: A tool for replacing keywords in the given text.
+extra:
+  python:
+    source: tools/text_replace.py
+parameters:
+  - name: input_text
+    type: string
+    label:
+      en_US: Input text
+      zh_Hans: 输入文本
+    form: llm
+    required: true
+    human_description:
+      en_US: Input text
+      zh_Hans: 输入文本
+  - name: search_text
+    type: string
+    label:
+      en_US: Search content
+      zh_Hans: 查找内容
+    form: llm
+    required: true
+    human_description:
+      en_US: Keywords to be searched. Regular expressions can also be used (Enable Regular Pattern).
+      zh_Hans: 要查找的关键字，也可以使用正则表达式（开启正则模式）。
+  - name: replace_text
+    type: string
+    label:
+      en_US: Replace text
+      zh_Hans: 替换文本
+    form: llm
+    required: true
+    human_description:
+      en_US: The target text for replacing the matched keywords can also reference regular expression capture groups (Enable Regular Pattern).
+      zh_Hans: 匹配的关键词替换的目标文本，也可以引用正则表达式捕获组。
+  - name: use_regex
+    type: boolean
+    label:
+      en_US: Regular Pattern
+      zh_Hans: 正则模式
+    form: form
+    required: true
+    default: false
+    human_description:
+      en_US: Use regular expressions for searching.
+      zh_Hans: 使用正则表达式进行搜索。
+  - name: regex_ignorecase
+    type: boolean
+    label:
+      en_US: RE.IGNORECASE
+      zh_Hans: RE.IGNORECASE
+    form: form
+    required: true
+    default: false
+    human_description:
+      en_US: When using regular expressions, ignore case
+      zh_Hans: 使用正则表达式时，忽略大小写
+  - name: regex_multiline
+    type: boolean
+    label:
+      en_US: RE.MULTILINE
+      zh_Hans: RE.MULTILINE
+    form: form
+    required: true
+    default: false
+    human_description:
+      en_US: When using regular expressions, make ^, $ take effect for each line
+      zh_Hans: 使用正则表达式时，让 ^, $ 每行生效
+  - name: regex_dotall
+    type: boolean
+    label:
+      en_US: RE.DOTALL
+      zh_Hans: RE.DOTALL
+    form: form
+    required: true
+    default: false
+    human_description:
+      en_US: When using regular expressions, make . match all characters including line breaks.
+      zh_Hans: 使用正则表达式时，让 . 匹配包括换行在内的所有字符
+  - name: regex_ascii
+    type: boolean
+    label:
+      en_US: RE.ASCII
+      zh_Hans: RE.ASCII
+    form: form
+    required: true
+    default: false
+    human_description:
+      en_US: When using regular expressions, make \w, \d, \s match only ASCII, not Unicode.
+      zh_Hans: 使用正则表达式时，让 \w, \d, \s 只匹配 ASCII，而非 Unicode

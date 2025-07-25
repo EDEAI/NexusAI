@@ -1,0 +1,145 @@
+identity:
+  name: exa_contents
+  author: yevanchen
+  label:
+    en_US: Exa URL Contents
+    zh_Hans: Exa URL 内容获取
+    pt_BR: Conteúdo Exa URL
+    ja_JP: Exa URL コンテンツ
+description:
+  human:
+    en_US: Retrieve the text content from specific URLs using Exa's web content extraction capabilities.
+    zh_Hans: 使用 Exa 的网页内容提取功能获取特定 URL 的文本内容。
+    pt_BR: Recupere o conteúdo de texto de URLs específicas usando as capacidades de extração de conteúdo web da Exa.
+    ja_JP: Exaのウェブコンテンツ抽出機能を使用して、特定のURLからテキストコンテンツを取得します。
+  llm: A tool for retrieving the full text content from specific web pages or documents using Exa's content extraction API.
+parameters:
+  - name: urls
+    type: string
+    required: true
+    label:
+      en_US: URLs
+      zh_Hans: URL列表
+      pt_BR: URLs
+      ja_JP: URL
+    human_description:
+      en_US: Comma-separated list of URLs to fetch content from.
+      zh_Hans: 用逗号分隔的URL列表，用于获取内容。
+      pt_BR: Lista de URLs separadas por vírgulas para buscar conteúdo.
+      ja_JP: コンテンツを取得するためのカンマ区切りのURLリスト。
+    llm_description: A list of URLs to extract content from, separated by commas.
+    form: llm
+
+  - name: livecrawl
+    type: select
+    required: false
+    default: 'never'
+    label:
+      en_US: Live Crawling
+      zh_Hans: 实时爬取
+      pt_BR: Crawl em Tempo Real
+      ja_JP: リアルタイムクロール
+    human_description:
+      en_US: Specify the live crawling behavior.
+      zh_Hans: 指定实时爬取行为。
+      pt_BR: Especifique o comportamento de crawl em tempo real.
+      ja_JP: 実時間のクロールの動作を指定します。
+    llm_description: Choose the live crawling strategy for content retrieval.
+    options:
+      - label:
+          en_US: Never
+          zh_Hans: 从不
+          pt_BR: Nunca
+          ja_JP: なし
+        value: 'never'
+      - label:
+          en_US: Fallback
+          zh_Hans: 回退
+          pt_BR: Redundância
+          ja_JP: フォールバック
+        value: 'fallback'
+      - label:
+          en_US: Always
+          zh_Hans: 总是
+          pt_BR: Sempre
+          ja_JP: いつも
+        value: 'always'
+      - label:
+          en_US: Auto
+          zh_Hans: 自动
+          pt_BR: Auto
+          ja_JP: 自動
+        value: 'auto'
+    form: form
+
+  - name: full_page_text
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Full Page Text
+      zh_Hans: 完整页面文本
+      pt_BR: Texto Completo da Página
+      ja_JP: 完全ページテキスト
+    human_description:
+      en_US: Return full webpage text for every result, including for subpages.
+      zh_Hans: 返回每个结果的完整网页文本，包括子页面。
+      pt_BR: Retorna o texto completo da página web para cada resultado, incluindo para subpáginas.
+      ja_JP: 各結果の完全なウェブページテキストを返し、サブページも含む。
+    llm_description: Include the full text of each webpage, including subpages.
+    form: form
+
+  - name: ai_page_summary
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: AI Page Summary
+      zh_Hans: AI页面摘要
+      pt_BR: Resumo AI da Página
+      ja_JP: AIページ要約
+    human_description:
+      en_US: Return an LLM-generated summary of each webpage.
+      zh_Hans: 返回每个网页的LLM生成的摘要。
+      pt_BR: Retorna um resumo gerado pelo LLM de cada página web.
+      ja_JP: 各ウェブページのLLM生成の要約を返します。
+    llm_description: Generate a summary for each webpage using LLM.
+    form: form
+
+  - name: number_of_subpages
+    type: number
+    required: false
+    default: 1
+    label:
+      en_US: Number of Subpages
+      zh_Hans: 子页面数量
+      pt_BR: Número de Subpáginas
+      ja_JP: サブページ数
+    human_description:
+      en_US: Number of subpages to include within each result.
+      zh_Hans: 每个结果中要包括的子页面数量。
+      pt_BR: Número de subpáginas a incluir dentro de cada resultado.
+      ja_JP: 各結果中に含めるサブページの数。
+    llm_description: Specify the number of subpages to include in the content extraction.
+    form: form
+
+  - name: return_links
+    type: number
+    required: false
+    default: 1
+    label:
+      en_US: Return Links
+      zh_Hans: 返回链接
+      pt_BR: Retornar Links
+      ja_JP: リンクを返す
+    human_description:
+      en_US: Number of links to return from each webpage.
+      zh_Hans: 从每个网页返回的链接数量。
+      pt_BR: Número de links a retornar de cada página web.
+      ja_JP: 各ウェブページから返すリンクの数。
+    llm_description: Include links found on each webpage.
+    form: form
+
+extra:
+  python:
+    source: tools/exa_contents.py

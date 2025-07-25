@@ -1,0 +1,50 @@
+identity:
+  name: steam_user_stats
+  author: bdim
+  label:
+    en_US: Steam User Game Stats
+    zh_Hans: 用户游戏统计
+description:
+  human:
+    en_US: Get detailed game statistics for a Steam user in a specific game
+    zh_Hans: 获取 Steam 用户在特定游戏中的详细统计数据
+  llm: Retrieve comprehensive in-game statistics for a Steam user in a specific game, including game-specific metrics, values, and achievement progress.
+parameters:
+  - name: steamid
+    type: string
+    required: true
+    label:
+      en_US: Steam ID
+      zh_Hans: Steam ID
+    human_description:
+      en_US: 64-bit Steam ID of the player
+      zh_Hans: 玩家的 64 位 Steam ID
+    llm_description: The 64-bit identifier for the Steam user whose game statistics you want to retrieve. The user's game details must be public.
+    form: llm
+
+  - name: appid
+    type: string
+    required: true
+    label:
+      en_US: Game AppID
+      zh_Hans: 游戏 AppID
+    human_description:
+      en_US: The AppID of the game you want statistics for
+      zh_Hans: 需要查询统计数据的游戏 AppID
+    llm_description: The unique identifier for the game on Steam. For example, 440 is the AppID for Team Fortress 2, 570 for Dota 2, 730 for CS:GO.
+    form: llm
+
+  - name: language
+    type: string
+    required: false
+    label:
+      en_US: Language
+      zh_Hans: 语言
+    human_description:
+      en_US: Language code for returned data (e.g., english, schinese)
+      zh_Hans: 返回数据的语言代码（例如：english, schinese）
+    llm_description: Optional language code to retrieve localized data. Examples include 'english', 'schinese' (Simplified Chinese), 'tchinese' (Traditional Chinese), 'russian', etc.
+    form: llm
+extra:
+  python:
+    source: tools/steam_user_stats.py

@@ -1,0 +1,41 @@
+identity:
+  name: dismiss_group
+  label:
+    en_US: Dismiss Group
+    zh_Hans: 解散群组
+  icon: rongcloud_logo.svg
+  author: rongcloud
+  version: 1.0.0
+  email: support@dify.ai
+description:
+  human:
+    en_US: Permanently delete a group chat from RongCloud, need to provide operator's user ID and group ID, return 200 success
+    zh_Hans: 解散融云群组，需要提供操作员用户 ID 和群组 ID，返回 200 成功
+  llm: Permanently delete a group chat from RongCloud, need to provide operator's user ID and group ID, return 200 success
+extra:
+  python:
+    source: tools/group/dismiss_group.py
+
+parameters:
+  - name: user_id
+    label:
+      en_US: Operator's User ID
+      zh_Hans: 操作解散群的用户 ID
+    human_description:
+      en_US: Operator's user ID, can be any user ID, non-group creator can also dismiss the group  
+      zh_Hans: 操作员用户 ID，可以为任何用户 ID，非群组创建者也可以解散群组
+    llm_description: Operator's user ID, can be any user ID, non-group creator can also dismiss the group
+    form: llm
+    type: string
+    required: true
+  - name: group_id
+    label:
+      en_US: Group ID
+      zh_Hans: 群组 ID
+    human_description:
+      en_US: The group ID of the group, maximum length 64 characters
+      zh_Hans: 要解散的群的群组 ID，最大长度 64 个字符
+    llm_description: The group ID of the group, maximum length 64 characters
+    form: llm
+    type: string
+    required: true

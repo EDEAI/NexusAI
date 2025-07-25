@@ -1,0 +1,15 @@
+identity:
+  name: ed25519_keygen
+  author: bowenliang123
+  label:
+    en_US: Ed25519 Keypair Generation
+    zh_Hans: Ed25519 密钥对生成
+description:
+  human:
+    en_US: Generate Ed25519 Key Pair, including public and private keys in PKCS#8 format
+    zh_Hans: 生成 Ed25519 的公钥及密钥，分别输出为 PKCS#8 格式 pem文件
+  llm: Generate Ed25519 Key Pair
+parameters:
+extra:
+  python:
+    source: tools/ed25519_keygen/ed25519_keygen.py

@@ -1,0 +1,34 @@
+identity:
+  name: get_profile
+  author: acane0320
+  label:
+    en_US: Get User Memory Profile
+    zh_Hans: 获取用户记忆配置文件
+    ja_Jp: ユーザーの記憶プロファイルを取得
+    pt_BR: Obter Perfil de Memória do Usuário
+description:
+  human:
+    en_US: Retrieve the real-time user profiles for long-term memory
+    zh_Hans: 获取实时用户记忆配置文件以进行长期记忆
+    ja_Jp: リアルタイムのユーザープロファイルを取得
+    pt_BR: Obter os perfis de memória em tempo real de um usuário
+  llm: Use this tool to retrieve the memory profiles of a user. This is useful for including user memory information in your prompts.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to retrieve the real-time memory profile for
+      zh_Hans: 要获取实时用户记忆配置文件的用户 ID
+      ja_Jp: リアルタイムのユーザープロファイルを取得するユーザーの ID
+      pt_BR: O ID do usuário para obter o perfil de memória em tempo real
+    llm_description: The ID of the user to retrieve the real-time memory profile for.
+    form: llm
+extra:
+  python:
+    source: tools/user_profile/get_profile.py

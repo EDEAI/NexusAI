@@ -1,0 +1,30 @@
+identity:
+  name: generation-content
+  author: aippt
+  label:
+    en_US: Generate Content
+    zh_Hans: 生成内容
+    pt_BR: Generate Content
+description:
+  human:
+    en_US: Generate content from the outline
+    zh_Hans: 通过大纲生成内容
+    pt_BR: Generate content from the outline
+  llm: Generate content from the outline
+parameters:
+  - name: task_id
+    type: number
+    required: true
+    label:
+      en_US: Task ID
+      zh_Hans: 任务 ID
+      pt_BR: Task ID
+    human_description:
+      en_US: Task ID
+      zh_Hans: 任务 ID
+      pt_BR: Task ID
+    llm_description: Task ID
+    form: llm
+extra:
+  python:
+    source: tools/generate-content.py

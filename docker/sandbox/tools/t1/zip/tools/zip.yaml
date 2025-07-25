@@ -1,0 +1,42 @@
+identity:
+  name: zip
+  author: hjlarry
+  label:
+    en_US: zip
+    zh_Hans: zip
+    pt_BR: zip
+description:
+  human:
+    en_US: compress multi files to a zip file
+    zh_Hans: 压缩多个文件为一个 zip 文件
+    pt_BR: compactar vários arquivos em um arquivo zip
+  llm: zip multi files to a zip file
+parameters:
+  - name: files
+    type: files
+    required: true
+    label:
+      en_US: Files
+      zh_Hans: 文件
+      pt_BR: Arquivos
+    human_description:
+      en_US: the files you want to zip
+      zh_Hans: 你想压缩的文件
+      pt_BR: os arquivos que você deseja compactar
+    llm_description: the files you want to zip
+    form: llm
+  - name: file_name
+    type: string
+    label:
+      en_US: File name
+      zh_Hans: 文件名称
+      pt_BR: Nome do arquivo
+    human_description:
+      en_US: the name of the zip file, default is 'files.zip'
+      zh_Hans: 压缩后的文件名称，默认是 'files.zip'
+      pt_BR: o nome do arquivo zip, padrão é 'files.zip'
+    llm_description: the name of the zip file, default is 'files.zip'
+    form: llm
+extra:
+  python:
+    source: tools/zip.py

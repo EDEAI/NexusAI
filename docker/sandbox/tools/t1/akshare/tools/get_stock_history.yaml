@@ -1,0 +1,65 @@
+identity:
+  author: jingfelix
+  name: get_stock_history
+  label:
+    zh_Hans: 获取A股历史行情
+    en_US: Get A-share Stock History
+    zh_Hant: 獲取A股歷史行情
+description:
+  human:
+    zh_Hans: 获取指定A股股票的历史区间数据。
+    en_US: Retrieve historical data for a specified A-share stock within a given date range.
+    zh_Hant: 獲取指定A股股票的歷史區間數據。
+  llm: 获取指定A股股票的历史区间数据，支持输入股票代码、开始日期、结束日期、复权类型等参数，返回历史行情数据。
+parameters:
+  - name: symbol
+    label:
+      zh_Hans: 股票代码
+      en_US: Stock Symbol
+      zh_Hant: 股票代碼
+    human_description:
+      zh_Hans: 需要查询的A股股票代码，如“SH600519”（需包含交易所代码）。
+      en_US: The A-share stock symbol to query, e.g., "SH600519".
+      zh_Hant: 需要查詢的A股股票代碼，如“SH600519”（需包含交易所代码）。
+    type: string
+    form: llm
+    required: true
+  - name: start_date
+    label:
+      zh_Hans: 开始日期
+      en_US: Start Date
+      zh_Hant: 開始日期
+    human_description:
+      zh_Hans: 查询的起始日期，格式为YYYYMMDD。
+      en_US: "The start date for the query, format: YYYYMMDD."
+      zh_Hant: 查詢的起始日期，格式為YYYYMMDD。
+    type: string
+    form: llm
+    required: true
+  - name: end_date
+    label:
+      zh_Hans: 结束日期
+      en_US: End Date
+      zh_Hant: 結束日期
+    human_description:
+      zh_Hans: 查询的结束日期，格式为YYYYMMDD。
+      en_US: "The end date for the query, format: YYYYMMDD."
+      zh_Hant: 查詢的結束日期，格式為YYYYMMDD。
+    type: string
+    form: llm
+    required: true
+  - name: adjust
+    label:
+      zh_Hans: 复权类型
+      en_US: Adjustment Type
+      zh_Hant: 復權類型
+    human_description:
+      zh_Hans: 复权类型，可选"qfq"（前复权）、"hfq"（后复权）、""（不复权）。
+      en_US: 'Adjustment type, options: "qfq" (forward), "hfq" (backward), or "" (none).'
+      zh_Hant: 復權類型，可選"qfq"（前復權）、"hfq"（後復權）、""（不復權）。
+    type: string
+    form: llm
+    required: false
+extra:
+  python:
+    source: tools/get_stock_history.py

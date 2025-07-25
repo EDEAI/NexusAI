@@ -1,0 +1,183 @@
+description:
+  human:
+    en_US: Generate image via getimg.ai.
+  llm: This tool is used to generate image from prompt or image via https://getimg.ai.
+extra:
+  python:
+    source: tools/text2image.py
+identity:
+  author: Matri Qi
+  icon: icon.svg
+  label:
+    en_US: text2image
+  name: text2image
+parameters:
+- form: llm
+  human_description:
+    en_US: The text prompt used to generate the image. The getimg.aier will generate
+      an image based on this prompt.
+  label:
+    en_US: prompt
+  llm_description: this prompt text will be used to generate image.
+  name: prompt
+  required: true
+  type: string
+- form: form
+  human_description:
+    en_US: The getimg.ai mode to use. The mode determines the endpoint used to generate
+      the image.
+  label:
+    en_US: mode
+  name: mode
+  options:
+  - label:
+      en_US: essential-v2
+    value: essential-v2
+  - label:
+      en_US: stable-diffusion-xl
+    value: stable-diffusion-xl
+  - label:
+      en_US: stable-diffusion
+    value: stable-diffusion
+  - label:
+      en_US: latent-consistency
+    value: latent-consistency
+  required: false
+  type: select
+- form: form
+  human_description:
+    en_US: The style preset to use. The style preset guides the generation towards
+      a particular style. It's just efficient for `Essential V2` mode.
+  label:
+    en_US: style
+  name: style
+  options:
+  - label:
+      en_US: photorealism
+    value: photorealism
+  - label:
+      en_US: anime
+    value: anime
+  - label:
+      en_US: art
+    value: art
+  required: false
+  type: select
+- form: form
+  human_description:
+    en_US: The aspect ratio of the generated image. It's just efficient for `Essential
+      V2` mode.
+  label:
+    en_US: aspect ratio
+  name: aspect_ratio
+  options:
+  - label:
+      en_US: '1:1'
+    value: '1:1'
+  - label:
+      en_US: '4:5'
+    value: '4:5'
+  - label:
+      en_US: '5:4'
+    value: '5:4'
+  - label:
+      en_US: '2:3'
+    value: '2:3'
+  - label:
+      en_US: '3:2'
+    value: '3:2'
+  - label:
+      en_US: '4:7'
+    value: '4:7'
+  - label:
+      en_US: '7:4'
+    value: '7:4'
+  required: false
+  type: select
+- form: form
+  human_description:
+    en_US: The file format of the generated image.
+  label:
+    en_US: output format
+  name: output_format
+  options:
+  - label:
+      en_US: jpeg
+    value: jpeg
+  - label:
+      en_US: png
+    value: png
+  required: false
+  type: select
+- form: form
+  human_description:
+    en_US: The format in which the generated images are returned. Must be one of url
+      or b64. URLs are only valid for 1 hour after the image has been generated.
+  label:
+    en_US: response format
+  name: response_format
+  options:
+  - label:
+      en_US: url
+    value: url
+  - label:
+      en_US: b64
+    value: b64
+  required: false
+  type: select
+- form: form
+  human_description:
+    en_US: Model ID supported by this pipeline and family. It's just efficient for
+      `Stable Diffusion XL`, `Stable Diffusion`, `Latent Consistency` mode.
+  label:
+    en_US: model
+  name: model
+  required: false
+  type: string
+- form: form
+  human_description:
+    en_US: Text input that will not guide the image generation. It's just efficient
+      for `Stable Diffusion XL`, `Stable Diffusion`, `Latent Consistency` mode.
+  label:
+    en_US: negative prompt
+  name: negative_prompt
+  required: false
+  type: string
+- form: form
+  human_description:
+    en_US: Prompt sent to second tokenizer and text encoder. If not defined, prompt
+      is used in both text-encoders. It's just efficient for `Stable Diffusion XL`
+      mode.
+  label:
+    en_US: prompt2
+  name: prompt_2
+  required: false
+  type: string
+- form: form
+  human_description:
+    en_US: he width of the generated image in pixels. Width needs to be multiple of
+      64.
+  label:
+    en_US: width
+  name: width
+  required: false
+  type: number
+- form: form
+  human_description:
+    en_US: he height of the generated image in pixels. Height needs to be multiple
+      of 64.
+  label:
+    en_US: height
+  name: height
+  required: false
+  type: number
+- form: form
+  human_description:
+    en_US: The number of denoising steps. More steps usually can produce higher quality
+      images, but take more time to generate.  It's just efficient for `Stable Diffusion
+      XL`, `Stable Diffusion`, `Latent Consistency` mode.
+  label:
+    en_US: steps
+  name: steps
+  required: false
+  type: number

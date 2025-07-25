@@ -1,0 +1,58 @@
+identity:
+  name: gentel-shield
+  author: GenTelAI
+  label:
+    en_US: LLM Guardrail
+    zh_Hans: 大模型内容风险检测
+description:
+  human:
+    en_US: Conduct safety and compliance detection for the text content, image content, etc., of large models.
+    zh_Hans: 针对大模型的文本内容、图像内容等进行安全合规检测
+  llm: LLM Content Risk Detection Tool
+parameters:
+  - name: modal
+    type: select
+    required: true
+    label:
+      en_US: Modal
+      zh_Hans: 模态
+    options:
+      - value: text
+        label:
+          en_US: Text
+          zh_Hans: 文本
+    human_description:
+      en_US: Data Modal
+      zh_Hans: 数据模态
+    form: form
+    default: text
+  - name: text
+    type: string
+    required: true
+    label:
+      en_US: Input Text
+      zh_Hans: 输入文本
+    human_description:
+      en_US: Risk Detect Text
+      zh_Hans: 风险检测文本
+    llm_description: Text for Risk Detect
+    form: llm
+output_schema:
+  type: object
+  properties:
+    defense_content:
+      type: string
+    event_risk_level:
+      type: string
+    risk_event:
+      type: array
+      items:
+        type: object
+        properties:
+          risk_level:
+            type: string
+          risk_name:
+            type: string
+extra:
+  python:
+    source: tools/shield.py

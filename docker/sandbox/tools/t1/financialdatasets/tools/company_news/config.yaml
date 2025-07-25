@@ -1,0 +1,80 @@
+identity:
+  name: conpany_news
+  author: financialai
+  label:
+    en_US: Company News
+    zh_Hans: 公司新闻
+    ja_Jp: 会社ニュース
+    pt_BR: Notícias da Empresa
+description:
+  human:
+    en_US: Get real-time and historical news for a ticker.
+    zh_Hans: 获取股票代码的实时和历史新闻。
+    ja_Jp: ティッカーのリアルタイムおよび過去のニュースを取得します。
+    pt_BR: Obtenha notícias em tempo real e históricas para um ticker.
+  llm: Get real-time and historical news for a ticker.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol of the company you want to get news for.
+      zh_Hans: 您想获取新闻的公司的股票代码。
+      ja_Jp: ニュースを取得したい会社のティッカーシンボル。
+      pt_BR: O símbolo do ticker da empresa para a qual você deseja obter notícias.
+    llm_description: The ticker symbol of the company you want to get news for.
+    form: llm
+  - name: start_date
+    type: string
+    required: false
+    label:
+      en_US: Start date (YYYY-MM-DD)
+      zh_Hans: 开始日期 (YYYY-MM-DD)
+      ja_Jp: 開始日 (YYYY-MM-DD)
+      pt_BR: Data de início (AAAA-MM-DD)
+    human_description:
+      en_US: "The start date for the news data (format: YYYY-MM-DD)."
+      zh_Hans: "新闻数据的开始日期（格式：YYYY-MM-DD）。"
+      ja_Jp: "ニュースデータの開始日（形式：YYYY-MM-DD）。"
+      pt_BR: "A data de início para os dados de notícias (formato: AAAA-MM-DD)."
+    llm_description: "The start date for the news data (format: YYYY-MM-DD)."
+    form: llm
+  - name: end_date
+    type: string
+    required: false
+    label:
+      en_US: End date (YYYY-MM-DD)
+      zh_Hans: 结束日期 (YYYY-MM-DD)
+      ja_Jp: 終了日 (YYYY-MM-DD)
+      pt_BR: Data final (AAAA-MM-DD)
+    human_description:
+      en_US: "The end date for the news data (format: YYYY-MM-DD)."
+      zh_Hans: "新闻数据的结束日期（格式：YYYY-MM-DD）。"
+      ja_Jp: "ニュースデータの終了日（形式：YYYY-MM-DD）。"
+      pt_BR: "A data final para os dados de notícias (formato: AAAA-MM-DD)."
+    llm_description: "The end date for the news data (format: YYYY-MM-DD)."
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    default: 1
+    label:
+      en_US: Limit
+      zh_Hans: 限制
+      ja_Jp: 制限
+      pt_BR: Limite
+    human_description:
+      en_US: "The maximum number of news articles to return (default: 100, max: 100)."
+      zh_Hans: "要返回的新闻文章的最大数（默认值：100，最大值：100）。"
+      ja_Jp: "返すニュース記事の最大数（デフォルト：100、最大：100）。"
+      pt_BR: "O número máximo de artigos de notícias a serem retornados (padrão: 100, máximo: 100)."
+    llm_description: "The maximum number of news articles to return (default: 100, max: 100)."
+    form: llm
+extra:
+  python:
+    source: tools/company_news/invoke.py

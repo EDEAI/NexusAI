@@ -1,0 +1,80 @@
+identity:
+  name: update-document
+  author: witmeng
+  label:
+    en_US: Update Document
+    zh_Hans: 更新文档（追加或覆盖）
+description:
+  human:
+    en_US: Download a document, append content, upload it back, and trigger reprocessing
+    zh_Hans: 下载文档，添加内容，重新上传并触发重新解析
+  llm: Update a document in RagFlow by appending new content and reprocessing
+parameters:
+  - form: llm
+    human_description:
+      en_US: Dataset ID
+      zh_Hans: 数据集ID
+    label:
+      en_US: Dataset ID
+      zh_Hans: 数据集ID
+    llm_description: The ID of the dataset containing the document
+    name: dataset_id
+    required: true
+    type: string 
+  - form: llm
+    human_description:
+      en_US: Document ID
+      zh_Hans: 文档ID
+    label:
+      en_US: Document ID
+      zh_Hans: 文档ID
+    llm_description: The ID of the document to update
+    name: document_id
+    required: false
+    type: string
+  - form: llm
+    human_description:
+      en_US: Document name, if not exist then create
+      zh_Hans: 文档名称，如果不存在则创建
+    label:
+      en_US: Document name
+      zh_Hans: 文档名称
+    llm_description: The name of the document to Create
+    name: document_name
+    required: false
+    type: string
+  - form: llm
+    human_description:
+      en_US: update mode
+      zh_Hans: 更新模式
+    label:
+      en_US: update mode
+      zh_Hans: 更新模式
+    llm_description: The mode to update the document
+    name: mode
+    required: true
+    type: select
+    default: "append"
+    options:
+    - value: "append"
+      label:
+        en_US: append
+        zh_Hans: 追加
+    - value: "overwrite"
+      label:
+        en_US: overwrite
+        zh_Hans: 覆盖
+  - form: llm
+    human_description:
+      en_US: Content to append
+      zh_Hans: 要添加的内容
+    label:
+      en_US: Content to append
+      zh_Hans: 要添加的内容
+    llm_description: The content to append to the end of the document
+    name: append_content
+    required: true
+    type: string   
+extra:
+  python:
+    source: tools/update-document.py

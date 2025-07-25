@@ -1,0 +1,34 @@
+identity:
+  name: get_or_create_user
+  author: acane0320
+  label:
+    en_US: Get or Create a User
+    zh_Hans: 获取或创建用户
+    ja_Jp: ユーザーを取得または作成
+    pt_BR: Obter ou Criar Usuário
+description:
+  human:
+    en_US: Get or create a user in Memobase
+    zh_Hans: 在 Memobase 中获取或创建用户
+    ja_Jp: Memobaseでユーザーを取得または作成
+    pt_BR: Obter ou Criar Usuário no Memobase
+  llm: Use this tool to get or create a user in Memobase. You need to provide the user ID.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザーID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: Unique identifier for the user
+      zh_Hans: 用户的唯一标识符
+      ja_Jp: ユーザーの一意の識別子
+      pt_BR: Identificador exclusivo para o usuário
+    llm_description: Unique identifier for the user.
+    form: llm
+extra:
+  python:
+    source: tools/user/get_or_create_user.py

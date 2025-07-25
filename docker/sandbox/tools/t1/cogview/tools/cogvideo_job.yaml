@@ -1,0 +1,25 @@
+description:
+  human:
+    en_US: Get the result of CogVideo tool generation.
+    zh_Hans: 根据 CogVideo 工具返回的 id 获取视频生成结果。
+  llm: Get the result of CogVideo tool generation. The input is the id which is returned
+    by the CogVideo tool. The output is the url of video and video cover image.
+extra:
+  python:
+    source: tools/cogvideo_job.py
+identity:
+  author: hjlarry
+  label:
+    en_US: CogVideo Result
+    zh_Hans: CogVideo 结果获取
+  name: cogvideo_job
+parameters:
+- form: llm
+  human_description:
+    en_US: The id returned by the CogVideo.
+    zh_Hans: CogVideo 工具返回的 id。
+  label:
+    en_US: id
+  llm_description: The id returned by the cogvideo.
+  name: id
+  type: string

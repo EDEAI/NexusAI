@@ -1,0 +1,59 @@
+identity:
+  name: call_mcp_tool
+  author: nacos
+  label:
+    en_US: Call MCP Server tool
+    zh_Hans: 调用 MCP Server 工具
+description:
+  human:
+    en_US: Call MCP Server tool according to the MCP Server name and tool's name
+    zh_Hans: 根据 MCP Server 的名称和工具名称调用 MCP Server 工具
+  llm: 根据 MCP Server 的名称、工具名称以及传入的对应的调用参数来调用 MCP Server 工具
+extra:
+  python:
+    source: tools/call_mcp_tool.py
+parameters:
+  - name: namespace_id
+    type: string
+    required: false
+    label:
+      en_US: namespace_id
+      zh_Hans: 命名空间ID
+    human_description:
+      en_US: Nacos namespaceId
+      zh_Hans: Nacos 命名空间ID
+    form: form
+    default: public
+  - name: mcp_server_name
+    type: string
+    required: true
+    label:
+      en_US: MCP Server Name
+      zh_Hans: MCP Server 的名字
+    human_description:
+      en_US: Names of MCP Server, only one
+      zh_Hans: MCP Server 的名字，只允许一个
+    llm_description: 要调用工具的 MCP Server 的名字，一次只允许一个
+    form: llm
+  - name: tool_name
+    type: string
+    required: true
+    label:
+      en_US: Tool Name
+      zh_Hans: 工具名称
+    human_description:
+      en_US: Name of the tool to execute.
+      zh_Hans: 要执行的工具的名称。
+    llm_description: 要执行的工具的名称，一次只能一个
+    form: llm
+  - name: arguments
+    type: string
+    required: true
+    label:
+      en_US: Arguments
+      zh_Hans: 参数
+    human_description:
+      en_US: Tool arguments (JSON string in the python dict[str, Any] format).
+      zh_Hans: 工具的参数。
+    llm_description: Tool arguments (JSON string in the python dict[str, Any] format).
+    form: llm

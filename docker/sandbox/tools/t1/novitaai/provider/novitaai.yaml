@@ -1,0 +1,39 @@
+credentials_for_provider:
+  api_key:
+    help:
+      en_US: Get your Novita AI API key from Novita AI
+      pt_BR: Obtenha sua chave de API do Novita AI na Novita AI
+      zh_Hans: 从 Novita AI 获取您的 Novita AI API 密钥
+    label:
+      en_US: API Key
+      pt_BR: Chave API
+      zh_Hans: API 密钥
+    placeholder:
+      en_US: Please enter your Novita AI API key
+      pt_BR: Por favor, insira sua chave de API do Novita AI
+      zh_Hans: 请输入你的 Novita AI API 密钥
+    required: true
+    type: secret-input
+    url: https://novita.ai
+extra:
+  python:
+    source: provider/novitaai.py
+identity:
+  author: Xiao Ley
+  description:
+    en_US: Innovative AI for Image Generation
+    pt_BR: Innovative AI for Image Generation
+    zh_Hans: 用于图像生成的创新人工智能。
+  icon: icon.ico
+  label:
+    en_US: Novita AI
+    pt_BR: Novita AI
+    zh_Hans: Novita AI
+  name: novitaai
+  tags:
+  - image
+  - productivity
+tools:
+- tools/novitaai_txt2img.yaml
+- tools/novitaai_modelquery.yaml
+- tools/novitaai_createtile.yaml

@@ -1,0 +1,29 @@
+identity:
+  author: baobaobao
+  name: weather
+  label:
+    en_US: weather
+    zh_Hans: 天气查询
+  description:
+    en_US: weather
+    zh_Hans: 天气查询是一个用于获取实时天气数据和预报信息的服务接口。该API提供国内范围内的天气状况、预报和相关气象数据。
+  icon: icon.svg
+tools:
+  - tools/weather.yaml 
+credentials_for_provider: #添加 credentials_for_provider 字段
+  qweather_api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: QWeather API key
+      zh_Hans: QWeather API key
+    placeholder:
+      en_US: Please input your QWeather API key
+      zh_Hans: 请输入你的 QWeather API key
+    help:
+      en_US: Get your QWeather API key from QWeather
+      zh_Hans: 从 QWeather 获取您的 QWeather API key
+    url: https://dev.qweather.com/docs/start/   
+extra:
+  python:
+    source: provider/weather.py

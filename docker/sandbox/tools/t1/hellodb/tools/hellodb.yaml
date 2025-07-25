@@ -1,0 +1,43 @@
+identity:
+  name: hellodb
+  author: cdnxy
+  label:
+    en_US: HelloDB
+    zh_Hans: HelloDB
+    pt_BR: HelloDB
+description:
+  human:
+    en_US: Database Query Assistant, let Dify connect to your database, understand your database, help you generate SQL and execute queries.
+    zh_Hans: 数据库查询助手，让Dify连接你的数据库，了解你的数据库，帮你生成SQL并执行查询。
+    pt_BR: Asistente de consulta de base de datos, deje que dify se conecte a su base de datos, conozca su base de datos, le ayude a generar SQL y ejecutar consultas.
+  llm: 数据库查询助手，让Dify连接你的数据库，了解你的数据库，帮你执行查询。
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: "Please enter a query statement, for example: Help me check the trend of monthly new registered users in 2024."
+      zh_Hans: "请输入查询语句，比如：帮我查询2024年每月新注册用户的变化趋势。"
+      pt_BR: "Por favor, introduzca una sentencia de consulta, como: ayúdame a consultar las tendencias de los nuevos usuarios registrados cada mes en 2024."
+    llm_description: "请输入查询语句，比如：帮我查询2024年每月新注册用户的变化趋势。"
+    form: llm
+  - name: app_key
+    type: string
+    required: true
+    label:
+      en_US: App Key
+      zh_Hans: 应用密钥
+      pt_BR: Clave de la aplicación
+    human_description:
+      en_US: Please create an application and view the《Third-party access》to get the APPKEY
+      zh_Hans: 请在创建应用后查看《三方接入》获取APPKEY
+      pt_BR: Crie uma aplicação e veja o《Acesso a terceiros》para obter a APPKEY
+    llm_description: 请在创建应用后查看《三方接入》获取APPKEY
+    form: llm
+extra:
+  python:
+    source: tools/hellodb.py

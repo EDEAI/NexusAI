@@ -1,0 +1,42 @@
+identity:
+  author: GenTelAI
+  name: gentel
+  label:
+    en_US: GenTel
+    zh_Hans: 君同未来
+  description:
+    en_US: GenTel AI is a company that provides artificial intelligence ecosystem governance services.
+    zh_Hans: 君同未来提供端到端的人工智能生态治理服务
+  icon: icon.svg
+tools:
+  - tools/shield.yaml
+extra:
+  python:
+    source: provider/gentel.py
+tags:
+  - productivity
+  - business
+  - utilities
+  - other
+
+credentials_for_provider:
+  endpoint:
+    type: text-input
+    require: true
+    default: https://shield.gentel.com/api/v1
+    label:
+      en_US: GenTel Endpoint
+      zh_Hans: GenTel Endpoint
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: GenTel API key
+      zh_Hans: GenTel API key
+    placeholder:
+      en_US: Please input your GenTel API key
+      zh_Hans: 请输入您的 GenTel API key
+    help:
+      en_US: Get your API key from GenTel
+      zh_Hans: 从 GenTel 获取您的 API key
+    url: https://gentel.com/apply-key

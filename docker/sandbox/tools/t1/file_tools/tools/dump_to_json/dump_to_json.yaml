@@ -1,0 +1,62 @@
+identity:
+  name: dump_to_json
+  author: kurokobo
+  label:
+    en_US: Dump to JSON
+    ja_JP: JSON にダンプ
+    zh_Hans: 转储为 JSON
+    pt_BR: Despejar para JSON
+
+description:
+  human:
+    en_US: Dump a file object as a JSON string for debugging.
+    ja_JP: デバッグ用にファイルオブジェクトを JSON 文字列としてダンプします。
+    zh_Hans: 将文件对象转储为 JSON 字符串以进行调试。
+    pt_BR: Despeja um objeto de arquivo como uma string JSON para depuração.
+  llm: Dump a file object as a JSON string for debugging.
+
+parameters:
+
+  - name: file
+    type: file
+    label:
+      en_US: File
+    human_description:
+      en_US: File object to dump.
+      ja_JP: ダンプするファイルオブジェクト。
+      zh_Hans: 要转储的文件对象。
+      pt_BR: Objeto de arquivo para despejar.
+    required: true
+    form: llm
+
+  - name: include_blob
+    type: select
+    label:
+      en_US: Include blob as Base64 in dump
+    human_description:
+      en_US: >-
+        Whether to include the blob as Base64 in the dump, "true" to include, "false" to exclude.
+        Default is "false".
+      ja_JP: >-
+        ダンプに blob を Base64 として含める設定。含める場合は "true"、除外する場合は "false"。
+        デフォルトは "false"。
+      zh_Hans: >-
+        是否在转储中包含 blob 作为 Base64，"true" 表示包含，"false" 表示排除。
+        默认值为 "false"。
+      pt_BR: >-
+        Se deve incluir o blob como Base64 no despejo, "true" para incluir, "false" para excluir.
+        O padrão é "false".
+    options:
+      - value: "true"
+        label:
+          en_US: "true"
+      - value: "false"
+        label:
+          en_US: "false"
+    required: false
+    default: "false"
+    form: form
+
+extra:
+  python:
+    source: tools/dump_to_json/dump_to_json.py

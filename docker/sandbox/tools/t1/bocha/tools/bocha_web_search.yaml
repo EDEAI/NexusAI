@@ -1,0 +1,66 @@
+identity:
+  name: BochaWebSearch
+  author: seekerliu
+  label:
+    en_US: Bocha Web Search
+    ja_JP: Bocha Web Search
+    zh_Hans: Bocha Web Search
+    pt_BR: Bocha Web Search
+description:
+  human:
+    en_US: Search with Bocha Web Search and get enhanced search details from billions of web documents, including page titles, urls, summaries, site names, site icons, publication dates, image links, and more
+    ja_JP: Bocha Web Searchで検索し、数十億のウェブドキュメントからページタイトル、URL、要約、サイト名、サイトアイコン、公開日、画像リンクなどの詳細な検索結果を取得します
+    zh_Hans: 从博查搜索全网信息和网页链接，返回结果包括网页标题、网页URL、网页摘要、网站名称、网站图标、发布时间、图片链接等
+    pt_BR: Pesquise com o Bocha Web Search e obtenha detalhes aprimorados de bilhões de documentos da web, incluindo títulos de páginas, URLs, resumos, nomes de sites, ícones de sites, datas de publicação, links de imagens e muito mais
+  llm: 使用博查搜索引擎(Web Search API)搜索互联网网页，输入应为搜索查询字符串，输出将返回搜索结果的详细信息，包括网页标题、网页URL、网页摘要、网站名称、网站图标、网页发布时间等
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: query
+      ja_JP: query
+      zh_Hans: query
+      pt_BR: query
+    human_description:
+      en_US: The keywords or phrases to search
+      ja_JP: 検索キーワードまたはフレーズ
+      zh_Hans: 搜索关键词或语句
+      pt_BR: As palavras-chave ou frases para pesquisar
+    llm_description: 搜索关键词或语句
+    form: llm
+  - name: freshness
+    type: string
+    label:
+      en_US: freshness
+      ja_JP: freshness
+      zh_Hans: freshness
+      pt_BR: freshness
+    human_description:
+      en_US: The time range for the search results. Available options noLimit, oneYear, oneMonth, oneWeek, oneDay. Default is noLimit
+      ja_JP: 検索結果の時間範囲。利用可能なオプションは noLimit, oneYear, oneMonth, oneWeek, oneDay です。デフォルトは noLimit です
+      zh_Hans: 搜索的时间范围，可选值为 noLimit, oneYear, oneMonth, oneWeek, oneDay。默认为 noLimit
+      pt_BR: O intervalo de tempo para os resultados da pesquisa. Opções disponíveis noLimit, oneYear, oneMonth, oneWeek, oneDay. O padrão é noLimit
+    llm_description: 搜索的时间范围，可选值为 noLimit, oneYear, oneMonth, oneWeek, oneDay。默认为 noLimit
+    form: llm
+    default: noLimit
+  - name: count
+    type: number
+    label:
+      en_US: count
+      ja_JP: count
+      zh_Hans: count
+      pt_BR: count
+    human_description:
+      en_US: Number of search results to retrieve (1-10), default is 10
+      ja_JP: 検索結果の数(1-10)、デフォルトは10
+      zh_Hans: 搜索结果的数量(1-10)，默认为10
+      pt_BR: Número de resultados de pesquisa para recuperar (1-10), padrão é 10
+    llm_description: 搜索结果的数量(1-10)，默认为10
+    form: llm
+    default: 10
+    min: 1
+    max: 10
+extra:
+  python:
+    source: tools/bocha_web_search.py

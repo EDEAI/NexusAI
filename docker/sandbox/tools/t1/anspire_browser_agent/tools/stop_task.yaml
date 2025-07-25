@@ -1,0 +1,28 @@
+identity:
+  name: stop_task
+  author: anspire
+  label:
+    en_US: Stop automated task results
+    zh_Hans: 停止自动化任务
+description:
+  human:
+    en_US: Stop automated task results
+    zh_Hans: 停止自动化任务
+  llm: This tool Stop browser automation task result with Browser Agent.
+parameters:
+- name: task_id
+  type: string
+  required: true
+  label:
+    en_US: task id string
+    zh_Hans: 任务标识
+    pt_BR: task id string
+  human_description:
+    en_US: task id
+    zh_Hans: 任务标识
+    pt_BR: task id
+  llm_description: cloud instance task id
+  form: llm
+extra:
+  python:
+    source: tools/stop_task.py

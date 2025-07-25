@@ -1,0 +1,43 @@
+identity:
+  name: npm_registry_get
+  author: jingfelix
+  label:
+    en_US: "npm Get API"
+    zh_Hans: "npm 包信息获取 API"
+    pt_BR: "npm Get API"
+description:
+  human:
+    en_US: A tool for retrieving detailed information about npm packages. Input a package name and get the corresponding package information.
+    zh_Hans: 用于在 npm 上获取指定包信息的工具。输入包名称，返回与之匹配的包信息。
+    pt_BR: Uma ferramenta para recuperar informações detalhadas sobre pacotes npm. Insira um nome de pacote e obtenha as informações correspondentes do pacote.
+  llm: A tool for retrieving detailed information about npm packages. Input a package name (string) and get the corresponding package information.
+parameters:
+  - name: package_name
+    type: string
+    required: true
+    label:
+      en_US: Package Name
+      zh_Hans: 包名称
+      pt_BR: Nome do Pacote
+    human_description:
+      en_US: Package name to retrieve npm package information
+      zh_Hans: 用于获取 npm 包信息的包名称
+      pt_BR: Nome do pacote para recuperar informações do pacote npm
+    llm_description: Package name, type is string, used to retrieve npm package information, cannot be empty
+    form: llm
+  - name: version
+    type: string
+    required: true
+    label:
+      en_US: Package Version
+      zh_Hans: 包版本
+      pt_BR: Versão do Pacote
+    human_description:
+      en_US: Package version to retrieve npm package information
+      zh_Hans: 用于获取 npm 包信息的包版本
+      pt_BR: Versão do pacote para recuperar informações do pacote npm
+    llm_description: Package version, type is string, used to retrieve information for a specific version of an npm package, default value is latest
+    form: llm
+extra:
+  python:
+    source: tools/npm_registry_get.py

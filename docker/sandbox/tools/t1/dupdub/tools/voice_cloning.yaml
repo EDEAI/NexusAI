@@ -1,0 +1,83 @@
+identity:
+  name: VoiceCloning
+  author: dupdub-dify
+  label:
+    en_US: Voice Cloning
+    zh_Hans: 声音克隆
+    pt_BR: Voice Cloning
+description:
+  human:
+    en_US: Voice Cloning
+    zh_Hans: 声音克隆
+    pt_BR: Voice Cloning
+  llm: Voice Cloning
+parameters:
+  - name: name
+    type: string
+    required: true
+    label:
+      en_US: Speaker Name
+      zh_Hans: 克隆名称
+      pt_BR: Speaker Name
+    human_description:
+      en_US: Speaker Name
+      zh_Hans: 克隆名称
+      pt_BR: Speaker Name
+    llm_description: Speaker Name
+    form: llm
+  - name: url
+    type: string
+    required: true
+    label:
+      en_US: url
+      zh_Hans: url
+      pt_BR: url
+    human_description:
+      en_US: URL of the speech samples to be cloned. Supports wav, mp3, mp4 format
+      zh_Hans: 要克隆的语音样本的URL。支持wav、mp3、mp4格式
+      pt_BR: URL of the speech samples to be cloned. Supports wav, mp3, mp4 format
+    llm_description: URL of the speech samples to be cloned. Supports wav, mp3, mp4 format
+    form: llm
+  - name: language
+    type: string
+    required: true
+    label:
+      en_US: Language
+      zh_Hans: 语言
+      pt_BR: Language
+    human_description:
+      en_US: Language:English、apanese、Chinese、German、Hindi、French、Korean、Portuguese、Italian、Spanish、Indonesian、Dutch、Turkish、Filipino、Polish、Swedish、Bulgarian、Romanian、Arabic、Czech、Greek、Finnish、Croatian、Malay、Slovak、Danish、Tamil、Ukrainian、Russian
+      zh_Hans: 支持的语言有 English、apanese、Chinese、German、Hindi、French、Korean、Portuguese、Italian、Spanish、Indonesian、Dutch、Turkish、Filipino、Polish、Swedish、Bulgarian、Romanian、Arabic、Czech、Greek、Finnish、Croatian、Malay、Slovak、Danish、Tamil、Ukrainian、Russian
+      pt_BR: Language:English、apanese、Chinese、German、Hindi、French、Korean、Portuguese、Italian、Spanish、Indonesian、Dutch、Turkish、Filipino、Polish、Swedish、Bulgarian、Romanian、Arabic、Czech、Greek、Finnish、Croatian、Malay、Slovak、Danish、Tamil、Ukrainian、Russian
+    llm_description: clone in Language
+    form: llm
+  - name: gender
+    type: string
+    required: true
+    label:
+      en_US: gender
+      zh_Hans: 性别
+      pt_BR: gender
+    human_description:
+      en_US: Speaker's gender:MALE、FEMALE
+      zh_Hans: 性别:MALE、FEMALE
+      pt_BR: Speaker's gender:MALE、FEMALE
+    llm_description: clone Speaker's gender:MALE、FEMALE
+    form: llm
+  - name: age
+    type: string
+    required: true
+    label:
+      en_US: age
+      zh_Hans: 年龄
+      pt_BR: age
+    human_description:
+      en_US: Speaker's age:Children、 Youth、 Adults、 Seniors
+      zh_Hans: 年龄选择:Children、 Youth、 Adults、 Seniors
+      pt_BR: Speaker's age:Children、 Youth、 Adults、 Seniors
+    llm_description: clone Speaker's age:Children、 Youth、 Adults、 Seniors
+    form: llm
+extra:
+  python:
+    source: tools/voice_cloning.py
+

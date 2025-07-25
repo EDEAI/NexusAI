@@ -1,0 +1,56 @@
+identity:
+  name: csv_query
+  author: hjlarry
+  label:
+    en_US: CSV Query
+description:
+  human:
+    en_US: run sql query on csv file.
+    zh_Hans: 运行在 CSV 文件上的 SQL 查询。
+  llm: run sql query on csv file.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+    human_description:
+      en_US: The sql query. The table name is `csv`.
+      zh_Hans: SQL 查询语句。 表名为 `csv`。
+    llm_description: The sql query. The table name is `csv`.
+    form: llm
+  - name: file
+    type: file
+    required: true
+    label:
+      en_US: csv file
+      zh_Hans: csv 文件
+    human_description:
+      en_US: The csv file.
+      zh_Hans: csv 文件。
+    llm_description: The csv file.
+    form: llm
+  - name: format
+    type: select
+    required: false
+    label:
+      en_US: Output format
+      zh_Hans: 输出格式
+    human_description:
+      en_US: Choose the output format.
+      zh_Hans: 选择输出格式。
+    form: form
+    default: md
+    options:
+      - value: json
+        label:
+          en_US: JSON
+          zh_Hans: JSON
+      - value: md
+        label:
+          en_US: Markdown
+          zh_Hans: Markdown
+extra:
+  python:
+      source: tools/csv_query.py

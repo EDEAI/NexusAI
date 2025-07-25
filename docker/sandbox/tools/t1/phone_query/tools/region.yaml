@@ -1,0 +1,30 @@
+identity:
+  name: phone_region
+  author: rainlzm
+  label:
+    en_US: query location and operator
+    zh_Hans: 查询归属地和运营商
+    pt_BR: query location and operator
+description:
+  human:
+    en_US: Query the location and operator of the phone number
+    zh_Hans: 电话或手机号码查询归属、运营商等
+    pt_BR: Query the location and operator of the phone number
+  llm: Query the location and operator of the phone number
+parameters:
+  - name: number
+    type: string
+    required: true
+    label:
+      en_US: Phone or mobile number
+      zh_Hans: 电话或手机号码
+      pt_BR: Phone or mobile number
+    human_description:
+      en_US: please input phone or mobile number
+      zh_Hans: 请输入电话或手机号码
+      pt_BR: please input phone or mobile number
+    llm_description: please input phone or mobile number
+    form: llm
+extra:
+  python:
+    source: tools/region.py

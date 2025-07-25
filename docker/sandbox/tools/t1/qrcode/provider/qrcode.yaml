@@ -1,0 +1,19 @@
+extra:
+  python:
+    source: provider/qrcode.py
+identity:
+  author: Bowen Liang
+  description:
+    en_US: A tool for generating QR code (quick-response code) image.
+    pt_BR: A tool for generating QR code (quick-response code) image.
+    zh_Hans: 一个二维码工具
+  icon: icon.svg
+  label:
+    en_US: QRCode
+    pt_BR: QRCode
+    zh_Hans: 二维码工具
+  name: qrcode
+  tags:
+  - utilities
+tools:
+- tools/qrcode_generator.yaml

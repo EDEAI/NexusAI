@@ -1,0 +1,19 @@
+identity:
+  author: stvlynn
+  name: doc
+  label:
+    en_US: DOC
+    zh_Hans: DOC
+    ja_JP: DOC
+    pt_BR: DOC
+  description:
+    en_US: Convert Markdown text to Microsoft Word DOCX files
+    zh_Hans: 将Markdown文本转换为Microsoft Word DOCX文件
+    ja_JP: Markdown テキストを Microsoft Word DOCX ファイルに変換します
+    pt_BR: Converter texto Markdown para arquivos DOCX do Microsoft Word
+  icon: icon.svg
+tools:
+  - tools/doc.yaml
+extra:
+  python:
+    source: provider/doc.py

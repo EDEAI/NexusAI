@@ -1,0 +1,101 @@
+identity:
+  author: datoujiejie
+  name: botos3
+  label:
+    en_US: botos3
+    zh_Hans: botos3
+  description:
+    en_US: upload file by boto s3
+    zh_Hans: 通过boto库操作s3协议
+  icon: icon.svg
+credentials_for_provider:
+  DIFY_ENDPOINT:
+    type: text-input
+    required: true
+    label:
+      en_US: DIFY Endpoint
+      zh_Hans: dify 服务地址
+    placeholder:
+      en_US: Please input your dify endpoint
+      zh_Hans: 请输入你的 dify 服务地址
+    help:
+      en_US: The endpoint for your dify service
+      zh_Hans: dify 服务的访问地址
+    url: https://docs.dify.ai/
+  S3_ENDPOINT:
+    type: text-input
+    required: true
+    label:
+      en_US: S3 Endpoint
+      zh_Hans: S3 服务地址
+    placeholder:
+      en_US: Please input your S3 endpoint
+      zh_Hans: 请输入你的 S3 服务地址
+    help:
+      en_US: The endpoint for your S3 service
+      zh_Hans: S3 服务的访问地址
+    url: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
+
+  S3_ACCESS_KEY:
+    type: secret-input
+    required: true
+    label:
+      en_US: S3 Access Key
+      zh_Hans: S3 访问密钥ID
+    placeholder:
+      en_US: Please input your S3 Access Key
+      zh_Hans: 请输入你的 S3 访问密钥ID
+    help:
+      en_US: Your S3 Access Key ID
+      zh_Hans: 您的 S3 访问密钥ID
+    url: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
+
+  S3_SECRET_KEY:
+    type: secret-input
+    required: true
+    label:
+      en_US: S3 Secret Key
+      zh_Hans: S3 访问密钥密码
+    placeholder:
+      en_US: Please input your S3 Secret Key
+      zh_Hans: 请输入你的 S3 访问密钥密码
+    help:
+      en_US: Your S3 Secret Access Key
+      zh_Hans: 您的 S3 访问密钥密码
+    url: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
+
+  S3_PUBLIC_URL:
+    type: text-input
+    required: true
+    label:
+      en_US: S3 Public URL
+      zh_Hans: S3 公网访问地址
+    placeholder:
+      en_US: Please input your S3 public URL
+      zh_Hans: 请输入你的 S3 公网访问地址
+    help:
+      en_US: The public access URL for your S3 bucket
+      zh_Hans: S3 存储空间的公网访问地址
+    url: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
+
+  BUCKET_NAME:
+    type: text-input
+    required: true
+    label:
+      en_US: S3 Bucket Name
+      zh_Hans: S3 存储空间名称
+    placeholder:
+      en_US: Please input your S3 bucket name
+      zh_Hans: 请输入你的 S3 存储空间名称
+    help:
+      en_US: The name of your S3 bucket
+      zh_Hans: 您的 S3 存储空间名称
+    url: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
+tools:
+  - tools/s3_upload_file.yaml
+  - tools/s3_upload_base64.yaml
+extra:
+  python:
+    source: provider/botos3.py
+tags:
+    - utilities

@@ -1,0 +1,66 @@
+identity:
+  name: currency_price
+  author: apro
+  label:
+    en_US: Price of currency
+    zh_Hans: 货币价格
+    pt_BR: Price of currency
+description:
+  human:
+    en_US: A tool that retrieves the price of a specific currency in a given quotation currency. The input should be the supported currency and the quotation currency.
+    zh_Hans: 一个获取特定货币在指定报价货币中的价格的工具。输入应该是支持的货币和报价货币
+    pt_BR: A tool that retrieves the price of a specific currency in a given quotation currency. The input should be the supported currency and the quotation currency.
+  llm: A tool that retrieves the price of a specific currency in a given quotation currency. The input should be the supported currency and the quotation currency.
+parameters:
+  - name: name
+    type: string
+    required: true
+    label:
+      en_US: Currency information (name, symbol, or keyword)
+      zh_Hans: 查询货币信息（全名，货币符号 或者 关键字）
+      pt_BR: Currency information (name, symbol, or keyword)
+    human_description:
+      en_US: The user specifies the currency information to be queried.
+      zh_Hans: 用户制定需要查询的货币信息， 例如 btc
+      pt_BR: The user specifies the currency information to be queried.
+    llm_description: The user specifies the currency information to be queried.
+    form: llm
+  - name: quotation
+    type: string
+    required: true
+    label:
+      en_US: Quotation currency (name, symbol, or keyword) (Example usd)
+      zh_Hans: 报价货币（名称、符号或关键词）（例如 USD）
+      pt_BR: Quotation currency (name, symbol, or keyword) (Example usd)
+    human_description:
+      en_US: The user specifies the quotation currency information to be queried.
+      zh_Hans: 用户制定需要查询的报价货币信息
+      pt_BR: The user specifies the quotation currency information to be queried.
+    llm_description: The user specifies the quotation currency information to be queried.
+    form: llm
+  - name: type
+    type: select
+    options:
+      - label:
+          en_US: median
+          zh_Hans: 中位数
+        value: median
+      - label:
+          en_US: average
+          zh_Hans: 平均数
+        value: average
+    required: false
+    form: form
+    default: median
+    label:
+      en_US:  Aggregation method (median or average) (Default median)
+      zh_Hans: 聚合方法（中位数或平均值）（默认值：中位数）
+      pt_BR: Aggregation method (median or average) (Default median)
+    human_description:
+      en_US: The user specifies the aggregation method for querying the quotation.
+      zh_Hans: 用户制定需要查询的报价的聚合方法
+      pt_BR: The user specifies the aggregation method for querying the quotation.
+    llm_description: The user specifies the aggregation method for querying the quotation.
+extra:
+  python:
+    source: tools/currency_price.py

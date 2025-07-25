@@ -1,0 +1,52 @@
+identity:
+  name: register_user
+  label:
+    en_US: Register User
+    zh_Hans: 注册用户
+  icon: rongcloud_logo.svg
+  author: rongcloud
+  version: 1.0.0
+  email: support@dify.ai
+description:
+  human:
+    en_US: Register user in RongCloud, need to provide user ID, name and portrait URI, return user ID and generated token
+    zh_Hans: 注册融云用户, 需要提供用户 ID、用户名称和用户头像 URI, 返回用户 ID 和 生成的 token
+  llm: Register user in RongCloud, need to provide user ID, name and portrait URI, return user ID and generated token
+extra:
+  python:
+    source: tools/user/register_user.py
+
+parameters:
+  - name: user_id
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+    human_description:
+      en_US: The user ID of the user
+      zh_Hans: 用户 ID
+    llm_description: The user ID of the user
+    form: llm
+    type: string
+    required: true
+  - name: name
+    label:
+      en_US: Name
+      zh_Hans: 用户名称
+    human_description:
+      en_US: The name of the user
+      zh_Hans: 用户名称
+    llm_description: The name of the user
+    form: llm
+    type: string
+    required: true
+  - name: portrait_uri
+    label:
+      en_US: Portrait URI
+      zh_Hans: 用户头像 URI
+    human_description:
+        en_US: The portrait URI of the user
+        zh_Hans: 用户头像 URI
+    llm_description: The portrait URI of the user
+    form: llm
+    type: string
+    required: false

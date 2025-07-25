@@ -1,0 +1,34 @@
+identity:
+  name: company_facts
+  author: financialai
+  label:
+    en_US: Company Facts
+    zh_Hans: 公司概况
+    ja_Jp: 会社概要
+    pt_BR: Dados da Empresa
+description:
+  human:
+    en_US: Get company facts for a ticker. Company facts includes data like name, CIK, market cap, total employees, website URL, and more.
+    zh_Hans: 获取股票代码的公司信息。公司信息包括名称、CIK、市值、员工总数、网站网址等数据。
+    ja_Jp: ティッカーの会社概要を取得します。会社概要には、名前、CIK、時価総額、従業員総数、ウェブサイト URL などのデータが含まれています。
+    pt_BR: Obtenha informações da empresa para um ticker. As informações da empresa incluem dados como nome, CIK, valor de mercado, total de funcionários, URL do site e muito mais.
+  llm: Get company facts for a ticker. Company facts includes data like name, CIK, market cap, total employees, website URL, and more.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol of the company you want to get facts for.
+      zh_Hans: 您想获取公司信息的公司的股票代码。
+      ja_Jp: ファクトを取得したい会社のティッカーシンボル。
+      pt_BR: O símbolo do ticker da empresa para a qual você deseja obter informações.
+    llm_description: The ticker symbol of the company you want to get facts for.
+    form: llm
+extra:
+  python:
+    source: tools/company_facts/invoke.py

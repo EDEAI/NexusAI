@@ -1,0 +1,20 @@
+extra:
+  python:
+    source: provider/discord.py
+identity:
+  author: Ice Yao
+  description:
+    en_US: Discord Webhook
+    pt_BR: Discord Webhook
+    zh_Hans: Discord Webhook
+  icon: icon.svg
+  label:
+    en_US: Discord
+    pt_BR: Discord
+    zh_Hans: Discord
+  name: discord
+  tags:
+    - social
+    - productivity
+tools:
+  - tools/discord_webhook.yaml

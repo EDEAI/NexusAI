@@ -1,0 +1,109 @@
+identity:
+  name: img2img
+  author: fotor
+  label:
+    en_US: Image to Image
+    zh_Hans: 图生图
+
+description:
+  human:
+    en_US: Call the Image to Image API to generate image
+    zh_Hans: 调用图生图的API接口生成图片
+  llm: Call the Image to Image API to generate image
+
+parameters:
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: Prompt
+      zh_Hans: 提示词
+    human_description:
+      en_US: Positive prompt
+      zh_Hans: 正面提示词
+    llm_description: Image prompt, you should describe the image you want to generate as a list of words as possible as detailed, the prompt must be written in English.
+    form: llm
+
+  - name: templateId
+    type: string
+    required: true
+    label:
+      en_US: Style ID
+      zh_Hans: 风格ID
+    human_description:
+      en_US: Style ID provided by Fotor AI,https://docs.fotor.com/reference/img2img/styles/
+      zh_Hans: Fotor AI 提供的风格ID，https://docs.fotor.com/reference/img2img/styles/
+    llm_description: Style ID, which is the ID of the image style used to specify the style of the generated image.
+    form: form
+
+  - name: negativePrompt
+    type: string
+    required: false
+    label:
+      en_US: Negative Prompt
+      zh_Hans: 负面提示词
+    human_description:
+      en_US: Negative Prompt
+      zh_Hans: 负面提示词
+    llm_description: Negative prompt, you should describe the image you don't want to generate as a list of words as possible as detailed, the prompt must be written in English.
+    form: form
+    default: ""
+
+  - name: userImageUrl
+    type: string
+    required: true
+    label:
+      en_US: UserImageUrl
+      zh_Hans: 用户原图
+    human_description:
+      en_US: The URL or BASE64 encoded image of the original image provided by the user
+      zh_Hans: 用户提供的原图的URL或BASE64编码
+    llm_description: User Image URL, the URL or BASE64 encoding of the original image provided by the user
+    form: llm
+
+  - name: format
+    type: select
+    required: false
+    label:
+      en_US: Image format
+      zh_Hans: 图片格式
+    human_description:
+      en_US: Image format, jpg or png
+      zh_Hans: 图片格式，jpg或png
+    llm_description: Image format, jpg or png
+    form: form
+    options:
+      - label:
+          en_US: "jpg"
+          zh_Hans: "jpg"
+        value: "jpg"
+      - label:
+          en_US: "png"
+          zh_Hans: "png"
+        value: "png"
+    default: "jpg"
+
+  - name: strength
+    type: number
+    required: false
+    label:
+      en_US: Strength
+      zh_Hans: 生成图相似度
+    human_description:
+      en_US: A parameter that affects the similarity between the original image and the generated image, ranging form 0 to 1.
+      zh_Hans: 影响原图和生成图相似度的参数，范围从0到1
+    llm_description: Strength, A parameter that affects the similarity between the original image and the generated image, ranging form 0 to 1, with a step of 0.1, 0 being the most similar and 1 being the least similar.
+    form: form
+    max: 1
+    min: 0
+    default: 0.5
+
+output_schema:
+  type: object
+  properties:
+    result_url:
+      type: string
+
+extra:
+  python:
+    source: tools/img2img.py

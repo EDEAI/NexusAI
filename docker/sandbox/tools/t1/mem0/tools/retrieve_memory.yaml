@@ -1,0 +1,43 @@
+identity:
+  name: retrieve_mem0ai_memory
+  author: yevanchen
+  label:
+    en_US: Retrieve Memory
+    zh_Hans: 检索内存
+    pt_BR: Recuperar Memória
+description:
+  human:
+    en_US: Search and retrieve memory
+    zh_Hans: 搜索和检索内存
+    pt_BR: Pesquisar e recuperar memória
+  llm: Search and retrieve memory
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: The query string is used to search for specific memories within the system. It can be a keyword, phrase, or sentence that describes the memory you're looking for.
+      zh_Hans: 查询语句用于在系统中搜索特定的记忆。它可以是一个关键词、短语或描述你正在寻找的记忆的句子。
+      pt_BR: A string de consulta é usada para buscar memórias específicas dentro do sistema. Ela pode ser uma palavra-chave, frase ou sentença que descreve a memória que você está procurando.
+    llm_description: The query string is used to search for specific memories within the system. It can be a keyword, phrase, or sentence that describes the memory you're looking for.
+    form: llm
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: User ID
+      zh_Hans: 用户ID
+      pt_BR: ID do Usuário
+    llm_description: User ID
+    form: llm
+extra:
+  python:
+    source: tools/retrieve_memory.py

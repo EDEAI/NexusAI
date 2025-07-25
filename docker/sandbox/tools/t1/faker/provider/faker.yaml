@@ -1,0 +1,17 @@
+identity:
+  author: tavan
+  name: faker
+  label:
+    en_US: faker
+    zh_Hans: faker
+    pt_BR: faker
+  description:
+    en_US: Quickly generate a set of mock data (name, address, email, credit card number, etc.).
+    zh_Hans: 快速生成一组模拟数据（姓名、地址、邮件、信用卡号等）。
+    pt_BR: Gere rapidamente um conjunto de dados fictícios (nome, endereço, e-mail, número de cartão de crédito, etc.).
+  icon: icon.jpg
+tools:
+  - tools/faker.yaml
+extra:
+  python:
+    source: provider/faker.py

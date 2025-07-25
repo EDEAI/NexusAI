@@ -1,0 +1,64 @@
+identity:
+  author: eric-2369
+  name: salesforce
+  label:
+    en_US: Salesforce Integration
+    zh_Hans: Salesforce 集成
+    pt_BR: Integração Salesforce
+  description:
+    en_US: Seamlessly integrate with Salesforce to access and interact with your organization's data and records.
+    zh_Hans: 与 Salesforce 无缝集成，访问和操作您组织的数据和记录。
+    pt_BR: Integre-se perfeitamente com o Salesforce para acessar e interagir com os dados e registros da sua organização.
+  icon: salesforce.svg
+credentials_for_provider:
+  salesforce_login_url:
+    type: text-input
+    required: true
+    label:
+      en_US: Salesforce Login URL
+      zh_Hans: Salesforce 登录 URL
+      pt_BR: URL de Login Salesforce
+    placeholder:
+      en_US: https://login.salesforce.com
+      zh_Hans: https://login.salesforce.com
+      pt_BR: https://login.salesforce.com
+    help:
+      en_US: Salesforce login URL (use https://login.salesforce.com for production or https://test.salesforce.com for sandbox)
+      zh_Hans: Salesforce 登录 URL（生产环境使用 https://login.salesforce.com，沙盒环境使用 https://test.salesforce.com）
+      pt_BR: URL de login do Salesforce (use https://login.salesforce.com para produção ou https://test.salesforce.com para sandbox)
+  salesforce_username:
+    type: text-input
+    required: true
+    label:
+      en_US: Salesforce Username
+      zh_Hans: Salesforce 用户名
+      pt_BR: Nome de usuário Salesforce
+    placeholder:
+      en_US: Enter your Salesforce username
+      zh_Hans: 请输入您的 Salesforce 用户名
+      pt_BR: Digite seu nome de usuário Salesforce
+    help:
+      en_US: Your Salesforce account username
+      zh_Hans: 您的 Salesforce 账户用户名
+      pt_BR: Seu nome de usuário da conta Salesforce
+  salesforce_password_with_security_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: Salesforce Password + Security Token
+      zh_Hans: Salesforce 密码 + 安全令牌
+      pt_BR: Senha Salesforce + Token de Segurança
+    placeholder:
+      en_US: Enter your password followed by security token
+      zh_Hans: 请输入您的密码后跟安全令牌
+      pt_BR: Digite sua senha seguida do token de segurança
+    help:
+      en_US: Your Salesforce password concatenated with your security token (no space between them)
+      zh_Hans: 您的 Salesforce 密码与安全令牌连接（它们之间没有空格）
+      pt_BR: Sua senha do Salesforce concatenada com seu token de segurança (sem espaço entre eles)
+    url: https://help.salesforce.com/s/articleView?id=sf.user_security_token.htm
+tools:
+  - tools/soql_query.yaml
+extra:
+  python:
+    source: provider/salesforce.py

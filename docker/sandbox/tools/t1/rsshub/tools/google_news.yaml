@@ -1,0 +1,181 @@
+identity:
+  name: google_news
+  author: stvlynn
+  label:
+    en_US: Google News
+    zh_Hans: Google 新闻
+    ja_JP: Google ニュース
+description:
+  human:
+    en_US: Get RSS feeds from Google News via RSSHub
+    zh_Hans: 通过RSSHub获取Google新闻的RSS源
+    ja_JP: RSSHubを通じてGoogleニュースのRSSフィードを取得
+  llm: "A tool to fetch RSS feeds from Google News using RSSHub as a proxy."
+parameters:
+  - name: base_url
+    type: string
+    required: false
+    default: https://rsshub.app
+    label:
+      en_US: RSSHub Base URL
+      zh_Hans: RSSHub基础URL
+      ja_JP: RSSHubベースURL
+    human_description:
+      en_US: The base URL of RSSHub instance
+      zh_Hans: RSSHub实例的基础URL
+      ja_JP: RSSHubインスタンスのベースURL
+    llm_description: "The base URL of the RSSHub instance to use"
+    form: form
+
+  - name: access_key
+    type: string
+    required: false
+    label:
+      en_US: RSSHub Access Key
+      zh_Hans: RSSHub访问密钥
+      ja_JP: RSSHubアクセスキー
+    human_description:
+      en_US: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+      zh_Hans: "RSSHub路由的访问密钥（例如：ILoveRSSHub）。如不需要请留空。"
+      ja_JP: "RSSHubルートのアクセスキー（例：ILoveRSSHub）。必要ない場合は空のままにしてください。"
+    llm_description: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+    form: form
+
+  - name: category
+    type: string
+    required: true
+    label:
+      en_US: Category Title
+      zh_Hans: 分类标题
+      ja_JP: カテゴリタイトル
+    human_description:
+      en_US: The category title of Google News, e.g. 'Top stories', 'World', 'Business'
+      zh_Hans: Google新闻的分类标题，例如'Top stories'、'World'、'Business'
+      ja_JP: Googleニュースのカテゴリタイトル、例：'Top stories'、'World'、'Business'
+    llm_description: "The category title of Google News, such as 'Top stories', 'World', 'Business'"
+    form: form
+
+  - name: language_code
+    type: select
+    required: true
+    default: "en-US"
+    label:
+      en_US: Language
+      zh_Hans: 语言
+      ja_JP: 言語
+    human_description:
+      en_US: The language code for Google News content
+      zh_Hans: Google新闻内容的语言代码
+      ja_JP: Googleニュースコンテンツの言語コード
+    llm_description: "The language code for Google News content (hl parameter)"
+    form: form
+    options:
+      - value: en-US
+        label:
+          en_US: English (US)
+          zh_Hans: 英语（美国）
+          ja_JP: 英語（米国）
+      - value: zh-CN
+        label:
+          en_US: Chinese (Simplified)
+          zh_Hans: 中文（简体）
+          ja_JP: 中国語（簡体字）
+      - value: ja-JP
+        label:
+          en_US: Japanese
+          zh_Hans: 日语
+          ja_JP: 日本語
+      - value: fr-FR
+        label:
+          en_US: French
+          zh_Hans: 法语
+          ja_JP: フランス語
+      - value: de-DE
+        label:
+          en_US: German
+          zh_Hans: 德语
+          ja_JP: ドイツ語
+      - value: es-ES
+        label:
+          en_US: Spanish
+          zh_Hans: 西班牙语
+          ja_JP: スペイン語
+
+  - name: country_code
+    type: select
+    required: true
+    default: "US"
+    label:
+      en_US: Country/Region
+      zh_Hans: 国家/地区
+      ja_JP: 国/地域
+    human_description:
+      en_US: The country or region code for Google News content
+      zh_Hans: Google新闻内容的国家或地区代码
+      ja_JP: Googleニュースコンテンツの国または地域コード
+    llm_description: "The country or region code for Google News content (gl parameter)"
+    form: form
+    options:
+      - value: US
+        label:
+          en_US: United States
+          zh_Hans: 美国
+          ja_JP: アメリカ合衆国
+      - value: CN
+        label:
+          en_US: China
+          zh_Hans: 中国
+          ja_JP: 中国
+      - value: JP
+        label:
+          en_US: Japan
+          zh_Hans: 日本
+          ja_JP: 日本
+      - value: FR
+        label:
+          en_US: France
+          zh_Hans: 法国
+          ja_JP: フランス
+      - value: DE
+        label:
+          en_US: Germany
+          zh_Hans: 德国
+          ja_JP: ドイツ
+      - value: GB
+        label:
+          en_US: United Kingdom
+          zh_Hans: 英国
+          ja_JP: イギリス
+
+  - name: country_edition
+    type: string
+    required: true
+    default: "US:en"
+    label:
+      en_US: Country Edition
+      zh_Hans: 国家版本
+      ja_JP: 国別エディション
+    human_description:
+      en_US: The country edition for Google News, usually in format 'COUNTRY:LANGUAGE', e.g. 'US:en', 'CN:zh'
+      zh_Hans: Google新闻的国家版本，通常格式为'国家:语言'，例如'US:en'、'CN:zh'
+      ja_JP: Googleニュースの国別エディション、通常'国:言語'の形式、例：'US:en'、'JP:ja'
+    llm_description: "The country edition for Google News (ceid parameter)"
+    form: form
+
+  - name: limit
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Item Limit
+      zh_Hans: 条目数量限制
+      ja_JP: アイテム数制限
+    human_description:
+      en_US: Maximum number of items to return
+      zh_Hans: 返回的最大条目数
+      ja_JP: 返回する最大アイテム数
+    llm_description: "Maximum number of items to return in the RSS feed"
+    form: form
+extra:
+  python:
+    source: tools/google_news.py 

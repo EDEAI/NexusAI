@@ -1,0 +1,37 @@
+description:
+  human:
+    en_US: HongKong stock market trends.
+    zh_Hans: 香港股市行情
+  llm: A tool to query HongKong stock market trends.
+extra:
+  python:
+    source: tools/stock_hk.py
+identity:
+  author: leslie2046
+  label:
+    en_US: HongKong stock markets
+    zh_Hans: 香港股市
+  name: StockHK
+parameters:
+- name: num
+  label:
+    en_US: stock code
+    zh_Hans: 股票代码
+  type: string
+  required: true
+  form: llm
+  human_description:
+    en_US: "Stock code, for example: 00001 is the stock code of Changjiang Industrial"
+    zh_Hans: "股票代码，如：00001 为长江实业股票代码"
+  llm_description: "Stock code, for example: 00001 is the stock code of Changjiang Industrial"
+- name: apiKey
+  label:
+    en_US: API KEY
+    zh_Hans: API密钥
+  type: secret-input
+  required: true
+  form: form
+  human_description:
+    en_US: The API key from Juhe.cn for accessing the currency exchange data.
+    zh_Hans: 来自聚合数据的API密钥。
+  llm_description: API key for querying currency exchange rate info from the provider.

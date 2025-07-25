@@ -1,0 +1,26 @@
+identity:
+  name: think
+  author: kalochin
+  label:
+    en_US: Think
+    zh_Hans: 思考
+description:
+  human:
+    en_US: A tool that allows LLMs to think. It will not obtain new information or change any data, but just log the thought.
+    zh_Hans: 一个允许LLM思考的工具。它不会获取新信息或更改任何数据，只会记录思考过程。
+  llm: Use the tool to think about something. It will not obtain new information or change the database, but just append the thought to the log. Use it when complex reasoning or some cache memory is needed.
+parameters:
+  - name: thought
+    type: string
+    required: true
+    label:
+      en_US: Thought
+      zh_Hans: 思考内容
+    human_description:
+      en_US: A thought to think about.
+      zh_Hans: 需要思考的内容。
+    llm_description: A thought to think about.
+    form: llm
+extra:
+  python:
+    source: tools/think.py

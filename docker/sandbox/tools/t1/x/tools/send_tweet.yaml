@@ -1,0 +1,30 @@
+identity:
+  name: send_tweet
+  author: stvlynn
+  label:
+    en_US: Send Tweet
+    ja_JP: ツイートを送信
+    zh_Hans: 发送推文
+description:
+  human:
+    en_US: Send a draft tweet using the X API
+    ja_JP: X APIを使用して下書きツイートを送信します
+    zh_Hans: 使用X API发送推文草稿
+  llm: Send a previously created draft tweet using the X API
+parameters:
+  - name: draft_id
+    type: string
+    required: true
+    label:
+      en_US: Draft ID
+      ja_JP: 下書きID
+      zh_Hans: 草稿ID
+    human_description:
+      en_US: The ID of the draft tweet to send
+      ja_JP: 送信する下書きツイートのID
+      zh_Hans: 要发送的推文草稿的ID
+    llm_description: The ID of the draft tweet to publish, obtained from the create_draft_tweet action
+    form: llm
+extra:
+  python:
+    source: tools/send_tweet.py

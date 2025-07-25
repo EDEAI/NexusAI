@@ -1,0 +1,127 @@
+identity:
+  name: get_full_doc
+  author: kurokobo
+  label:
+    en_US: Get Full Doc
+    ja_JP: 全文を取得
+    zh_Hans: 获取完整文档
+    pt_BR: Obter documento completo
+
+description:
+  human:
+    en_US: Retrieve the full doc by concatenating all the chunks of the specified document in Knowledge.
+    ja_JP: ナレッジの指定したドキュメントの全チャンクを連結して、全文を取得します。
+    zh_Hans: 通过连接 Knowledge 中指定文档的所有分块来获取完整文档。
+    pt_BR: Recupere o documento completo concatenando todos os pedaços do documento especificado no Knowledge.
+  llm: Retrieve the full doc by concatenating all the chunks of the specified document in Knowledge.
+
+parameters:
+
+  - name: api_base_url
+    type: string
+    label:
+      en_US: API Base URL
+    human_description:
+      en_US: >-
+        The base URL of the Knowledge API, with trailing "/v1".
+        Example: "https://api.dify.ai/v1", "http://api:5001/v1".
+      ja_JP: >-
+        ナレッジ API のベース URL（末尾に "/v1" を付ける）。
+        例: "https://api.dify.ai/v1", "http://api:5001/v1"。
+      zh_Hans: >-
+        Knowledge API 的基础 URL，结尾带有 "/v1"。
+        例如: "https://api.dify.ai/v1", "http://api:5001/v1"。
+      pt_BR: >-
+        A URL base da API do Knowledge, terminando com "/v1".
+        Exemplo: "https://api.dify.ai/v1", "http://api:5001/v1".
+    required: true
+    default: ""
+    form: llm
+
+  - name: api_key
+    type: secret-input
+    label:
+      en_US: API Key
+    human_description:
+      en_US: >-
+        The API key for the Knowledge API.
+        You can generate it at "Knowledge" -> "API Access" -> "API Key" in the Dify Console.
+      ja_JP: >-
+        Knowledge API の API キー。
+        Dify のコンソールの "Knowledge" -> "API Access" -> "API Key" で発行できる。
+      zh_Hans: >-
+        Knowledge API 的 API 密钥。
+        可以在 Dify 控制台的“Knowledge”->“API Access”->“API Key”中生成。
+      pt_BR: >-
+        A chave de API para o Knowledge API.
+        Você pode gerá-la em "Knowledge" -> "API Access" -> "API Key" no Console Dify.
+    required: true
+    default: ""
+    form: llm
+
+  - name: knowledge_id
+    type: string
+    label:
+      en_US: Knowledge ID
+    human_description:
+      en_US: >-
+        The ID of the Knowledge to retrieve the uploaded file from.
+        You can find this ID in the URL of each Knowledge page (/datasets/<knowledge_id>).
+      ja_JP: >-
+        アップロードしたファイルを取得するナレッジの ID。
+        各ナレッジのページの URL（/datasets/<knowledge_id>）で確認できる。
+      zh_Hans: >-
+        要获取的知识库 ID。
+        可以在每个知识库页面的 URL（/datasets/<knowledge_id>）中找到。
+      pt_BR: >-
+        O ID do Knowledge de onde recuperar o arquivo enviado.
+        Você pode encontrar esse ID na URL de cada página do Knowledge (/datasets/<knowledge_id>).
+    required: true
+    default: ""
+    form: llm
+
+  - name: document_id
+    type: string
+    label:
+      en_US: Document ID
+    human_description:
+      en_US: >-
+        The ID of the document in the Knowledge to retrieve.
+        You can find this ID in the URL of each document page (/datasets/<knowledge_id>/documents/<document_id>).
+      ja_JP: >-
+        取得するドキュメントの ID。
+        各ドキュメントページの URL（/datasets/<knowledge_id>/documents/<document_id>）で確認できる。
+      zh_Hans: >-
+        要获取的知识库中文档的 ID。
+        可以在每个文档页面的 URL（/datasets/<knowledge_id>/documents/<document_id>）中找到。
+      pt_BR: >-
+        O ID do documento no Knowledge a ser recuperado.
+        Você pode encontrar esse ID na URL de cada página de documento (/datasets/<knowledge_id>/documents/<document_id>).
+    required: true
+    default: ""
+    form: llm
+
+  - name: delimiter
+    type: string
+    label:
+      en_US: Delimiter
+    human_description:
+      en_US: >-
+        The string inserted between each chunk while joining them together.
+        Default is "\n\n".
+      ja_JP: >-
+        各チャンクを連結する時に間に挿入する文字列。
+        デフォルトは "\n\n"。
+      zh_Hans: >-
+        连接每个分块时插入的字符串。
+        默认是 "\n\n"。
+      pt_BR: >-
+        A string inserida entre cada pedaço ao juntá-los.
+        O padrão é "\n\n".
+    required: false
+    default: "\n\n"
+    form: form
+
+extra:
+  python:
+    source: tools/get_full_doc/get_full_doc.py

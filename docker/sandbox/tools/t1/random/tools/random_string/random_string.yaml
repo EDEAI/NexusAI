@@ -1,0 +1,122 @@
+identity:
+  name: random_string
+  author: bowenliang123
+  label:
+    en_US: Random String
+    zh_Hans: 生成随机字符串
+description:
+  human:
+    en_US: Generate a random string with given length from alphabets and numbers.
+  llm: Generate a random string with given length from alphabets and numbers.
+parameters:
+  - name: length
+    type: number
+    required: true
+    default: 0
+    label:
+      en_US: String length
+      zh_Hans: 字符串长度
+    human_description:
+      en_US: String length
+      zh_Hans: 字符串长度
+    llm_description: String length
+    form: llm
+  - name: include_alphabets
+    type: select
+    required: true
+    default: "upper_and_lower"
+    options:
+      - value: "upper_and_lower"
+        label:
+          en_US: "Upper and lower case (a-zA-Z)"
+          zh_Hans: 大写和小写英文字母 (a-zA-Z)
+      - value: "uppercase_only"
+        label:
+          en_US: "Uppercase only (A-Z)"
+          zh_Hans: 仅大写英文字母 (A-Z)
+      - value: "lowercase_only"
+        label:
+          en_US: "Lowercase only (a-z)"
+          zh_Hans: 仅小写英文字母 (a-z)
+      - value: "not_included"
+        label:
+          en_US: "Not included"
+          zh_Hans: 不包含
+    label:
+      en_US: Included alphabets
+      zh_Hans: 包含的英文字母
+    human_description:
+      en_US: Include uppercase or lowercase alphabets, default to include both
+      zh_Hans: 包含大写或小写字母, 默认为包含全部
+    llm_description: Include uppercase or lowercase alphabets
+    form: form
+  - name: include_numbers
+    type: select
+    required: true
+    default: "true"
+    options:
+      - value: "true"
+        label:
+          en_US: "Yes"
+          zh_Hans: 是
+      - value: "false"
+        label:
+          en_US: "No"
+          zh_Hans: 否
+    label:
+      en_US: Whether include numbers
+      zh_Hans: 是否包含数字
+    human_description:
+      en_US: Whether include numbers (0-9), default to Yes
+      zh_Hans: 是否包含数字（0-9）, 默认为是
+    llm_description: Whether include numbers
+    form: form
+  - name: include_punctuation
+    type: select
+    required: true
+    default: "false"
+    options:
+      - value: "true"
+        label:
+          en_US: "Yes"
+          zh_Hans: 是
+      - value: "false"
+        label:
+          en_US: "No"
+          zh_Hans: 否
+    label:
+      en_US: Include punctuation
+      zh_Hans: 是否包含特殊字符
+    human_description:
+      en_US: Default to false. Punctuation chars are !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+      zh_Hans: 默认为否。特殊字符为 !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+    llm_description: Whether include punctuation symbol characters
+    form: form
+  - name: string_count
+    type: number
+    required: true
+    default: "1"
+    label:
+      en_US: Number of random strings
+      zh_Hans: 生成的字符串个数
+    human_description:
+      en_US: Default to 1
+      zh_Hans: 默认为1
+    llm_description: Number of random strings to generate, default to 1
+    form: llm
+  - name: separator
+    type: string
+    required: false
+    default: ","
+    placeholder: ","
+    label:
+      en_US: Separator for multiple generated strings
+      zh_Hans: 生成的多个字符串的分隔符
+    human_description:
+      en_US: Default to "," comma
+      zh_Hans: 默认为 "," 小逗号
+    llm_description: Separator for multiple generated strings, default to ","
+    form: form
+extra:
+  python:
+    source: tools/random_string/random_string.py

@@ -1,0 +1,20 @@
+identity:
+  author: edtechools
+  name: mattermost
+  label:
+    en_US: Mattermost
+    zh_Hans: Mattermost
+    ja_Jp: Mattermost
+    pt_BR: Mattermost
+  description:
+    en_US: Send message to channel
+    ja_JP: チャンネルにメッセージを送信する
+    zh_Hans: 向频道发送消息
+    pt_BR: Enviar uma mensagem para o canal
+  icon: icon.svg
+tools:
+  - tools/incoming_hook.yaml
+  - tools/bot_accounts.yaml
+extra:
+  python:
+    source: provider/mattermost.py

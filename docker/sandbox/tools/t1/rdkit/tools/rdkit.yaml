@@ -1,0 +1,30 @@
+identity:
+  name: rdkit
+  author: s20ss
+  label:
+    en_US: rdkit
+    zh_Hans: rdkit
+    pt_BR: rdkit
+description:
+  human:
+    en_US: Dify plugin for understanding,drawing chemical reactions between different molecules.
+    zh_Hans: Dify plugin for understanding,drawing chemical reactions between different molecules.
+    pt_BR: Dify plugin for understanding,drawing chemical reactions between different molecules.
+  llm: Dify plugin for understanding,drawing chemical reactions between different molecules.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: Dify plugin for understanding,drawing chemical reactions between different molecules.
+      zh_Hans: Dify plugin for understanding,drawing chemical reactions between different molecules.
+      pt_BR: Dify plugin for understanding,drawing chemical reactions between different molecules.
+    llm_description: Dify plugin for understanding,drawing chemical reactions between different molecules.
+    form: llm
+extra:
+  python:
+    source: tools/rdkit.py

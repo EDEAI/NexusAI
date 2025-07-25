@@ -1,0 +1,45 @@
+credentials_for_provider:
+  base_url:
+    label:
+      en_US: Brave server's Base URL
+      zh_Hans: Brave服务器的API URL
+    placeholder:
+      en_US: https://api.search.brave.com/res/v1/web/search
+    required: false
+    default: https://api.search.brave.com/res/v1/web/search
+    type: text-input
+  brave_search_api_key:
+    help:
+      en_US: Get your Brave Search API key from Brave
+      pt_BR: Get your Brave Search API key from Brave
+      zh_Hans: 从 Brave 获取您的 Brave Search API key
+    label:
+      en_US: Brave Search API key
+      pt_BR: Brave Search API key
+      zh_Hans: Brave Search API key
+    placeholder:
+      en_US: Please input your Brave Search API key
+      pt_BR: Please input your Brave Search API key
+      zh_Hans: 请输入你的 Brave Search API key
+    required: true
+    type: secret-input
+    url: https://brave.com/search/api/
+extra:
+  python:
+    source: provider/brave.py
+identity:
+  author: Yash Parmar
+  description:
+    en_US: Brave
+    pt_BR: Brave
+    zh_Hans: Brave
+  icon: icon.svg
+  label:
+    en_US: Brave
+    pt_BR: Brave
+    zh_Hans: Brave
+  name: brave
+  tags:
+    - search
+tools:
+  - tools/brave_search.yaml

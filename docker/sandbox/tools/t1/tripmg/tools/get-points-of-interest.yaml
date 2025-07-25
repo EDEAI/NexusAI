@@ -1,0 +1,66 @@
+identity:
+  name: get-points-of-interest
+  author: ayush3941
+  label:
+    en_US: Get Recommended Locations
+    zh_Hans: 获取推荐地点
+    pt_BR: Obter Locais Recomendados
+  icon: "icon.png"
+  description:
+    en_US: Get recommended locations for travelers using the Amadeus API.
+    zh_Hans: 使用 Amadeus API 为旅行者获取推荐地点。
+    pt_BR: Obtenha locais recomendados para viajantes usando a API Amadeus.
+
+description:
+  human:
+    en_US: Find top recommended places in a city for travelers from a specific country
+    zh_Hans: 为来自特定国家的旅行者查找城市中推荐的地点
+    pt_BR: Encontrar locais recomendados em uma cidade para viajantes de um país específico
+  llm: Suggest recommended locations in a city for travelers from a specific country
+
+parameters:
+  - name: city_code
+    type: string
+    required: true
+    label:
+      en_US: City Code
+      zh_Hans: 城市代码
+      pt_BR: Código da cidade
+    human_description:
+      en_US: 3-letter IATA code of the city (e.g. PAR for Paris)
+      zh_Hans: 城市的 3 个字母 IATA 代码（例如：巴黎为 PAR）
+      pt_BR: Código IATA de 3 letras da cidade (por exemplo, PAR para Paris)
+    llm_description: IATA code of the destination city
+    form: llm
+
+  - name: traveler_country_code
+    type: string
+    required: true
+    label:
+      en_US: Traveler Country Code
+      zh_Hans: 旅行者国家代码
+      pt_BR: Código do país do viajante
+    human_description:
+      en_US: 2-letter country code of the traveler's origin (e.g. FR for France)
+      zh_Hans: 旅行者的 2 个字母国家代码（例如：法国为 FR）
+      pt_BR: Código do país de origem do viajante com 2 letras (por exemplo, FR para França)
+    llm_description: ISO country code of the traveler's origin
+    form: llm
+
+  - name: limit
+    type: number
+    required: true
+    label:
+      en_US: Result Limit
+      zh_Hans: 结果数量
+      pt_BR: Limite de resultados
+    human_description:
+      en_US: Number of recommended locations to return
+      zh_Hans: 返回的推荐地点数量
+      pt_BR: Número de locais recomendados a serem retornados
+    llm_description: Limit on how many recommendations to return
+    form: llm
+
+extra:
+  python:
+    source: tools/get-points-of-interest.py

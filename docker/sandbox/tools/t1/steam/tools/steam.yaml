@@ -1,0 +1,26 @@
+identity:
+  name: steam
+  author: bdim
+  label:
+    en_US: Steam Player Info
+    zh_Hans: 玩家信息
+description:
+  human:
+    en_US: Get Steam user information by their Steam ID
+    zh_Hans: 通过 Steam ID 获取用户信息
+  llm: Retrieve detailed profile information for a Steam user using their 17-digit Steam ID.
+parameters:
+  - name: steam_id
+    type: string
+    required: true
+    label:
+      en_US: Steam ID
+      zh_Hans: Steam ID
+    human_description:
+      en_US: The 17-digit Steam ID of the user
+      zh_Hans: 用户的 17 位数字 Steam ID
+    llm_description: The unique 17-digit identifier for a Steam user account. Example format - 76561198998970686
+    form: llm
+extra:
+  python:
+    source: tools/steam.py

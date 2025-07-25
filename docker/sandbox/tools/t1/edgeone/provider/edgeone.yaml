@@ -1,0 +1,66 @@
+identity:
+  author: stvlynn
+  name: edgeone
+  label:
+    en_US: EdgeOne Pages
+    zh_Hans: EdgeOne Pages
+    pt_BR: EdgeOne Pages
+    ja_JP: EdgeOne Pages
+    zh_Hant: EdgeOne Pages
+  description:
+    en_US: Deploy HTML content and ZIP files to EdgeOne Pages with edge delivery
+    zh_Hans: 将HTML内容和ZIP文件部署到EdgeOne Pages并支持边缘分发
+    pt_BR: Implante conteúdo HTML e arquivos ZIP no EdgeOne Pages com entrega de borda
+    ja_JP: HTMLコンテンツとZIPファイルをEdgeOne Pagesにエッジ配信でデプロイ
+    zh_Hant: 將HTML內容和ZIP檔案部署到EdgeOne Pages並支援邊緣分發
+  icon: icon.png
+credentials_for_provider:
+  api_token:
+    type: secret-input
+    required: false
+    label:
+      en_US: API Token
+      zh_Hans: API令牌
+      pt_BR: Token de API
+      ja_JP: APIトークン
+      zh_Hant: API權杖
+    placeholder:
+      en_US: Enter your EdgeOne Pages API token (optional)
+      zh_Hans: 输入您的EdgeOne Pages API令牌（可选）
+      pt_BR: Digite seu token de API do EdgeOne Pages (opcional)
+      ja_JP: EdgeOne Pages APIトークンを入力してください（オプション）
+      zh_Hant: 輸入您的EdgeOne Pages API權杖（可選）
+    help:
+      en_US: Required API token for ZIP file deployment. Get your token from EdgeOne console
+      zh_Hans: ZIP文件部署所需的API令牌。从EdgeOne控制台获取您的令牌
+      pt_BR: Token de API obrigatório para implantação de arquivos ZIP. Obtenha seu token do console EdgeOne
+      ja_JP: ZIPファイルデプロイに必要なAPIトークン。EdgeOneコンソールからトークンを取得
+      zh_Hant: ZIP檔案部署所需的API權杖。從EdgeOne控制台取得您的權杖
+    url: https://edgeone.ai/document/177158578324279296
+  project_name:
+    type: text-input
+    required: false
+    label:
+      en_US: Project Name
+      zh_Hans: 项目名称
+      pt_BR: Nome do Projeto
+      ja_JP: プロジェクト名
+      zh_Hant: 專案名稱
+    placeholder:
+      en_US: Enter existing project name (optional)
+      zh_Hans: 输入现有项目名称（可选）
+      pt_BR: Digite o nome do projeto existente (opcional)
+      ja_JP: 既存のプロジェクト名を入力（オプション）
+      zh_Hant: 輸入現有專案名稱（可選）
+    help:
+      en_US: Leave empty to create a new project. Provide a name to update an existing project
+      zh_Hans: 留空以创建新项目。提供名称以更新现有项目
+      pt_BR: Deixe em branco para criar um novo projeto. Forneça um nome para atualizar um projeto existente
+      ja_JP: 空白のままにすると新しいプロジェクトを作成。名前を入力すると既存のプロジェクトを更新
+      zh_Hant: 留空以建立新專案。提供名稱以更新現有專案
+tools:
+  - tools/deploy_html.yaml
+  - tools/deploy_folder_or_zip.yaml
+extra:
+  python:
+    source: provider/edgeone.py

@@ -1,0 +1,85 @@
+identity:
+  name: get_group_messages
+  label:
+    en_US: Query Group Messages
+    zh_Hans: 获取群历史消息
+  icon: rongcloud_logo.svg
+  author: rongcloud
+  version: 1.0.0
+  email: support@dify.ai
+description:
+  human:
+    en_US: Query Group Messages in the last 24 hours, return at most 100 messages, return message list
+    zh_Hans: 查询最近一天的群消息, 上限 100 条, 返回消息列表
+  llm: Query Group Messages in the last 24 hours, return at most 100 messages, return message list
+extra:
+  python:
+    source: tools/history/get_group_messages.py
+
+parameters:
+  - name: user_id
+    label:
+      en_US: Query User ID
+      zh_Hans: 查询用户ID
+    human_description:
+      en_US: The user ID of the user who query the group messages
+      zh_Hans: 查询用户ID
+    llm_description: The user ID of the user who query the group messages
+    form: llm
+    type: string
+    required: true
+  - name: target_id
+    label:
+      en_US: Query Conversation ID
+      zh_Hans: 查询会话ID
+    human_description:
+      en_US: The target ID of the target conversation
+      zh_Hans: 查询会话ID
+    llm_description: The target ID of the target conversation
+    form: llm
+    type: string
+    required: true
+  # - name: start_time
+  #   label:
+  #     en_US: Start Time(millisecond timestamp)
+  #     zh_Hans: 开始时间（毫秒时间戳）
+  #   human_description:
+  #     en_US: The start time of the group messages(millisecond timestamp)
+  #     zh_Hans: 开始时间（毫秒时间戳）
+  #   llm_description: The start time of the group messages(millisecond timestamp)
+  #   form: llm
+  #   type: number  
+  #   required: true
+  # - name: end_time
+  #   label:
+  #     en_US: End Time(millisecond timestamp)
+  #     zh_Hans: 结束时间（毫秒时间戳）
+  #   human_description:
+  #     en_US: The end time of the group messages(millisecond timestamp)
+  #     zh_Hans: 结束时间（毫秒时间戳）
+  #   llm_description: The end time of the group messages(millisecond timestamp)
+  #   form: llm
+  #   type: number
+  #   required: true
+  # - name: page_size
+  #   label:
+  #     en_US: Page Size
+  #     zh_Hans: 每页数量
+  #   human_description:
+  #     en_US: The page size of the group messages
+  #     zh_Hans: 每页数量
+  #   llm_description: The page size of the group messages
+  #   form: llm
+  #   type: number
+  #   required: false
+  # - name: include_start_time
+  #   label:
+  #     en_US: Include Start Time
+  #     zh_Hans: 包含开始时间
+  #   human_description:
+  #     en_US: Whether to include the start time of the group messages
+  #     zh_Hans: 是否包含开始时间
+  #   llm_description: Whether to include the start time of the group messages
+  #   form: llm
+  #   type: boolean
+  #   required: true

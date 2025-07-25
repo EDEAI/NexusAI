@@ -1,0 +1,59 @@
+identity:
+  name: get_user
+  author: yasu89
+  label:
+    en_US: Get User Details
+    zh_Hans: 获取用户详情
+    pt_BR: Obter Detalhes do Usuário
+    ja_JP: ユーザー詳細を取得
+description:
+  human:
+    en_US: Returns details of a specific user from Redmine
+    zh_Hans: 从Redmine获取特定用户的详情
+    pt_BR: Retorna detalhes de um usuário específico do Redmine
+    ja_JP: Redmineから特定のユーザーの詳細を返す
+  llm: Retrieve detailed information about a specific user from a Redmine project management system
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户ID
+      pt_BR: ID do Usuário
+      ja_JP: ユーザーID
+    human_description:
+      en_US: "User ID (numeric) or 'current' for the authenticated user"
+      zh_Hans: "用户ID（数字）或'current'表示当前认证用户"
+      pt_BR: "ID do usuário (numérico) ou 'current' para o usuário autenticado"
+      ja_JP: "ユーザーID（数値）または認証されたユーザーの場合は'current'"
+    placeholder:
+      en_US: "123"
+      zh_Hans: "123"
+      pt_BR: "123"
+      ja_JP: "123"
+    llm_description: User ID (numeric) or 'current' for the authenticated user
+    form: llm
+  - name: include
+    type: string
+    required: false
+    label:
+      en_US: Include Additional Data
+      zh_Hans: 包含额外数据
+      pt_BR: Incluir Dados Adicionais
+      ja_JP: 追加データを含める
+    human_description:
+      en_US: "Additional data to include (comma-separated). Possible values: memberships, groups"
+      zh_Hans: "要包含的额外数据（逗号分隔）。可能的值：memberships, groups"
+      pt_BR: "Dados adicionais para incluir (separados por vírgula). Valores possíveis: memberships, groups"
+      ja_JP: "含める追加データ（カンマ区切り）。可能な値：memberships, groups"
+    placeholder:
+      en_US: "memberships,groups"
+      zh_Hans: "memberships,groups"
+      pt_BR: "memberships,groups"
+      ja_JP: "memberships,groups"
+    llm_description: Additional data to include (comma-separated values like memberships, groups)
+    form: llm
+extra:
+  python:
+    source: tools/get_user.py

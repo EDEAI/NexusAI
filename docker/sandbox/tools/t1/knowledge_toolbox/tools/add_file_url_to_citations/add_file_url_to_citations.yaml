@@ -1,0 +1,136 @@
+identity:
+  name: add_file_url_to_citations
+  author: kurokobo
+  label:
+    en_US: Add File URL to Citations
+    ja_JP: 引用にファイル URL を追加
+    zh_Hans: 引用中添加文件 URL
+    pt_BR: Adicionar URL do arquivo às citações
+
+description:
+  human:
+    en_US: Retrieves download URLs for files included in the results of the Knowledge Retrieval node and returns a list.
+    ja_JP: 知識取得ノードの結果に含まれるファイルのダウンロード URL を取得し、一覧を返します。
+    zh_Hans: 获取知识检索节点结果中包含的文件的下载 URL，并返回一个列表。
+    pt_BR: Obtém URLs de download para arquivos incluídos nos resultados do nó de Recuperação de Conhecimento e retorna uma lista.
+  llm: Retrieves download URLs for files included in the results of the Knowledge Retrieval node and returns a list.
+
+parameters:
+
+  - name: api_base_url
+    type: string
+    label:
+      en_US: API Base URL
+    human_description:
+      en_US: >-
+        The base URL of the Knowledge API, with trailing "/v1".
+        Example: "https://api.dify.ai/v1", "http://api:5001/v1".
+      ja_JP: >-
+        ナレッジ API のベース URL（末尾に "/v1" を付ける）。
+        例: "https://api.dify.ai/v1", "http://api:5001/v1"。
+      zh_Hans: >-
+        Knowledge API 的基础 URL，结尾带有 "/v1"。
+        例如: "https://api.dify.ai/v1", "http://api:5001/v1"。
+      pt_BR: >-
+        A URL base da API do Knowledge, terminando com "/v1".
+        Exemplo: "https://api.dify.ai/v1", "http://api:5001/v1".
+    required: true
+    default: ""
+    form: llm
+
+  - name: api_key
+    type: secret-input
+    label:
+      en_US: API Key
+    human_description:
+      en_US: >-
+        The API key for the Knowledge API.
+        You can generate it at "Knowledge" -> "API Access" -> "API Key" in the Dify Console.
+      ja_JP: >-
+        Knowledge API の API キー。
+        Dify のコンソールの "Knowledge" -> "API Access" -> "API Key" で発行できる。
+      zh_Hans: >-
+        Knowledge API 的 API 密钥。
+        可以在 Dify 控制台的“Knowledge”->“API Access”->“API Key”中生成。
+      pt_BR: >-
+        A chave de API para o Knowledge API.
+        Você pode gerá-la em "Knowledge" -> "API Access" -> "API Key" no Console Dify.
+    required: true
+    default: ""
+    form: llm
+
+  - name: context
+    type: string
+    label:
+      en_US: Context
+    human_description:
+      en_US: >-
+        Input the result of the Knowledge Retrieval node.
+        However, since Array[Object] cannot be selected directly here, please convert it to a string using a Template node or similar before inputting.
+        Refer to the documentation for details.
+      ja_JP: >-
+        知識取得ノードの結果を入力する。
+        ただし、ここでは Array[Object] は直接は選べないため、テンプレートノードなどで文字列に変換してから入力すること。
+        詳細はドキュメントを参照。
+      zh_Hans: >-
+        输入知识检索节点的结果。
+        由于这里不能直接选择 Array[Object]，请在输入前使用模板节点等将其转换为字符串。
+        有关详细信息，请参阅文档。
+      pt_BR: >-
+        Insira o resultado do nó de Recuperação de Conhecimento.
+        No entanto, como Array[Object] não pode ser selecionado diretamente aqui, converta-o em uma string usando um nó de Template ou similar antes de inserir.
+        Consulte a documentação para obter detalhes.
+    required: true
+    default: ""
+    form: llm
+
+
+  - name: format
+    type: select
+    label:
+      en_US: Format of the output
+    human_description:
+      en_US: >-
+        Format of the output.
+        "full" returns a complete object with the metadata of the Knowledge Retrieval node results, adding a "download_url" field.
+        "minimal_json" returns a JSON string with basic information such as file names and download URLs of the referenced documents.
+        "minimal_markdown" returns a list of Markdown formatted download links for the referenced documents.
+        "chunks_markdown" returns a collapsible Markdown that contains the referenced chunks and download links for the documents.
+      ja_JP: >-
+        結果のフォーマット。
+        "full" は知識取得ノードの結果のメタデータに "download_url" フィールドを追加した完全なオブジェクトを返す。
+        "minimal_json" は参照されているドキュメントのファイル名やダウンロード URL などの基礎情報を JSON 形式の文字列で返す。
+        "minimal_markdown" は参照されているドキュメントの Markdown 形式のダウンロードリンクの一覧を返す。
+        "chunks_markdown" は参照されているチャンクとドキュメントのダウンロードリンクを含む折りたたみ可能な Markdown を返す。
+      zh_Hans: >-
+        输出的格式。
+        "full" 返回一个完整的对象，包含知识检索节点结果的元数据，并添加一个 "download_url" 字段。
+        "minimal_json" 返回一个 JSON 字符串，包含引用文档的基本信息，如文件名和下载 URL。
+        "minimal_markdown" 返回一个 Markdown 格式的引用文档下载链接列表。
+        "chunks_markdown" 返回一个可折叠的 Markdown，包含引用的块和文档的下载链接。
+      pt_BR: >-
+        Formato da saída.
+        "full" retorna um objeto completo com os metadados dos resultados do nó de Recuperação de Conhecimento, adicionando um campo "download_url".
+        "minimal_json" retorna uma string JSON com informações básicas, como nomes de arquivos e URLs de download dos documentos referenciados.
+        "minimal_markdown" retorna uma lista de links de download formatados em Markdown para os documentos referenciados.
+        "chunks_markdown" retorna um Markdown dobrável que contém os blocos referenciados e links de download para os documentos.
+    options:
+      - value: "full"
+        label:
+          en_US: "full"
+      - value: "minimal_json"
+        label:
+          en_US: "minimal_json"
+      - value: "minimal_markdown"
+        label:
+          en_US: "minimal_markdown"
+      - value: "chunks_markdown"
+        label:
+          en_US: "chunks_markdown"
+    required: true
+    default: "full"
+    form: form
+
+extra:
+  python:
+    source: tools/add_file_url_to_citations/add_file_url_to_citations.py

@@ -1,0 +1,49 @@
+identity:
+  name: update_user
+  author: acane0320
+  label:
+    en_US: Update User
+    zh_Hans: 更新用户
+    ja_Jp: ユーザーを更新
+    pt_BR: Atualizar Usuário
+description:
+  human:
+    en_US: Update an existing user in Memobase
+    zh_Hans: 更新 Memobase 中的现有用户
+    ja_Jp: Memobaseの既存のユーザーを更新
+    pt_BR: Atualizar um usuário existente no Memobase
+  llm: Use this tool to update an existing user in Memobase. You need to provide the user ID and optionally the name and metadata.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户ID
+      ja_Jp: ユーザーID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to update
+      zh_Hans: 要更新的用户的ID
+      ja_Jp: 更新するユーザーのID
+      pt_BR: O ID do usuário a ser atualizado
+    llm_description: The ID of the user to update.
+    form: llm
+  - name: metadata
+    type: string
+    required: false
+    label:
+      en_US: Metadata
+      zh_Hans: 元数据
+      ja_Jp: メタデータ
+      pt_BR: Metadados
+    human_description:
+      en_US: 'Optional metadata for the user (JSON). Example: {"name": "acane0320"}'
+      zh_Hans: '可选的用户元数据（JSON）。示例：{"name": "acane0320"}'
+      ja_Jp: 'ユーザーのオプションのメタデータ（JSON）。例：{"name": "acane0320"}'
+      pt_BR: 'Metadados opcionais para o usuário (JSON). Exemplo: {"name": "acane0320"}'
+    llm_description: 'Optional metadata for the user in JSON format. Example: {"name": "acane0320"}'
+    form: llm
+extra:
+  python:
+    source: tools/user/update_user.py

@@ -1,0 +1,35 @@
+identity:
+  name: restoration
+  author: fotor
+  label:
+    en_US: Old Photo Restoration
+    zh_Hans: 老照片修复
+
+description:
+  human:
+    en_US: Old Photo Restoration
+    zh_Hans: 老照片修复
+  llm: This operation is usually called "Restoration", "Old Photo Restoration", "Photo Restoration", "Repair Old Photo", "Photo Recovery", etc. Call the restoration API to restore the old photos, repair the old photos, recover the old photos, restore the old images, repair the old images, recover the old images, restore the old pictures, repair the old pictures, recover the old pictures, restore the old photographs, repair the old photographs, recover the old photographs.
+
+parameters:
+  - name: userImageUrl
+    type: string
+    required: true
+    label:
+      en_US: UserImageUrl
+      zh_Hans: 用户原图
+    human_description:
+      en_US: The URL or BASE64 encoded image of the original image provided by the user
+      zh_Hans: 用户提供的原图的URL或BASE64编码
+    llm_description: User Image URL, the URL or BASE64 encoding of the original image provided by the user.
+    form: llm
+
+output_schema:
+  type: object
+  properties:
+    result_url:
+      type: string
+
+extra:
+  python:
+    source: tools/restoration.py

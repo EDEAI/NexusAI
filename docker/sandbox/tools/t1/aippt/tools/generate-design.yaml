@@ -1,0 +1,48 @@
+identity:
+  name: generation-design
+  author: aippt
+  label:
+    en_US: Generate Work
+    zh_Hans: 生成作品
+    pt_BR: Generate Work
+description:
+  human:
+    en_US: Return the download link of your work
+    zh_Hans: 为您返回作品的下载链接
+    pt_BR: Return the download link of your work
+  llm: Return the download link of your work
+parameters:
+  - name: task_id
+    type: number
+    required: true
+    label:
+      en_US: Task ID
+      zh_Hans: 任务ID
+      pt_BR: Task ID
+    human_description:
+      en_US: Please enter the task ID
+      zh_Hans: 请输入任务ID
+      pt_BR: Please enter the task ID
+    llm_description: Please enter the task ID
+    form: llm
+  - name: template_id
+    type: number
+    required: true
+    label:
+      en_US: Template ID
+      zh_Hans: 模板ID
+      pt_BR: Template ID
+    human_description:
+      en_US: Please enter the template ID
+      zh_Hans: 请输入模板ID
+      pt_BR: Please enter the template ID
+    llm_description: Please enter the template ID
+    form: llm
+output_schema:
+  type: object
+  properties:
+    url:
+      type: string
+extra:
+  python:
+    source: tools/generate-design.py

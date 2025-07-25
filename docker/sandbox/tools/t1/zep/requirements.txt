@@ -1,0 +1,4 @@
+dify-plugin>=0.0.1b74
+packaging>=24.2
+ruff>=0.11.0
+zep-cloud>=2.7.0

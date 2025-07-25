@@ -1,0 +1,117 @@
+identity:
+  name: knowledge_extractor
+  author: junjiem
+  label:
+    en_US: Knowledge Extractor
+    zh_Hans: 知识提取器
+description:
+  human:
+    en_US: Use LLM to Extract knowledge & summary from large text.
+    zh_Hans: 利用 LLM 从大文本中提取知识 & 总结摘要。
+  llm: Use LLM to Extract knowledge & summary from large text.
+parameters:
+  - name: model
+    type: model-selector
+    scope: llm
+    required: true
+    label:
+      en_US: Model
+      zh_Hans: 模型
+    human_description:
+      en_US: Choose the model.
+      zh_Hans: 选择模型。
+    form: form
+  - name: text
+    type: string
+    required: true
+    label:
+      en_US: Text
+      zh_Hans: 文本
+    human_description:
+      en_US: Input large text
+      zh_Hans: 输入大文本
+    llm_description: Input large text
+    form: llm
+  - name: instruction
+    type: string
+    required: false
+    label:
+      en_US: Instruction
+      zh_Hans: 指令
+    auto_generate:
+      type: prompt_instruction
+    template:
+      enabled: true
+    human_description:
+      en_US: Input additional instructions to help the knowledge extractor understand how to extract knowledge.
+      zh_Hans: 你可以输入额外的附加指令，帮助知识提取器理解如何提炼知识。
+    form: form
+  - name: language
+    type: select
+    required: true
+    options:
+      - value: English
+        label:
+          en_US: English
+          zh_Hans: 英语
+      - value: Chinese
+        label:
+          en_US: Chinese
+          zh_Hans: 中文
+      - value: Japanese
+        label:
+          en_US: Japanese
+          zh_Hans: 日语
+    default: English
+    label:
+      en_US: language
+      zh_Hans: 语言
+    human_description:
+      en_US: Output language
+      zh_Hans: 输出的语言
+    form: form
+  - name: chunk_size
+    type: number
+    required: true
+    label:
+      en_US: Maximum Chunk Length
+      zh_Hans: 分段最大长度
+    default: 8192
+    max: 32768
+    min: 1
+    human_description:
+      en_US: Maximum chunk length should be less than 32768.
+      zh_Hans: 分段最大长度不能大于 32768。
+    form: form
+  - name: chunk_overlap
+    type: number
+    required: true
+    label:
+      en_US: Chunk Overlap
+      zh_Hans: 分段重叠长度
+    default: 0
+    max: 512
+    min: 0
+    human_description:
+      en_US: 'Setting the chunk overlap can maintain the semantic relevance between them. 
+        It is recommended to set 10%-25% of the maximum chunk size.'
+      zh_Hans: '设置分段之间的重叠长度可以保留分段之间的语义关系。建议设置为最大分段长度的10%-25%。'
+    form: form
+  - name: separator
+    type: string
+    required: true
+    label:
+      en_US: Delimiter
+      zh_Hans: 分段标识符
+    default: '\\s*(?>\\R)\\s*(?>\\R)\\s*'
+    human_description:
+      en_US: 'A delimiter is the character used to separate text. 
+        \\n\\n and \\n are commonly used delimiters for separating paragraphs and lines. 
+        Combined with commas (\\n\\n,\\n), paragraphs will be segmented by lines when exceeding the maximum chunk length. 
+        You can also use special delimiters defined by yourself (e.g. ***).'
+      zh_Hans: '分隔符是用于分隔文本的字符。\\n\\n 和 \\n 是常用于分隔段落和行的分隔符。
+        用逗号连接分隔符（\\n\\n,\\n），当段落超过最大块长度时，会按行进行分割。你也可以使用自定义的特殊分隔符（例如 ***）。'
+    form: form
+extra:
+  python:
+    source: tools/knowledge_extractor.py

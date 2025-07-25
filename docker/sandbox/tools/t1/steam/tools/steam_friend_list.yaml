@@ -1,0 +1,38 @@
+identity:
+  name: steam_friend_list
+  author: bdim
+  label:
+    en_US: Friend List
+    zh_Hans: 好友列表
+description:
+  human:
+    en_US: Get the friend list of a Steam user (profile must be public)
+    zh_Hans: 获取用户的好友列表（个人资料必须为公开）
+  llm: Retrieve the friend list of any Steam user, provided their Steam Community profile visibility is set to "Public". Returns each friend's Steam ID and when the friendship was established.
+parameters:
+  - name: steamid
+    type: string
+    required: true
+    label:
+      en_US: Steam ID
+      zh_Hans: Steam ID
+    human_description:
+      en_US: 64-bit Steam ID to return friend list for
+      zh_Hans: 需要查询好友列表的 64 位 Steam ID
+    llm_description: The 64-bit identifier for the Steam user whose friend list you want to retrieve. The user's profile must be set to public for this API to work.
+    form: llm
+
+  - name: relationship
+    type: string
+    required: false
+    label:
+      en_US: Relationship Filter
+      zh_Hans: 关系过滤器
+    human_description:
+      en_US: Relationship filter (all, friend)
+      zh_Hans: 关系过滤器 (all, friend)
+    llm_description: Filter the type of relationships to return. Valid values are 'all' or 'friend'. Default is 'friend' if not specified.
+    form: llm
+extra:
+  python:
+    source: tools/steam_friend_list.py

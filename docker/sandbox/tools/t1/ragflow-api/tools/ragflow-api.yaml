@@ -1,0 +1,26 @@
+identity:
+  name: ragflow-api
+  author: witmeng
+  label:
+    en_US: list dataset ID
+    zh_Hans: 查找數據集ID
+description:
+  human:
+    en_US: list dataset
+    zh_Hans: 根據數據集名稱查找數據集ID
+  llm: list dataset
+parameters:
+  - form: llm
+    human_description:
+      en_US: dataset name
+      zh_Hans: 數據集名稱（全量匹配）
+    label:
+      en_US: dataset name
+      zh_Hans: 數據集名稱
+    llm_description: 數據集名稱（完整匹配）
+    name: name
+    required: true
+    type: string   
+extra:
+  python:
+    source: tools/ragflow-api.py

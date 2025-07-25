@@ -1,0 +1,34 @@
+identity:
+  name: earnings_press_releases
+  author: financialai
+  label:
+    en_US: Earnings Press Releases
+    zh_Hans: 盈利新闻稿
+    ja_Jp: 決算発表
+    pt_BR: Comunicados de Resultados
+description:
+  human:
+    en_US: Get earnings press releases for a ticker. The data returned from the API includes the URL, publish date, and full text of the press release.
+    zh_Hans: 获取股票代码的盈利新闻稿。API 返回的数据包括新闻稿的 URL、发布日期和全文。
+    ja_Jp: ティッカーの決算発表を取得します。API から返されるデータには、プレスリリースの URL、公開日、全文が含まれています。
+    pt_BR: Obtenha comunicados de resultados para um ticker. Os dados retornados pela API incluem a URL, a data de publicação e o texto completo do comunicado.
+  llm: Get earnings press releases for a ticker. The data returned from the API includes the URL, publish date, and full text of the press release.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol of the company you want to get earnings press releases for.
+      zh_Hans: 您想获取盈利新闻稿的公司的股票代码。
+      ja_Jp: 決算発表を取得したい会社のティッカーシンボル。
+      pt_BR: O símbolo do ticker da empresa para a qual você deseja obter comunicados de resultados.
+    llm_description: The ticker symbol of the company you want to get earnings press releases for.
+    form: llm
+extra:
+  python:
+    source: tools/earnings_press_releases/invoke.py

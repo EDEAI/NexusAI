@@ -1,0 +1,30 @@
+identity:
+  name: dify-plugin-pdm-template
+  author: jingfelix
+  label:
+    en_US: dify-plugin-pdm-template
+    zh_Hans: dify-plugin-pdm-template
+    pt_BR: dify-plugin-pdm-template
+description:
+  human:
+    en_US: A Dify plugin template with pdm
+    zh_Hans: A Dify plugin template with pdm
+    pt_BR: A Dify plugin template with pdm
+  llm: A Dify plugin template with pdm
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: A Dify plugin template with pdm
+      zh_Hans: A Dify plugin template with pdm
+      pt_BR: A Dify plugin template with pdm
+    llm_description: A Dify plugin template with pdm
+    form: llm
+extra:
+  python:
+    source: tools/dify-plugin-pdm-template.py

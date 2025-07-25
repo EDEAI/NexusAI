@@ -1,0 +1,250 @@
+identity:
+  name: external_auth_check
+  author: axdlee
+  description:
+    en_US: Check if the current user is authenticated by external authentication service
+    zh_Hans: 检查当前用户是否通过外部认证服务认证
+  icon: icon.svg
+  label:
+    en_US: External Auth Check
+    zh_Hans: 外部认证检查
+  tags:
+    - utilities
+
+description:
+  human:
+    en_US: Check if the current user is authenticated by external authentication service
+    zh_Hans: 检查当前用户是否通过外部认证服务认证
+  llm: Check if the current user is authenticated by external authentication service based on configured authentication rules
+
+extra:
+  python:
+    source: tools/external_auth_check.py
+
+parameters:
+  - name: auth_url
+    type: string
+    required: true
+    label:
+      en_US: Authentication URL
+      zh_Hans: 认证URL
+    help:
+      en_US: The URL of the external authentication service
+      zh_Hans: 外部认证服务的URL
+    human_description:
+      en_US: Please provide the URL of the external authentication service
+      zh_Hans: 请提供外部认证服务的URL
+    llm_description: The URL of the external authentication service
+    form: llm
+
+  - name: header_params
+    type: string
+    required: false
+    label:
+      en_US: Header Parameters
+      zh_Hans: 请求头参数
+    help:
+      en_US: 'Header parameters in JSON format, e.g. {"Authorization": "Bearer token", "X-API-Key": "key"}'
+      zh_Hans: '请求头参数的JSON格式,例如 {"Authorization": "Bearer token", "X-API-Key": "key"}'
+    human_description:
+      en_US: 'Header parameters in JSON format, e.g. {"Authorization": "Bearer token", "X-API-Key": "key"}'
+      zh_Hans: '请求头参数的JSON格式,例如 {"Authorization": "Bearer token", "X-API-Key": "key"}'
+    llm_description: Header parameters in JSON format
+    form: llm
+    default: "{}"
+
+  - name: query_params
+    type: string
+    required: false
+    label:
+      en_US: Query Parameters
+      zh_Hans: 查询参数
+    help:
+      en_US: 'Query parameters in JSON format, e.g. {"api_key": "key", "token": "value"}'
+      zh_Hans: '查询参数的JSON格式,例如 {"api_key": "key", "token": "value"}'
+    human_description:
+      en_US: 'Query parameters in JSON format, e.g. {"api_key": "key", "token": "value"}'
+      zh_Hans: '查询参数的JSON格式,例如 {"api_key": "key", "token": "value"}'
+    llm_description: Query parameters in JSON format
+    form: llm
+    default: "{}"
+
+  - name: body_params
+    type: string
+    required: false
+    label:
+      en_US: Body Parameters
+      zh_Hans: 请求体参数
+    help:
+      en_US: 'Body parameters in JSON format, e.g. {"auth_key": "value", "token": "value"}'
+      zh_Hans: '请求体参数的JSON格式,例如 {"auth_key": "value", "token": "value"}'
+    human_description:
+      en_US: 'Body parameters in JSON format, e.g. {"auth_key": "value", "token": "value"}'
+      zh_Hans: '请提供JSON格式的请求体参数,例如 {"auth_key": "value", "token": "value"}'
+    llm_description: Body parameters in JSON format
+    form: llm
+    default: "{}"
+
+  - name: request_method
+    type: select
+    required: true
+    label:
+      en_US: Request Method
+      zh_Hans: 请求方法
+    help:
+      en_US: The HTTP method to use for the authentication request
+      zh_Hans: 认证请求使用的HTTP方法
+    human_description:
+      en_US: Select the HTTP method to use for the authentication request
+      zh_Hans: 选择认证请求使用的HTTP方法
+    llm_description: The HTTP method to use for the authentication request
+    form: llm
+    options:
+      - value: GET
+        label:
+          en_US: GET
+          zh_Hans: GET
+      - value: POST
+        label:
+          en_US: POST
+          zh_Hans: POST
+      - value: PUT
+        label:
+          en_US: PUT
+          zh_Hans: PUT
+      - value: DELETE
+        label:
+          en_US: DELETE
+          zh_Hans: DELETE
+
+  - name: response_type
+    type: select
+    required: true
+    label:
+      en_US: Response Type
+      zh_Hans: 响应类型
+    help:
+      en_US: The type of response to expect from the authentication service
+      zh_Hans: 期望的认证服务响应类型
+    human_description:
+      en_US: Select the type of response to expect
+      zh_Hans: 选择期望的响应类型
+    llm_description: The type of response to expect
+    form: llm
+    options:
+      - value: json
+        label:
+          en_US: JSON
+          zh_Hans: JSON
+      - value: text
+        label:
+          en_US: Text
+          zh_Hans: 文本
+
+  - name: success_check
+    type: select
+    required: true
+    label:
+      en_US: Success Check Method
+      zh_Hans: 成功检查方式
+    help:
+      en_US: How to check if the authentication was successful
+      zh_Hans: 如何检查认证是否成功
+    human_description:
+      en_US: Select how to check for authentication success
+      zh_Hans: 选择如何检查认证是否成功
+    llm_description: How to check for authentication success
+    form: llm
+    options:
+      - value: json_path
+        label:
+          en_US: JSON Path
+          zh_Hans: JSON路径
+      - value: regex
+        label:
+          en_US: Regular Expression
+          zh_Hans: 正则表达式
+
+  - name: success_pattern
+    type: string
+    required: true
+    label:
+      en_US: Success Pattern
+      zh_Hans: 成功模式
+    help:
+      en_US: JSON path or regex pattern to check for success, for json_path, please provide the JSON path, for regex, please provide the regex pattern
+      zh_Hans: 用于检查成功的JSON路径或正则表达式, 对json_path, 请提供JSON路径, 对regex, 请提供正则表达式
+    human_description:
+      en_US: Please provide the JSON path or regex pattern to check for success, for json_path, please provide the JSON path, for regex, please provide the regex pattern
+      zh_Hans: 请提供用于检查成功的JSON路径或正则表达式, 对json_path, 请提供JSON路径, 对regex, 请提供正则表达式
+    llm_description: JSON path or regex pattern to check for success
+    form: llm
+
+  - name: success_value
+    type: string
+    required: true
+    label:
+      en_US: Success Value
+      zh_Hans: 成功值
+    help:
+      en_US: The value to match against for success
+      zh_Hans: 用于匹配成功的值
+    human_description:
+      en_US: Please provide the value to match for success
+      zh_Hans: 请提供用于匹配成功的值
+    llm_description: Value to match for success
+    form: llm
+
+  - name: user_info_extract
+    type: select
+    required: false
+    label:
+      en_US: User Info Extract Method
+      zh_Hans: 用户信息提取方式
+    help:
+      en_US: How to extract user information from the response
+      zh_Hans: 如何从响应中提取用户信息
+    human_description:
+      en_US: Select how to extract user information
+      zh_Hans: 选择如何提取用户信息
+    llm_description: How to extract user information
+    form: llm
+    options:
+      - value: json_path
+        label:
+          en_US: JSON Path
+          zh_Hans: JSON路径
+      - value: regex
+        label:
+          en_US: Regular Expression
+          zh_Hans: 正则表达式
+
+  - name: user_info_pattern
+    type: string
+    required: false
+    label:
+      en_US: User Info Pattern
+      zh_Hans: 用户信息模式
+    help:
+      en_US: JSON path or regex pattern to extract user information, for json_path, please provide the JSON path, for regex, please provide the regex pattern
+      zh_Hans: 用于提取用户信息的JSON路径或正则表达式, 对json_path, 请提供JSON路径, 对regex, 请提供正则表达式
+    human_description:
+      en_US: Please provide the JSON path or regex pattern to extract user information
+      zh_Hans: 请提供用于提取用户信息的JSON路径或正则表达式
+    llm_description: JSON path or regex pattern to extract user information
+    form: llm
+
+output_schema:
+  $schema: http://json-schema.org/draft-07/schema#
+  type: object
+  required: ["authenticated", "user_info"]
+  additionalProperties: false
+  properties:
+    authenticated:
+      type: string
+      title: Authenticated
+      description: Whether the user is authenticated, "true" or "false"
+    user_info:
+      type: string
+      title: User Info
+      description: Extracted user information from the response

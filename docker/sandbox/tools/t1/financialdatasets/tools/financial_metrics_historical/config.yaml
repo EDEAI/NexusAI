@@ -1,0 +1,84 @@
+identity:
+  name: financial_metrics_historical
+  author: financialai
+  label:
+    en_US: Historical Financial Metrics
+    zh_Hans: 历史财务指标
+    ja_Jp: 過去の財務指標
+    pt_BR: Métricas Financeiras Históricas
+description:
+  human:
+    en_US: Get financial metrics for a ticker, including valuation, profitability, efficiency, liquidity, leverage, growth, and per share metrics.
+    zh_Hans: 获取股票代码的财务指标，包括估值、盈利能力、效率、流动性、杠杆、增长和每股指标。
+    ja_Jp: ティッカーの財務指標を取得します。これには、評価、収益性、効率、流動性、レバレッジ、成長、株価指標が含まれます。
+    pt_BR: Obtenha métricas financeiras para um ticker, incluindo avaliação, lucratividade, eficiência, liquidez, alavancagem, crescimento e métricas por ação.
+  llm: Get financial metrics for a ticker, including valuation, profitability, efficiency, liquidity, leverage, growth, and per share metrics.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol of the company you want to get financial metrics for.
+      zh_Hans: 您想获取财务指标的公司的股票代码。
+      ja_Jp: 財務指標を取得したい会社のティッカーシンボル。
+      pt_BR: O símbolo do ticker da empresa para a qual você deseja obter métricas financeiras.
+    llm_description: The ticker symbol of the company you want to get financial metrics for.
+    form: llm
+  - name: period
+    type: select
+    required: true
+    label:
+      en_US: Period
+      zh_Hans: 期间
+      ja_Jp: 期間
+      pt_BR: Período
+    human_description:
+      en_US: The period for the financial metrics.
+      zh_Hans: 财务指标的期间。
+      ja_Jp: 財務指標の期間。
+      pt_BR: O período para as métricas financeiras.
+    llm_description: The period for the financial metrics.
+    form: llm
+    options:
+      - value: annual
+        label:
+          en_US: Annual
+          zh_Hans: 年度
+          ja_Jp: 年次
+          pt_BR: Anual
+      - value: quarterly
+        label:
+          en_US: Quarterly
+          zh_Hans: 季度
+          ja_Jp: 四半期
+          pt_BR: Trimestral
+      - value: ttm
+        label:
+          en_US: Trailing twelve months
+          zh_Hans: 过去十二个月
+          ja_Jp: 直近 12 か月
+          pt_BR: Últimos doze meses
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: Limit
+      zh_Hans: 限制
+      ja_Jp: 制限
+      pt_BR: Limite
+    human_description:
+      en_US: "The maximum number of financial metrics to return."
+      zh_Hans: "要返回的财务指标的最大数量。"
+      ja_Jp: "返す財務指標の最大数。"
+      pt_BR: "O número máximo de métricas financeiras a serem retornadas."
+    llm_description: "The maximum number of financial metrics to return."
+    form: llm
+
+extra:
+  python:
+    source: tools/financial_metrics_historical/invoke.py

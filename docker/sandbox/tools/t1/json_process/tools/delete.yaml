@@ -1,0 +1,55 @@
+description:
+  human:
+    en_US: A tool for deleting JSON content
+    pt_BR: A tool for deleting JSON content
+    zh_Hans: 一个删除 JSON 内容的工具
+  llm: A tool for deleting JSON content
+extra:
+  python:
+    source: tools/delete.py
+identity:
+  author: Mingwei_Zhang
+  label:
+    en_US: JSON Delete
+    pt_BR: JSON Delete
+    zh_Hans: JSON 删除
+  name: json_delete
+parameters:
+- form: llm
+  human_description:
+    en_US: JSON content to be processed
+    pt_BR: JSON content to be processed
+    zh_Hans: 待处理的 JSON 内容
+  label:
+    en_US: JSON content
+    pt_BR: JSON content
+    zh_Hans: JSON 内容
+  llm_description: JSON content to be processed
+  name: content
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: JSONPath query to locate the element to delete
+    pt_BR: JSONPath query to locate the element to delete
+    zh_Hans: 用于定位要删除元素的 JSONPath 查询
+  label:
+    en_US: Query
+    pt_BR: Query
+    zh_Hans: 查询
+  llm_description: JSONPath query to locate the element to delete
+  name: query
+  required: true
+  type: string
+- default: true
+  form: form
+  human_description:
+    en_US: Ensure the JSON output is ASCII encoded
+    pt_BR: Ensure the JSON output is ASCII encoded
+    zh_Hans: 确保输出的 JSON 是 ASCII 编码
+  label:
+    en_US: Ensure ASCII
+    pt_BR: Ensure ASCII
+    zh_Hans: 确保 ASCII
+  name: ensure_ascii
+  type: boolean

@@ -1,0 +1,59 @@
+description:
+  human:
+    en_US: Create Sheet in AI Table
+    zh_Hans: 在AI表格中创建数据表
+  llm: A tool for creating a sheet in an AI Table. (在AI表格中创建数据表)
+extra:
+  python:
+    source: tools/create_sheet_ai.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: Create Sheet in AI Table
+    zh_Hans: 在AI表格中创建数据表
+  name: create_sheet_ai
+parameters:
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID of the AI Table (baseId)
+    zh_Hans: AI表格的ID (baseId)
+  label:
+    en_US: Base ID
+    zh_Hans: AI表格ID
+  llm_description: AI表格的ID (baseId)
+  name: base_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The name of the sheet to be created
+    zh_Hans: 要创建的数据表名称
+  label:
+    en_US: Sheet Name
+    zh_Hans: 数据表名称
+  llm_description: 要创建的数据表名称
+  name: name
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: JSON array of field definitions, e.g., [{"name":"Field1","type":"text"},{"name":"Field2","type":"number"}]
+    zh_Hans: 字段定义的JSON数组，例如：[{"name":"字段1","type":"text"},{"name":"字段2","type":"number"}]
+  label:
+    en_US: Fields
+    zh_Hans: 字段定义
+  llm_description: 字段定义的JSON数组，例如：[{"name":"字段1","type":"text"},{"name":"字段2","type":"number"}]
+  name: fields
+  required: false
+  type: string 

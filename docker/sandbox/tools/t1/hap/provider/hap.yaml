@@ -1,0 +1,25 @@
+extra:
+  python:
+    source: provider/hap.py
+identity:
+  author: Mingdao
+  description:
+    en_US: Hyper application platform that is particularly friendly to AI
+    pt_BR: Plataforma de aplicação hiper que é particularmente amigável à IA
+    zh_Hans: 对 AI 特别友好的超级应用平台
+  icon: icon.svg
+  label:
+    en_US: HAP
+    pt_BR: HAP
+    zh_Hans: HAP
+  name: hap
+  tags:
+  - productivity
+tools:
+- tools/get_worksheet_fields.yaml
+- tools/list_worksheet_records.yaml
+- tools/delete_worksheet_record.yaml
+- tools/add_worksheet_record.yaml
+- tools/list_worksheets.yaml
+- tools/update_worksheet_record.yaml
+- tools/get_worksheet_pivot_data.yaml

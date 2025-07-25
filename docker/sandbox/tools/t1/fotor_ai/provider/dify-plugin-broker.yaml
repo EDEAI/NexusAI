@@ -1,0 +1,55 @@
+identity:
+  author: Fotor
+  name: fotor-ai
+  label:
+    en_US: Fotor AI
+    zh_Hans: Fotor AI
+  description:
+    en_US: Fotor AI Tools
+    zh_Hans: Fotor AI 工具
+  icon: icon.svg
+  tags:
+    - image
+    - productivity
+
+credentials_for_provider: #添加 credentials_for_provider 字段
+  fotor_openapi_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Fotor OpenAPI key
+      zh_Hans: Fotor OpenAPI key
+    placeholder:
+      en_US: Please input your OpenAPI key
+      zh_Hans: 请输入你的 OpenAPI key
+    help:
+      en_US: Get your OpenAPI key from Fotor
+      zh_Hans: 从 Fotor 获取您的 OpenAPI key
+    url: https://developers.fotor.com
+  fotor_openapi_endpoint:
+    type: text-input
+    required: true
+    label:
+      en_US: Endpoint
+      zh_Hans: 端点
+    placeholder:
+      en_US: Please input your endpoint
+      zh_Hans: 请输入你的端点
+    help:
+      en_US: Fotor API endpoint
+      zh_Hans: Fotor API 端点
+
+tools:
+  - tools/txt2img.yaml
+  - tools/img2img.yaml
+  - tools/upscaler.yaml
+  - tools/rembg.yaml
+  - tools/retouch.yaml
+  - tools/colorize.yaml
+  - tools/restoration.yaml
+  - tools/headshot.yaml
+  - tools/faceswap.yaml
+  - tools/replacer.yaml
+extra:
+  python:
+    source: provider/dify-plugin-broker.py

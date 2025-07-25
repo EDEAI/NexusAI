@@ -1,0 +1,19 @@
+identity:
+  author: aias00
+  name: minio
+  label:
+    en_US: minio
+    zh_Hans: minio
+    pt_BR: minio
+  description:
+    en_US: Tools for writing content to minio and reading from minio
+    zh_Hans: Tools for writing content to minio and reading from minio
+    pt_BR: Tools for writing content to minio and reading from minio
+  icon: minio.svg
+
+tools:
+  - tools/minio_reader.yaml
+  - tools/minio_writer.yaml
+extra:
+  python:
+    source: provider/minio.py

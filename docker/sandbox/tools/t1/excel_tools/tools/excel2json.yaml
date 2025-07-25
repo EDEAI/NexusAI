@@ -1,0 +1,26 @@
+identity:
+  name: excel2json
+  author: qiangxinglin
+  label:
+    en_US: Excel to Json
+    zh_Hans: Excel转Json
+description:
+  human:
+    en_US: Convert Excel to Json.
+    zh_Hans: 将Excel转换为Json。
+  llm: Convert Excel to Json.
+parameters:
+  - name: file
+    type: file
+    required: true
+    label:
+      en_US: File
+      zh_Hans: 文件
+    human_description:
+      en_US: Upload file.
+      zh_Hans: 上传的文件.
+    llm_description: Upload file.
+    form: llm
+extra:
+  python:
+    source: tools/excel2json.py

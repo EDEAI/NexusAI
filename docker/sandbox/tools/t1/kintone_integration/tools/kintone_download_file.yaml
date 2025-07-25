@@ -1,0 +1,71 @@
+identity:
+  name: kintone_download_file
+  author: r3-yamauchi
+  label:
+    en_US: kintone Download File
+    zh_Hans: kintone 下载文件
+    pt_BR: kintone Baixar Arquivo
+    ja_JP: kintone ファイルダウンロード
+description:
+  human:
+    en_US: Download a file from kintone using file key
+    zh_Hans: 使用文件密钥从kintone下载文件
+    pt_BR: Baixe um arquivo do kintone usando a chave do arquivo
+    ja_JP: |-
+      kintoneからファイルをダウンロードします
+
+      【file_keyの取得方法】
+      1. kintone_queryツールを使用してレコードを取得します
+      2. 添付ファイルフィールドの値を確認します（例: "添付ファイル": [{"fileKey": "xxxxxxxx"}]）
+      3. fileKeyの値をこのツールのfile_keyパラメータに指定します
+  llm: Download a file from kintone using the file key identifier
+parameters:
+  - name: kintone_domain
+    type: string
+    required: true
+    label:
+      en_US: kintone Domain
+      zh_Hans: kintone 域名
+      pt_BR: Domínio kintone
+      ja_JP: kintone ドメイン
+    human_description:
+      en_US: "Your kintone domain (e.g., your-subdomain.cybozu.com)"
+      zh_Hans: "您的kintone域名（例如 your-subdomain.cybozu.com）"
+      pt_BR: "O domínio do seu kintone (ex. your-subdomain.cybozu.com)"
+      ja_JP: "お使いのkintoneのURLのうち、https:// より後ろの部分（例: your-subdomain.cybozu.com）"
+    llm_description: kintone domain where the file is hosted
+    form: llm
+  - name: kintone_api_token
+    type: secret-input
+    required: true
+    label:
+      en_US: kintone API Token
+      zh_Hans: kintone API 令牌
+      pt_BR: Token de API kintone
+      ja_JP: kintone APIトークン
+    human_description:
+      en_US: "API token generated from your kintone app with view permissions"
+      zh_Hans: "从您的kintone应用程序生成的具有查看权限的API令牌"
+      pt_BR: "Token de API gerado do seu aplicativo kintone com permissões de visualização"
+      ja_JP: "kintone アプリで発行した閲覧権限を持つAPIトークン"
+    llm_description: API token with view permissions for the kintone app
+    form: llm
+  - name: file_key
+    type: string
+    required: true
+    label:
+      en_US: File Key
+      zh_Hans: 文件密钥
+      pt_BR: Chave do Arquivo
+      ja_JP: ファイルキー
+    human_description:
+      en_US: "The file key of the file to download from kintone"
+      zh_Hans: "要从kintone下载的文件的文件密钥"
+      pt_BR: "A chave do arquivo a ser baixado do kintone"
+      ja_JP: "kintoneからダウンロードするファイルのファイルキー"
+    llm_description: The unique file key identifier for the file in kintone
+    form: llm
+extra:
+  python:
+    source: tools/kintone_download_file.py
+    class: KintoneDownloadFileTool

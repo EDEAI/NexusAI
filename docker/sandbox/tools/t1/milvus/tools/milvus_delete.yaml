@@ -1,0 +1,69 @@
+identity:
+  name: "milvus_delete"
+  author: "zeroz-lab"
+  label:
+    en_US: "Milvus Data Delete"
+    zh_Hans: "Milvus 数据删除"
+    pt_BR: "Exclusão de Dados Milvus"
+description:
+  human:
+    en_US: "Delete data from Milvus collections by ID or filter expression"
+    zh_Hans: "通过ID或过滤表达式从Milvus集合中删除数据"
+    pt_BR: "Excluir dados de coleções Milvus por ID ou expressão de filtro"
+  llm: "A tool for deleting entities from Milvus vector database collections using entity IDs or filter expressions"
+parameters:
+  - name: collection_name
+    type: string
+    required: true
+    label:
+      en_US: "Collection Name"
+      zh_Hans: "集合名称"
+      pt_BR: "Nome da Coleção"
+    human_description:
+      en_US: "The name of the collection to delete data from"
+      zh_Hans: "要删除数据的集合名称"
+      pt_BR: "O nome da coleção para excluir dados"
+    llm_description: "The name of the collection to delete data from"
+    form: llm
+  - name: ids
+    type: string
+    required: false
+    label:
+      en_US: "Entity IDs"
+      zh_Hans: "实体ID"
+      pt_BR: "IDs das Entidades"
+    human_description:
+      en_US: "JSON array of entity IDs to delete (e.g., [1, 2, 3] or ['id1', 'id2'])"
+      zh_Hans: "要删除的实体ID的JSON数组（例如：[1, 2, 3] 或 ['id1', 'id2']）"
+      pt_BR: "Array JSON de IDs de entidades para excluir (ex: [1, 2, 3] ou ['id1', 'id2'])"
+    llm_description: "JSON array of entity IDs to delete (either this or filter must be provided)"
+    form: llm
+  - name: filter
+    type: string
+    required: false
+    label:
+      en_US: "Filter Expression"
+      zh_Hans: "过滤表达式"
+      pt_BR: "Expressão de Filtro"
+    human_description:
+      en_US: "Filter expression for scalar fields (e.g., 'age > 18 and status == \"inactive\"')"
+      zh_Hans: "标量字段的过滤表达式（例如：'age > 18 and status == \"inactive\"'）"
+      pt_BR: "Expressão de filtro para campos escalares (ex: 'age > 18 and status == \"inactive\"')"
+    llm_description: "Boolean expression for filtering entities to delete (either this or ids must be provided)"
+    form: llm
+  - name: partition_name
+    type: string
+    required: false
+    label:
+      en_US: "Partition Name"
+      zh_Hans: "分区名称"
+      pt_BR: "Nome da Partição"
+    human_description:
+      en_US: "Optional partition name to delete data from"
+      zh_Hans: "可选的分区名称，用于删除数据"
+      pt_BR: "Nome da partição opcional para excluir dados"
+    llm_description: "Optional partition name to delete data from (if not specified, deletes from all partitions)"
+    form: llm
+extra:
+  python:
+    source: tools/milvus_delete.py 

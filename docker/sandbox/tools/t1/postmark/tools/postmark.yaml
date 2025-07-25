@@ -1,0 +1,107 @@
+identity:
+  name: postmark
+  author: harrywang
+  label:
+    en_US: Send Email
+    zh_Hans: 发送邮件
+    pt_BR: Enviar Email
+    ja_JP: メール送信
+    zh_Hant: 發送郵件
+description:
+  human:
+    en_US: Send an email using Postmark API
+    zh_Hans: 使用 Postmark API 发送电子邮件
+    pt_BR: Enviar um email usando a API Postmark
+    ja_JP: Postmark API を使用してメールを送信する
+    zh_Hant: 使用 Postmark API 發送電子郵件
+  llm: Sends an email through Postmark API. Requires To, Subject, and HTML Body. The From address is automatically set to the default sender email configured in the plugin credentials. The sender email must be a verified sender signature in your Postmark account.
+parameters:
+  - name: to_email
+    type: string
+    required: true
+    label:
+      en_US: To Email
+      zh_Hans: 收件人邮箱
+      pt_BR: Email de Destino
+      ja_JP: 宛先メール
+      zh_Hant: 收件人郵箱
+    human_description:
+      en_US: The recipient's email address
+      zh_Hans: 收件人的电子邮件地址
+      pt_BR: O endereço de email do destinatário
+      ja_JP: 受信者のメールアドレス
+      zh_Hant: 收件人的電子郵件地址
+    llm_description: "The recipient's email address. Multiple addresses can be comma-separated. Can include names in the format 'Name <email@example.com>'."
+    form: llm
+  - name: subject
+    type: string
+    required: true
+    label:
+      en_US: Subject
+      zh_Hans: 主题
+      pt_BR: Assunto
+      ja_JP: 件名
+      zh_Hant: 主旨
+    human_description:
+      en_US: The subject line of the email
+      zh_Hans: 电子邮件的主题行
+      pt_BR: A linha de assunto do email
+      ja_JP: メールの件名
+      zh_Hant: 電子郵件的主旨行
+    llm_description: "The subject line of the email."
+    form: llm
+
+  - name: html_body
+    type: string
+    required: true
+    label:
+      en_US: HTML Body
+      zh_Hans: HTML 正文
+      pt_BR: Corpo HTML
+      ja_JP: HTML 本文
+      zh_Hant: HTML 內容
+    human_description:
+      en_US: The HTML content of the email
+      zh_Hans: 电子邮件的 HTML 内容
+      pt_BR: O conteúdo HTML do email
+      ja_JP: メールの HTML 内容
+      zh_Hant: 電子郵件的 HTML 內容
+    llm_description: "The HTML content of the email."
+    form: llm
+  - name: cc
+    type: string
+    required: false
+    label:
+      en_US: CC
+      zh_Hans: 抄送
+      pt_BR: CC
+      ja_JP: CC
+      zh_Hant: 副本
+    human_description:
+      en_US: Carbon copy recipients
+      zh_Hans: 抄送收件人
+      pt_BR: Destinatários em cópia
+      ja_JP: カーボンコピー受信者
+      zh_Hant: 副本收件人
+    llm_description: "Carbon copy recipients. Multiple addresses can be comma-separated."
+    form: llm
+  - name: bcc
+    type: string
+    required: false
+    label:
+      en_US: BCC
+      zh_Hans: 密送
+      pt_BR: BCC
+      ja_JP: BCC
+      zh_Hant: 密件副本
+    human_description:
+      en_US: Blind carbon copy recipients
+      zh_Hans: 密送收件人
+      pt_BR: Destinatários em cópia oculta
+      ja_JP: ブラインドカーボンコピー受信者
+      zh_Hant: 密件副本收件人
+    llm_description: "Blind carbon copy recipients. Multiple addresses can be comma-separated."
+    form: llm
+extra:
+  python:
+    source: tools/postmark.py

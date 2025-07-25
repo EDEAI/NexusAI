@@ -1,0 +1,51 @@
+identity:
+  author: eric-2369
+  name: zoominfo
+  label:
+    en_US: ZoomInfo Enrichment
+    zh_Hans: ZoomInfo 数据丰富化
+    pt_BR: Enriquecimento ZoomInfo
+  description:
+    en_US: Retrieve comprehensive company, contact, and news information using ZoomInfo API with username/password authentication.
+    zh_Hans: 使用用户名/密码认证通过 ZoomInfo API 检索全面的公司、联系人和新闻信息。
+    pt_BR: Recupere informações abrangentes de empresas, contatos e notícias usando a API ZoomInfo com autenticação de usuário/senha.
+  icon: zoominfo.svg
+credentials_for_provider:
+  zoominfo_username:
+    type: text-input
+    required: true
+    label:
+      en_US: ZoomInfo Username
+      zh_Hans: ZoomInfo 用户名
+      pt_BR: Nome de usuário ZoomInfo
+    placeholder:
+      en_US: Enter your ZoomInfo username
+      zh_Hans: 请输入您的 ZoomInfo 用户名
+      pt_BR: Digite seu nome de usuário ZoomInfo
+    help:
+      en_US: Your ZoomInfo account username
+      zh_Hans: 您的 ZoomInfo 账户用户名
+      pt_BR: Seu nome de usuário da conta ZoomInfo
+  zoominfo_password:
+    type: secret-input
+    required: true
+    label:
+      en_US: ZoomInfo Password
+      zh_Hans: ZoomInfo 密码
+      pt_BR: Senha ZoomInfo
+    placeholder:
+      en_US: Enter your ZoomInfo password
+      zh_Hans: 请输入您的 ZoomInfo 密码
+      pt_BR: Digite sua senha ZoomInfo
+    help:
+      en_US: Your ZoomInfo account password
+      zh_Hans: 您的 ZoomInfo 账户密码
+      pt_BR: Sua senha da conta ZoomInfo
+    url: https://api-docs.zoominfo.com
+tools:
+  - tools/enrich_company.yaml
+  - tools/enrich_contact.yaml
+  - tools/enrich_news.yaml
+extra:
+  python:
+    source: provider/zoominfo.py

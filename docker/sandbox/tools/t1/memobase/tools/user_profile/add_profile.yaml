@@ -1,0 +1,79 @@
+identity:
+  name: add_profile
+  author: acane0320
+  label:
+    en_US: Add User Memory Profile
+    zh_Hans: 添加用户记忆配置文件
+    ja_Jp: ユーザーの記憶プロファイルを追加
+    pt_BR: Adicionar Perfil de Memória do Usuário
+description:
+  human:
+    en_US: Add a new profile entry to the user's memory profile
+    zh_Hans: 向用户记忆配置文件添加新的配置项
+    ja_Jp: ユーザーの記憶プロファイルに新しいエントリを追加します
+    pt_BR: Adicionar uma nova entrada de perfil ao perfil de memória do usuário
+  llm: Use this tool to add a new profile entry to the user's memory profile. This is useful for storing persistent information about the user.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to add the profile data for
+      zh_Hans: 要添加配置文件数据的用户 ID
+      ja_Jp: プロファイルデータを追加するユーザーの ID
+      pt_BR: O ID do usuário para adicionar os dados do perfil
+    llm_description: The ID of the user to add the profile data for.
+    form: llm
+  - name: topic
+    type: string
+    required: true
+    label:
+      en_US: Topic
+      zh_Hans: 主题
+      ja_Jp: 主题
+      pt_BR: Tópico
+    human_description:
+      en_US: The topic for the profile data
+      zh_Hans: 配置文件数据的主题
+      ja_Jp: プロファイルデータのトピック
+      pt_BR: O tópico para os dados do perfil
+    llm_description: The topic for the profile data.
+    form: llm
+  - name: sub_topic
+    type: string
+    required: true
+    label:
+      en_US: Sub-Topic
+      zh_Hans: 子主题
+      ja_Jp: サブトピック
+      pt_BR: Sub-Tópico
+    human_description:
+      en_US: The sub-topic for the profile data
+      zh_Hans: 配置文件数据的子主题
+      ja_Jp: プロファイルデータのサブトピック
+      pt_BR: O sub-tópico para os dados do perfil
+    llm_description: The sub-topic for the profile data.
+    form: llm
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: Content
+      zh_Hans: 内容
+      ja_Jp: コンテンツ
+      pt_BR: Conteúdo
+    human_description:
+      en_US: The content for the profile data
+      zh_Hans: 配置文件数据的内容
+      ja_Jp: プロファイルデータの内容
+      pt_BR: O conteúdo para os dados do perfil
+    llm_description: The content for the profile data.
+    form: llm
+extra:
+  python:
+    source: tools/user_profile/add_profile.py

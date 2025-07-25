@@ -1,0 +1,8 @@
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+  <title>Mistral</title>
+  <path d="M14.28 14.17h14.29v14.28H14.28V14.17zm57.14 0h14.29v14.28H71.42V14.17z" fill="gold"/>
+  <path d="M14.28 28.45h28.57v14.29H14.28V28.45zm42.86 0h28.57v14.29H57.14V28.45z" fill="#FFAF00"/>
+  <path d="M14.28 42.74h71.43v14.28H14.28V42.74z" fill="#FF8205"/>
+  <path d="M14.28 57.02h14.29v14.28H14.28V57.02zm28.57 0h14.29v14.28H42.85V57.02zm28.57 0h14.29v14.28H71.42V57.02z" fill="#FA500F"/>
+  <path d="M0 71.31h42.86v14.29H0V71.31zm57.14 0H100v14.29H57.14V71.31z" fill="#E10500"/>
+</svg>

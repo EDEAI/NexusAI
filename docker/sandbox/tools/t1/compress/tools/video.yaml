@@ -1,0 +1,101 @@
+identity:
+  name: video_compress
+  author: hjlarry
+  label:
+    en_US: Video Compress
+    zh_Hans: 视频压缩
+description:
+  human:
+    en_US: a tool to compress the video
+    zh_Hans: 一个压缩视频的工具
+  llm: a tool to compress the video
+parameters:
+  - name: video_file
+    type: file
+    required: true
+    label:
+      en_US: Video file
+      zh_Hans: 视频文件
+    human_description:
+      en_US: a tool to compress the video
+      zh_Hans: 一个压缩视频的工具
+    llm_description: a tool to compress the video
+    form: llm
+  - name: target_height
+    type: select
+    required: false
+    default: "720"
+    label:
+      en_US: Resolution
+      zh_Hans: 分辨率
+    human_description:
+      en_US: The resolution of the video, more resolution means more size. If the video is larger than the set resolution, it will be scaled down proportionally
+      zh_Hans: 视频的分辨率，分辨率越高，视频文件越大。大于设定的分辨率，视频会被等比例的缩放
+    form: form
+    options:
+      - label:
+          en_US: 480p
+          zh_Hans: 480p
+        value: "480"
+      - label:
+          en_US: 720p
+          zh_Hans: 720p
+        value: "720"
+      - label:
+          en_US: 1080p
+          zh_Hans: 1080p
+        value: "1080"
+  - name: fps
+    type: number
+    required: false
+    default: 1
+    min: 1
+    max: 60
+    label:
+      en_US: FPS
+      zh_Hans: 帧率
+    human_description:
+      en_US: The FPS of the video, more FPS means more size
+      zh_Hans: 视频的帧率，帧率越高，视频文件越大
+    form: form
+  - name: crf
+    type: number
+    default: 35
+    min: 0
+    max: 51
+    required: false
+    label:
+      en_US: CRF
+      zh_Hans: 压缩率
+    human_description:
+      en_US: The compression level of the video, 0 means no compression, 51 means maximum compression
+      zh_Hans: 视频的压缩级别，0表示不压缩，51表示最大压缩
+    form: form
+  - name: preset
+    type: select
+    default: slower
+    required: false
+    label:
+      en_US: Preset
+      zh_Hans: 预设
+    human_description:
+      en_US: The preset of the video, slower means more compression but slower encoding speed
+      zh_Hans: 视频的预设，slower表示更多压缩但编码速度更慢
+    form: form
+    options:
+      - label:
+          en_US: slower
+          zh_Hans: 慢
+        value: slower
+      - label:
+          en_US: medium
+          zh_Hans: 中
+        value: medium
+      - label:
+          en_US: faster
+          zh_Hans: 快
+        value: faster
+extra:
+  python:
+    source: tools/video.py
+

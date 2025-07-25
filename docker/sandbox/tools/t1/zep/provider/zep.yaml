@@ -1,0 +1,32 @@
+identity:
+  author: obadakhalili
+  name: zep
+  label:
+    en_US: Zep
+  description:
+    en_US: Dify Zep plugin
+  icon: zep.png
+  tags:
+    - utilities
+
+credentials_for_provider:
+  zep_api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Zep API key
+    placeholder:
+      en_US: Enter your Zep API key
+    help:
+      en_US: Get the API key from your Zep project
+    url: https://app.getzep.com/projects
+
+tools:
+  - tools/init_session.yaml
+  - tools/get_session_memory.yaml
+  - tools/add_session_memory.yaml
+  - tools/search_user_graph.yaml
+
+extra:
+  python:
+    source: provider/zep.py

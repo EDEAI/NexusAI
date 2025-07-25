@@ -1,0 +1,38 @@
+identity:
+  name: deploy_html
+  author: stvlynn
+  label:
+    en_US: Deploy HTML
+    zh_Hans: 部署HTML
+    pt_BR: Implantar HTML
+    ja_JP: HTML展開
+    zh_Hant: 部署HTML
+description:
+  human:
+    en_US: Deploy HTML content to EdgeOne Pages and get a publicly accessible URL
+    zh_Hans: 将HTML内容部署到EdgeOne Pages并获取公开访问URL
+    pt_BR: Implante conteúdo HTML no EdgeOne Pages e obtenha uma URL publicamente acessível
+    ja_JP: HTMLコンテンツをEdgeOne Pagesにデプロイし、公開アクセス可能なURLを取得
+    zh_Hant: 將HTML內容部署到EdgeOne Pages並取得公開存取URL
+  llm: Deploys HTML content directly to EdgeOne Pages using their edge delivery network. The HTML is stored in EdgeOne KV store and served from edge locations globally. Returns a publicly accessible URL that can be accessed immediately with fast edge delivery.
+parameters:
+  - name: html_content
+    type: string
+    required: true
+    label:
+      en_US: HTML Content
+      zh_Hans: HTML内容
+      pt_BR: Conteúdo HTML
+      ja_JP: HTMLコンテンツ
+      zh_Hant: HTML內容
+    human_description:
+      en_US: The HTML content to deploy to EdgeOne Pages
+      zh_Hans: 要部署到EdgeOne Pages的HTML内容
+      pt_BR: O conteúdo HTML para implantar no EdgeOne Pages
+      ja_JP: EdgeOne PagesにデプロイするHTMLコンテンツ
+      zh_Hant: 要部署到EdgeOne Pages的HTML內容
+    llm_description: The HTML content to deploy. Can be a complete HTML document with head, body tags, or just HTML fragments. The content will be served directly from EdgeOne's edge locations with fast global access.
+    form: llm
+extra:
+  python:
+    source: tools/deploy_html.py

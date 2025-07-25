@@ -1,0 +1,94 @@
+identity:
+  name: update_profile
+  author: acane0320
+  label:
+    en_US: Update User Memory Profile
+    zh_Hans: 更新用户记忆配置文件
+    ja_Jp: ユーザーメモリプロファイルを更新します
+    pt_BR: Atualizar Perfil de Memória do Usuário
+description:
+  human:
+    en_US: Update an existing profile entry in the user's memory profile
+    zh_Hans: 更新用户记忆配置文件中的现有配置项
+    ja_Jp: 現在のプロファイルエントリを更新します
+    pt_BR: Atualizar uma entrada de perfil existente no perfil de memória do usuário
+  llm: Use this tool to update an existing profile entry in the user's memory profile. This is useful for modifying persistent information about the user.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to update the profile data for
+      zh_Hans: 要更新配置文件数据的用户 ID
+      ja_Jp: プロファイルデータを更新するユーザーの ID
+      pt_BR: O ID do usuário para atualizar os dados do perfil
+    llm_description: The ID of the user to update the profile data for.
+    form: llm
+  - name: profile_id
+    type: string
+    required: true
+    label:
+      en_US: Profile ID
+      zh_Hans: 配置文件 ID
+      ja_Jp: プロファイル ID
+      pt_BR: ID do Perfil
+    human_description:
+      en_US: The ID of the profile to update
+      zh_Hans: 要更新的配置文件 ID
+      ja_Jp: 更新するプロファイル ID
+      pt_BR: O ID do perfil a ser atualizado
+    llm_description: The ID of the profile to update.
+    form: llm
+  - name: topic
+    type: string
+    required: true
+    label:
+      en_US: Topic
+      zh_Hans: 主题
+      ja_Jp: トピック
+      pt_BR: Tópico
+    human_description:
+      en_US: The topic for the profile data
+      zh_Hans: 配置文件数据的主题
+      ja_Jp: プロファイルデータのトピック
+      pt_BR: O tópico para os dados do perfil
+    llm_description: The topic for the profile data.
+    form: llm
+  - name: sub_topic
+    type: string
+    required: true
+    label:
+      en_US: Sub-Topic
+      zh_Hans: 子主题
+      ja_Jp: サブトピック
+      pt_BR: Sub-Tópico
+    human_description:
+      en_US: The sub-topic for the profile data
+      zh_Hans: 配置文件数据的子主题
+      ja_Jp: プロファイルデータのサブトピック
+      pt_BR: O sub-tópico para os dados do perfil
+    llm_description: The sub-topic for the profile data.
+    form: llm
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: New Content
+      zh_Hans: 新内容
+      ja_Jp: 新しいコンテンツ
+      pt_BR: Novo Conteúdo
+    human_description:
+      en_US: The new content for the profile data
+      zh_Hans: 配置文件数据的新内容
+      ja_Jp: プロファイルデータの新しい内容
+      pt_BR: O novo conteúdo para os dados do perfil
+    llm_description: The new content for the profile data.
+    form: llm
+extra:
+  python:
+    source: tools/user_profile/update_profile.py

@@ -1,0 +1,130 @@
+identity:
+  name: ai_guardrails # 工具的唯一内部名称
+  author: aliyun-security
+  label: # 在 Dify UI 中显示的工具名称 (多语言)
+    en_US: Ai Guardrails
+    zh_Hans: AI安全护栏
+description: # 给人类用户看的工具描述 (多语言)
+  human:
+    en_US: Ai Guardrails
+    zh_Hans: AI安全护栏
+  llm: 大模型输入输出的安全防护 # 给 LLM 看的工具描述 (用于 Agent 模式)
+parameters:
+  - name: modalType
+    type: select
+    required: true
+    label:
+        en_US: Modal Type
+        zh_Hans: 模态类型
+    human_description:
+        en_US: Modal Type
+        zh_Hans: 模态类型
+    llm_description: # 强调格式要求对 LLM 很重要
+        模态类型
+    options:
+      - value: text
+        label: 
+          en_US: text
+          zh_Hans: 文本
+      - value: image
+        label: 
+          en_US: image
+          zh_Hans: 图片
+      - value: file
+        label: 
+          en_US: file
+          zh_Hans: 文件
+      - value: modal_text_image
+        label: 
+          en_US: MultiModal(Text And Image)
+          zh_Hans: 多模态（文本图片）
+      - value: modal_text_file
+        label: 
+          en_US: MultiModal(Text And File)
+          zh_Hans: 多模态（文本文件）
+    form: form
+  - name: content # 参数的内部名称，与 Python 代码中的 key 对应
+    type: string # 参数类型
+    required: false # 是否必需
+    label: # 在 Dify UI 中显示的参数标签 (多语言)
+        en_US: Content
+        zh_Hans: 检测的文本内容
+    human_description: # 给人类用户看的参数描述 (多语言)
+        en_US: Text content to be detected
+        zh_Hans: 检测的文本内容
+    llm_description: # 给 LLM 看的参数描述 (指导 Agent 如何填充)
+        检测的文本内容
+    form: llm # 参数表单类型 ('llm' 或 'form')
+  - name: imageUrl # 参数的内部名称，与 Python 代码中的 key 对应
+    type: string # 参数类型
+    required: false # 是否必需
+    label: # 在 Dify UI 中显示的参数标签 (多语言)
+        en_US: ImageUrl
+        zh_Hans: 检测的图片地址
+    human_description: # 给人类用户看的参数描述 (多语言)
+        en_US: Image url to be detected
+        zh_Hans: 检测的图片地址
+    llm_description: # 给 LLM 看的参数描述 (指导 Agent 如何填充)
+        检测的图片地址
+    form: llm # 参数表单类型 ('llm' 或 'form')
+  - name: fileUrl # 参数的内部名称，与 Python 代码中的 key 对应
+    type: string # 参数类型
+    required: false # 是否必需
+    label: # 在 Dify UI 中显示的参数标签 (多语言)
+        en_US: FileUrl
+        zh_Hans: 检测的文件内容
+    human_description: # 给人类用户看的参数描述 (多语言)
+        en_US: File url to be detected
+        zh_Hans: 检测的文件内容
+    llm_description: # 给 LLM 看的参数描述 (指导 Agent 如何填充)
+        检测的文件内容
+    form: llm # 参数表单类型 ('llm' 或 'form')
+  - name: type
+    type: select
+    required: true
+    label:
+        en_US: Detection Type
+        zh_Hans: 检测类型
+    human_description:
+        en_US: Detection Type
+        zh_Hans: 检测类型
+    llm_description: # 强调格式要求对 LLM 很重要
+        检测类型
+    options:
+      - value: input
+        label: 
+          en_US: input
+          zh_Hans: 输入
+      - value: output
+        label: 
+          en_US: output
+          zh_Hans: 输出
+    form: form
+output_schema:
+  type: object
+  properties:
+    contentModerationSuggestion:
+      type: string
+      description: 内容合规建议
+    sensitiveDataSuggestion:
+      type: string
+      description: 敏感数据建议
+    promptAttackSuggestion:
+      type: string
+      description: 提示词攻击建议
+    maliciousUrlSuggestion:
+      type: string
+      description: 恶意URL建议
+    maliciousFileSuggestion:
+      type: string
+      description: 恶意文件建议
+    waterMark:
+      type: string
+      description: 水印图片地址
+    _finalSuggestion:
+      type: string
+      description: 综合防护建议
+  additionalProperties: false
+extra:
+  python:
+    source: tools/ai_guardrails.py

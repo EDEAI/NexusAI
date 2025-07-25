@@ -1,0 +1,19 @@
+identity:
+  name: get_status
+  author: stvlynn
+  label:
+    en_US: Get Agent Status
+    zh_Hans: 获取代理状态
+    pt_BR: Obter Status do Agente
+    ja_JP: エージェントステータスの取得
+description:
+  human:
+    en_US: Get the current status of the AgentAPI agent.
+    zh_Hans: 获取 AgentAPI 代理的当前状态。
+    pt_BR: Obtenha o status atual do agente AgentAPI.
+    ja_JP: AgentAPI エージェントの現在のステータスを取得します。
+  llm: Returns the current status of the agent, either "stable" or "running".
+parameters: []
+extra:
+  python:
+    source: tools/get_status.py

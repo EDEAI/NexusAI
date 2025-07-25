@@ -1,0 +1,56 @@
+identity:
+  name: scrapegraphai
+  author: scrapegraphai
+  label:
+    en_US: ScrapeGraphAI
+    zh_Hans: ScrapeGraphAI
+    pt_BR: ScrapeGraphAI
+description:
+  human:
+    en_US: ScrapeGraphAI integration for LLM powered web scraping
+    zh_Hans: ScrapeGraphAI 集成，用于 LLM 驱动的网络抓取
+    pt_BR: Integração ScrapeGraphAI para web scraping com LLM
+  llm: ScrapeGraphAI integration for LLM powered web scraping
+parameters:
+  - name: method
+    type: string
+    required: true
+    label:
+      en_US: Method
+      zh_Hans: 方法
+      pt_BR: Método
+    human_description:
+      en_US: The scraping method to use (smartscraper, searchscraper, or markdownify)
+      zh_Hans: 要使用的抓取方法（smartscraper、searchscraper 或 markdownify）
+      pt_BR: O método de scraping a ser usado (smartscraper, searchscraper ou markdownify)
+    llm_description: The scraping method to use (smartscraper, searchscraper, or markdownify)
+    form: llm
+  - name: website_url
+    type: string
+    required: false
+    label:
+      en_US: Website URL
+      zh_Hans: 网站网址
+      pt_BR: URL do site
+    human_description:
+      en_US: The URL of the website to scrape (required for smartscraper and markdownify methods)
+      zh_Hans: 要抓取的网站网址（smartscraper 和 markdownify 方法需要）
+      pt_BR: A URL do site para fazer scraping (necessário para os métodos smartscraper e markdownify)
+    llm_description: The URL of the website to scrape (required for smartscraper and markdownify methods)
+    form: llm
+  - name: user_prompt
+    type: string
+    required: true
+    label:
+      en_US: User Prompt
+      zh_Hans: 用户提示
+      pt_BR: Prompt do usuário
+    human_description:
+      en_US: The prompt for extraction or search
+      zh_Hans: 用于提取或搜索的提示
+      pt_BR: O prompt para extração ou pesquisa
+    llm_description: The prompt for extraction or search
+    form: llm
+extra:
+  python:
+    source: tools/scrapegraphai.py

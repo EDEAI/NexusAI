@@ -1,0 +1,84 @@
+identity:
+  name: audio_compress
+  author: hjlarry
+  label:
+    en_US: Audio Compress
+    zh_Hans: 音频压缩
+description:
+  human:
+    en_US: a tool to compress the audio
+    zh_Hans: 一个压缩音频的工具
+  llm: a tool to compress the audio
+parameters:
+  - name: audio_file
+    type: file
+    required: true
+    label:
+      en_US: Audio file
+      zh_Hans: 音频文件
+    human_description:
+      en_US: a tool to compress the audio
+      zh_Hans: 一个压缩音频的工具
+    llm_description: a tool to compress the audio
+    form: llm
+  - name: bitrate
+    type: select
+    required: false
+    default: 16k
+    label:
+      en_US: Bitrate
+      zh_Hans: 比特率
+    human_description:
+      en_US: The bitrate of the audio, more bitrate means more size
+      zh_Hans: 音频的比特率，比特率越高，音频文件越大
+    form: form
+    options:
+      - label:
+          en_US: 8k
+          zh_Hans: 8k
+        value: 8k
+      - label:
+          en_US: 16k
+          zh_Hans: 16k
+        value: 16k
+      - label:
+          en_US: 32k
+          zh_Hans: 32k
+        value: 32k
+  - name: sample_rate
+    type: select
+    required: false
+    default: "8000"
+    label:
+      en_US: Sample rate
+      zh_Hans: 采样率
+    human_description:
+      en_US: The sample rate of the audio, more sample rate means more size
+      zh_Hans: 音频的采样率，采样率越高，音频文件越大
+    form: form
+    options:
+      - label:
+          en_US: 8000Hz
+          zh_Hans: 8000Hz
+        value: "8000"
+      - label:
+          en_US: 16000Hz
+          zh_Hans: 16000Hz
+        value: "16000"
+  - name: compression_level
+    type: number
+    default: 4
+    min: 0
+    max: 9
+    required: false
+    label:
+      en_US: Compression level
+      zh_Hans: 压缩级别
+    human_description:
+      en_US: The compression level of the audio, 0 means no compression, 9 means maximum compression
+      zh_Hans: 音频的压缩级别，0表示不压缩，9表示最大压缩
+    form: form
+extra:
+  python:
+    source: tools/audio.py
+

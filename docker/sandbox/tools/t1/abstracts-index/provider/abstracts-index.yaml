@@ -1,0 +1,28 @@
+identity:
+  author: bdim
+  name: abstracts-index
+  label:
+    en_US: Academic Abstracts Search
+    zh_Hans: 学术摘要搜索
+  description:
+    en_US: Semantic search across 110 million academic publications using embeddings and FAISS indexing
+    zh_Hans: 使用嵌入向量和 FAISS 索引对 1.1 亿篇学术出版物进行语义搜索
+  icon: icon.svg
+credentials_for_provider:
+  gradio_endpoint:
+    type: text-input
+    required: true
+    label:
+      en_US: Gradio Endpoint
+      zh_Hans: Gradio 端点
+    placeholder:
+      en_US: e.g., colonelwatch/abstracts-index or http://localhost:7860
+      zh_Hans: 例如：colonelwatch/abstracts-index 或 http://localhost:7860
+    help:
+      en_US: Enter the Gradio endpoint (Hugging Face Space name or local URL)
+      zh_Hans: 输入 Gradio 端点（Hugging Face Space 名称或本地 URL）
+tools:
+  - tools/abstracts-index.yaml
+extra:
+  python:
+    source: provider/abstracts-index.py

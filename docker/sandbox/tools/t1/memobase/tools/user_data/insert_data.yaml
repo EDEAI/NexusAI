@@ -1,0 +1,65 @@
+identity:
+  name: insert_data
+  author: acane0320
+  label:
+    en_US: Insert Data
+    zh_Hans: 插入数据
+    ja_Jp: データを挿入する
+    pt_BR: Inserir Dados
+description:
+  human:
+    en_US: Insert conversation data for a user in Memobase
+    zh_Hans: 在Memobase中为用户插入对话数据
+    ja_Jp: Memobase にユーザーの会話データを挿入します
+    pt_BR: Inserir dados de conversa para um usuário no Memobase
+  llm: Use this tool to insert conversation data for a user in Memobase. You need to provide the user ID and the conversation messages.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to insert data for
+      zh_Hans: 要为其插入数据的用户 ID
+      ja_Jp: データを挿入するユーザーの ID
+      pt_BR: O ID do usuário para inserir dados
+    llm_description: The ID of the user to insert data for.
+    form: llm
+  - name: user_message
+    type: string
+    required: true
+    label:
+      en_US: User Message
+      zh_Hans: 用户消息
+      ja_Jp: ユーザーメッセージ
+      pt_BR: Mensagem do Usuário
+    human_description:
+      en_US: The message from the user in the conversation
+      zh_Hans: 对话中用户的消息
+      ja_Jp: 会話の中のユーザーメッセージ
+      pt_BR: A mensagem do usuário na conversa
+    llm_description: The message content from the user in the conversation.
+    form: llm
+  - name: assistant_message
+    type: string
+    required: true
+    label:
+      en_US: Assistant Message
+      zh_Hans: 助手消息
+      ja_Jp: アシスタントメッセージ
+      pt_BR: Mensagem do Assistente
+    human_description:
+      en_US: The message from the assistant in the conversation
+      zh_Hans: 对话中助手的消息
+      ja_Jp: 会話の中のアシスタントメッセージ
+      pt_BR: A mensagem do assistente na conversa
+    llm_description: The message content from the assistant in the conversation.
+    form: llm
+
+extra:
+  python:
+    source: tools/user_data/insert_data.py

@@ -1,0 +1,48 @@
+description:
+  human:
+    en_US: Shanghai and Shenzhen stock market trends.
+    zh_Hans: 沪深股市行情
+  llm: A tool to query Shanghai and Shenzhen stock market trends.
+extra:
+  python:
+    source: tools/stock_hs.py
+identity:
+  author: leslie2046
+  label:
+    en_US: Shanghai and Shenzhen stock markets
+    zh_Hans: 沪深股市
+  name: StockHS
+parameters:
+- name: gid
+  label:
+    en_US: stock code
+    zh_Hans: 股票代码
+  type: string
+  required: false
+  form: llm
+  human_description:
+    en_US: "Stock code, Shanghai stock market starts with sh, Shenzhen stock market starts with sz, for example: sh601009 (gid not transmitted when type is 0 or 1)."
+    zh_Hans: "股票编号，上海股市以sh开头，深圳股市以sz开头如：sh601009（type为0或者1时gid不传）。"
+  llm_description: "Stock code, Shanghai stock market starts with sh, Shenzhen stock market starts with sz, for example: sh601009 (gid not transmitted when type is 0 or 1)."
+- name: type
+  label:
+    en_US: Stock index type
+    zh_Hans: 股票指数类型
+  type: number
+  required: false
+  form: llm
+  human_description:
+    en_US: "0 means the Shanghai Composite Index, 1 means the Shenzhen Component Index (when entering this field, the gid field does not work). Do not pass when querying individual stocks."
+    zh_Hans: "0代表上证综合指数，1代表深证成份指数(输入此字段时,gid字段不起作用)。查询个股时不要传。"
+  llm_description: "0 means the Shanghai Composite Index, 1 means the Shenzhen Component Index (when entering this field, the gid field does not work). Do not pass when querying individual stocks."
+- name: apiKey
+  label:
+    en_US: API KEY
+    zh_Hans: API密钥
+  type: secret-input
+  required: true
+  form: form
+  human_description:
+    en_US: The API key from Juhe.cn for accessing the currency exchange data.
+    zh_Hans: 来自聚合数据的API密钥。
+  llm_description: API key for querying currency exchange rate info from the provider.

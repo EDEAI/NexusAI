@@ -1,0 +1,108 @@
+identity:
+  author: quicksandzn
+  name: elasticsearch
+  label:
+    en_US: Elasticsearch
+    zh_Hans: Elasticsearch
+    pt_BR: Elasticsearch
+  description:
+    en_US: Elasticsearch
+    zh_Hans: Elasticsearch
+    pt_BR: Elasticsearch
+  icon: icon.svg
+credentials_for_provider:
+  endpoint:
+    type: text-input
+    required: true
+    label:
+      en_US: Endpoint
+      zh_Hans: Endpoint
+    placeholder:
+      en_US: Please input your endpoint
+      zh_Hans: 请输入你的 endpoint
+    help:
+      en_US: Get your endpoint from elasticsearch
+      zh_Hans: 从 elasticsearch 获取您的 endpoint
+    url: https://www.elastic.co/guide/en/elasticsearch/client/python-api/current/getting-started-python.html
+  verify_certs:
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Verify Certs
+      zh_Hans: 是否验证证书
+  auth_method:
+    type: select
+    required: true
+    variable: auth_method
+    label:
+      en_US: Authentication Method
+      zh_Hans: 鉴权方式
+    options:
+      - value: no_auth
+        label:
+          en_US: No Auth
+          zh_Hans: 无鉴权
+      - value: api_key
+        label:
+          en_US: API Key
+          zh_Hans: API Key
+      - value: basic
+        label:
+          en_US: Basic Auth
+          zh_Hans: 基础认证
+    default: no_auth
+  api_key:
+    type: secret-input
+    required: false
+    label:
+      en_US: API Key
+      zh_Hans: API Key
+    placeholder:
+      en_US: Please input your API key
+      zh_Hans: 请输入你的 API key
+    help:
+      en_US: Get your API key from Elasticsearch
+      zh_Hans: 从 Elasticsearch 获取您的 API key
+    url: https://www.elastic.co/guide/en/elasticsearch/client/python-api/8.17/connecting.html#auth-apikey
+    show_on:
+      - value: api_key
+        variable: auth_method
+  username:
+    type: text-input
+    required: false
+    label:
+      en_US: Username
+      zh_Hans: 用户名
+    placeholder:
+      en_US: Please input your username
+      zh_Hans: 请输入你的用户名
+    help:
+      en_US: Username for Basic Authentication
+      zh_Hans: 基础认证的用户名
+    url: https://www.elastic.co/guide/en/elasticsearch/client/python-api/8.17/connecting.html#auth-basic
+    show_on:
+      - value: basic
+        variable: auth_method
+  password:
+    type: secret-input
+    required: false
+    label:
+      en_US: Password
+      zh_Hans: 密码
+    placeholder:
+      en_US: Please input your password
+      zh_Hans: 请输入你的密码
+    help:
+      en_US: Password for Basic Authentication
+      zh_Hans: 基础认证的密码
+    url: https://www.elastic.co/guide/en/elasticsearch/client/python-api/8.17/connecting.html#auth-basic
+    show_on:
+      - value: basic
+        variable: auth_method
+tools:
+  - tools/query.yaml
+  - tools/create.yaml
+extra:
+  python:
+    source: provider/es.py

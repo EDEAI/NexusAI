@@ -1,0 +1,41 @@
+identity:
+  name: join_group
+  label:
+    en_US: Join Group
+    zh_Hans: 加入群组
+  icon: rongcloud_logo.svg
+  author: rongcloud
+  version: 1.0.0
+  email: support@dify.ai
+description:
+  human:
+    en_US: Join a group in RongCloud, need to provide member IDs and group ID, return 200 success
+    zh_Hans: 加入融云群组，需要提供成员 ID 和群组 ID, 返回 200 成功
+  llm: Join a group in RongCloud, need to provide member IDs and group ID, return 200 success
+extra:
+  python:
+    source: tools/group/join_group.py
+
+parameters:
+  - name: member_ids
+    label:
+      en_US: Member IDs
+      zh_Hans: 加入群组的用户 ID
+    human_description:
+      en_US: The user IDs of the users who join the group, separated by commas, for example "123,456,789", up to 1000 user IDs
+      zh_Hans: 要加入群的用户 ID，最多不超过 1000 个，用逗号分隔，例如 "123,456,789"
+    llm_description: The user IDs of the users who join the group, separated by commas, for example "123,456,789", up to 1000 user IDs
+    form: llm
+    type: string
+    required: true
+  - name: group_id
+    label:
+      en_US: Group ID
+      zh_Hans: 群组 ID
+    human_description:
+      en_US: The group ID of the group, maximum length 64 characters
+      zh_Hans: 要加入的群的群组 ID，最大长度 64 个字符
+    llm_description: The group ID of the group, maximum length 64 characters
+    form: llm
+    type: string
+    required: true

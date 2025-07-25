@@ -1,0 +1,51 @@
+identity:
+  name: post_tweet
+  author: stvlynn
+  label:
+    en_US: Post Tweet
+    ja_JP: ツイートを投稿
+    zh_Hans: 发送推文
+description:
+  human:
+    en_US: Post a tweet using the X API V2
+    ja_JP: X API V2を使用してツイートを投稿します
+    zh_Hans: 使用X API V2发送推文
+  llm: Send a tweet directly using the X API V2 endpoint /2/tweets
+parameters:
+  - name: text
+    type: string
+    required: true
+    label:
+      en_US: Tweet Text
+      ja_JP: ツイート内容
+      zh_Hans: 推文内容
+    human_description:
+      en_US: The text content of your tweet (max 280 characters)
+      ja_JP: ツイートの内容（最大280文字）
+      zh_Hans: 推文的内容（最多280个字符）
+    llm_description: The text content of the tweet, limited to 280 characters. The tweet will be posted to the X account associated with the provided credentials.
+    form: llm
+response:
+  success:
+    description:
+      en_US: The tweet was successfully posted
+      ja_JP: ツイートが正常に投稿されました
+      zh_Hans: 推文已成功发送
+    schema:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Success status
+        tweet_id:
+          type: string
+          description: The ID of the posted tweet
+        text:
+          type: string
+          description: The text content of the posted tweet
+        message:
+          type: string
+          description: Success message with tweet ID
+extra:
+  python:
+    source: tools/post_tweet.py

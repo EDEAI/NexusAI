@@ -1,0 +1,30 @@
+identity:
+  name: create_draft_tweet
+  author: stvlynn
+  label:
+    en_US: Create Draft Tweet
+    ja_JP: 下書きツイートを作成
+    zh_Hans: 创建推文草稿
+description:
+  human:
+    en_US: Create a draft tweet that you can publish later
+    ja_JP: あとで投稿できる下書きツイートを作成します
+    zh_Hans: 创建一个稍后可以发布的推文草稿
+  llm: Create a draft tweet that will be saved locally and can be published later using the send_tweet action
+parameters:
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: Tweet Content
+      ja_JP: ツイート内容
+      zh_Hans: 推文内容
+    human_description:
+      en_US: The content of your tweet (max 280 characters)
+      ja_JP: ツイートの内容（最大280文字）
+      zh_Hans: 推文的内容（最多280个字符）
+    llm_description: The text content of the tweet, limited to 280 characters
+    form: llm
+extra:
+  python:
+    source: tools/create_draft_tweet.py

@@ -1,0 +1,17 @@
+identity:
+  author: wjdsg
+  name: 163-smtp-send-mail
+  label:
+    en_US: 163 SMTP Mail Sender
+    zh_Hans: 163SMTP邮件发送
+    pt_BR: envio de email 163SMTP
+  description:
+    en_US: 163 SMTP Mail Sender
+    zh_Hans: 163SMTP邮件发送
+    pt_BR: envio de email 163SMTP
+  icon: icon.svg
+tools:
+  - tools/send-mail.yaml
+extra:
+  python:
+    source: provider/send-mail.py

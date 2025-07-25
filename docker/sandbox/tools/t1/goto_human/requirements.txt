@@ -1,0 +1,4 @@
+requests>=2.31.0
+python-dotenv>=1.0.0
+dify-plugin==0.0.1b62
+werkzeug>=3.0.1
