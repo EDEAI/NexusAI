@@ -1,4 +1,4 @@
-from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows, ChatroomDrivenRecords, Models)
+from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows, ChatroomDrivenRecords, Models, ModelConfigurations)
 from fastapi import APIRouter
 from api.utils.common import *
 from api.utils.jwt import *
@@ -222,10 +222,16 @@ async def show_chatroom_details(chatroom_id: int, userinfo: TokenData = Depends(
             agent['type'] = 'my_agent'
         else:
             agent['type'] = 'more_agent'
-        support_image = Models().select_one(
-                columns=["support_image"],
+        model_id = ModelConfigurations().select_one(
+                columns=["model_id"],
                 conditions=[
                     {"column": "id", "value": agent['model_config_id']}
+                ]
+            )
+        support_image = Models.select_one(
+                columns=["support_image"],
+                conditions=[
+                    {"column": "id", "value": model_id['model_id']}
                 ]
             )
         if support_image:
