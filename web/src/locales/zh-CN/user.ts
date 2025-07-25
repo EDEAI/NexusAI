@@ -14,7 +14,7 @@ export default {
     'user.addTeamMember': '添加团队成员',
     'user.accessTeamData': '对方在登录后可以访问你的团队数据。',
     'user.email': '邮箱',
-    'user.enterMultipleEmailsSeparatedByComma': '输入多个邮箱请用逗号(,)隔开',
+    'user.enterMultipleEmailsSeparatedByComma': '输入多邮箱时请换行输入，保证每行一个邮箱',
     'user.inviteAsMemberUser': '邀请为成员用户',
     'user.member': '成员',
     'user.sendInvitation': '生成邀请链接',
