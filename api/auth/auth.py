@@ -326,11 +326,12 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
     return response_success({'email_list': url_list})
 
 @router.get("/team_member_list", response_model=ResDictSchema)
-async def invite_user(team_id: int = 1,userinfo: TokenData = Depends(get_current_user)):
+async def invite_user(userinfo: TokenData = Depends(get_current_user)):
     """
       team_id: int, team id.(Reserved fields may not be transmitted)
       role: When role equals 1, use the frontend language pack; when role equals 2, use user_title.
     """
+    team_id = userinfo.team_id
     team_member_list = []
     # user_info_list = Users().select(columns='*', conditions=[{'column': 'team_id', 'value': team_id},{'column': 'status', 'value': 1}])
     user_info_list = UserTeamRelations().select(

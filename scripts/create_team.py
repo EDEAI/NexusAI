@@ -163,6 +163,6 @@ if __name__ == "__main__":
         create_team(team_name, account, password)
     else:
         print("Usage: python create_team.py <team_name> <account> <password>")
-        print("Example: python create_team.py 'Test Team' 'admin@example.com' '123456'")
+        print("Example: python create_team.py 'dp测试团队' '517227291@qq.com' '123456'")
         # Or call function directly for testing
         # create_team("Test Team", "admin@example.com", "123456")
