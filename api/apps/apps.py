@@ -394,11 +394,11 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
     icon = data['icon']
     icon_background = data['icon_background']
 
-    team_id = userinfo['team_id']
+    team_id = userinfo.team_id
     team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
         return response_error(get_language_content("the_current_user_does_not_have_permission"))
-    uid =  userinfo['uid']
+    uid =  userinfo.uid
     user_info = get_uid_user_info(uid)
     if user_info['role']!=1:
         app_model = Apps()
