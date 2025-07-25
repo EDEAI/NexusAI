@@ -14,7 +14,7 @@ export default {
     'user.addTeamMember': 'Add Team Member',
     'user.accessTeamData': 'The other party can access your team data after logging in.',
     'user.email': 'Email',
-    'user.enterMultipleEmailsSeparatedByComma': 'Enter multiple emails separated by comma (,)',
+    'user.enterMultipleEmailsSeparatedByComma': 'When entering multiple emails, please enter one email per line',
     'user.inviteAsMemberUser': 'Invite as Member User',
     'user.member': 'Member',
     'user.sendInvitation': 'Generate Invitation Link',
