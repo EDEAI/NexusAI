@@ -55,4 +55,13 @@ export default {
     'menu.editor.flow': 'Flow Editor',
     'menu.editor.mind': 'Mind Editor',
     'menu.editor.koni': 'Koni Editor',
+    'menu.plaza': 'Plaza',
+    'menu.workspace': 'WorkSpace',
+    'menu.workspace.workspace': 'WorkSpace',
+    'menu.workspace.workflow': 'Workflow',
+    'menu.workspace.log': 'Log',
+    'menu.creation': 'Creation',
+    'menu.plaza.dash_board': 'Dashboard',
+    'menu.plaza.meeting': 'Meeting',
+    'menu.knowledgebase': 'Knowledge Base',
 };

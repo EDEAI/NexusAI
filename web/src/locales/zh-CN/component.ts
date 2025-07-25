@@ -28,6 +28,5 @@ export default {
     'component.menu.arrange': '编排',
     'component.menu.accessAPI': '访问API',
     'component.tooltip.enableAPIFirst': '请先开启API',
-    'component.menu.log': '日志',
-    'menu.knowledgebase': '知识库',
+    'component.menu.log': '日志'
 };

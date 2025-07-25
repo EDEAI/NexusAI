@@ -210,6 +210,7 @@ const useVariablesManagement = (
                     id: x.value,
                 }))
             );
+            
         }
 
         // Process output variables from selectedNode
@@ -219,6 +220,7 @@ const useVariablesManagement = (
                 name: x.label,
                 id: x.value,
             })) || [];
+            
             result.push(...nodeVariables);
         }
 
@@ -231,10 +233,21 @@ const useVariablesManagement = (
                     name: x.name,
                 },
             }));
+            
             result.push(...varList);
         }
-
-        return result;
+        // INSERT_YOUR_CODE
+        // Remove duplicates by id
+        const uniqueResult: Variable[] = [];
+        const seenIds = new Set<string>();
+        for (const item of result) {
+            if (!seenIds.has(item.id)) {
+                uniqueResult.push(item);
+                seenIds.add(item.id);
+            }
+        }
+        return uniqueResult;
+    
     }, [options, variables, selectedNodeId, getOutputVariables]);
 };
 
@@ -535,7 +548,7 @@ const SlateEditorV3: React.FC<MentionEditorProps> = ({
         variables,
         selectedNode?.id
     );
-
+    
     // Mention functionality
     const {
         ref: mentionRef,
