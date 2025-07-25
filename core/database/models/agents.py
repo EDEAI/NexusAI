@@ -196,7 +196,7 @@ class Agents(MySQL):
                 ["left", "suppliers", "models.supplier_id = suppliers.id"]
             ],
             conditions=[
-                {"column": "model_configurations.id", "value": m_config_id},
+                {"column": "model_configurations.model_id", "value": m_config_id},
                 {"column": "model_configurations.team_id", "value": team_id},
                 {"column": "model_configurations.status", "value": 1},
                 {"column": "models.type", "value": 1},
