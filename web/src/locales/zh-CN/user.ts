@@ -17,7 +17,7 @@ export default {
     'user.enterMultipleEmailsSeparatedByComma': '输入多个邮箱请用逗号(,)隔开',
     'user.inviteAsMemberUser': '邀请为成员用户',
     'user.member': '成员',
-    'user.sendInvitation': '发送邀请',
+    'user.sendInvitation': '生成邀请链接',
     'user.invitationSent': '邀请',
     'user.invitationSentLoginNexusAI': '请对方登录 NEXUS AI',
     'user.invitationLink': '邀请链接',
