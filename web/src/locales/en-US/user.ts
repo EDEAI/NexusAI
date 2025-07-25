@@ -17,7 +17,7 @@ export default {
     'user.enterMultipleEmailsSeparatedByComma': 'Enter multiple emails separated by commas (,)',
     'user.inviteAsMemberUser': 'Invite as Member User',
     'user.member': 'Member',
-    'user.sendInvitation': 'Send Invitation',
+    'user.sendInvitation': 'Generate Invitation Link',
     'user.invitationSent': 'Invitation',
     'user.invitationSentLoginNexusAI': 'Invitation, the recipient can log in to NEXUS AI',
     'user.invitationLink': 'Invitation Link',
