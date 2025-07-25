@@ -60,8 +60,8 @@ class Models(MySQL):
             ],
             joins=[
                 ['inner', 'suppliers', 'models.supplier_id = suppliers.id'],
-                ['inner', 'supplier_configurations', 'suppliers.id = supplier_configurations.supplier_id'],
-                ['inner', 'model_configurations', 'models.id = model_configurations.model_id']
+                ['inner', 'model_configurations', 'models.id = model_configurations.model_id'],
+                ['inner', 'supplier_configurations', 'suppliers.id = supplier_configurations.supplier_id AND model_configurations.team_id = supplier_configurations.team_id']
             ],
             conditions=[
                 {'column': 'model_configurations.id', 'value': model_config_id},
