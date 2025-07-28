@@ -1454,13 +1454,13 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                         else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
-                    # 只替换name, description, avatar
+                    # Only replace name, description, avatar
                     new_item["name"] = app_info.get("name", new_item.get("name"))
                     new_item["description"] = app_info.get("description", new_item.get("description"))
                     new_item["avatar"] = app_info.get("avatar", new_item.get("avatar"))
                     processed_assistants.append(new_item)
-                    # 查不到app_info时不加入
-                    # agent_id不存在时也不加入
+                    # Don't add when app_info is not found
+                    # Don't add when agent_id doesn't exist
         processed_data["assistants"] = processed_assistants
 
     # Process workflows
@@ -1486,13 +1486,13 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                         else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
-                    # 只替换name, description, avatar
+                    # Only replace name, description, avatar
                     new_item["name"] = app_info.get("name", new_item.get("name"))
                     new_item["description"] = app_info.get("description", new_item.get("description"))
                     new_item["avatar"] = app_info.get("avatar", new_item.get("avatar"))
                     processed_workflows.append(new_item)
-                # 查不到app_info时不加入
-            # app_id不存在时也不加入
+                # Don't add when app_info is not found
+            # Don't add when app_id doesn't exist
         processed_data["workflows"] = processed_workflows
 
     # Process discussions
@@ -1521,7 +1521,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                         else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
-                    # 更新name, description, avatar
+                    # Update name, description, avatar
                     current_discussion = discussion_item.copy()
                     current_discussion["name"] = app_info.get("name", current_discussion.get("name"))
                     current_discussion["description"] = app_info.get("description", current_discussion.get("description"))
@@ -1559,13 +1559,13 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
             #                 # Process avatar
             #                 if app_info.get("avatar"):
             #                     app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
-            #                 # 只替换name, description, avatar
+            #                 # Only replace name, description, avatar
             #                 new_agent_item["name"] = app_info.get("name", new_agent_item.get("name"))
             #                 new_agent_item["description"] = app_info.get("description", new_agent_item.get("description"))
             #                 new_agent_item["avatar"] = app_info.get("avatar", new_agent_item.get("avatar"))
             #                 processed_agent_list.append(new_agent_item)
-            #             # 查不到app_info时不加入
-            #         # agent_id不存在时也不加入
+            #             # Don't add when app_info is not found
+            #         # Don't add when agent_id doesn't exist
             #     # Replace the original agent_list with the processed one
             #     current_discussion["agent_list"] = processed_agent_list
 
