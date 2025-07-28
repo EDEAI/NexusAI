@@ -186,6 +186,8 @@ class Apps(MySQL):
                 if info_item['avatar']:
                     if info_item['avatar'].find('head_icon') == -1:
                         info_item['avatar'] = f"{settings.STORAGE_URL}/upload/{info_item['avatar']}"
+                    else：
+                        info_item["avatar"] = f"{settings.ICON_URL}/{info_item['avatar']}"
                 else:
                     if info_item['icon']:
                         info_item['avatar'] = f"{settings.ICON_URL}/head_icon/{info_item['icon']}.png"
@@ -213,6 +215,8 @@ class Apps(MySQL):
                 if app_item['avatar']:
                     if app_item['avatar'].find('head_icon') == -1:
                         app_item['avatar'] = f"{settings.STORAGE_URL}/upload/{app_item['avatar']}"
+                    else：
+                        app_item["avatar"] = f"{settings.ICON_URL}/{app_item['avatar']}"
                 else:
                     if app_item['icon']:
                         app_item['avatar'] = f"{settings.ICON_URL}/head_icon/{app_item['icon']}.png"
@@ -225,6 +229,8 @@ class Apps(MySQL):
                 # data_item['avatar'] = f"{os.getenv('STORAGE_URL', '')}/upload/{data_item['avatar']}"
                 if data_item['avatar'].find('head_icon') == -1:
                     data_item['avatar'] = f"{settings.STORAGE_URL}/upload/{data_item['avatar']}"
+                else：
+                    data_item["avatar"] = f"{settings.ICON_URL}/{data_item['avatar']}"
             else:
                 if data_item['icon']:
                     data_item['avatar'] = f"{settings.ICON_URL}/head_icon/{data_item['icon']}.png"

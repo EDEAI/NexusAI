@@ -61,6 +61,8 @@ class AppRuns(MySQL):
             if item.get('avatar'):
                 if item['avatar'].find('head_icon') == -1:
                     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                else：
+                    item["avatar"] = f"{settings.ICON_URL}/{item['avatar']}"
             else:
                 if item['icon']:
                     item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"
@@ -87,6 +89,8 @@ class AppRuns(MySQL):
         if data and data.get('avatar'):
             if data['avatar'].find('head_icon') == -1:
                 data['avatar'] = f"{settings.STORAGE_URL}/upload/{data['avatar']}"
+            else：
+                data["avatar"] = f"{settings.ICON_URL}/{data['avatar']}"
         else:
             if data['icon']:
                 data['avatar'] = f"{settings.ICON_URL}/head_icon/{data['icon']}.png"
@@ -174,6 +178,8 @@ class AppRuns(MySQL):
             if item.get('avatar'):
                 if item['avatar'].find('head_icon') == -1:
                     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                else：
+                    item["avatar"] = f"{settings.ICON_URL}/{item['avatar']}"
             else:
                 if item['icon']:
                     item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"
@@ -230,6 +236,8 @@ class AppRuns(MySQL):
             if item.get('avatar'):
                 if item['avatar'].find('head_icon') == -1:
                     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                else：
+                    item["avatar"] = f"{settings.ICON_URL}/{item['avatar']}"
             else:
                 if item['icon']:
                     item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"

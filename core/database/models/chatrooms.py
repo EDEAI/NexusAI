@@ -193,6 +193,8 @@ class Chatrooms(MySQL):
                         if agent_data and agent_data.get('avatar'):
                             if agent_data['avatar'].find('head_icon') == -1:
                                 agent_data['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_data['avatar']}"
+                            else：
+                                agent_data["avatar"] = f"{settings.ICON_URL}/{agent_data['avatar']}"
                         else:
                             if agent_data['icon']:
                                 agent_data['avatar'] = f"{settings.ICON_URL}/head_icon/{agent_data['icon']}.png"
@@ -349,6 +351,8 @@ class Chatrooms(MySQL):
                         if agent_info.get('avatar'):
                             if item['avatar'].find('head_icon') == -1:
                                 agent_info['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_info['avatar']}"
+                            else：
+                                agent_info["avatar"] = f"{settings.ICON_URL}/{agent_info['avatar']}"
                         else:
                             if agent_info['icon']:
                                 agent_info['avatar'] = f"{settings.ICON_URL}/head_icon/{agent_info['icon']}.png"
