@@ -1450,7 +1450,8 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                 if app_info:
                     # Process avatar
                     if app_info.get("avatar"):
-                        app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+                        if item['avatar'].find('head_icon') == -1:
+                            app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                     # 只替换name, description, avatar
                     new_item["name"] = app_info.get("name", new_item.get("name"))
                     new_item["description"] = app_info.get("description", new_item.get("description"))
@@ -1479,7 +1480,8 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                 if app_info:
                     # Process avatar
                     if app_info.get("avatar"):
-                        app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+                        if item['avatar'].find('head_icon') == -1:
+                            app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                     # 只替换name, description, avatar
                     new_item["name"] = app_info.get("name", new_item.get("name"))
                     new_item["description"] = app_info.get("description", new_item.get("description"))
@@ -1511,7 +1513,8 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                 if app_info:
                     # Process avatar
                     if app_info.get("avatar"):
-                        app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+                        if item['avatar'].find('head_icon') == -1:
+                            app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                     # 更新name, description, avatar
                     current_discussion = discussion_item.copy()
                     current_discussion["name"] = app_info.get("name", current_discussion.get("name"))
@@ -1523,7 +1526,8 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     for item in processed_agent_list:
                         new_item = {key: value for key, value in item.items() if key not in ['user_id', 'active']}
                         if item.get('avatar'):
-                            item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                            if item['avatar'].find('head_icon') == -1:
+                                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
                         processed_agent_list_cleaned.append(new_item)
                     current_discussion["agent_list"] = processed_agent_list_cleaned
                     processed_discussions.append(current_discussion)
