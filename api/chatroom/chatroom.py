@@ -1,4 +1,4 @@
-from core.database.models import (Chatrooms, Apps, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows, ChatroomDrivenRecords, Models)
+from core.database.models import (Chatrooms, Apps,Teams,Roles, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows, ChatroomDrivenRecords, Models, ModelConfigurations)
 from fastapi import APIRouter
 from api.utils.common import *
 from api.utils.jwt import *
@@ -16,6 +16,7 @@ from datetime import datetime
 from core.helper import truncate_messages_by_token_limit
 
 from core.database.models import AppRuns
+from api.utils.auth import get_uid_user_info
 
 router = APIRouter()
 models = Models()
@@ -69,6 +70,17 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
     agent = chat_data['agent']
     is_temporary: int = chat_data.get('is_temporary', 0)
     mode: int = 5
+
+    team_id = userinfo.team_id
+    team_type = Teams().get_team_type_by_id(team_id)
+    if team_type == 2:
+        return response_error(get_language_content("the_current_user_does_not_have_permission"))
+    uid =  userinfo.uid
+    user_info = get_uid_user_info(uid)
+    if user_info['role']!=1:
+        return_status = Roles().check_role_deletable(user_info['role_id'],5)
+        if not return_status:
+            return response_error(get_language_content("the_current_user_does_not_have_permission"))
 
     if not name:
         return response_error(get_language_content("chatroom_name_is_required"))
@@ -222,12 +234,20 @@ async def show_chatroom_details(chatroom_id: int, userinfo: TokenData = Depends(
             agent['type'] = 'my_agent'
         else:
             agent['type'] = 'more_agent'
-        agent['support_image'] = Models().select_one(
-                columns=["support_image"],
+        model_id = ModelConfigurations().select_one(
+                columns=["model_id"],
                 conditions=[
                     {"column": "id", "value": agent['model_config_id']}
                 ]
-            )['support_image']
+            )
+        support_image = Models().select_one(
+                columns=["support_image"],
+                conditions=[
+                    {"column": "id", "value": model_id['model_id']}
+                ]
+            )
+        if support_image:
+            agent['support_image'] = support_image['support_image']
     return response_success({
         'chat_info': chat_info,
         'agent_list': agent_list,
@@ -330,6 +350,17 @@ async def update_chatroom(chatroom_id: int, chat_request: ReqChatroomUpdateSchem
             missing_keys = required_keys - item.keys()
             if missing_keys:
                 return response_error(get_language_content("chatroom_agent_item_missing_keys"))
+
+    team_id = userinfo.team_id
+    team_type = Teams().get_team_type_by_id(team_id)
+    if team_type == 2:
+        return response_error(get_language_content("the_current_user_does_not_have_permission"))
+    uid =  userinfo.uid
+    user_info = get_uid_user_info(uid)
+    if user_info['role']!=1:
+        return_status = Roles().check_role_deletable(user_info['role_id'],5)
+        if not return_status:
+            return response_error(get_language_content("the_current_user_does_not_have_permission"))
 
     Apps().update(
         [

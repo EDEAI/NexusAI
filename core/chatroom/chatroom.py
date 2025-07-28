@@ -26,7 +26,7 @@ from core.mcp.app_executor import skill_run, workflow_run
 from core.mcp.client import MCPClient
 from core.workflow.context import Context
 from core.workflow.graph import create_graph_from_dict
-from core.workflow.nodes import AgentNode, LLMNode
+from core.workflow.nodes import AgentNode, LLMNode, SandboxBaseNode
 from core.workflow.variables import create_variable_from_dict, ObjectVariable
 from languages import get_language_content
 from log import Logger
@@ -742,6 +742,9 @@ class Chatroom:
                 else:
                     app = apps.get_app_by_id(skill['app_id'])
                     mcp_tool_use['skill_or_workflow_name'] = app['name']
+                    dependencies = skill['dependencies']
+                    if dependencies:
+                        mcp_tool_use['skill_dependencies'] = dependencies['python3']
                     mcp_tool_use_update_data['skill_id'] = skill_id
 
                     # Check if the skill has input variables that are files and need to be uploaded
@@ -871,6 +874,15 @@ class Chatroom:
                                 return
                         
                         if skill_match:
+                            if SandboxBaseNode.check_venv_exists(mcp_tool_use['skill_dependencies']):
+                                await self._ws_manager.send_instruction(
+                                    self._chatroom_id,
+                                    'SHOWTOOLMSG',
+                                    {
+                                        'id': mcp_tool_use['id'],
+                                        'msg': get_language_content('msg_preparing_environment', uid=self._user_id)
+                                    }
+                                )
                             result = await asyncio.wait_for(
                                 skill_run(
                                     int(skill_match.group(1)),
@@ -1041,6 +1053,7 @@ class Chatroom:
                                         'id': mcp_tool_use_id,
                                         'name': mcp_tool_name,
                                         'skill_or_workflow_name': None,
+                                        'skill_dependencies': None,
                                         'files_to_upload': None,
                                         'workflow_run_id': 0,
                                         'workflow_confirmation_status': None,

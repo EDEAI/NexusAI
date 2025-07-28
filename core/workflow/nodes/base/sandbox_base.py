@@ -4,6 +4,7 @@ import json
 import os
 import uuid
 import shutil
+from typing import Optional, List
 
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent.parent.parent))
 import traceback
@@ -305,12 +306,13 @@ class SandboxBaseNode(Node):
             raise ValueError(str(e))
     
     # Check if the virtual environment exists in the cache for the given pip packages
-    def check_venv_exists(self, pip_packages: list[str]) -> bool:
+    @staticmethod
+    def check_venv_exists(pip_packages: Optional[List[str]]) -> bool:
         """
         Check if a virtual environment exists in the cache for the specified pip packages.
 
         Args:
-            pip_packages (list[str]): List of pip package names.
+            pip_packages (Optional[List[str]]): List of pip package names.
 
         Returns:
             bool: True if the virtual environment exists, False otherwise.

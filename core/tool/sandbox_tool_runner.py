@@ -29,7 +29,7 @@ class SandboxToolRunner(SandboxBaseNode):
         
         super().__init__(**kwargs)
     
-    def _load_requirements_from_file(self, tool_path: str) -> list[str]:
+    def load_requirements_from_file(self, tool_path: str) -> list[str]:
         """
         Load pip packages from requirements.txt file if it exists.
         
@@ -488,7 +488,7 @@ run_tool()
         tool_dir = os.path.join(sandbox_path, 'tools', category, provider)
         
         # Load pip packages from requirements.txt
-        pip_packages = self._load_requirements_from_file(tool_dir)
+        pip_packages = self.load_requirements_from_file(tool_dir)
         
         # Generate tool invocation code
         code = self._generate_tool_invocation_code(category, provider, 
