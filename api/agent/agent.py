@@ -1452,7 +1452,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     if app_info.get("avatar"):
                         if item['avatar'].find('head_icon') == -1:
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
-                        else：
+                        else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
                     # 只替换name, description, avatar
                     new_item["name"] = app_info.get("name", new_item.get("name"))
@@ -1484,7 +1484,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     if app_info.get("avatar"):
                         if item['avatar'].find('head_icon') == -1:
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
-                        else：
+                        else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
                     # 只替换name, description, avatar
                     new_item["name"] = app_info.get("name", new_item.get("name"))
@@ -1519,7 +1519,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     if app_info.get("avatar"):
                         if item['avatar'].find('head_icon') == -1:
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
-                        else：
+                        else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
                     # 更新name, description, avatar
                     current_discussion = discussion_item.copy()
@@ -1534,7 +1534,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                         if item.get('avatar'):
                             if item['avatar'].find('head_icon') == -1:
                                 item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
-                            else：
+                            else:
                                 item["avatar"] = f"{settings.ICON_URL}/{item['avatar']}"
                         processed_agent_list_cleaned.append(new_item)
                     current_discussion["agent_list"] = processed_agent_list_cleaned

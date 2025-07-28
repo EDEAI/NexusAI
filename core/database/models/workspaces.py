@@ -119,7 +119,7 @@ class Workspaces(MySQL):
                 if app.get('avatar'):
                     if app['avatar'].find('head_icon') == -1:
                         app['avatar'] = f"{settings.STORAGE_URL}/upload/{app['avatar']}"
-                    else：
+                    else:
                         app["avatar"] = f"{settings.ICON_URL}/{app['avatar']}"
                 else:
                     if app['icon']:
@@ -174,7 +174,7 @@ class Workspaces(MySQL):
                             if agent.get('avatar'):
                                 if agent.get('avatar').find('head_icon') == -1:
                                     avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
-                                else：
+                                else:
                                     avatar_url = f"{settings.ICON_URL}/{agent['avatar']}"
                             # else:
                             #     avatar_url = ''
@@ -245,7 +245,7 @@ class Workspaces(MySQL):
                 if app_node.get('avatar'):
                     if app_node['avatar'].find('head_icon') == -1:
                         app_node['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node['avatar']}"
-                    else：
+                    else:
                         app_node['avatar'] = f"{settings.ICON_URL}/{app_node['avatar']}"
                 else:
                     if app_node['icon']:
@@ -480,7 +480,7 @@ class Workspaces(MySQL):
                 if log.get('avatar'):
                     if log['avatar'].find('head_icon') == -1:
                         log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
-                    else：
+                    else:
                         log['avatar'] = f"{settings.ICON_URL}/{log['avatar']}"
                 else:
                     if log['icon']:
@@ -543,7 +543,7 @@ class Workspaces(MySQL):
                             if agent.get('avatar'):
                                 if agent.get('avatar').find('head_icon') == -1:
                                     avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
-                                else：
+                                else:
                                     avatar_url = f"{settings.ICON_URL}/{agent['avatar']}"
                             # else:
                             #     avatar_url = ''
@@ -614,7 +614,7 @@ class Workspaces(MySQL):
                             if app_node_list.get('avatar'):
                                 if app_node_list['avatar'].find('head_icon') == -1:
                                     app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
-                                else：
+                                else:
                                     app_node_list['avatar'] = f"{settings.ICON_URL}/{app_node_list['avatar']}"
                             else:
                                 if app_node_list['icon']:
@@ -721,7 +721,7 @@ class Workspaces(MySQL):
                         if app_node_list.get('avatar'):
                             if app_node_list['avatar'].find('head_icon') == -1:
                                 app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
-                            else：
+                            else:
                                 app_node_list['avatar'] = f"{settings.ICON_URL}/{app_node_list['avatar']}"
                         else:
                             if app_node_list['icon']:
@@ -835,7 +835,7 @@ class Workspaces(MySQL):
                 if log.get('avatar'):
                     if log['avatar'].find('head_icon') == -1:
                         log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
-                    else：
+                    else:
                         log['avatar'] = f"{settings.ICON_URL}/{log['avatar']}"
                 else:
                     if log['icon']:

@@ -179,7 +179,7 @@ class ChatroomAgentRelation(MySQL):
             if item.get('avatar'):
                 if item['avatar'].find('head_icon') == -1:
                     item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
-                else：
+                else:
                     item["avatar"] = f"{settings.ICON_URL}/{item['avatar']}"
             else:
                 if item['icon']:
