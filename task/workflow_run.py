@@ -577,13 +577,12 @@ def check_if_node_need_installing_dependencies(node: Node) -> bool:
         else:
             category = 't1'
         current_file = os.path.realpath(__file__)
-        # Go up from core/tool/sandbox_tool_runner.py to project root
-        project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
+        project_root = os.path.dirname(os.path.dirname(current_file))
         sandbox_path = os.path.join(project_root, 'docker', 'sandbox')
         tool_dir = os.path.join(sandbox_path, 'tools', category, provider)
         runner = SandboxToolRunner()
         dependencies = runner.load_requirements_from_file(tool_dir)
-    return SandboxBaseNode.check_venv_exists(dependencies)
+    return not SandboxBaseNode.check_venv_exists(dependencies)
 
 def task_delay_thread():
     """
