@@ -273,7 +273,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
         return_status = Roles().check_role_deletable(user_info['role_id'],mode)
         if not return_status:
             return response_error(get_language_content("the_current_user_does_not_have_permission"))
-    if avatar and  avatar.find('head_icon') == -1:
+    if avatar and avatar.find('head_icon') != -1:
         avatar = avatar.split('/head_icon/')[-1]
     if avatar and avatar.startswith('upload_files/'):
         avatar = avatar.split('upload_files/')[-1]
@@ -423,7 +423,7 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
         return response_error(get_language_content("name_is_required"))
     if not avatar and not icon:
         return response_error(get_language_content("avatar_or_icon_required"))
-    if avatar and  avatar.find('head_icon') == -1:
+    if avatar and avatar.find('head_icon') != -1:
         avatar = avatar.split('/head_icon/')[-1]
     if avatar and avatar.startswith('upload_files/'):
         avatar = avatar.split('upload_files/')[-1]
