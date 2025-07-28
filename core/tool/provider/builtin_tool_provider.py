@@ -382,12 +382,12 @@ def get_docker_sandbox_tools() -> dict[str, Any]:
                                             
                                             # Create hardcoded variable dictionary for text output
                                             text_var_dict = {
-                                                "name": "text",
+                                                "name": "output",
                                                 "type": "string"
                                             }
                                             
                                             # Add the property to output variable using ObjectVariable
-                                            output_variable.add_property("text", create_variable_from_dict(text_var_dict))
+                                            output_variable.add_property("output", create_variable_from_dict(text_var_dict))
                                             
                                             # Convert ObjectVariable to dictionary format
                                             tool_yaml['output'] = output_variable.to_dict()
