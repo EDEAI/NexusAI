@@ -262,7 +262,7 @@ class SandboxBaseNode(Node):
         except Exception as e:
             return False, f"Error occurred while copying the file: {str(e)}"
 
-    def skill_file_handler(self, stdout_dict: dict, workflow_id: int = 0, app_run_id: int = 0) -> dict:
+    def skill_file_handler(self, stdout_dict: dict, workflow_id: int = 0, app_run_id: int = 0, tool_type: str = None, tool_name: str = None) -> dict:
         """
         Handles skill files by copying them to a secure storage path and updating the dictionary with new paths.
 
@@ -270,6 +270,8 @@ class SandboxBaseNode(Node):
             stdout_dict (dict): Dictionary containing the standard output data.
             workflow_id (int): Workflow ID (default is 0).
             app_run_id (int): Application run ID (default is 0).
+            tool_type (str): Tool type for tool nodes (optional).
+            tool_name (str): Tool name for tool nodes (optional).
 
         Returns:
             dict: Updated dictionary with new file paths.
@@ -284,8 +286,13 @@ class SandboxBaseNode(Node):
                     unique_id = str(uuid.uuid4())
                     if workflow_id > 0:
                         relative_path = f"/workflow/wf{workflow_id}/run{app_run_id}/{self.id}/{unique_id}.{file_suffix}"
+                    elif tool_type and tool_name:
+                        # Handle tool type nodes
+                        relative_path = f"/tool/{tool_type}/{tool_name}/{unique_id}.{file_suffix}"
                     else:
-                        relative_path = f"/skill/sk{self.data['skill_id']}/{unique_id}.{file_suffix}"
+                        # Handle skill type nodes
+                        skill_id = self.data.get('skill_id', 0)
+                        relative_path = f"/skill/sk{skill_id}/{unique_id}.{file_suffix}"
                     # Get the secure full storage path
                     target_dirstatus, target_dir = self._get_storage_path(original_path,
                                                                           fixed_directory + relative_path)
