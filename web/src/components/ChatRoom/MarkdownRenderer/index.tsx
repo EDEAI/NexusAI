@@ -6,13 +6,36 @@ import { Button, Image } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { copyToClipboard } from '../utils/clipboard';
 import { extractTextFromArray } from '../utils';
+import MermaidChart from './MermaidChart';
 
 // Markdown renderers for code blocks and images
 export const createRenderers = (index: any, intl: any) => {
+    const downloadFile = (url: string, filename: string) => {
+        try {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (e) {}
+    };
     return {
         code: ({ node, className, children, ...props }) => {
             const match = /language-(\w+)/.exec(className || '');
             if (match?.length) {
+                // Handle Mermaid charts
+                // if (match[1] === 'mermaid') {
+                //     return (
+                //         <MermaidChart 
+                //             code={extractTextFromArray(children)} 
+                //             index={index}
+                //         />
+                //     );
+                // }
+                
+                // Handle regular code blocks
                 const id = Math.random().toString(36).substr(2, 9);
                 return (
                     <div className=" rounded-md border overflow-hidden">
@@ -70,20 +93,8 @@ export const createRenderers = (index: any, intl: any) => {
             }
         },
         img: ({ node, ...props }) => {
-            const downloadFile = (url: string, filename: string) => {
-                try {
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = filename;
-                    link.target = '_blank';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } catch (e) {}
-            };
-
             return (
-                <div className="relative group">
+                <div className="relative group" key={props.src}>
                     <Image
                         src={props.src}
                         alt={props.alt}
@@ -101,6 +112,38 @@ export const createRenderers = (index: any, intl: any) => {
                         />
                     </div>
                 </div>
+            );
+        },
+        table: ({ node, children, ...props }) => {
+            return (
+                <div className="overflow-x-auto my-4 border border-gray-300 rounded-lg">
+                    <table className="min-w-full" {...props}>
+                        {children}
+                    </table>
+                </div>
+            );
+        },
+        thead: ({ node, children, ...props }) => {
+            return <thead className="bg-gray-50" {...props}>{children}</thead>;
+        },
+        tbody: ({ node, children, ...props }) => {
+            return <tbody className="bg-white" {...props}>{children}</tbody>;
+        },
+        tr: ({ node, children, ...props }) => {
+            return <tr className="border-b border-gray-200 hover:bg-gray-50" {...props}>{children}</tr>;
+        },
+        th: ({ node, children, ...props }) => {
+            return (
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-r border-gray-200 last:border-r-0" {...props}>
+                    {children}
+                </th>
+            );
+        },
+        td: ({ node, children, ...props }) => {
+            return (
+                <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 last:border-r-0" {...props}>
+                    {children}
+                </td>
             );
         },
     };
