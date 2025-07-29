@@ -117,7 +117,10 @@ class Workspaces(MySQL):
 
             for app in app_list:
                 if app.get('avatar'):
-                    app['avatar'] = f"{settings.STORAGE_URL}/upload/{app['avatar']}"
+                    if app['avatar'].find('head_icon') == -1:
+                        app['avatar'] = f"{settings.STORAGE_URL}/upload/{app['avatar']}"
+                    else:
+                        app["avatar"] = f"{settings.ICON_URL}/{app['avatar']}"
                 else:
                     if app['icon']:
                         app['avatar'] = f"{settings.ICON_URL}/head_icon/{app['icon']}.png"
@@ -169,7 +172,10 @@ class Workspaces(MySQL):
                         # Build a mapping from agent_id to agent information
                         for agent in agents:
                             if agent.get('avatar'):
-                                avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                                if agent.get('avatar').find('head_icon') == -1:
+                                    avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                                else:
+                                    avatar_url = f"{settings.ICON_URL}/{agent['avatar']}"
                             # else:
                             #     avatar_url = ''
                             else:
@@ -237,7 +243,10 @@ class Workspaces(MySQL):
             from api.utils.common import extract_file_list_from_skill_output
             for app_node in app_node_list:
                 if app_node.get('avatar'):
-                    app_node['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node['avatar']}"
+                    if app_node['avatar'].find('head_icon') == -1:
+                        app_node['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node['avatar']}"
+                    else:
+                        app_node['avatar'] = f"{settings.ICON_URL}/{app_node['avatar']}"
                 else:
                     if app_node['icon']:
                         app_node['avatar'] = f"{settings.ICON_URL}/head_icon/{app_node['icon']}.png"
@@ -469,7 +478,10 @@ class Workspaces(MySQL):
         if log_list:
             for log in log_list:
                 if log.get('avatar'):
-                    log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
+                    if log['avatar'].find('head_icon') == -1:
+                        log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
+                    else:
+                        log['avatar'] = f"{settings.ICON_URL}/{log['avatar']}"
                 else:
                     if log['icon']:
                         log['avatar'] = f"{settings.ICON_URL}/head_icon/{log['icon']}.png"
@@ -529,7 +541,10 @@ class Workspaces(MySQL):
                         # Build a mapping from agent_id to agent information
                         for agent in agents:
                             if agent.get('avatar'):
-                                avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                                if agent.get('avatar').find('head_icon') == -1:
+                                    avatar_url = f"{settings.STORAGE_URL}/upload/{agent['avatar']}"
+                                else:
+                                    avatar_url = f"{settings.ICON_URL}/{agent['avatar']}"
                             # else:
                             #     avatar_url = ''
                             else:
@@ -597,7 +612,10 @@ class Workspaces(MySQL):
                         if app_node_list and app_node_list.get('outputs'):
                             
                             if app_node_list.get('avatar'):
-                                app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
+                                if app_node_list['avatar'].find('head_icon') == -1:
+                                    app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
+                                else:
+                                    app_node_list['avatar'] = f"{settings.ICON_URL}/{app_node_list['avatar']}"
                             else:
                                 if app_node_list['icon']:
                                     app_node_list['avatar'] = f"{settings.ICON_URL}/head_icon/{app_node_list['icon']}.png"
@@ -701,7 +719,10 @@ class Workspaces(MySQL):
                     log['file_list'] = []
                     if app_node_list and app_node_list.get('outputs'):
                         if app_node_list.get('avatar'):
-                            app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
+                            if app_node_list['avatar'].find('head_icon') == -1:
+                                app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"
+                            else:
+                                app_node_list['avatar'] = f"{settings.ICON_URL}/{app_node_list['avatar']}"
                         else:
                             if app_node_list['icon']:
                                 app_node_list['avatar'] = f"{settings.ICON_URL}/head_icon/{app_node_list['icon']}.png"
@@ -812,7 +833,10 @@ class Workspaces(MySQL):
         if list:
             for log in list:
                 if log.get('avatar'):
-                    log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
+                    if log['avatar'].find('head_icon') == -1:
+                        log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
+                    else:
+                        log['avatar'] = f"{settings.ICON_URL}/{log['avatar']}"
                 else:
                     if log['icon']:
                         log['avatar'] = f"{settings.ICON_URL}/head_icon/{log['icon']}.png"
