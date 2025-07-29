@@ -99,16 +99,7 @@ export default memo(() => {
         },
     ];
 
-    const props: UploadProps = {
-        name: 'file',
-        fileList: null,
-        action: BASE_URL + '/v1/workflow/import',
-        accept: '.yml',
-        multiple: false,
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-    };
+    
     return (
         <div className="fixed right-2 top-16 flex gap-2">
             {!publishStatus && (
@@ -122,7 +113,7 @@ export default memo(() => {
                     <Button icon={<SyncOutlined />} type="dashed" disabled={loadingWorkflowData} onClick={saveWorkFlow}>
                         {intl.formatMessage({ id: 'workflow.save' })}
                     </Button>
-                    {/* <Dropdown menu={{ items: layoutMenuItems }} placement="bottomRight">
+                    <Dropdown menu={{ items: layoutMenuItems }} placement="bottomRight">
                         <Button
                             icon={<NodeIndexOutlined />}
                             type="dashed"
@@ -130,7 +121,7 @@ export default memo(() => {
                         >
                             {intl.formatMessage({ id: 'workflow.autoLayout', defaultMessage: 'Auto Layout' })}
                         </Button>
-                    </Dropdown> */}
+                    </Dropdown>
                 </div>
             )}
 

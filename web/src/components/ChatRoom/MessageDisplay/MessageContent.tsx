@@ -5,6 +5,7 @@ import FileListDisplay from '@/components/FileListDisplay';
 import { FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
+import remarkGfm from 'remark-gfm';
 import { createRenderers } from '../MarkdownRenderer';
 import { MCPToolDisplay } from '../MCPToolDisplay';
 import { ContentBlock } from '../types';
@@ -78,6 +79,7 @@ export const MessageContent: FC<MessageContentProps> = props => {
                             {block.type === 'text'
                                 ? block.content && (
                                       <ReactMarkdown
+                                          remarkPlugins={[remarkGfm]}
                                           rehypePlugins={[rehypeHighlight]}
                                           components={createRenderers(index, intl)}
                                       >
@@ -116,6 +118,7 @@ export const MessageContent: FC<MessageContentProps> = props => {
                         <div key={blockIndex}>
                             {block.type === 'text' ? (
                                 <ReactMarkdown
+                                    remarkPlugins={[remarkGfm]}
                                     rehypePlugins={[rehypeHighlight]}
                                     components={createRenderers(index, intl)}
                                 >
@@ -139,6 +142,7 @@ export const MessageContent: FC<MessageContentProps> = props => {
             ) : (
                 // Default: simple text rendering
                 <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
                     rehypePlugins={[rehypeHighlight]}
                     components={createRenderers(index, intl)}
                 >
