@@ -113,7 +113,7 @@ export default memo(() => {
                     <Button icon={<SyncOutlined />} type="dashed" disabled={loadingWorkflowData} onClick={saveWorkFlow}>
                         {intl.formatMessage({ id: 'workflow.save' })}
                     </Button>
-                    <Dropdown menu={{ items: layoutMenuItems }} placement="bottomRight">
+                    {/* <Dropdown menu={{ items: layoutMenuItems }} placement="bottomRight">
                         <Button
                             icon={<NodeIndexOutlined />}
                             type="dashed"
@@ -121,7 +121,7 @@ export default memo(() => {
                         >
                             {intl.formatMessage({ id: 'workflow.autoLayout', defaultMessage: 'Auto Layout' })}
                         </Button>
-                    </Dropdown>
+                    </Dropdown> */}
                 </div>
             )}
 
