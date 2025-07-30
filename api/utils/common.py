@@ -1,3 +1,4 @@
+import re
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
@@ -12,6 +13,11 @@ from core.database.models import UploadFiles
 from core.workflow.variables import *
 
 project_root = Path(__file__).absolute().parent.parent.parent
+
+
+SKILL_PATH_PATTERN = r'^/skill/sk\d+/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.[a-zA-Z0-9]+$'
+WORKFLOW_PATH_PATTERN = r'^/workflow/wf\d+/[^/]+/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.[a-zA-Z0-9]+$'
+COMBINED_PATH_PATTERN = rf'^({SKILL_PATH_PATTERN[1:-1]}|{WORKFLOW_PATH_PATTERN[1:-1]})$'
 
 
 def get_new_collection_name() -> str:
@@ -78,7 +84,21 @@ def extract_file_list_from_skill_output(outputs: dict, node_data_dict: dict) -> 
     # outputs = result['data']['outputs']
     storage_url = f"{settings.STORAGE_URL}/file"
     output_vars = create_variable_from_dict(node_data_dict)
+    for key, value in outputs.items():
+        # Ensure path starts with /
+        if not value.startswith('/'):
+            value = '/' + value
+        
+        # Check if it's a skill path
+        if re.match(SKILL_PATH_PATTERN, value):
+            output_vars.properties[key].type = 'file'
+        
+        # Check if it's a workflow path
+        if re.match(WORKFLOW_PATH_PATTERN, value):
+            output_vars.properties[key].type = 'file'
     file_vars = output_vars.extract_file_variables()
+    
+    
     for var in file_vars.properties.values():
         if var.name in outputs:
             file_path = outputs[var.name]

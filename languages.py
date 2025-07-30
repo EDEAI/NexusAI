@@ -1798,7 +1798,15 @@ def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = 
         
         if append_ret_lang_prompt:
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            return_language_prompt = f"\n\nPlease note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction.\n\nThe current time is {current_time}."
+            return_language_prompt = f"""
+
+=== IMPORTANT CONTEXT ===
+CURRENT DATE AND TIME: {current_time}
+
+Please note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction.
+
+Always consider the current date and time when providing responses, especially for time-sensitive questions or tasks.
+=== END CONTEXT ==="""
             if isinstance(content, str):
                 content += return_language_prompt
             elif isinstance(content, dict):

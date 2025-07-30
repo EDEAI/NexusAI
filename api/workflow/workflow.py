@@ -159,7 +159,7 @@ async def node_run(data: WorkflowsNodeRunSchema,
         while not task.ready():
             await asyncio.sleep(0.1)
         result = task.get(timeout=100)
-        if node_data.data['type'] in ['skill', 'custom_code', 'end']:
+        if node_data.data['type'] in ['skill', 'custom_code', 'end', 'tool']:
             node_data_dict = node_data.to_dict()
             file_list = extract_file_list_from_skill_output(result['data']['outputs'], node_data_dict["data"]["output"])
             result['data']['file_list'] = file_list

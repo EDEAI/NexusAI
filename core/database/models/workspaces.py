@@ -285,7 +285,7 @@ class Workspaces(MySQL):
                     elif app_node['node_type'] == 'recursive_task_generation' or (app_node['node_type'] == 'recursive_task_execution' and not app_node['task_id']):
                         task_dict = json.loads(get_first_variable_value(create_variable_from_dict(outputs)))
                         app_node['outputs_md'] = create_recursive_task_category_from_dict(task_dict).to_markdown()
-                    elif app_node['node_type'] in ['skill', 'custom_code', 'end']:
+                    elif app_node['node_type'] in ['skill', 'custom_code', 'end', 'tool']:
                         file_list = extract_file_list_from_skill_output(app_node['outputs'], app_node['node_graph']['data']['output'])
                         app_node['file_list'] = file_list
                     else:

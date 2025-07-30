@@ -22,3 +22,4 @@ scripts/test*
 .cursor
 prompt.py
 prompt.py.backup_*
+.trae
