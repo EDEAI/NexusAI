@@ -164,6 +164,31 @@ export default {
     'workflow.label.manualConfirmation': 'Manual Confirmation',
     'workflow.label.waitForAllPredecessors': 'Wait for all predecessors',
     'workflow.placeholder.enterContent': 'Please enter content, use @ to insert variables',
+    
+    // SlateEditorV3 Related Translations
+    'workflow.editor.selectVariable': 'Select Variable',
+    'workflow.editor.navigation.up': '↑↓ Navigate',
+    'workflow.editor.navigation.select': 'Enter Select',
+    'workflow.editor.navigation.cancel': 'Esc Cancel',
+    'workflow.editor.inputVariable': 'Input',
+    'workflow.editor.outputVariable': 'Output',
+    'workflow.editor.variableType.input': 'Input Variable',
+    'workflow.editor.variableType.output': 'Output Variable',
+    'workflow.editor.noVariablesFound': 'No variables available',
+    
+    // Demo Component Related Translations
+    'workflow.editor.demo.title': 'Variable Tag Style Preview',
+    'workflow.editor.demo.description': 'Showcase the new styling effects for variable tags in the editor',
+    'workflow.editor.demo.basicStyle': 'Basic Style Effects:',
+    'workflow.editor.demo.inTextStyle': 'Effects in Text:',
+    'workflow.editor.demo.colorExplanation': 'Color Legend:',
+    'workflow.editor.demo.greenLabel': 'Green Tags',
+    'workflow.editor.demo.blueLabel': 'Blue Tags',
+    'workflow.editor.demo.inputVariables': 'Input Variables',
+    'workflow.editor.demo.outputVariables': 'Output Variables',
+    'workflow.editor.demo.inputIcon': 'Input Variable Identifier',
+    'workflow.editor.demo.variableIcon': 'Variable Identifier',
+    'workflow.editor.demo.exampleText': 'Please generate a reply based on {input} and refer to the format of {output}. The system will use {system} to guide the generation process.',
     'workflow.message.noVariablesFound': 'No variables found',
     'workflow.label.api': 'API',
     'workflow.button.auth': 'Authenticate',
@@ -315,6 +340,7 @@ export default {
 
     'workflow.form.parameter.required': 'Please enter parameter',
     'workflow.form.confirmer.required': 'Please select confirmer',
+    'workflow.form.parameter.json.invalid': 'Please enter valid JSON format',
 
     'agent.batch.count.tooltip': 'Select batch generation count',
     'agent.batch.submit': 'Submit',
@@ -346,6 +372,7 @@ export default {
     'skill.debug.output.title': 'Debug Output',
     'skill.debug.output.error': 'Debug Output Error',
     'skill.debug.output.success': 'Debug Success',
+    'skill.debug.no.input.parameters': 'This skill has no input parameters',
     'skill.result.input.variables': 'Input Variables',
     'skill.result.output.variables': 'Output Variables',
     'skill.result.output.type': 'Output Type',
@@ -359,4 +386,8 @@ export default {
     'workflow.tag.imageUnderstanding': 'Image Understanding',
 
     'workflow.context': 'Context',
+    'workflow.form.splitTaskByLine.label': 'Split tasks by line',
+    'workflow.form.splitTaskByLine.tooltip': 'If enabled, the input variable will be split into tasks by line directly, without analysis and splitting by the large language model.',
+    'workflow.split_task_by_line': 'Split tasks by line',
+    'workflow.split_task_by_lineDes': 'If enabled, the input variable will be split into tasks by line directly, without analysis and splitting by the large language model.',
 };

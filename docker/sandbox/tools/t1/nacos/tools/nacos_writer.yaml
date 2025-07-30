@@ -1,0 +1,69 @@
+identity:
+  name: nacos_config_writer
+  author: aias00
+  label:
+    en_US: Nacos Configuration Writer
+    zh_Hans: 写入 Nacos 中的配置
+    pt_BR: Nacos Configuration Writer
+description:
+  human:
+    en_US: Nacos Configuration Writer
+    zh_Hans: 写入 Nacos 中的配置
+    pt_BR: Nacos Configuration Writer
+  llm: A tool write configuration to nacos
+parameters:
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: content
+      zh_Hans: 配置内容
+      pt_BR: content
+    human_description:
+      en_US: content
+      zh_Hans: 配置
+      pt_BR: content
+    llm_description: content
+    form: llm
+  - name: namespace_id
+    type: string
+    required: true
+    label:
+      en_US: Namespace ID
+      zh_Hans: 命名空间 ID
+      pt_BR: Namespace ID
+    human_description:
+      en_US: Nacos namespace ID
+      zh_Hans: Nacos命名空间 ID
+      pt_BR: Nacos namespace ID
+    llm_description: The namespace ID of the configuration in Nacos
+    form: form
+  - name: data_id
+    type: string
+    required: true
+    label:
+      en_US: Data ID
+      zh_Hans: 配置ID
+      pt_BR: Data ID
+    human_description:
+      en_US: Nacos configuration data ID
+      zh_Hans: Nacos配置的数据ID
+      pt_BR: Nacos configuration data ID
+    llm_description: The data ID of the configuration in Nacos
+    form: form
+  - name: group_name
+    type: string
+    required: true
+    label:
+      en_US: Group Name
+      zh_Hans: 分组名称
+      pt_BR: Group Name
+    human_description:
+      en_US: Nacos configuration group name
+      zh_Hans: Nacos配置分组名称
+      pt_BR: Nacos configuration group name
+    llm_description: The group name of the configuration in Nacos
+    form: form
+extra:
+  python:
+    source: tools/nacos_writer.py

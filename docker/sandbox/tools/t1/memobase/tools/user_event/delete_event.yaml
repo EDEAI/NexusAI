@@ -1,0 +1,49 @@
+identity:
+  name: delete_event
+  author: acane0320
+  label:
+    en_US: Delete User Event
+    zh_Hans: 删除用户事件
+    ja_Jp: ユーザーイベントを削除する
+    pt_BR: Excluir Evento do Usuário
+description:
+  human:
+    en_US: Delete an existing event from the user's history
+    zh_Hans: 从用户历史记录中删除现有事件
+    ja_Jp: ユーザーの履歴から既存のイベントを削除します
+    pt_BR: Excluir um evento existente do histórico do usuário
+  llm: Use this tool to delete an existing event from the user's history. This is useful for removing events that are no longer relevant or contain incorrect information.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user whose event will be deleted
+      zh_Hans: 要删除事件的用户 ID
+      ja_Jp: イベントを削除するユーザーの ID
+      pt_BR: O ID do usuário cujo evento será excluído
+    llm_description: The ID of the user whose event will be deleted.
+    form: llm
+  - name: event_id
+    type: string
+    required: true
+    label:
+      en_US: Event ID
+      zh_Hans: 事件 ID
+      ja_Jp: イベント ID
+      pt_BR: ID do Evento
+    human_description:
+      en_US: The ID of the event to delete
+      zh_Hans: 要删除的事件 ID
+      ja_Jp: 削除するイベントの ID
+      pt_BR: O ID do evento a ser excluído
+    llm_description: The ID of the event to delete.
+    form: llm
+extra:
+  python:
+    source: tools/user_event/delete_event.py

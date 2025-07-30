@@ -1,0 +1,41 @@
+description:
+  human:
+    en_US: A tool for extracting matching content using regular expressions.
+    pt_BR: A tool for extracting matching content using regular expressions.
+    zh_Hans: 一个用于利用正则表达式提取匹配内容结果的工具。
+  llm: A tool for extracting matching content using regular expressions.
+extra:
+  python:
+    source: tools/regex_extract.py
+identity:
+  author: zhuhao
+  label:
+    en_US: Regex Extract
+    pt_BR: Regex Extract
+    zh_Hans: 正则表达式内容提取
+  name: regex_extract
+parameters:
+- form: llm
+  human_description:
+    en_US: Content to be extracted
+    pt_BR: Content to be extracted
+    zh_Hans: 内容
+  label:
+    en_US: Content to be extracted
+    pt_BR: Content to be extracted
+    zh_Hans: 内容
+  name: content
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Regular expression
+    pt_BR: Regular expression
+    zh_Hans: 正则表达式
+  label:
+    en_US: Regular expression
+    pt_BR: Regular expression
+    zh_Hans: 正则表达式
+  name: expression
+  required: true
+  type: string

@@ -1,0 +1,138 @@
+description:
+  human:
+    en_US: Create Field in AI Table Sheet
+    zh_Hans: 在AI表格数据表中创建字段
+  llm: A tool for creating a field in an AI Table sheet. (在AI表格数据表中创建字段)
+extra:
+  python:
+    source: tools/create_field_ai.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: Create Field in AI Table Sheet
+    zh_Hans: 在AI表格数据表中创建字段
+  name: create_field_ai
+parameters:
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID of the AI Table (baseId)
+    zh_Hans: AI表格的ID (baseId)
+  label:
+    en_US: Base ID
+    zh_Hans: AI表格ID
+  llm_description: AI表格的ID (baseId)
+  name: base_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID or name of the sheet
+    zh_Hans: 数据表ID或名称
+  label:
+    en_US: Sheet ID or Name
+    zh_Hans: 数据表ID或名称
+  llm_description: 数据表ID或名称
+  name: sheet_id_or_name
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The name of the field to be created
+    zh_Hans: 要创建的字段名称
+  label:
+    en_US: Field Name
+    zh_Hans: 字段名称
+  llm_description: 要创建的字段名称
+  name: name
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The type of the field (e.g., text, number, singleSelect, etc.)
+    zh_Hans: 字段类型（如text、number、singleSelect等）
+  label:
+    en_US: Field Type
+    zh_Hans: 字段类型
+  llm_description: 字段类型（如text、number、singleSelect等）
+  name: type
+  required: true
+  type: select
+  options:
+    - label: 
+        en_US: text
+        zh_Hans: 文本
+        pt_BR: text
+      value: text
+    - label: 
+        en_US: number
+        zh_Hans: 数字
+        pt_BR: number
+      value: number
+    - label: 
+        en_US: singleSelect
+        zh_Hans: 单选
+        pt_BR: singleSelect
+      value: singleSelect
+    - label: 
+        en_US: multipleSelect
+        zh_Hans: 多选
+        pt_BR: multipleSelect
+      value: multipleSelect
+    - label: 
+        en_US: date
+        zh_Hans: 日期
+        pt_BR: date
+      value: date
+    - label: 
+        en_US: user
+        zh_Hans: 人员
+        pt_BR: user
+      value: user
+    - label: 
+        en_US: department
+        zh_Hans: 部门
+        pt_BR: department
+      value: department
+    - label: 
+        en_US: attachment
+        zh_Hans: 附件
+        pt_BR: attachment
+      value: attachment
+    - label: 
+        en_US: unidirectionalLink
+        zh_Hans: 单向关联
+        pt_BR: unidirectionalLink
+      value: unidirectionalLink
+    - label: 
+        en_US: bidirectionalLink
+        zh_Hans: 双向关联
+        pt_BR: bidirectionalLink
+      value: bidirectionalLink
+    - label: 
+        en_US: url
+        zh_Hans: 链接
+        pt_BR: url
+      value: url
+    
+- form: llm
+  human_description:
+    en_US: JSON object of field properties, varies by field type
+    zh_Hans: 字段属性的JSON对象，根据字段类型而异
+  label:
+    en_US: Field Properties
+    zh_Hans: 字段属性
+  llm_description: 字段属性的JSON对象，根据字段类型而异
+  name: property
+  required: false
+  type: string 

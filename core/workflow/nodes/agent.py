@@ -1,4 +1,5 @@
 import asyncio
+import builtins
 import json
 
 from copy import deepcopy
@@ -156,8 +157,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     abilities_content_and_output_format = []
                     for ability in abilities:
                         actual_output_format = default_output_format if ability['output_format'] == 0 else ability['output_format']
-                        if task:
-                            actual_output_format = 2
                         abilities_content_and_output_format.append(
                             (
                                 ability['id'],
@@ -188,8 +187,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         )
                 else:
                     output_format = default_output_format
-                    if task:
-                        output_format = 2
                     abilities_content = '\n'.join(ability['content'] for ability in abilities)
                     system_prompt = get_language_content(
                         'agent_system_prompt_with_abilities',
@@ -208,8 +205,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         )
             else:
                 output_format = default_output_format
-                if task:
-                    output_format = 2
                 system_prompt = get_language_content(
                     'agent_system_prompt_with_no_ability',
                     uid=user_id
@@ -229,8 +224,6 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             output_format = ability['output_format']
             if output_format == 0:
                 output_format = default_output_format
-            if task:
-                output_format = 2
             system_prompt = get_language_content(
                 'agent_system_prompt_with_abilities',
                 uid=user_id
@@ -246,7 +239,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     'agent_reply_requirement_with_task_splitting_and_abilities',
                     append_ret_lang_prompt=False
                 )
-        if direct_output and not task:
+        if direct_output:
             output_format = 1
             
         user_prompt = self.data['prompt'].get_user()
@@ -300,7 +293,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     retrieval, _, _ = DatasetRetrieval.single_retrieve(self.data['retrieval_task_datasets'][0], 0, 0, workflow_id, workflow_run_id, user_id, type, previous_documents)
                 else:
                     retrieval, _, _ = DatasetRetrieval.multiple_retrieve(self.data['retrieval_task_datasets'], 0, 0, workflow_id, workflow_run_id, user_id, type, previous_documents)
-                retrieval_result: List[Document] = retrieval.invoke(current_task_dict['keywords'])
+                retrieval_result: List[Document] = retrieval.invoke(current_task_dict['keywords'] if current_task_dict['keywords'] else current_task_dict['task'])
                 if retrieval_result:
                     previous_documents_results = DatasetRetrieval.get_full_documents(retrieval_result)
                     if previous_documents_results:
@@ -877,8 +870,12 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
 
             outputs = Variable(
                 name="text",
-                type="string",
-                value=full_chunk.content
+                type="string" if builtins.type(full_chunk.content) == str else "json",
+                value=(
+                    full_chunk.content
+                    if builtins.type(full_chunk.content) == str
+                    else json.dumps(full_chunk.content, ensure_ascii=False)
+                )
             )
             if (
                 not self.data['manual_confirmation']

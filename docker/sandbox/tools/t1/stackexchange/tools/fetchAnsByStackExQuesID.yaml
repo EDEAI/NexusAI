@@ -1,0 +1,117 @@
+description:
+  human:
+    en_US: A tool for retrieving answers for a specific Stack Exchange question ID.
+      Must be used with the searchStackExQuesID tool.
+    zh_Hans: 用于检索特定Stack Exchange问题ID的答案的工具。必须与searchStackExQuesID工具一起使用。
+  llm: A tool for retrieving answers for Stack Exchange question ID.
+extra:
+  python:
+    source: tools/fetchAnsByStackExQuesID.py
+identity:
+  author: Richards Tu
+  label:
+    en_US: Fetch Stack Exchange Answers
+    zh_Hans: 获取 Stack Exchange 答案
+  name: fetchAnsByStackExQuesID
+parameters:
+- form: llm
+  human_description:
+    en_US: The ID of the Stack Exchange question to fetch answers for.
+    zh_Hans: 要获取答案的Stack Exchange问题的ID。
+  label:
+    en_US: Question ID
+    zh_Hans: 问题ID
+  llm_description: The ID of the Stack Exchange question.
+  name: id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The Stack Exchange site the question is from, e.g. stackoverflow, unix,
+      etc.
+    zh_Hans: 问题所在的Stack Exchange站点，例如stackoverflow、unix等。
+  label:
+    en_US: Stack Exchange site
+    zh_Hans: Stack Exchange站点
+  llm_description: Stack Exchange site identifier - 'stackoverflow', 'serverfault',
+    'superuser', 'askubuntu', 'unix', 'cs', 'softwareengineering', 'codegolf', 'codereview',
+    'cstheory', 'security', 'cryptography', 'reverseengineering', 'datascience', 'devops',
+    'ux', 'dba', 'gis', 'webmasters', 'arduino', 'raspberrypi', 'networkengineering',
+    'iot', 'tor', 'sqa', 'mathoverflow', 'math', 'mathematica', 'dsp', 'gamedev',
+    'robotics', 'genai', 'computergraphics'.
+  name: site
+  required: true
+  type: string
+- default: '!nNPvSNdWme'
+  form: form
+  human_description:
+    en_US: This is required in order to actually get the body of the answer.
+    zh_Hans: 为了实际获取答案的正文是必需的。
+  label:
+    en_US: Filter
+    zh_Hans: 过滤器
+  name: filter
+  options:
+  - label:
+      en_US: Must Select
+      zh_Hans: 必须选择
+    value: '!nNPvSNdWme'
+  required: true
+  type: string
+- default: desc
+  form: form
+  human_description:
+    en_US: The direction to sort the answers - ascending or descending.
+    zh_Hans: 答案的排序方向 - 升序或降序。
+  label:
+    en_US: Sort direction
+    zh_Hans: 排序方向
+  name: order
+  options:
+  - label:
+      en_US: Ascending
+      zh_Hans: 升序
+    value: asc
+  - label:
+      en_US: Descending
+      zh_Hans: 降序
+    value: desc
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The sort order for the answers - activity, votes, or creation date.
+    zh_Hans: 答案的排序顺序 - 活动、投票或创建日期。
+  label:
+    en_US: Sort order
+    zh_Hans: 排序
+  llm_description: activity, votes, or creation.
+  name: sort
+  required: true
+  type: string
+- default: 1
+  form: form
+  human_description:
+    en_US: The number of answers to return per page.
+    zh_Hans: 每页返回的答案数。
+  label:
+    en_US: Results per page
+    zh_Hans: 每页结果数
+  max: 5
+  min: 1
+  name: pagesize
+  required: true
+  type: number
+- default: 3
+  form: form
+  human_description:
+    en_US: The page number of answers to retrieve.
+    zh_Hans: 要检索的答案的页码。
+  label:
+    en_US: Page number
+    zh_Hans: 页码
+  max: 5
+  min: 1
+  name: page
+  required: true
+  type: number

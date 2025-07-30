@@ -1,0 +1,30 @@
+identity:
+  name: time_identify
+  author: digitforce
+  label:
+    en_US: time_identify
+    zh_Hans: 时间识别
+    pt_BR: time_identify
+description:
+  human:
+    en_US: Identify time in natural language
+    zh_Hans: 识别自然语言中的时间
+    pt_BR: Identify time in natural language
+  llm: Identify time in natural language
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 用户的查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: Query string
+      zh_Hans: 用户的查询语句
+      pt_BR: Query string
+    llm_description: Query string
+    form: llm
+extra:
+  python:
+    source: tools/time_identify.py

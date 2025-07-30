@@ -1,0 +1,21 @@
+<svg width="100" height="100" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="90" fill="#f0f4f8" stroke="#ccc" stroke-width="2"/>
+
+  <!-- Cloud shape -->
+  <path d="M60 120a30 30 0 0 1 0-60 40 40 0 0 1 78-10 30 30 0 1 1 12 58H60z" fill="#6cb2eb"/>
+
+  <!-- Upward arrow representing upload -->
+  <path d="M100 80 L85 100 H95 V120 H105 V100 H115 Z" fill="#ffffff"/>
+
+  <!-- Boto bot head -->
+  <circle cx="100" cy="55" r="12" fill="#4a5568"/>
+  <rect x="88" y="55" width="24" height="8" fill="#4a5568"/>
+  <circle cx="93" cy="55" r="2" fill="#f6e05e"/>
+  <circle cx="107" cy="55" r="2" fill="#f6e05e"/>
+
+  <!-- Text label -->
+  <text x="100" y="170" font-size="18" font-family="Arial, sans-serif" fill="#2d3748" text-anchor="middle">
+    botos3
+  </text>
+</svg>

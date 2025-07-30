@@ -1,0 +1,34 @@
+identity:
+  name: sec_filings
+  author: financialai
+  label:
+    en_US: SEC Filings
+    zh_Hans: SEC备案
+    ja_Jp: SEC 提出書類
+    pt_BR: Arquivamentos da SEC
+description:
+  human:
+    en_US: Get SEC filings for a company. This includes 10-Ks, 10-Qs, 8-Ks, and more.
+    zh_Hans: 获取公司的 SEC 备案。这包括 10-K、10-Q、8-K 等。
+    ja_Jp: 会社の SEC 提出書類を取得します。これには 10-K、10-Q、8-K などが含まれます。
+    pt_BR: Obtenha arquivamentos da SEC para uma empresa. Isso inclui 10-Ks, 10-Qs, 8-Ks e muito mais.
+  llm: Get SEC filings for a company. This includes 10-Ks, 10-Qs, 8-Ks, and more.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol of the company you want to get SEC filings for.
+      zh_Hans: 您想获取公司的 SEC 备案的公司的股票代码。
+      ja_Jp: SEC 提出書類を取得したい会社のティッカーシンボル。
+      pt_BR: O símbolo do ticker da empresa para a qual você deseja obter arquivamentos da SEC.
+    llm_description: The ticker symbol of the company you want to get SEC filings for.
+    form: llm
+extra:
+  python:
+    source: tools/sec_filings/invoke.py

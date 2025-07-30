@@ -1,0 +1,26 @@
+description:
+  human:
+    en_US:  Today's domestic oil price query may not be supported in some provinces. Please refer to the actual data returned for accuracy.
+    zh_Hans: 今日国内油价查询，部分省份可能不支持，请根据返回实际数据为准。
+  llm: A tool to query oil price in some provinces of china.
+extra:
+  python:
+    source: tools/oil_price.py
+identity:
+  author: leslie2046
+  label:
+    en_US: Oil Price
+    zh_Hans: 国内油价查询
+  name: oil_price
+parameters:
+- name: apiKey
+  label:
+    en_US: API KEY
+    zh_Hans: API密钥
+  type: secret-input
+  required: true
+  form: form
+  human_description:
+    en_US: The API key from Juhe.cn.
+    zh_Hans: 来自聚合数据API密钥。
+  llm_description: API key from the juhe provider.

@@ -1,16 +1,14 @@
 import { GetdatasetList } from '@/api/agents';
-import { getAppListByMode } from '@/api/workflow';
 import Callword from '@/components/callword';
+import Avatar from '@/components/ChatAvatar';
 import { findOption } from '@/components/WorkFlow/components/Form/Select';
 import Variable from '@/components/WorkFlow/components/Variable';
 import { useModelSelect } from '@/store/modelList';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Form, Input, Radio, Select, Switch, Tag, Spin } from 'antd';
+import { Button, Form, Input, Radio, Select, Switch, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import SelectApp from '../../../Plaza/components/CreationChatRoom/selectApp';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import Avatar from '@/components/ChatAvatar';
-import { headportrait } from '@/utils/useUser';
 
 const { TextArea } = Input;
 
@@ -72,7 +70,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
 }) => {
     const intl = useIntl();
     const [dataset, setDataset] = useState([]);
-  
+
     const [isLoading, setIsLoading] = useState(false);
     const [selectedSkills, setSelectedSkills] = useState([]);
     const [selectedWorkflows, setSelectedWorkflows] = useState([]);
@@ -92,14 +90,12 @@ const AgentsFirst: React.FC<ChildProps> = ({
     useEffect(() => {
         getDataset();
         if (Detaillist?.agent?.selected_skills) {
-            setSelectedSkills(Detaillist.agent.selected_skills)
+            setSelectedSkills(Detaillist.agent.selected_skills);
         }
         if (Detaillist?.agent?.selected_workflows) {
-            setSelectedWorkflows(Detaillist?.agent?.selected_workflows)
+            setSelectedWorkflows(Detaillist?.agent?.selected_workflows);
         }
-    }, [Detaillist,Detaillist?.agent]);
-
-
+    }, [Detaillist, Detaillist?.agent]);
 
     const FourthlySelect = (value: any) => {
         setFourthly_config_id(value);
@@ -169,12 +165,12 @@ const AgentsFirst: React.FC<ChildProps> = ({
         });
     };
 
-    const MCPUpload = (checked:boolean)=>{
+    const MCPUpload = (checked: boolean) => {
         setDetaillist({
             ...Detaillist,
             agent: { ...Detaillist.agent, mcp: checked ? 1 : 0 },
         });
-    }
+    };
 
     const handleChange = (value: any) => {
         setAgentsFirstData({
@@ -193,13 +189,11 @@ const AgentsFirst: React.FC<ChildProps> = ({
         );
     };
 
-   
-
     const handleSkillSelect = (selectedItems: any[]) => {
         setSelectedSkills(selectedItems);
         setDetaillist({
             ...Detaillist,
-            agent: { ...Detaillist.agent, selected_skills: selectedItems }
+            agent: { ...Detaillist.agent, selected_skills: selectedItems },
         });
     };
 
@@ -207,7 +201,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
         setSelectedWorkflows(selectedItems);
         setDetaillist({
             ...Detaillist,
-            agent: { ...Detaillist.agent, selected_workflows: selectedItems }
+            agent: { ...Detaillist.agent, selected_workflows: selectedItems },
         });
     };
 
@@ -239,7 +233,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
         setSelectedSkills(params.checkItem);
         setDetaillist({
             ...Detaillist,
-            agent: { ...Detaillist.agent, selected_skills: params.checkItem }
+            agent: { ...Detaillist.agent, selected_skills: params.checkItem },
         });
         setShowSkillSelect(false);
     };
@@ -248,7 +242,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
         setSelectedWorkflows(params.checkItem);
         setDetaillist({
             ...Detaillist,
-            agent: { ...Detaillist.agent, selected_workflows: params.checkItem }
+            agent: { ...Detaillist.agent, selected_workflows: params.checkItem },
         });
         setShowWorkflowSelect(false);
     };
@@ -266,17 +260,18 @@ const AgentsFirst: React.FC<ChildProps> = ({
         setSelectedSkills(updatedSkills);
         setDetaillist({
             ...Detaillist,
-            agent: { ...Detaillist.agent, selected_skills: updatedSkills }
+            agent: { ...Detaillist.agent, selected_skills: updatedSkills },
         });
-        
     };
 
     const handleRemoveWorkflow = (workflowToRemove: any) => {
-        const updatedWorkflows = selectedWorkflows.filter(workflow => workflow.app_id !== workflowToRemove.app_id);
+        const updatedWorkflows = selectedWorkflows.filter(
+            workflow => workflow.app_id !== workflowToRemove.app_id,
+        );
         setSelectedWorkflows(updatedWorkflows);
         setDetaillist({
             ...Detaillist,
-            agent: { ...Detaillist.agent, selected_workflows: updatedWorkflows }
+            agent: { ...Detaillist.agent, selected_workflows: updatedWorkflows },
         });
     };
 
@@ -392,8 +387,6 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     }
                                 />
                             </div> */}
-                           
-                            
                         </div>
                     </Form.Item>
                     <Form.Item className="mb-[30px]">
@@ -413,15 +406,14 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         ? intl.formatMessage({
                                               id: 'agent.pleaseselect',
                                           })
-                                        : Fourthly_config_id 
+                                        : Fourthly_config_id
                                 }
                                 variant="filled"
                                 onChange={FourthlySelect}
                                 options={options}
-                                
                                 optionRender={option => {
                                     return (
-                                        <div >
+                                        <div>
                                             {option.label}{' '}
                                             {option?.data?.support_image == 1 && (
                                                 <Tag color="blue" className="text-xs">
@@ -645,12 +637,14 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         size="large"
                                         mode="multiple"
                                         showSearch
-                                        style={{ width: '100%' ,fontSize:'12px'}}
+                                        style={{ width: '100%', fontSize: '12px' }}
                                         placeholder={intl.formatMessage({
                                             id: 'agent.pleaseselect',
                                         })}
                                         filterOption={(input, option) =>
-                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                            (option?.label ?? '')
+                                                .toLowerCase()
+                                                .includes(input.toLowerCase())
                                         }
                                         value={repository}
                                         onChange={handleChange}
@@ -695,20 +689,22 @@ const AgentsFirst: React.FC<ChildProps> = ({
                         )}
                     </Form.List>
                     <Form.Item className="mb-[30px]">
-                        <div className='text-[#555555] text-base mb-[15px]'>
+                        <div className="text-[#555555] text-base mb-[15px]">
                             {intl.formatMessage({ id: 'agent.mcp.resources' })}
                         </div>
-                        <div className='pl-4 '>
+                        <div className="pl-4 ">
                             <div className="mb-[30px]">
                                 <div className="flex items-center justify-between mb-[15px]">
                                     <div className="text-[#555555] text-xs">
                                         <Callword
                                             className="font-medium"
                                             name={intl.formatMessage({ id: 'agent.selectSkills' })}
-                                            title={intl.formatMessage({ id: 'agent.explain.selectSkills' })}
+                                            title={intl.formatMessage({
+                                                id: 'agent.explain.selectSkills',
+                                            })}
                                         />
                                     </div>
-                                    <Button 
+                                    <Button
                                         type="link"
                                         icon={<PlusOutlined />}
                                         onClick={() => setShowSkillSelect(true)}
@@ -720,19 +716,26 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 {selectedSkills.length > 0 ? (
                                     <div className="flex flex-col gap-4 mb-4">
                                         {selectedSkills.map((skill: any) => (
-                                            <div key={skill.app_id} className="group relative flex items-center cursor-pointer w-full p-2 bg-white rounded-lg shadow-sm transition-shadow">
+                                            <div
+                                                key={skill.app_id}
+                                                className="group relative flex items-center cursor-pointer w-full p-2 bg-white rounded-lg shadow-sm transition-shadow"
+                                            >
                                                 <Avatar
                                                     rounded="6px"
                                                     data={skill}
                                                     bg={skill.icon_background}
                                                 />
                                                 <div className="flex flex-col ml-2 truncate">
-                                                    <span className="text-sm font-medium text-[#333333]">{skill.name}</span>
-                                                    <span className="text-xs text-[#666666] truncate">{skill.description}</span>
+                                                    <span className="text-sm font-medium text-[#333333]">
+                                                        {skill.name}
+                                                    </span>
+                                                    <span className="text-xs text-[#666666] truncate">
+                                                        {skill.description}
+                                                    </span>
                                                 </div>
-                                                <div 
+                                                <div
                                                     className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-red-500"
-                                                    onClick={(e) => {
+                                                    onClick={e => {
                                                         e.stopPropagation();
                                                         handleRemoveSkill(skill);
                                                     }}
@@ -743,14 +746,19 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         ))}
                                     </div>
                                 ) : (
-                                    <div onClick={() => setShowSkillSelect(true)} className="w-full h-[120px] flex items-center justify-center border border-dashed border-[#e8e8e8] rounded-lg bg-[#fafafa] cursor-pointer hover:border-[#1b64f3] transition-colors">
+                                    <div
+                                        onClick={() => setShowSkillSelect(true)}
+                                        className="w-full h-[120px] flex items-center justify-center border border-dashed border-[#e8e8e8] rounded-lg bg-[#fafafa] cursor-pointer hover:border-[#1b64f3] transition-colors"
+                                    >
                                         <div className="flex flex-col items-center gap-2">
                                             <PlusOutlined className="text-[#999999] text-lg" />
-                                            <span className="text-[#999999] text-sm">{intl.formatMessage({ id: 'agent.addSkill' })}</span>
+                                            <span className="text-[#999999] text-sm">
+                                                {intl.formatMessage({ id: 'agent.addSkill' })}
+                                            </span>
                                         </div>
                                     </div>
                                 )}
-                                <SelectApp 
+                                <SelectApp
                                     show={showSkillSelect}
                                     popupClose={handleSkillPopupClose}
                                     popupSave={handleSkillPopupSave}
@@ -765,11 +773,15 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                     <div className="text-[#555555] text-xs">
                                         <Callword
                                             className="font-medium"
-                                            name={intl.formatMessage({ id: 'agent.selectWorkflows' })}
-                                            title={intl.formatMessage({ id: 'agent.explain.selectWorkflows' })}
+                                            name={intl.formatMessage({
+                                                id: 'agent.selectWorkflows',
+                                            })}
+                                            title={intl.formatMessage({
+                                                id: 'agent.explain.selectWorkflows',
+                                            })}
                                         />
                                     </div>
-                                    <Button 
+                                    <Button
                                         type="link"
                                         icon={<PlusOutlined />}
                                         onClick={() => setShowWorkflowSelect(true)}
@@ -781,19 +793,26 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 {selectedWorkflows.length > 0 ? (
                                     <div className="flex flex-col gap-4 mb-4">
                                         {selectedWorkflows.map((workflow: any) => (
-                                            <div key={workflow.app_id} className="group relative flex items-center cursor-pointer w-full p-2 bg-white rounded-lg shadow-sm transition-shadow">
+                                            <div
+                                                key={workflow.app_id}
+                                                className="group relative flex items-center cursor-pointer w-full p-2 bg-white rounded-lg shadow-sm transition-shadow"
+                                            >
                                                 <Avatar
                                                     rounded="6px"
                                                     data={workflow}
                                                     bg={workflow.icon_background}
                                                 />
                                                 <div className="flex flex-col ml-2 truncate">
-                                                    <span className="text-sm font-medium text-[#333333]">{workflow.name}</span>
-                                                    <span className="text-xs text-[#666666] truncate">{workflow.description}</span>
+                                                    <span className="text-sm font-medium text-[#333333]">
+                                                        {workflow.name}
+                                                    </span>
+                                                    <span className="text-xs text-[#666666] truncate">
+                                                        {workflow.description}
+                                                    </span>
                                                 </div>
-                                                <div 
+                                                <div
                                                     className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-red-500"
-                                                    onClick={(e) => {
+                                                    onClick={e => {
                                                         e.stopPropagation();
                                                         handleRemoveWorkflow(workflow);
                                                     }}
@@ -804,14 +823,19 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                         ))}
                                     </div>
                                 ) : (
-                                    <div  onClick={() => setShowWorkflowSelect(true)} className="w-full h-[120px] flex items-center justify-center border border-dashed border-[#e8e8e8] rounded-lg bg-[#fafafa] cursor-pointer hover:border-[#1b64f3] transition-colors">
+                                    <div
+                                        onClick={() => setShowWorkflowSelect(true)}
+                                        className="w-full h-[120px] flex items-center justify-center border border-dashed border-[#e8e8e8] rounded-lg bg-[#fafafa] cursor-pointer hover:border-[#1b64f3] transition-colors"
+                                    >
                                         <div className="flex flex-col items-center gap-2">
                                             <PlusOutlined className="text-[#999999] text-lg" />
-                                            <span className="text-[#999999] text-sm">{intl.formatMessage({ id: 'agent.addWorkflow' })}</span>
+                                            <span className="text-[#999999] text-sm">
+                                                {intl.formatMessage({ id: 'agent.addWorkflow' })}
+                                            </span>
                                         </div>
                                     </div>
                                 )}
-                                <SelectApp 
+                                <SelectApp
                                     show={showWorkflowSelect}
                                     popupClose={handleWorkflowPopupClose}
                                     popupSave={handleWorkflowPopupSave}

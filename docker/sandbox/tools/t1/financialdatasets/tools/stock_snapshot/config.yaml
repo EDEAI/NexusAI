@@ -1,0 +1,34 @@
+identity:
+  name: stock_snapshot
+  author: financialai
+  label:
+    en_US: Stock Snapshot
+    zh_Hans: 股票快照
+    ja_Jp: 株価スナップショット
+    pt_BR: Instantâneo de Ações
+description:
+  human:
+    en_US: Get the real-time price snapshot for a ticker.
+    zh_Hans: 获取股票代码的实时价格快照。
+    ja_Jp: ティッカーのリアルタイム価格スナップショットを取得します。
+    pt_BR: Obtenha o instantâneo de preço em tempo real para um ticker.
+  llm: Get the real-time price snapshot for a ticker.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol.
+      zh_Hans: 股票代码。
+      ja_Jp: ティッカーシンボル。
+      pt_BR: O símbolo do ticker.
+    llm_description: The ticker symbol.
+    form: llm
+extra:
+  python:
+    source: tools/stock_snapshot/invoke.py

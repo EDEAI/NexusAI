@@ -1,0 +1,26 @@
+identity:
+  name: "flomo"
+  author: "crazywoola"
+  label:
+    en_US: "Flomo"
+    zh_Hans: "Flomo"
+description:
+  human:
+    en_US: "A flomo plugin to note down your thoughts"
+    zh_Hans: "一个用于记录想法的 flomo 插件"
+  llm: "A flomo plugin to note down your thoughts"
+parameters:
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: "Content"
+      zh_Hans: "内容"
+    human_description:
+      en_US: "The content you want to note down"
+      zh_Hans: "你想记录的内容"
+    llm_description: "The content you want to note down"
+    form: llm
+extra:
+  python:
+    source: tools/flomo.py

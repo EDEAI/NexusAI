@@ -1,0 +1,153 @@
+description:
+  human:
+    en_US:
+      Talks enables the creation of realistic talking head videos from text or
+      audio inputs.
+  llm:
+    Talks enables the creation of realistic talking head videos from text or audio
+    inputs.
+extra:
+  python:
+    source: tools/talks.py
+identity:
+  author: Matri Qi
+  label:
+    en_US: Talks
+  name: talks
+parameters:
+  - form: llm
+    human_description:
+      en_US:
+        The URL of the source image to be animated by the driver video, or a selection
+        from the list of provided studio actors.
+    label:
+      en_US: source url
+    llm_description:
+      The URL of the source image to be animated by the driver video,
+      or a selection from the list of provided studio actors.
+    name: source_url
+    required: true
+    type: string
+  - form: form
+    human_description:
+      en_US:
+        The URL of the driver video to drive the talk, or a provided driver name
+        from D-ID.
+    label:
+      en_US: driver url
+    name: driver_url
+    required: false
+    type: string
+  - form: form
+    human_description:
+      en_US: The type of the script.
+    label:
+      en_US: script type
+    name: script_type
+    options:
+      - label:
+          en_US: text
+        value: text
+      - label:
+          en_US: audio
+        value: audio
+    required: false
+    type: string
+  - form: form
+    human_description:
+      en_US:
+        The text input to be spoken by the talking head. Required when script type
+        is text.
+    label:
+      en_US: text input
+    name: text_input
+    required: true
+    type: string
+  - form: form
+    human_description:
+      en_US:
+        The URL of the audio file to be spoken by the talking head. Required when
+        script type is audio.
+    label:
+      en_US: audio url
+    name: audio_url
+    required: false
+    type: string
+  - form: form
+    human_description:
+      en_US:
+        If enabled, the audio will be processed to reduce noise before being spoken
+        by the talking head. It only works when script type is audio.
+    label:
+      en_US: audio reduce noise
+    name: audio_reduce_noise
+    required: false
+    type: boolean
+  - form: form
+    human_description:
+      en_US: If enabled, the driver video will be stitched with the talking head video.
+    label:
+      en_US: stitch
+    name: stitch
+    required: false
+    type: boolean
+  - form: form
+    human_description:
+      en_US: If enabled, the talking head video will be sharpened.
+    label:
+      en_US: sharpen
+    name: sharpen
+    required: false
+    type: boolean
+  - form: form
+    human_description:
+      en_US: The format of the result video.
+    label:
+      en_US: result format
+    name: result_format
+    options:
+      - label:
+          en_US: mp4
+        value: mp4
+      - label:
+          en_US: gif
+        value: gif
+      - label:
+          en_US: mov
+        value: mov
+    required: false
+    type: string
+  - form: form
+    human_description:
+      en_US:
+        Interpolate between the last & first frames of the driver video When used
+        together with pad_audio can create a seamless transition between videos of the
+        same driver
+    label:
+      en_US: fluent
+    name: fluent
+    required: false
+    type: boolean
+  - form: form
+    human_description:
+      en_US:
+        Pad the audio with silence at the end (given in seconds) Will increase
+        the video duration & the credits it consumes
+    label:
+      en_US: pad audio
+    max: 60
+    min: 1
+    name: pad_audio
+    required: false
+    type: number
+  - form: form
+    human_description:
+      en_US:
+        timed expressions for animation. It should be an JSON array style string.
+        Take D-ID documentation(https://docs.d-id.com/reference/createtalk) for more
+        information.
+    label:
+      en_US: driver expressions
+    name: driver_expressions
+    required: false
+    type: string

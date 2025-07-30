@@ -1,0 +1,52 @@
+identity:
+  name: create_group
+  label:
+    en_US: Create Group
+    zh_Hans: 创建群组
+  icon: rongcloud_logo.svg
+  author: rongcloud
+  version: 1.0.0
+  email: support@dify.ai
+description:
+  human:
+    en_US: Create a group in RongCloud, need to provide user ID, group ID and group name, return 200 success
+    zh_Hans: 创建融云群组，需要提供用户 ID、群组 ID 和群组名称，返回 200 成功
+  llm: Create a group in RongCloud, need to provide user ID, group ID and group name, return 200 success
+extra:
+  python:
+    source: tools/group/create_group.py
+
+parameters:
+  - name: user_id
+    label:
+      en_US: User ID
+      zh_Hans: 加入群组的用户 ID
+    human_description:
+      en_US: The user ID of the user who joins the group, at most 1000 users, separated by commas, e.g. "user1,user2,user3"
+      zh_Hans: 要加入群的用户 ID，最多不超过 1000 个，用逗号分隔，例如 "user1,user2,user3"
+    llm_description: The user ID of the user who joins the group, at most 1000 users, separated by commas, e.g. "user1,user2,user3"
+    form: llm
+    type: string
+    required: true
+  - name: group_id
+    label:
+      en_US: Group ID
+      zh_Hans: 群组 ID
+    human_description:
+      en_US: The group ID of the group, maximum length 64 characters, support combination of uppercase and lowercase letters and numbers  
+      zh_Hans: 群组 ID，最大长度 64 个字符，支持大小写英文字母与数字的组合
+    llm_description: The group ID of the group, maximum length 64 characters, support combination of uppercase and lowercase letters and numbers
+    form: llm
+    type: string
+    required: true
+  - name: group_name
+    label:
+      en_US: Group Name
+      zh_Hans: 群组名称
+    human_description:
+      en_US: The name of the group, maximum length 128 characters, if the length exceeds the limit, the first 125 characters will be automatically truncated and "..." will be added  
+      zh_Hans: 群组名称，最大长度 128 个字符。若超过长度限制，则自动截取前 125 个字符并添加“...”
+    llm_description: The name of the group, maximum length 128 characters, if the length exceeds the limit, the first 125 characters will be automatically truncated and "..." will be added
+    form: llm
+    type: string
+    required: true

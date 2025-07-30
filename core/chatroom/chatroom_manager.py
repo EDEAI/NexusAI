@@ -63,6 +63,7 @@ class ChatroomManager:
                 'is_temporary',
                 'max_round',
                 'initial_message_id',
+                'chat_file_list',
                 'chat_status',
                 'smart_selection'
             ],
@@ -229,7 +230,7 @@ class ChatroomManager:
                 self._chatrooms[chatroom_id] = chatroom
                 self._workflow_ws_manager.add_chatroom(user_id, chatroom_id)
                 chatroom_added_to_workflow_ws_manager = True
-                chatroom.load_history_messages(history_messages)
+                chatroom.load_history_messages(history_messages, chatroom_info['chat_file_list'])
                 await chatroom.chat(user_input is None, file_list)
             end_time = time()
             app_runs.update(
@@ -333,7 +334,7 @@ class ChatroomManager:
                             if last_message_id:
                                 chatrooms.update(
                                     {'column': 'id', 'value': chatroom_to_truncate},
-                                    {'initial_message_id': last_message_id}
+                                    {'initial_message_id': last_message_id, 'chat_file_list': None}
                                 )
                             await self._ws_manager.send_instruction(chatroom_to_truncate, 'TRUNCATABLE', False)
                             if chatroom_to_truncate != chatroom_id:
@@ -362,6 +363,12 @@ class ChatroomManager:
                                     assert isinstance(data, list), 'MCP tool list should be a list.'
                                     self._desktop_mcp_tool_list_by_chatroom[chatroom_id] = data
                                     await self._ws_manager.send_instruction_by_connection(connection, 'OK')
+                                case 'MCPTOOLFILES':
+                                    # MCP tool files
+                                    assert isinstance(data, dict), 'MCP tool files should be a dictionary.'
+                                    assert isinstance(mcp_tool_use_id := data['id'], int), f'Invalid MCP tool use ID: {mcp_tool_use_id}'
+                                    assert isinstance(files_to_upload := data['files_to_upload'], list), f'Invalid MCP tool files: {files_to_upload}'
+                                    await self._chatrooms[chatroom_id].set_mcp_tool_use_uploaded_files(mcp_tool_use_id, files_to_upload)
                                 case 'MCPTOOLRESULT':
                                     assert isinstance(data, dict), 'MCP tool result should be a dictionary.'
                                     assert isinstance(mcp_tool_use_id := data['id'], int), f'Invalid MCP tool use ID: {mcp_tool_use_id}'
@@ -381,8 +388,7 @@ class ChatroomManager:
                                         {'chat_status': 0}
                                     )
                                     await self._ws_manager.send_instruction(chatroom_id, 'STOPPABLE', False)
-                                    chatroom = self._chatrooms[chatroom_id]
-                                    if chatroom.mcp_tool_is_using:
+                                    if (chatroom := self._chatrooms.get(chatroom_id)) and chatroom.mcp_tool_is_using:
                                         await chatroom.stop_all_mcp_tool_uses('Stopped by user')
                                 case _:
                                     raise Exception(f'Unknown command: {cmd}')

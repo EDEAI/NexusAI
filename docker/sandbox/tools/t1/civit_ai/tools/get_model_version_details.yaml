@@ -1,0 +1,57 @@
+identity:
+  name: get_model_version_details
+  author: yt-koike
+  label:
+    en_US: Model Detail(Version)
+description:
+  human:
+    en_US: Gets details of a model at a certain version
+  llm: Gets details of a model at a certain version
+parameters:
+  - name: model_version_id
+    type: number
+    required: true
+    label:
+      en_US: Model version ID
+    human_description:
+      en_US: Model version ID
+    llm_description: Model version ID
+    form: llm
+extra:
+  python:
+    source: tools/get_model_version_details.py
+output_schema:
+  type: object
+  properties:
+    url:
+      type: string
+      label:
+        en_US: Download URL
+    created_at:
+      type: string
+      label:
+        en_US: Created at
+    published_at:
+      type: string
+      label:
+        en_US: Published at
+    download_count:
+      type: number
+      label:
+        en_US: Download Count
+    file_names:
+      type: array[string]
+      label:
+        en_US: Filenames
+    file_urls:
+      type: array[string]
+      label:
+        en_US: URLs of file
+    image_urls:
+      type: array[string]
+      label:
+        en_US: URLs of example image
+    image_nsfw:
+      type: array[number]
+      label:
+        en_US: NSFW levels of example image

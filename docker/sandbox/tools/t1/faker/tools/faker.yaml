@@ -1,0 +1,99 @@
+identity:
+  name: faker
+  author: tavan
+  label:
+    en_US: faker
+    zh_Hans: faker
+    pt_BR: faker
+description:
+  human:
+    en_US: Quickly generate a set of mock data (name, address, email, credit card number, etc.).
+    zh_Hans: 快速生成一组模拟数据（姓名、地址、邮件、信用卡号等）。
+    pt_BR: Gere rapidamente um conjunto de dados fictícios (nome, endereço, e-mail, número de cartão de crédito, etc.).
+  llm: Quickly generate a set of mock data (name, address, email, credit card number, etc.).
+parameters:
+  - name: type
+    type: select
+    options:
+      - name: name
+        value: name
+        label:
+          en_US: Name
+          zh_Hans: 姓名
+          pt_BR: Nome
+      - name: address
+        value: address
+        label:
+          en_US: Address
+          zh_Hans: 地址
+          pt_BR: Endereço
+      - name: email
+        value: email
+        label:
+          en_US: Email
+          zh_Hans: 邮件
+          pt_BR: Email
+      - name: credit_card_number
+        value: credit_card_number
+        label:
+          en_US: Credit Card Number
+          zh_Hans: 信用卡号
+          pt_BR: Número do Cartão de Crédito
+    required: true
+    label:
+      en_US: Type
+      zh_Hans: 类型
+      pt_BR: Tipo
+    human_description:
+      en_US: The type of random data to generate.
+      zh_Hans: 生成随机数据的类型。
+      pt_BR: O tipo de dados aleatórios a serem gerados.
+    form: llm
+  - name: count
+    type: number
+    required: true
+    label:
+      en_US: Count
+      zh_Hans: 生成数量
+      pt_BR: Contagem
+    human_description:
+      en_US: The number of random data to generate.
+      zh_Hans: 生成随机数据的数量。
+      pt_BR: O número de dados aleatórios a serem gerados.
+    llm_description: The number of random data to generate.
+    form: llm
+  - name: locale
+    type: select
+    options:
+      - name: en_US
+        value: en_US
+        label:
+          en_US: English
+          zh_Hans: 英语
+          pt_BR: Inglês
+      - name: zh_CN
+        value: zh_CN
+        label:
+          en_US: Chinese
+          zh_Hans: 中文
+          pt_BR: Chinês
+      - name: ja_JP
+        value: ja_JP
+        label:
+          en_US: Japanese
+          zh_Hans: 日语
+          pt_BR: Japonês
+    required: true
+    label:
+      en_US: Language
+      zh_Hans: 语言
+      pt_BR: Idioma
+    human_description:
+      en_US: The language of the generated data.
+      zh_Hans: 生成随机数据的语言。
+      pt_BR: O idioma dos dados gerados.
+    llm_description: The language of the generated data.
+    form: llm
+extra:
+  python:
+    source: tools/faker.py

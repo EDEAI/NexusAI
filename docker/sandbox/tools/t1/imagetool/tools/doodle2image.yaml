@@ -1,0 +1,166 @@
+identity:
+  name: doodle2image
+  author: caffbyte
+  label:
+    en_US: Doodle to Image
+    zh_Hans: 涂鸦作画
+    pt_BR: Doodle to Image
+description:
+  human:
+    en_US: Generate an image based on a doodle prompt.
+    zh_Hans: 根据涂鸦提示生成图像。
+    pt_BR: Generate an image based on a doodle prompt.
+  llm: Generate an image based on a doodle prompt.
+parameters:
+  - name: model
+    type: select
+    required: true
+    default: wanx-sketch-to-image-lite
+    label:
+      en_US: Model Name
+      zh_Hans: 模型名称
+      pt_BR: Model Name
+    human_description:
+      en_US: "The model name."
+      zh_Hans: "模型名称。"
+      pt_BR: "The model name."
+    llm_description: "The model name to use for generation."
+    form: form
+    options:
+      - label:
+          en_US: wanx-sketch-to-image-lite
+          zh_Hans: wanx-sketch-to-image-lite
+          pt_BR: wanx-sketch-to-image-lite
+        value: "wanx-sketch-to-image-lite"
+  - name: prompt
+    type: string
+    required: true
+    label:
+      en_US: Prompt
+      zh_Hans: 提示词
+      pt_BR: Prompt
+    human_description:
+      en_US: Text describing expected elements and visual characteristics of the generated image. Supports Chinese and English, max 75 characters.
+      zh_Hans: 用来描述生成图像中期望包含的元素和视觉特点。支持中英文，长度不超过75个字符，超过部分会自动截断。
+      pt_BR: Text describing expected elements and visual characteristics of the generated image. Supports Chinese and English, max 75 characters.
+    llm_description: Text describing expected elements and visual characteristics of the generated image. Supports Chinese and English, max 75 characters.
+    form: llm
+  - name: sketch_image_url
+    type: string
+    required: true
+    label:
+      en_US: Sketch Image URL
+      zh_Hans: 涂鸦图像URL
+      pt_BR: Sketch Image URL
+    human_description:
+      en_US: |
+        It must match the aspect ratio of the output image to avoid distortion. A white background is recommended. Supported formats: JPG, JPEG, PNG, TIFF, WEBP. Resolution: Between 256×256 and 2048×2048 pixels. File size: No more than 10 MB. Note: The URL must not contain Chinese characters.
+      zh_Hans: |
+        需要与输出图像的分辨率比例保持一致，否则会导致图片拉伸变形，建议使用白色背景图。图像格式：JPG、JPEG、PNG、TIFF、WEBP。分辨率：256×256至2048×2048像素。大小不超过10 MB。URL地址中不能包含中文字符。
+      pt_BR: |
+        It must match the aspect ratio of the output image to avoid distortion. A white background is recommended. Supported formats: JPG, JPEG, PNG, TIFF, WEBP. Resolution: Between 256×256 and 2048×2048 pixels. File size: No more than 10 MB. Note: The URL must not contain Chinese characters.
+    llm_description: |
+      It must match the aspect ratio of the output image to avoid distortion. A white background is recommended. Supported formats: JPG, JPEG, PNG, TIFF, WEBP. Resolution: Between 256×256 and 2048×2048 pixels. File size: No more than 10 MB. Note: The URL must not contain Chinese characters.
+    form: llm
+  - name: style
+    type: select
+    required: false
+    default: "<auto>"
+    label:
+      en_US: Image Style
+      zh_Hans: 输出图像的风格
+      pt_BR: Image Style
+    human_description:
+      en_US: Choose the Image Style.
+      zh_Hans: 从以下选项中选择图像风格。
+      pt_BR: Choose the Image Style.
+    llm_description: Choose the Image Style.
+    form: form
+    options:
+      - label:
+          en_US: Auto (random)
+          zh_Hans: 由模型随机输出图像风格
+        value: "<auto>"
+      - label:
+          en_US: 3D Cartoon
+          zh_Hans: 3D卡通
+        value: "<3d cartoon>"
+      - label:
+          en_US: Anime
+          zh_Hans: 二次元
+        value: "<anime>"
+      - label:
+          en_US: Oil Painting
+          zh_Hans: 油画
+        value: "<oil painting>"
+      - label:
+          en_US: Watercolor
+          zh_Hans: 水彩
+        value: "<watercolor>"
+      - label:
+          en_US: Sketch
+          zh_Hans: 素描
+        value: "<sketch>"
+      - label:
+          en_US: Chinese Painting
+          zh_Hans: 中国画
+        value: "<chinese painting>"
+      - label:
+          en_US: Flat Illustration
+          zh_Hans: 扁平插画
+        value: "<flat illustration>"
+  - name: size
+    type: select
+    required: false
+    default: 768*768
+    label:
+      en_US: Image Size
+      zh_Hans: 输出图像的分辨率
+      pt_BR: Image Size
+    human_description:
+      en_US: Select output image resolution.
+      zh_Hans: 从以下选项中选择图像分辨率。
+      pt_BR: Select output image resolution.
+    llm_description: Select output image resolution.
+    form: form
+    options:
+      - label:
+          en_US: 768×768
+          zh_Hans: 768×768
+          pt_BR: 768×768
+        value: 768*768
+  - name: count
+    type: number
+    required: false
+    default: 1
+    label:
+      en_US: Number of Images Generated
+      zh_Hans: 生成的图像数量
+      pt_BR: Number of Images Generated
+    human_description:
+      en_US: Select how many images to generate (1–4).
+      zh_Hans: 选择要生成的图片数量（1~4）。
+      pt_BR: Select how many images to generate (1~4).
+    llm_description: Number of images to generate.
+    form: form
+    min: 1
+    max: 4
+  - name: sketch_weight
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Sketch Weight
+      zh_Hans: 草图对输出图像的约束程度
+      pt_BR: Sketch Weight
+    human_description:
+      en_US: Range 0–10, step 1. Higher values increase adherence to the input sketch.
+      zh_Hans: 取值范围为0-10，取值间隔为1，默认值为10。取值越大表示输出图像跟输入草图越相似。
+      pt_BR: Range 0–10, step 1. Higher values stick closer to the sketch.
+    llm_description: Controls how closely the output follows the sketch.
+    form: form
+    min: 0
+    max: 10
+extra:
+  python:
+    source: "tools/doodle2image.py"

@@ -1,0 +1,27 @@
+extra:
+  python:
+    source: provider/chart.py
+identity:
+  author: langgenius
+  description:
+    en_US:
+      Chart Generator is a tool for generating statistical charts like bar chart,
+      line chart, pie chart, etc.
+    pt_BR:
+      O Gerador de gráficos é uma ferramenta para gerar gráficos estatísticos
+      como gráfico de barras, gráfico de linhas, gráfico de pizza, etc.
+    zh_Hans: 图表生成是一个用于生成可视化图表的工具，你可以通过它来生成柱状图、折线图、饼图等各类图表
+  icon: icon.png
+  label:
+    en_US: ChartGenerator
+    pt_BR: Gerador de gráficos
+    zh_Hans: 图表生成
+  name: chart
+  tags:
+    - design
+    - productivity
+    - utilities
+tools:
+  - tools/line.yaml
+  - tools/bar.yaml
+  - tools/pie.yaml

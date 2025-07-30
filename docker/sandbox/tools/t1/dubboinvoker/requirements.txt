@@ -1,0 +1,4 @@
+dify_plugin==0.0.1b76
+kazoo==2.8.0
+httpx>=0.27.0
+nacos-sdk-python>=2.0.3

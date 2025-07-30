@@ -1,0 +1,49 @@
+identity:
+  name: mcp_sse_list_tools
+  author: junjiem
+  label:
+    en_US: Fetch MCP Tools
+    zh_Hans: 获取 MCP 工具列表
+description:
+  human:
+    en_US: Fetch MCP Servers tools list.
+    zh_Hans: 获取 MCP 服务端的工具列表。
+  llm: Fetch MCP Servers tools list (Gets a list of MCP tools in addition to existing tools).
+extra:
+  python:
+    source: tools/mcp_list_tools.py
+parameters:
+  - name: resources_as_tools
+    type: boolean
+    required: true
+    default: true
+    label:
+      en_US: MCP Resources as Tools
+      zh_Hans: MCP 资源作为工具
+    human_description:
+      en_US: Fetch and call the preset MCP Resources as Tools.
+      zh_Hans: 将预设的 MCP Resources 作为 Tools 返回和调用。
+    form: form
+  - name: prompts_as_tools
+    type: boolean
+    required: true
+    default: true
+    label:
+      en_US: MCP Prompts as Tools
+      zh_Hans: MCP 提示词作为工具
+    human_description:
+      en_US: Fetch and call the preset MCP Prompts as Tools.
+      zh_Hans: 将预设的 MCP Prompts 作为 Tools 返回和调用。
+    form: form
+  - name: servers_config
+    type: string
+    required: false
+    label:
+      en_US: MCP Servers config
+      zh_Hans: MCP 服务配置
+    human_description:
+      en_US: MCP Servers config, support multiple MCP services. 
+        (Optional, Filling in this field will overwrite the MCP Servers config entered during authorization.)
+      zh_Hans: MCP服务配置，支持多个MCP服务。
+        （选填，填写后将覆盖授权时填写的MCP服务配置。）
+    form: llm

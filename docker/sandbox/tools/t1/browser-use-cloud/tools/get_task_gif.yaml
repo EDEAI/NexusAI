@@ -1,0 +1,34 @@
+identity:
+  name: get_task_gif
+  author: lysonober
+  label:
+    en_US: "Get Task GIF"
+    zh_Hans: "获取任务 GIF"
+    ja_JP: "タスク GIF を取得"
+    pt_BR: "Obter GIF da Tarefa"
+description:
+  human:
+    en_US: "Returns a GIF URL generated from the screenshots of the task execution. Only available for completed tasks that have screenshots."
+    zh_Hans: "返回从任务执行截图生成的 GIF URL。仅适用于有截图的已完成任务。"
+    ja_JP: "タスク実行のスクリーンショットから生成された GIF URL を返します。スクリーンショットがある完了したタスクでのみ利用可能です。"
+    pt_BR: "Retorna uma URL de GIF gerada a partir das capturas de tela da execução da tarefa. Disponível apenas para tarefas concluídas que possuem capturas de tela."
+  llm: "This tool retrieves a URL to an animated GIF that shows the progression of a browser automation task. It makes a GET request to the /api/v1/task/{task_id}/gif endpoint. The GIF is automatically generated from screenshots taken during task execution, providing a visual replay of what happened in the browser. This is particularly useful for reviewing complex tasks or debugging issues. Note that this is only available for completed tasks that have screenshots captured during execution."
+parameters:
+  - name: task_id
+    type: string
+    required: true
+    label:
+      en_US: "Task ID"
+      zh_Hans: "任务 ID"
+      ja_JP: "タスク ID"
+      pt_BR: "ID da Tarefa"
+    human_description:
+      en_US: "The unique identifier of the task for which you want to retrieve a GIF. Must be a valid task ID from a previously completed task."
+      zh_Hans: "您要检索 GIF 的任务的唯一标识符。必须是先前完成的任务的有效任务 ID。"
+      ja_JP: "GIF を取得したいタスクの一意の識別子。以前に完了したタスクの有効なタスク ID である必要があります。"
+      pt_BR: "O identificador único da tarefa para a qual você deseja recuperar um GIF. Deve ser um ID de tarefa válido de uma tarefa concluída anteriormente."
+    llm_description: "The unique identifier of the task for which to retrieve a GIF animation. This must be a valid task ID from a previously completed task. The task must have had screenshots captured during execution for a GIF to be available."
+    form: llm
+extra:
+  python:
+    source: tools/get_task_gif.py

@@ -1,0 +1,50 @@
+identity:
+  name: get_recent_event
+  author: acane0320
+  label:
+    en_US: Get User Recent Events
+    zh_Hans: 获取用户近期事件
+    ja_Jp: ユーザーの最近のイベントを取得する
+    pt_BR: Obter Eventos Recentes do Usuário
+description:
+  human:
+    en_US: Retrieve the most recent events for a user
+    zh_Hans: 获取用户的最近事件记录
+    ja_Jp: ユーザーの最近のイベントを取得する
+    pt_BR: Recuperar os eventos mais recentes de um usuário
+  llm: Use this tool to retrieve the most recent events for a user. This is useful for understanding the user's recent activities or interactions.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to retrieve the recent events for
+      zh_Hans: 要获取近期事件的用户 ID
+      ja_Jp: 最近のイベントを取得するユーザーの ID
+      pt_BR: O ID do usuário para recuperar os eventos recentes
+    llm_description: The ID of the user to retrieve the recent events for.
+    form: llm
+  - name: topk
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Top K
+      zh_Hans: 前K条
+      ja_Jp: トップ K
+      pt_BR: Top K
+    human_description:
+      en_US: The number of most recent events to retrieve
+      zh_Hans: 要获取的最近事件的数量
+      ja_Jp: 取得する最近のイベントの数
+      pt_BR: O número de eventos mais recentes a serem recuperados
+    llm_description: The number of most recent events to retrieve.
+    form: llm
+extra:
+  python:
+    source: tools/user_event/get_recent_event.py

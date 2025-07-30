@@ -1,0 +1,197 @@
+description:
+  human:
+    en_US: Recursively search through a urls subdomains, and gather the content.
+    zh_Hans: 递归爬取一个网址的子域名，并收集内容。
+  llm: This tool initiates a web crawl to extract data from a specified URL. It allows
+    configuring crawler options such as including or excluding URL patterns, generating
+    alt text for images using LLMs (paid plan required), limiting the maximum number
+    of pages to crawl, and returning only the main content of the page. The tool can
+    return either a list of crawled documents or a list of URLs based on the provided
+    options.
+extra:
+  python:
+    source: tools/crawl.py
+identity:
+  author: watercrawl
+  label:
+    en_US: Crawl
+    zh_Hans: 深度爬取
+  name: crawl
+parameters:
+- form: llm
+  human_description:
+    en_US: The base URL to start crawling from.
+    zh_Hans: 要爬取网站的起始URL。
+  label:
+    en_US: Start URL
+    zh_Hans: 起始URL
+  llm_description: The URL of the website that needs to be crawled. This is a required
+    parameter.
+  name: url
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: If you choose not to wait, it will directly return a crawl request json object. You can use
+      this object uuid to check the crawling results or cancel the crawling task, which
+      is usually very useful for a large-scale crawling task.
+    zh_Hans: 如果你选择不等待，它将直接返回爬取请求json对象。你可以使用这个对象uuid来检查爬取结果或取消爬取任务，通常对大规模爬取任务很有用。
+  label:
+    en_US: Wait For Results
+    zh_Hans: 等待爬取结果
+  name: wait_for_results
+  type: boolean
+  default: true
+- form: llm
+  human_description:
+    en_US: 'Pages matching these patterns will be skipped. Example: /blog/*, */about/*'
+    zh_Hans: 匹配这些模式的页面将被跳过。示例：/blog/*, */about/*
+  label:
+    en_US: URL patterns to exclude
+    zh_Hans: 要排除的URL模式
+  name: exclude_paths
+  placeholder:
+    en_US: Use commas to separate multiple tags
+    zh_Hans: 多个标签时使用半角逗号分隔
+  type: string
+- form: llm
+  human_description:
+    en_US: 'Only pages matching these patterns will be crawled. Example: /blog/*, /about/*'
+    zh_Hans: 只有与这些模式匹配的页面才会被爬取。示例：/blog/*, /about/*
+  label:
+    en_US: URL patterns to include
+    zh_Hans: 要包含的URL模式
+  name: include_paths
+  placeholder:
+    en_US: Use commas to separate multiple tags
+    zh_Hans: 多个标签时使用半角逗号分隔
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Maximum depth to crawl relative to the entered URL. A max depth of 0 scrapes
+      only the entered URL. A max depth of 1 scrapes the entered URL and all pages
+      one level deep. A max depth of 2 scrapes the entered URL and all pages up to
+      two levels deep. Higher values follow the same pattern.
+    zh_Hans: 相对于输入的URL，爬取的最大深度。max_depth为0时，仅抓取输入的URL。max_depth为1时，抓取输入的URL以及所有一级深层页面。max_depth为2时，抓取输入的URL以及所有两级深层页面。更高值遵循相同模式。
+  label:
+    en_US: Maximum crawl depth
+    zh_Hans: 爬取深度
+  min: 0
+  name: max_depth
+  type: number
+  default: 2
+- form: llm
+  human_description:
+    en_US: Specify the maximum number of pages to crawl. The crawler will stop after
+      reaching this limit.
+    zh_Hans: 指定要爬取的最大页面数。爬虫将在达到此限制后停止。
+  label:
+    en_US: Maximum pages to crawl
+    zh_Hans: 最大爬取页面数
+  min: 1
+  name: page_limit
+  required: false
+  type: number
+  default: 5
+- form: form
+  human_description:
+    en_US: Allows the crawler to follow links. By default, it follows all subdomains. You can specify a custom list of domains using comma-separated values, including wildcard patterns to match URLs. *.example.com
+    zh_Hans: 允许爬虫跟随链接。默认情况下，它会在所有子域名上跟随链接。您可以使用逗号分隔值，包括通配符模式来匹配URL。*.example.com
+  label:
+    en_US: Allowed Domains
+    zh_Hans: 允许爬取的域名
+  name: allowed_domains
+  type: string
+  default: ''
+- form: form
+  human_description:
+    en_US: 'Headers to send with the request. Can be used to send cookies, user-agent,
+      etc. Example: {"cookies": "testcookies"}'
+    zh_Hans: '随请求发送的头部。可以用来发送cookies、用户代理等。示例：{"cookies": "testcookies"}'
+  label:
+    en_US: Headers
+    zh_Hans: 请求头
+  name: headers
+  placeholder:
+    en_US: Please enter an object that can be serialized in JSON
+    zh_Hans: 请输入可以json序列化的对象
+  type: string
+- form: form
+  human_description:
+    en_US: 'Only include tags, classes and ids from the page in the final output.
+      Use comma separated values. Example: script, .ad, #footer'
+    zh_Hans: '仅在最终输出中包含HTML页面的这些标签，可以通过标签名、类或ID来设定，使用逗号分隔值。示例：script, .ad, #footer'
+  label:
+    en_US: Include Tags
+    zh_Hans: 仅抓取这些标签
+  name: include_tags
+  placeholder:
+    en_US: Use commas to separate multiple tags
+    zh_Hans: 多个标签时使用半角逗号分隔
+  type: string
+- form: form
+  human_description:
+    en_US: 'Tags, classes and ids to remove from the page. Use comma separated values.
+      Example: script, .ad, #footer'
+    zh_Hans: '要在最终输出中移除HTML页面的这些标签，可以通过标签名、类或ID来设定，使用逗号分隔值。示例：script, .ad, #footer'
+  label:
+    en_US: Exclude Tags
+    zh_Hans: 要移除这些标签
+  name: exclude_tags
+  placeholder:
+    en_US: Use commas to separate multiple tags
+    zh_Hans: 多个标签时使用半角逗号分隔
+  type: string
+- form: form
+  human_description:
+    en_US: Only return the main content of the page excluding headers, navs, footers,
+      etc.
+    zh_Hans: 只返回页面的主要内容，不包括头部、导航栏、尾部等。
+  label:
+    en_US: only Main Content
+    zh_Hans: 仅抓取主要内容
+  name: only_main_content
+  type: boolean
+  default: true
+- form: form
+  human_description:
+    en_US: The timeout for the request, in milliseconds. Default is 3000ms.
+  label:
+    en_US: Timeout
+    zh_Hans: 超时时间
+  min: 1000
+  default: 3000
+  name: timeout
+  type: number
+- form: form
+  human_description:
+    en_US: Wait x amount of milliseconds for the page to load to fetch content.
+    zh_Hans: 等待x毫秒以使页面加载并获取内容。
+  label:
+    en_US: Wait Time
+    zh_Hans: 等待时间
+  min: 0
+  default: 1000
+  name: wait_time
+  type: number
+- form: form
+  human_description:
+    en_US: Include html in the output
+    zh_Hans: 包含html
+  label:
+    en_US: Include HTML
+    zh_Hans: 包含html
+  name: include_html
+  type: boolean
+  default: false
+- form: form
+  human_description:
+    en_US: Include links in the output
+    zh_Hans: 包含链接
+  label:
+    en_US: Include Links
+    zh_Hans: 包含链接
+  name: include_links
+  type: boolean
+  default: false

@@ -1,0 +1,33 @@
+description:
+  human:
+    en_US: A tool for performing a Google search and extracting snippets and webpages.Input
+      should be a search query.
+    pt_BR: A tool for performing a Google search and extracting snippets and webpages.Input
+      should be a search query.
+    zh_Hans: 一个用于执行 Google 搜索并提取片段和网页的工具。输入应该是一个搜索查询。
+  llm: A tool for performing a Google search and extracting snippets and webpages.Input
+    should be a search query.
+extra:
+  python:
+    source: tools/serper_search.py
+identity:
+  author: zhuhao
+  label:
+    en_US: Serper
+    pt_BR: Serper
+    zh_Hans: Serper
+  name: serper
+parameters:
+- form: llm
+  human_description:
+    en_US: used for searching
+    pt_BR: used for searching
+    zh_Hans: 用于搜索网页内容
+  label:
+    en_US: Query string
+    pt_BR: Query string
+    zh_Hans: 查询语句
+  llm_description: key words for searching
+  name: query
+  required: true
+  type: string

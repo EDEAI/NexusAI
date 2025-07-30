@@ -1,0 +1,139 @@
+identity:
+  name: rhymefinder
+  author: whyteawhy
+  label:
+    en_US: RhymeFinder
+    zh_Hans: 押韵词查询
+    pt_BR: RhymeFinder
+description:
+  human:
+    en_US: A tool for finding rhyming words with syllable counts and song examples for a given English word.
+    zh_Hans: 一个查询英文押韵词、音节数和歌曲示例的工具。
+    pt_BR: A tool for finding rhyming words with syllable counts and song examples for a given English word.
+  llm: A tool for finding perfect rhymes for English words. Given an English word, it returns a list of rhyming words, their syllable counts, and song examples where they are used.
+parameters:
+  - name: word
+    type: string
+    required: true
+    label:
+      en_US: English Word
+      zh_Hans: 英文单词
+      pt_BR: English Word
+    human_description:
+      en_US: The English word to find rhymes for
+      zh_Hans: 需要查询押韵词的英文单词
+      pt_BR: The English word to find rhymes for
+    llm_description: The English word for which to find rhyming words. Must be a valid English word.
+    form: llm
+  - name: match_type
+    type: select
+    required: false
+    default: "full"
+    options:
+      - value: "full"
+        label:
+          en_US: Full Rhyme
+          zh_Hans: 完全押韵
+          pt_BR: Full Rhyme
+      - value: "partial"
+        label:
+          en_US: Partial Rhyme
+          zh_Hans: 部分押韵
+          pt_BR: Partial Rhyme
+    label:
+      en_US: Rhyme Type
+      zh_Hans: 押韵类型
+      pt_BR: Rhyme Type
+    human_description:
+      en_US: Choose between full rhyme (all syllables) or partial rhyme (last syllables)
+      zh_Hans: 选择完全押韵（所有音节）或部分押韵（最后几个音节）
+      pt_BR: Choose between full rhyme (all syllables) or partial rhyme (last syllables)
+    llm_description: Determines if the tool should return words that fully rhyme with the input word (matching all syllables) or partially rhyme (matching only the last syllables).
+    form: form
+  - name: syllable_filter
+    type: select
+    required: false
+    default: "all"
+    options:
+      - value: "all"
+        label:
+          en_US: All Syllables
+          zh_Hans: 所有音节
+          pt_BR: All Syllables
+      - value: "1"
+        label:
+          en_US: 1 Syllable
+          zh_Hans: 1个音节
+          pt_BR: 1 Syllable
+      - value: "2"
+        label:
+          en_US: 2 Syllables
+          zh_Hans: 2个音节
+          pt_BR: 2 Syllables
+      - value: "3"
+        label:
+          en_US: 3 Syllables
+          zh_Hans: 3个音节
+          pt_BR: 3 Syllables
+      - value: "4"
+        label:
+          en_US: 4 Syllables
+          zh_Hans: 4个音节
+          pt_BR: 4 Syllables
+    label:
+      en_US: Syllable Filter
+      zh_Hans: 音节筛选
+      pt_BR: Syllable Filter
+    human_description:
+      en_US: Filter results by syllable count
+      zh_Hans: 按音节数筛选结果
+      pt_BR: Filter results by syllable count
+    llm_description: Filter the rhyming words by syllable count. Select 'All Syllables' to get words with various syllable counts, or select a specific number to get only words with that syllable count.
+    form: form
+  - name: result_count
+    type: number
+    required: false
+    default: 10
+    min: 5
+    max: 500
+    label:
+      en_US: Number of Results
+      zh_Hans: 结果数量
+      pt_BR: Number of Results
+    human_description:
+      en_US: Number of rhyming words to generate (5-500)
+      zh_Hans: 要生成的押韵词数量（5-500）
+      pt_BR: Number of rhyming words to generate (5-500)
+    llm_description: The number of rhyming words to generate. Default is 10, minimum is 5, maximum is 500.
+    form: form
+  - name: model
+    type: model-selector
+    scope: llm
+    required: true
+    label:
+      en_US: Language Model
+      zh_Hans: 语言模型
+      pt_BR: Modelo de Linguagem
+    human_description:
+      en_US: Select the language model to use for generating rhymes
+      zh_Hans: 选择用于生成押韵词的语言模型
+      pt_BR: Selecione o modelo de linguagem para gerar rimas
+    llm_description: The language model to use for generating rhyming words.
+    form: form
+output_schema:
+  type: object
+  properties:
+    rhyming_words:
+      type: array
+      items:
+        type: object
+        properties:
+          word:
+            type: string
+          syllables:
+            type: integer
+          song_example:
+            type: string
+extra:
+  python:
+    source: tools/rhymefinder.py

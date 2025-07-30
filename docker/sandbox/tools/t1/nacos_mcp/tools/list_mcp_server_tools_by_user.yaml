@@ -1,0 +1,37 @@
+identity:
+  name: list_mcp_server_tools_by_hand
+  author: nacos
+  label:
+    en_US: List tools of user-preconfigured MCP servers
+    zh_Hans: 列出用户预配置的 MCP Server 的工具列表
+description:
+  human:
+    en_US: List tools of user-preconfigured MCP servers
+    zh_Hans: 列出用户预配置的 MCP Server 工具列表
+  llm: 返回用户预配置的 MCP Servers 的对应的工具列表，请根据返回的结果，挑选和任务相关的需要使用的 MCP Server及工具进行调用
+extra:
+  python:
+    source: tools/list_mcp_server_tools_by_user.py
+parameters:
+  - name: namespace_id
+    type: string
+    required: false
+    label:
+      en_US: namespace_id
+      zh_Hans: 命名空间ID
+    human_description:
+      en_US: Nacos namespaceId
+      zh_Hans: Nacos 命名空间ID
+    form: form
+    default: public
+  - name: mcp_server_name
+    type: string
+    required: true
+    label:
+      en_US: MCP Server Name
+      zh_Hans: MCP Server 的名字
+    human_description:
+      en_US: Names of MCP Servers, multiple supported, separated by semicolons.
+      zh_Hans: MCP Server 的名字，支持多个，每个之间以分号分隔
+    llm_description: 想查询工具列表 MCP Server 的名字，支持多个，每个之间以分号分隔
+    form: form

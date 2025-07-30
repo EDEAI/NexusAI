@@ -1,0 +1,63 @@
+identity:
+  name: tianyancha-mortgage
+  author: bdim
+  label:
+    en_US: Chattel Mortgage
+    zh_Hans: 动产抵押
+description:
+  human:
+    en_US: Get chattel mortgage information
+    zh_Hans: 获取企业动产抵押公告信息
+  llm: 可以通过公司名称或ID获取企业动产抵押公告信息，企业动产抵押公告信息包括被担保债权类型、数额、登记机关等字段信息。
+parameters:
+  - name: company_keyword
+    type: string
+    required: true
+    label:
+      en_US: Company Keyword
+      zh_Hans: 公司关键词
+    human_description:
+      en_US: The name or ID of the company to search for
+      zh_Hans: 要查询的公司名称或ID
+    llm_description: 要查询的公司名称或ID，例如"讷河市丰盛现代农业农机专业合作社"
+    form: llm
+  - name: page_size
+    type: string
+    required: false
+    default: 20
+    label:
+      en_US: Page Size
+      zh_Hans: 每页数量
+    human_description:
+      en_US: Number of records per page (max 50)
+      zh_Hans: 每页记录数量（最大50）
+    llm_description: 每页返回的记录数量，默认20，最大50
+    form: llm
+  - name: page_num
+    type: string
+    required: false
+    default: 1
+    label:
+      en_US: Page Number
+      zh_Hans: 页码
+    human_description:
+      en_US: Page number to retrieve
+      zh_Hans: 要获取的页码
+    llm_description: 要获取的页码，默认为第1页
+    form: llm
+extra:
+  python:
+    source: tools/tianyancha_mortgage.py
+credentials:
+  - name: token
+    type: string
+    required: true
+    label: 
+      en_US: Tianyancha API Token
+      zh_Hans: 天眼查API Token
+    placeholder:
+      en_US: Enter your Tianyancha API token
+      zh_Hans: 输入你的天眼查API token
+    help:
+      en_US: You can get your token from Tianyancha data center -> My APIs
+      zh_Hans: 你可以从天眼查的数据中心 -> 我的接口中获取token

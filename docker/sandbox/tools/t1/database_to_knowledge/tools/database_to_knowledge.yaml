@@ -1,0 +1,144 @@
+identity:
+  name: database_to_knowledge
+  author: majinkai
+  label:
+    en_US: Database to knowledge
+    zh_Hans: 表结构写入知识库
+description:
+  human:
+    en_US: Write the database metadata into the dify knowledge.
+    zh_Hans: 此工具将数据库表结构写入知识库
+  llm: Write the database metadata into the dify knowledge.
+extra:
+  python:
+    source: tools/database_to_knowledge.py
+parameters:
+  - name: db_type
+    type: select
+    required: true
+    options:
+      - label:
+          en_US: MySQL
+        value: mysql
+      - label:
+          en_US: Oracle
+        value: oracle
+      - label:
+          en_US: Microsoft SQL Server
+        value: mssql
+      - label:
+          en_US: PostgreSQL
+        value: postgresql
+      - label:
+          en_US: Apache Doris
+        value: doris
+    label:
+      en_US: Database type
+      zh_Hans: 数据库类型
+    human_description:
+      en_US: Database type
+      zh_Hans: 数据库类型
+    llm_description: Database type
+    form: form
+  - name: host
+    type: string
+    required: true
+    label:
+      en_US: Host
+      zh_Hans: 主机地址
+    human_description:
+      en_US: Host
+      zh_Hans: 主机地址
+    llm_description: Host
+    form: form
+  - name: port
+    type: number
+    required: true
+    min: 1
+    max: 65535
+    label:
+      en_US: Port
+      zh_Hans: 端口号
+    human_description:
+      en_US: Port
+      zh_Hans: 端口号
+    llm_description: Port
+    form: form
+  - name: database
+    type: string
+    required: true
+    label:
+      en_US: Database
+      zh_Hans: 数据库名
+    human_description:
+      en_US: Database
+      zh_Hans: 数据库名
+    llm_description: Database
+    form: form
+  - name: username
+    type: string
+    required: true
+    label:
+      en_US: Username
+      zh_Hans: 用户名
+    human_description:
+      en_US: Username
+      zh_Hans: 用户名
+    llm_description: Username
+    form: form
+  - name: password
+    type: secret-input
+    required: true
+    label:
+      en_US: Password
+      zh_Hans: 密码
+    human_description:
+      en_US: Password
+      zh_Hans: 密码
+    llm_description: Password
+    form: form
+  - name: properties
+    type: string
+    required: false
+    label:
+      en_US: Database properties
+      zh_Hans: 数据库属性
+    human_description:
+      en_US: 'Database properties, for example: options=-csearch_path%3Dschema_name'
+      zh_Hans: 数据库属性，例如：options=-csearch_path%3Dschema_name
+    llm_description: Database properties
+    form: form
+  - name: table_names
+    type: string
+    label:
+      en_US: Table names(Split with commas)
+      zh_Hans: 表名(逗号分隔)
+    human_description:
+      en_US: Table names(Split with commas)
+      zh_Hans: 表名(逗号分隔)
+    llm_description: Table names
+    form: form
+  - name: embedding_model
+    type: model-selector
+    scope: text-embedding
+    required: true
+    label:
+      en_US: Embedding model
+      zh_Hans: Embedding 模型
+    human_description:
+      en_US: Embedding model
+      zh_Hans: Embedding 模型
+    llm_description: which Text Embedding Model to invoke
+    form: form
+  - name: rerank_model
+    type: model-selector
+    scope: rerank
+    required: true
+    label:
+      en_US: Rerank model
+      zh_Hans: Rerank 模型
+    human_description:
+      en_US: Rerank model
+      zh_Hans: Rerank 模型
+    llm_description: which Rerank Model to invoke
+    form: form

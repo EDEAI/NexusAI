@@ -1,0 +1,45 @@
+identity:
+  name: dataeyes_reader
+  author: dataeyesai
+  label:
+    en_US: DataEyes Reader
+    zh_Hans: 网页阅读器
+    pt_BR: DataEyes Reader
+description:
+  human:
+    en_US: Extract web page content and convert it to LLM-friendly markdown
+    zh_Hans: 读取网页内容并返回大模型友好的 Markdown 格式
+    pt_BR: Extrair conteúdo de páginas web e converter para markdown amigável para LLM
+  llm: Parses and extracts web page content, converting it to clean markdown optimized for LLM processing and analysis.
+parameters:
+  - name: url
+    type: string
+    required: true
+    label:
+      en_US: URL
+      zh_Hans: URL
+      pt_BR: URL
+    human_description:
+      en_US: The web page URL to extract content from
+      zh_Hans: 要读取的网页链接
+      pt_BR: A URL da página web para extrair conteúdo
+    llm_description: The target web page URL that needs content extraction and analysis
+    form: llm
+  - name: timeout
+    type: number
+    required: false
+    label:
+      en_US: Timeout (seconds)
+      zh_Hans: 超时时间（秒）
+      pt_BR: Tempo limite (segundos)
+    human_description:
+      en_US: Page loading timeout in seconds (1-60)
+      zh_Hans: 页面加载超时时间，单位为秒（1-60）
+      pt_BR: Tempo limite de carregamento da página em segundos (1-60)
+    llm_description: Maximum time in seconds to wait for the web page to fully load before timing out
+    form: llm
+    minimum: 1
+    maximum: 60
+extra:
+  python:
+    source: tools/dataeyes_reader.py

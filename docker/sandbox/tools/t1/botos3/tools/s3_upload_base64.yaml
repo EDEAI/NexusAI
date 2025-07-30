@@ -1,0 +1,37 @@
+identity:
+  name: s3_upload_base64
+  author: datoujiejie
+  label:
+    en_US: Upload base64 via s3
+    zh_Hans: 通过s3上传base64
+description:
+  human:
+    en_US: Upload base64 via s3
+    zh_Hans: 通过s3上传base64
+  llm: Upload base64 via s3
+parameters:
+  - name: file_base64
+    type: string
+    required: true
+    label:
+      en_US: file_base64
+      zh_Hans: 文件base64
+    human_description:
+      en_US: Base64 encoded file content
+      zh_Hans: base64编码文件内容
+    llm_description: Base64 encoded file content
+    form: llm
+  - name: s3_key
+    type: string
+    required: true
+    label:
+      en_US: S3 Object key
+      zh_Hans: s3对象key
+    human_description:
+      en_US: S3 Object key
+      zh_Hans: s3对象key
+    llm_description: S3 Object key
+    form: llm
+extra:
+  python:
+    source: tools/s3_upload_base64.py

@@ -1,0 +1,80 @@
+identity:
+  author: lework
+  name: aliyun-sls
+  label:
+    en_US: Aliyun SLS
+    zh_Hans: 阿里云日志服务
+    pt_BR: Aliyun SLS
+  description:
+    en_US: Query logs from Aliyun SLS (Simple Log Service)
+    zh_Hans: 查询阿里云日志服务(SLS)中的日志数据
+    pt_BR: Query logs from Aliyun SLS (Simple Log Service)
+  icon: icon.svg
+  tags:
+    - other
+credentials_for_provider: #添加 credentials_for_provider 字段
+  endpoint:
+    type: secret-input
+    required: true
+    label:
+      en_US: Endpoint
+      zh_Hans: 端点
+    placeholder:
+      en_US: Please input your endpoint
+      zh_Hans: 请输入你的端点
+    help:
+      en_US: Get your endpoint from Aliyun SLS
+      zh_Hans: 从阿里云日志服务获取您的端点
+    url: https://sls.console.aliyun.com/lognext/project/list
+  access_key_id:
+    type: secret-input
+    required: true
+    label:
+      en_US: Access Key ID
+      zh_Hans: 访问密钥ID
+    placeholder:
+      en_US: Please input your access key id
+      zh_Hans: 请输入你的访问密钥ID
+    help:
+      en_US: Get your access key id from Aliyun SLS
+      zh_Hans: 从阿里云日志服务获取您的访问密钥ID
+    url: https://sls.console.aliyun.com/lognext/project/list
+  access_key_secret:
+    type: secret-input
+    required: true
+    label:
+      en_US: Access Key Secret
+      zh_Hans: 访问密钥密钥
+    placeholder:
+      en_US: Please input your access key secret
+      zh_Hans: 请输入你的访问密钥密钥
+    help:
+      en_US: Get your access key secret from Aliyun SLS
+      zh_Hans: 从阿里云日志服务获取您的访问密钥密钥
+  project:
+    type: secret-input
+    required: true
+    label:
+      en_US: Project
+      zh_Hans: 默认项目
+    placeholder:
+      en_US: Please input your project
+      zh_Hans: 请输入你的项目
+    help:
+      en_US: Get your project from Aliyun SLS
+      zh_Hans: 从阿里云日志服务获取您的项目
+  logstore:
+    type: secret-input
+    required: true
+    label:
+      en_US: Logstore
+      zh_Hans: 默认日志库
+    placeholder:
+      en_US: Please input your logstore
+      zh_Hans: 请输入你的日志库
+
+tools:
+  - tools/aliyun-sls.yaml
+extra:
+  python:
+    source: provider/aliyun-sls.py

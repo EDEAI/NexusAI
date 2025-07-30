@@ -1,0 +1,92 @@
+identity:
+  name: "funasr-connecter"
+  author: "michael_edison"
+  label:
+    en_US: "funasr-connecter"
+    zh_Hans: "funasr连接器"
+    pt_BR: "funasr-connecter"
+description:
+  human:
+    en_US: "help dify to connect to funasr"
+    zh_Hans: "funasr-connecter是一个dify连接到funasr websocket的工具"
+    pt_BR: "help dify to connect to funasr"
+  llm: "help dify to connect to funasr"
+parameters:
+  - name: host
+    type: string
+    required: true
+    label:
+      en_US: host
+      zh_Hans: host
+      pt_BR: host
+    human_description:
+      en_US: "IP address of the FunASR server"
+      zh_Hans: "funasr 服务器ip地址"
+      pt_BR: "IP address of the FunASR server"
+    form: form
+  - name: port
+    type: number
+    required: true
+    label:
+      en_US: port
+      zh_Hans: port
+      pt_BR: port
+    human_description:
+      en_US: "Port of the FunASR server"
+      zh_Hans: "funasr 服务器端口号"
+      pt_BR: "Port of the FunASR server"
+    form: form
+  - name: audio_in
+    type: files
+    mime_types: [ "audio/mp3", "audio/mp4", "audio/mpeg", "audio/mpga", "audio/m4a", "audio/wav", "audio/webm" ]
+    required: true
+    label:
+      en_US: audio_in
+      zh_Hans: audio_in
+      pt_BR: audio_in
+    human_description:
+      en_US: "input audio file "
+      zh_Hans: "input audio file "
+      pt_BR: "input audio file "
+    form: llm
+  - name: ssl
+    type: boolean
+    required: true
+    default: false
+    label:
+      en_US: ssl
+      zh_Hans: ssl
+      pt_BR: ssl
+    human_description:
+      en_US: "Whether to use SSL encryption"
+      zh_Hans: "Whether to use SSL encryption"
+      pt_BR: "Whether to use SSL encryption"
+    form: form
+  - name: hotword
+    type: string
+    required: false
+    label:
+      en_US: hotword
+      zh_Hans: hotword
+      pt_BR: hotword
+    human_description:
+      en_US: "Hotwords to enhance recognition"
+      zh_Hans: "提高识别度的热词"
+      pt_BR: "Hotwords to enhance recognition"
+    form: llm
+  - name: use_itn
+    type: boolean
+    default: true
+    required: true
+    label:
+      en_US: use_itn
+      zh_Hans: use_itn
+      pt_BR: use_itn
+    human_description:
+      en_US: "Whether to use ITN"
+      zh_Hans: "Whether to use ITN"
+      pt_BR: "Whether to use ITN"
+    form: form
+extra:
+  python:
+    source: tools/funasr-connecter.py

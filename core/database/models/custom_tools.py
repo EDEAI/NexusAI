@@ -180,7 +180,10 @@ class CustomTools(MySQL):
         if list:
             for item in list:
                 if item.get('avatar'):
-                    item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                    if item['avatar'].find('head_icon') == -1:
+                        item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                    else:
+                        item["avatar"] = f"{settings.ICON_URL}/{item['avatar']}"
                 else:
                     if item['icon']:
                         item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"

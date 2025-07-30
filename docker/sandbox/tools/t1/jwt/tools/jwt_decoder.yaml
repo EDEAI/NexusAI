@@ -1,0 +1,87 @@
+identity:
+  name: jwt_decoder
+  author: bowenliang123
+  label:
+    en_US: JWT Decoder
+    zh_Hans: JWT 解码
+description:
+  human:
+    en_US: Decode a JWT (JSON Web Token).
+    zh_Hans: 解码 JWT (JSON Web Token).
+  llm: A tool to decode JWT (JSON Web Token).
+parameters:
+  - name: jwt
+    type: string
+    required: true
+    label:
+      en_US: Encoded JWT string
+      zh_Hans: JWT 密文
+    human_description:
+      en_US: Encoded JWT string
+      zh_Hans: JWT 密文
+    llm_description: Encoded JWT (JSON Web Token) string
+    form: llm
+  - name: algorithm
+    required: true
+    label:
+      en_US: decryption algorithm
+      zh_Hans: 解密算法
+    human_description:
+      en_US: one of supported algorithms in HS256, RS256, PS256, EdDSA, ES256
+      zh_Hans: 其中一个支持的加密算法 HS256, RS256, PS256, EdDSA, ES256
+    default: HS256
+    type: select
+    options:
+      - value: HS256
+        label:
+          en_US: HS256
+      - value: RS256
+        label:
+          en_US: RS256 (RSA)
+      - value: PS256
+        label:
+          en_US: PS256 (RSA)
+      - value: EdDSA
+        label:
+          en_US: EdDSA (Ed25519)
+      - value: ES256
+        label:
+          en_US: ES256 (ECDSA)
+    llm_description: encryption algorithm
+    form: form
+  - name: key
+    type: secret-input
+    required: true
+    label:
+      en_US: decryption key
+      zh_Hans: 解密秘钥
+    human_description:
+      en_US: "Secret key for encryption. For HS256, it is a string; For RS256, PS256, EdDSA, ES256, it is a string starting with \"-----BEGIN PUBLIC KEY-----\""
+      zh_Hans: "加密秘钥, 对于HS256, 是一个秘钥字符串; 对于RS256, PS256, EdDSA, ES256, 是一个\"-----BEGIN PUBLIC KEY-----\"开头的秘钥字符串"
+    llm_description: secret key for decryption
+    form: llm
+  - name: extract_headers
+    type: select
+    required: true
+    default: "true"
+    options:
+      - value: "true"
+        label:
+          en_US: "Yes"
+          zh_Hans: 是
+      - value: "false"
+        label:
+          en_US: "No"
+          zh_Hans: 否
+    label:
+      en_US: Extract headers to _headers field
+      zh_Hans: 是否提取Headers到_headers字段
+    human_description:
+      en_US: "Whether to extract headers put into \"_headers\" field"
+      zh_Hans: "提取Headers对象并放入\"_headers\"字段"
+    llm_description: Whether to extract headers object
+    form: form
+
+extra:
+  python:
+    source: tools/jwt_decoder.py

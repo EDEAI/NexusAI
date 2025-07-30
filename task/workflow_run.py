@@ -10,7 +10,8 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 from typing import Dict, Optional, Any
 from log import Logger
 from core.database import redis
-from core.database.models import AppRuns, AppNodeExecutions, AppNodeUserRelation, UploadFiles, Users
+from core.database.models import AppRuns, AppNodeExecutions, AppNodeUserRelation, CustomTools, UploadFiles, Users
+from core.tool.sandbox_tool_runner import SandboxToolRunner
 from core.workflow import *
 from core.workflow.nodes import *
 from celery_app import run_workflow_node
@@ -105,7 +106,8 @@ def create_celery_task(
     parent_exec_id: int = 0,
     context: Optional[Context] = None,
     ancestor_context: Optional[Context] = None,
-    correct_llm_output: bool = False
+    correct_llm_output: bool = False,
+    override_rag_input: Optional[str] = None
 ):
     """
     Creates a Celery task to execute a node asynchronously.
@@ -129,6 +131,7 @@ def create_celery_task(
     :param context: The context object.
     :param ancestor_context: The ancestor context object.
     :param correct_llm_output: Flag to indicate if correct LLM output is found.
+    :param override_rag_input: The input to override the RAG input.
     """
     level = edge.level if edge else 0
     # Execute the node asynchronously using Celery
@@ -146,7 +149,8 @@ def create_celery_task(
         level=level,
         task_level=task_level,
         task=task_data,
-        correct_llm_output=correct_llm_output
+        correct_llm_output=correct_llm_output,
+        override_rag_input=override_rag_input
     )
     # Add task to global tasks list
     global_tasks.append((task, team_id, app_user_id, app_name, icon, icon_background, app_run_id, run_name, level, edge if edge else None, node, context if context else None, exec_id, task_operation, parent_exec_id))
@@ -249,7 +253,7 @@ def push_workflow_debug_message(
         elif node.data['type'] in ['recursive_task_generation', 'recursive_task_execution']:
             task_dict = json.loads(get_first_variable_value(create_variable_from_dict(outputs)))
             node_exec_data['outputs_md'] = create_recursive_task_category_from_dict(task_dict).to_markdown()
-        elif node.data['type'] in ['skill', 'custom_code', 'end']:
+        elif node.data['type'] in ['skill', 'custom_code', 'end', 'tool']:
             from api.utils.common import extract_file_list_from_skill_output
             file_list = extract_file_list_from_skill_output(node_exec_data['outputs'], node.data['output'].to_dict())
             # skill_output = node_exec_data['outputs']
@@ -518,6 +522,68 @@ def push_remove_human_confirm_message(
     push_to_websocket_queue(data)
     logger.info(f"Remove human confirm message pushed for user_id:{user_id} run:{app_run_id} exec_id:{exec_id} data:{data} queue_length:{get_websocket_queue_length()}")
 
+def push_node_exec_message(
+    user_id: int,
+    app_id: int,
+    workflow_id: int,
+    app_run_id: int,
+    exec_id: int,
+    msg: str
+):
+    """
+    Pushes a node execution message to the WebSocket message queue.
+
+    :param user_id: The ID of the user.
+    :param app_id: The ID of the app.
+    :param workflow_id: The ID of the workflow.
+    :param app_run_id: The ID of the app run.
+    :param exec_id: The ID of the node execution record.
+    :param msg: The message to be pushed.
+    """
+    data = {
+        'user_id': user_id,
+        'type': 'workflow_node_exec_msg',
+        'data': {
+            'app_id': app_id,
+            'workflow_id': workflow_id,
+            'app_run_id': app_run_id,
+            'node_exec_data': {
+                'node_exec_id': exec_id
+            },
+            'msg': msg
+        }
+    }
+    push_to_websocket_queue(data)
+    logger.info(f"Installing dependencies message pushed for user_id:{user_id} run:{app_run_id} exec_id:{exec_id} data:{data} queue_length:{get_websocket_queue_length()}")
+
+def check_if_node_need_installing_dependencies(node: Node) -> bool:
+    """
+    Checks if the node needs to install dependencies.
+    """
+    dependencies = None
+    if node.data['type'] == 'skill':
+        skill = CustomTools().get_skill_by_id(node.data['skill_id'])
+        dependencies = skill['dependencies']
+        if dependencies:
+            dependencies = dependencies['python3']
+    elif node.data['type'] == 'custom_code':
+        dependencies = node.data['code_dependencies']
+        if dependencies:
+            dependencies = dependencies['python3']
+    elif node.data['type'] == 'tool':
+        provider = node.data['tool']['provider']
+        if 'tool_category' in node.data['tool']:
+            category = node.data['tool']['tool_category']
+        else:
+            category = 't1'
+        current_file = os.path.realpath(__file__)
+        project_root = os.path.dirname(os.path.dirname(current_file))
+        sandbox_path = os.path.join(project_root, 'docker', 'sandbox')
+        tool_dir = os.path.join(sandbox_path, 'tools', category, provider)
+        runner = SandboxToolRunner()
+        dependencies = runner.load_requirements_from_file(tool_dir)
+    return not SandboxBaseNode.check_venv_exists(dependencies)
+
 def task_delay_thread():
     """
     Thread to process runnable workflow runs and execute node tasks.
@@ -603,6 +669,7 @@ def task_delay_thread():
                     task_data = None # task data
                     task_operation = '' # task operation
                     parent_exec_id = 0 # parent node execution ID
+                    override_rag_input = None # override RAG input
 
                     source_node_execution = app_node_exec.get_node_successful_execution(app_run_id, edge.source_node_id)
                     if not source_node_execution: # Check if the source node execution record exists
@@ -646,6 +713,8 @@ def task_delay_thread():
                             parent_output = create_variable_from_dict(task_condition['parent_output'])
                             task_data = json.loads(parent_output.properties['task'].value)
                             parent_exec_id = task_condition['first_execution_id']
+                            current_task_dict = task_data['current']
+                            override_rag_input = current_task_dict['keywords'] if current_task_dict['keywords'] else current_task_dict['task']
                     else:
                         target_node = graph.nodes.get_node(edge.target_node_id)
 
@@ -748,13 +817,19 @@ def task_delay_thread():
                     # Execute the node asynchronously using Celery
                     if not (target_node.data['type'] == 'human' and human_node_run_status != 3):
                         create_celery_task(team_id, app_id, run['app_name'], run['icon'], run['icon_background'], workflow_id, app_user_id, user_id, app_run_id, run_type, run['run_name'],
-                            exec_id, edge, target_node, task_level, task_data, task_operation, parent_exec_id, context, ancestor_context, correct_llm_output)
+                            exec_id, edge, target_node, task_level, task_data, task_operation, parent_exec_id, context, ancestor_context, correct_llm_output, override_rag_input)
 
                         if not (correct_llm_output or target_node.data['type'] == 'end' or (task_operation == 'assign_task' and task_level > 0)):
                             # Push a workflow debug message to the WebSocket message queue
                             push_workflow_debug_message(user_id, app_id, workflow_id, app_run_id, run_type, level, edge, target_node, 1, None, completed_steps, actual_completed_steps, 0,
                                 run['elapsed_time'], run['prompt_tokens'], run['completion_tokens'], run['total_tokens'], run['embedding_tokens'], run['reranking_tokens'],
                                 run['total_steps'], run['created_time'], run['finished_time'], exec_id, parent_exec_id, 0, {'status': 2, 'error': None, 'need_human_confirm': 0})
+
+                        if target_node.data['type'] in ['skill', 'custom_code', 'tool'] and check_if_node_need_installing_dependencies(target_node):
+                            push_node_exec_message(
+                                user_id, app_id, workflow_id, app_run_id, exec_id,
+                                get_language_content('msg_preparing_environment', uid=user_id)
+                            )
 
                 if current_level_edge_count == 0:
                     logger.error(f"No edges found for run:{app_run_id} level:{level}")

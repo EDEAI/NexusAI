@@ -1,0 +1,15 @@
+identity:
+  author: leslie-hjlarry
+  name: object_detection
+  label:
+    en_US: Object Detection
+    zh_Hans: 目标检测
+  description:
+    en_US: A tool can detect the object of an image
+    zh_Hans: 一个可以检测到图片中的物体的工具
+  icon: icon.svg
+tools:
+  - tools/object_detection.yaml
+extra:
+  python:
+    source: provider/object_detection.py

@@ -1,0 +1,18 @@
+identity:
+  name: check_balance
+  author: lysonober
+  label:
+    en_US: "Check Balance"
+    zh_Hans: "查询余额"
+    ja_JP: "残高を確認"
+    pt_BR: "Verificar Saldo"
+description:
+  human:
+    en_US: "Check your current Browser Use API credit balance, including both monthly subscription credits and any additional purchased credits."
+    zh_Hans: "查询您当前的 Browser Use API 积分余额，包括每月订阅积分和任何额外购买的积分。"
+    ja_JP: "月額サブスクリプションクレジットと追加購入クレジットの両方を含む、現在の Browser Use API クレジット残高を確認します。"
+    pt_BR: "Verifique seu saldo atual de créditos da API Browser Use, incluindo créditos de assinatura mensal e quaisquer créditos adicionais comprados."
+  llm: "This tool checks the user's current API credit balance with Browser Use. It makes a GET request to the /api/v1/balance endpoint with the API key in the Authorization header. The response includes the balance field which shows the number of API credits available (where 1 credit = $0.01 USD). This is useful for monitoring usage and ensuring sufficient credits for task execution. No parameters are required as the API key is automatically used from the credentials."
+extra:
+  python:
+    source: tools/check_balance.py

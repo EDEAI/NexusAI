@@ -1,0 +1,38 @@
+identity:
+  author: stvlynn
+  name: unsplash
+  label:
+    en_US: Unsplash
+    zh_Hans: Unsplash图片搜索
+    pt_BR: Unsplash
+  description:
+    en_US: Search for high-quality photos on Unsplash
+    zh_Hans: 在Unsplash上搜索高质量图片
+    pt_BR: Pesquise fotos de alta qualidade no Unsplash
+  icon: icon.svg
+  tags:
+    - image
+    - search
+credentials_for_provider:
+  access_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Unsplash Access Key
+      zh_Hans: Unsplash访问密钥
+      pt_BR: Chave de Acesso Unsplash
+    placeholder:
+      en_US: Please input your Unsplash Access Key
+      zh_Hans: 请输入您的Unsplash访问密钥
+      pt_BR: Por favor, insira sua Chave de Acesso Unsplash
+    help:
+      en_US: Get your Unsplash Access Key from Unsplash Developer Portal
+      zh_Hans: 从Unsplash开发者门户获取您的访问密钥
+      pt_BR: Obtenha sua Chave de Acesso Unsplash no Portal do Desenvolvedor Unsplash
+    url: https://unsplash.com/developers
+tools:
+  - tools/unsplash.yaml
+  - tools/random.yaml
+extra:
+  python:
+    source: provider/unsplash.py

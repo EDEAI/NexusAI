@@ -1,0 +1,31 @@
+identity:
+  author: jingfelix
+  name: akshare
+  label:
+    en_US: AKShare
+    zh_Hans: AKShare
+    pt_BR: AKShare
+  description:
+    en_US: Get stock information using AKShare
+    zh_Hans: 使用 AKShare 获取股票信息
+    pt_BR: Usar AKShare para obter informações sobre ações
+  icon: icon.png
+  tags:
+    - finance
+credentials_for_provider:
+  xq_a_token:
+    type: secret-input
+    label:
+      en_US: Xueqiu Token
+      zh_Hans: 雪球 Token
+    help:
+      en_US: "Please enter your Xueqiu xq_a_token. You can get it from your browser cookies after logging in to xueqiu.com."
+      zh_Hans: "请输入你的雪球 xq_a_token，可在登录雪球网页版后从浏览器 Cookie 获取。"
+tools:
+  - tools/get_stock_history.yaml
+  - tools/get_stock_individual_spot.yaml
+  - tools/get_stock_individual_basic_info.yaml
+  - tools/get_stock_sse_summary.yaml
+extra:
+  python:
+    source: provider/xueqiu.py

@@ -1,0 +1,52 @@
+description:
+  human:
+    en_US: Retrieve the scraping results based on the crawl request uuid, or cancel the scraping
+      task.
+    zh_Hans: 根据爬取任务UUID获取爬取结果，或者取消爬取任务
+  llm: Retrieve the scraping results based on the crawl request uuid, or cancel the scraping task.
+extra:
+  python:
+    source: tools/crawl_job.py
+identity:
+  author: watercrawl
+  label:
+    en_US: Crawl Job
+    zh_Hans: 爬取任务处理
+  name: crawl_job
+parameters:
+- form: llm
+  human_description:
+    en_US: Enter the crawl request UUID.
+    zh_Hans: 输入爬取任务UUID
+  label:
+    en_US: Crawl Request UUID
+    zh_Hans: 爬取任务UUID
+  llm_description: Use the crawl request uuid to get the crawl results or cancel the
+  name: crawl_request_uuid
+  required: true
+  type: string
+- form: llm
+  label:
+    en_US: operation
+    zh_Hans: 操作
+  human_description:
+    en_US: choose the operation to perform. `get` is for getting the crawl status, `cancel` is for cancelling the crawl job, `get_results` is for getting the crawl results.
+    zh_Hans: 选择操作类型。`get` 是获取爬取状态，`cancel` 是取消爬取任务，`get_results` 是获取爬取结果。
+  llm_description: choose the operation to perform. `get` is for getting the crawl
+    status, `cancel` is for cancelling the crawl job, `get_results` is for getting the crawl results. 
+  name: operation
+  options:
+  - label:
+      en_US: get crawl status
+      zh_Hans: 获取爬取状态
+    value: get
+  - label:
+      en_US: cancel crawl job
+      zh_Hans: 取消爬取任务
+    value: cancel
+  - label:
+      en_US: get crawl results
+      zh_Hans: 获取爬取结果
+    value: get_results
+  required: true
+  type: select

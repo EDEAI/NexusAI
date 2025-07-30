@@ -1,0 +1,48 @@
+identity:
+  name: retrieval
+  author: witmeng
+  label:
+    en_US: retrieval
+    zh_Hans: 检索块
+description:
+  human:
+    en_US: retrieval
+    zh_Hans: 检索块
+  llm: retrieval
+parameters:
+  - form: llm
+    human_description:
+      en_US: datasets ids
+      zh_Hans: 數據集IDS
+    label:
+      en_US: datasets ids, multiple split by comma, datasets and document can choose one
+      zh_Hans: 數據集IDS，多個以英文逗号分隔，數據集和文件二選一
+    llm_description:  數據集IDS
+    name: datasets_ids
+    required: true
+    type: string 
+  - form: llm
+    human_description:
+      en_US: document ids
+      zh_Hans: 文件IDS
+    label:
+      en_US: document ids, multiple split by comma, datasets and document can choose one
+      zh_Hans: 文件IDS，多個以英文逗号分隔，數據集和文件二選一
+    llm_description:  文件IDS
+    name: document_ids
+    required: false
+    type: string 
+  - form: llm
+    human_description:
+      en_US: question
+      zh_Hans: 關鍵詞
+    label:
+      en_US: question
+      zh_Hans: 關鍵詞
+    llm_description: 關鍵詞
+    name: question
+    required: true
+    type: string   
+extra:
+  python:
+    source: tools/retrieval.py

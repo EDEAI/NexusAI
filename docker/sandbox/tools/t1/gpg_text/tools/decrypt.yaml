@@ -1,0 +1,56 @@
+identity:
+  name: decrypt_message # Changed from encrypt_message
+  author: alterxyz
+  label:
+    en_US: GPG Decrypt Message
+    zh_Hans: GPG 解密消息
+description:
+  human:
+    en_US: Decrypts a GPG encrypted message using your private key.
+    zh_Hans: 使用你的私钥解密 GPG 加密的消息。
+  llm: Use this tool to decrypt a GPG encrypted message (ASCII-armored format) using the recipient's private key. Requires the private key string.
+parameters:
+  - name: encrypted_message_str
+    type: string
+    required: true
+    label:
+      en_US: Encrypted Message
+      zh_Hans: 加密消息
+    human_description:
+      en_US: The ASCII-armored GPG encrypted message string (starts with '-----BEGIN PGP MESSAGE-----').
+      zh_Hans: ASCII 封装的 GPG 加密消息字符串（以 '-----BEGIN PGP MESSAGE-----' 开头）。
+    llm_description: The complete ASCII-armored PGP encrypted message block that needs to be decrypted.
+    form: llm
+  - name: private_key_str
+    type: string # Should be secret-input in provider if needed globally, but here string is fine for tool param
+    required: true
+    label:
+      en_US: Private Key
+      zh_Hans: 私钥
+    human_description:
+      en_US: Your ASCII-armored GPG private key string (starts with '-----BEGIN PGP PRIVATE KEY BLOCK-----'). Keep this secure!
+      zh_Hans: 你的 ASCII 封装 GPG 私钥字符串（以 '-----BEGIN PGP PRIVATE KEY BLOCK-----' 开头）。请妥善保管！
+    llm_description: The full ASCII-armored PGP private key block corresponding to the recipient's public key used for encryption. It must start with '-----BEGIN PGP PRIVATE KEY BLOCK-----'. This is highly sensitive.
+    form: llm # Or potentially 'secret-input' if integrated differently
+  # Optional: Add passphrase parameter if keys are protected
+  - name: passphrase
+    type: string # Changed from secret-input to allow LLM usage, UI might still mask string type
+    required: false
+    label:
+      en_US: Passphrase (Optional)
+      zh_Hans: 密码短语（可选）
+    human_description:
+      en_US: The passphrase for your private key, if it's protected.
+      zh_Hans: 如果你的私钥受密码保护，请输入密码短语。
+    llm_description: The passphrase needed to unlock the provided private key, if applicable.
+    form: llm
+extra:
+  python:
+    source: tools/decrypt.py # Ensure this matches the python file name
+# Optional: Define output schema
+output_schema:
+  type: object
+  properties:
+    decrypted_message:
+      type: string
+      description: The decrypted plaintext message.

@@ -1,0 +1,41 @@
+identity:
+  author: majinkai
+  name: database_to_knowledge
+  label:
+    en_US: Database to knowledge
+    zh_Hans: 表结构写入知识库
+  description:
+    en_US: Write the database metadata into the dify knowledge.
+    zh_Hans: 此工具将数据库表结构写入知识库
+  icon: icon.svg
+tools:
+  - tools/database_to_knowledge.yaml
+credentials_for_provider:
+  dify_knowledge_api_url:
+    help:
+      en_US: Get your url from Dify knowledge API
+      zh_Hans: 从Dify获取您的API URL
+    label:
+      en_US: Dify knowledge API URL
+      zh_Hans: Dify知识库API地址
+    placeholder:
+      en_US: Please input your Dify API URL
+      zh_Hans: 请输入你的Dify知识库API地址
+    required: true
+    type: text-input
+  dify_knowledge_api_key:
+    help:
+      en_US: Get your key from Dify knowledge API
+      zh_Hans: 从Dify获取您的API密钥
+    label:
+      en_US: Dify knowledge API Key
+      zh_Hans: Dify知识库API密钥
+    placeholder:
+      en_US: Please input your Dify knowledge API key
+      zh_Hans: 请输入你的Dify知识库API密钥
+    required: true
+    type: secret-input
+    url: https://docs.dify.ai/guides/knowledge-base/knowledge-and-documents-maintenance/maintain-dataset-via-api#how-to-use
+extra:
+  python:
+    source: provider/database_to_knowledge.py

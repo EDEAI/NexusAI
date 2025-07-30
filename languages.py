@@ -17,6 +17,10 @@ language_packs = {
         "agent_run_type_2": "Workflow: {app_name} Invocation",
         "agent_run_type_3": "Round Table: {app_name} Invocation",
         "agent_run_type_4": "Round Table: {app_name} Orientation",
+        # Virtual environment check messages
+        "venv_exists_true": "Virtual environment exists in cache",
+        "venv_exists_false": "Virtual environment does not exist in cache",
+        "venv_check_failed": "Failed to check virtual environment",
         "requirement_category": {
             "system": """
                 You are a content categorization assistant.
@@ -56,7 +60,10 @@ language_packs = {
             3. Based on the dialogue scenario analysis from point 2, if the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding;
             5. Based on the current task planning, task progress, and the related tools I have provided, select the most suitable tool for the next step of task processing. Tools can be called repeatedly, with only one tool called at a time. Patiently repeat the above steps until the task processing is completed or you have failed to execute the tool after 3 consecutive attempts;
-            6. Pay attention to the tool list I provide. Tools with the name prefix "nexusai__workflow" are workflow tools. Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users". Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
+            6. Pay attention to the tool list I provide.
+            6.1 Tools with the name prefix "nexusai__skill" or "nexusai__workflow" are skill or workflow tools. For these types of tools, according to the tool definition I provide, you need to ensure that the input parameters include an "input_variables" parameter, which should contain the actual input arguments required by the tool. For example, if a tool requires parameters a and b, your input should be: {{"input_variables": {{"a": "foo", "b": "bar"}}}}, instead of {{"a": "foo", "b": "bar"}}.
+            6.2 Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users" (at the same level as "input_variables"). Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
+            6.3 Pay attention to the input parameters of the tools. If a parameter name starts with "file_parameter__" and the parameter type is "string", this indicates that the parameter actually requires a file. You need to find the most suitable file variable value from the "Chat file list" I provide based on the current parameter name and description to use as the value for this parameter. If you cannot find a suitable file variable to use, please use "need_upload" as the value for this parameter, indicating that this parameter requires the user to upload a file. Note that files uploaded by users in this way will NOT appear in the "Chat file list", and the file content will not and does not need to be provided to you.
             
             {team_members}
         ''',
@@ -85,7 +92,10 @@ language_packs = {
             3. Based on the dialogue scenario analysis from point 2, if the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding;
             5. Based on the current task planning, task progress, and the related tools I have provided, select the most suitable tool for the next step of task processing. Tools can be called repeatedly, with only one tool called at a time. Patiently repeat the above steps until the task processing is completed or you have failed to execute the tool after 3 consecutive attempts;
-            6. Pay attention to the tool list I provide. Tools with the name prefix "nexusai__workflow" are workflow tools. Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users". Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
+            6. Pay attention to the tool list I provide.
+            6.1 Tools with the name prefix "nexusai__skill" or "nexusai__workflow" are skill or workflow tools. For these types of tools, according to the tool definition I provide, you need to ensure that the input parameters include an "input_variables" parameter, which should contain the actual input arguments required by the tool. For example, if a tool requires parameters a and b, your input should be: {{"input_variables": {{"a": "foo", "b": "bar"}}}}, instead of {{"a": "foo", "b": "bar"}}.
+            6.2 Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users" (at the same level as "input_variables"). Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
+            6.3 Pay attention to the input parameters of the tools. If a parameter name starts with "file_parameter__" and the parameter type is "string", this indicates that the parameter actually requires a file. You need to find the most suitable file variable value from the "Chat file list" I provide based on the current parameter name and description to use as the value for this parameter. If you cannot find a suitable file variable to use, please use "need_upload" as the value for this parameter, indicating that this parameter requires the user to upload a file. Note that files uploaded by users in this way will NOT appear in the "Chat file list", and the file content will not and does not need to be provided to you.
             
             {team_members}
         ''',
@@ -115,7 +125,10 @@ language_packs = {
             3. Based on the dialogue scenario analysis from point 2, if the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding;
             5. Based on the current task planning, task progress, and the related tools I have provided, select the most suitable tool for the next step of task processing. Tools can be called repeatedly, with only one tool called at a time. Patiently repeat the above steps until the task processing is completed or you have failed to execute the tool after 3 consecutive attempts;
-            6. Pay attention to the tool list I provide. Tools with the name prefix "nexusai__workflow" are workflow tools. Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users". Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
+            6. Pay attention to the tool list I provide.
+            6.1 Tools with the name prefix "nexusai__skill" or "nexusai__workflow" are skill or workflow tools. For these types of tools, according to the tool definition I provide, you need to ensure that the input parameters include an "input_variables" parameter, which should contain the actual input arguments required by the tool. For example, if a tool requires parameters a and b, your input should be: {{"input_variables": {{"a": "foo", "b": "bar"}}}}, instead of {{"a": "foo", "b": "bar"}}.
+            6.2 Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users" (at the same level as "input_variables"). Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
+            6.3 Pay attention to the input parameters of the tools. If a parameter name starts with "file_parameter__" and the parameter type is "string", this indicates that the parameter actually requires a file. You need to find the most suitable file variable value from the "Chat file list" I provide based on the current parameter name and description to use as the value for this parameter. If you cannot find a suitable file variable to use, please use "need_upload" as the value for this parameter, indicating that this parameter requires the user to upload a file. Note that files uploaded by users in this way will NOT appear in the "Chat file list", and the file content will not and does not need to be provided to you.
             
             {team_members}
         ''',
@@ -142,7 +155,10 @@ language_packs = {
             3. Based on the dialogue scenario analysis from point 2, if the dialogue scenario is related to your identity definition, refer to your identity definition. If there is no correlation, completely discard your identity definition and try to adapt to the dialogue scenario to reply;
             4. Through the analysis required in point 3, if you need to refer to the identity definition and I have provided relevant content retrieved from the knowledge base, you must also refer to the relevant content retrieved from the knowledge base when responding;
             5. Based on the current task planning, task progress, and the related tools I have provided, select the most suitable tool for the next step of task processing. Tools can be called repeatedly, with only one tool called at a time. Patiently repeat the above steps until the task processing is completed or you have failed to execute the tool after 3 consecutive attempts;
-            6. Pay attention to the tool list I provide. Tools with the name prefix "nexusai__workflow" are workflow tools. Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users". Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
+            6. Pay attention to the tool list I provide.
+            6.1 Tools with the name prefix "nexusai__skill" or "nexusai__workflow" are skill or workflow tools. For these types of tools, according to the tool definition I provide, you need to ensure that the input parameters include an "input_variables" parameter, which should contain the actual input arguments required by the tool. For example, if a tool requires parameters a and b, your input should be: {{"input_variables": {{"a": "foo", "b": "bar"}}}}, instead of {{"a": "foo", "b": "bar"}}.
+            6.2 Some nodes in each workflow may require manual confirmation for their output data. This type of workflow tool has a characteristic feature: the tool input parameters will contain a parameter called "node_confirm_users" (at the same level as "input_variables"). Each parameter within this parameter represents a node that requires manual confirmation. You need to select one confirmer from the member list I provide for each node. You should analyze and select the most suitable member as the confirmer based on the current task, node information, and member information. Note that the actual parameter must be a member ID. Use ID 0 to indicate the user themselves when they are selected as the confirmer.
+            6.3 Pay attention to the input parameters of the tools. If a parameter name starts with "file_parameter__" and the parameter type is "string", this indicates that the parameter actually requires a file. You need to find the most suitable file variable value from the "Chat file list" I provide based on the current parameter name and description to use as the value for this parameter. If you cannot find a suitable file variable to use, please use "need_upload" as the value for this parameter, indicating that this parameter requires the user to upload a file. Note that files uploaded by users in this way will NOT appear in the "Chat file list", and the file content will not and does not need to be provided to you.
             
             {team_members}
         ''',
@@ -245,6 +261,8 @@ language_packs = {
             Subtask list for reference only: {child_tasks}
             Related task content for reference only: {related_content}
         """,
+        "recursive_task_root_task": "Root Task",
+        "recursive_task_sub_task": "Sub Task",
 
         # HTTP requeust node
         'http_request_failed': 'HTTP request failed with status code {status_code}',
@@ -488,7 +506,7 @@ language_packs = {
         'chatroom_agent_user_subprompt': '''
             You are an AI agent in a meeting room, where there is one user and at least one AI agent.
             You should adapt your identity and role according to the context of the conversation.
-            You need to reply to the user's instructions. Please pay attention to the following requirements when responding:
+            Please pay attention to the following requirements when responding:
             1. If images are uploaded in the current request (note that they are not images in the conversation history), please fully understand and analyze the content of all images, as the image content is also an important part of the latest round of conversation content.
             2. You need to fully analyze and understand the conversation records, analyze the current conversation scene and progress through the last round of the conversation, focus on what the user wants, and provide enough details. Note that tool uses of every agent are included in the conversation records
             3. You need to fully analyze and understand the user's command intention through the current conversation scene and progress, as well as the user's instructions, focus on what the user wants, and do not miss important information, rules or requirements in the instructions
@@ -498,7 +516,7 @@ language_packs = {
 
             The JSON format of the conversation history is as follows: [round 1, (round 2,) ...]
             where the conversation round in the following JSON format: [message 1, (message 2,) ...]
-            Each round starts with a user message and includes all subsequent agent messages until the next user message;
+            Each round starts with a user message and includes all subsequent agent messages and tool use & result messages until the next user message;
             The JSON structure of each message is as follows:
             {{"id": agent ID (if the speaker is a user, the ID is 0), "name": speaker name, "role": speaker role, user or agent, "type": message type (text, or tool_use for agent, or tool_result for user), "message": message content}}.
             Each message is consecutive with the previous one, and each round is also consecutive with the previous one.
@@ -508,6 +526,9 @@ language_packs = {
 
             Conversation history:
             {messages}
+
+            Chat file list:
+            {chat_file_list}
             
             Do not explicitly mention the user's instructions and the conversation history in your response.
         ''',
@@ -974,7 +995,7 @@ language_packs = {
                 "input_variables": [
                     {{
                         "name":"variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
-                        "type":"Variable type, including ['string', 'number', 'json'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python",
+                        "type":"Variable type, including ['string', 'number', 'json', 'file'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python, 'file' type variable value is a file path that can be directly used for file operations",
                         "required":"(bool type), whether the variable is required: True means required, False means non-required",
                         "display_name":"variable display name, which can be used as a description of the function and purpose of the variable"
                     }}
@@ -1028,7 +1049,7 @@ language_packs = {
                 "input_variables": [
                     {{
                         "name":"variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
-                        "type":"Variable type, including ['string', 'number', 'json'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python",
+                        "type":"Variable type, including ['string', 'number', 'json', 'file'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python, 'file' type variable value is a file path that can be directly used for file operations",
                         "required":"(bool type), whether the variable is required: True means required, False means non-required",
                         "display_name":"variable display name, which can be used as a description of the function and purpose of the variable"
                     }}
@@ -1104,14 +1125,31 @@ language_packs = {
 
         'Permission_does_not_exist': 'Permission does not exist',
         'role_delete_success': 'Role delete success',
-        'role_id_is_required': 'Role ID is required'
+        'role_id_is_required': 'Role ID is required',
+        'user_does_not_belong_to_this_team': 'User does not belong to this team.',
+        'the_current_user_does_not_have_permission': 'The current user does not have permission',
+        'comprehensive_administrator': 'Comprehensive administrator',
+        'agent_administrator': 'Agent administrator',
+        'workflow_administrator': 'Workflow administrator',
+        'skill_administrator': 'Skill administrator',
+        'roundtable_administrator': 'Roundtable administrator',
+        'knowledge_base_administrator': 'Knowledge_base administrator',
+
+        'msg_preparing_environment': 'Need to initialize the runtime environment, please wait patiently'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
         "agent_run_type_2": "工作流：{app_name} 调用",
         "agent_run_type_3": "圆桌：{app_name} 调用",
         "agent_run_type_4": "圆桌：{app_name} 导向执行",
+        
+        # Virtual environment check messages
+        "venv_exists_true": "虚拟环境已存在于缓存中",
+        "venv_exists_false": "虚拟环境在缓存中不存在",
+        "venv_check_failed": "检查虚拟环境失败",
 
+        "recursive_task_root_task": "根任务",
+        "recursive_task_sub_task": "子任务",
         'http_request_failed': 'HTTP请求失败，错误码：{status_code}',
         'http_response_content_oversize': 'HTTP响应内容过大！最大不应超过{max_size}字节，而实际为{size}字节',
 
@@ -1433,7 +1471,17 @@ language_packs = {
 
         'Permission_does_not_exist': '权限不存在',
         'role_delete_success': '角色删除成功',
-        'role_id_is_required': '角色ID不能为空'
+        'role_id_is_required': '角色ID不能为空',
+        'user_does_not_belong_to_this_team': '用户不属于该团队，无法进行切换',
+        'the_current_user_does_not_have_permission': '当前用户暂无权限',
+        'comprehensive_administrator': '综合管理员',
+        'agent_administrator': '智能体管理员',
+        'workflow_administrator': '工作流管理员',
+        'skill_administrator': '技能管理员',
+        'roundtable_administrator': '圆桌管理员',
+        'knowledge_base_administrator': '知识库管理员',
+
+        'msg_preparing_environment': '需要初始化运行环境，请耐心等待'
     }
 }
 
@@ -1750,7 +1798,15 @@ def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = 
         
         if append_ret_lang_prompt:
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            return_language_prompt = f"\n\nPlease note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction.\n\nThe current time is {current_time}."
+            return_language_prompt = f"""
+
+=== IMPORTANT CONTEXT ===
+CURRENT DATE AND TIME: {current_time}
+
+Please note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction.
+
+Always consider the current date and time when providing responses, especially for time-sensitive questions or tasks.
+=== END CONTEXT ==="""
             if isinstance(content, str):
                 content += return_language_prompt
             elif isinstance(content, dict):

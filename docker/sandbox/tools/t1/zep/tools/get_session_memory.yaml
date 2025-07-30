@@ -1,0 +1,45 @@
+identity:
+  name: get_session_memory
+  author: obadakhalili
+  label:
+    en_US: Get session memory
+
+description:
+  human:
+    en_US: Retrieves relevant memory context from the session based on recent messages
+  llm: Retrieves relevant memory context from the session based on recent messages
+
+parameters:
+  - name: session_id
+    type: string
+    required: true
+    label:
+      en_US: Session ID
+    human_description:
+      en_US: The session ID to retrieve memory from
+    llm_description: The session ID to retrieve memory from
+    form: llm
+  - name: lastn
+    type: number
+    required: false
+    min: 0
+    max: 50
+    label:
+      en_US: Last N messages
+    human_description:
+      en_US: The number of last messages to use for context retrieval
+    llm_description: The number of last messages to use for context retrieval
+    form: llm
+  - name: min_rating
+    type: number
+    required: false
+    label:
+      en_US: Minimum rating
+    human_description:
+      en_US: The minimum rating threshold for memory retrieval
+    llm_description: The minimum rating threshold for memory retrieval
+    form: llm
+
+extra:
+  python:
+    source: tools/get_session_memory.py

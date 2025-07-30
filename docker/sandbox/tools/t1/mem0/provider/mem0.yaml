@@ -1,0 +1,37 @@
+credentials_for_provider:
+  mem0_api_key:
+    help:
+      en_US: Please visit the Mem0 AI Dashboard to register an account and apply for
+        an API key
+      pt_BR: Please visit the Mem0 AI Dashboard to register an account and apply for
+        an API key
+      zh_Hans: 请访问 Mem0 AI 仪表板注册账号并获取 API Key
+    label:
+      en_US: Mem0 API key
+      pt_BR: Mem0 API key
+      zh_Hans: Mem0 API Key
+    placeholder:
+      en_US: Please input your Mem0 API key
+      pt_BR: Please input your Mem0 API key
+      zh_Hans: 请输入你的 Mem0 API Key
+    required: true
+    type: secret-input
+    url: https://app.mem0.ai/dashboard/api-keys
+extra:
+  python:
+    source: provider/mem0.py
+identity:
+  author: yevanchen
+  description:
+    en_US: mem0
+    pt_BR: mem0
+    zh_Hans: mem0
+  icon: mem0.png
+  label:
+    en_US: mem0
+    pt_BR: mem0
+    zh_Hans: mem0
+  name: mem0
+tools:
+- tools/add_memory.yaml
+- tools/retrieve_memory.yaml

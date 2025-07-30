@@ -9,6 +9,7 @@ import { MessageContent } from './MessageContent';
 import { MessageActions } from './MessageActions';
 import { MCPToolRuntimeData } from '../types/mcp';
 import { hasMessageContent } from '../utils';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 
 interface MessageItemProps {
     item: any;

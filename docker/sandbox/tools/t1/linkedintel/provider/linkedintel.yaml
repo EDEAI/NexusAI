@@ -1,0 +1,34 @@
+identity:
+  author: Ayush3941
+  name: linkedintel
+  label:
+    en_US: LinkedIntel (Proxycurl)
+    ja_JP: LinkedIntel（Proxycurl）
+    zh_Hans: LinkedIntel（Proxycurl）
+  description:
+    en_US: Enrich LinkedIn profiles using Proxycurl API.
+    ja_JP: Proxycurl API を使用して LinkedIn プロフィールを強化します。
+    zh_Hans: 使用 Proxycurl API 增强 LinkedIn 个人资料。
+  icon: icon.png
+
+credentials_for_provider:
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Proxycurl API Key
+      zh_Hans: Proxycurl API 密钥
+    placeholder:
+      en_US: Enter your Proxycurl API Key
+      zh_Hans: 请输入您的 Proxycurl API 密钥
+    help:
+      en_US: Obtain it from the Proxycurl dashboard
+      zh_Hans: 请从 Proxycurl 控制台获取
+    url: https://nubela.co/proxycurl
+
+tools:
+  - tools/enrich_profile.yaml
+
+extra:
+  python:
+    source: provider/linkedintel.py

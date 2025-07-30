@@ -1,0 +1,41 @@
+identity:
+  name: get_task_result
+  author: anspire
+  label:
+    en_US: Get automated task results
+    zh_Hans: 获取自动化任务结果
+description:
+  human:
+    en_US: Get automated task results
+    zh_Hans: 获取自动化任务结果
+  llm: This tool get browser automation task result with Browser Agent.
+parameters:
+- name: task_id
+  type: string
+  required: true
+  label:
+    en_US: task id string
+    zh_Hans: 任务标识
+    pt_BR: task id string
+  human_description:
+    en_US: task id
+    zh_Hans: 任务标识
+    pt_BR: task id
+  llm_description: cloud instance task id
+  form: llm
+- name: task_run_id
+  type: string
+  required: true
+  label:
+    en_US: task run id string
+    zh_Hans: 任务运行标识
+    pt_BR: instance id string
+  human_description:
+    en_US: task run id
+    zh_Hans: 任务运行标识
+    pt_BR: task run id
+  llm_description: cloud instance task run id
+  form: llm
+extra:
+  python:
+    source: tools/get_task_result.py

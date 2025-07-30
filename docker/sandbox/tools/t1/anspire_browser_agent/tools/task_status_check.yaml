@@ -1,0 +1,41 @@
+identity:
+  name: task_status_check
+  author: anspire
+  label:
+    en_US: Automated task status check
+    zh_Hans: 自动化任务状态检查
+description:
+  human:
+    en_US: Automated task status check
+    zh_Hans: 自动话任务状态检查
+  llm: This tool check browser automation task status with Browser Agent.
+parameters:
+- name: task_id
+  type: string
+  required: true
+  label:
+    en_US: task id string
+    zh_Hans: 任务标识
+    pt_BR: task id string
+  human_description:
+    en_US: task id
+    zh_Hans: 任务标识
+    pt_BR: task id
+  llm_description: cloud instance task id
+  form: llm
+- name: task_run_id
+  type: string
+  required: true
+  label:
+    en_US: task run id string
+    zh_Hans: 任务运行标识
+    pt_BR: instance id string
+  human_description:
+    en_US: task run id
+    zh_Hans: 任务运行标识
+    pt_BR: task run id
+  llm_description: cloud instance task run id
+  form: llm
+extra:
+  python:
+    source: tools/task_status_check.py

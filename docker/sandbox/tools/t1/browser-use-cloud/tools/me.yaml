@@ -1,0 +1,18 @@
+identity:
+  name: me
+  author: lysonober
+  label:
+    en_US: "Get User Info"
+    zh_Hans: "获取用户信息"
+    ja_JP: "ユーザー情報を取得"
+    pt_BR: "Obter Informações do Usuário"
+description:
+  human:
+    en_US: "Check if your Browser Use API key is valid and you are properly authenticated."
+    zh_Hans: "检查您的 Browser Use API 密钥是否有效，以及您是否已正确认证。"
+    ja_JP: "Browser Use API キーが有効であり、適切に認証されているかどうかを確認します。"
+    pt_BR: "Verifique se sua chave de API do Browser Use é válida e se você está autenticado corretamente."
+  llm: "This tool checks if the provided Browser Use API key is valid and the user is properly authenticated. It makes a GET request to the /api/v1/me endpoint with the API key in the Authorization header. The response is a boolean value indicating if the API key is valid. This is useful for verifying API key validity before attempting operations that require authentication. No parameters are required as the API key is automatically used from the credentials."
+extra:
+  python:
+    source: tools/me.py

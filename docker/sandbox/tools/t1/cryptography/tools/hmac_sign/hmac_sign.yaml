@@ -1,0 +1,75 @@
+identity:
+  name: hmac_sign
+  author: bowenliang123
+  label:
+    en_US: HMAC Signature
+    zh_Hans: HMAC 签名生成
+description:
+  human:
+    en_US: Generate signature with HMAC-SHA1, HMAC-SHA256 algorithms, supporting Hex or Base64 encoding for output
+    zh_Hans: 使用 HMAC-SHA1, HMAC-SHA256 等算法生成签名，支持十六进制或Base64编码输出
+  llm: Generate MD5 hash of file
+parameters:
+  - name: algorithm
+    type: select
+    default: "HMAC-SHA256"
+    options:
+      - value: "HMAC-SHA256"
+        label:
+          en_US: "HMAC-SHA256"
+      - value: "HMAC-SHA1"
+        label:
+          en_US: "HMAC-SHA1"
+    label:
+      en_US: Singing Algorithm
+      zh_Hans: 签名算法
+    human_description:
+      en_US: Supports HMAC-SHA1, HMAC-SHA256
+      zh_Hans: 支持 HMAC-SHA1, HMAC-SHA256
+    llm_description: Singing Key
+    form: llm
+  - name: plaintext
+    type: string
+    required: true
+    label:
+      en_US: Plaintext for singing
+      zh_Hans: 签名原文
+    human_description:
+      en_US: Plaintext for singing
+      zh_Hans: 签名原文
+    llm_description: 签名原文
+    form: llm
+  - name: key
+    type: string
+    required: true
+    label:
+      en_US: Singing Key
+      zh_Hans: 签名秘钥
+    human_description:
+      en_US: Singing Key
+      zh_Hans: 签名秘钥
+    llm_description: Singing Key
+    form: llm
+  - name: output_encoding
+    type: select
+    default: "hex"
+    options:
+      - value: "hex"
+        label:
+          en_US: "Hex (Hexadecimal text)"
+          zh_Hans: "Hex (十六进制文本)"
+      - value: "base64"
+        label:
+          en_US: "Base64 (Base64 encoded text)"
+          zh_Hans: "Base64 (Base64 编码文本)"
+    label:
+      en_US: Output format
+      zh_Hans: 输出格式
+    human_description:
+      en_US: Supports Hex, Base64
+      zh_Hans: 支持 Hex(十六进制)、Base64
+    llm_description: Singing Key
+    form: llm
+extra:
+  python:
+    source: tools/hmac_sign/hmac_sign.py

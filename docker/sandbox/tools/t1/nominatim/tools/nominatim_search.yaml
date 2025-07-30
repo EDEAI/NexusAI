@@ -1,0 +1,55 @@
+description:
+  human:
+    de_DE: Suche nach Orten mit Nominatim
+    en_US: Search for locations using Nominatim
+    ja_JP: Nominatimを使用して場所を検索
+    zh_Hans: 使用Nominatim搜索位置
+  llm: A tool for geocoding using Nominatim, which can search for locations based
+    on addresses or place names.
+extra:
+  python:
+    source: tools/nominatim_search.py
+identity:
+  author: Charles Zhou
+  label:
+    de_DE: Nominatim Suche
+    en_US: Nominatim Search
+    ja_JP: Nominatim 検索
+    zh_Hans: Nominatim 搜索
+  name: nominatim_search
+parameters:
+- form: llm
+  human_description:
+    de_DE: Geben Sie eine Adresse oder einen Ortsnamen für die Suche ein
+    en_US: Enter an address or place name to search for
+    ja_JP: 検索する住所または場所の名前を入力してください
+    zh_Hans: 输入要搜索的地址或地名
+  label:
+    de_DE: Suchanfrage
+    en_US: Search Query
+    ja_JP: 検索クエリ
+    zh_Hans: 搜索查询
+  llm_description: The search query for Nominatim, which can be an address or place
+    name.
+  name: query
+  required: true
+  type: string
+- default: 10
+  form: form
+  human_description:
+    de_DE: 'Maximale Anzahl der zurückzugebenden Ergebnisse (Standard: 10, max: 40)'
+    en_US: 'Maximum number of results to return (default: 10, max: 40)'
+    ja_JP: 返す結果の最大数（デフォルト：10、最大：40）
+    zh_Hans: 要返回的最大结果数（默认：10，最大：40）
+  label:
+    de_DE: Ergebnislimit
+    en_US: Result Limit
+    ja_JP: 結果の制限
+    zh_Hans: 结果限制
+  llm_description: Limit the number of returned results. The default is 10, and the
+    maximum is 40.
+  max: 40
+  min: 1
+  name: limit
+  required: false
+  type: number

@@ -1,0 +1,62 @@
+identity:
+  name: steam_owned_games
+  author: bdim
+  label:
+    en_US: Owned Games
+    zh_Hans: 拥有的游戏
+description:
+  human:
+    en_US: Get a list of games owned by a Steam user
+    zh_Hans: 获取 Steam 用户拥有的游戏列表
+  llm: Retrieve a comprehensive list of games owned by a Steam user, including playtime statistics and game information.
+parameters:
+  - name: steamid
+    type: string
+    required: true
+    label:
+      en_US: Steam ID
+      zh_Hans: Steam ID
+    human_description:
+      en_US: 64-bit Steam ID of the user
+      zh_Hans: 用户的 64 位 Steam ID
+    llm_description: The 64-bit identifier for the Steam user whose game library you want to retrieve. The user's profile must be public unless you're requesting your own game library.
+    form: llm
+
+  - name: include_appinfo
+    type: string
+    required: false
+    label:
+      en_US: Include App Info
+      zh_Hans: 包含应用信息
+    human_description:
+      en_US: Include game name and logo information (true/false)
+      zh_Hans: 包含游戏名称和图标信息（true/false）
+    llm_description: Set to 'true' to include game names and logo URLs in the results. Set to 'false' to return only appids. Default is 'true'.
+    form: llm
+
+  - name: include_played_free_games
+    type: string
+    required: false
+    label:
+      en_US: Include Free Games
+      zh_Hans: 包含免费游戏
+    human_description:
+      en_US: Include free games that have been played (true/false)
+      zh_Hans: 包含已玩过的免费游戏（true/false）
+    llm_description: Set to 'true' to include free games that the user has played. Set to 'false' to exclude free games. Default is 'true'.
+    form: llm
+
+  - name: appids_filter
+    type: string
+    required: false
+    label:
+      en_US: App IDs Filter
+      zh_Hans: 应用ID过滤器
+    human_description:
+      en_US: Filter results to specific app IDs (JSON array format)
+      zh_Hans: 将结果过滤为特定的应用ID（JSON数组格式）
+    llm_description: Optional JSON array of app IDs to filter the results. Example format - [440, 570, 730]
+    form: llm
+extra:
+  python:
+    source: tools/steam_owned_games.py

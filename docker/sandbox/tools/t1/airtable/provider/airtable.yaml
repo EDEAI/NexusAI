@@ -1,0 +1,35 @@
+identity:
+  author: chenzeng
+  name: airtable
+  label:
+    en_US: airtable
+    zh_Hans: airtable
+    pt_BR: airtable
+  description:
+    en_US: A tool that can operate on the created airtable
+    zh_Hans: 可以对创建的airtable进行操作的工具
+    pt_BR: A tool that can operate on the created airtable
+  icon: icon.svg
+  tags:
+    - utilities
+    - productivity
+credentials_for_provider:
+  airtable_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: Airtable Token
+      zh_Hans: Airtable Token
+    placeholder:
+      en_US: Please input your Airtable Token
+      zh_Hans: 请输入你的 Airtable Token
+    help:
+      en_US: Get your Airtable from Airtable
+      zh_Hans: 从 Airtable 获取您的 Airtable Token
+    url: https://airtable.com/create/tokens
+tools:
+  - tools/insert/config.yaml
+  - tools/all/config.yaml
+extra:
+  python:
+    source: provider/airtable.py

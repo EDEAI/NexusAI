@@ -1,0 +1,30 @@
+description:
+  human:
+    en_US: A tool for searching literature information using CrossRef by DOI.
+    pt_BR: A tool for searching literature information using CrossRef by DOI.
+    zh_Hans: 一个使用CrossRef通过DOI获取文献信息的工具。
+  llm: A tool for searching literature information using CrossRef by DOI.
+extra:
+  python:
+    source: tools/query_doi.py
+identity:
+  author: Sakura4036
+  label:
+    en_US: CrossRef Query DOI
+    pt_BR: CrossRef Query DOI
+    zh_Hans: CrossRef DOI 查询
+  name: crossref_query_doi
+parameters:
+  - form: llm
+    label:
+      en_US: DOI
+      pt_BR: DOI
+      zh_Hans: DOI
+    llm_description: DOI for searching in CrossRef
+    human_description:
+      en_US: DOI for searching in CrossRef
+      pt_BR: DOI for searching in CrossRef
+      zh_Hans: 用于在CrossRef中搜索的DOI
+    name: doi
+    required: true
+    type: string

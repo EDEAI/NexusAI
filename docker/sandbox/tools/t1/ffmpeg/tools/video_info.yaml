@@ -1,0 +1,30 @@
+identity:
+  name: video_info
+  author: stvlynn
+  label:
+    en_US: Video Info
+    zh_Hans: 视频信息
+    pt_BR: Informações de Vídeo
+description:
+  human:
+    en_US: Get detailed information about a video file
+    zh_Hans: 获取视频文件的详细信息
+    pt_BR: Obter informações detalhadas sobre um arquivo de vídeo
+  llm: "Gets technical details about a video file including format, duration, resolution, codecs, and more."
+parameters:
+  - name: video
+    type: file
+    required: true
+    label:
+      en_US: Video File
+      zh_Hans: 视频文件
+      pt_BR: Arquivo de Vídeo
+    human_description:
+      en_US: The video file to analyze
+      zh_Hans: 要分析的视频文件
+      pt_BR: O arquivo de vídeo para analisar
+    llm_description: "The video file to get information about. Supported formats include MP4, AVI, MOV, MKV, and most common video formats."
+    form: llm
+extra:
+  python:
+    source: tools/video_info.py 

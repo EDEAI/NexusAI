@@ -1,0 +1,28 @@
+identity:
+  author: hjlarry
+  name: small_pay
+  label:
+    en_US: Small Pay
+    zh_Hans: 小支付
+    pt_BR: Small Pay
+  description:
+    en_US: For personal developers to receive payments via WeChat
+    zh_Hans: 个人开发者的工作对话流微信收款服务
+  icon: icon.svg
+tools:
+  - tools/create_order.yaml
+  - tools/query_order.yaml
+extra:
+  python:
+    source: provider/small_pay.py
+credentials_for_provider:
+  api_key:
+    help:
+      en_US: Please enter the API Key
+      zh_Hans: 请输入 API Key
+    label:
+      en_US: API Key
+      zh_Hans: API Key
+    required: true
+    type: secret-input
+    url: https://pay.freecicoda.com/api

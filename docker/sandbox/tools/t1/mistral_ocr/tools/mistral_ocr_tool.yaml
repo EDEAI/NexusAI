@@ -1,0 +1,57 @@
+description:
+  human:
+    en_US: Mistral OCR is a powerful document OCR processor that extracts text and structured content from PDF documents and images while maintaining document structure and hierarchy. It preserves formatting like headers, paragraphs, lists and tables, and returns results in markdown format for easy parsing and rendering.
+    zh_Hans: Mistral OCR 是一个强大的文档 OCR 处理器，可以从 PDF 文档和图像中提取文本和结构化内容，同时保持文档结构和层次结构。它保留了标题、段落、列表和表格等格式，并以 markdown 格式返回结果，便于解析和渲染。
+  llm: Mistral OCR processes documents and images to extract text while preserving structure and formatting. It handles complex layouts including multi-column text and mixed content, returning results in markdown format.
+extra:
+  python:
+    source: tools/mistral_ocr_tool.py
+identity:
+  author: inlei
+  label:
+    en_US: Mistral OCR
+    zh_Hans: Mistral OCR
+  name: mistral_ocr_tool
+parameters:
+  - form: llm
+    human_description:
+      en_US: Upload a single file for OCR processing. Only one document can be processed at a time. Supports PDF documents and common image formats.
+      zh_Hans: 上传单个文件进行 OCR 处理。每次只能处理一个文档。支持 PDF 文档和常见图像格式。
+    label:
+      en_US: Upload File
+      zh_Hans: 上传文件
+    name: file_path
+    required: false
+    type: file
+  - form: llm
+    human_description:
+      en_US: Specific pages to process (e.g., "0,2,4-7"). For PDF documents only.
+      zh_Hans: 要处理的特定页面（例如："0,2,4-7"）。仅适用于 PDF 文档。
+    label:
+      en_US: Pages
+      zh_Hans: 页面
+    name: pages
+    required: false
+    type: string
+    default: "0"
+  - form: llm
+    human_description:
+      en_US: Maximum number of images to extract from the document.
+      zh_Hans: 从文档中提取的最大图像数量。
+    label:
+      en_US: Image Limit
+      zh_Hans: 图像限制
+    name: image_limit
+    required: false
+    type: number
+  - form: llm
+    human_description:
+      en_US: Minimum size threshold for extracting images (default 100px). Smaller images are ignored.
+      zh_Hans: 提取图像的最小尺寸阈值（默认 100px），小于该尺寸的将被忽略。
+    label:
+      en_US: Image Minimum Size
+      zh_Hans: 图像最小尺寸
+    name: image_min_size
+    required: false
+    type: number
+    default: 100

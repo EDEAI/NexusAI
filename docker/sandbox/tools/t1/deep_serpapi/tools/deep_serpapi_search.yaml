@@ -1,0 +1,30 @@
+identity:
+  name: deep_serpapi
+  author: scrapelesshq
+  label:
+    en_US: Deep SerpApi
+    zh_Hans: Deep SerpApi
+    pt_BR: Deep SerpApi
+description:
+  human:
+    en_US: Powered by scrapeless.com, this real-time API delivers structured Google Search results at $0.1 per 1,000 queries.
+    zh_Hans: 由 scrapeless.com 提供支持，此实时 API 以每 1,000 次查询 $0.1 的价格提供结构化的 Google 搜索结果。
+    pt_BR: Desenvolvido por scrapeless.com, esta API em tempo real fornece resultados estruturados do Google Search por $0,1 a cada 1.000 consultas.
+  llm: Powered by scrapeless.com, this real-time API delivers structured Google Search results at $0.1 per 1,000 queries.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: Powered by scrapeless.com, this real-time API delivers structured Google Search results at $0.1 per 1,000 queries.
+      zh_Hans: 由 scrapeless.com 提供支持，此实时 API 以每 1,000 次查询 $0.1 的价格提供结构化的 Google 搜索结果。
+      pt_BR: Desenvolvido por scrapeless.com, esta API em tempo real fornece resultados estruturados do Google Search por $0,1 a cada 1.000 consultas.
+    llm_description: Powered by scrapeless.com, this real-time API delivers structured Google Search results at $0.1 per 1,000 queries.
+    form: llm
+extra:
+  python:
+    source: tools/deep_serpapi_search.py

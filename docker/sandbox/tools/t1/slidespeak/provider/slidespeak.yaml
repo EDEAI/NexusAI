@@ -1,0 +1,29 @@
+credentials_for_provider:
+  slidespeak_api_key:
+    label:
+      en_US: API Key
+      zh_Hans: API 密钥
+    placeholder:
+      en_US: Enter your SlideSpeak API key
+      zh_Hans: 输入您的 SlideSpeak API 密钥
+    required: true
+    type: secret-input
+    url: https://app.slidespeak.co/settings/developer
+extra:
+  python:
+    source: provider/slidespeak.py
+identity:
+  author: Kalo Chin
+  description:
+    en_US: Generate presentation slides using SlideSpeak API
+    zh_Hans: 使用 SlideSpeak API 生成演示幻灯片
+  icon: icon.png
+  label:
+    en_US: SlideSpeak
+    zh_Hans: SlideSpeak
+  name: slidespeak
+tools:
+- tools/presentation_generator.yaml
+- tools/slide_by_slide_generator.yaml
+- tools/document_uploader.yaml
+- tools/template_lister.yaml

@@ -1,0 +1,19 @@
+identity:
+  author: qiangxinglin
+  name: excel_tools
+  label:
+    en_US: Excel Tools
+    zh_Hans: Excel工具箱
+  description:
+    en_US: A tool to convert Excel to Json and vice versa.
+    zh_Hans: 一个将Excel转换为Json及其反向转换的工具。
+  icon: icon.svg
+  tags:
+    - productivity
+    - utilities
+extra:
+  python:
+    source: provider/excel_tools.py
+tools:
+  - tools/excel2json.yaml
+  - tools/json2excel.yaml

@@ -57,7 +57,7 @@ const SkillSecond: React.FC<ChildProps> = ({
         setskillmenudisabled({ ...skillmenudisabled, thirdly: false });
     };
     return (
-        <div style={{ height: '100%' }}>
+        <div style={{ height: '100%', width: '100%' }}>
             <div className="flex align-center justify-between mt-[30px]">
                 <div className="text-base font-medium mb-[30px] text-[#333333]">
                     {intl.formatMessage({ id: 'skill.codesetting' })}
@@ -65,7 +65,7 @@ const SkillSecond: React.FC<ChildProps> = ({
             </div>
             <Form
                 name="dynamic_form_nest_item"
-                style={{ width: 900 }}
+                style={{ width: '100%' }}
                 autoComplete="off"
                 form={Secondref}
             >
@@ -106,10 +106,7 @@ ${intl.formatMessage({ id: 'customcode.notice.file.return.example' })}`}
                             value={
                                 Skillinfo && Skillinfo.code
                                     ? JSON.parse(Skillinfo.code).python3
-                                    : `def main(arg1: int) -> dict:
-    return {
-        "result": (arg1 + 2) * 3,
-    }`
+                                    : ``
                             }
                             onChange={handleCodeChange}
                             title={`python3`}
@@ -126,13 +123,13 @@ ${intl.formatMessage({ id: 'customcode.notice.file.return.example' })}`}
                     >
                         {intl.formatMessage({ id: 'skill.btn.nextstep' })}
                     </Button>
-                    <Button
+                    {/* <Button
                         onClick={() => {
                             history.back();
                         }}
                     >
                         {intl.formatMessage({ id: 'skill.btn.back' })}
-                    </Button>
+                    </Button> */}
                 </div>
                 <div className="h-[30px] w-1"></div>
             </Form>

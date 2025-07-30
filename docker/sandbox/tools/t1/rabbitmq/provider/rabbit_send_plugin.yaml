@@ -1,0 +1,50 @@
+identity:
+  author: zxp088
+  name: rabbitmq
+  label:
+    en_US: RabbitMq
+    zh_Hans: RabbitMq
+    pt_BR: RabbitMq
+  description:
+    en_US: send data to rabbit server
+    zh_Hans: 发送消息到rabbitmq
+    pt_BR: send data to rabbit server
+  icon: icon_1.svg
+credentials_for_provider:
+  addresses:
+    type: text-input
+    required: true
+    label:
+      en_US: rabbitmq addresses
+      zh_Hans: rabbitmq 地址
+    placeholder:
+      en_US: 'default: 127.0.0.1:5672'
+      zh_Hans: '默认: 127.0.0.1:5672'
+  username:
+    type: text-input
+    required: true
+    label:
+      en_US: username
+      zh_Hans: 用户名
+  password:
+    type: secret-input
+    required: true
+    label:
+      en_US: Password
+      zh_Hans: 密码
+  vhost:
+    type: text-input
+    required: false
+    label:
+      en_US: Virtual Host
+      zh_Hans: 虚拟主机
+    placeholder:
+      en_US: 'default: /'
+      zh_Hans: '默认: /'
+tools:
+  - tools/rabbit_send_plugin.yaml
+  - tools/rabbit_consumer_plugin.yaml
+extra:
+  python:
+    source: provider/rabbit_send_plugin.py
+

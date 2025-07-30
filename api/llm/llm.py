@@ -19,7 +19,8 @@ async def skill_create(userinfo: TokenData = Depends(get_current_user)):
     - A successful response containing the list of LLM model configurations.
     """
     # Retrieve the list of LLM model configurations from the database
-    result = Models().get_model_config_llm_list()
+    team_id = userinfo.team_id
+    result = Models().get_model_config_llm_list(team_id)
     
     # Return the result wrapped in a success response
     return response_success({'data': result})

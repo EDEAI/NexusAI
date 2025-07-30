@@ -1,0 +1,220 @@
+identity:
+  name: threads
+  author: stvlynn
+  label:
+    en_US: Threads
+    zh_Hans: Threads
+    ja_JP: Threads
+description:
+  human:
+    en_US: Get RSS feeds from Threads via RSSHub
+    zh_Hans: 通过RSSHub获取Threads的RSS订阅源
+    ja_JP: RSSHubを通じてThreadsのRSSフィードを取得
+  llm: "A tool to fetch RSS feeds from Threads using RSSHub as a proxy."
+parameters:
+  - name: route_type
+    type: select
+    required: true
+    default: "user"
+    label:
+      en_US: Route Type
+      zh_Hans: 路由类型
+      ja_JP: ルートタイプ
+    human_description:
+      en_US: "The type of Threads route to use"
+      zh_Hans: "要使用的Threads路由类型"
+      ja_JP: "使用するThreadsルートのタイプ"
+    llm_description: "The type of Threads route to use"
+    form: form
+    options:
+      - value: user
+        label:
+          en_US: User Timeline
+          zh_Hans: 用户时间线
+          ja_JP: ユーザータイムライン
+  - name: base_url
+    type: string
+    required: false
+    default: "https://rsshub.app"
+    label:
+      en_US: RSSHub Base URL
+      zh_Hans: RSSHub基础URL
+      ja_JP: RSSHubベースURL
+    human_description:
+      en_US: "The base URL of RSSHub instance (default is https://rsshub.app)"
+      zh_Hans: "RSSHub实例的基础URL（默认为https://rsshub.app）"
+      ja_JP: "RSSHubインスタンスのベースURL（デフォルトはhttps://rsshub.app）"
+    llm_description: "The base URL of RSSHub instance (default is https://rsshub.app)"
+    form: form
+  - name: access_key
+    type: string
+    required: false
+    label:
+      en_US: RSSHub Access Key
+      zh_Hans: RSSHub访问密钥
+      ja_JP: RSSHubアクセスキー
+    human_description:
+      en_US: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+      zh_Hans: "RSSHub路由的访问密钥（例如：ILoveRSSHub）。如不需要请留空。"
+      ja_JP: "RSSHubルートのアクセスキー（例：ILoveRSSHub）。必要ない場合は空のままにしてください。"
+    llm_description: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+    form: form
+  - name: username
+    type: string
+    required: true
+    label:
+      en_US: Threads Username
+      zh_Hans: Threads用户名
+      ja_JP: Threadsユーザー名
+    human_description:
+      en_US: "The username of Threads account"
+      zh_Hans: "Threads账户的用户名"
+      ja_JP: "Threadsアカウントのユーザー名"
+    llm_description: "The username of Threads account"
+    form: llm
+  - name: show_author_in_title
+    type: boolean
+    required: false
+    default: true
+    label:
+      en_US: Show Author in Title
+      zh_Hans: 在标题中显示作者
+      ja_JP: タイトルに作者を表示
+    human_description:
+      en_US: "Show author name in title"
+      zh_Hans: "在标题中显示作者名"
+      ja_JP: "タイトルに作者名を表示する"
+    llm_description: "Show author name in title"
+    form: form
+  - name: show_author_in_desc
+    type: boolean
+    required: false
+    default: true
+    label:
+      en_US: Show Author in Description
+      zh_Hans: 在描述中显示作者
+      ja_JP: 説明に作者を表示
+    human_description:
+      en_US: "Show author name in description (RSS body)"
+      zh_Hans: "在描述中显示作者名（RSS正文）"
+      ja_JP: "説明（RSSの本文）に作者名を表示する"
+    llm_description: "Show author name in description (RSS body)"
+    form: form
+  - name: show_quoted_in_title
+    type: boolean
+    required: false
+    default: true
+    label:
+      en_US: Show Quoted in Title
+      zh_Hans: 在标题中显示引用
+      ja_JP: タイトルに引用を表示
+    human_description:
+      en_US: "Show quoted thread in title"
+      zh_Hans: "在标题中显示引用的帖子"
+      ja_JP: "タイトルに引用されたスレッドを表示する"
+    llm_description: "Show quoted thread in title"
+    form: form
+  - name: show_emoji_for_quotes_and_reply
+    type: boolean
+    required: false
+    default: true
+    label:
+      en_US: Use Emoji for Quotes and Replies
+      zh_Hans: 使用表情符号表示引用和回复
+      ja_JP: 引用と返信に絵文字を使用
+    human_description:
+      en_US: "Use 🔁 instead of QT, ↩️ instead of Re"
+      zh_Hans: "使用🔁代替QT，↩️代替Re"
+      ja_JP: "QTの代わりに🔁、Reの代わりに↩️を使用する"
+    llm_description: "Use 🔁 instead of QT, ↩️ instead of Re"
+    form: form
+  - name: replies
+    type: boolean
+    required: false
+    default: true
+    label:
+      en_US: Show Replies
+      zh_Hans: 显示回复
+      ja_JP: 返信を表示
+    human_description:
+      en_US: "Show replies"
+      zh_Hans: "显示回复"
+      ja_JP: "返信を表示する"
+    llm_description: "Show replies"
+    form: form
+  - name: show_author_avatar_in_desc
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Show Author Avatar in Description
+      zh_Hans: 在描述中显示作者头像
+      ja_JP: 説明に作者のアバターを表示
+    human_description:
+      en_US: "Show avatar of author in description (Not recommended if your RSS reader extracts images from description)"
+      zh_Hans: "在描述中显示作者头像（如果您的RSS阅读器从描述中提取图片，不推荐使用）"
+      ja_JP: "説明に作者のアバターを表示する（RSSリーダーが説明から画像を抽出する場合は推奨されません）"
+    llm_description: "Show avatar of author in description (Not recommended if your RSS reader extracts images from description)"
+    form: form
+  - name: show_quoted_author_avatar_in_desc
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Show Quoted Author Avatar in Description
+      zh_Hans: 在描述中显示被引用作者头像
+      ja_JP: 説明に引用された作者のアバターを表示
+    human_description:
+      en_US: "Show avatar of quoted author in description (Not recommended if your RSS reader extracts images from description)"
+      zh_Hans: "在描述中显示被引用作者头像（如果您的RSS阅读器从描述中提取图片，不推荐使用）"
+      ja_JP: "説明に引用された作者のアバターを表示する（RSSリーダーが説明から画像を抽出する場合は推奨されません）"
+    llm_description: "Show avatar of quoted author in description (Not recommended if your RSS reader extracts images from description)"
+    form: form
+  - name: limit
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Item Limit
+      zh_Hans: 条目数量限制
+      ja_JP: アイテム数制限
+    human_description:
+      en_US: "Maximum number of items to return (default: 10)"
+      zh_Hans: "返回的最大条目数量（默认：10）"
+      ja_JP: "返される最大アイテム数（デフォルト：10）"
+    llm_description: "Maximum number of items to return (default: 10)"
+    form: llm
+extra:
+  python:
+    source: tools/threads.py 
+output_variables:
+  - name: title
+    type: string
+    description:
+      en_US: The title of the RSS feed
+      zh_Hans: RSS订阅源的标题
+      ja_JP: RSSフィードのタイトル
+  - name: description
+    type: string
+    description:
+      en_US: The description of the RSS feed
+      zh_Hans: RSS订阅源的描述
+      ja_JP: RSSフィードの説明
+  - name: url
+    type: string
+    description:
+      en_US: The URL of the RSS feed
+      zh_Hans: RSS订阅源的URL
+      ja_JP: RSSフィードのURL
+  - name: entries
+    type: array
+    description:
+      en_US: The entries of the RSS feed
+      zh_Hans: RSS订阅源的条目
+      ja_JP: RSSフィードのエントリー
+  - name: username
+    type: string
+    description:
+      en_US: The username of the Threads account
+      zh_Hans: Threads账户的用户名
+      ja_JP: Threadsアカウントのユーザー名 

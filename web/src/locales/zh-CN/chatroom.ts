@@ -3,6 +3,7 @@ export default {
     'app.chatroom.mcptool.status.completed': '已完成',
     'app.chatroom.mcptool.status.running': '运行中',
     'app.chatroom.mcptool.status.waiting': '等待确认',
+    'app.chatroom.mcptool.status.waitingFileUpload': '等待文件上传',
     'app.chatroom.mcptool.status.failed': '失败',
     'app.chatroom.mcptool.status.pending': '待处理',
     
@@ -18,6 +19,7 @@ export default {
     'app.chatroom.mcptool.outputs': '输出结果',
     'app.chatroom.mcptool.noOutputs': '暂无输出',
     'app.chatroom.mcptool.files': '文件列表',
+  'app.chatroom.mcptool.inputFiles': '输入文件',
     'app.chatroom.mcptool.downloadFile': '下载文件',
     'app.chatroom.mcptool.parameters': '参数',
     'app.chatroom.mcptool.result': '结果',
@@ -35,4 +37,10 @@ export default {
     
     // Waiting Reply Indicator
     'app.chatroom.waitingReply': '等待回复中...',
+    'app.chatroom.mcptool.requiredFiles': '补充文件',
+    'app.chatroom.mcptool.completeUpload': '完成上传',
+    'app.chatroom.mcptool.noFilesRequired': '无需上传文件。',
+    'app.chatroom.mcptool.uploading': '上传中...',
+    'app.chatroom.mcptool.uploadFile': '上传文件',
+    'app.chatroom.mcptool.remove': '移除',
 }; 

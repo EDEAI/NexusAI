@@ -1,0 +1,49 @@
+credentials_for_provider:
+  base_url:
+    label:
+      en_US: Meilisearch API base URL
+      zh_Hans: Meilisearch API 接口基础 URL
+      zh_Hant: Meilisearch API 介面基礎 URL
+    placeholder:
+      en_US: https://edge.meilisearch.com
+    required: true
+    type: text-input
+  meilisearch_api_key:
+    help:
+      en_US: The API key for the Meilisearch instance.
+      zh_Hans: 从 Meilisearch 实例获取的 API 密钥.
+      zh_Hant: 從 Meilisearch 實例獲取的 API 密鑰.
+    label:
+      en_US: Meilisearch API key
+      zh_Hans: Meilisearch API 密钥
+      zh_Hant: Meilisearch API 密鑰
+    placeholder:
+      en_US: Please enter your Meilisearch API key.
+      zh_Hans: 请输入您的 Meilisearch API 密钥.
+      zh_Hant: 請輸入您的 Meilisearch API 密鑰.
+    required: true
+    type: secret-input
+    url: https://www.meilisearch.com/docs/reference/api/keys
+identity:
+  author: fernvenue
+  name: meilisearch
+  label:
+    en_US: Meilisearch
+    zh_Hans: Meilisearch
+    zh_Hant: Meilisearch
+  description:
+    en_US: Interact with Meilisearch instance.
+    zh_Hans: 与 Meilisearch 实例交互.
+    zh_Hant: 與 Meilisearch 實例交互.
+  icon: icon.svg
+  tags:
+    - search
+    - productivity
+    - utilities
+tools:
+  - tools/search.yaml
+  - tools/addOrReplaceDocuments.yaml
+  - tools/addOrUpdateDocuments.yaml
+extra:
+  python:
+    source: provider/meilisearch.py

@@ -1,0 +1,30 @@
+identity:
+  name: npm_registry_search
+  author: jingfelix
+  label:
+    en_US: "npm Search API"
+    zh_Hans: "npm 包搜索 API"
+    pt_BR: "npm Search API"
+description:
+  human:
+    en_US: A tool for searching npm packages by keyword. Input a keyword and get a list of matching packages.
+    zh_Hans: 用于在 npm 上搜索包的工具。输入关键字，返回与之匹配的包列表。
+    pt_BR: Uma ferramenta para pesquisar pacotes npm por palavra-chave. Insira uma palavra-chave e obtenha uma lista de pacotes correspondentes.
+  llm: A tool for searching npm packages by keyword. Input a keyword (string) and get a list of matching packages.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query String
+      zh_Hans: 查询参数
+      pt_BR: String de Consulta
+    human_description:
+      en_US: Keyword to search for npm packages
+      zh_Hans: 待搜索的包关键字，用于搜索 npm 包
+      pt_BR: Palavra-chave para pesquisar pacotes npm
+    llm_description: Keyword to search for npm packages, type is string, cannot be empty
+    form: llm
+extra:
+  python:
+    source: tools/npm_registry_search.py

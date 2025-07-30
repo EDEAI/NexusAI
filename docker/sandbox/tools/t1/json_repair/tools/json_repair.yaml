@@ -1,0 +1,30 @@
+identity:
+  name: json_repair
+  author: migege
+  label:
+    en_US: json_repair
+    zh_Hans: json_repair
+    pt_BR: json_repair
+description:
+  human:
+    en_US: Fix invalid JSON data
+    zh_Hans: 修复无效的JSON数据
+    pt_BR: Corrigir dados JSON inválidos
+  llm: Fix invalid JSON data
+parameters:
+  - name: text
+    type: string
+    required: true
+    label:
+      en_US: Text
+      zh_Hans: 文本
+      pt_BR: Texto
+    human_description:
+      en_US: JSON data string
+      zh_Hans: JSON数据字符串
+      pt_BR: String de dados JSON
+    llm_description: JSON data string
+    form: llm
+extra:
+  python:
+    source: tools/json_repair.py

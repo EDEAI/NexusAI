@@ -1,0 +1,50 @@
+identity:
+  author: watercrawl
+  name: watercrawl
+  label:
+    en_US: WaterCrawl
+    zh_Hans: WaterCrawl
+  description:
+    en_US: WaterCrawl is a smart web crawling tool. with this plugin, you can easily crawl websites and extract data from them. this plugin is compatible with WaterCrawl v0.3.*
+    zh_Hans: WaterCrawl 是一个智能的网页爬取工具，使用这个插件，你可以轻松地爬取网站，从中提取数据。这个插件与 WaterCrawl v0.3.* 兼容。
+    ja_JP: WaterCrawlはスマートなウェブクローリングツールです。このプラグインを使えば、ウェブサイトを簡単にクロールし、データを抽出することができます。WaterCrawl バージョン0.3.*に対応しています。
+  icon: icon.svg
+tools:
+  - tools/scrape.yaml
+  - tools/crawl.yaml
+  - tools/crawl_job.yaml
+  - tools/search.yaml
+  - tools/search_job.yaml
+  - tools/sitemap.yaml
+extra:
+  python:
+    source: provider/water-crawl.py
+credentials_for_provider:
+  base_url:
+    label:
+      en_US: WaterCrawl server's Base URL
+      zh_Hans: WaterCrawl 服务器的基本 URL
+      ja_JP: WaterCrawl のサーバーURL
+    placeholder:
+      en_US: https://app.watercrawl.dev
+    required: false
+    type: text-input
+  api_key:
+    help:
+      en_US: You can get your WaterCrawl API key from your WaterCrawl dashboard.
+        If you are using a self-hosted version, login to your self-hosted WaterCrawl instance and generate a new API key.
+      zh_Hans: 你可以从你的 WaterCrawl 仪表板获取你的 WaterCrawl API 密钥。
+        如果你在本地运行 WaterCrawl，请登录你的本地 WaterCrawl 实例并生成一个新的 API 密钥。
+      ja_JP: WaterCrawlのダッシュボードから、WaterCrawlのAPIキーを取得できます。
+             ローカルでWaterCrawlを実行している場合は、ローカルのWaterCrawlインスタンスにログインし、新しいAPIキーを生成してください。
+    label:
+      en_US: WaterCrawl API Key
+      zh_Hans: WaterCrawl API Key
+      ja_JP: WaterCrawl API Key
+    placeholder:
+      en_US: Please input your WaterCrawl API key
+      zh_Hans: 请输入您的 WaterCrawl API 密钥
+      ja_JP: API keyを記入してください
+    required: true
+    type: secret-input
+    url: https://github.com/watercrawl/watercrawl-dify-plugin/blob/main/README.md#authentication

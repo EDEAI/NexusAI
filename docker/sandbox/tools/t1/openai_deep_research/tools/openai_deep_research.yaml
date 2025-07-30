@@ -1,0 +1,55 @@
+identity:
+  name: "openai_deep_research"
+  author: "alterxyz"
+  label:
+    en_US: "Start New Deep Research"
+    zh_Hans: "启动新的深度研究任务"
+    pt_BR: "Iniciar Nova Pesquisa Profunda"
+description:
+  human:
+    en_US: "Starts a new deep research task with a given prompt."
+    zh_Hans: "根据给定的提示创建并启动一个新的深度研究任务。"
+    pt_BR: "Inicia uma nova tarefa de pesquisa profunda com um prompt fornecido."
+  llm: "This tool initiates a new deep research task using the OpenAI API. It takes a detailed user prompt as input and returns a task ID. This task ID can be used later with the 'openai_deep_research_get' tool to retrieve the comprehensive research results once the analysis is complete."
+parameters:
+  - name: prompt
+    type: string
+    required: true
+    label:
+      en_US: Research Prompt
+      zh_Hans: 研究问题
+      pt_BR: Conteúdo da Pesquisa
+    human_description:
+      en_US: "The topic or question for the deep research."
+      zh_Hans: "需要深入研究的具体主题、问题或研究方向。"
+      pt_BR: "O tópico ou pergunta para a pesquisa profunda."
+    llm_description: "The detailed prompt or question for the deep research task. Be specific and comprehensive to ensure the research provides valuable insights on your topic of interest."
+    form: llm
+  - name: model
+    type: select
+    required: true
+    label:
+      en_US: Model
+      zh_Hans: 模型
+      pt_BR: Modelo
+    human_description:
+      en_US: "Select which model to use for the deep research."
+      zh_Hans: "选择用于深度研究的模型。"
+      pt_BR: "Selecione qual modelo usar para a pesquisa profunda."
+    llm_description: "The model to use for the deep research task. `o4-mini-deep-research` is newer and may provide better results."
+    form: form
+    default: o4-mini-deep-research
+    options:
+      - label:
+          en_US: o4-mini-deep-research
+          zh_Hans: o4-mini-deep-research
+          pt_BR: o4-mini-deep-research
+        value: o4-mini-deep-research
+      - label:
+          en_US: o3-deep-research
+          zh_Hans: o3-deep-research
+          pt_BR: o3-deep-research
+        value: o3-deep-research
+extra:
+  python:
+    source: tools/openai_deep_research.py

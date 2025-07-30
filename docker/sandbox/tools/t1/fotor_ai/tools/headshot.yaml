@@ -1,0 +1,47 @@
+identity:
+  name: headshot
+  author: fotor
+  label:
+    en_US: AI Headshot
+    zh_Hans: AI头像
+
+description:
+  human:
+    en_US: AI Headshot
+    zh_Hans: AI头像
+  llm: This operation is usually called "AI Headshot", "AI Avatar", or "AI Portrait". It is a technology that uses AI to generate a portrait image based on the user's original image. The generated image is usually a stylized image. Call the AI Headshot API to generate a headshot image.
+
+parameters:
+  - name: UserImageUrl
+    type: string
+    required: true
+    label:
+      en_US: UserImageUrl
+      zh_Hans: 用户原图
+    human_description:
+      en_US: The URL or BASE64 encoded image of the original image provided by the user
+      zh_Hans: 用户提供的原图的URL或BASE64编码
+    llm_description: User Image URL, the URL or BASE64 encoding of the original image provided by the user.
+    form: llm
+
+  - name: templateId
+    type: string
+    required: true
+    label:
+      en_US: Style ID
+      zh_Hans: 风格ID
+    human_description:
+      en_US: Style ID provided by Fotor AI,https://docs.fotor.com/reference/headshot/styles/
+      zh_Hans: Fotor AI 提供的风格ID,https://docs.fotor.com/reference/headshot/styles/
+    llm_description: Style ID, which is the ID of the image style used to specify the style of the generated image.
+    form: form
+
+output_schema:
+  type: object
+  properties:
+    result_url:
+      type: string
+
+extra:
+  python:
+    source: tools/headshot.py

@@ -1,0 +1,47 @@
+identity:
+  name: upload_and_parse_documents # 工具的唯一名稱
+  author: witmeng
+  label: # 工具的標籤 (用於前端展示)
+    en_US: Upload and Parse Documents
+    zh_Hans: 上傳並解析文檔
+description: # 工具的描述
+  human:
+    en_US: Upload one or more files to a specified RAGFlow dataset and automatically trigger parsing for these files. Allows batch upload and initiates document processing.
+    zh_Hans: 上傳一個或多個文件到指定的 RAGFlow 數據集，並自動觸發對這些文件的解析。支持批量上傳並啟動文檔處理流程。
+  llm: Uploads files to a RAGFlow dataset and then parses them. For LLM, it will receive file content as arguments if user uploaded files.
+parameters:
+  - form: llm
+    human_description:
+      en_US: The unique identifier of the RAGFlow dataset where the files will be uploaded.
+      zh_Hans: 文件將要上傳到的 RAGFlow 數據集的唯一標識符。
+    label:
+      en_US: Dataset ID
+      zh_Hans: 數據集 ID
+    llm_description: The ID of the RAGFlow dataset to upload files to.
+    name: dataset_id
+    required: true
+    type: string
+  - form: llm 
+    human_description:
+      en_US: Select one or more files to upload to the dataset. Maximum 10 files, 100MB per file.
+      zh_Hans: 選擇一個或多個要上傳到數據集的文件。
+    label:
+      en_US: Files
+      zh_Hans: 文件
+    llm_description: The file(s) to be uploaded. When user uploads files, the content will be passed to the tool.
+    name: files
+    required: false
+    type: files
+  - form: llm  
+    human_description:
+      en_US: Remote files from OSS, one URL per line.
+      zh_Hans: oss的遠程文件，一行一個
+    label:
+      en_US: Remote Files (OSS, one per line)
+      zh_Hans: 遠程文件，一行一個
+    name: oss_remote_files
+    required: false
+    type: string
+extra:
+  python:
+    source: tools/upload-and-parse-documents.py 

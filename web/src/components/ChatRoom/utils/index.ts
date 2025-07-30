@@ -2,7 +2,7 @@
  * @LastEditors: biz
  */
 import React, { ReactNode } from 'react';
-import { ContentDetectionConfig, MessageWithContent, MessageContentAnalysis } from '../types';
+import { ContentDetectionConfig, MessageContentAnalysis, MessageWithContent } from '../types';
 
 // Download file utility function
 export const downloadFile = (url: string, filename: string) => {
@@ -44,8 +44,8 @@ export const extractTextFromArray = (arr: any) => {
  * @returns boolean - true if message has content, false if empty
  */
 export const hasMessageContent = (
-    message: MessageWithContent | any, 
-    config: ContentDetectionConfig = {}
+    message: MessageWithContent | any,
+    config: ContentDetectionConfig = {},
 ): boolean => {
     try {
         // Safety check: ensure message is an object
@@ -60,7 +60,7 @@ export const hasMessageContent = (
             checkFiles = true,
             checkMCPTools = true,
             checkStreaming = true,
-            minTextLength = 1
+            minTextLength = 1,
         } = config;
 
         // 1. Text content detection
@@ -68,9 +68,9 @@ export const hasMessageContent = (
             if (!checkText) return false;
             try {
                 const content = message.content;
-                return content && 
-                       typeof content === 'string' && 
-                       content.trim().length >= minTextLength;
+                return (
+                    content && typeof content === 'string' && content.trim().length >= minTextLength
+                );
             } catch (error) {
                 console.warn('Error checking text content:', error);
                 return false;
@@ -82,9 +82,7 @@ export const hasMessageContent = (
             if (!checkFiles) return false;
             try {
                 const fileList = message.fileList || message.file_list;
-                return fileList && 
-                       Array.isArray(fileList) && 
-                       fileList.length > 0;
+                return fileList && Array.isArray(fileList) && fileList.length > 0;
             } catch (error) {
                 console.warn('Error checking file content:', error);
                 return false;
@@ -103,7 +101,7 @@ export const hasMessageContent = (
                 // Check contentBlocks format
                 if (message.contentBlocks && Array.isArray(message.contentBlocks)) {
                     const hasMCPBlocks = message.contentBlocks.some(
-                        (block: any) => block && block.type === 'mcp' && block.toolId
+                        (block: any) => block && block.type === 'mcp' && block.toolId,
                     );
                     if (hasMCPBlocks) {
                         return true;
@@ -129,10 +127,11 @@ export const hasMessageContent = (
                 // If message is in streaming state and has accumulated some content
                 if (message.contentBlocks && Array.isArray(message.contentBlocks)) {
                     return message.contentBlocks.some(
-                        (block: any) => block && 
-                                       block.type === 'text' && 
-                                       block.content && 
-                                       block.content.trim().length >= minTextLength
+                        (block: any) =>
+                            block &&
+                            block.type === 'text' &&
+                            block.content &&
+                            block.content.trim().length >= minTextLength,
                     );
                 }
                 return false;
@@ -141,13 +140,9 @@ export const hasMessageContent = (
                 return false;
             }
         };
-
+        
         // Comprehensive content check: any dimension with content = true
-        return hasTextContent() || 
-               hasFileContent() || 
-               hasMCPContent() || 
-               hasStreamingContent();
-
+        return hasTextContent() || hasFileContent() || hasMCPContent() || hasStreamingContent();
     } catch (error) {
         // Error safety: default to showing message to avoid hiding content accidentally
         console.error('hasMessageContent unexpected error:', error);
@@ -160,7 +155,9 @@ export const hasMessageContent = (
  * @param message - The message object to analyze
  * @returns object with detailed content breakdown
  */
-export const analyzeMessageContent = (message: MessageWithContent | any): MessageContentAnalysis => {
+export const analyzeMessageContent = (
+    message: MessageWithContent | any,
+): MessageContentAnalysis => {
     try {
         const content = message?.content || '';
         const fileList = message?.fileList || message?.file_list || [];
@@ -174,13 +171,13 @@ export const analyzeMessageContent = (message: MessageWithContent | any): Messag
             hasParsedMCP: Boolean(parsedContent.hasMCPTools),
             hasContentBlocksMCP: contentBlocks.some((block: any) => block?.type === 'mcp'),
             hasActiveMCP: Array.isArray(activeMCPTools) && activeMCPTools.length > 0,
-            hasStreamingText: contentBlocks.some((block: any) => 
-                block?.type === 'text' && block?.content?.trim()
+            hasStreamingText: contentBlocks.some(
+                (block: any) => block?.type === 'text' && block?.content?.trim(),
             ),
             textLength: content ? content.trim().length : 0,
             fileCount: Array.isArray(fileList) ? fileList.length : 0,
             mcpToolCount: Array.isArray(activeMCPTools) ? activeMCPTools.length : 0,
-            blockCount: Array.isArray(contentBlocks) ? contentBlocks.length : 0
+            blockCount: Array.isArray(contentBlocks) ? contentBlocks.length : 0,
         };
     } catch (error) {
         console.error('analyzeMessageContent error:', error);
@@ -195,7 +192,7 @@ export const analyzeMessageContent = (message: MessageWithContent | any): Messag
             textLength: 0,
             fileCount: 0,
             mcpToolCount: 0,
-            blockCount: 0
+            blockCount: 0,
         };
     }
 };
@@ -207,29 +204,45 @@ export const analyzeMessageContent = (message: MessageWithContent | any): Messag
  * @returns Last valid agent message or null
  */
 export const checkLastAgentMessage = (
-    messages: any[], 
-    config: ContentDetectionConfig = {}
+    messages: any[],
+    config: ContentDetectionConfig = {},
 ): any | null => {
     try {
         // Parameter validation
         if (!messages || !Array.isArray(messages) || messages.length === 0) {
             return null;
         }
-        
+
         // Find the last Agent message (messages already in reverse chronological order)
-        for (const message of messages) {
-            if (message && 
-                message.is_agent === 1 && 
-                hasMessageContent(message, {
-                    checkText: false,
-                    checkFiles: true,
-                    checkMCPTools: true,
-                    minTextLength: 1,
-                    ...config
-                })) {
-                return message;
-            }
+        const toLastMessage=messages[0]
+        if(toLastMessage.is_agent===1&&toLastMessage.content!=''){
+            return toLastMessage
         }
+        // for (const message of messages) {
+        //     console.log( message ,
+        //         message.is_agent === 1 ,
+        //         hasMessageContent(message, {
+        //             checkText: true,
+        //             checkFiles: false,
+        //             checkMCPTools: false,
+        //             minTextLength: 1
+        //         }));
+            
+        //     if (
+        //         message &&
+        //         message.is_agent === 1 &&
+        //         hasMessageContent(message, {
+        //             checkText: true,
+        //             checkFiles: false,
+        //             checkMCPTools: false,
+        //             minTextLength: 1,
+        //             ...config,
+        //         })
+        //     ) {
+                
+        //         return message;
+        //     }
+        // }
         
         return null;
     } catch (error) {
@@ -247,24 +260,26 @@ export const convertParsedContentToContentBlocks = (parsedContent: any): any[] =
     if (!parsedContent?.blocks || !Array.isArray(parsedContent.blocks)) {
         return [];
     }
-    
-    return parsedContent.blocks.map((block: any) => {
-        if (block.type === 'text') {
-            return {
-                type: 'text',
-                content: block.content || '',
-                timestamp: Date.now()
-            };
-        } else if (block.type === 'mcp-tool' && block.toolData?.id) {
-            return {
-                type: 'mcp',
-                toolId: block.toolData.id,
-                timestamp: Date.now()
-            };
-        }
-        // Skip invalid blocks
-        return null;
-    }).filter(Boolean);
+
+    return parsedContent.blocks
+        .map((block: any) => {
+            if (block.type === 'text') {
+                return {
+                    type: 'text',
+                    content: block.content || '',
+                    timestamp: Date.now(),
+                };
+            } else if (block.type === 'mcp-tool' && block.toolData?.id) {
+                return {
+                    type: 'mcp',
+                    toolId: block.toolData.id,
+                    timestamp: Date.now(),
+                };
+            }
+            // Skip invalid blocks
+            return null;
+        })
+        .filter(Boolean);
 };
 
 /**
@@ -286,39 +301,41 @@ export const extractMCPToolIds = (contentBlocks: any[]): (string | number)[] => 
  */
 export const prepareHistoryMessageForCurrent = (
     message: any,
-    getMCPTool?: (id: string | number) => any | null
+    getMCPTool?: (id: string | number) => any | null,
 ): any => {
     try {
         // Base message structure conversion
         const preparedMessage = {
             ...message,
             content: message.content || '',
-            activeMCPTools: message.activeMCTools || []
+            activeMCPTools: message.activeMCTools || [],
         };
-        
+
         // Handle contentBlocks conversion
         let contentBlocks = message.contentBlocks;
         if (!contentBlocks && message.parsedContent) {
             contentBlocks = convertParsedContentToContentBlocks(message.parsedContent);
         } else if (!contentBlocks && message.content) {
-            contentBlocks = [{
-                type: 'text',
-                content: message.content,
-                timestamp: Date.now()
-            }];
+            contentBlocks = [
+                {
+                    type: 'text',
+                    content: message.content,
+                    timestamp: Date.now(),
+                },
+            ];
         }
-        
+
         // Sync MCP tool state
         if (getMCPTool && contentBlocks) {
             const mcpToolIds = extractMCPToolIds(contentBlocks);
             preparedMessage.activeMCPTools = mcpToolIds;
         }
-        
+
         preparedMessage.contentBlocks = contentBlocks || [];
-        
+
         return preparedMessage;
     } catch (error) {
         console.error('prepareHistoryMessageForCurrent error:', error);
         return message; // Return original message as fallback
     }
-}; 
+};

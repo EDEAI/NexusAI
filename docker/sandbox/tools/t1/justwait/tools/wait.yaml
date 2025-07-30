@@ -1,0 +1,30 @@
+description:
+  human:
+    en_US: "Wait for a specified number of seconds, similar to Python's time.sleep() function"
+    zh_Hans: "等待指定的秒数，类似于Python的time.sleep()函数"
+  llm: A tool that pauses execution for a specified number of seconds. Use this to implement delays in workflows.
+extra:
+  python:
+    source: tools/wait.py
+identity:
+  author: "AGIMaster"
+  label:
+    en_US: Wait
+    zh_Hans: 等待
+  name: wait
+  description:
+    en_US: Wait for a specified time
+    zh_Hans: 等待指定的时间
+  icon: icon.svg
+parameters:
+- form: llm
+  human_description:
+    en_US: "The number of seconds to wait"
+    zh_Hans: "等待的秒数"
+  label:
+    en_US: Seconds
+    zh_Hans: 秒数
+  llm_description: The number of seconds to pause execution
+  name: seconds
+  required: true
+  type: number

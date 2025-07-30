@@ -1,0 +1,110 @@
+identity:
+  name: airtable_all
+  author: chenzeng
+  label:
+    en_US: airtable_all
+    zh_Hans: 获取所有记录
+    pt_BR: airtable_all
+description:
+  human:
+    en_US: Get all records in table
+    zh_Hans: 在表中获取所有的记录
+    pt_BR: Obter todos os registros em uma tabela
+  llm: Get all records in table
+parameters:
+  - name: baseId
+    type: string
+    required: true
+    label:
+      en_US: Base ID
+      zh_Hans: Base ID
+      pt_BR: Base ID
+    human_description:
+      en_US: you can find it here https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+      zh_Hans: 你可以在这里找到它 https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+      pt_BR: you can find it here https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+    llm_description: workspace Base id
+    form: llm
+  - name: tableId
+    type: string
+    required: true
+    label:
+      en_US: Table ID
+      zh_Hans: Table ID
+      pt_BR:  Table ID
+    human_description:
+      en_US: you can find it here https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+      zh_Hans: 你可以在这里找到它 https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+      pt_BR: you can find it here https://support.airtable.com/v1/docs/finding-airtable-ids#finding-base-table-and-view-ids-from-urls
+    llm_description: workspace Table id
+    form: llm
+  - name: pageSize
+    type: number
+    default: 100
+    required: false
+    label:
+      en_US: Page Size
+      zh_Hans: 每页大小
+      pt_BR: Tamanho da página
+    human_description:
+      en_US: How many records per page
+      zh_Hans: 每页多少条数据
+      pt_BR: Quantos dados por página
+    llm_description: How many records per page
+    form: llm
+  - name: maxRecords
+    type: number
+    default: 1000
+    required: false
+    label:
+      en_US: Maximum number of records per page
+      zh_Hans: 每页最大记录数
+      pt_BR: Número máximo de registros por página
+    human_description:
+      en_US: The maximum number of pieces of data returned per page
+      zh_Hans: 每页最多返回多少条数据
+      pt_BR: Número máximo de dados retornados por página
+    llm_description: The maximum number of pieces of data returned per page
+    form: llm
+  - name: sort
+    type: string
+    required: false
+    label:
+      en_US: Sort
+      zh_Hans: 排序
+      pt_BR: Ordenação
+    human_description:
+      en_US: Sort by field, can pass multiple fields, separated by comma
+      zh_Hans: 按字段排序,可以传入多个字段，用逗号分隔
+      pt_BR: Ordenar por campo, pode passar vários campos, separados por vírgula
+    llm_description: Sort by field
+    form: llm
+  - name: fields
+    type: string
+    required: false
+    label:
+      en_US: Fields
+      zh_Hans: 字段
+      pt_BR: Campos
+    human_description:
+      en_US: Fields to return, can pass multiple fields, separated by comma
+      zh_Hans: 返回的字段,可以传入多个字段，用逗号分隔
+      pt_BR: Campos a retornar, pode passar vários campos, separados por vírgula
+    llm_description: Fields to return
+    form: llm
+  - name: filterByFormula
+    type: string
+    required: false
+    label:
+      en_US: Filter By Formula
+      zh_Hans: 过滤公式
+      pt_BR: Filtro por fórmula
+    human_description:
+      en_US: Filter by formula
+      zh_Hans: 按公式过滤
+      pt_BR: Filtrar por fórmula
+    llm_description: Filter by formula
+    form: llm
+extra:
+  python:
+    source: tools/all/invoke.py

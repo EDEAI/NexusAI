@@ -1,0 +1,48 @@
+description:
+  human:
+    en_US: Pie chart
+    pt_BR: Gráfico de pizza
+    zh_Hans: 饼图
+  llm: generate a pie chart with input data
+extra:
+  python:
+    source: tools/pie.py
+identity:
+  author: langgenius
+  icon: icon.svg
+  label:
+    en_US: Pie Chart
+    pt_BR: Gráfico de pizza
+    zh_Hans: 饼图
+  name: pie_chart
+parameters:
+- form: llm
+  human_description:
+    en_US: data for generating chart, each number should be separated by ";"
+    pt_BR: dados para gerar gráfico de pizza, cada número deve ser separado por ";"
+    zh_Hans: 用于生成饼图的数据，每个数字之间用 ";" 分隔
+  label:
+    en_US: data
+    pt_BR: dados
+    zh_Hans: 数据
+  llm_description: data for generating pie chart, data should be a string contains
+    a list of numbers like "1;2;3;4;5"
+  name: data
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Categories for chart, each category should be separated by ";"
+    pt_BR: Categorias para gráfico de pizza, cada categoria deve ser separada por
+      ";"
+    zh_Hans: 饼图的分类，每个分类之间用 ";" 分隔
+  label:
+    en_US: Categories
+    pt_BR: Categorias
+    zh_Hans: 分类
+  llm_description: categories for pie chart, categories should be a string contains
+    a list of texts like "a;b;c;1;2" in order to match the data, each category should
+    be split by ";"
+  name: categories
+  required: true
+  type: string

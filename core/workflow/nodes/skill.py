@@ -124,18 +124,21 @@ class SkillNode(SandboxBaseNode):
                     except json.JSONDecodeError as e:
                         return {
                             'status': 'failed',
+                            'app_run_id': skill_run_id,
                             'message': f"Failed to parse stdout as JSON: {e}"
                         }
                 else:
                     stderr_text = response['data']['stderr']
                     return {
                         'status': 'failed',
+                        'app_run_id': skill_run_id,
                         'message': stderr_text
                     }
             else:
                 stderr_text = response['data']['stderr']
                 return {
                     'status': 'failed',
+                    'app_run_id': skill_run_id,
                     'message': stderr_text
                 }
             end_time = datetime.now()

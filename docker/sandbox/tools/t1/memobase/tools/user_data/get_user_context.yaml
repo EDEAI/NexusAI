@@ -1,0 +1,50 @@
+identity:
+  name: get_user_context
+  author: acane0320
+  label:
+    en_US: Get User Context
+    zh_Hans: 获取用户上下文
+    ja_Jp: ユーザーのコンテキストを取得する
+    pt_BR: Obter Contexto do Usuário
+description:
+  human:
+    en_US: Get personalized context for a user from Memobase
+    zh_Hans: 从 Memobase 获取用户的个性化上下文
+    ja_Jp: Memobase からユーザーの個人化されたコンテキストを取得する
+    pt_BR: Obter contexto personalizado de um usuário do Memobase
+  llm: Use this tool to retrieve personalized context for a user from Memobase. You need to provide the user ID and can customize what context to retrieve.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户ID
+      ja_Jp: ユーザーID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to retrieve context for
+      zh_Hans: 要检索上下文的用户ID
+      ja_Jp: コンテキストを取得するユーザーの ID
+      pt_BR: O ID do usuário para recuperar o contexto
+    llm_description: The ID of the user to retrieve context for.
+    form: llm
+  - name: max_token_size
+    type: number
+    required: false
+    default: 1000
+    label:
+      en_US: Max token size of returned Context
+      zh_Hans: 返回上下文的最大Token大小
+      ja_Jp: 戻り値のコンテキストの最大トークンサイズ
+      pt_BR: Tamanho máximo do token do contexto retornado
+    human_description:
+      en_US: "The maximum number of tokens to return (default: 1000)"
+      zh_Hans: "要返回的最大Token大小（默认值：1000）"
+      ja_Jp: "戻り値のコンテキストの最大トークンサイズ（デフォルト：1000）"
+      pt_BR: "O número máximo de tokens a serem retornados (padrão: 1000)"
+    llm_description: The maximum number of tokens to return in the context.
+    form: llm
+extra:
+  python:
+    source: tools/user_data/get_user_context.py

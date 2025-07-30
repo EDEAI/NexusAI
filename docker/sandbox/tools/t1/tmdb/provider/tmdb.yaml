@@ -1,0 +1,46 @@
+identity:
+  author: lcandy
+  name: tmdb
+  label:
+    en_US: The Movie Database (TMDB)
+    zh_Hans: The Movie Database (TMDB)
+    zh_Hant: The Movie Database (TMDB)
+    ja_JP: The Movie Database (TMDB)
+    pt_BR: The Movie Database (TMDB)
+  description:
+    en_US: Search for movies, TV shows and people on The Movie Database (TMDB).
+    zh_Hans: 在 The Movie Database (TMDB) 上搜索电影、电视节目和人物。
+    zh_Hant: 在 The Movie Database (TMDB) 上搜尋電影、電視節目和人物。
+    ja_JP: The Movie Database (TMDB) で映画、テレビ番組、人物を検索します。
+    pt_BR: Pesquise filmes, programas de TV e pessoas no The Movie Database (TMDB).
+  icon: icon.svg
+credentials_for_provider:
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: API Read Access Token
+      zh_Hans: API 读取访问令牌 (Read Access Token)
+      zh_Hant: API 讀取存取權杖 (Read Access Token)
+      ja_JP: API 読み取りアクセストークン (Read Access Token)
+      pt_BR: Token de Acesso de Leitura da API (Read Access Token)
+    help:
+      en_US: Get your API Read Access Token (v4 auth) from TMDB
+      zh_Hans: 从 TMDB 获取您的 API 读取访问令牌（v4 认证）
+      zh_Hant: 從 TMDB 獲取您的 API 讀取存取權杖（v4 認證）
+      ja_JP: TMDB からAPI読み取りアクセストークン（v4認証）を取得してください
+      pt_BR: Obtenha seu Token de Acesso de Leitura da API (autenticação v4) do TMDB
+    placeholder:
+      en_US: Please input your TMDB API Read Access Token
+      zh_Hans: 请输入您的 TMDB API 读取访问令牌
+      zh_Hant: 請輸入您的 TMDB API 讀取存取權杖
+      ja_JP: TMDB API 読み取りアクセストークンを入力してください
+      pt_BR: Por favor, insira seu Token de Acesso de Leitura da API TMDB
+    url: https://developer.themoviedb.org/reference/intro/authentication
+tools:
+  - tools/tmdb_movie_search.yaml
+  - tools/tmdb_tv_search.yaml
+  - tools/tmdb_multi_search.yaml
+extra:
+  python:
+    source: provider/tmdb.py

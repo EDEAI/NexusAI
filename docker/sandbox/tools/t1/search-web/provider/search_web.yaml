@@ -1,0 +1,36 @@
+identity:
+  author: linkup
+  name: search-web
+  label:
+    en_US: Search Web
+  description:
+    en_US: Performs an online search using Linkup search engine and retrieves the top results as a string. This function is useful for accessing real-time information, including news, articles, and other relevant web content.
+    zh-Hans: 使用 Linkup 搜索引擎在线搜索并获取顶部结果。此功能适用于访问实时信息，包括新闻、文章和其他相关网页内容。
+    pt-BR: Realiza uma pesquisa online usando o mecanismo de busca Linkup e recupera os principais resultados como texto. Esta função é útil para acessar informações em tempo real, incluindo notícias, artigos e outros conteúdos relevantes da web.
+    es-ES: Realiza una búsqueda en línea utilizando el motor de búsqueda Linkup y recupera los principales resultados como texto. Esta función es útil para acceder a información en tiempo real, incluidas noticias, artículos y otros contenidos relevantes de la web.
+    fr-FR: Effectue une recherche en ligne à l'aide du moteur de recherche Linkup et récupère les meilleurs résultats sous forme de texte. Cette fonction est utile pour accéder à des informations en temps réel, notamment des actualités, des articles et d'autres contenus web pertinents.
+    de-DE: Führt eine Online-Suche mit der Linkup-Suchmaschine durch und ruft die besten Ergebnisse als Text ab. Diese Funktion ist nützlich für den Zugriff auf Echtzeitinformationen, einschließlich Nachrichten, Artikeln und anderen relevanten Webinhalten.
+    ja-JP: Linkup検索エンジンを使用してオンライン検索を実行し、上位の結果を文字列として取得します。この機能は、ニュース、記事、その他の関連するウェブコンテンツなどのリアルタイム情報にアクセスするのに役立ちます。
+    ko-KR: Linkup 검색 엔진을 사용하여 온라인 검색을 수행하고 상위 결과를 문자열로 가져옵니다. 이 기능은 뉴스, 기사 및 기타 관련 웹 콘텐츠를 포함한 실시간 정보에 액세스하는 데 유용합니다.
+    ru-RU: Выполняет онлайн-поиск с помощью поисковой системы Linkup и извлекает лучшие результаты в виде текста. Эта функция полезна для доступа к информации в реальном времени, включая новости, статьи и другой актуальный веб-контент.
+    it-IT: Esegue una ricerca online utilizzando il motore di ricerca Linkup e recupera i principali risultati come testo. Questa funzione è utile per accedere a informazioni in tempo reale, inclusi notizie, articoli e altri contenuti web rilevanti.
+    uk-UA: Виконує онлайн-пошук за допомогою пошукової системи Linkup і повертає найкращі результати у вигляді тексту. Ця функція корисна для доступу до актуальної інформації, включно з новинами, статтями та іншим релевантним веб-контентом.
+  icon: icon.svg
+  tags:
+    - search
+credentials_for_provider:
+  linkup_api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Linkup API Key
+    placeholder:
+      en_US: Please input your Linkup API Key
+    help:
+      en_US: Get free 5$ credits every month
+    url: https://www.linkup.so/
+tools:
+  - tools/search_web.yaml
+extra:
+  python:
+    source: provider/search_web.py

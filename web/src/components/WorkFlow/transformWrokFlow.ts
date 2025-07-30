@@ -26,7 +26,7 @@ import ToolNode from '@/py2js/nodes/tool.js';
 import VariableAggregationNode from '@/py2js/nodes/variable_aggregation.js';
 import { Prompt } from '@/py2js/prompt.js';
 import { ObjectVariable, Variable, createVariableFromObject } from '@/py2js/variables.js';
-import _ from 'lodash';
+import _, { cloneDeep } from 'lodash';
 import useStore from './store';
 import { AppNode, BlockEnum } from './types';
 
@@ -63,6 +63,9 @@ function transformOrigData(node: AppNode): OriNode {
 }
 
 const serialize = nodes => {
+    if (!Array.isArray(nodes)) {
+        return nodes;
+    }
     return nodes
         .map(node => {
             if (node.type === 'mention') {
@@ -719,7 +722,6 @@ export const transformer = {
             // if (data?.infoData?.output_variables?.length) {
             //     data.infoData.output_variables
             // }
-            console.log(1234, data);
 
             return data?.infoData?.output_variables?.properties || {};
         },
@@ -787,6 +789,7 @@ export const transformer = {
                 input: new Variable('input', 'string', node.data['variable'] || ''),
                 model_config_id: node.data['model'] || getDefaultModelId(),
                 manual_confirmation: node.data['manual_confirmation'] || false,
+                split_task_by_line: node.data['split_task_by_line'] || false,
                 // category_purpose: node.data['category_purpose'] || 0,
                 requirement_category: null,
                 requires_upload: false,
@@ -800,6 +803,7 @@ export const transformer = {
                     output: {},
                 },
             };
+            
             // params.category_purpose=parseInt(params.category_purpose)
             getVarFromData(node, 'import_to_knowledge_base.')?.forEach(({ key, value, output }) => {
                 if (!value) return;
@@ -902,11 +906,21 @@ export const transformer = {
                 paramseters.forEach(x => {
                     console.log(x, node);
 
+                    let value = '';
+                    if (node?.data?.form?.[x.name]) {
+                        // debugger
+                        value = serialize(node?.data?.form?.[x.name]);
+                    } else if (x.default) {
+                        value = x.default;
+                    }
                     const vars = new Variable(
                         x.name,
                         x.type || 'string',
-                        node?.data?.form?.[x.name] || x.default || '',
+                        value,
+                        x.label.zh_Hans,
+                        x.required,
                     );
+
                     input.addProperty(x.name, vars);
                 });
             }
@@ -915,8 +929,47 @@ export const transformer = {
                 provider: node.data?.baseData?.groupName,
                 tool_name: node.data?.baseData?.identity?.name,
             };
-
+            
+            params.output = node.data?.baseData?.output
             return new ToolNode(params);
+        },
+        context1(freeNode) {
+            console.log(freeNode);
+            debugger;
+            const input = cloneDeep(freeNode.data.input);
+            Object.values(input.properties).forEach(x => {
+                if (!x.required) {
+                    delete input.properties[x.name];
+                }
+            });
+            return {
+                inputs: input,
+            };
+        },
+        variables(data) {
+            // const output = new ObjectVariable('output');
+            // if (data?.infoData?.output_variables?.length) {
+            //     data.infoData.output_variables
+            // }
+
+            return data?.outputInfo?.properties || {};
+        },
+        context(freeNode) {
+            const prompt = freeNode.data.input.properties;
+            let context = [];
+
+            Object.values(prompt).forEach((x: object) => {
+                if (!x?.value) return;
+                const getVar = parseText(x.value);
+                context = [...context, ...getVar];
+            });
+            return {
+                // inputs: freeNode.data.input,
+                context: _.uniqWith(
+                    context,
+                    (a, b) => a.identifier === b.identifier && a.fieldName === b.fieldName,
+                ),
+            };
         },
     },
     [BlockEnum.End]: {

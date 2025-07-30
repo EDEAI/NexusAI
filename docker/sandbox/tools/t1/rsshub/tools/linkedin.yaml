@@ -1,0 +1,253 @@
+identity:
+  name: linkedin
+  author: stvlynn
+  label:
+    en_US: LinkedIn
+    zh_Hans: LinkedIn
+    ja_JP: LinkedIn
+description:
+  human:
+    en_US: Get RSS feeds from LinkedIn via RSSHub
+    zh_Hans: 通过RSSHub获取LinkedIn的RSS订阅源
+    ja_JP: RSSHubを通じてLinkedInのRSSフィードを取得
+  llm: "A tool to fetch RSS feeds from LinkedIn using RSSHub as a proxy."
+parameters:
+  - name: route_type
+    type: select
+    required: true
+    default: "jobs"
+    label:
+      en_US: Route Type
+      zh_Hans: 路由类型
+      ja_JP: ルートタイプ
+    human_description:
+      en_US: "The type of LinkedIn route to use"
+      zh_Hans: "要使用的LinkedIn路由类型"
+      ja_JP: "使用するLinkedInルートのタイプ"
+    llm_description: "The type of LinkedIn route to use"
+    form: form
+    options:
+      - value: jobs
+        label:
+          en_US: Jobs
+          zh_Hans: 职位搜索
+          ja_JP: 求人検索
+  - name: base_url
+    type: string
+    required: false
+    default: "https://rsshub.app"
+    label:
+      en_US: RSSHub Base URL
+      zh_Hans: RSSHub基础URL
+      ja_JP: RSSHubベースURL
+    human_description:
+      en_US: "The base URL of RSSHub instance (default is https://rsshub.app)"
+      zh_Hans: "RSSHub实例的基础URL（默认为https://rsshub.app）"
+      ja_JP: "RSSHubインスタンスのベースURL（デフォルトはhttps://rsshub.app）"
+    llm_description: "The base URL of RSSHub instance (default is https://rsshub.app)"
+    form: form
+  - name: access_key
+    type: string
+    required: false
+    label:
+      en_US: RSSHub Access Key
+      zh_Hans: RSSHub访问密钥
+      ja_JP: RSSHubアクセスキー
+    human_description:
+      en_US: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+      zh_Hans: "RSSHub路由的访问密钥（例如：ILoveRSSHub）。如不需要请留空。"
+      ja_JP: "RSSHubルートのアクセスキー（例：ILoveRSSHub）。必要ない場合は空のままにしてください。"
+    llm_description: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+    form: form
+  - name: keywords
+    type: string
+    required: false
+    label:
+      en_US: Keywords
+      zh_Hans: 关键词
+      ja_JP: キーワード
+    human_description:
+      en_US: "Search keywords for jobs"
+      zh_Hans: "职位搜索关键词"
+      ja_JP: "求人検索キーワード"
+    llm_description: "Search keywords for jobs"
+    form: llm
+  - name: job_types
+    type: select
+    required: false
+    default: "all"
+    label:
+      en_US: Job Types
+      zh_Hans: 职位类型
+      ja_JP: 雇用形態
+    human_description:
+      en_US: "The type of jobs to search for"
+      zh_Hans: "要搜索的职位类型"
+      ja_JP: "検索する雇用形態"
+    llm_description: "The type of jobs to search for"
+    form: form
+    options:
+      - value: F
+        label:
+          en_US: Full Time
+          zh_Hans: 全职
+          ja_JP: フルタイム
+      - value: P
+        label:
+          en_US: Part Time
+          zh_Hans: 兼职
+          ja_JP: パートタイム
+      - value: C
+        label:
+          en_US: Contractor
+          zh_Hans: 合同工
+          ja_JP: 契約社員
+      - value: all
+        label:
+          en_US: All
+          zh_Hans: 全部
+          ja_JP: すべて
+  - name: exp_levels
+    type: select
+    required: false
+    default: "all"
+    label:
+      en_US: Experience Levels
+      zh_Hans: 经验等级
+      ja_JP: 経験レベル
+    human_description:
+      en_US: "The experience level required for the jobs"
+      zh_Hans: "职位所需的经验等级"
+      ja_JP: "求人に必要な経験レベル"
+    llm_description: "The experience level required for the jobs"
+    form: form
+    options:
+      - value: "1"
+        label:
+          en_US: Internship
+          zh_Hans: 实习
+          ja_JP: インターンシップ
+      - value: "2"
+        label:
+          en_US: Entry Level
+          zh_Hans: 入门级
+          ja_JP: 新卒・第二新卒
+      - value: "3"
+        label:
+          en_US: Associate
+          zh_Hans: 助理级
+          ja_JP: アソシエイト
+      - value: "4"
+        label:
+          en_US: Mid-Senior Level
+          zh_Hans: 中高级
+          ja_JP: 中堅・管理職
+      - value: "5"
+        label:
+          en_US: Director
+          zh_Hans: 总监级
+          ja_JP: ディレクター
+      - value: all
+        label:
+          en_US: All
+          zh_Hans: 全部
+          ja_JP: すべて
+  - name: work_type
+    type: select
+    required: false
+    default: "0"
+    label:
+      en_US: Work Type
+      zh_Hans: 工作方式
+      ja_JP: 勤務形態
+    human_description:
+      en_US: "The work type of the jobs"
+      zh_Hans: "职位的工作方式"
+      ja_JP: "求人の勤務形態"
+    llm_description: "The work type of the jobs"
+    form: form
+    options:
+      - value: "1"
+        label:
+          en_US: Onsite
+          zh_Hans: 现场办公
+          ja_JP: オンサイト
+      - value: "2"
+        label:
+          en_US: Remote
+          zh_Hans: 远程办公
+          ja_JP: リモート
+      - value: "3"
+        label:
+          en_US: Hybrid
+          zh_Hans: 混合办公
+          ja_JP: ハイブリッド
+      - value: "0"
+        label:
+          en_US: Any
+          zh_Hans: 任意
+          ja_JP: 指定なし
+  - name: time_posted
+    type: select
+    required: false
+    default: "0"
+    label:
+      en_US: Time Posted
+      zh_Hans: 发布时间
+      ja_JP: 投稿時間
+    human_description:
+      en_US: "Filter by when the job was posted"
+      zh_Hans: "按职位发布时间筛选"
+      ja_JP: "求人の投稿時間でフィルタリング"
+    llm_description: "Filter by when the job was posted"
+    form: form
+    options:
+      - value: "r86400"
+        label:
+          en_US: Past 24 hours
+          zh_Hans: 过去24小时
+          ja_JP: 過去24時間
+      - value: "r604800"
+        label:
+          en_US: Past week
+          zh_Hans: 过去一周
+          ja_JP: 過去1週間
+      - value: "r2592000"
+        label:
+          en_US: Past month
+          zh_Hans: 过去一个月
+          ja_JP: 過去1ヶ月
+      - value: "0"
+        label:
+          en_US: Any time
+          zh_Hans: 任意时间
+          ja_JP: 指定なし
+  - name: geo_id
+    type: string
+    required: false
+    label:
+      en_US: Geographic Location ID
+      zh_Hans: 地理位置ID
+      ja_JP: 地理的位置ID
+    human_description:
+      en_US: "Geographic location ID (e.g. 91000012 for East Asia)"
+      zh_Hans: "地理位置ID（如91000012代表东亚）"
+      ja_JP: "地理的位置ID（例：91000012は東アジアを表す）"
+    llm_description: "Geographic location ID (e.g. 91000012 for East Asia)"
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: Item Limit
+      zh_Hans: 条目数量限制
+      ja_JP: アイテム数制限
+    human_description:
+      en_US: "Maximum number of items to return (default: 10)"
+      zh_Hans: "返回的最大条目数量（默认：10）"
+      ja_JP: "返される最大アイテム数（デフォルト：10）"
+    llm_description: "Maximum number of items to return (default: 10)"
+    form: llm
+extra:
+  python:
+    source: tools/linkedin.py

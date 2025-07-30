@@ -1,0 +1,41 @@
+identity:
+  name: OCR_to_Markdown
+  author: quhao
+  label:
+    en_US: OCR to Markdown Converter
+    zh_Hans: OCR 转 Markdown 工具
+
+description:
+  human:
+    en_US: Upload an image or PDF file, send it to an OCR API, and return the markdown content as a downloadable file.
+    zh_Hans: 上传图片或 PDF 文件，调用 OCR 接口，将返回的 Markdown 内容保存为文件。
+  llm: 将上传的图片或 PDF 文件转换为 Markdown 并返回文件。
+
+parameters:
+  - name: file
+    type: file
+    required: true
+    label:
+      en_US: Upload File
+      zh_Hans: 上传文件
+    human_description:
+      en_US: Upload the image or PDF file to be converted.
+      zh_Hans: 上传需要转换的图片或 PDF 文件。
+    llm_description: 上传的文件（图片或 PDF 文件）。
+    form: llm
+
+  - name: service_url
+    type: string
+    required: true
+    label:
+      en_US: OCR Service URL
+      zh_Hans: OCR 接口地址
+    human_description:
+      en_US: The URL of the OCR service endpoint that accepts image/PDF files and returns markdown.
+      zh_Hans: 接收图片或 PDF 并返回 markdown 的 OCR 接口地址。
+    llm_description: OCR 服务的 HTTP 接口地址。
+    form: llm
+
+extra:
+  python:
+    source: tools/ocr_to_markdown.py

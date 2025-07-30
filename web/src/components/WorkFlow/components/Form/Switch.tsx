@@ -25,6 +25,11 @@ const switchConfigs = {
         label: '',
         tooltip: '',
     },
+    split_task_by_line: {
+        name: 'split_task_by_line',
+        label: '',
+        tooltip: '',
+    },
 } as const;
 
 type FieldName = keyof typeof switchConfigs;
@@ -32,9 +37,10 @@ const typedSwitchConfigs: Record<FieldName, ProFormSwitchProps> = switchConfigs;
 
 interface SwitchGroupProps {
     fields: FieldName[];
+    onChange?: (value: boolean) => void;
 }
 
-export const SwitchGroup: React.FC<SwitchGroupProps> = ({ fields }) => {
+export const SwitchGroup: React.FC<SwitchGroupProps> = ({ fields, onChange }) => {
     const intl = useIntl();
     return (
         <div className="user-form mt-6">
@@ -49,6 +55,14 @@ export const SwitchGroup: React.FC<SwitchGroupProps> = ({ fields }) => {
                         tooltip={intl.formatMessage({
                             id: `workflow.${field}Des`,
                         })}
+                        fieldProps={
+                            {
+                                onChange: checked => {
+                                    onChange?.(checked);
+                                },
+                            }
+                        }
+                      
                     ></ProFormSwitch>
                 ) : null,
             )}
@@ -79,6 +93,14 @@ export const SwitchImportToKnowledgeBase = () => {
 export const SwitchManualConfirmation = () => {
     return <SwitchGroup fields={['manual_confirmation']} />;
 };
+/**
+ * Render the switch for splitting tasks by line
+ * @returns {JSX.Element} ProFormSwitch component
+ */
+export const SwitchSplitTaskByLine = ({ onChange }: { onChange?: (value: boolean) => void }) => {
+    return <SwitchGroup fields={['split_task_by_line']} onChange={onChange} />;
+};
+
 
 /**
  * Render the switch for waiting for all predecessor nodes

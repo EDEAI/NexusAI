@@ -1,0 +1,20 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#f9f9f9"></rect>
+
+  <!-- Book -->
+  <path d="M40 40 H120 A10 10 0 0 1 130 50 V150 A10 10 0 0 1 120 160 H40 Z" fill="#4A90E2"></path>
+  <path d="M40 40 V160" stroke="#ffffff" stroke-width="2"></path>
+  <path d="M130 50 L140 55 V145 L130 150 Z" fill="#3A78C2"></path>
+
+  <!-- Magnifying glass -->
+  <circle cx="100" cy="100" r="20" stroke="#000" stroke-width="4" fill="none"></circle>
+  <line x1="114" y1="114" x2="130" y2="130" stroke="#000" stroke-width="4" stroke-linecap="round"></line>
+
+  <!-- Plugin prongs (representing plugin concept) -->
+  <rect x="70" y="170" width="10" height="20" rx="2" fill="#333"></rect>
+  <rect x="90" y="170" width="10" height="20" rx="2" fill="#333"></rect>
+
+  <!-- Text Label (optional, remove for icon-only) -->
+  <!-- <text x="100" y="190" font-size="14" font-family="Arial" text-anchor="middle" fill="#333">Book Explorer</text> -->
+</svg>

@@ -152,7 +152,7 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
                         retrieval, _, _ = DatasetRetrieval.single_retrieve(self.data['retrieval_task_datasets'][0], 0, 0, workflow_id, app_run_id, user_id, type, previous_documents)
                     else:
                         retrieval, _, _ = DatasetRetrieval.multiple_retrieve(self.data['retrieval_task_datasets'], 0, 0, workflow_id, app_run_id, user_id, type, previous_documents)
-                    retrieval_result: List[Document] = retrieval.invoke(current_task_dict['keywords'])
+                    retrieval_result: List[Document] = retrieval.invoke(current_task_dict['keywords'] if current_task_dict['keywords'] else current_task_dict['task'])
                     if retrieval_result:
                         previous_documents_results = DatasetRetrieval.get_full_documents(retrieval_result)
                         if previous_documents_results:

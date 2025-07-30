@@ -2,7 +2,7 @@
  * @Author: wnagchi 1305bcd@gmail.com
  * @Date: 2024-12-30 17:31:04
  * @LastEditors: biz
- * @LastEditTime: 2025-04-22 13:57:35
+ * @LastEditTime: 2025-07-29 11:44:59
  * @FilePath: \NexusAI_GITHUB\web\src\components\WorkFlow\components\DraggableList\index.tsx
  */
 import { getBaseNode } from '@/components/WorkFlow/nodes/nodeDisperse';
@@ -146,10 +146,9 @@ const BaseNodeItem = memo(
                     item={item}
                     onClick={() => onItemClick?.(item)}
                 >
-                 
                     <UserCon
                         title={item.data.title}
-                        icon={item?.baseData?.avatar||item?.baseData?.icon || item.type}
+                        icon={item?.baseData?.avatar || item?.baseData?.icon || item.type}
                         typeBadge={typeBadge}
                     />
                 </NodeWrapper>
@@ -201,9 +200,9 @@ const ToolNodeItem = memo(
         toolIndex,
     }: ToolNodeItemProps) => {
         const lang = getLocale() === 'en-US' ? 'en_US' : 'zh_Hans';
-     
+
         const originNode = getBaseNode()[BlockEnum.Tool];
-      
+
         const toolItem = {
             ...tool,
             authorization_status: category?.authorization_status,
@@ -220,10 +219,10 @@ const ToolNodeItem = memo(
                 title: tool?.identity?.label[lang],
                 desc: tool?.description?.human?.[lang] || tool?.description?.llm,
                 icon: category?.identity?.icon,
+                optput:tool?.output
             },
             baseData: toolItem,
         };
-      
 
         return (
             <Tooltip placement="right" title={tool?.description?.human?.[lang]}>
@@ -234,11 +233,9 @@ const ToolNodeItem = memo(
                         item={createItem}
                         onClick={() => onItemClick?.(category, tool, categoryIndex, toolIndex)}
                     >
-                        <UserCon
-                            title={tool?.identity?.label[lang]}
-                            icon={category?.identity?.icon}
-                            typeBadge={typeBadge}
-                        />
+                        <div className="text-sm py-2 pl-2 text-gray-600">
+                            {tool?.identity?.label[lang] || tool?.identity?.label['en_US']}
+                        </div>
                     </NodeWrapper>
                 </div>
             </Tooltip>
@@ -252,26 +249,36 @@ const ToolCategory = memo(
         const lang = getLocale() === 'en-US' ? 'en_US' : 'zh_Hans';
 
         return (
-            <div>
-                <div className="text-[#333333] mb-2">
-                    {category?.identity?.label[lang]}
+            <div className="flex flex-col pb-2">
+                <div className="text-[#333333] mb-2 flex items-center">
+                    {/* <img src={category?.identity?.icon} alt="" className='w-4 h-4' /> */}
+                    {/* {category?.identity?.label[lang]} */}
+                    <UserCon
+                        title={
+                            category?.identity?.label[lang] || category?.identity?.label['en_US']
+                        }
+                        icon={category?.identity?.icon}
+                        typeBadge={typeBadge}
+                    />
                     <Tooltip placement="right" title={category?.identity?.description[lang]}>
                         <QuestionCircleOutlined className="cursor-pointer ml-1" />
                     </Tooltip>
                 </div>
                 {category.tools.map((tool, toolIndex) => (
-                    <ToolNodeItem
-                        key={toolIndex}
-                        tool={tool}
-                        category={category}
-                        onDragStart={onDragStart}
-                        typeBadge={typeBadge}
-                        onItemClick={(category, item, catIndex, toolIdx) =>
-                            onItemClick?.(category, item, catIndex, toolIdx)
-                        }
-                        categoryIndex={categoryIndex}
-                        toolIndex={toolIndex}
-                    />
+                    <div className='pl-6'>
+                        <ToolNodeItem
+                            key={toolIndex}
+                            tool={tool}
+                            category={category}
+                            onDragStart={onDragStart}
+                            typeBadge={typeBadge}
+                            onItemClick={(category, item, catIndex, toolIdx) =>
+                                onItemClick?.(category, item, catIndex, toolIdx)
+                            }
+                            categoryIndex={categoryIndex}
+                            toolIndex={toolIndex}
+                        />
+                    </div>
                 ))}
             </div>
         );
@@ -286,7 +293,6 @@ const DraggableList: React.FC<DraggableListProps> = ({
     onItemClick,
 }) => {
     if (!list?.length) return null;
-  
 
     return (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-y-2 gap-2">
@@ -325,4 +331,3 @@ const DraggableList: React.FC<DraggableListProps> = ({
 };
 
 export default memo(DraggableList);
-

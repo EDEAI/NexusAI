@@ -1,0 +1,64 @@
+identity:
+  name: update_event
+  author: acane0320
+  label:
+    en_US: Update User Event
+    zh_Hans: 更新用户事件
+    ja_Jp: ユーザーイベントを更新する
+    pt_BR: Atualizar Evento do Usuário
+description:
+  human:
+    en_US: Update an existing event in the user's history
+    zh_Hans: 更新用户历史记录中的现有事件
+    ja_Jp: ユーザーの履歴にある既存のイベントを更新します
+    pt_BR: Atualizar um evento existente no histórico do usuário
+  llm: Use this tool to update an existing event in the user's history. This is useful for modifying event information that needs to be corrected or enhanced.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user whose event will be updated
+      zh_Hans: 要更新事件的用户 ID
+      ja_Jp: イベントを更新するユーザーの ID
+      pt_BR: O ID do usuário cujo evento será atualizado
+    llm_description: The ID of the user whose event will be updated.
+    form: llm
+  - name: event_id
+    type: string
+    required: true
+    label:
+      en_US: Event ID
+      zh_Hans: 事件 ID
+      ja_Jp: イベント ID
+      pt_BR: ID do Evento
+    human_description:
+      en_US: The ID of the event to update
+      zh_Hans: 要更新的事件 ID
+      ja_Jp: イベントを更新するユーザーの ID
+      pt_BR: O ID do evento a ser atualizado
+    llm_description: The ID of the event to update.
+    form: llm
+  - name: event_data_str
+    type: string
+    required: true
+    label:
+      en_US: Event Data (JSON)
+      zh_Hans: 事件数据 (JSON)
+      ja_Jp: イベントデータ (JSON)
+      pt_BR: Dados do Evento (JSON)
+    human_description:
+      en_US: The new data for the event in JSON format
+      zh_Hans: JSON 格式的事件新数据
+      ja_Jp: JSON 形式のイベントの新しいデータ
+      pt_BR: Os novos dados para o evento no formato JSON
+    llm_description: The new data for the event in JSON format. Must be a valid JSON string.
+    form: llm
+extra:
+  python:
+    source: tools/user_event/update_event.py

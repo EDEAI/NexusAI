@@ -1,13 +1,12 @@
 from typing import Union, List, Dict, Tuple, Any, Optional, Type
 from pathlib import Path
 
-from markitdown import MarkItDown
 from pydantic import BaseModel, Field, create_model
 import json
 
+from core.helper import convert_document_to_markdown
 
 project_root = Path(__file__).absolute().parent.parent.parent
-md = MarkItDown(enable_plugins=False)
 
 class Variable:
     """
@@ -362,12 +361,16 @@ def replace_value_in_variable(
                     if file_var_value := context_variable.value:
                         if isinstance(file_var_value, int):
                             # Upload file ID
+                            attr = 'id'
+                            value = file_var_value
                             file_data = UploadFiles().get_file_by_id(file_var_value)
                             file_path = project_root.joinpath(file_data['path'])
                         elif isinstance(file_var_value, str):
+                            attr = 'path'
                             if file_var_value[0] == '/':
                                 file_var_value = file_var_value[1:]
                             file_path = project_root.joinpath('storage').joinpath(file_var_value)
+                            value = str(file_path)
                         else:
                             # This should never happen
                             raise Exception('Unsupported value type!')
@@ -379,9 +382,14 @@ def replace_value_in_variable(
                         else:
                             # Use Markdown for document files
                             variable_string = (
-                                f'\n******Start of {file_path.name}******\n'
-                                f'{md.convert(file_path).text_content}\n'
-                                f'******End of {file_path.name}******\n'
+                                '\n\n'
+                                '---\n\n'
+                                f'##{file_path.name}\n\n'
+                                f'**{attr}**: `{value}`\n\n'
+                                '```\n'
+                                f'{convert_document_to_markdown(file_path)}\n'
+                                '```\n\n'
+                                '---\n\n'
                             )
                 else:
                     variable_string = context_variable.to_string()

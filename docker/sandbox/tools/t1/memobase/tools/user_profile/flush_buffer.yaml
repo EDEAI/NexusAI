@@ -1,0 +1,34 @@
+identity:
+  name: flush_buffer
+  author: acane0320
+  label:
+    en_US: Flush Buffer
+    zh_Hans: 刷新记忆缓冲区
+    ja_Jp: バッファをフラッシュ
+    pt_BR: Limpar Buffer
+description:
+  human:
+    en_US: Flush the memory buffer for a user in Memobase
+    zh_Hans: 刷新 Memobase 中用户的记忆缓冲区
+    ja_Jp: Memobase のユーザーのメモリ バッファをフラッシュします
+    pt_BR: Limpar o buffer de memória para um usuário no Memobase
+  llm: Use this tool to manually flush the memory buffer for a user, triggering memory extraction. This is useful after a chat session is closed.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to flush memory for
+      zh_Hans: 要刷新记忆的用户 ID
+      ja_Jp: メモリをフラッシュするユーザーの ID
+      pt_BR: O ID do usuário para limpar a memória
+    llm_description: The ID of the user to flush memory for.
+    form: llm
+extra:
+  python:
+    source: tools/user_profile/flush_buffer.py

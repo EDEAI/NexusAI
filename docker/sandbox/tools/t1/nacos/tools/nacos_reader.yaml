@@ -1,0 +1,56 @@
+identity:
+  name: nacos_config_reader
+  author: aias00
+  label:
+    en_US: Nacos Configuration Reader
+    zh_Hans: 读取 Nacos 中的配置
+    pt_BR: Nacos Configuration Reader
+description:
+  human:
+    en_US: Nacos Configuration Reader
+    zh_Hans: 读取 Nacos 中的配置
+    pt_BR: Nacos Configuration Reader
+  llm: A tool read configuration to nacos
+parameters:
+  - name: namespace_id
+    type: string
+    required: true
+    label:
+      en_US: Namespace ID
+      zh_Hans: 命名空间 ID
+      pt_BR: Namespace ID
+    human_description:
+      en_US: Nacos namespace ID
+      zh_Hans: Nacos命名空间 ID
+      pt_BR: Nacos namespace ID
+    llm_description: The namespace ID of the configuration in Nacos
+    form: form
+  - name: data_id
+    type: string
+    required: true
+    label:
+      en_US: Data ID
+      zh_Hans: 配置ID
+      pt_BR: Data ID
+    human_description:
+      en_US: Nacos configuration data ID
+      zh_Hans: Nacos配置的数据ID
+      pt_BR: Nacos configuration data ID
+    llm_description: The data ID of the configuration in Nacos
+    form: form
+  - name: group_name
+    type: string
+    required: true
+    label:
+      en_US: Group Name
+      zh_Hans: 分组名称
+      pt_BR: Group Name
+    human_description:
+      en_US: Nacos configuration group name
+      zh_Hans: Nacos配置分组名称
+      pt_BR: Nacos configuration group name
+    llm_description: The group name of the configuration in Nacos
+    form: form
+extra:
+  python:
+    source: tools/nacos_reader.py

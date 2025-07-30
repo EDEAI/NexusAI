@@ -1,0 +1,41 @@
+credentials_for_provider:
+  token:
+    help:
+      en_US: Get Alibaba Yuque team token
+      zh_Hans: 先获取语雀团队Token
+    label:
+      en_US: Yuque Team Token
+      zh_Hans: 语雀团队Token
+    placeholder:
+      en_US: Please input your Yuque team token
+      zh_Hans: 请输入你的语雀团队Token
+    required: true
+    type: secret-input
+    url: https://www.yuque.com/settings/tokens
+extra:
+  python:
+    source: provider/aliyuque.py
+identity:
+  author: 佐井
+  description:
+    en_US: Yuque, https://www.yuque.com.
+    pt_BR: Yuque, https://www.yuque.com.
+    zh_Hans: 语雀，https://www.yuque.com。
+  icon: icon.svg
+  label:
+    en_US: yuque
+    pt_BR: yuque
+    zh_Hans: 语雀
+  name: aliyuque
+  tags:
+  - productivity
+  - search
+tools:
+- tools/create_document.yaml
+- tools/describe_document_content.yaml
+- tools/describe_book_table_of_contents.yaml
+- tools/delete_document.yaml
+- tools/describe_book_index_page.yaml
+- tools/describe_documents.yaml
+- tools/update_book_table_of_contents.yaml
+- tools/update_document.yaml

@@ -1,0 +1,68 @@
+identity:
+  author: "zeroz-lab"
+  name: "milvus"
+  label:
+    en_US: "Milvus"
+    zh_Hans: "Milvus"
+    pt_BR: "Milvus"
+  description:
+    en_US: "Milvus vector database client for AI applications"
+    zh_Hans: "用于AI应用的Milvus向量数据库客户端"
+    pt_BR: "Cliente de banco de dados vetorial Milvus para aplicações de IA"
+  icon: "icon.svg"
+credentials_for_provider:
+  uri:
+    type: text-input
+    required: true
+    label:
+      en_US: "Milvus URI"
+      zh_Hans: "Milvus URI"
+      pt_BR: "URI do Milvus"
+    placeholder:
+      en_US: "http://localhost:19530 or https://your-milvus-cluster.com:19530"
+      zh_Hans: "http://localhost:19530 或 https://your-milvus-cluster.com:19530"
+      pt_BR: "http://localhost:19530 ou https://your-milvus-cluster.com:19530"
+    help:
+      en_US: "The URI of your Milvus instance"
+      zh_Hans: "您的Milvus实例的URI"
+      pt_BR: "O URI da sua instância do Milvus"
+  token:
+    type: secret-input
+    required: false
+    label:
+      en_US: "Authentication Token"
+      zh_Hans: "认证令牌"
+      pt_BR: "Token de Autenticação"
+    placeholder:
+      en_US: "username:password or API key"
+      zh_Hans: "用户名:密码 或 API密钥"
+      pt_BR: "usuário:senha ou chave API"
+    help:
+      en_US: "Authentication token for Milvus (optional for local instances)"
+      zh_Hans: "Milvus的认证令牌（本地实例可选）"
+      pt_BR: "Token de autenticação para Milvus (opcional para instâncias locais)"
+  database:
+    type: text-input
+    required: false
+    default: "default"
+    label:
+      en_US: "Database Name"
+      zh_Hans: "数据库名称"
+      pt_BR: "Nome do Banco de Dados"
+    placeholder:
+      en_US: "default"
+      zh_Hans: "default"
+      pt_BR: "default"
+    help:
+      en_US: "The database name to connect to"
+      zh_Hans: "要连接的数据库名称"
+      pt_BR: "O nome do banco de dados para conectar"
+tools:
+  - tools/milvus_collection.yaml
+  - tools/milvus_search.yaml
+  - tools/milvus_insert.yaml
+  - tools/milvus_query.yaml
+  - tools/milvus_delete.yaml
+extra:
+  python:
+    source: provider/milvus.py

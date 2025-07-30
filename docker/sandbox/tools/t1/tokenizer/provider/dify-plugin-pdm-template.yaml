@@ -1,0 +1,17 @@
+identity:
+  author: jingfelix
+  name: dify-plugin-pdm-template
+  label:
+    en_US: dify-plugin-pdm-template
+    zh_Hans: dify-plugin-pdm-template
+    pt_BR: dify-plugin-pdm-template
+  description:
+    en_US: A Dify plugin template with pdm
+    zh_Hans: A Dify plugin template with pdm
+    pt_BR: A Dify plugin template with pdm
+  icon: icon.svg
+tools:
+  - tools/dify-plugin-pdm-template.yaml
+extra:
+  python:
+    source: provider/dify-plugin-pdm-template.py

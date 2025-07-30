@@ -73,6 +73,7 @@ dependencies:
   - openssl
   - pillow=10.4.0
   # - pip=24.0
+  - poppler=24.09.0
   # - python=3.10.13
   - pysocks=1.7.1
   - pytorch=2.3.1
@@ -287,7 +288,6 @@ dependencies:
       - pyarrow-hotfix==0.6
       - pyasn1==0.6.0
       - pyasn1-modules==0.4.0
-      - pyautogen==0.2.35
       - pyautogui==0.9.54
       - pycocotools==2.0.8
       - pycparser==2.22

@@ -1,0 +1,38 @@
+identity:
+  name: random_prime
+  author: bowenliang123
+  label:
+    en_US: Random prime number
+    zh_Hans: 生成随机质数
+description:
+  human:
+    en_US: Generate a random prime number.
+  llm: Generate a random prime number.
+parameters:
+  - name: lower_bound
+    type: number
+    required: true
+    default: 0
+    label:
+      en_US: Lower bound
+      zh_Hans: 数值下限
+    human_description:
+      en_US: Included lower bound of the random number, accepting integer or float.
+      zh_Hans: 包括的数值下限，可填写整数或小数
+    llm_description: Lower bound of the random number.
+    form: llm
+  - name: upper_bound
+    type: number
+    required: true
+    default: 1024
+    label:
+      en_US: Upper bound
+      zh_Hans: 范围上限
+    human_description:
+      en_US: Included upper bound of the random number, accepting integer or float.
+      zh_Hans: 包括的数值上限，可填写整数或小数
+    llm_description: Upper bound of the random number.
+    form: llm
+extra:
+  python:
+    source: tools/random_prime/random_prime.py

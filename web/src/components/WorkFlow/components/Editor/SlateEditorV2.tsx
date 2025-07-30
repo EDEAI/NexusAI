@@ -109,15 +109,17 @@ const MentionEditor = ({
         const valueChange = _.isEqual(oldPropsValue, value);
         if (valueChange) return;
 
-        if (value && value.length > 0) {
-            updateValue(value);
-        } else if (value && _.isArray(value) && value.length == 0) {
-            updateValue([
+        // 处理空值情况
+        if (!value || (Array.isArray(value) && value.length === 0)) {
+            const defaultValue = [
                 {
                     type: 'paragraph',
-                    children: [],
+                    children: [{ text: '' }],
                 },
-            ]);
+            ];
+            updateValue(defaultValue);
+        } else if (value && value.length > 0) {
+            updateValue(value);
         }
     }, [value, id]);
 
@@ -191,22 +193,70 @@ const MentionEditor = ({
             at?: Location;
         } = {},
     ): void => {
+        // Save current selection before resetting nodes
+        const currentSelection = editor.selection;
+        
         const children = [...editor.children];
 
         children.forEach(node => editor.apply({ type: 'remove_node', path: [0], node }));
 
         if (options.nodes) {
-            const nodes = Node.isNode(options.nodes) ? [options.nodes] : options.nodes;
+            let nodes: Node[];
+            
+            if (Node.isNode(options.nodes)) {
+                nodes = [options.nodes];
+            } else if (Array.isArray(options.nodes)) {
+                nodes = options.nodes;
+            } else {
+                // Handle invalid input by creating a default paragraph node
+                nodes = [
+                    {
+                        type: 'paragraph',
+                        children: [{ text: '' }],
+                    } as Node,
+                ];
+            }
 
             nodes.forEach((node, i) =>
                 editor.apply({ type: 'insert_node', path: [i], node: node }),
             );
         }
 
-        const point = options.at && Point.isPoint(options.at) ? options.at : Editor.end(editor, []);
+        // Determine where to place cursor
+        let targetPoint: Point | null = null;
+        
+        if (options.at && Point.isPoint(options.at)) {
+            // Use explicitly provided position
+            targetPoint = options.at;
+        } else if (currentSelection && Range.isRange(currentSelection)) {
+            // Try to restore previous cursor position
+            try {
+                const { anchor } = currentSelection;
+                // Check if the previous position is still valid in the new content
+                if (Editor.hasPath(editor, anchor.path)) {
+                    const node = Editor.node(editor, anchor.path);
+                    if (node && node[0] && 'text' in node[0]) {
+                        // Ensure offset doesn't exceed text length
+                        const textLength = (node[0] as any).text?.length || 0;
+                        targetPoint = {
+                            path: anchor.path,
+                            offset: Math.min(anchor.offset, textLength)
+                        };
+                    }
+                }
+            } catch (error) {
+                // If restoring position fails, fall back to start
+                console.warn('Failed to restore cursor position:', error);
+            }
+        }
+        
+        // If we couldn't restore position, default to editor start instead of end
+        if (!targetPoint) {
+            targetPoint = Editor.start(editor, []);
+        }
 
-        if (point) {
-            Transforms.select(editor, point);
+        if (targetPoint) {
+            Transforms.select(editor, targetPoint);
         }
     };
     useEffect(() => {
@@ -238,14 +288,18 @@ const MentionEditor = ({
         setTarget(null);
     };
 
+    const handleSlateChange = useCallback(
+        _.debounce((val) => {
+            onChange?.(val);
+        }, 200),
+        [onChange]
+    );
+
     return (
         <Slate
             editor={editor}
             initialValue={initialValue}
-            onChange={val => {
-                onChange?.(val);
-                setTarget(null);
-            }}
+            onChange={handleSlateChange}
         >
             <Editable
                 renderElement={renderElement}
@@ -336,7 +390,7 @@ const withMentions = editor => {
 };
 
 const insertMention = (editor, character) => {
-    const mention = {
+    const mention: any = {
         type: 'mention',
         id: character?.id || '',
         character: character.name,

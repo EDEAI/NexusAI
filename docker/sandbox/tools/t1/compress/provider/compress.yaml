@@ -1,0 +1,17 @@
+identity:
+  author: hjlarry
+  name: compress
+  label:
+    en_US: Compress
+    zh_Hans: 压缩
+  description:
+    en_US: a tool to compress the multimodal files
+    zh_Hans: 一个压缩多模态文件的工具
+  icon: icon.svg
+tools:
+  - tools/image.yaml
+  - tools/video.yaml
+  - tools/audio.yaml
+extra:
+  python:
+    source: provider/compress.py

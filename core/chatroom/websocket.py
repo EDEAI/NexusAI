@@ -195,8 +195,10 @@ class WorkflowWebSocketManager():
     async def _start_connection(self, user_id: int):
         try:
             assert user_id in self._connection_status_by_user_id, f'User {user_id} is not in connection status'
-            assert self._connection_status_by_user_id[user_id] == self.RUNNING, f'User {user_id} is not running'
             logger.info(f'Starting Workflow WebSocket connection for user {user_id}...')
+            if self._connection_status_by_user_id[user_id] == self.EXITING:
+                logger.info(f'User {user_id} is EXITING, skipping...')
+                return
             token = (
                 redis.get(f'access_token:{user_id}')
                 or redis.get(f'third_party_access_token:{user_id}')

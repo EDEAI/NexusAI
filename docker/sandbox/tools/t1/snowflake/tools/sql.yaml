@@ -1,0 +1,28 @@
+identity:
+  name: sql
+  author: hankookncompany
+  label:
+    en_US: SQL
+    zh_Hans: SQL
+description:
+  human:
+    en_US: SQL Query Executor
+    zh_Hans: SQL 查询执行器
+  llm: A tool that execute a custom SQL query on Snowflake.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: SQL Query
+      zh_Hans: SQL 查询
+      ko_KR: SQL 쿼리
+    human_description:
+      en_US: The SQL statement to be executed
+      zh_Hans: 需要执行的 SQL 语句
+      ko_KR: 실행할 SQL 구문
+    llm_description: The SQL statement to run on Snowflake.
+    form: llm
+extra:
+  python:
+    source: tools/sql.py

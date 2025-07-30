@@ -1,0 +1,19 @@
+identity:
+  name: get_messages
+  author: stvlynn
+  label:
+    en_US: Get Conversation History
+    zh_Hans: 获取对话历史
+    pt_BR: Obter Histórico da Conversa
+    ja_JP: 会話履歴の取得
+description:
+  human:
+    en_US: Get the conversation history with the AgentAPI agent.
+    zh_Hans: 获取与 AgentAPI 代理的对话历史。
+    pt_BR: Obtenha o histórico da conversa com o agente AgentAPI.
+    ja_JP: AgentAPI エージェントとの会話履歴を取得します。
+  llm: Returns a list of messages representing the conversation history with the agent.
+parameters: []
+extra:
+  python:
+    source: tools/get_messages.py

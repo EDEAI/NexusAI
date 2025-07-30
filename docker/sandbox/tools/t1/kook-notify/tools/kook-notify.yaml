@@ -1,0 +1,57 @@
+identity:
+  name: kook-notify
+  author: jingfelix
+  label:
+    en_US: Send Kook Notification
+    zh_Hans: 发送 Kook 通知
+    pt_BR: Enviar Notificação Kook
+description:
+  human:
+    en_US: Sends a notification message to a specified Kook channel.
+    zh_Hans: 发送通知消息到指定的 Kook 频道。
+    pt_BR: Envia uma mensagem de notificação para um canal Kook especificado.
+  llm: Sends a notification message to a specified Kook channel using the provided Kook Bot token and channel ID. You can specify the title, content, and type (Warning, Error, Info, Success) of the notification.
+parameters:
+  - name: title
+    type: string
+    required: false
+    label:
+      en_US: Title
+      zh_Hans: 标题
+      pt_BR: Título
+    human_description:
+      en_US: Notification title
+      zh_Hans: 通知标题
+      pt_BR: Título da notificação
+    llm_description: The title of the notification message.
+    form: llm
+  - name: content
+    type: string
+    required: false
+    label:
+      en_US: Content
+      zh_Hans: 内容
+      pt_BR: Conteúdo
+    human_description:
+      en_US: Notification content
+      zh_Hans: 通知内容
+      pt_BR: Conteúdo da notificação
+    llm_description: The main content of the notification message.
+    form: llm
+
+  - name: type
+    type: string
+    required: false
+    label:
+      en_US: Type
+      zh_Hans: 类型
+      pt_BR: Tipo
+    human_description:
+      en_US: Notification type (Warning, Error, Info, Success)
+      zh_Hans: 通知类型 (Warning, Error, Info, Success)
+      pt_BR: Tipo de notificação (Warning, Error, Info, Success)
+    llm_description: The type of the notification message, determining its appearance (e.g., color). Allowed values are Warning, Error, Info, Success.
+    form: llm
+extra:
+  python:
+    source: tools/kook-notify.py

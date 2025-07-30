@@ -1,0 +1,99 @@
+identity:
+  name: enrich_contact
+  author: eric-2369
+  label:
+    en_US: Enrich Contact
+    zh_Hans: 丰富联系人信息
+    pt_BR: Enriquecer Contato
+description:
+  human:
+    en_US: Enrich contact information by name and company using ZoomInfo API
+    zh_Hans: 使用 ZoomInfo API 通过姓名和公司丰富联系人信息
+    pt_BR: Enriquecer informações de contato por nome e empresa usando a API ZoomInfo
+  llm: A tool that takes a person's first name, last name, and company name to retrieve detailed contact information from ZoomInfo, including email, phone, job title, and other professional details. Use this when you need to find contact information for specific individuals at companies.
+parameters:
+  - name: first_name
+    type: string
+    required: true
+    label:
+      en_US: First Name
+      zh_Hans: 名字
+      pt_BR: Primeiro Nome
+    human_description:
+      en_US: The first name of the contact
+      zh_Hans: 联系人的名字
+      pt_BR: O primeiro nome do contato
+    llm_description: The first name of the person you want to find contact information for.
+    form: llm
+  - name: last_name
+    type: string
+    required: true
+    label:
+      en_US: Last Name
+      zh_Hans: 姓氏
+      pt_BR: Sobrenome
+    human_description:
+      en_US: The last name of the contact
+      zh_Hans: 联系人的姓氏
+      pt_BR: O sobrenome do contato
+    llm_description: The last name of the person you want to find contact information for.
+    form: llm
+  - name: company_name
+    type: string
+    required: true
+    label:
+      en_US: Company Name
+      zh_Hans: 公司名称
+      pt_BR: Nome da Empresa
+    human_description:
+      en_US: The name of the company where the contact works
+      zh_Hans: 联系人工作的公司名称
+      pt_BR: O nome da empresa onde o contato trabalha
+    llm_description: The name of the company where this person works. Should be the official company name.
+    form: llm
+  - name: output_fields
+    type: string
+    required: true
+    label:
+      en_US: Output Fields
+      zh_Hans: 输出字段
+      pt_BR: Campos de Saída
+    human_description:
+      en_US: Comma-separated list of fields to retrieve (max 5 fields)
+      zh_Hans: 要检索的字段的逗号分隔列表（最多5个字段）
+      pt_BR: Lista separada por vírgulas dos campos a recuperar (máximo 5 campos)
+    llm_description: |
+      A comma-separated list of up to 5 fields to retrieve from ZoomInfo. Choose from the following allowed fields:
+      
+      Personal Info: id, firstName, middleName, lastName, salutation, suffix, picture
+      Contact: email, hasCanadianEmail, phone, directPhoneDoNotCall, mobilePhoneDoNotCall
+      Location: street, city, region, metroArea, zipCode, state, country, continent
+      Job: jobTitle, jobFunction, managementLevel, positionStartDate, yearsOfExperience
+      Company: companyId, companyName, companyDescriptionList, companyPhone, companyWebsite, companyRevenue, companyEmployeeCount
+      Education: education, techSkills
+      Privacy: withinEu, withinCalifornia, withinCanada, personHasMoved, noticeProvidedDate
+      Other: hashedEmails, externalUrls, employmentHistory, contactAccuracyScore, engagements
+      
+      Example: "firstName,lastName,email,jobTitle,companyName"
+    form: llm
+extra:
+  python:
+    source: tools/enrich_contact.py
+output_schema:
+  type: object
+  properties:
+    contact_name:
+      type: string
+      description: The contact name that was searched
+    company_name:
+      type: string
+      description: The company name that was searched
+    requested_fields:
+      type: array
+      description: List of fields that were requested
+    data:
+      type: object
+      description: Contact data returned by ZoomInfo API
+    status:
+      type: string
+      description: Status of the enrichment request

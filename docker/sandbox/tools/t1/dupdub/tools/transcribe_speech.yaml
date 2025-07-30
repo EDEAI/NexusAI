@@ -1,0 +1,349 @@
+identity:
+  name: TranscribeSpeech
+  author: dupdub-dify
+  label:
+    en_US: TranscribeSpeech
+    zh_Hans: 提取文案
+    pt_BR: TranscribeSpeech
+description:
+  human:
+    en_US: TranscribeSpeech
+    zh_Hans: 提取文案
+    pt_BR: TranscribeSpeech
+  llm: TranscribeSpeech
+parameters:
+  - name: duration
+    type: number
+    required: true
+    label:
+      en_US: Duration
+      zh_Hans: 时长
+      pt_BR: Duration
+    human_description:
+      en_US: Duration of the video
+      zh_Hans: 视频时长
+      pt_BR: Duração do vídeo
+    llm_description: Duration of the video
+    form: llm
+  - name: url
+    type: string
+    required: true
+    label:
+      en_US: URL
+      zh_Hans: 视频链接
+      pt_BR: URL do vídeo
+    human_description:
+      en_US: URL of the video
+      zh_Hans: 视频链接
+      pt_BR: URL do vídeo
+    llm_description: URL of the video
+    form: llm
+  - name: language
+    type: select
+    required: true
+    label:
+      en_US: Language
+      zh_Hans: 语言
+      pt_BR: Idioma
+    human_description:
+      en_US: Languageoftheaudio/videocontent
+      zh_Hans: 视频支持的语言
+      pt_BR: Languageoftheaudio/videocontent
+    llm_description: Language of the video
+    form: llm
+    default: US
+    options:
+      - value: Afrikaans
+        label:
+          en_US: Afrikaans
+          zh_Hans: 南非语
+          pt_BR: Afrikáans
+      - value: Arabic
+        label:
+          en_US: Arabic
+          zh_Hans: 阿拉伯语
+          pt_BR: Árabe
+      - value: Armenian
+        label:
+          en_US: Armenian
+          zh_Hans: 亚美尼亚语
+          pt_BR: Armênio
+      - value: Azerbaijani
+        label:
+          en_US: Azerbaijani
+          zh_Hans: 阿塞拜疆语
+          pt_BR: Azeri
+      - value: Belarusian
+        label:
+          en_US: Belarusian
+          zh_Hans: 白俄罗斯语
+          pt_BR: Bielorrusso
+      - value: Bosnian
+        label:
+          en_US: Bosnian
+          zh_Hans: 波斯尼亚语
+          pt_BR: Bósnio
+      - value: Bulgarian
+        label:
+          en_US: Bulgarian
+          zh_Hans: 保加利亚语
+          pt_BR: Búlgaro
+      - value: Catalan
+        label:
+          en_US: Catalan
+          zh_Hans: 加泰罗尼亚语
+          pt_BR: Catalão
+      - value: Chinese(simplified)
+        label:
+          en_US: Chinese(simplified)
+          zh_Hans: 简体中文
+          pt_BR: Chinese(simplified)
+      - value: Chinese(traditional)
+        label:
+          en_US: Chinese(traditional)
+          zh_Hans: 繁体中文
+          pt_BR: Chinese(traditional)
+      - value: Croatian
+        label:
+          en_US: Croatian
+          zh_Hans: 克罗地亚语
+          pt_BR: Croata
+      - value: Czech
+        label:
+          en_US: Czech
+          zh_Hans: 捷克语
+          pt_BR: Tcheco
+      - value: Danish
+        label:
+          en_US: Danish
+          zh_Hans: 丹麦语
+          pt_BR: Dinamarquês
+      - value: Dutch
+        label:
+          en_US: Dutch
+          zh_Hans: 荷兰语
+          pt_BR: Holandês
+      - value: English
+        label:
+          en_US: English
+          zh_Hans: 英语
+          pt_BR: Inglês
+      - value: Estonian
+        label:
+          en_US: Estonian
+          zh_Hans: 爱沙尼亚语
+          pt_BR: Estônio
+      - value: Finnish
+        label:
+          en_US: Finnish
+          zh_Hans: 芬兰语
+          pt_BR: Finlândes
+      - value: French
+        label:
+          en_US: French
+          zh_Hans: 法语
+          pt_BR: Francês
+      - value: Galician
+        label:
+          en_US: Galician
+          zh_Hans: 加利西亚语
+          pt_BR: Galês
+      - value: German
+        label:
+          en_US: German
+          zh_Hans: 德语
+          pt_BR: Alemão
+      - value: Greek
+        label:
+          en_US: Greek
+          zh_Hans: 希腊语
+          pt_BR: Grego
+      - value: Hebrew
+        label:
+          en_US: Hebrew
+          zh_Hans: 希伯来语
+          pt_BR: Hebraico
+      - value: Hindi
+        label:
+          en_US: Hindi
+          zh_Hans: 印地语
+          pt_BR: Hindi
+      - value: Hungarian
+        label:
+          en_US: Hungarian
+          zh_Hans: 匈牙利语
+          pt_BR: Húngaro
+      - value: Icelandic
+        label:
+          en_US: Icelandic
+          zh_Hans: 冰岛语
+          pt_BR: Islandês
+      - value: Indonesian
+        label:
+          en_US: Indonesian
+          zh_Hans: 印度尼西亚语
+          pt_BR: Indonésio
+      - value: Italian
+        label:
+          en_US: Italian
+          zh_Hans: 意大利语
+          pt_BR: Italiano
+      - value: Japanese
+        label:
+          en_US: Japanese
+          zh_Hans: 日语
+          pt_BR: Japonês
+      - value: Kannada
+        label:
+          en_US: Kannada
+          zh_Hans: 卡纳达语
+          pt_BR: Kannada
+      - value: Kazakh
+        label:
+          en_US: Kazakh
+          zh_Hans: 哈萨克语
+          pt_BR: Cazaque
+      - value: Korean
+        label:
+          en_US: Korean
+          zh_Hans: 韩语
+          pt_BR: Coreano
+      - value: Latvian
+        label:
+          en_US: Latvian
+          zh_Hans: 拉脱维亚语
+          pt_BR: Letão
+      - value: Lithuanian
+        label:
+          en_US: Lithuanian
+          zh_Hans: 立陶宛语
+          pt_BR: Lituano
+      - value: Macedonian
+        label:
+          en_US: Macedonian
+          zh_Hans: 马其顿语
+          pt_BR: Mazedônico
+      - value: Malay
+        label:
+          en_US: Malay
+          zh_Hans: 马来语
+          pt_BR: Malaio
+      - value: Marathi
+        label:
+          en_US: Marathi
+          zh_Hans: 马拉地语
+          pt_BR: Marathi
+      - value: Maori
+        label:
+          en_US: Maori
+          zh_Hans: 毛利语
+          pt_BR: Maori
+      - value: Nepali
+        label:
+          en_US: Nepali
+          zh_Hans: 尼泊尔语
+          pt_BR: Nepalês
+      - value: Norwegian
+        label:
+          en_US: Norwegian
+          zh_Hans: 挪威语
+          pt_BR: Norueguês
+      - value: Persian
+        label:
+          en_US: Persian
+          zh_Hans: 波斯语
+          pt_BR: Persa
+      - value: Polish
+        label:
+          en_US: Polish
+          zh_Hans: 波兰语
+          pt_BR: Polonês
+      - value: Portuguese
+        label:
+          en_US: Portuguese
+          zh_Hans: 葡萄牙语
+          pt_BR: Português
+      - value: Romanian
+        label:
+          en_US: Romanian
+          zh_Hans: 罗马尼亚语
+          pt_BR: Romeno
+      - value: Russian
+        label:
+          en_US: Russian
+          zh_Hans: 俄语
+          pt_BR: Russo
+      - value: Serbian
+        label:
+          en_US: Serbian
+          zh_Hans: 塞尔维亚语
+          pt_BR: Sérvio
+      - value: Slovak
+        label:
+          en_US: Slovak
+          zh_Hans: 斯洛伐克语
+          pt_BR: Eslovaco
+      - value: Slovenian
+        label:
+          en_US: Slovenian
+          zh_Hans: 斯洛文尼亚语
+          pt_BR: Esloveno
+      - value: Spanish
+        label:
+          en_US: Spanish
+          zh_Hans: 西班牙语
+          pt_BR: Espanhol
+      - value: Swahili
+        label:
+          en_US: Swahili
+          zh_Hans: 斯瓦希里语
+          pt_BR: Swahili
+      - value: Swedish
+        label:
+          en_US: Swedish
+          zh_Hans: 瑞典语
+          pt_BR: Sueco
+      - value: Tagalog
+        label:
+          en_US: Tagalog
+          zh_Hans: 菲律宾语
+          pt_BR: Tagalo
+      - value: Tamil
+        label:
+          en_US: Tamil
+          zh_Hans: 泰米尔语
+          pt_BR: Tamil
+      - value: Thai
+        label:
+          en_US: Thai
+          zh_Hans: 泰语
+          pt_BR: Tailandês
+      - value: Turkish
+        label:
+          en_US: Turkish
+          zh_Hans: 土耳其语
+          pt_BR: Turco
+      - value: Ukrainian
+        label:
+          en_US: Ukrainian
+          zh_Hans: 乌克兰语
+          pt_BR: Ucraniano
+      - value: Urdu
+        label:
+          en_US: Urdu
+          zh_Hans: 乌尔都语
+          pt_BR: Urdu
+      - value: Vietnamese
+        label:
+          en_US: Vietnamese
+          zh_Hans: 越南语
+          pt_BR: Vietnamita
+      - value: Welsh
+        label:
+          en_US: Welsh
+          zh_Hans: 威尔士语
+          pt_BR: Galês
+extra:
+  python:
+    source: tools/transcribe_speech.py
+

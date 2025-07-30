@@ -411,7 +411,7 @@ const useStore = create(
                     } else {
                         createVar = transformer[node.type]?.variables?.(node.data) || {};
                     }
-
+                    
                     return createVar
                         ? Object.values(createVar).map(varObj => ({
                               title,

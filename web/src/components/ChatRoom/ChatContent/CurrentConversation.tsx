@@ -8,6 +8,7 @@ import { MessageItem } from '../MessageDisplay/MessageItem';
 import { MCPToolRuntimeData } from '../types/mcp';
 import { WaitingReplyIndicator } from './WaitingReplyIndicator';
 import { checkLastAgentMessage } from '../utils';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 
 interface CurrentConversationProps {
     messageApi?: any;
@@ -43,6 +44,9 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
         getMCPTool,
         userMessage,
     } = props;
+    
+    // Use context for setInstruction
+    const { setInstruction } = useChatRoomContext();
 
     const [currentMessageContent, setCurrentMessageContent]: any = useState([]);
     const [isEnd, setisEnd] = useState(false);
@@ -155,6 +159,7 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
                         cidName="currentChilContent"
                         mcpTools={mcpTools}
                         updateMCPTool={updateMCPTool}
+                        setInstruction={setInstruction}
                         getMCPTool={getMCPTool}
                     />
                 ))
@@ -182,6 +187,7 @@ export const CurrentConversation: FC<CurrentConversationProps> = memo(props => {
                 setCurrentMessageFromHistory={(callback) => {
                     setCurrentMessageFromHistoryCallback.current = callback;
                 }}
+                setInstruction={setInstruction}
             />
         </>
     );

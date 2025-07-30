@@ -1,0 +1,53 @@
+credentials_for_provider:
+  account_sid:
+    label:
+      en_US: Account SID
+      pt_BR: Account SID
+      zh_Hans: 账户SID
+    placeholder:
+      en_US: Please input your Twilio Account SID
+      pt_BR: Please input your Twilio Account SID
+      zh_Hans: 请输入您的Twilio账户SID
+    required: true
+    type: secret-input
+  auth_token:
+    label:
+      en_US: Auth Token
+      pt_BR: Auth Token
+      zh_Hans: 认证令牌
+    placeholder:
+      en_US: Please input your Twilio Auth Token
+      pt_BR: Please input your Twilio Auth Token
+      zh_Hans: 请输入您的Twilio认证令牌
+    required: true
+    type: secret-input
+  from_number:
+    label:
+      en_US: From Number
+      pt_BR: De Número
+      zh_Hans: 发信号码
+    placeholder:
+      en_US: Please input your Twilio phone number
+      pt_BR: Please input your Twilio phone number
+      zh_Hans: 请输入您的Twilio电话号码
+    required: true
+    type: secret-input
+extra:
+  python:
+    source: provider/twilio.py
+identity:
+  author: Yash Parmar
+  description:
+    en_US: Send messages through SMS or Twilio Messaging Channels.
+    pt_BR: Send messages through SMS or Twilio Messaging Channels.
+    zh_Hans: 通过SMS或Twilio消息通道发送消息。
+  icon: icon.svg
+  label:
+    en_US: Twilio
+    pt_BR: Twilio
+    zh_Hans: Twilio
+  name: twilio
+  tags:
+  - social
+tools:
+- tools/send_message.yaml

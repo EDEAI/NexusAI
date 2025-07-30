@@ -1,0 +1,30 @@
+identity:
+  name: get_user_info
+  label:
+    en_US: Get Registered User Info
+    zh_Hans: 获取注册用户信息
+  icon: rongcloud_logo.svg
+  author: rongcloud
+  version: 1.0.0
+  email: support@dify.ai
+description:
+  human:
+    en_US: Get registered user info from RongCloud, need to provide user ID, return user name, portrait URI and create time
+    zh_Hans: 获取融云注册用户信息, 需要提供用户 ID， 返回用户名称、用户头像地址、用户创建时间
+  llm: Get registered user info from RongCloud, need to provide user ID, return user name, portrait URI and create time
+extra:
+  python:
+    source: tools/user/get_user_info.py
+
+parameters:
+  - name: user_id
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+    human_description:
+      en_US: The user ID of the user
+      zh_Hans: 用户 ID
+    llm_description: The user ID of the user
+    form: llm
+    type: string
+    required: true

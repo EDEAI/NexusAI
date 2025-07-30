@@ -13,7 +13,7 @@ class Roles(MySQL):
     have_updated_time = False
     
 
-    def get_roles_list(self, page: int = 1, page_size: int = 10, name: str = "") -> dict:
+    def get_roles_list(self, page: int = 1, page_size: int = 10, name: str = "", team_id = int) -> dict:
         """
         Retrieves a list of roles with pagination and name filtering.
 
@@ -26,11 +26,13 @@ class Roles(MySQL):
             A dictionary containing the role list and pagination information
         """
         conditions = [
-            {"column": "status", "value": 1}  # Only query records with normal status
+            {"column": "status", "value": 1},  # Only query records with normal status
+            {"column": "team_id", "op": "in", "value": [team_id, 0]}
         ]
 
         if name:
             conditions.append({"column": "name", "op": "like", "value": f"%{name}%"})
+            conditions.append({"column": "built_in", "op": "!=", "value": 1})
 
         # Get total count
         total_count = self.select_one(
@@ -43,16 +45,22 @@ class Roles(MySQL):
             columns=[
                 "id",
                 "name",
+                "built_in",
                 "description",
                 "status",
                 "created_at",
                 "updated_at"
             ],
             conditions=conditions,
-            order_by="id DESC",
+            order_by="id ASC",
             limit=page_size,
             offset=(page - 1) * page_size
         )
+
+        from languages import get_language_content
+        for role in role_list:
+            if role.get('built_in') == 1:
+                role['name'] = get_language_content(role['name'])
 
         return {
             "list": role_list,
@@ -87,3 +95,72 @@ class Roles(MySQL):
             ]
         )
         return role
+
+    def check_role_deletable(self, role_id: int, mode: int = None) -> bool:
+        """
+        Check if a role can be deleted based on its name and mode.
+
+        Args:
+            role_id (int): The ID of the role to check.
+            mode (int): The mode value (1-5) corresponding to different administrator types.
+                       1: agent_administrator
+                       2: workflow_administrator  
+                       3: knowledge_base_administrator
+                       4: skill_administrator
+                       5: roundtable_administrator
+
+        Returns:
+            bool: True if the role can be deleted, False otherwise.
+        """
+        # Define the mode to role name mapping
+        mode_role_mapping = {
+            1: 'agent_administrator',
+            2: 'workflow_administrator', 
+            3: 'knowledge_base_administrator',
+            4: 'skill_administrator',
+            5: 'roundtable_administrator'
+        }
+        
+        # Query the role by ID with built_in = 0 condition
+        role = self.select_one(
+            columns=['name'],
+            conditions=[
+                {"column": "id", "value": role_id},
+                {"column": "built_in", "value": 1},
+                {"column": "status", "value": 1}
+            ]
+        )
+        
+        # If role not found or query returns None, return True (can be deleted)
+        if not role:
+            return True
+        
+        role_name = role.get('name', '')
+        
+        # If role name is comprehensive_administrator, always return True
+        if role_name == 'comprehensive_administrator':
+            return True
+        
+        # If mode is provided, check if role name matches the mode
+        if mode is not None and mode in mode_role_mapping:
+            expected_role_name = mode_role_mapping[mode]
+            # Return True if role name matches the expected role for this mode
+            return role_name == expected_role_name
+        
+        # If no mode provided or invalid mode, check if role is in restricted list
+        restricted_roles = [
+            'agent_administrator', 
+            'workflow_administrator',
+            'skill_administrator',
+            'roundtable_administrator',
+            'knowledge_base_administrator'
+        ]
+        
+        # If role name is not in restricted list, return True (can be deleted)
+        if role_name not in restricted_roles:
+            return True
+        
+        # For other restricted roles without matching mode, return False
+        return False
+
+    

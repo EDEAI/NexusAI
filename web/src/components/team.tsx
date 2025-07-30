@@ -73,7 +73,8 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     ];
     const [teammemberList, setTeammemberList] = useState<any>(null);
     const [isModalOpen2, setIsModalOpen2] = useState(false);
-    const [EmailList, setEmaillist] = useState(null);
+    const [EmailList, setEmaillist] = useState('');
+    const [processedEmails, setProcessedEmails] = useState<string[]>([]);
     const [roleid, setRoleid] = useState(2);
     const [isBtn, setIsBtn] = useState(true);
     const [isModalOpen3, setIsModalOpen3] = useState(false);
@@ -108,11 +109,29 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     };
 
     const Emaillistonchange = (e: any) => {
-        setEmaillist(e.target.value.split(','));
-        if (!!e.target.value) {
+        const textValue = e.target.value;
+        setEmaillist(textValue);
+        
+        // Split by lines, trim whitespace, and filter out empty emails
+        const emailArray = textValue
+            .split('\n')
+            .map((email: string) => email.trim())
+            .filter((email: string) => email.length > 0);
+        
+        setProcessedEmails(emailArray);
+        
+        if (!!textValue.trim()) {
             setIsBtn(false);
         } else {
             setIsBtn(true);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        // Ensure Enter key works for new lines
+        if (e.key === 'Enter') {
+            e.stopPropagation();
+            // Don't prevent default - let the textarea handle the Enter key naturally
         }
     };
 
@@ -120,14 +139,14 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
         let newintcode = [];
         const pattern =
             /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/; //
-        EmailList &&
-            EmailList.map((item: any) => {
-                if (pattern.test(item)) {
-                    newintcode.push(item);
-                } else {
-                    console.log('');
-                }
-            });
+        
+        processedEmails.forEach((item: any) => {
+            if (pattern.test(item)) {
+                newintcode.push(item);
+            } else {
+                console.log('');
+            }
+        });
 
         if (newintcode.length > 0) {
 
@@ -142,6 +161,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                 setIsModalOpen3(true);
                 setIsModalOpen2(false);
                 setEmaillist('');
+                setProcessedEmails([]);
                 message.success(
                     intl.formatMessage({
                         id: 'user.invitationSentSuccessfully',
@@ -217,7 +237,9 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                         })}
                         value={EmailList}
                         onChange={Emaillistonchange}
-                        autoSize={{ minRows: 4 }}
+                        rows={4}
+                        style={{ resize: 'vertical' }}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
                 <div className="mb-8">

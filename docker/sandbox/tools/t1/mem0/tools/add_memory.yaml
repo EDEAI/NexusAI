@@ -1,0 +1,56 @@
+identity:
+  name: add_mem0ai_memory
+  author: yevanchen
+  label:
+    en_US: Add Memory
+    zh_Hans: 添加内存
+    pt_BR: Adicionar Memória
+description:
+  human:
+    en_US: Add memory support
+    zh_Hans: 添加内存支持
+    pt_BR: Adicionar suporte à memória
+  llm: Add memory support
+parameters:
+  - name: user
+    type: string
+    required: true
+    label:
+      en_US: User Message
+      zh_Hans: 用户消息
+      pt_BR: Mensagem do Usuário
+    human_description:
+      en_US: The message from the user in the conversation.
+      zh_Hans: 对话中的用户消息。
+      pt_BR: A mensagem do usuário na conversa.
+    llm_description: The message from the user in the conversation.
+    form: llm
+  - name: assistant
+    type: string
+    required: true
+    label:
+      en_US: Assistant Response
+      zh_Hans: 助手回应
+      pt_BR: Resposta do Assistente
+    human_description:
+      en_US: The response from the assistant in the conversation.
+      zh_Hans: 对话中的助手回应。
+      pt_BR: A resposta do assistente na conversa.
+    llm_description: The response from the assistant in the conversation.
+    form: llm
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: User ID
+      zh_Hans: 用户ID
+      pt_BR: ID do Usuário
+    llm_description: User ID
+    form: llm
+extra:
+  python:
+    source: tools/add_memory.py

@@ -1,0 +1,69 @@
+identity:
+  name: exa_similar
+  author: yevanchen
+  label:
+    en_US: Exa Similar Links
+    zh_Hans: Exa 相似链接
+    pt_BR: Links Similares Exa
+    ja_JP: Exa 類似リンク
+description:
+  human:
+    en_US: Find similar links to a given URL using Exa's content similarity search.
+    zh_Hans: 使用 Exa 的内容相似度搜索功能查找与给定 URL 相似的链接。
+    pt_BR: Encontre links semelhantes a uma URL específica usando a pesquisa de similaridade de conteúdo da Exa.
+    ja_JP: Exaのコンテンツ類似性検索を使用して、指定されたURLに類似したリンクを見つけます。
+  llm: A tool for finding web pages with similar content to a specified URL using Exa's content similarity search API.
+parameters:
+  - name: url
+    type: string
+    required: true
+    label:
+      en_US: URL
+      zh_Hans: URL
+      pt_BR: URL
+      ja_JP: URL
+    human_description:
+      en_US: The URL for which you would like to find similar links.
+      zh_Hans: 您想要查找相似链接的URL。
+      pt_BR: A URL para a qual você gostaria de encontrar links semelhantes.
+      ja_JP: 類似リンクを見つけたいURL。
+    llm_description: The source URL to find similar content for.
+    form: llm
+
+  - name: num_results
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Number of Results
+      zh_Hans: 结果数量
+      pt_BR: Número de Resultados
+      ja_JP: 結果数
+    human_description:
+      en_US: Number of similar links to return (max 100).
+      zh_Hans: 返回的相似链接数量（最多100个）。
+      pt_BR: Número de links semelhantes a retornar (máximo 100).
+      ja_JP: 返す類似リンクの数（最大100）。
+    llm_description: Specify how many similar pages to return (maximum 100).
+    form: form
+
+  - name: text
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Include Text
+      zh_Hans: 包含文本
+      pt_BR: Incluir Texto
+      ja_JP: テキストを含む
+    human_description:
+      en_US: Whether to include full text of the results.
+      zh_Hans: 是否包含结果的完整文本。
+      pt_BR: Se deve incluir o texto completo dos resultados.
+      ja_JP: 結果の全文を含めるかどうか。
+    llm_description: Include the full text content of each similar page in the results.
+    form: form
+
+extra:
+  python:
+    source: tools/exa_similar.py

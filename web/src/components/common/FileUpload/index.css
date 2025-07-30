@@ -1,0 +1,49 @@
+.upload-content {
+    padding: 4px;
+}
+
+.upload-content .ant-upload-drag-container {
+    padding: 0;
+}
+
+/* Custom styles for the dragger */
+.ant-upload-drag {
+    border: 2px dashed #d9d9d9;
+    border-radius: 8px;
+    background: #fafafa;
+    transition: border-color 0.3s ease;
+}
+
+.ant-upload-drag:hover {
+    border-color: #1890ff;
+}
+
+.ant-upload-drag.ant-upload-drag-hover {
+    border-color: #1890ff;
+}
+
+.ant-upload-drag-icon {
+    margin-bottom: 16px;
+}
+
+.ant-upload-text {
+    color: #666;
+    font-size: 16px;
+}
+
+.ant-upload-hint {
+    color: #999;
+    font-size: 14px;
+}
+
+/* Disabled state */
+.ant-upload-drag.ant-upload-disabled {
+    background: #f5f5f5;
+    border-color: #d9d9d9;
+    cursor: not-allowed;
+}
+
+.ant-upload-drag.ant-upload-disabled .ant-upload-text,
+.ant-upload-drag.ant-upload-disabled .ant-upload-hint {
+    color: #ccc;
+} 

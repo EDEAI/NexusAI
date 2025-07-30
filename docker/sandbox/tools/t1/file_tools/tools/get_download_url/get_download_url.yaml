@@ -1,0 +1,83 @@
+identity:
+  name: get_download_url
+  author: kurokobo
+  label:
+    en_US: Get Download URL
+    ja_JP: ダウンロード URL を取得
+    zh_Hans: 获取下载 URL
+    pt_BR: Obter URL de Download
+
+description:
+  human:
+    en_US: Get a download URL for a file object, optionally as a markdown link.
+    ja_JP: ファイルオブジェクトのダウンロード URL を取得し、オプションで Markdown リンクとして出力します。
+    zh_Hans: 获取文件对象的下载 URL，可选择作为 Markdown 链接输出。
+    pt_BR: Obtenha uma URL de download para um objeto de arquivo, opcionalmente como um link markdown.
+  llm: Get a download URL for a file object, optionally as a markdown link.
+
+parameters:
+
+  - name: file
+    type: file
+    label:
+      en_US: File
+    human_description:
+      en_US: File object to get download url.
+      ja_JP: ダウンロード URL を取得するファイルオブジェクト。
+      zh_Hans: 要获取下载 URL 的文件对象。
+      pt_BR: Objeto de arquivo para obter URL de download.
+    required: true
+    form: llm
+
+  - name: link_text
+    type: string
+    label:
+      en_US: Link text for markdown link
+    human_description:
+      en_US: >-
+        The text to use for the markdown link. Ignored if "format" is not "markdown".
+        Default is empty, which means the filename will be used as the link text.
+      ja_JP: >-
+        Markdown リンクに使用するテキスト。"format" が "markdown" でない場合は無視される。
+        デフォルトは空で、ファイル名がリンクテキストとして使用される。
+      zh_Hans: >-
+        用于 Markdown 链接的文本。如果 "format" 不是 "markdown" 则忽略。
+        默认为空，这意味着文件名将用作链接文本。
+      pt_BR: >-
+        O texto a ser usado para o link markdown. Ignorado se "format" não for "markdown".
+        O padrão é vazio, o que significa que o nome do arquivo será usado como texto do link.
+    required: false
+    default: ""
+    form: llm
+
+  - name: format
+    type: select
+    label:
+      en_US: Format of the download url
+    human_description:
+      en_US: >-
+        Format of the download url. "markdown" for markdown link, "plain" for plain url.
+        Default is "plain".
+      ja_JP: >-
+        ダウンロード URL の形式。Markdown リンクの場合は "markdown"、プレーン URL の場合は "plain"。
+        デフォルトは "plain"。
+      zh_Hans: >-
+        下载 URL 的格式。"markdown" 表示 Markdown 链接，"plain" 表示纯 URL。
+        默认为 "plain"。
+      pt_BR: >-
+        Formato da URL de download. "markdown" para link markdown, "plain" para URL simples.
+        O padrão é "plain".
+    options:
+      - value: "markdown"
+        label:
+          en_US: "markdown"
+      - value: "plain"
+        label:
+          en_US: "plain"
+    required: false
+    default: "plain"
+    form: form
+
+extra:
+  python:
+    source: tools/get_download_url/get_download_url.py

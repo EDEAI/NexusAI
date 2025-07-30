@@ -1,0 +1,37 @@
+identity:
+  name: rsa_decrypt
+  author: bowenliang123
+  label:
+    en_US: RSA Decryption
+    zh_Hans: RSA 解密
+description:
+  human:
+    en_US: RSA Decrypt
+    zh_Hans: RSA 解密
+  llm: RSA Encrypt
+parameters:
+  - name: ciphertext
+    type: string
+    required: true
+    label:
+      en_US: Ciphertext
+      zh_Hans: 密文
+    human_description:
+      en_US: "Base64-encoded ciphertext"
+      zh_Hans: "Base64 编码的密文"
+    llm_description: "Plaintext"
+    form: llm
+  - name: private_key_text
+    type: string
+    required: true
+    label:
+      en_US: Public Key Content
+      zh_Hans: 私钥文本
+    human_description:
+      en_US: "Starts with '-----BEGIN RSA PRIVATE KEY-----'"
+      zh_Hans: "以 '-----BEGIN RSA PRIVATE KEY-----' 开头"
+    llm_description: "Private Key File"
+    form: llm
+extra:
+  python:
+    source: tools/rsa_decrypt/rsa_decrypt.py

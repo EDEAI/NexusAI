@@ -1,0 +1,36 @@
+identity:
+  name: image_compress
+  author: hjlarry
+  label:
+    en_US: Image Compress
+    zh_Hans: 图片压缩
+description:
+  human:
+    en_US: a tool to compress the image
+    zh_Hans: 一个压缩图片的工具
+  llm: a tool to compress the image
+parameters:
+  - name: image_file
+    type: file
+    required: true
+    label:
+      en_US: Image file
+      zh_Hans: 图片文件
+    human_description:
+      en_US: a tool to compress the image
+      zh_Hans: 一个压缩图片的工具
+    llm_description: a tool to compress the image
+    form: llm
+  - name: target_size
+    type: number
+    required: true
+    label:
+      en_US: Target size (MB)
+      zh_Hans: 目标大小 (MB)
+    human_description:
+      en_US: The target size of the image (MB)
+      zh_Hans: 目标大小 (MB)
+    form: form
+extra:
+  python:
+    source: tools/image.py

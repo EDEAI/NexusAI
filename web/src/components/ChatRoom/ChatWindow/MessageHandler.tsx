@@ -46,6 +46,12 @@ export const useMessageHandler = (
         return data.indexOf('--NEXUSAI-INSTRUCTION-') !== -1;
     };
 
+    // Helper function to check if args contain need_upload values
+    const checkNeedUploadInArgs = (args: any): boolean => {
+        if (!args || !args.input_variables) return false;
+        return Object.values(args.input_variables).some(value => value === 'need_upload');
+    };
+
     // Helper function to manage contentBlocks for streaming messages
     const updateContentBlocks = (updateFn: (blocks: ContentBlock[]) => ContentBlock[]) => {
         setCurrentMessage((prev: any) => {
@@ -342,17 +348,26 @@ export const useMessageHandler = (
         },
 
         MCPTOOLUSE: (data: any) => {
-            const { id, name, skill_or_workflow_name, args } = data;
+            const { id, name, skill_or_workflow_name, args, files_to_upload } = data;
             const isWorkflow =
                 skill_or_workflow_name && skill_or_workflow_name.toLowerCase().includes('workflow');
 
-            // Start tool in running state
+            // Check if file upload is required
+            const hasFilesToUpload = files_to_upload && Array.isArray(files_to_upload) && files_to_upload.length > 0;
+            const needsFileUpload = hasFilesToUpload || checkNeedUploadInArgs(args);
+            
+            // Determine initial status
+            const initialStatus = needsFileUpload ? MCPToolStatus.WAITING_FILE_UPLOAD : MCPToolStatus.RUNNING;
+
+            // Update tool state
             updateMCPToolState(id, {
                 name,
                 skill_or_workflow_name: skill_or_workflow_name || name,
                 args,
-                status: MCPToolStatus.RUNNING,
+                status: initialStatus,
                 isWorkflow,
+                files_to_upload: files_to_upload || [],
+                uploaded_files: []
             });
 
             // Create MCP block in contentBlocks for ordered rendering
@@ -423,6 +438,16 @@ export const useMessageHandler = (
                 workflow_confirmation: workflowConfirmation,
                 status: mcpStatus,
                 isWorkflow: true,
+            });
+        },
+
+        WITHMCPTOOLFILES: (data: any) => {
+            const { id, files_to_upload, args } = data;
+            // Update tool data with uploaded files and input_variables
+            updateMCPToolState(id, {
+                uploaded_files: files_to_upload || [],
+                status: MCPToolStatus.COMPLETED,
+                ...(args ? { args } : {})
             });
         },
     };

@@ -1,0 +1,79 @@
+identity:
+  name: bitly_shortner
+  author: tushargururaj
+  label:
+    en_US: Bitly URL Shortener & Analytics
+description:
+  human:
+    en_US: Shorten long URLs using Bitly API or get analytics for existing Bitly links. Provide a long URL to shorten it, or provide a Bitly link to get click analytics and geographic distribution.
+  llm: A unified tool that can either shorten long URLs using the Bitly API or retrieve analytics for existing Bitly links. If a long URL is provided, it will be shortened and return the Bitly link. If a Bitly link is provided, it will return click analytics including total clicks and geographic distribution by country.
+parameters:
+  - name: access_token
+    type: string
+    required: true
+    label:
+      en_US: Bitly Access Token
+    human_description:
+      en_US: Your Bitly API access token for authentication. Get this from your Bitly account settings.
+    llm_description: "The Bitly API access token required for authentication. This can be obtained from your Bitly account settings under API access."
+    form: llm
+  - name: url_or_bitlink
+    type: string
+    required: true
+    label:
+      en_US: URL or Bitly Link
+    human_description:
+      en_US: Enter a long URL to shorten it, or enter a Bitly link to get analytics for it.
+    llm_description: "Either a long URL to shorten (e.g., https://www.example.com/very-long-path) or a Bitly link to get analytics for (e.g., bit.ly/abc123)."
+    form: llm
+  - name: domain
+    type: string
+    required: false
+    default: "bit.ly"
+    label:
+      en_US: Domain
+    human_description:
+      en_US: The domain to use for shortened links (only applies when shortening URLs).
+    llm_description: "The domain for shortened links when shortening a URL. Default is 'bit.ly'. Only used when shortening URLs, not for analytics."
+    form: llm
+  - name: group_guid
+    type: string
+    required: false
+    label:
+      en_US: Group GUID
+    human_description:
+      en_US: The GUID of the Bitly group to associate with shortened links (only applies when shortening URLs).
+    llm_description: "The GUID of the Bitly group to organize shortened links. Only used when shortening URLs, not for analytics."
+    form: llm
+  - name: title
+    type: string
+    required: false
+    label:
+      en_US: Title
+    human_description:
+      en_US: A title for the shortened link (only applies when shortening URLs).
+    llm_description: "A descriptive title for shortened links. Only used when shortening URLs, not for analytics."
+    form: llm
+  - name: unit
+    type: string
+    required: false
+    default: "day"
+    label:
+      en_US: Time Unit
+    human_description:
+      en_US: The time unit for analytics (only applies when getting analytics for Bitly links).
+    llm_description: "The time unit for analytics data when getting analytics for a Bitly link. Options: minute, hour, day, week, month. Default is 'day'. Only used for analytics, not for shortening URLs."
+    form: llm
+  - name: units
+    type: number
+    required: false
+    default: -1
+    label:
+      en_US: Number of Units
+    human_description:
+      en_US: Number of time units to query for analytics (use -1 for all available data, only applies when getting analytics).
+    llm_description: "Number of time units to query for analytics. Use -1 to return all available data. Default is -1. Only used for analytics, not for shortening URLs."
+    form: llm
+extra:
+  python:
+    source: tools/bitly_shortner.py

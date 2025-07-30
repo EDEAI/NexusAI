@@ -99,16 +99,7 @@ export default memo(() => {
         },
     ];
 
-    const props: UploadProps = {
-        name: 'file',
-        fileList: null,
-        action: BASE_URL + '/v1/workflow/import',
-        accept: '.yml',
-        multiple: false,
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-    };
+    
     return (
         <div className="fixed right-2 top-16 flex gap-2">
             {!publishStatus && (

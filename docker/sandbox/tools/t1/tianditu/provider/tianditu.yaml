@@ -1,0 +1,41 @@
+credentials_for_provider:
+  tianditu_api_key:
+    help:
+      en_US: Get your Tianditu API key from Tianditu
+      pt_BR: Get your Tianditu API key from Tianditu
+      zh_Hans: 获取您的天地图Key
+    label:
+      en_US: Tianditu API Key
+      pt_BR: Tianditu API key
+      zh_Hans: 天地图Key
+    placeholder:
+      en_US: Please input your Tianditu API key
+      pt_BR: Please input your Tianditu API key
+      zh_Hans: 请输入你的天地图Key
+    required: true
+    type: secret-input
+    url: http://lbs.tianditu.gov.cn/home.html
+extra:
+  python:
+    source: provider/tianditu.py
+identity:
+  author: Listeng
+  description:
+    en_US: The Tianditu tool provided the functions of place name search, geocoding,
+      static maps generation, etc. in China region.
+    pt_BR: The Tianditu tool provided the functions of place name search, geocoding,
+      static maps generation, etc. in China region.
+    zh_Hans: 天地图工具可以调用天地图的接口，实现中国区域内的地名搜索、地理编码、静态地图等功能。
+  icon: icon.svg
+  label:
+    en_US: Tianditu
+    pt_BR: Tianditu
+    zh_Hans: 天地图
+  name: tianditu
+  tags:
+  - utilities
+  - travel
+tools:
+- tools/staticmap.yaml
+- tools/geocoder.yaml
+- tools/poisearch.yaml

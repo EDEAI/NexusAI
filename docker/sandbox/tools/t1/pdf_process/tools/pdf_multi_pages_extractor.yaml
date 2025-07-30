@@ -1,0 +1,50 @@
+description:
+  human:
+    en_US: A tool for extracting multiple pages from a PDF with optional fixed pages using flexible page specifications
+    zh_Hans: 一个提取 PDF 多页的工具，可选择固定页，支持灵活的页码指定方式
+  llm: A tool for extracting specified pages from a PDF document. Supports ranges ("1-3"), individual pages ("1,3,5"), or combinations ("1-3,5"). Can optionally include a set of fixed pages before the dynamic pages.
+extra:
+  python:
+    source: tools/pdf_multi_pages_extractor.py
+identity:
+  author: kalochin
+  label:
+    en_US: PDF Multi Pages Extractor
+    zh_Hans: PDF 多页提取器
+  name: pdf_multi_pages_extractor
+parameters:
+- form: llm
+  human_description:
+    en_US: PDF file content
+    zh_Hans: PDF 文件内容
+  label:
+    en_US: PDF Content
+    zh_Hans: PDF 内容
+  llm_description: PDF file content in base64 encoded format or as a File object
+  name: pdf_content
+  required: true
+  type: file
+- form: llm
+  human_description:
+    en_US: "Fixed Pages to include (e.g., \"1-3\", \"1,2,3\", \"1,3-5\"). Leave empty if not using fixed pages."
+    zh_Hans: "要包含的固定页码（例如：\"1-3\", \"1,2,3\", \"1,3-5\"）。如果不使用固定页可留空。"
+  label:
+    en_US: Fixed Pages
+    zh_Hans: 固定页码
+  llm_description: "A string specifying the fixed page numbers or ranges (1-indexed). Examples: \"1-3\", \"5\", \"1,3,5-7\". Optional."
+  name: fixed_pages
+  required: false
+  type: string
+  default: ""
+- form: llm
+  human_description:
+    en_US: "Dynamic Pages to extract (e.g., \"1-3\", \"1,2,3\", \"1,3-5\")."
+    zh_Hans: "要提取的动态页码（例如：\"1-3\", \"1,2,3\", \"1,3-5\"）。"
+  label:
+    en_US: Dynamic Pages
+    zh_Hans: 动态页码
+  llm_description: "A string specifying the dynamic page numbers or ranges to extract (1-indexed). Examples: \"1-3\", \"5\", \"1,3,5-7\". Required."
+  name: dynamic_pages
+  required: true
+  type: string
+  default: "1"

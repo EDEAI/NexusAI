@@ -1,0 +1,34 @@
+credentials_for_provider:
+  api_key:
+    help:
+      en_US: Get your API key from Volcengine Ark platform. You need to create an account and enable the Visual Services.
+      zh_CN: 从火山引擎方舟平台获取您的 API Key。您需要创建账户并开通智能视觉服务。
+    label:
+      en_US: Volcengine API Key
+      zh_CN: 火山引擎 API Key
+    placeholder:
+      en_US: Please input your Volcengine API Key
+      zh_CN: 请输入您的火山引擎 API Key
+    required: true
+    type: secret-input
+    url: https://www.volcengine.com/docs/85128/1526761
+extra:
+  python:
+    source: provider/doubao_provider.py
+identity:
+  author: allenwriter
+  description:
+    en_US: Doubao (豆包) API integration for AI image and video generation by Volcengine/ByteDance.
+    zh_CN: 火山引擎/字节跳动提供的豆包 API，用于 AI 图像和视频生成。
+  icon: icon.svg
+  label:
+    en_US: Doubao Generator
+    zh_CN: 豆包生成器
+  name: doubao
+  tags:
+  - image
+  - videos
+tools:
+- tools/text2image.yaml
+- tools/text2video.yaml
+- tools/image2video.yaml

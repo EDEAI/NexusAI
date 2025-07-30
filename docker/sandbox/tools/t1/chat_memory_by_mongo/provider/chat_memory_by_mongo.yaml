@@ -1,0 +1,78 @@
+identity:
+  author: ssssshql
+  name: chat_memory_by_mongo
+  label:
+    en_US: MongoDB Session Memory
+    zh_Hans: MongoDB 会话记忆
+    pt_BR: Memória de Sessão do MongoDB
+  description:
+    en_US: Store conversations through MongoDB
+    zh_Hans: 通过MongoDB存储对话
+    pt_BR: Armazenar conversas através do MongoDB
+  icon: memory_slot.svg
+
+credentials_for_provider:
+  database_host:
+    type: text-input
+    required: true
+    label:
+      en_US: MongoDB Host Address
+      zh_Hans: MongoDB数据库地址
+      pt_BR: Endereço do Host MongoDB
+    placeholder:
+      en_US: Enter MongoDB URI (e.g. 127.0.0.1)
+      zh_Hans: 请输入MongoDB数据库地址(例如 127.0.0.1)
+      pt_BR: Insira o URI do MongoDB (ex： 127.0.0.1)
+    help:
+      en_US: MongoDB connection URI
+      zh_Hans: MongoDB连接地址
+      pt_BR: URI completo de conexão MongoDB com
+
+  database_port:
+    type: text-input  # 更合适的输入类型
+    required: true
+    label:
+      en_US: MongoDB Port
+      zh_Hans: MongoDB数据库端口
+      pt_BR: Porta do MongoDB
+    placeholder:
+      en_US: Default is 27017
+      zh_Hans: 默认端口27017
+      pt_BR: Porta padrão 27017
+    help:
+      en_US: MongoDB server port number
+      zh_Hans: MongoDB服务端口号
+      pt_BR: Número da porta do servidor MongoDB
+
+  database_username:
+    type: text-input
+    required: false
+    label:
+      en_US: Database Username
+      zh_Hans: MongoDB数据库用户名
+      pt_BR: Nome de Usuário
+    placeholder:
+      en_US: Optional authentication username
+      zh_Hans: 可选认证用户名(例如 admin)
+      pt_BR: Nome de usuário opcional
+
+  database_password:
+    type: secret-input  # 更安全的输入类型
+    required: false
+    label:
+      en_US: Database Password
+      zh_Hans: MongoDB数据库密码
+      pt_BR: Senha do Banco
+    placeholder:
+      en_US: Optional authentication password
+      zh_Hans: 可选认证密码
+      pt_BR: Senha de autenticação opcional
+
+tools:
+  - tools/putMessage.yaml
+  - tools/getMessage.yaml
+  - tools/delMessage.yaml
+
+extra:
+  python:
+    source: provider/chat_memory_by_mongo.py  # 修正文件名拼写

@@ -1,0 +1,125 @@
+identity:
+  name: upload
+  author: stvlynn
+  label:
+    en_US: Upload File
+    zh_Hans: 上传文件
+description:
+  human:
+    en_US: Upload a file to a remote server via SFTP
+    zh_Hans: 通过SFTP上传文件到远程服务器
+  llm: Uploads a file to a remote server via SFTP.
+parameters:
+  - name: host
+    type: string
+    required: true
+    label:
+      en_US: Host
+      zh_Hans: 主机地址
+    human_description:
+      en_US: Remote server hostname or IP address
+      zh_Hans: 远程服务器主机名或IP地址
+    llm_description: The hostname or IP address of the remote SFTP server
+    form: llm
+  - name: port
+    type: number
+    required: false
+    default: 22
+    label:
+      en_US: Port
+      zh_Hans: 端口
+    human_description:
+      en_US: SFTP port number (default 22)
+      zh_Hans: SFTP端口号（默认22）
+    llm_description: The port number for the SFTP connection
+    form: llm
+  - name: username
+    type: string
+    required: true
+    label:
+      en_US: Username
+      zh_Hans: 用户名
+    human_description:
+      en_US: Username for authentication
+      zh_Hans: 用于认证的用户名
+    llm_description: Username for authenticating with the SFTP server
+    form: llm
+  - name: auth_type
+    type: select
+    required: true
+    default: password
+    form: form
+    options:
+      - value: password
+        label:
+          en_US: Password
+          zh_Hans: 密码
+      - value: key
+        label:
+          en_US: Private Key
+          zh_Hans: 私钥
+    label:
+      en_US: Authentication Type
+      zh_Hans: 认证类型
+    human_description:
+      en_US: Choose between password or private key authentication
+      zh_Hans: 选择密码或私钥认证
+    llm_description: The authentication method to use (password or private key).
+  - name: password
+    type: string
+    required: false
+    label:
+      en_US: Password
+      zh_Hans: 密码
+    human_description:
+      en_US: The password for password authentication (required if auth_type is password)
+      zh_Hans: 用于密码认证的密码（如果认证类型为密码则必填）
+    llm_description: The password for password authentication. Required if auth_type is password.
+    form: llm
+  - name: private_key
+    type: string
+    required: false
+    label:
+      en_US: Private Key
+      zh_Hans: 私钥
+    human_description:
+      en_US: The private key for key authentication (required if auth_type is key)
+      zh_Hans: 用于密钥认证的私钥（如果认证类型为私钥则必填）
+    llm_description: The private key content for key-based authentication. Required if auth_type is key.
+    form: llm
+  - name: passphrase
+    type: string
+    required: false
+    label:
+      en_US: Passphrase
+      zh_Hans: 密钥口令
+    human_description:
+      en_US: The passphrase for the private key (if the key is encrypted)
+      zh_Hans: 私钥的密码（如果私钥已加密）
+    llm_description: The passphrase for the private key if it is encrypted. Optional.
+    form: llm
+  - name: remote_path
+    type: string
+    required: true
+    label:
+      en_US: Remote File Path
+      zh_Hans: 远程文件路径
+    human_description:
+      en_US: Path where to save the file on the remote server
+      zh_Hans: 在远程服务器上保存文件的路径
+    llm_description: The path on the remote server to save the file
+    form: llm
+  - name: files
+    type: files
+    required: true
+    label:
+      en_US: Upload Files
+      zh_Hans: 上传文件
+    human_description:
+      en_US: Files to upload to the remote server
+      zh_Hans: 要上传到远程服务器的文件
+    llm_description: The files to upload to the remote server
+    form: llm
+extra:
+  python:
+    source: tools/upload.py 

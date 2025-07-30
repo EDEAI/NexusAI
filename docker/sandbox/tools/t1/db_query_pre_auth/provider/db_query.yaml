@@ -1,0 +1,108 @@
+extra:
+  python:
+    source: provider/db_query.py
+identity:
+  name: db_query_pre_auth
+  author: junjiem
+  label:
+    en_US: Database Query (Pre-authorization)
+    zh_Hans: 数据库查询（预授权）
+  description:
+    en_US: Database Query Utils (Pre-authorization).
+    zh_Hans: 数据库查询工具（预授权）。
+  icon: icon.svg
+  tags:
+    - search
+    - utilities
+tools:
+  - tools/sql_query.yaml
+credentials_for_provider:
+  db_type:
+    type: select
+    required: true
+    options:
+      - value: mysql
+        label:
+          en_US: MySQL
+          zh_Hans: MySQL
+      - value: oracle
+        label:
+          en_US: Oracle
+          zh_Hans: Oracle
+      - value: oracle11g
+        label:
+          en_US: Oracle11g
+          zh_Hans: Oracle11g
+      - value: postgresql
+        label:
+          en_US: PostgreSQL
+          zh_Hans: PostgreSQL
+      - value: mssql
+        label:
+          en_US: Microsoft SQL Server
+          zh_Hans: Microsoft SQL Server
+    default: mysql
+    label:
+      en_US: Database type
+      zh_Hans: 数据库类型
+    help:
+      en_US: Used for selecting the database type, mysql, oracle, oracle11g, postgresql or mssql.
+      zh_Hans: 用于选择数据库类型，mysql、oracle、oracle11g、postgresql或mssql。
+  db_host:
+    type: text-input
+    required: true
+    default: localhost
+    label:
+      en_US: Database Host
+      zh_Hans: 数据库地址
+    human_description:
+      en_US: Database hostname or IP address (Original string, not URL-encoded string).
+      zh_Hans: 数据库的主机名或IP地址（原始字符串，非URL编码字符串）。
+  db_port:
+    type: text-input
+    required: false
+    label:
+      en_US: Port
+      zh_Hans: 端口
+    human_description:
+      en_US: Database port (Original string, not URL-encoded string).
+      zh_Hans: 数据库的端口（原始字符串，非URL编码字符串）。
+  db_username:
+    type: text-input
+    required: true
+    label:
+      en_US: Username
+      zh_Hans: 用户名
+    human_description:
+      en_US: Database username (Original string, not URL-encoded string).
+      zh_Hans: 数据库的用户名（原始字符串，非URL编码字符串）。
+  db_password:
+    type: secret-input
+    required: true
+    label:
+      en_US: Password
+      zh_Hans: 密码
+    human_description:
+      en_US: Database password (Original string, not URL-encoded string).
+      zh_Hans: 数据库的密码（原始字符串，非URL编码字符串）。
+  db_name:
+    type: text-input
+    required: false
+    label:
+      en_US: Database name
+      zh_Hans: 库名
+    human_description:
+      en_US: Database name.
+      zh_Hans: 数据库的名称。
+  db_properties:
+    type: text-input
+    required: false
+    label:
+      en_US: Database properties
+      zh_Hans: 数据库属性
+    human_description:
+      en_US: 'Database properties, for example: alt_host=host1&alt_host=host2&ssl_cipher=%2Fpath%2Fto%2Fcrt'
+      zh_Hans: '数据库属性，例如：alt_host=host1&alt_host=host2&ssl_cipher=%2Fpath%2Fto%2Fcrt'
+    help:
+      en_US: 'Database properties, for example: alt_host=host1&alt_host=host2&ssl_cipher=%2Fpath%2Fto%2Fcrt'
+      zh_Hans: '数据库属性，例如：alt_host=host1&alt_host=host2&ssl_cipher=%2Fpath%2Fto%2Fcrt'

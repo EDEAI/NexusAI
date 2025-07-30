@@ -66,6 +66,9 @@ def skill_to_mcp_tool(skill_data: Dict[str, Any]) -> Dict[str, Any]:
                 json_type = "number"
             else:
                 json_type = "string"
+
+            if var_type == 'file':
+                var_name = f'file_parameter__{var_name}'
             
             var_properties[var_name] = {
                 "type": json_type,
@@ -184,6 +187,9 @@ def workflow_to_mcp_tool(workflow_data: Dict[str, Any]) -> Dict[str, Any]:
                 json_type = "number"
             else:
                 json_type = "string"
+
+            if var_type == 'file':
+                var_name = f'file_parameter__{var_name}'
             
             var_properties[var_name] = {
                 "type": json_type,

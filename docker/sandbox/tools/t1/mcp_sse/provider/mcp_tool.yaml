@@ -1,0 +1,30 @@
+identity:
+  author: junjiem
+  name: mcp_sse
+  label:
+    en_US: MCP tools
+    zh_Hans: 发现和调用 MCP 工具
+  description:
+    en_US: Fetch and call tools by MCP protocol.
+    zh_Hans: 使用 MCP 协议发现和调用工具。
+  icon: icon.png
+  tags:
+    - utilities
+tools:
+  - tools/mcp_list_tools.yaml
+  - tools/mcp_call_tool.yaml
+extra:
+  python:
+    source: provider/mcp_tool.py
+credentials_for_provider:
+  servers_config:
+    type: text-input
+    required: true
+    default: "{\n  \"server_name\": {\n    \"url\": \"http://127.0.0.1:8000/sse\",\n    \"headers\": {},\n
+      \"timeout\": 50,\n    \"sse_read_timeout\": 50\n  }\n}"
+    label:
+      en_US: MCP Servers config
+      zh_Hans: MCP 服务配置
+    help:
+      en_US: MCP Servers config, support multiple MCP services.
+      zh_Hans: MCP服务配置，支持多个MCP服务。

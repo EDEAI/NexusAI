@@ -1,0 +1,50 @@
+description:
+  human:
+    en_US: Retrieve search results or manage a search job based on its UUID.
+    zh_Hans: 根据搜索任务UUID获取搜索结果或管理搜索任务。
+  llm: Retrieve search results or manage a search job based on its UUID. This tool allows you to check the status of a search request, monitor its progress, or cancel it if needed.
+extra:
+  python:
+    source: tools/search_job.py
+identity:
+  author: watercrawl
+  label:
+    en_US: Search Job
+    zh_Hans: 搜索任务管理
+  name: search_job
+parameters:
+- form: llm
+  human_description:
+    en_US: Enter the search request UUID.
+    zh_Hans: 输入搜索请求UUID
+  label:
+    en_US: Search Request UUID
+    zh_Hans: 搜索请求UUID
+  llm_description: Use the search request UUID to get the search results or manage the search job.
+  name: search_request_uuid
+  required: true
+  type: string
+- form: llm
+  label:
+    en_US: Operation
+    zh_Hans: 操作
+  human_description:
+    en_US: Choose the operation to perform. `get` is for getting the search status, `cancel` is for cancelling the search job, `monitor` is for monitoring the search progress.
+    zh_Hans: 选择操作类型。`get` 是获取搜索状态，`cancel` 是取消搜索任务，`monitor` 是监控搜索进度。
+  llm_description: Choose the operation to perform. `get` is for getting the search status, `cancel` is for cancelling the search job, `monitor` is for monitoring the search progress.
+  name: operation
+  options:
+  - label:
+      en_US: Get search status
+      zh_Hans: 获取搜索状态
+    value: get
+  - label:
+      en_US: Cancel search job
+      zh_Hans: 取消搜索任务
+    value: cancel
+  - label:
+      en_US: Monitor search progress
+      zh_Hans: 监控搜索进度
+    value: monitor
+  required: true
+  type: select

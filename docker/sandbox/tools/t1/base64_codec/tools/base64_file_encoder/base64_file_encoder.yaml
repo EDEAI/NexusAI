@@ -1,0 +1,26 @@
+identity:
+  name: base64_file_encoder
+  author: bowenliang123
+  label:
+    en_US: File to Base64 Text
+    zh_Hans: 文件 转 Base64 文本
+description:
+  human:
+    en_US: Encode the binary file to Base64-encoded text
+    zh_Hans: 将文件转为 Base64 编码文本
+  llm: Encode the binary file to Base64-encoded text
+parameters:
+  - name: input_file
+    type: file
+    required: true
+    label:
+      en_US: Input File
+      zh_Hans: 输入的文件
+    human_description:
+      en_US: Input File
+      zh_Hans: 输入的文件
+    llm_description: A tool for encoding file to Base64-encoded text
+    form: llm
+extra:
+  python:
+    source: tools/base64_file_encoder/base64_file_encoder.py

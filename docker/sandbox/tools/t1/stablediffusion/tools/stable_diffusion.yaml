@@ -1,0 +1,111 @@
+description:
+  human:
+    en_US: A tool for generating images which can be deployed locally, you can use
+      stable-diffusion-webui to deploy it.
+    pt_BR: A tool for generating images which can be deployed locally, you can use
+      stable-diffusion-webui to deploy it.
+    zh_Hans: 一个可以在本地部署的图片生成的工具，您可以使用 stable-diffusion-webui 来部署它。
+  llm: draw the image you want based on your prompt.
+extra:
+  python:
+    source: tools/stable_diffusion.py
+identity:
+  author: langgenius
+  label:
+    en_US: Stable Diffusion WebUI
+    pt_BR: Stable Diffusion WebUI
+    zh_Hans: Stable Diffusion WebUI
+  name: stable_diffusion
+parameters:
+- form: llm
+  human_description:
+    en_US: Image prompt, you can check the official documentation of Stable Diffusion
+    pt_BR: Image prompt, you can check the official documentation of Stable Diffusion
+    zh_Hans: 图像提示词，您可以查看 Stable Diffusion 的官方文档
+  label:
+    en_US: Prompt
+    pt_BR: Prompt
+    zh_Hans: 提示词
+  llm_description: Image prompt of Stable Diffusion, you should describe the image
+    you want to generate as a list of words as possible as detailed, the prompt must
+    be written in English.
+  name: prompt
+  required: true
+  type: string
+- form: form
+  human_description:
+    en_US: Model Name
+    pt_BR: Model Name
+    zh_Hans: 模型名称
+  label:
+    en_US: Model Name
+    pt_BR: Model Name
+    zh_Hans: 模型名称
+  name: model
+  required: false
+  type: string
+- default: ''
+  form: form
+  human_description:
+    en_US: Lora
+    pt_BR: Lora
+    zh_Hans: Lora
+  label:
+    en_US: Lora
+    pt_BR: Lora
+    zh_Hans: Lora
+  name: lora
+  required: false
+  type: string
+- default: 10
+  form: form
+  human_description:
+    en_US: Steps
+    pt_BR: Steps
+    zh_Hans: Steps
+  label:
+    en_US: Steps
+    pt_BR: Steps
+    zh_Hans: Steps
+  name: steps
+  required: false
+  type: number
+- default: 1024
+  form: form
+  human_description:
+    en_US: Width
+    pt_BR: Width
+    zh_Hans: Width
+  label:
+    en_US: Width
+    pt_BR: Width
+    zh_Hans: Width
+  name: width
+  required: false
+  type: number
+- default: 1024
+  form: form
+  human_description:
+    en_US: Height
+    pt_BR: Height
+    zh_Hans: Height
+  label:
+    en_US: Height
+    pt_BR: Height
+    zh_Hans: Height
+  name: height
+  required: false
+  type: number
+- default: bad art, ugly, deformed, watermark, duplicated, discontinuous lines
+  form: form
+  human_description:
+    en_US: Negative prompt
+    pt_BR: Negative prompt
+    zh_Hans: Negative prompt
+  label:
+    en_US: Negative prompt
+    pt_BR: Negative prompt
+    zh_Hans: Negative prompt
+  name: negative_prompt
+  required: false
+  type: string

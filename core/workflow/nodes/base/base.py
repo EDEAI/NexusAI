@@ -53,6 +53,7 @@ class Node:
         :param interrupt_conversation_memory: bool, indicates whether to interrupt conversation memory.
         :param flow_data: dict, data required by the web.
         :param original_node_id: str, the original ID of the node if it's being recreated or duplicated. This parameter is optional.
+        :param split_task_by_line: bool, indicates whether the node requires task splitting by line.
         """
         if 'original_node_id' in kwargs:
             self.id = kwargs['original_node_id']

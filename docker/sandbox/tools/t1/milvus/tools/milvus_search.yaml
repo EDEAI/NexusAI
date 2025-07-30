@@ -1,0 +1,205 @@
+identity:
+  name: "milvus_search"
+  author: "zeroz-lab"
+  label:
+    en_US: "Milvus Vector Search"
+    zh_Hans: "Milvus 向量搜索"
+    pt_BR: "Busca Vetorial Milvus"
+description:
+  human:
+    en_US: "Perform vector similarity search in Milvus collections"
+    zh_Hans: "在 Milvus 集合中执行向量相似度搜索"
+    pt_BR: "Realizar busca de similaridade vetorial em coleções Milvus"
+  llm: "A tool for performing vector similarity search in Milvus collections with support for filtering and custom search parameters"
+parameters:
+  - name: collection_name
+    type: string
+    required: true
+    label:
+      en_US: "Collection Name"
+      zh_Hans: "集合名称"
+      pt_BR: "Nome da Coleção"
+    human_description:
+      en_US: "The name of the collection to search in"
+      zh_Hans: "要搜索的集合名称"
+      pt_BR: "O nome da coleção para pesquisar"
+    llm_description: "The name of the collection to perform vector search in"
+    form: llm
+  - name: query_vector
+    type: string
+    required: true
+    label:
+      en_US: "Query Vector"
+      zh_Hans: "查询向量"
+      pt_BR: "Vetor de Consulta"
+    human_description:
+      en_US: "The query vector as JSON array (e.g., [0.1, 0.2, 0.3])"
+      zh_Hans: "查询向量，JSON数组格式（例如：[0.1, 0.2, 0.3]）"
+      pt_BR: "O vetor de consulta como array JSON (ex: [0.1, 0.2, 0.3])"
+    llm_description: "The query vector as a JSON array of numbers for similarity search"
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: "Result Limit"
+      zh_Hans: "结果限制"
+      pt_BR: "Limite de Resultados"
+    human_description:
+      en_US: "Maximum number of results to return (1-1000)"
+      zh_Hans: "返回的最大结果数量（1-1000）"
+      pt_BR: "Número máximo de resultados a retornar (1-1000)"
+    llm_description: "Maximum number of search results to return (1-1000, default: 10)"
+    form: llm
+  - name: output_fields
+    type: string
+    required: false
+    label:
+      en_US: "Output Fields"
+      zh_Hans: "输出字段"
+      pt_BR: "Campos de Saída"
+    human_description:
+      en_US: "Comma-separated list of fields to return (e.g., 'field1,field2')"
+      zh_Hans: "要返回的字段列表，用逗号分隔（例如：'field1,field2'）"
+      pt_BR: "Lista de campos separados por vírgula para retornar (ex: 'field1,field2')"
+    llm_description: "Comma-separated list of fields to include in search results"
+    form: llm
+  - name: filter
+    type: string
+    required: false
+    label:
+      en_US: "Filter Expression"
+      zh_Hans: "过滤表达式"
+      pt_BR: "Expressão de Filtro"
+    human_description:
+      en_US: "Filter expression for scalar fields (e.g., 'age > 18 and status == \"active\"')"
+      zh_Hans: "标量字段的过滤表达式（例如：'age > 18 and status == \"active\"'）"
+      pt_BR: "Expressão de filtro para campos escalares (ex: 'age > 18 and status == \"active\"')"
+    llm_description: "Boolean expression for filtering results based on scalar fields"
+    form: llm
+  - name: anns_field
+    type: string
+    required: false
+    default: "vector"
+    label:
+      en_US: "Vector Field Name"
+      zh_Hans: "向量字段名称"
+      pt_BR: "Nome do Campo Vetorial"
+    human_description:
+      en_US: "The name of the vector field to search against. Defaults to 'vector' if not provided."
+      zh_Hans: "要进行搜索的向量字段的名称。如果未提供，则默认为 'vector'。"
+      pt_BR: "O nome do campo vetorial para pesquisar. O padrão é 'vector' se não for fornecido."
+    llm_description: "The name of the vector field for similarity search. Defaults to 'vector' if not specified."
+    form: llm
+  - name: metric_type
+    type: select
+    required: false
+    label:
+      en_US: "Metric Type"
+      zh_Hans: "距离度量类型"
+      pt_BR: "Tipo de Métrica"
+    human_description:
+      en_US: "Distance metric type for similarity calculation"
+      zh_Hans: "用于相似度计算的距离度量类型"
+      pt_BR: "Tipo de métrica de distância para cálculo de similaridade"
+    llm_description: "Distance metric type: COSINE, L2, or IP"
+    form: form
+    options:
+      - value: COSINE
+        label:
+          en_US: "Cosine Similarity"
+          zh_Hans: "余弦相似度"
+          pt_BR: "Similaridade Cosseno"
+      - value: L2
+        label:
+          en_US: "Euclidean Distance"
+          zh_Hans: "欧几里得距离"
+          pt_BR: "Distância Euclidiana"
+      - value: IP
+        label:
+          en_US: "Inner Product"
+          zh_Hans: "内积"
+          pt_BR: "Produto Interno"
+  - name: level
+    type: select
+    required: false
+    default: 1
+    label:
+      en_US: "Search Level"
+      zh_Hans: "搜索级别"
+      pt_BR: "Nível de Busca"
+    human_description:
+      en_US: "Search precision level (1-5, higher means more accurate but slower)"
+      zh_Hans: "搜索精度级别（1-5，越高越准确但越慢）"
+      pt_BR: "Nível de precisão da busca (1-5, maior significa mais preciso mas mais lento)"
+    llm_description: "Search precision level from 1 to 5 (higher values provide better recall but slower performance)"
+    form: form
+    options:
+      - value: 1
+        label:
+          en_US: "Level 1 (Fastest)"
+          zh_Hans: "级别1（最快）"
+          pt_BR: "Nível 1 (Mais Rápido)"
+      - value: 2
+        label:
+          en_US: "Level 2"
+          zh_Hans: "级别2"
+          pt_BR: "Nível 2"
+      - value: 3
+        label:
+          en_US: "Level 3"
+          zh_Hans: "级别3"
+          pt_BR: "Nível 3"
+      - value: 4
+        label:
+          en_US: "Level 4"
+          zh_Hans: "级别4"
+          pt_BR: "Nível 4"
+      - value: 5
+        label:
+          en_US: "Level 5 (Most Accurate)"
+          zh_Hans: "级别5（最准确）"
+          pt_BR: "Nível 5 (Mais Preciso)"
+  - name: radius
+    type: number
+    required: false
+    label:
+      en_US: "Search Radius"
+      zh_Hans: "搜索半径"
+      pt_BR: "Raio de Busca"
+    human_description:
+      en_US: "Minimum similarity threshold for range search"
+      zh_Hans: "范围搜索的最小相似度阈值"
+      pt_BR: "Limite mínimo de similaridade para busca por intervalo"
+    llm_description: "Minimum similarity threshold for range search (used with range_filter)"
+    form: llm
+  - name: range_filter
+    type: number
+    required: false
+    label:
+      en_US: "Range Filter"
+      zh_Hans: "范围过滤器"
+      pt_BR: "Filtro de Intervalo"
+    human_description:
+      en_US: "Maximum similarity threshold for range search"
+      zh_Hans: "范围搜索的最大相似度阈值"
+      pt_BR: "Limite máximo de similaridade para busca por intervalo"
+    llm_description: "Maximum similarity threshold for range search (used with radius)"
+    form: llm
+  - name: search_params
+    type: string
+    required: false
+    label:
+      en_US: "Advanced Search Parameters"
+      zh_Hans: "高级搜索参数"
+      pt_BR: "Parâmetros Avançados de Busca"
+    human_description:
+      en_US: "Additional search parameters as JSON (e.g., '{\"nprobe\": 16}')"
+      zh_Hans: "额外的搜索参数，JSON格式（例如：'{\"nprobe\": 16}'）"
+      pt_BR: "Parâmetros de busca adicionais como JSON (ex: '{\"nprobe\": 16}')"
+    llm_description: "Additional search parameters as JSON object for fine-tuning search behavior"
+    form: llm
+extra:
+  python:
+    source: tools/milvus_search.py 

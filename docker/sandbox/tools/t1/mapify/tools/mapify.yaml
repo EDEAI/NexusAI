@@ -1,0 +1,267 @@
+identity:
+  name: mapify
+  author: xmindltd
+  label:
+    en_US: mapify
+    zh_Hans: mapify
+    pt_BR: mapify
+description:
+  human:
+    en_US: Transform text, YouTube videos, and web content into beautiful mind maps using AI
+    zh_Hans: 使用AI将文本、YouTube视频和网页内容转化为精美的思维导图
+    pt_BR: Transform text, YouTube videos, and web content into beautiful mind maps using AI
+  llm: Transform text, YouTube videos, and web content into beautiful mind maps using AI
+parameters:
+  - name: prompt-url
+    type: string
+    required: true
+    label:
+      en_US: Prompt or URL
+      zh_Hans: 提示词或URL
+      pt_BR: Prompt or URL
+    human_description:
+      en_US: The prompt to generate the mind map. When mode is website or youtube, the prompt should be a URL without any other text.
+      zh_Hans: 输入文本、YouTube链接或网页URL生成思维导图。当模式为网站或YouTube时，提示词应为URL，无需其他文本。
+      pt_BR: The prompt to generate the mind map. When mode is website or youtube, the prompt should be a URL without any other text.
+    llm_description: Transform text, YouTube videos, and web content into beautiful mind maps using AI
+    form: llm
+  - name: mode
+    type: select
+    required: true
+    label:
+      en_US: Mode
+      zh_Hans: 模式
+      pt_BR: Mode
+    human_description:
+      en_US: Select the mode for generating the mind map
+      zh_Hans: 选择生成思维导图的模式
+      pt_BR: Select the mode for generating the mind map
+    form: llm
+    options:
+      - name: prompt
+        label:
+          en_US: Prompt
+          zh_Hans: 提示词
+          pt_BR: Prompt
+        value: prompt
+      - name: ai-search
+        label:
+          en_US: AI Search
+          zh_Hans: AI搜索
+          pt_BR: AI Search
+        value: ai-search
+      - name: youtube
+        label:
+          en_US: YouTube
+          zh_Hans: YouTube
+          pt_BR: YouTube
+        value: youtube
+      - name: website
+        label:
+          en_US: Website
+          zh_Hans: 网站
+          pt_BR: Website
+        value: website
+  - name: language
+    type: select
+    required: false
+    label:
+      en_US: Language
+      zh_Hans: 语言
+      pt_BR: Language
+    options:
+      - name: id
+        label:
+          en_US: Indonesian
+          zh_Hans: 印尼语
+          pt_BR: Indonesian
+        value: id
+      - name: ms
+        label:
+          en_US: Malay
+          zh_Hans: 马来语
+          pt_BR: Malay
+        value: ms
+      - name: da
+        label:
+          en_US: Danish
+          zh_Hans: 丹麦语
+          pt_BR: Danish
+        value: da
+      - name: de
+        label:
+          en_US: German
+          zh_Hans: 德语
+          pt_BR: German
+        value: de
+      - name: en
+        label:
+          en_US: English
+          zh_Hans: 英文
+          pt_BR: English
+        value: en
+      - name: es
+        label:
+          en_US: Spanish
+          zh_Hans: 西班牙语
+          pt_BR: Spanish
+        value: es
+      - name: fr
+        label:
+          en_US: French
+          zh_Hans: 法语
+          pt_BR: French
+        value: fr
+      - name: it
+        label:
+          en_US: Italian
+          zh_Hans: 意大利语
+          pt_BR: Italian
+        value: it
+      - name: nl
+        label:
+          en_US: Dutch
+          zh_Hans: 荷兰语
+          pt_BR: Dutch
+        value: nl
+      - name: no
+        label:
+          en_US: Norwegian
+          zh_Hans: 挪威语
+          pt_BR: Norwegian
+        value: no
+      - name: pl
+        label:
+          en_US: Polish
+          zh_Hans: 波兰语
+          pt_BR: Polish
+        value: pl
+      - name: pt
+        label:
+          en_US: Portuguese
+          zh_Hans: 葡萄牙语
+          pt_BR: Portuguese
+        value: pt
+      - name: ro
+        label:
+          en_US: Romanian
+          zh_Hans: 罗马尼亚语
+          pt_BR: Romanian
+        value: ro
+      - name: fi
+        label:
+          en_US: Finnish
+          zh_Hans: 芬兰语
+          pt_BR: Finnish
+        value: fi
+      - name: sv
+        label:
+          en_US: Swedish
+          zh_Hans: 瑞典语
+          pt_BR: Swedish
+        value: sv
+      - name: vi
+        label:
+          en_US: Vietnamese
+          zh_Hans: 越南语
+          pt_BR: Vietnamese
+        value: vi
+      - name: tr
+        label:
+          en_US: Turkish
+          zh_Hans: 土耳其语
+          pt_BR: Turkish
+        value: tr
+      - name: hu
+        label:
+          en_US: Hungarian
+          zh_Hans: 匈牙利语
+          pt_BR: Hungarian
+        value: hu
+      - name: cs
+        label:
+          en_US: Czech
+          zh_Hans: 捷克语
+          pt_BR: Czech
+        value: cs
+      - name: uk
+        label:
+          en_US: Ukrainian
+          zh_Hans: 乌克兰语
+          pt_BR: Ukrainian
+        value: uk
+      - name: ru
+        label:
+          en_US: Russian
+          zh_Hans: 俄语
+          pt_BR: Russian
+        value: ru
+      - name: bg
+        label:
+          en_US: Bulgarian
+          zh_Hans: 保加利亚语
+          pt_BR: Bulgarian
+        value: bg
+      - name: ar
+        label:
+          en_US: Arabic
+          zh_Hans: 阿拉伯语
+          pt_BR: Arabic
+        value: ar
+      - name: fa
+        label:
+          en_US: Persian
+          zh_Hans: 波斯语
+          pt_BR: Persian
+        value: fa
+      - name: he
+        label:
+          en_US: Hebrew
+          zh_Hans: 希伯来语
+          pt_BR: Hebrew
+        value: he
+      - name: hi
+        label:
+          en_US: Hindi
+          zh_Hans: 印地语
+          pt_BR: Hindi
+        value: hi
+      - name: th
+        label:
+          en_US: Thai
+          zh_Hans: 泰语
+          pt_BR: Thai
+        value: th
+      - name: ja
+        label:
+          en_US: Japanese
+          zh_Hans: 日语
+          pt_BR: Japanese
+        value: ja
+      - name: zh-CN
+        label:
+          en_US: Simplified Chinese
+          zh_Hans: 简体中文
+          pt_BR: Chinese (Simplified)
+        value: zh-CN
+      - name: zh-TW
+        label:
+          en_US: Traditional Chinese
+          zh_Hans: 繁体中文
+          pt_BR: Chinese (Traditional)
+        value: zh-TW
+      - name: ko
+        label:
+          en_US: Korean
+          zh_Hans: 韩语
+          pt_BR: Korean
+        value: ko
+    human_description:
+      en_US: Output language (en for English, zh for Chinese)
+      zh_Hans: 输出语言（en为英文，zh为中文）
+      pt_BR: Output language (en for English, zh for Chinese)
+    llm_description: Output language (en for English, zh for Chinese)
+    form: llm
+extra:
+  python:
+    source: tools/mapify.py

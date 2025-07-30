@@ -1,0 +1,41 @@
+credentials_for_provider:
+  api_key:
+    help:
+      en_US: Get your API key from Vanna.AI
+      zh_Hans: 从 Vanna.AI 获取你的 API key
+    label:
+      en_US: API key
+      zh_Hans: API key
+    placeholder:
+      en_US: Please input your API key
+      pt_BR: Please input your API key
+      zh_Hans: 请输入你的 API key
+    required: true
+    type: secret-input
+    url: https://vanna.ai/account/profile
+  base_url:
+    label:
+      en_US: Vanna.AI Endpoint Base URL
+    placeholder:
+      en_US: https://ask.vanna.ai/rpc
+    required: false
+    type: text-input
+extra:
+  python:
+    source: provider/vanna.py
+identity:
+  author: qctc
+  description:
+    en_US: The fastest way to get actionable insights from your database just by asking
+      questions.
+    zh_Hans: 一个基于大模型和RAG的Text2SQL工具。
+  icon: icon.png
+  label:
+    en_US: Vanna.AI
+    zh_Hans: Vanna.AI
+  name: vanna
+  tags:
+  - utilities
+  - productivity
+tools:
+- tools/vanna.yaml

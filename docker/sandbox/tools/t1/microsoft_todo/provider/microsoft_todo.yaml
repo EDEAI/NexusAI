@@ -1,0 +1,37 @@
+identity:
+  author: Ayush3941
+  name: microsoft_todo
+  label:
+    en_US: Microsoft Todo
+    ja_JP: マイクロソフト Todo
+    zh_Hans: 微软待办事项
+  description:
+    en_US: Plugin to manage tasks using Microsoft Todo API — create, retrieve, delete, and mark as completed.
+    ja_JP: Microsoft Todo API を使ってタスクの作成、取得、削除、完了が可能なプラグインです。
+    zh_Hans: 使用 Microsoft Todo API 管理任务：创建、查询、删除和标记完成。
+  icon: icon.png
+
+credentials_for_provider:
+  access_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: Microsoft OAuth Access Token
+      zh_Hans: 微软 OAuth 访问令牌
+    placeholder:
+      en_US: Enter your Microsoft access token
+      zh_Hans: 请输入您的微软访问令牌
+    help:
+      en_US: Obtain it via Microsoft OAuth 2.0
+      zh_Hans: 请通过微软 OAuth 2.0 获取
+    url: https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
+
+tools:
+  - tools/create_todo.yaml
+  - tools/get_todos.yaml
+  - tools/delete_todo.yaml
+  - tools/mark_todo_completed.yaml
+
+extra:
+  python:
+    source: provider/microsoft_todo.py

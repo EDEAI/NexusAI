@@ -1,0 +1,24 @@
+extra:
+  python:
+    source: provider/yahoo.py
+identity:
+  author: langgenius
+  description:
+    en_US: Finance, and Yahoo! get the latest news, stock quotes, and interactive
+      chart with Yahoo!
+    pt_BR: Finance, and Yahoo! get the latest news, stock quotes, and interactive
+      chart with Yahoo!
+    zh_Hans: 雅虎财经，获取并整理出最新的新闻、股票报价等一切你想要的财经信息。
+  icon: icon.png
+  label:
+    en_US: YahooFinance
+    pt_BR: YahooFinance
+    zh_Hans: 雅虎财经
+  name: yahoo
+  tags:
+  - business
+  - finance
+tools:
+- tools/analytics.yaml
+- tools/ticker.yaml
+- tools/news.yaml

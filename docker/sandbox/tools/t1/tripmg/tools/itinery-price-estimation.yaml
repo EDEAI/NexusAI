@@ -1,0 +1,66 @@
+identity:
+  name: itinery-price-estimation
+  author: ayush3941
+  label:
+    en_US: Itinerary Price Estimation
+    zh_Hans: 行程价格估算
+    pt_BR: Estimativa de Preço de Itinerário
+  icon: "icon.png"
+  description:
+    en_US: Estimate itinerary prices using Amadeus Analytics API.
+    zh_Hans: 使用 Amadeus Analytics API 估算行程价格。
+    pt_BR: Estime os preços de itinerários usando a API Analytics da Amadeus.
+
+description:
+  human:
+    en_US: Estimate flight prices between two airports on a given date
+    zh_Hans: 估算两个机场之间某日的航班价格
+    pt_BR: Estimar preços de voos entre dois aeroportos em uma data específica
+  llm: Get price insights for flights between origin and destination on a date
+
+parameters:
+  - name: origin
+    type: string
+    required: true
+    label:
+      en_US: Origin Airport Code
+      zh_Hans: 出发机场代码
+      pt_BR: Código do aeroporto de origem
+    human_description:
+      en_US: 3-letter IATA code for departure airport
+      zh_Hans: 出发机场的3字母IATA代码
+      pt_BR: Código IATA de 3 letras do aeroporto de partida
+    llm_description: Departure airport IATA code
+    form: llm
+
+  - name: destination
+    type: string
+    required: true
+    label:
+      en_US: Destination Airport Code
+      zh_Hans: 目的地机场代码
+      pt_BR: Código do aeroporto de destino
+    human_description:
+      en_US: 3-letter IATA code for arrival airport
+      zh_Hans: 到达机场的3字母IATA代码
+      pt_BR: Código IATA de 3 letras do aeroporto de destino
+    llm_description: Arrival airport IATA code
+    form: llm
+
+  - name: departure_date
+    type: string
+    required: true
+    label:
+      en_US: Departure Date
+      zh_Hans: 出发日期
+      pt_BR: Data de partida
+    human_description:
+      en_US: Date of departure in YYYY-MM-DD format
+      zh_Hans: 出发日期（格式：YYYY-MM-DD）
+      pt_BR: Data de partida no formato AAAA-MM-DD
+    llm_description: Date of flight departure
+    form: llm
+
+extra:
+  python:
+    source: tools/itinery-price-estimation.py

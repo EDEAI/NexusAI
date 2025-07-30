@@ -1,0 +1,34 @@
+identity:
+  name: get_task
+  author: lysonober
+  label:
+    en_US: "Get Task Details"
+    zh_Hans: "获取任务详情"
+    ja_JP: "タスク詳細を取得"
+    pt_BR: "Obter Detalhes da Tarefa"
+description:
+  human:
+    en_US: "Get comprehensive information about a browser automation task, including its status, steps completed, output, and live preview URL."
+    zh_Hans: "获取浏览器自动化任务的全面信息，包括其状态、已完成的步骤、输出和实时预览 URL。"
+    ja_JP: "ブラウザ自動化タスクのステータス、完了したステップ、出力、ライブプレビューURLなど、包括的な情報を取得します。"
+    pt_BR: "Obtenha informações abrangentes sobre uma tarefa de automação do navegador, incluindo seu status, etapas concluídas, saída e URL de visualização ao vivo."
+  llm: "This tool retrieves comprehensive information about a browser automation task by its ID. It makes a GET request to the /api/v1/task/{task_id} endpoint and returns detailed task information including current status, steps completed, output (if finished), creation and completion timestamps, and a live preview URL that can be embedded in an iframe to watch the task execution in real-time. If the task was created with save_browser_data=true, it will also include browser session data like cookies."
+parameters:
+  - name: task_id
+    type: string
+    required: true
+    label:
+      en_US: "Task ID"
+      zh_Hans: "任务 ID"
+      ja_JP: "タスク ID"
+      pt_BR: "ID da Tarefa"
+    human_description:
+      en_US: "The unique identifier of the task you want to get details for. This is the ID returned when you created the task."
+      zh_Hans: "您想要获取详情的任务的唯一标识符。这是您创建任务时返回的 ID。"
+      ja_JP: "詳細を取得したいタスクの一意の識別子。これはタスク作成時に返された ID です。"
+      pt_BR: "O identificador único da tarefa para a qual você deseja obter detalhes. Este é o ID retornado quando você criou a tarefa."
+    llm_description: "The unique identifier (ID) of the task you want to get details for. This is the ID string that was returned when you created the task using the run_task tool."
+    form: llm
+extra:
+  python:
+    source: tools/get_task.py

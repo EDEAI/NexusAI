@@ -1,0 +1,26 @@
+description:
+  human:
+    en_US: A tool for converting Chemical Smiles to images.
+    zh_Hans: 一个用于将化学Smiles字符串转换为图像的工具。
+  llm: A tool for converting Chemical Smiles to images.
+extra:
+  python:
+    source: tools/smiles_to_image.py
+identity:
+  author: s20ss
+  label:
+    en_US: Smiles to Image Converter
+    zh_Hans: Smiles转图片转换器
+  name: smiles_to_image
+parameters:
+- form: llm
+  human_description:
+    en_US: A string containing the chemical structure in SMILES format.
+    zh_Hans: 一个包含化学结构的SMILES格式字符串。
+  label:
+    en_US: SMILES String
+    zh_Hans: SMILES字符串
+  llm_description: "A string containing the chemical structure in SMILES format."
+  name: smiles
+  required: true
+  type: string

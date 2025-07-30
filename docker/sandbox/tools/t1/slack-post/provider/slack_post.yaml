@@ -1,0 +1,24 @@
+extra:
+  python:
+    source: provider/slack_post.py
+identity:
+  author: solaoi
+  description:
+    en_US: Slack Post
+    pt_BR: Slack Post
+    zh_Hans: Slack Post
+    ja_JP: Slack Post
+  icon: icon.svg
+  label:
+    en_US: Slack Post
+    pt_BR: Slack Post
+    zh_Hans: Slack Post
+    ja_JP: Slack Post
+  name: slack-post
+  tags:
+    - social
+    - productivity
+tools:
+  - tools/slack_post_to_thread.yaml
+  - tools/slack_post_to_channel.yaml
+  - tools/slack_add_reaction.yaml

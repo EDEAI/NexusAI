@@ -1,0 +1,81 @@
+identity:
+  name: get_data
+  author: acane0320
+  label:
+    en_US: Get Data
+    zh_Hans: 获取数据
+    ja_Jp: データを取得する
+    pt_BR: Obter Dados
+description:
+  human:
+    en_US: Get data for a user from Memobase
+    zh_Hans: 从 Memobase 获取用户数据
+    ja_Jp: Memobaseからユーザーデータを取得する
+    pt_BR: Obter dados de um usuário do Memobase
+  llm: Use this tool to retrieve data for a user from Memobase. You need to provide the user ID.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户 ID
+      ja_Jp: ユーザー ID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to retrieve data for
+      zh_Hans: 要检索数据的用户 ID
+      ja_Jp: データを取得するユーザーの ID
+      pt_BR: O ID do usuário para recuperar dados
+    llm_description: The ID of the user to retrieve data for.
+    form: llm
+  - name: blob_id
+    type: string
+    required: false
+    label:
+      en_US: Blob ID
+      zh_Hans: Blob ID
+      ja_Jp: Blob ID
+      pt_BR: Blob ID
+    human_description:
+      en_US: The specific blob ID to retrieve
+      zh_Hans: 要检索的特定 Blob ID
+      ja_Jp: 削除する特定の Blob ID
+      pt_BR: O ID de blob específico a ser recuperado
+    llm_description: The specific Blob ID to retrieve. If not provided, data will be returned filtered by page and page_size values.
+    form: llm
+  - name: page
+    type: number
+    required: false
+    default: 1
+    label:
+      en_US: Page
+      zh_Hans: 页码
+      ja_Jp: ページ
+      pt_BR: Página
+    human_description:
+      en_US: "The page number to retrieve (default: 1)"
+      zh_Hans: 要检索的页码（默认值：1）
+      ja_Jp: "取得するページ番号（デフォルト：1）"
+      pt_BR: "O número da página a ser recuperada (padrão: 1)"
+    llm_description: The page number to retrieve. If not provided, the first page will be retrieved.
+    form: llm
+  - name: page_size
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Page Size
+      zh_Hans: 每页大小
+      ja_Jp: ページサイズ
+      pt_BR: Tamanho da Página
+    human_description:
+      en_US: "The number of blobs per page (default: 10)"
+      zh_Hans: 每页显示的 Blob ID（默认值：10）
+      ja_Jp: "ページあたりのBlobの数（デフォルト：10）"
+      pt_BR: "O número de blobs por página (padrão: 10)"
+    llm_description: The number of blobs to return per page. If not provided, the default page size of 10 will be used.
+    form: llm
+extra:
+  python:
+    source: tools/user_data/get_data.py

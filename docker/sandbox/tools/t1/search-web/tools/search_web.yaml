@@ -1,0 +1,109 @@
+identity:
+  name: search-web
+  author: linkup
+  label:
+    en_US: Search Web
+description:
+  human:
+    en_US: Performs an online search using Linkup search engine and retrieves the top results as a string. This function is useful for accessing real-time information, including news, articles, and other relevant web content.
+    zh-Hans: 使用 Linkup 搜索引擎在线搜索并获取顶部结果。此功能适用于访问实时信息，包括新闻、文章和其他相关网页内容。
+    pt-BR: Realiza uma pesquisa online usando o mecanismo de busca Linkup e recupera os principais resultados como texto. Esta função é útil para acessar informações em tempo real, incluindo notícias, artigos e outros conteúdos relevantes da web.
+    es-ES: Realiza una búsqueda en línea utilizando el motor de búsqueda Linkup y recupera los principales resultados como texto. Esta función es útil para acceder a información en tiempo real, incluidas noticias, artículos y otros contenidos relevantes de la web.
+    fr-FR: Effectue une recherche en ligne à l'aide du moteur de recherche Linkup et récupère les meilleurs résultats sous forme de texte. Cette fonction est utile pour accéder à des informations en temps réel, notamment des actualités, des articles et d'autres contenus web pertinents.
+    de-DE: Führt eine Online-Suche mit der Linkup-Suchmaschine durch und ruft die besten Ergebnisse als Text ab. Diese Funktion ist nützlich für den Zugriff auf Echtzeitinformationen, einschließlich Nachrichten, Artikeln und anderen relevanten Webinhalten.
+    ja-JP: Linkup検索エンジンを使用してオンライン検索を実行し、上位の結果を文字列として取得します。この機能は、ニュース、記事、その他の関連するウェブコンテンツなどのリアルタイム情報にアクセスするのに役立ちます。
+    ko-KR: Linkup 검색 엔진을 사용하여 온라인 검색을 수행하고 상위 결과를 문자열로 가져옵니다. 이 기능은 뉴스, 기사 및 기타 관련 웹 콘텐츠를 포함한 실시간 정보에 액세스하는 데 유용합니다.
+    ru-RU: Выполняет онлайн-поиск с помощью поисковой системы Linkup и извлекает лучшие результаты в виде текста. Эта функция полезна для доступа к информации в реальном времени, включая новости, статьи и другой актуальный веб-контент.
+    it-IT: Esegue una ricerca online utilizzando il motore di ricerca Linkup e recupera i principali risultati come testo. Questa funzione è utile per accedere a informazioni in tempo reale, inclusi notizie, articoli e altri contenuti web rilevanti.
+    uk-UA: Виконує онлайн-пошук за допомогою пошукової системи Linkup і повертає найкращі результати у вигляді тексту. Ця функція корисна для доступу до актуальної інформації, включно з новинами, статтями та іншим релевантним веб-контентом.
+  llm: Performs an online search using Linkup search engine and retrieves the top results as a string. This function is useful for accessing real-time information, including news, articles, and other relevant web content.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh-Hans: 查询字符串
+      pt-BR: String de consulta
+      es-ES: Cadena de consulta
+      fr-FR: Chaîne de requête
+      de-DE: Abfragezeichenfolge
+      ja-JP: クエリ文字列
+      ko-KR: 쿼리 문자열
+      ru-RU: Строка запроса
+      it-IT: Stringa di query
+      uk-UA: Рядок запиту
+    human_description:
+      en_US: The search query to perform.
+      zh-Hans: 要执行的搜索查询。
+      pt-BR: A consulta de pesquisa a ser realizada.
+      es-ES: La consulta de búsqueda a realizar.
+      fr-FR: La requête de recherche à effectuer.
+      de-DE: Die auszuführende Suchanfrage.
+      ja-JP: 実行する検索クエリです。
+      ko-KR: 수행할 검색 쿼리입니다.
+      ru-RU: Поисковый запрос для выполнения.
+      it-IT: La query di ricerca da eseguire.
+      uk-UA: Пошуковий запит для виконання.
+    llm_description: The search query to perform.
+    form: llm
+  - name: depth
+    type: select
+    required: true
+    options: 
+    - value: "standard"
+      label:
+        en_US: Standard
+        zh-Hans: 标准
+        fr-FR: Standard
+        es-ES: Estándar
+        pt-BR: Padrão
+        de-DE: Standard
+        ja-JP: 標準
+        ko-KR: 표준
+        ru-RU: Стандарт
+        it-IT: Standard
+        uk-UA: Стандарт
+    - value: "deep"
+      label:
+        en_US: Deep
+        zh-Hans: 深入
+        fr-FR: Profonde
+        es-ES: Profunda
+        pt-BR: Profunda
+        de-DE: Tief
+        ja-JP: 深い
+        ko-KR: 심화
+        ru-RU: Глубокий
+        it-IT: Approfondita
+        uk-UA: Глибокий
+    default: "standard"
+    label:
+      en_US: Search depth
+      zh-Hans: 搜索深度
+      pt-BR: Profundidade da busca
+      es-ES: Profundidad de búsqueda
+      fr-FR: Profondeur de recherche
+      de-DE: Suchtiefe
+      ja-JP: 検索の深さ
+      ko-KR: 검색 깊이
+      ru-RU: Глубина поиска
+      it-IT: Profondità di ricerca
+      uk-UA: Глибина пошуку
+    human_description:
+      en_US: The search depth to perform. Use 'standard' for straightforward queries with likely direct answers (e.g., facts, definitions, simple explanations). Use 'deep' for - 1) complex queries requiring comprehensive analysis or information synthesis, 2) queries containing uncommon terms, specialized jargon, or abbreviations that may need additional context, or 3) questions likely requiring up-to-date or specialized web search results to answer effectively.
+      zh-Hans: 要执行的搜索深度。"standard" 适用于可能有直接答案的简单查询（例如，事实、定义、简单解释）。“deep” 适用于以下情况：1）需要综合分析或信息整合的复杂查询；2）包含不常见术语、专业术语或可能需要额外上下文的缩写的查询；3）可能需要最新或专业网络搜索结果才能有效回答的问题。
+      pt-BR: A profundidade de busca a ser realizada. Use "standard" para consultas simples com respostas diretas (por exemplo, fatos, definições, explicações simples). Use "deep" para - 1) consultas complexas que exigem análise abrangente ou síntese de informações; 2) consultas com termos incomuns, jargões especializados ou abreviações que exigem contexto adicional; ou 3) perguntas que provavelmente precisam de resultados atualizados ou especializados da web para serem respondidas com eficácia.
+      es-ES: La profundidad de búsqueda a realizar. Usa "standard" para consultas sencillas con respuestas directas (por ejemplo, hechos, definiciones, explicaciones simples). Usa "deep" para - 1) consultas complejas que requieren un análisis exhaustivo o síntesis de información; 2) consultas que contienen términos poco comunes, jerga especializada o abreviaturas que puedan necesitar contexto adicional; o 3) preguntas que probablemente requieran resultados de búsqueda web actualizados o especializados para responderse eficazmente.
+      fr-FR: La profondeur de recherche à effectuer. Utilisez "standard" pour les requêtes simples ayant probablement des réponses directes (par exemple, faits, définitions, explications simples). Utilisez "deep" pour - 1) les requêtes complexes nécessitant une analyse approfondie ou une synthèse d'informations ; 2) les requêtes contenant des termes rares, du jargon spécialisé ou des abréviations nécessitant un contexte supplémentaire ; ou 3) les questions nécessitant probablement des résultats web récents ou spécialisés pour y répondre efficacement.
+      de-DE: Die auszuführende Suchtiefe. Verwenden Sie "standard" für einfache Anfragen mit voraussichtlich direkten Antworten (z. B. Fakten, Definitionen, einfache Erklärungen). Verwenden Sie "deep" für - 1) komplexe Anfragen, die eine umfassende Analyse oder Informationssynthese erfordern; 2) Anfragen mit ungewöhnlichen Begriffen, Fachjargon oder Abkürzungen, die zusätzlichen Kontext benötigen könnten; oder 3) Fragen, die wahrscheinlich aktuelle oder spezialisierte Suchergebnisse erfordern.
+      ja-JP: 実行する検索の深さです。「standard」は事実、定義、簡単な説明など、明確な回答が得られる可能性の高い単純なクエリに使用します。「deep」は以下の場合に使用します：1）包括的な分析や情報の統合が必要な複雑なクエリ、2）一般的でない用語、専門用語、追加の文脈が必要な略語などを含むクエリ、3）最新または専門的なWeb検索結果を必要とする可能性が高い質問。
+      ko-KR: 수행할 검색 깊이입니다. 'standard'는 사실, 정의, 간단한 설명 등 직접적인 답변이 예상되는 간단한 쿼리에 적합합니다. 'deep'은 다음과 같은 경우에 사용됩니다 - 1) 포괄적인 분석 또는 정보 종합이 필요한 복잡한 쿼리, 2) 드물게 사용되는 용어, 전문 용어나 추가 문맥이 필요한 약어를 포함하는 쿼리, 3) 최신 정보 또는 전문적인 웹 검색 결과가 필요한 질문.
+      ru-RU: Глубина поиска, которую необходимо выполнить. Используйте "standard" для простых запросов с вероятными прямыми ответами (например, факты, определения, простые объяснения). Используйте "deep" для - 1) сложных запросов, требующих комплексного анализа или синтеза информации; 2) запросов с редкими терминами, специализированным жаргоном или аббревиатурами, требующими дополнительного контекста; или 3) вопросов, для которых, вероятно, потребуются актуальные или специализированные веб-результаты.
+      it-IT: La profondità di ricerca da eseguire. Usa "standard" per query semplici con risposte dirette (ad esempio, fatti, definizioni, spiegazioni semplici). Usa "deep" per - 1) query complesse che richiedono un'analisi approfondita o una sintesi delle informazioni; 2) query contenenti termini insoliti, gergo tecnico o abbreviazioni che richiedono contesto aggiuntivo; oppure 3) domande che potrebbero richiedere risultati web aggiornati o specializzati per essere efficacemente risposte.
+      uk-UA: Глибина пошуку, яку потрібно виконати. Використовуйте "standard" для простих запитів з імовірно прямими відповідями (наприклад, факти, визначення, прості пояснення). Використовуйте "deep", якщо - 1) запит є складним і вимагає всебічного аналізу або синтезу інформації; 2) запит містить рідкісні терміни, професійний жаргон або абревіатури, які потребують додаткового контексту; 3) питання ймовірно потребує актуальних або спеціалізованих результатів веб-пошуку для ефективної відповіді.
+    llm_description: The search depth to perform. Use 'standard' for straightforward queries with likely direct answers (e.g., facts, definitions, simple explanations). Use 'deep' for - 1) complex queries requiring comprehensive analysis or information synthesis, 2) queries containing uncommon terms, specialized jargon, or abbreviations that may need additional context, or 3) questions likely requiring up-to-date or specialized web search results to answer effectively.
+    form: form
+extra:
+  python:
+    source: tools/search_web.py

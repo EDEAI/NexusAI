@@ -1,0 +1,48 @@
+identity:
+  name: s3_upload_file
+  author: datoujiejie
+  label:
+    en_US: Upload files via s3
+    zh_Hans: 通过s3上传文件
+description:
+  human:
+    en_US: Upload files via s3
+    zh_Hans: 通过s3上传文件
+  llm: Upload files via s3
+parameters:
+  - name: file
+    type: file
+    required: false
+    label:
+      en_US: File
+      zh_Hans: 文件
+    human_description:
+      en_US: File to upload
+      zh_Hans: 要上传的文件
+    llm_description: File to upload
+    form: llm
+  - name: file_url
+    type: string
+    required: false
+    label:
+      en_US: file_url
+      zh_Hans: 文件下载链接
+    human_description:
+      en_US: Download link of the file to upload
+      zh_Hans: 要上传的文件的下载链接
+    llm_description: Download link of the file to upload
+    form: llm
+  - name: s3_key
+    type: string
+    required: true
+    label:
+      en_US: S3 Object key
+      zh_Hans: s3对象key
+    human_description:
+      en_US: S3 Object key
+      zh_Hans: s3对象key
+    llm_description: S3 Object key
+    form: llm
+extra:
+  python:
+    source: tools/s3_upload_file.py

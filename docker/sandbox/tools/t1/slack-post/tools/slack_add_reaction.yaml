@@ -1,0 +1,97 @@
+description:
+  human:
+    en_US: Add a reaction to a Slack message
+    pt_BR: Adicionar uma reação a uma mensagem do Slack
+    zh_Hans: 给 Slack 消息添加表情反应
+    ja_JP: Slackメッセージにリアクションを追加
+  llm: A tool for adding reactions to Slack messages.
+
+extra:
+  python:
+    source: tools/slack_add_reaction.py
+
+identity:
+  author: solaoi
+  icon: icon.svg
+  label:
+    en_US: Slack Add Reaction
+    pt_BR: Slack Add Reaction
+    zh_Hans: Slack 添加表情
+    ja_JP: Slack リアクション追加
+  description:
+    en_US: Add a reaction emoji to a specified Slack message
+    pt_BR: Adiciona um emoji de reação a uma mensagem específica do Slack
+    zh_Hans: 为指定的 Slack 消息添加表情符号
+    ja_JP: 指定したSlackメッセージにリアクションを付与
+  name: slack_add_reaction
+
+parameters:
+  - name: channel_id
+    type: string
+    required: true
+    label:
+      en_US: channel_id
+      pt_BR: channel_id
+      zh_Hans: channel_id
+      ja_JP: channel_id
+    human_description:
+      en_US: Slack channel ID where the message exists
+      pt_BR: ID do canal Slack onde a mensagem está
+      zh_Hans: 消息所在的 Slack 频道ID
+      ja_JP: メッセージが存在するSlackチャンネルID
+    llm_description: The Slack channel ID containing the message you want to react to.
+    form: llm
+
+  - name: icon_name
+    type: string
+    required: true
+    label:
+      en_US: icon_name
+      pt_BR: icon_name
+      zh_Hans: icon_name
+      ja_JP: icon_name
+    human_description:
+      en_US: "Emoji name without surrounding colons (e.g., 'thumbsup' for :thumbsup:)"
+      pt_BR: "Nome do emoji sem os dois-pontos (ex.: 'thumbsup' para :thumbsup:)"
+      zh_Hans: "去掉两端冒号的表情名称（例如 :thumbsup: 写为 'thumbsup'）"
+      ja_JP: "Slack上では :thumbsup: と記載するため、コロン(:)で囲まない絵文字名（thumbsup など）を入力"
+    llm_description: "The emoji name to add as a reaction, without the surrounding ':' characters."
+    form: llm
+
+  - name: timestamp
+    type: string
+    required: true
+    label:
+      en_US: timestamp
+      pt_BR: timestamp
+      zh_Hans: timestamp
+      ja_JP: timestamp
+    human_description:
+      en_US: Timestamp of the Slack message
+      pt_BR: Timestamp da mensagem do Slack
+      zh_Hans: Slack 消息的时间戳
+      ja_JP: Slackメッセージのタイムスタンプ
+    llm_description: The timestamp of the message to which the reaction will be added.
+    form: llm
+
+  - name: bot_token
+    type: secret-input
+    required: true
+    label:
+      en_US: "Bot Token"
+      zh_Hans: "Bot Token"
+      pt_BR: "Token do Bot"
+      ja_JP: "Bot Token"
+    placeholder:
+      en_US: "Please enter the Bot Token"
+      zh_Hans: "请输入 Bot Token"
+      pt_BR: "Por favor, insira o Token do Bot"
+      ja_JP: "Bot Tokenを入力してください"
+    human_description:
+      en_US: "An optional Bot Token for this specific usage."
+      zh_Hans: "可选的 Bot Token、用于本次使用。"
+      pt_BR: "Um Token do Bot opcional para este uso específico."
+      ja_JP: "今回利用する個別のBot Token。"
+    llm_description: "If provided, this Bot Token will be used for the current action."
+    form: form
+

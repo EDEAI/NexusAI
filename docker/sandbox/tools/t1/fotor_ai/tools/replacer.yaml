@@ -1,0 +1,58 @@
+identity:
+  name: replacer
+  author: fotor
+  label:
+    en_US: AI Replace
+    zh_Hans: AI局部替换
+
+description:
+  human:
+    en_US: AI Replace
+    zh_Hans: AI局部替换
+  llm: This operation is usually called "Restoration", "Old Photo Restoration", "Photo Restoration", "Repair Old Photo", "Photo Recovery", etc. Call the restoration API to restore the old photos, repair the old photos, recover the old photos, restore the old images, repair the old images, recover the old images, restore the old pictures, repair the old pictures, recover the old pictures, restore the old photographs, repair the old photographs, recover the old photographs.
+
+parameters:
+  - name: userImageUrl
+    type: string
+    required: true
+    label:
+      en_US: UserImageUrl
+      zh_Hans: 用户原图
+    human_description:
+      en_US: The URL or BASE64 encoded image of the original image provided by the user
+      zh_Hans: 用户提供的原图的URL或BASE64编码
+    llm_description: User Image URL, the URL or BASE64 encoding of the original image provided by the user.
+    form: llm
+
+  - name: maskImageUrl
+    type: string
+    required: true
+    label:
+      en_US: MaskImageUrl
+      zh_Hans: 遮罩图
+    human_description:
+      en_US: Specifies a mask image used to define the regions for partial replacement in the source image. Accepts either a base64-encoded image string or a publicly accessible image URL.
+      zh_Hans: 指定用于定义源图像中部分替换区域的遮罩图像。接受 base64 编码的图像字符串或可公开访问的图像 URL。
+    llm_description: Specifies a mask image used to define the regions for partial replacement in the source image. Accepts either a base64-encoded image string or a publicly accessible image URL..
+    form: llm
+
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: Replace content
+      zh_Hans: 替换内容
+    human_description:
+      en_US: Describe what you want to appear in the masked area — this prompt tells the model how to modify just that part of the image.
+      zh_Hans: 描述您希望在蒙版区域中显示的内容——此提示告诉模型如何修改图像的该部分。
+    llm_description: Describe what you want to appear in the masked area — this prompt tells the model how to modify just that part of the image.
+    form: llm
+output_schema:
+  type: object
+  properties:
+    result_url:
+      type: string
+
+extra:
+  python:
+    source: tools/replacer.py

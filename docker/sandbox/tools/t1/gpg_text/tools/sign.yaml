@@ -1,0 +1,56 @@
+identity:
+  name: sign_message # Changed from encrypt_message
+  author: alterxyz
+  label:
+    en_US: GPG Sign Message
+    zh_Hans: GPG 签名消息
+description:
+  human:
+    en_US: Creates a detached GPG signature for a text message using your private key.
+    zh_Hans: 使用你的私钥为文本消息创建分离式 GPG 签名。
+  llm: Use this tool to create a detached ASCII-armored GPG signature for a given plaintext message using the signer's private key. Requires the private key string.
+parameters:
+  - name: message_to_sign
+    type: string
+    required: true
+    label:
+      en_US: Message to Sign
+      zh_Hans: 要签名的消息
+    human_description:
+      en_US: The text message you want to create a signature for.
+      zh_Hans: 你想要为其创建签名的文本消息。
+    llm_description: The plaintext content for which a detached GPG signature should be generated.
+    form: llm
+  - name: signer_private_key_str
+    type: string # As before, consider secret-input in provider if needed globally
+    required: true
+    label:
+      en_US: Signer Private Key
+      zh_Hans: 签名者私钥
+    human_description:
+      en_US: Your ASCII-armored GPG private key string (starts with '-----BEGIN PGP PRIVATE KEY BLOCK-----') used for signing. Keep this secure!
+      zh_Hans: 用于签名的你的 ASCII 封装 GPG 私钥字符串（以 '-----BEGIN PGP PRIVATE KEY BLOCK-----' 开头）。请妥善保管！
+    llm_description: The full ASCII-armored PGP private key block of the signer. It must start with '-----BEGIN PGP PRIVATE KEY BLOCK-----'. This is highly sensitive.
+    form: llm
+  # Optional: Add passphrase parameter if keys are protected
+  - name: passphrase
+    type: string # Changed from secret-input
+    required: false
+    label:
+      en_US: Passphrase (Optional)
+      zh_Hans: 密码短语（可选）
+    human_description:
+      en_US: The passphrase for your private key, if it's protected.
+      zh_Hans: 如果你的私钥受密码保护，请输入密码短语。
+    llm_description: The passphrase needed to unlock the provided private key for signing, if applicable.
+    form: llm
+extra:
+  python:
+    source: tools/sign.py # Ensure this matches the python file name
+# Optional: Define output schema
+output_schema:
+  type: object
+  properties:
+    signature:
+      type: string
+      description: The detached ASCII-armored GPG signature.

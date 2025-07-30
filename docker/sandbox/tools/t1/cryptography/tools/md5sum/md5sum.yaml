@@ -1,0 +1,26 @@
+identity:
+  name: md5sum
+  author: bowenliang123
+  label:
+    en_US: MD5 File Checksum (md5sum)
+    zh_Hans: MD5 文件哈希 (md5sum)
+description:
+  human:
+    en_US: Generate MD5 hash of file
+    zh_Hans: 生成文件的 MD5 哈希值
+  llm: Generate MD5 hash of file
+parameters:
+  - name: input_file
+    type: file
+    required: true
+    label:
+      en_US: Input File
+      zh_Hans: 输入文件
+    human_description:
+      en_US: Input File
+      zh_Hans: 输入文件
+    llm_description: The file to generate MD5 hash for
+    form: llm
+extra:
+  python:
+    source: tools/md5sum/md5sum.py

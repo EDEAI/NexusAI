@@ -1,0 +1,40 @@
+credentials_for_provider:
+  api_key:
+    help:
+      en_US: Get your API key from Semantic Scholar for enhanced performance
+      pt_BR: Get your API key from Semantic Scholar for enhanced performance
+      zh_Hans: パフォーマンス向上のためSemantic ScholarからAPIキーを取得
+    label:
+      en_US: Semantic Scholar API Key (Optional)
+      pt_BR: Semantic Scholar API Key (Optional)
+      zh_Hans: Semantic Scholar API キー（オプション）
+    placeholder:
+      en_US: Enter your Semantic Scholar API key for higher rate limits
+      pt_BR: Enter your Semantic Scholar API key for higher rate limits
+      zh_Hans: より高いレート制限のためのSemantic Scholar APIキーを入力
+    required: false
+    type: secret-input
+    url: https://www.semanticscholar.org/product/api
+extra:
+  python:
+    source: provider/semantic_scholar.py
+identity:
+  author: yusukemurata
+  description:
+    en_US: Search Semantic Scholar-related academic papers and extract semantic snippets
+      using advanced AI-powered search capabilities
+    pt_BR: Search Semantic Scholar-related academic papers and extract semantic snippets
+      using advanced AI-powered search capabilities
+    zh_Hans: 使用先进的AI驱动搜索功能搜索Semantic Scholar相关学术论文并提取语义片段
+  icon: icon.svg
+  label:
+    en_US: Semantic Scholar
+    pt_BR: Semantic Scholar
+    zh_Hans: Semantic Scholar
+  name: semantic_scholar
+  tags:
+  - search
+tools:
+- tools/semantic_search.yaml
+- tools/paper_details.yaml
+- tools/snippet_search.yaml

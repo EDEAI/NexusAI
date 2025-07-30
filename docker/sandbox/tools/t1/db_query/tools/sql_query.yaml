@@ -1,0 +1,139 @@
+identity:
+  name: sql_query
+  author: junjiem
+  label:
+    en_US: SQL Query
+    zh_Hans: SQL查询
+description:
+  human:
+    en_US: A tool for Database SQL query.
+    zh_Hans: 数据库SQL查询工具。
+  llm: A tool for executing SQL query. Input should be a search query.
+extra:
+  python:
+    source: tools/sql_query.py
+parameters:
+  - name: db_type
+    type: select
+    required: true
+    options:
+      - value: mysql
+        label:
+          en_US: MySQL
+          zh_Hans: MySQL
+      - value: oracle
+        label:
+          en_US: Oracle
+          zh_Hans: Oracle
+      - value: oracle11g
+        label:
+          en_US: Oracle11g
+          zh_Hans: Oracle11g
+      - value: postgresql
+        label:
+          en_US: PostgreSQL
+          zh_Hans: PostgreSQL
+      - value: mssql
+        label:
+          en_US: Microsoft SQL Server
+          zh_Hans: Microsoft SQL Server
+    default: mysql
+    label:
+      en_US: Database type
+      zh_Hans: 数据库类型
+    human_description:
+      en_US: Used for selecting the database type, mysql, oracle, oracle11g, postgresql or mssql.
+      zh_Hans: 用于选择数据库类型，mysql、oracle、oracle11g、postgresql或mssql。
+    form: llm
+  - name: db_host
+    type: string
+    required: true
+    default: localhost
+    label:
+      en_US: Database Host
+      zh_Hans: 数据库地址
+    human_description:
+      en_US: Database hostname or IP address (Original string, not URL-encoded string).
+      zh_Hans: 数据库的主机名或IP地址（原始字符串，非URL编码字符串）。
+    form: llm
+  - name: db_port
+    type: number
+    required: false
+    label:
+      en_US: Port
+      zh_Hans: 端口
+    human_description:
+      en_US: Database port.
+      zh_Hans: 数据库的端口。
+    form: llm
+  - name: db_username
+    type: string
+    required: true
+    label:
+      en_US: Username
+      zh_Hans: 用户名
+    human_description:
+      en_US: Database username (Original string, not URL-encoded string).
+      zh_Hans: 数据库的用户名（原始字符串，非URL编码字符串）。
+    form: llm
+  - name: db_password
+    type: secret-input
+    required: true
+    label:
+      en_US: Password
+      zh_Hans: 密码
+    human_description:
+      en_US: Database password (Original string, not URL-encoded string).
+      zh_Hans: 数据库的密码（原始字符串，非URL编码字符串）。
+    form: llm
+  - name: db_name
+    type: string
+    required: false
+    label:
+      en_US: Database name
+      zh_Hans: 库名
+    human_description:
+      en_US: Database name (Original string, not URL-encoded string).
+      zh_Hans: 数据库的名称（原始字符串，非URL编码字符串）。
+    form: llm
+  - name: db_properties
+    type: string
+    required: false
+    label:
+      en_US: Database properties
+      zh_Hans: 数据库属性
+    human_description:
+      en_US: 'Database properties, for example: alt_host=host1&alt_host=host2&ssl_cipher=%2Fpath%2Fto%2Fcrt'
+      zh_Hans: '数据库属性，例如：alt_host=host1&alt_host=host2&ssl_cipher=%2Fpath%2Fto%2Fcrt'
+    form: llm
+  - name: query_sql
+    type: string
+    required: true
+    label:
+      en_US: Query SQL
+      zh_Hans: SQL查询语句
+    human_description:
+      en_US: 'SQL query statement, for example: select * from tbl_name'
+      zh_Hans: SQL查询语句，例如：select * from tbl_name
+    llm_description: 'SQL query statement, for example: select * from tbl_name'
+    form: llm
+  - name: output_format
+    type: select
+    required: true
+    label:
+      en_US: Output format
+      zh_Hans: 输出格式
+    human_description:
+      en_US: Used for selecting the output format, markdown or json.
+      zh_Hans: 用于选择输出格式，markdown或json。
+    options:
+      - value: markdown
+        label:
+          en_US: MARKDOWN
+          zh_Hans: MARKDOWN
+      - value: json
+        label:
+          en_US: JSON
+          zh_Hans: JSON
+    default: markdown
+    form: form

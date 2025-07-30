@@ -1,0 +1,107 @@
+identity:
+  name: sec_filings_items
+  author: financialai
+  label:
+    en_US: SEC Filings Items
+    zh_Hans: SEC备案项目
+    ja_Jp: SEC 提出書類アイテム
+    pt_BR: Itens de Arquivamentos da SEC
+description:
+  human:
+    en_US: Get SEC filing items for a company. The Items endpoint allows you to extract specific sections (called items) from a given 10-K or 10-Q filing.
+    zh_Hans: 获取公司的 SEC 备案项目。Items 端点允许您从给定的 10-K 或 10-Q 备案中提取特定部分（称为项目）。
+    ja_Jp: 会社の SEC 提出書類アイテムを取得します。Items エンドポイントを使用すると、指定された 10-K または 10-Q 提出書類から特定のセクション（アイテムと呼ばれる）を抽出できます。
+    pt_BR: Obtenha itens de arquivamento da SEC para uma empresa. O endpoint Items permite que você extraia seções específicas (chamadas itens) de um arquivamento 10-K ou 10-Q fornecido.
+  llm: Get SEC filing items for a company. The Items endpoint allows you to extract specific sections (called items) from a given 10-K or 10-Q filing.
+parameters:
+  - name: ticker
+    type: string
+    required: true
+    label:
+      en_US: Ticker symbol
+      zh_Hans: 股票代码
+      ja_Jp: ティッカーシンボル
+      pt_BR: Símbolo do ticker
+    human_description:
+      en_US: The ticker symbol of the company you want to get SEC filing items for.
+      zh_Hans: 您想获取公司的 SEC 备案项目的公司的股票代码。
+      ja_Jp: SEC 提出書類アイテムを取得したい会社のティッカーシンボル。
+      pt_BR: O símbolo do ticker da empresa para a qual você deseja obter itens de arquivamento da SEC.
+    llm_description: The ticker symbol of the company you want to get SEC filing items for.
+    form: llm
+  - name: filing_type
+    type: select
+    required: true
+    label:
+      en_US: Type of filing
+      zh_Hans: 备案类型
+      ja_Jp: 提出書類の種類
+      pt_BR: O tipo de arquivamento
+    human_description:
+      en_US: The type of filing you want to get items for.
+      zh_Hans: 您想获取项目的备案类型。
+      ja_Jp: アイテムを取得したい提出書類の種類。
+      pt_BR: O tipo de arquivamento para o qual você deseja obter itens.
+    llm_description: The type of filing you want to get items for.
+    form: llm
+    options:
+      - value: 10-K
+        label:
+          en_US: 10-K
+          zh_Hans: 10-K
+          ja_Jp: 10-K
+          pt_BR: 10-K
+      - value: 10-Q
+        label:
+          en_US: 10-Q
+          zh_Hans: 10-Q
+          ja_Jp: 10-Q
+          pt_BR: 10-Q
+  - name: year
+    type: number
+    required: true
+    label:
+      en_US: Year of the filing
+      zh_Hans: 备案年份
+      ja_Jp: 提出書類の年
+      pt_BR: O ano do arquivamento
+    human_description:
+      en_US: The year of the filing you want to get items for.
+      zh_Hans: 您想获取项目的备案年份。
+      ja_Jp: アイテムを取得したい提出書類の年。
+      pt_BR: O ano do arquivamento para o qual você deseja obter itens.
+    llm_description: The year of the filing you want to get items for.
+    form: llm
+  - name: quarter
+    type: number
+    required: false
+    label:
+      en_US: Quarter of the filing
+      zh_Hans: 备案季度
+      ja_Jp: 提出書類の四半期
+      pt_BR: O trimestre do arquivamento
+    human_description:
+      en_US: The quarter of the filing you want to get items for.
+      zh_Hans: 您想获取项目的备案季度。
+      ja_Jp: アイテムを取得したい提出書類の四半期。
+      pt_BR: O trimestre do arquivamento para o qual você deseja obter itens.
+    llm_description: The quarter of the filing you want to get items for.
+    form: llm
+  - name: item
+    type: string
+    required: false
+    label:
+      en_US: Item
+      zh_Hans: 项目
+      ja_Jp: アイテム
+      pt_BR: Item
+    human_description:
+      en_US: The item you want to get.
+      zh_Hans: 您想获取的项目。
+      ja_Jp: 取得したいアイテム。
+      pt_BR: O item que você deseja obter.
+    llm_description: The item you want to get.
+    form: llm
+extra:
+  python:
+    source: tools/sec_filings_items/invoke.py

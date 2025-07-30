@@ -1,0 +1,82 @@
+identity:
+  author: lework
+  name: prometheus
+  label:
+    en_US: Prometheus
+    zh_Hans: Prometheus
+    pt_BR: Prometheus
+  description:
+    en_US: Query Prometheus metrics using PromQL
+    zh_Hans: 使用PromQL查询Prometheus指标数据
+    pt_BR: Query Prometheus metrics using PromQL
+  icon: icon.svg
+  tags:
+    - other
+credentials_for_provider: #添加 credentials_for_provider 字段
+  api_url:
+    type: secret-input
+    required: true
+    label:
+      en_US: API URL
+      zh_Hans: API URL
+      pt_BR: API URL
+    help:
+      en_US: The URL of your Prometheus server, e.g. http://localhost:9090
+      zh_Hans: Prometheus服务器的URL，例如 http://localhost:9090
+      pt_BR: The URL of your Prometheus server, e.g. http://localhost:9090
+    placeholder:
+      en_US: http://localhost:9090
+      zh_Hans: http://localhost:9090
+      pt_BR: http://localhost:9090
+    url: https://prometheus.io/docs/prometheus/latest/querying/api/
+  username:
+    type: secret-input
+    required: false
+    label:
+      en_US: Username
+      zh_Hans: 用户名
+      pt_BR: Username
+    help:
+      en_US: Username for basic authentication (optional)
+      zh_Hans: 基本认证的用户名（可选）
+      pt_BR: Username for basic authentication (optional)
+    placeholder:
+      en_US: username
+      zh_Hans: 用户名
+      pt_BR: username
+  password:
+    type: secret-input
+    required: false
+    label:
+      en_US: Password
+      zh_Hans: 密码
+      pt_BR: Password
+    help:
+      en_US: Password for basic authentication (optional)
+      zh_Hans: 基本认证的密码（可选）
+      pt_BR: Password for basic authentication (optional)
+    placeholder:
+      en_US: password
+      zh_Hans: 密码
+      pt_BR: password
+  token:
+    type: secret-input
+    required: false
+    label:
+      en_US: Token
+      zh_Hans: 令牌
+      pt_BR: Token
+    help:
+      en_US: Bearer token for authentication (optional)
+      zh_Hans: 认证的Bearer令牌（可选）
+      pt_BR: Bearer token for authentication (optional)
+    placeholder:
+      en_US: token
+      zh_Hans: 令牌
+      pt_BR: token
+tools:
+  - tools/prometheus.yaml
+  - tools/kubernetes_pod_metrics.yaml
+extra:
+  python:
+    source: provider/prometheus.py

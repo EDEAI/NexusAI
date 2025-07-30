@@ -1,0 +1,66 @@
+identity:
+  author: mark
+  name: opensearch
+  label:
+    en_US: OpenSearch
+    zh_Hans: OpenSearch
+    pt_BR: OpenSearch
+  description:
+    en_US: search information by OpenSearch
+    zh_Hans: search information by OpenSearch
+    pt_BR: search information by OpenSearch
+  icon: icon.svg
+credentials_for_provider:
+  endpoint:
+    type: text-input
+    required: true
+    label:
+      en_US: Endpoint
+      zh_Hans: 服务地址
+      pt_BR: Endpoint
+    placeholder:
+      en_US: host:port,...
+      zh_Hans: host:port,...
+      pt_BR: host:port,...
+    help:
+      en_US: Get your OpenSearch endpoint from your provider
+      zh_Hans: 从您的OpenSearch服务商那里获取您的endpoint
+      pt_BR: Get your OpenSearch endpoint from your provider
+    url: https://opensearch-project.github.io/opensearch-py/api-ref/clients/opensearch_client.html
+  user:
+    type: text-input
+    required: true
+    label:
+      en_US: User
+      zh_Hans: 用户名
+      pt_BR: User
+    placeholder:
+      en_US: Please input your user name
+      zh_Hans: 请输入你的用户名
+      pt_BR: Please input your user name
+    help:
+      en_US: Get your user name
+      zh_Hans: 您在OpenSearch服务商那里设置的账号名称
+      pt_BR: Get your user name
+    url: https://opensearch-project.github.io/opensearch-py/api-ref/clients/opensearch_client.html
+  password:
+    type: secret-input
+    required: false
+    label:
+      en_US: password
+      zh_Hans: 密码
+      pt_BR: password
+    placeholder:
+      en_US: Please input your password
+      zh_Hans: 请输入你的密码
+      pt_BR: Please input your password
+    help:
+      en_US: Get your password
+      zh_Hans: 您在OpenSearch服务商那里设置的密码
+      pt_BR: Get your password
+    url: https://opensearch-project.github.io/opensearch-py/api-ref/clients/opensearch_client.html
+tools:
+  - tools/query.yaml
+extra:
+  python:
+    source: provider/opensearch.py

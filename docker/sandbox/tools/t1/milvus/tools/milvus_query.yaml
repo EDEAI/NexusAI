@@ -1,0 +1,95 @@
+identity:
+  name: "milvus_query"
+  author: "zeroz-lab"
+  label:
+    en_US: "Milvus Data Query"
+    zh_Hans: "Milvus 数据查询"
+    pt_BR: "Consulta de Dados Milvus"
+description:
+  human:
+    en_US: "Query data from Milvus collections by IDs or filter conditions"
+    zh_Hans: "通过ID或过滤条件从Milvus集合中查询数据"
+    pt_BR: "Consultar dados de coleções Milvus por IDs ou condições de filtro"
+  llm: "A tool for querying data from Milvus collections using entity IDs or filter expressions"
+parameters:
+  - name: collection_name
+    type: string
+    required: true
+    label:
+      en_US: "Collection Name"
+      zh_Hans: "集合名称"
+      pt_BR: "Nome da Coleção"
+    human_description:
+      en_US: "The name of the collection to query from"
+      zh_Hans: "要查询的集合名称"
+      pt_BR: "O nome da coleção para consultar"
+    llm_description: "The name of the collection to query data from"
+    form: llm
+  - name: ids
+    type: string
+    required: false
+    label:
+      en_US: "Entity IDs"
+      zh_Hans: "实体ID"
+      pt_BR: "IDs das Entidades"
+    human_description:
+      en_US: "JSON array of entity IDs to query (e.g., [1, 2, 3] or ['id1', 'id2'])"
+      zh_Hans: "要查询的实体ID的JSON数组（例如：[1, 2, 3] 或 ['id1', 'id2']）"
+      pt_BR: "Array JSON de IDs de entidades para consultar (ex: [1, 2, 3] ou ['id1', 'id2'])"
+    llm_description: "JSON array of entity IDs to query (either this or filter must be provided)"
+    form: llm
+  - name: filter
+    type: string
+    required: false
+    label:
+      en_US: "Filter Expression"
+      zh_Hans: "过滤表达式"
+      pt_BR: "Expressão de Filtro"
+    human_description:
+      en_US: "Filter expression for scalar fields (e.g., 'age > 18 and status == \"active\"')"
+      zh_Hans: "标量字段的过滤表达式（例如：'age > 18 and status == \"active\"'）"
+      pt_BR: "Expressão de filtro para campos escalares (ex: 'age > 18 and status == \"active\"')"
+    llm_description: "Boolean expression for filtering results (either this or ids must be provided)"
+    form: llm
+  - name: output_fields
+    type: string
+    required: false
+    label:
+      en_US: "Output Fields"
+      zh_Hans: "输出字段"
+      pt_BR: "Campos de Saída"
+    human_description:
+      en_US: "Comma-separated list of fields to return (e.g., 'field1,field2' or '*' for all)"
+      zh_Hans: "要返回的字段列表，用逗号分隔（例如：'field1,field2' 或 '*' 表示所有字段）"
+      pt_BR: "Lista de campos separados por vírgula para retornar (ex: 'field1,field2' ou '*' para todos)"
+    llm_description: "Comma-separated list of fields to include in results ('*' for all fields)"
+    form: llm
+  - name: partition_names
+    type: string
+    required: false
+    label:
+      en_US: "Partition Names"
+      zh_Hans: "分区名称"
+      pt_BR: "Nomes das Partições"
+    human_description:
+      en_US: "Comma-separated list of partition names to query from"
+      zh_Hans: "要查询的分区名称列表，用逗号分隔"
+      pt_BR: "Lista de nomes de partições separados por vírgula para consultar"
+    llm_description: "Comma-separated list of partition names to query from (optional)"
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: "Result Limit"
+      zh_Hans: "结果限制"
+      pt_BR: "Limite de Resultados"
+    human_description:
+      en_US: "Maximum number of results to return (only for filter queries)"
+      zh_Hans: "返回的最大结果数量（仅适用于过滤查询）"
+      pt_BR: "Número máximo de resultados a retornar (apenas para consultas com filtro)"
+    llm_description: "Maximum number of results to return (applies only to filter-based queries)"
+    form: llm
+extra:
+  python:
+    source: tools/milvus_query.py 

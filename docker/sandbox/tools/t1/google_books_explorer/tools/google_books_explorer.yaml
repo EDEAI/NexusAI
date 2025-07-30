@@ -1,0 +1,30 @@
+identity:
+  name: "google_books_explorer"
+  author: "pragnyan_ramtha"
+  label:
+    en_US: google_books_explorer
+    zh_Hans: google_books_explorer
+    pt_BR: google_books_explorer
+description:
+  human:
+    en_US: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
+    zh_Hans: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
+    pt_BR: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
+  llm: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
+      zh_Hans: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
+      pt_BR: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
+    llm_description: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
+    form: llm
+extra:
+  python:
+    source: tools/google_books_explorer.py

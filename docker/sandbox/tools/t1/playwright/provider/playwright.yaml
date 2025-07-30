@@ -1,0 +1,28 @@
+identity:
+  author: hjlarry
+  name: playwright
+  label:
+    en_US: playwright
+    zh_Hans: playwright
+    pt_BR: playwright
+  description:
+    en_US: A tool can be used to automate the browser with playwright script.
+    zh_Hans: 一个可以使用 playwright 脚本自动化浏览器的工具
+  icon: icon.svg
+tools:
+  - tools/playwright.yaml
+extra:
+  python:
+    source: provider/playwright.py
+credentials_for_provider:
+  playwright_uri:
+    help:
+      en_US: For example `ws://host.docker.internal:3003`
+      zh_Hans: 例如 `ws://host.docker.internal:3003`
+    label:
+      en_US: Playwright URI
+    placeholder:
+      en_US: Please enter the Playwright URI
+      zh_Hans: 请输入Playwright URI
+    required: true
+    type: secret-input

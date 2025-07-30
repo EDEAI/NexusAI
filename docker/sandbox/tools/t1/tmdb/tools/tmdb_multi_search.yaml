@@ -1,0 +1,94 @@
+identity:
+  name: tmdb_multi_search
+  author: lcandy
+  label:
+    en_US: Multi Search
+    zh_Hans: 多类型搜索
+    zh_Hant: 多類型搜尋
+    ja_JP: マルチ検索
+    pt_BR: Pesquisa Múltipla
+description:
+  human:
+    en_US: Search for movies, TV shows, and people in a single request. Returns results of multiple types with their respective details.
+    zh_Hans: 在单个请求中搜索电影、电视节目和人物。返回多种类型的结果及其各自的详情。
+    zh_Hant: 在單個請求中搜尋電影、電視節目和人物。返回多種類型的結果及其各自的詳情。
+    ja_JP: 映画、テレビ番組、人物を一度のリクエストで検索します。複数のタイプの結果とそれぞれの詳細を返します。
+    pt_BR: Pesquise filmes, programas de TV e pessoas em uma única solicitação. Retorna resultados de vários tipos com seus respectivos detalhes.
+  llm: Search for movies, TV shows, and people in a single request. This tool searches The Movie Database (TMDB) across multiple content types.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Search Keywords
+      zh_Hans: 搜索关键词
+      zh_Hant: 搜尋關鍵詞
+      ja_JP: 検索キーワード
+      pt_BR: Palavras-chave de Pesquisa
+    human_description:
+      en_US: The keywords to search for movies, TV shows, and people
+      zh_Hans: 用于搜索电影、电视节目和人物的关键词
+      zh_Hant: 用於搜尋電影、電視節目和人物的關鍵詞
+      ja_JP: 映画、テレビ番組、人物を検索するためのキーワード
+      pt_BR: As palavras-chave para pesquisar filmes, programas de TV e pessoas
+    llm_description: The keywords to search for in TMDB across movies, TV shows, and people
+    form: llm
+  - name: language
+    type: string
+    required: false
+    default: en-US
+    label:
+      en_US: Language
+      zh_Hans: 语言
+      zh_Hant: 語言
+      ja_JP: 言語
+      pt_BR: Idioma
+    human_description:
+      en_US: The ISO 639-1 language code to search in (default is en-US)
+      zh_Hans: 要搜索的 ISO 639-1 语言代码（默认为 en-US）
+      zh_Hant: 要搜尋的 ISO 639-1 語言代碼（預設為 en-US）
+      ja_JP: 検索するISO 639-1言語コード（デフォルトはen-US）
+      pt_BR: O código de idioma ISO 639-1 para pesquisar (o padrão é en-US)
+    llm_description: The ISO 639-1 language code to search in (e.g., en-US, zh-CN, fr-FR)
+    form: form
+  - name: include_adult
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Include Adult Content
+      zh_Hans: 包括成人内容
+      zh_Hant: 包括成人內容
+      ja_JP: アダルトコンテンツを含める
+      pt_BR: Incluir Conteúdo Adulto
+    human_description:
+      en_US: Whether to include adult content in search results
+      zh_Hans: 是否在搜索结果中包括成人内容
+      zh_Hant: 是否在搜尋結果中包括成人內容
+      ja_JP: 検索結果にアダルトコンテンツを含めるかどうか
+      pt_BR: Se deve incluir conteúdo adulto nos resultados da pesquisa
+    llm_description: Set to true to include adult content in search results, false to exclude
+    form: form
+  - name: results_limit
+    type: number
+    required: false
+    default: 10
+    min: 1
+    max: 20
+    label:
+      en_US: Number of Results
+      zh_Hans: 结果数量
+      zh_Hant: 結果數量
+      ja_JP: 結果の数
+      pt_BR: Número de Resultados
+    human_description:
+      en_US: Maximum number of results to return (1-20, default is 10)
+      zh_Hans: 要返回的最大结果数（1-20，默认为10）
+      zh_Hant: 要返回的最大結果數（1-20，預設為10）
+      ja_JP: 返す結果の最大数（1-20、デフォルトは10）
+      pt_BR: Número máximo de resultados a serem retornados (1-20, o padrão é 10)
+    llm_description: Maximum total number of results to return across all types (1-20)
+    form: form
+extra:
+  python:
+    source: tools/tmdb_multi_search.py 

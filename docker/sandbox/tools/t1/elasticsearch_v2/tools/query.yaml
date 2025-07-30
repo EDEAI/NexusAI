@@ -1,0 +1,172 @@
+identity:
+  name: search
+  author: quicksandzn
+  label:
+    en_US: Elasticsearch Query
+    zh_Hans: Elasticsearch Query
+description:
+  human:
+    en_US: Elasticsearch Query
+    zh_Hans: Elasticsearch Query
+  llm: Elasticsearch Query
+parameters:
+  - name: endpoint
+    type: string
+    required: true
+    label:
+      en_US: Endpoint
+      zh_Hans: 端点
+    human_description:
+      en_US: Endpoint
+      zh_Hans: Endpoint
+    llm_description: Endpoint
+    form: form
+  - name: verify_certs
+    type: boolean
+    required: false
+    default: false
+    label:
+      en_US: Verify Certs
+      zh_Hans: 是否验证证书
+    human_description:
+      en_US: Verify Certs
+      zh_Hans: 是否验证证书
+    llm_description: Verify Certs
+    form: form
+  - name: auth_method
+    type: select
+    required: true
+    options:
+      - value: no_auth
+        label:
+          en_US: No Auth
+          zh_Hans: 无鉴权
+      - value: api_key
+        label:
+          en_US: API Key
+          zh_Hans: API Key
+      - value: basic
+        label:
+          en_US: Basic Auth
+          zh_Hans: 基础认证
+    default: no_auth
+    label:
+      en_US: Authentication Method
+      zh_Hans: 鉴权方式
+    human_description:
+      en_US: Authentication Method
+      zh_Hans: 鉴权方式
+    form: form
+  - name: api_key
+    type: secret-input
+    required: false
+    label:
+      en_US: API Key
+      zh_Hans: API Key
+    human_description:
+      en_US: API Key
+      zh_Hans: API Key
+    llm_description: API Key
+    form: form
+    show_on:
+      - value: api_key
+        variable: auth_method
+  - name: username
+    type: string
+    required: false
+    label:
+      en_US: Username
+      zh_Hans: 用户名
+    human_description:
+      en_US: Username
+      zh_Hans: 用户名
+    llm_description: Username
+    form: form
+    show_on:
+      - value: basic
+        variable: auth_method
+  - name: password
+    type: secret-input
+    required: false
+    label:
+      en_US: Password
+      zh_Hans: 密码
+    human_description:
+      en_US: Password
+      zh_Hans: 密码
+    llm_description: Password
+    form: form
+    show_on:
+      - value: basic
+        variable: auth_method
+  - name: index
+    type: string
+    required: true
+    label:
+      en_US: Index name
+      zh_Hans: 索引名称
+    human_description:
+      en_US: index name
+      zh_Hans: index name
+    llm_description: index name
+    form: llm
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: DSL Query
+      zh_Hans: DSL 查询语句
+    human_description:
+      en_US: DSL Query
+      zh_Hans: DSL 查询语句
+    llm_description: Elasticsearch DSL Query
+    form: llm
+  - name: source_includes
+    type: string
+    required: false
+    label:
+      en_US: Source Fields
+      zh_Hans: 返回字段
+    human_description:
+      en_US: "Source Fields (default: *, multiple fields separated by commas)"
+      zh_Hans: "返回字段 (默认: 全部，多个字段以逗号分隔)"
+    llm_description: Elasticsearch Source
+    form: llm
+  - name: sort
+    type: string
+    required: false
+    label:
+      en_US: Sort
+      zh_Hans: 排序
+    human_description:
+      en_US: "Sort A comma-separated list of <field>:<direction> pairs"
+      zh_Hans: "排序，以逗号分隔的 <字段>:<方向> 对列表"
+    llm_description: Elasticsearch Sort
+    form: llm
+  - name: from
+    type: number
+    required: false
+    default: 0
+    label:
+      en_US: From
+      zh_Hans: 查询的起始位置
+    human_description:
+      en_US: From
+      zh_Hans: 查询的起始位置
+    llm_description: Elasticsearch Query from
+    form: llm
+  - name: size
+    type: number
+    required: false
+    default: 10
+    label:
+      en_US: Size
+      zh_Hans: 文档数量
+    human_description:
+      en_US: Size
+      zh_Hans: 文档数量
+    llm_description: Elasticsearch Query Size
+    form: llm
+extra:
+  python:
+    source: tools/query.py

@@ -1,0 +1,34 @@
+identity:
+  name: delete_user
+  author: acane0320
+  label:
+    en_US: Delete User
+    zh_Hans: 删除用户
+    ja_Jp: ユーザーを削除
+    pt_BR: Excluir Usuário
+description:
+  human:
+    en_US: Delete a user from Memobase
+    zh_Hans: 从 Memobase 删除用户
+    ja_Jp: Memobaseからユーザーを削除
+    pt_BR: Excluir um usuário do Memobase
+  llm: Use this tool to delete a user from Memobase. You need to provide the user ID.
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户ID
+      ja_Jp: ユーザーID
+      pt_BR: ID do Usuário
+    human_description:
+      en_US: The ID of the user to delete
+      zh_Hans: 要删除的用户的ID
+      ja_Jp: 削除するユーザーのID
+      pt_BR: O ID do usuário a ser excluído
+    llm_description: The ID of the user to delete.
+    form: llm
+extra:
+  python:
+    source: tools/user/delete_user.py

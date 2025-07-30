@@ -1,0 +1,49 @@
+identity:
+  name: incoming_webhook
+  author: edtechools
+  label:
+    en_US: Send messages via Incoming Webhook
+    zh_Hans: 通过传入Webhook发送消息
+    ja_Jp: 受信Webhook経由でメッセージを送信する
+    pt_BR: Enviar mensagens através de um Webhook de entrada
+description:
+  human:
+    en_US: Send messages via Incoming Webhook
+    zh_Hans: 通过传入Webhook发送消息
+    ja_Jp: 受信Webhook経由でメッセージを送信する
+    pt_BR: Enviar mensagens através de um Webhook de entrada
+  llm: Send messages via Incoming Webhook
+parameters:
+  - name: message
+    type: string
+    required: true
+    label:
+      en_US: The messages you want to send
+      zh_Hans: 要发送的消息
+      ja_Jp: 送信するメッセージ
+      pt_BR: Mensagem a ser enviada
+    human_description:
+      en_US: The messages you want to send
+      zh_Hans: 要发送的消息
+      ja_Jp: 送信するメッセージ
+      pt_BR: Mensagem a ser enviada
+    llm_description: The messages you want to send
+    form: llm
+  - name: webhook_url
+    type: secret-input
+    required: true
+    label:
+      en_US: Mattermost Incoming Webhook URL
+      zh_Hans: Mattermost 中的 传入Webhook 网址
+      ja_Jp: Mattermostの受信Webhook URL
+      pt_BR: URL do Webhook de entrada no Mattermost
+    human_description:
+      en_US: Mattermost Incoming Webhook URL
+      zh_Hans: Mattermost 中的 传入Webhook 网址
+      ja_Jp: Mattermostの受信Webhook URL
+      pt_BR: URL do Webhook de entrada no Mattermost
+    llm_description: Mattermost Incoming Webhook URL
+    form: form
+extra:
+  python:
+    source: tools/incoming_hook.py

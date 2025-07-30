@@ -1,0 +1,30 @@
+identity:
+  name: agentapi
+  author: stvlynn
+  label:
+    en_US: agentapi
+    zh_Hans: agentapi
+    pt_BR: agentapi
+description:
+  human:
+    en_US: agentapi
+    zh_Hans: agentapi
+    pt_BR: agentapi
+  llm: agentapi
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: agentapi
+      zh_Hans: agentapi
+      pt_BR: agentapi
+    llm_description: agentapi
+    form: llm
+extra:
+  python:
+    source: tools/agentapi.py

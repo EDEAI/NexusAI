@@ -1,0 +1,157 @@
+identity:
+  name: rookie_excute_sql
+  author: jaguarliuu
+  label:
+    en_US: rookie_excute_sql
+    zh_Hans: rookie_excute_sql
+    pt_BR: rookie_excute_sql
+description:
+  human:
+    en_US: excute sql
+    zh_Hans: sql 执行器
+    pt_BR: excute sql
+  llm: excute sql
+parameters:
+  - name: db_type
+    type: select
+    required: true
+    form: form
+    label:
+      en_US: Database type
+      zh_Hans: 数据库类型
+      pt_BR: Database type
+    human_description:
+      en_US: Database type
+      zh_Hans: 数据库类型
+      pt_BR: Database type
+    llm_description: Database type
+    options:
+      - label:
+          en_US: MySQL
+        value: mysql
+      - label:
+          en_US: PostgreSQL
+        value: postgresql
+  - name: host
+    type: string
+    required: true
+    form: form
+    label:
+      en_US: Database ip/host
+      zh_Hans: 数据库IP/域名
+      pt_BR: Database ip/host
+    human_description:
+      en_US: Database ip/host
+      zh_Hans: 数据库IP/域名
+      pt_BR: Database ip/host
+    llm_description: Database ip/host
+  - name: port
+    type: number
+    required: true
+    form: form
+    min: 1
+    max: 65535
+    label:
+      en_US: Database port
+      zh_Hans: 数据库端口
+      pt_BR: Database port
+    human_description:
+      en_US: Database port
+      zh_Hans: 数据库端口
+      pt_BR: Database port
+    llm_description: Database port
+  - name: db_name
+    type: string
+    required: true
+    form: form
+    label:
+      en_US: Database name
+      zh_Hans: 数据库名称
+      pt_BR: Database name
+    human_description:
+      en_US: Database name
+      zh_Hans: 数据库名称
+      pt_BR: Database name
+    llm_description: Database name
+  - name: username
+    type: string
+    required: true
+    form: form
+    label:
+      en_US: Username
+      zh_Hans: 用户名
+      pt_BR: Username
+    human_description:
+      en_US: Username
+      zh_Hans: 用户名
+      pt_BR: Username
+    llm_description: Username
+  - name: password
+    type: secret-input
+    required: true
+    form: form
+    label:
+      en_US: Password
+      zh_Hans: 密码
+      pt_BR: Password
+    human_description:
+      en_US: Password
+      zh_Hans: 密码
+      pt_BR: Password
+    llm_description: Password
+  - name: schema
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: Schema name
+      zh_Hans: 数据库Schema PGSQL用户选填，默认为public
+      pt_BR: Schema name
+    human_description:
+      en_US: Schema name
+      zh_Hans: 数据库Schema PGSQL用户选填，默认为public
+      pt_BR: Schema name
+    llm_description: Schema name
+  - name: sql
+    type: string
+    required: true
+    label:
+      en_US: SQL string
+      zh_Hans: 待执行的 SQL 语句
+      pt_BR: SQL string
+    human_description:
+      en_US: Fetching data from the database using natural language.
+      zh_Hans: Fetching data from the database using natural language.
+      pt_BR: Fetching data from the database using natural language.
+    llm_description: Fetching data from the database using natural language.
+    form: llm
+  - name: result_format
+    type: select
+    required: false
+    label:
+      en_US: result_format
+      zh_Hans: 返回数据格式
+      pt_BR: result_format
+    human_description:
+      en_US: result_format
+      zh_Hans: 返回数据格式
+      pt_BR: result_format
+    llm_description: result_format
+    form: form
+    default: json
+    options:
+      - label:
+          en_US: JSON
+          zh_Hans: JSON
+        value: json
+      - label:
+          en_US: TEXT
+          zh_Hans: TEXT
+        value: text
+      - label:
+          en_US: CSV
+          zh_Hans: CSV
+        value: csv
+extra:
+  python:
+    source: tools/rookie_excute_sql.py

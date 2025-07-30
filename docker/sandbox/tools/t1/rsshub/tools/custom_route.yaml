@@ -1,0 +1,70 @@
+identity:
+  name: custom_route
+  author: stvlynn
+  label:
+    en_US: Custom Route
+    zh_Hans: 自定义路由
+    ja_JP: カスタムルート
+description:
+  human:
+    en_US: Get RSS feeds from RSSHub using a custom route
+    zh_Hans: 使用自定义路由从RSSHub获取RSS订阅源
+    ja_JP: カスタムルートを使用してRSSHubからRSSフィードを取得
+  llm: "A tool to fetch RSS feeds from RSSHub using any custom route path."
+parameters:
+  - name: base_url
+    type: string
+    required: false
+    default: "https://rsshub.app"
+    label:
+      en_US: RSSHub Base URL
+      zh_Hans: RSSHub基础URL
+      ja_JP: RSSHubベースURL
+    human_description:
+      en_US: "The base URL of RSSHub instance (default is https://rsshub.app)"
+      zh_Hans: "RSSHub实例的基础URL（默认为https://rsshub.app）"
+      ja_JP: "RSSHubインスタンスのベースURL（デフォルトはhttps://rsshub.app）"
+    llm_description: "The base URL of RSSHub instance (default is https://rsshub.app)"
+    form: form
+  - name: access_key
+    type: string
+    required: false
+    label:
+      en_US: RSSHub Access Key
+      zh_Hans: RSSHub访问密钥
+      ja_JP: RSSHubアクセスキー
+    human_description:
+      en_US: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+      zh_Hans: "RSSHub路由的访问密钥（例如：ILoveRSSHub）。如不需要请留空。"
+      ja_JP: "RSSHubルートのアクセスキー（例：ILoveRSSHub）。必要ない場合は空のままにしてください。"
+    llm_description: "Access key for RSSHub routes (e.g. ILoveRSSHub). Leave empty if not needed."
+    form: form
+  - name: route
+    type: string
+    required: true
+    label:
+      en_US: RSSHub Route
+      zh_Hans: RSSHub路由
+      ja_JP: RSSHubルート
+    human_description:
+      en_US: "The RSSHub route path (e.g. /zhihu/hot, /sspai/matrix)"
+      zh_Hans: "RSSHub的路由路径（例如：/zhihu/hot, /sspai/matrix）"
+      ja_JP: "RSSHubのルートパス（例：/zhihu/hot, /sspai/matrix）"
+    llm_description: "The RSSHub route path without the base URL (e.g. /zhihu/hot, /sspai/matrix)"
+    form: llm
+  - name: limit
+    type: number
+    required: false
+    label:
+      en_US: Item Limit
+      zh_Hans: 条目数量限制
+      ja_JP: アイテム数制限
+    human_description:
+      en_US: "Maximum number of items to return (default: 10)"
+      zh_Hans: "返回的最大条目数量（默认：10）"
+      ja_JP: "返される最大アイテム数（デフォルト：10）"
+    llm_description: "Maximum number of items to return (default: 10)"
+    form: llm
+extra:
+  python:
+    source: tools/rsshub.py

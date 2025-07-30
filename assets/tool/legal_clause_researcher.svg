@@ -1,0 +1,31 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Grid -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e0e0" stroke-width="1"></path>
+    </pattern>
+  </defs>
+  <rect width="240" height="240" fill="#ffffff"></rect>
+  <rect width="240" height="240" fill="url(#grid)" opacity="0.2"></rect>
+
+  <!-- Legal Document -->
+  <rect x="60" y="60" width="80" height="100" rx="8" fill="#3F51B5"></rect>
+  <path d="M60 60 L100 60 L110 70 L110 160 L60 160 Z" fill="#5C6BC0"></path>
+  <line x1="70" y1="80" x2="100" y2="80" stroke="#ffffff" stroke-width="2"></line>
+  <line x1="70" y1="95" x2="100" y2="95" stroke="#ffffff" stroke-width="2"></line>
+  <line x1="70" y1="110" x2="100" y2="110" stroke="#ffffff" stroke-width="2"></line>
+
+  <!-- Section Symbol (§) -->
+  <text x="150" y="125" font-size="48" font-family="Georgia, serif" fill="#333">
+    §
+  </text>
+
+  <!-- Plugin Prongs -->
+  <rect x="30" y="200" width="10" height="25" rx="2" fill="#333"></rect>
+  <rect x="48" y="200" width="10" height="25" rx="2" fill="#333"></rect>
+
+  <!-- Optional Text -->
+  <!-- <text x="120" y="230" font-size="14" font-family="Segoe UI, sans-serif" text-anchor="middle" fill="#333">
+    Legal Clause Plugin
+  </text> -->
+</svg>

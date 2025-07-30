@@ -1,0 +1,17 @@
+identity:
+  author: "hjlarry"
+  name: "mermaid_converter"
+  label:
+    en_US: "Mermaid Converter"
+    zh_Hans: "Mermaid转换器"
+    pt_BR: "Conversor Mermaid"
+  description:
+    en_US: "Convert Mermaid diagram code to images (PNG, JPG, PDF, SVG)"
+    zh_Hans: "将Mermaid图表代码转换为图像（PNG、JPG、PDF、SVG）"
+    pt_BR: "Converte código de diagrama Mermaid para imagens (PNG, JPG, PDF, SVG)"
+  icon: "icon.svg"
+tools:
+  - tools/mermaid_converter.yaml
+extra:
+  python:
+    source: provider/mermaid_provider.py

@@ -1,0 +1,52 @@
+identity:
+  name: decode-coordinates
+  author: ayush3941
+  label:
+    en_US: Decode Coordinates to Location
+    zh_Hans: 坐标转地址
+    pt_BR: Decodificar Coordenadas para Endereço
+  icon: "icon.png"
+  description:
+    en_US: Get the place name for given coordinates using the OpenCage API.
+    zh_Hans: 使用 OpenCage API 将坐标转换为地点名称。
+    pt_BR: Obtenha o nome do local a partir das coordenadas usando a API OpenCage.
+
+description:
+  human:
+    en_US: Convert latitude and longitude into a readable location name
+    zh_Hans: 将纬度和经度转换为可读的地点名称
+    pt_BR: Converta latitude e longitude em um nome de local legível
+  llm: Convert coordinates into a human-readable location using reverse geocoding
+
+parameters:
+  - name: latitude
+    type: number
+    required: true
+    label:
+      en_US: Latitude
+      zh_Hans: 纬度
+      pt_BR: Latitude
+    human_description:
+      en_US: The latitude of the place you want to decode (e.g. 40.7128)
+      zh_Hans: 您想要解码的地点纬度（例如：40.7128）
+      pt_BR: 'A latitude do local que deseja decodificar (ex: 40.7128)'
+    llm_description: Latitude value to reverse geocode
+    form: llm
+
+  - name: longitude
+    type: number
+    required: true
+    label:
+      en_US: Longitude
+      zh_Hans: 经度
+      pt_BR: Longitude
+    human_description:
+      en_US: The longitude of the place you want to decode (e.g. -74.0060)
+      zh_Hans: 您想要解码的地点经度（例如：-74.0060）
+      pt_BR: 'A longitude do local que deseja decodificar (ex: -74.0060)'
+    llm_description: Longitude value to reverse geocode
+    form: llm
+
+extra:
+  python:
+    source: tools/decode_coordinates.py

@@ -1,0 +1,51 @@
+identity:
+  author: Ayush3941
+  name: tripmg
+  label:
+    en_US: Trip Manager (Amadeus)
+    ja_JP: トリップマネージャー（Amadeus）
+    zh_Hans: 行程管理器（Amadeus）
+  description:
+    en_US: Travel assistant powered by Amadeus API for real-time flight and hotel searches.
+    ja_JP: Amadeus API によるリアルタイムのフライトとホテル検索を提供する旅行アシスタントです。
+    zh_Hans: 基于 Amadeus API 的旅行助手，提供实时航班与酒店搜索。
+  icon: icon.png
+
+credentials_for_provider:
+  api_key:
+    type: text-input
+    required: true
+    label:
+      en_US: Amadeus API Key
+      zh_Hans: Amadeus API 密钥
+    placeholder:
+      en_US: Enter your Amadeus API Key
+      zh_Hans: 请输入您的 Amadeus API 密钥
+    help:
+      en_US: Obtain it from Amadeus developer portal
+      zh_Hans: 请从 Amadeus 开发者平台获取
+    url: https://developers.amadeus.com/
+
+  api_secret:
+    type: secret-input
+    required: true
+    label:
+      en_US: Amadeus API Secret
+      zh_Hans: Amadeus API 密钥（Secret）
+    placeholder:
+      en_US: Enter your Amadeus API Secret
+      zh_Hans: 请输入您的 Amadeus API Secret
+    help:
+      en_US: Obtain it from Amadeus developer portal
+      zh_Hans: 请从 Amadeus 开发者平台获取
+    url: https://developers.amadeus.com/
+
+tools:
+  - tools/search-flights.yaml
+  - tools/search-hotels.yaml
+  - tools/itinery-price-estimation.yaml
+  - tools/get-points-of-interest.yaml
+
+extra:
+  python:
+    source: provider/tripmg.py

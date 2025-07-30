@@ -1,0 +1,34 @@
+identity:
+  name: init_session
+  author: obadakhalili
+  label:
+    en_US: Initialize session
+
+description:
+  human:
+    en_US: Creates a new Zep session or ensures one exists for the conversation
+  llm: Creates a new Zep session or ensures one exists for the conversation
+
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+    human_description:
+      en_US: The user ID to initialize a session for
+    llm_description: The user ID to initialize a session for
+    form: llm
+  - name: session_id
+    type: string
+    required: true
+    label:
+      en_US: Session ID
+    human_description:
+      en_US: The ID of the session to initialize
+    llm_description: The ID of the session to initialize
+    form: llm
+
+extra:
+  python:
+    source: tools/init_session.py 

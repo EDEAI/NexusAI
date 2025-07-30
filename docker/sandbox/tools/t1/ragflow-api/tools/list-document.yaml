@@ -1,0 +1,37 @@
+identity:
+  name: list-document
+  author: witmeng
+  label:
+    en_US: list document ID
+    zh_Hans: 查找文件ID
+description:
+  human:
+    en_US: list document
+    zh_Hans: 根據名稱查找文件ID
+  llm: list document
+parameters:
+  - form: llm
+    human_description:
+      en_US: datasets id
+      zh_Hans: 數據集ID
+    label:
+      en_US: datasets id
+      zh_Hans: 數據集ID
+    llm_description:  數據集ID
+    name: datasets_id
+    required: true
+    type: string 
+  - form: llm
+    human_description:
+      en_US: document name
+      zh_Hans: 文件名稱（全量匹配）
+    label:
+      en_US: document name
+      zh_Hans: document name
+    llm_description: 文件名稱（全量匹配）
+    name: name
+    required: true
+    type: string   
+extra:
+  python:
+    source: tools/list-document.py

@@ -1,0 +1,26 @@
+description:
+  human:
+    en_US: A tool for getting SMILES from a Molecule name.
+    zh_Hans: 一个用于从分子名称获取SMILES的工具。
+  llm: A tool for getting SMILES from a Molecule name.
+extra:
+  python:
+    source: tools/name_to_smiles.py
+identity:
+  author: s20ss
+  label:
+    en_US: Name to SMILES Converter
+    zh_Hans: 名称转SMILES转换器
+  name: name_to_smiles
+parameters:
+- form: llm
+  human_description:
+    en_US: Name of the molecule to convert to SMILES.
+    zh_Hans: 要转换为SMILES的分子名称。
+  label:
+    en_US: Molecule Name
+    zh_Hans: Molecule Name
+  llm_description: "Name of the molecule to convert to SMILES."
+  name: molecule_name
+  required: true
+  type: string

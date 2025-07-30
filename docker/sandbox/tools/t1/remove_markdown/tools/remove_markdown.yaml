@@ -1,0 +1,24 @@
+identity:
+  name: remove_markdown
+  author: mystery0
+  label:
+    en_US: Remove Markdown
+description:
+  human:
+    en_US: Remove Markdown formatting from LLM output
+  llm: Remove Markdown formatting from LLM output
+parameters:
+  - name: text
+    type: string
+    required: true
+    label:
+      en_US: Text
+      zh_Hans: 文本
+      pt_BR: Texto
+    human_description:
+      en_US: Text that needs Markdown formatting removed
+    llm_description: Text that needs Markdown formatting removed
+    form: llm
+extra:
+  python:
+    source: tools/remove_markdown.py

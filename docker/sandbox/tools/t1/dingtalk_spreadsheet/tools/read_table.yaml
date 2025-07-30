@@ -1,0 +1,37 @@
+description:
+  human:
+    en_US: List Spreadsheet Sheets
+    zh_Hans: 列出电子表格所有工作表
+  llm: A tool for listing all sheets in a spreadsheet. (列出电子表格所有工作表)
+extra:
+  python:
+    source: tools/read_table.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: List Spreadsheet Sheets
+    zh_Hans: 列出电子表格所有工作表
+  name: read_table
+parameters:
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Spreadsheet ID or URL, e.g., XXXXSlNkL2dUTCJcPRgentXXX or https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+    zh_Hans: 电子表格的ID或者URL，如：XXXXSlNkL2dUTCJcPRgentXXX或者https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+  label:
+    en_US: Spreadsheet ID or URL
+    zh_Hans: 表格的ID或者URL
+  llm_description: 电子表格的ID或者URL，如：XXXXSlNkL2dUTCJcPRgentXXX或者https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+  name: table_id
+  required: true
+  type: string

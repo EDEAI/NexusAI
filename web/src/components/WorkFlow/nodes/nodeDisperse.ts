@@ -327,8 +327,8 @@ export const NodeCustom = {
                     '将任务数据递归分配至执行器，最终生成带有任务执行结果的完整任务数据，仍然是原有可递归结构，以便下游的任务执行节点继续使用',
                 endescTools:
                     'Recursively assign task data to executors, ultimately generating complete task data with execution results, maintaining the original recursive structure for downstream nodes',
-                outputInfo: {
-                    key: 'output',
+                outputInfo: { 
+                    key: 'output', 
                     type: 'string',
                     base: true,
                 },

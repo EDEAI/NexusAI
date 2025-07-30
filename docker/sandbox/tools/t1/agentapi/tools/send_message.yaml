@@ -1,0 +1,63 @@
+identity:
+  name: send_message
+  author: stvlynn
+  label:
+    en_US: Send Message
+    zh_Hans: 发送消息
+    pt_BR: Enviar Mensagem
+    ja_JP: メッセージを送信
+description:
+  human:
+    en_US: Send a message to the AgentAPI agent.
+    zh_Hans: 向 AgentAPI 代理发送消息。
+    pt_BR: Envie uma mensagem para o agente AgentAPI.
+    ja_JP: AgentAPI エージェントにメッセージを送信します。
+  llm: Sends a message to the agent. Can be a 'user' message to be logged in history or a 'raw' message for direct terminal input.
+parameters:
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: Message Content
+      zh_Hans: 消息内容
+      pt_BR: Conteúdo da Mensagem
+      ja_JP: メッセージ内容
+    human_description:
+      en_US: The content of the message to send.
+      zh_Hans: 要发送的消息内容。
+      pt_BR: O conteúdo da mensagem a ser enviada.
+      ja_JP: 送信するメッセージの内容。
+    llm_description: The content of the message to send to the agent.
+    form: llm
+  - name: type
+    type: select
+    required: true
+    default: user
+    options:
+      - value: user
+        label:
+          en_US: User
+          zh_Hans: 用户
+          pt_BR: Usuário
+          ja_JP: ユーザー
+      - value: raw
+        label:
+          en_US: Raw
+          zh_Hans: 原始
+          pt_BR: Bruto
+          ja_JP: 生
+    label:
+      en_US: Message Type
+      zh_Hans: 消息类型
+      pt_BR: Tipo de Mensagem
+      ja_JP: メッセージタイプ
+    human_description:
+      en_US: Type of message to send. 'user' for conversation, 'raw' for direct terminal input.
+      zh_Hans: 要发送的消息类型。“user”用于对话，“raw”用于直接终端输入。
+      pt_BR: Tipo de mensagem a ser enviada. 'user' para conversa, 'raw' para entrada direta no terminal.
+      ja_JP: 送信するメッセージのタイプ。「user」は会話用、「raw」は直接的なターミナル入力用です。
+    llm_description: The type of message. Use 'user' for conversational messages that should be part of the history. Use 'raw' for sending raw keystrokes or escape sequences directly to the agent's terminal.
+    form: llm
+extra:
+  python:
+    source: tools/send_message.py

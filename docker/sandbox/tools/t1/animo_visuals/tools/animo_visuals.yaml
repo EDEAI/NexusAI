@@ -1,0 +1,30 @@
+identity:
+  name: "animo_visuals"
+  author: "pragnyan_ramtha"
+  label:
+    en_US: "animo_visuals"
+    zh_Hans: "animo_visuals"
+    pt_BR: "animo_visuals"
+description:
+  human:
+    en_US: "generate stunning visual animations with animo api"
+    zh_Hans: "generate stunning visual animations with animo api"
+    pt_BR: "generate stunning visual animations with animo api"
+  llm: "generate stunning visual animations with animo api"
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query string
+      zh_Hans: 查询语句
+      pt_BR: Query string
+    human_description:
+      en_US: "generate stunning visual animations with animo api"
+      zh_Hans: "generate stunning visual animations with animo api"
+      pt_BR: "generate stunning visual animations with animo api"
+    llm_description: "generate stunning visual animations with animo api"
+    form: llm
+extra:
+  python:
+    source: tools/animo_visuals.py

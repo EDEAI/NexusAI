@@ -1,0 +1,244 @@
+identity:
+  name: update_user
+  author: yasu89
+  label:
+    en_US: Update a User
+    zh_Hans: 更新用户
+    pt_BR: Atualizar um Usuário
+    ja_JP: ユーザーを更新
+description:
+  human:
+    en_US: Update an existing user in Redmine
+    zh_Hans: 更新Redmine中的现有用户
+    pt_BR: Atualizar um usuário existente no Redmine
+    ja_JP: Redmineの既存のユーザーを更新
+  llm: Update an existing user in a Redmine project management system with specified parameters
+parameters:
+  - name: user_id
+    type: string
+    required: true
+    label:
+      en_US: User ID
+      zh_Hans: 用户ID
+      pt_BR: ID do Usuário
+      ja_JP: ユーザーID
+    human_description:
+      en_US: The numeric ID of the user to update
+      zh_Hans: 要更新的用户的数字ID
+      pt_BR: O ID numérico do usuário a ser atualizado
+      ja_JP: 更新するユーザーの数値ID
+    placeholder:
+      en_US: "123"
+      zh_Hans: "123"
+      pt_BR: "123"
+      ja_JP: "123"
+    llm_description: The numeric ID of the specific user to update
+    form: llm
+  - name: login
+    type: string
+    required: false
+    label:
+      en_US: Login
+      zh_Hans: 登录名
+      pt_BR: Login
+      ja_JP: ログイン名
+    human_description:
+      en_US: New user login name (unique identifier)
+      zh_Hans: 新的用户登录名（唯一标识符）
+      pt_BR: Novo nome de login do usuário (identificador único)
+      ja_JP: 新しいユーザーログイン名（一意識別子）
+    placeholder:
+      en_US: "jsmith"
+      zh_Hans: "zhangsan"
+      pt_BR: "jsilva"
+      ja_JP: "tanaka"
+    llm_description: New login name for the user
+    form: llm
+  - name: password
+    type: secret-input
+    required: false
+    label:
+      en_US: Password
+      zh_Hans: 密码
+      pt_BR: Senha
+      ja_JP: パスワード
+    human_description:
+      en_US: New user password
+      zh_Hans: 新的用户密码
+      pt_BR: Nova senha do usuário
+      ja_JP: 新しいユーザーパスワード
+    placeholder:
+      en_US: "SecurePassword123"
+      zh_Hans: "安全密码123"
+      pt_BR: "SenhaSegura123"
+      ja_JP: "安全なパスワード123"
+    llm_description: New password for the user
+    form: llm
+  - name: firstname
+    type: string
+    required: false
+    label:
+      en_US: First Name
+      zh_Hans: 名字
+      pt_BR: Nome
+      ja_JP: 名前
+    human_description:
+      en_US: User's new first name
+      zh_Hans: 用户的新名字
+      pt_BR: Novo nome do usuário
+      ja_JP: ユーザーの新しい名前
+    placeholder:
+      en_US: "John"
+      zh_Hans: "三"
+      pt_BR: "João"
+      ja_JP: "太郎"
+    llm_description: New first name of the user
+    form: llm
+  - name: lastname
+    type: string
+    required: false
+    label:
+      en_US: Last Name
+      zh_Hans: 姓氏
+      pt_BR: Sobrenome
+      ja_JP: 姓
+    human_description:
+      en_US: User's new last name
+      zh_Hans: 用户的新姓氏
+      pt_BR: Novo sobrenome do usuário
+      ja_JP: ユーザーの新しい姓
+    placeholder:
+      en_US: "Smith"
+      zh_Hans: "张"
+      pt_BR: "Silva"
+      ja_JP: "田中"
+    llm_description: New last name of the user
+    form: llm
+  - name: mail
+    type: string
+    required: false
+    label:
+      en_US: Email
+      zh_Hans: 邮箱
+      pt_BR: Email
+      ja_JP: メール
+    human_description:
+      en_US: User's new email address
+      zh_Hans: 用户的新邮箱地址
+      pt_BR: Novo endereço de email do usuário
+      ja_JP: ユーザーの新しいメールアドレス
+    placeholder:
+      en_US: "john.smith@example.com"
+      zh_Hans: "zhangsan@example.com"
+      pt_BR: "joao.silva@example.com"
+      ja_JP: "tanaka@example.com"
+    llm_description: New email address for the user
+    form: llm
+  - name: auth_source_id
+    type: string
+    required: false
+    label:
+      en_US: Auth Source ID
+      zh_Hans: 认证源ID
+      pt_BR: ID da Fonte de Autenticação
+      ja_JP: 認証ソースID
+    human_description:
+      en_US: Authentication source ID (for LDAP or other external auth)
+      zh_Hans: 认证源ID（用于LDAP或其他外部认证）
+      pt_BR: ID da fonte de autenticação (para LDAP ou outra autenticação externa)
+      ja_JP: 認証ソースID（LDAPまたはその他の外部認証用）
+    placeholder:
+      en_US: "2"
+      zh_Hans: "2"
+      pt_BR: "2"
+      ja_JP: "2"
+    llm_description: Authentication source ID for external authentication systems
+    form: llm
+  - name: mail_notification
+    type: string
+    required: false
+    label:
+      en_US: Mail Notification
+      zh_Hans: 邮件通知
+      pt_BR: Notificação por Email
+      ja_JP: メール通知
+    human_description:
+      en_US: "Email notification preference (only_my_events, none, all, selected, only_assigned, only_owner)"
+      zh_Hans: "邮件通知偏好（only_my_events, none, all, selected, only_assigned, only_owner）"
+      pt_BR: "Preferência de notificação por email (only_my_events, none, all, selected, only_assigned, only_owner)"
+      ja_JP: "メール通知設定（only_my_events, none, all, selected, only_assigned, only_owner）"
+    placeholder:
+      en_US: "only_my_events"
+      zh_Hans: "only_my_events"
+      pt_BR: "only_my_events"
+      ja_JP: "only_my_events"
+    llm_description: Email notification preference for the user
+    form: llm
+  - name: must_change_passwd
+    type: boolean
+    required: false
+    label:
+      en_US: Must Change Password
+      zh_Hans: 必须更改密码
+      pt_BR: Deve Alterar Senha
+      ja_JP: パスワード変更必須
+    human_description:
+      en_US: Whether user must change password on next login
+      zh_Hans: 用户是否必须在下次登录时更改密码
+      pt_BR: Se o usuário deve alterar a senha no próximo login
+      ja_JP: ユーザーが次回ログイン時にパスワードを変更する必要があるかどうか
+    llm_description: Whether user must change password on next login
+    form: llm
+  - name: generate_password
+    type: boolean
+    required: false
+    label:
+      en_US: Generate Password
+      zh_Hans: 生成密码
+      pt_BR: Gerar Senha
+      ja_JP: パスワード生成
+    human_description:
+      en_US: Whether to automatically generate a new password for the user
+      zh_Hans: 是否为用户自动生成新密码
+      pt_BR: Se deve gerar automaticamente uma nova senha para o usuário
+      ja_JP: ユーザーの新しいパスワードを自動生成するかどうか
+    llm_description: Whether to automatically generate a new password for the user
+    form: llm
+  - name: custom_fields
+    type: string
+    required: false
+    label:
+      en_US: Custom Fields
+      zh_Hans: 自定义字段
+      pt_BR: Campos Personalizados
+      ja_JP: カスタムフィールド
+    human_description:
+      en_US: "Custom fields as JSON string (e.g., [{\"id\":1,\"value\":\"text\"},{\"id\":2,\"value\":[\"1\",\"2\"]}])"
+      zh_Hans: "自定义字段JSON字符串（例如：[{\"id\":1,\"value\":\"text\"},{\"id\":2,\"value\":[\"1\",\"2\"]}]）"
+      pt_BR: "Campos personalizados como string JSON (ex: [{\"id\":1,\"value\":\"text\"},{\"id\":2,\"value\":[\"1\",\"2\"]}])"
+      ja_JP: "カスタムフィールドのJSON文字列（例：[{\"id\":1,\"value\":\"text\"},{\"id\":2,\"value\":[\"1\",\"2\"]}]）"
+    placeholder:
+      en_US: "[{\"id\":1,\"value\":\"updated value\"}]"
+      zh_Hans: "[{\"id\":1,\"value\":\"更新的值\"}]"
+      pt_BR: "[{\"id\":1,\"value\":\"valor atualizado\"}]"
+      ja_JP: "[{\"id\":1,\"value\":\"更新された値\"}]"
+    llm_description: Custom fields as JSON array with id and value pairs
+    form: llm
+  - name: admin
+    type: boolean
+    required: false
+    label:
+      en_US: Admin Rights
+      zh_Hans: 管理员权限
+      pt_BR: Direitos de Administrador
+      ja_JP: 管理者権限
+    human_description:
+      en_US: Whether to grant or revoke admin rights for the user
+      zh_Hans: 是否为用户授予或撤销管理员权限
+      pt_BR: Se deve conceder ou revogar direitos de administrador para o usuário
+      ja_JP: ユーザーに管理者権限を付与または取り消すかどうか
+    llm_description: Whether to grant or revoke admin rights for the user
+    form: llm
+extra:
+  python:
+    source: tools/update_user.py

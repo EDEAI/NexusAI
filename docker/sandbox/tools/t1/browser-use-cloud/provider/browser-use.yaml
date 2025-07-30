@@ -1,0 +1,50 @@
+identity:
+  author: lysonober
+  name: browser-use-cloud
+  label:
+    en_US: "Browser Use Cloud"
+    zh_Hans: "Browser Use Cloud"
+    ja_JP: "Browser Use Cloud"
+    pt_BR: "Browser Use Cloud"
+  description:
+    en_US: "Introducing the Dify plugin version of Browser Use - a powerful tool that enables AI agents to control and interact with web browsers, providing seamless automation for web-based tasks."
+    zh_Hans: "Browser Use 的 Dify 插件版本 - 一个强大的工具，使 AI 代理能够控制和交互网页浏览器，为基于网络的任务提供无缝自动化。"
+    ja_JP: "Browser Use の Dify プラグインバージョン - AI エージェントがウェブブラウザを制御および操作できるようにする強力なツールで、ウェブベースのタスクのシームレスな自動化を提供します。"
+    pt_BR: "Apresentando a versão do plugin Dify do Browser Use - uma ferramenta poderosa que permite que agentes de IA controlem e interajam com navegadores da web, fornecendo automação perfeita para tarefas baseadas na web."
+  icon: icon.svg
+credentials_for_provider:
+  browser_use_api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: "Browser Use API Key"
+      zh_Hans: "Browser Use API 密钥"
+      ja_JP: "Browser Use API キー"
+      pt_BR: "Chave de API do Browser Use"
+    placeholder:
+      en_US: "Please input your Browser Use API key"
+      zh_Hans: "请输入您的 Browser Use API 密钥"
+      ja_JP: "Browser Use API キーを入力してください"
+      pt_BR: "Por favor, insira sua chave de API do Browser Use"
+    help:
+      en_US: "Get your Browser Use API key from cloud.browser-use.com/billing"
+      zh_Hans: "从 cloud.browser-use.com/billing 获取您的 Browser Use API 密钥"
+      ja_JP: "cloud.browser-use.com/billing から Browser Use API キーを取得する"
+      pt_BR: "Obtenha sua chave de API do Browser Use em cloud.browser-use.com/billing"
+    url: "https://cloud.browser-use.com/billing"
+tools:
+  - tools/ping.yaml
+  - tools/me.yaml
+  - tools/check_balance.yaml
+  - tools/run_task.yaml
+  - tools/get_task_status.yaml
+  - tools/get_task.yaml
+  - tools/stop_task.yaml
+  - tools/list_tasks.yaml
+  - tools/pause_task.yaml
+  - tools/resume_task.yaml
+  - tools/get_task_media.yaml
+  - tools/get_task_gif.yaml
+extra:
+  python:
+    source: provider/browser-use.py

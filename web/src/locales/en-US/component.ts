@@ -28,5 +28,5 @@ export default {
     'component.menu.arrange': 'Arrange',
     'component.menu.accessAPI': 'Access API',
     'component.tooltip.enableAPIFirst': 'Please enable the API first',
-    'component.menu.log': 'Log',
+    'component.menu.log': 'Log'
 };

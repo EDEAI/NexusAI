@@ -1,0 +1,137 @@
+identity:
+  name: bot_accounts
+  author: edtechools
+  label:
+    en_US: Send messages via the Bot account
+    zh_Hans: 通过Bot账号发送消息
+    ja_Jp: Botアカウント経由でメッセージを送信する
+    pt_BR: Enviar mensagens através da conta do bot
+description:
+  human:
+    en_US: Send messages via the Bot account
+    zh_Hans: 通过Bot账号发送消息
+    ja_Jp: Botアカウント経由でメッセージを送信する
+    pt_BR: Enviar mensagens através da conta do bot
+  llm: Send messages via the Bot account
+parameters:
+  - name: message
+    type: string
+    required: true
+    label:
+      en_US: The messages you want to send
+      zh_Hans: 要发送的消息
+      ja_Jp: 送信するメッセージ
+      pt_BR: Mensagem a ser enviada
+    human_description:
+      en_US: The messages you want to send
+      zh_Hans: 要发送的消息
+      ja_Jp: 送信するメッセージ
+      pt_BR: Mensagem a ser enviada
+    llm_description: The messages you want to send
+    form: llm
+  - name: channel_id
+    type: string
+    required: true
+    label:
+      en_US: Channel ID where the message will be sent
+      zh_Hans: 消息要发送到的频道的ID
+      ja_Jp: メッセージの送信先チャンネルのID
+      pt_BR: ID do canal de destino da mensagem
+    human_description:
+      en_US: Channel ID where the message will be sent
+      zh_Hans: 消息要发送到的频道的ID
+      ja_Jp: メッセージの送信先チャンネルのID
+      pt_BR: ID do canal de destino da mensagem
+    llm_description: Channel ID where the message will be sent
+    form: form
+  - name: message_type
+    type: select
+    required: true
+    options:
+      - label:
+          en_US: normal post
+          pt_BR: Postagem normal
+          ja_Jp: 通常の投稿
+          zh_Hans: 普通消息
+        value: normal
+      - label:
+          en_US: ephemeral post
+          pt_BR: Post efêmero
+          ja_Jp: エフェメラル投稿
+          zh_Hans: 即时消息
+        value: ephemeral
+    label:
+      en_US: Message type
+      zh_Hans: 消息的类型
+      ja_Jp: メッセージのタイプ
+      pt_BR: Tipo de mensagem
+    human_description:
+      en_US: Message type
+      zh_Hans: 消息的类型
+      ja_Jp: メッセージのタイプ
+      pt_BR: Tipo de mensagem
+    llm_description: TMessage type
+    form: form
+  - name: user_id
+    type: string
+    label:
+      en_US: The ID of the user to whom the instant message is to be sent
+      zh_Hans: 即时消息要发送给的用户的id
+      ja_Jp: インスタントメッセージの送信先ユーザーのID
+      pt_BR: O ID do usuário para quem a mensagem instantânea deve ser enviada
+    human_description:
+      en_US: The ID of the user to whom the instant message is to be sent
+      zh_Hans: 即时消息要发送给的用户的id
+      ja_Jp: インスタントメッセージの送信先ユーザーのID
+      pt_BR: O ID do usuário para quem a mensagem instantânea deve ser enviada
+    llm_description: The ID of the user to whom the instant message is to be sent
+    form: form
+  - name: bot_access_token
+    type: secret-input
+    required: true
+    label:
+      en_US: Bot access token
+      zh_Hans: Bot的访问令牌
+      ja_Jp: ボットのアクセストークン
+      pt_BR: Token de acesso do bot
+    human_description:
+      en_US: bot's access token
+      zh_Hans: bot的访问令牌
+      ja_Jp: ボットのアクセストークン
+      pt_BR: Token de acesso do bot
+    llm_description: Bot access token
+    form: form
+  - name: mattermost_domain
+    type: string
+    required: true
+    label:
+      en_US: Domain name for the Mattermost service
+      zh_Hans: 部署Mattermost服务的域名
+      ja_Jp: Mattermostサービスのドメイン名
+      pt_BR: Domínio para implantação do Mattermost.
+    human_description:
+      en_US: The domain name used to deploy the Mattermost service.
+      zh_Hans: 部署Mattermost服务的域名
+      ja_Jp: Mattermostサービスのドメイン名
+      pt_BR: O domínio para implantar o serviço Mattermost.
+    llm_description: The domain name used to deploy the Mattermost service
+    form: form
+  - name: mattermost_port
+    type: number
+    required: true
+    default: 443
+    label:
+      en_US: Mattermost service port
+      zh_Hans: Mattermost服务的运行端口
+      ja_Jp: Mattermostサービスの動作ポート
+      pt_BR: Porta do serviço Mattermost
+    human_description:
+      en_US: Operating port for the Mattermost service
+      zh_Hans: Mattermost服务的运行端口
+      ja_Jp: Mattermostサービスが使用するポート
+      pt_BR: Porta de operação do serviço Mattermost
+    llm_description: Mattermost service port
+    form: form
+extra:
+  python:
+    source: tools/bot_accounts.py

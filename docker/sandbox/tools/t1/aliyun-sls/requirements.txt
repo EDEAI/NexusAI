@@ -1,0 +1,2 @@
+dify_plugin>=0.2.0,<0.3.0
+aliyun-log-python-sdk>=0.6.63

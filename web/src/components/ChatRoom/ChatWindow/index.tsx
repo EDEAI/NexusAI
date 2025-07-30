@@ -10,6 +10,7 @@ import { useMessageHandler } from './MessageHandler';
 import { CurrentMessage } from './CurrentMessage';
 import { MCPToolRuntimeData } from '../types/mcp';
 import { prepareHistoryMessageForCurrent } from '../utils';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 
 interface chatwindowParameters {
     setisEnd?: any;
@@ -51,6 +52,9 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
         removeHistoryMessage,
         setCurrentMessageFromHistory,
     } = props;
+    
+    // Use context for setInstruction
+    const { setInstruction } = useChatRoomContext();
     
     const intl = useIntl();
     const { id: urlParamId } = useParams<{ id: string }>();

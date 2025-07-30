@@ -1,0 +1,38 @@
+description:
+  human:
+    en_US: Generate images based on user input, with image generation API provided
+      by Spark
+    pt_BR: Gerar imagens com base na entrada do usuário, com API de geração de imagem
+      fornecida pela Spark
+    zh_Hans: 根据用户的输入生成图片，由讯飞星火提供图片生成api
+  llm: spark_img_generation is a tool used to generate images from text
+extra:
+  python:
+    source: tools/spark_img_generation.py
+identity:
+  author: Onelevenvy
+  description:
+    en_US: Spark Image Generation
+    pt_BR: Geração de imagens Spark
+    zh_Hans: 图片生成
+  icon: icon.svg
+  label:
+    en_US: Spark Image Generation
+    pt_BR: Geração de imagens Spark
+    zh_Hans: 图片生成
+  name: spark_img_generation
+parameters:
+- form: llm
+  human_description:
+    en_US: Image prompt
+    pt_BR: Image prompt
+    zh_Hans: 图像提示词
+  label:
+    en_US: Prompt
+    pt_BR: Prompt
+    zh_Hans: 提示词
+  llm_description: Image prompt of spark_img_generation tooll, you should describe
+    the image you want to generate as a list of words as possible as detailed
+  name: prompt
+  required: true
+  type: string

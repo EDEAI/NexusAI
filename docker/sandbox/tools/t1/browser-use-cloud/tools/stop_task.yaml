@@ -1,0 +1,34 @@
+identity:
+  name: stop_task
+  author: lysonober
+  label:
+    en_US: "Stop Task"
+    zh_Hans: "停止任务"
+    ja_JP: "タスクを停止"
+    pt_BR: "Parar Tarefa"
+description:
+  human:
+    en_US: "Permanently stop a running browser automation task. Note that the task cannot be resumed after being stopped."
+    zh_Hans: "永久停止正在运行的浏览器自动化任务。请注意，任务停止后将无法恢复。"
+    ja_JP: "実行中のブラウザ自動化タスクを永久に停止します。停止後はタスクを再開できないことに注意してください。"
+    pt_BR: "Pare permanentemente uma tarefa de automação de navegador em execução. Observe que a tarefa não pode ser retomada após ser interrompida."
+  llm: "This tool permanently stops a running browser automation task. It makes a PUT request to the /api/v1/stop-task endpoint with the task ID as a query parameter. Once a task is stopped, it cannot be resumed - this is a permanent action. If you only want to temporarily halt execution with the ability to resume later, use the pause_task tool instead. The response is typically a simple confirmation message."
+parameters:
+  - name: task_id
+    type: string
+    required: true
+    label:
+      en_US: "Task ID"
+      zh_Hans: "任务 ID"
+      ja_JP: "タスク ID"
+      pt_BR: "ID da Tarefa"
+    human_description:
+      en_US: "The unique identifier of the task you want to stop. This is the ID returned when you created the task."
+      zh_Hans: "您想要停止的任务的唯一标识符。这是您创建任务时返回的 ID。"
+      ja_JP: "停止したいタスクの一意の識別子。これはタスク作成時に返された ID です。"
+      pt_BR: "O identificador único da tarefa que você deseja parar. Este é o ID retornado quando você criou a tarefa."
+    llm_description: "The unique identifier (ID) of the task you want to stop. This is the ID string that was returned when you created the task using the run_task tool. Be aware that stopping a task is permanent - the task cannot be resumed after being stopped."
+    form: llm
+extra:
+  python:
+    source: tools/stop_task.py

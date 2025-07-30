@@ -1,0 +1,83 @@
+identity:
+  name: SpeechSynthesis
+  author: dupdub-dify
+  label:
+    en_US: Speech Synthesis
+    zh_Hans: 语音合成
+    pt_BR: Speech Synthesis
+description:
+  human:
+    en_US: Speech Synthesis
+    zh_Hans: 语音合成
+    pt_BR: Speech Synthesis
+  llm: Speech Synthesis
+parameters:
+  - name: name
+    type: string
+    required: true
+    label:
+      en_US: Speaker Name
+      zh_Hans: 克隆名称
+      pt_BR: Speaker Name
+    human_description:
+      en_US: Speaker Name
+      zh_Hans: 克隆名称
+      pt_BR: Speaker Name
+    llm_description: Speaker Name
+    form: llm
+  - name: speaker
+    type: string
+    required: true
+    label:
+      en_US: speaker
+      zh_Hans: 发音人
+      pt_BR: speaker
+    human_description:
+      en_US: Identifier for the speaker whose voice will be used.
+      zh_Hans: 将使用其语音的说话者的标识符。
+      pt_BR: Identifier for the speaker whose voice will be used.
+    llm_description: Identifier for the speaker whose voice will be used.
+    form: llm
+  - name: speed
+    type: number
+    required: false
+    label:
+      en_US: speed
+      zh_Hans: 语速
+      pt_BR: speed
+    human_description:
+      en_US: Speed of the speech. Default is normal speed (1.0)
+      zh_Hans: 说话的速度。默认为正常速度1.0
+      pt_BR: Speed of the speech. Default is normal speed (1.0)
+    llm_description: Speed of the speech. Default is normal speed (1.0)
+    form: llm
+  - name: pitch
+    type: number
+    required: false
+    label:
+      en_US: pitch
+      zh_Hans: 语调
+      pt_BR: pitch
+    human_description:
+      en_US: Pitch of the speech. Default is standard pitch (0)
+      zh_Hans: 演讲的音高。默认值为标准间距0
+      pt_BR: Pitch of the speech. Default is standard pitch (0)
+    llm_description: Pitch of the speech. Default is standard pitch (0)
+    form: llm
+  - name: textList
+    type: string
+    required: true
+    label:
+      en_US: text
+      zh_Hans: 文本
+      pt_BR: text
+    human_description:
+      en_US: text segments to be dubbed
+      zh_Hans: 要配音的文本段
+      pt_BR: text segments to be dubbed
+    llm_description: text segments to be dubbed
+    form: llm
+extra:
+  python:
+    source: tools/dubbing.py
+

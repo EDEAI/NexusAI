@@ -1,0 +1,56 @@
+credentials_for_provider:
+  access_tokens:
+    help:
+      en_US: Get your GitLab access token from GitLab
+      zh_Hans: 从 GitLab 获取您的 access token
+    label:
+      en_US: GitLab access token
+      zh_Hans: GitLab access token
+    placeholder:
+      en_US: Please input your GitLab access token
+      zh_Hans: 请输入你的 GitLab access token
+    required: true
+    type: secret-input
+    url: https://docs.gitlab.com/16.9/ee/api/oauth2.html
+  site_url:
+    default: https://gitlab.com
+    help:
+      en_US: Find your GitLab url
+      zh_Hans: 找到你的 GitLab url
+    label:
+      en_US: GitLab site url
+      zh_Hans: GitLab site url
+    placeholder:
+      en_US: Please input your GitLab site url
+      zh_Hans: 请输入你的 GitLab site url
+    required: false
+    type: text-input
+    url: https://gitlab.com/help
+  ssl_verify:
+    default: true
+    help:
+      en_US: Whether to verify the SSL certificate
+      zh_Hans: 是否验证 SSL 证书
+    label:
+      en_US: Whether to verify the SSL certificate
+      zh_Hans: 是否验证 SSL 证书
+    required: false
+    type: boolean
+extra:
+  python:
+    source: provider/gitlab.py
+identity:
+  author: Leo.Wang
+  description:
+    en_US: GitLab plugin, API v4 only.
+    zh_Hans: 用于获取GitLab内容的插件，目前仅支持 API v4。
+  icon: gitlab.svg
+  label:
+    en_US: GitLab
+    zh_Hans: GitLab
+  name: gitlab
+tools:
+- tools/gitlab_files.yaml
+- tools/gitlab_commits.yaml
+- tools/gitlab_mergerequests.yaml
+- tools/gitlab_projects.yaml

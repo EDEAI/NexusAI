@@ -85,7 +85,7 @@ interface ToolsNodeListProps {
 
 export const ToolsNodeList = memo(({ items, onDragStart }: ToolsNodeListProps) => {
     const lang = getLocale() === 'en-US' ? 'en_US' : 'zh_Hans';
-
+    
     return (
         <div>
             {items.map((category, index) => (

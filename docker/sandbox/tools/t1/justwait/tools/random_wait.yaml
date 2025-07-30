@@ -1,0 +1,41 @@
+description:
+  human:
+    en_US: "Wait for a random number of seconds within a specified range"
+    zh_Hans: "在指定范围内随机等待秒数"
+  llm: A tool that pauses execution for a random number of seconds within a specified range. 
+    The random value follows a uniform distribution between min_seconds and max_seconds.
+extra:
+  python:
+    source: tools/random_wait.py
+identity:
+  author: "AGIMaster"
+  label:
+    en_US: Random Wait
+    zh_Hans: 随机等待
+  name: random_wait
+  description:
+    en_US: Wait for a random time within a range
+    zh_Hans: 在指定范围内随机等待
+parameters:
+- form: llm
+  human_description:
+    en_US: "The minimum number of seconds to wait"
+    zh_Hans: "最小等待秒数"
+  label:
+    en_US: Min Seconds
+    zh_Hans: 最小秒数
+  llm_description: The minimum number of seconds for the random wait
+  name: min_seconds
+  required: true
+  type: number
+- form: llm
+  human_description:
+    en_US: "The maximum number of seconds to wait"
+    zh_Hans: "最大等待秒数"
+  label:
+    en_US: Max Seconds
+    zh_Hans: 最大秒数
+  llm_description: The maximum number of seconds for the random wait
+  name: max_seconds
+  required: true
+  type: number

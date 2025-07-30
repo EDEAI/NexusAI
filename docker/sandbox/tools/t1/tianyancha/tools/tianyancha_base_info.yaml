@@ -1,0 +1,39 @@
+identity:
+  name: tianyancha-base-info
+  author: bdim
+  label:
+    en_US: Basic Info
+    zh_Hans: 基本信息
+description:
+  human:
+    en_US: Get basic company information from Tianyancha
+    zh_Hans: 获取企业基本信息
+  llm: 可以通过公司名称或 ID 获取企业基本信息，包括公司名称、类型、成立日期、经营状态、注册资本、法人、工商注册号、统一社会信用代码、组织机构代码、纳税人识别号等字段信息。
+parameters:
+  - name: company_keyword
+    type: string
+    required: true
+    label:
+      en_US: Company Keyword
+      zh_Hans: 公司关键词
+    human_description:
+      en_US: The name or ID of the company to search for
+      zh_Hans: 要查询的公司名称或ID
+    llm_description: 要查询的公司名称或 ID，例如"北京瑞莱智慧科技有限公司"或"3217633851"
+    form: llm
+extra:
+  python:
+    source: tools/tianyancha_base_info.py
+credentials:
+  - name: token
+    type: string
+    required: true
+    label: 
+      en_US: Tianyancha API Token
+      zh_Hans: 天眼查 API Token
+    placeholder:
+      en_US: Enter your Tianyancha API token
+      zh_Hans: 输入你的天眼查 API token
+    help:
+      en_US: You can get your token from Tianyancha data center -> My APIs
+      zh_Hans: 你可以从天眼查的数据中心 -> 我的接口中获取 token

@@ -1,0 +1,58 @@
+identity:
+  name: image_compression
+  author: liuxin
+  label:
+    en_US: ImageCompression
+    zh_Hans: 图片压缩
+    pt_BR: ImageCompression
+description:
+  human:
+    en_US: An image compression tool
+    zh_Hans: 图片压缩工具
+    pt_BR: An image compression tool
+  llm: An image compression tool
+parameters:
+  - name: input_image
+    type: files
+    required: true
+    label:
+      en_US: Image file
+      zh_Hans: 图片文件
+      pt_BR: Image file
+    human_description:
+      en_US: An image compression tool
+      zh_Hans: 用于图片压缩
+      pt_BR: An image compression tool
+    llm_description: An image compression tool
+    form: llm
+  - name: host_url
+    type: string
+    required: true
+    default: http://localhost:8000
+    label:
+      en_US: Host URL
+      zh_Hans: Dify 地址
+      pt_BR: Host URL
+    human_description:
+      en_US: The host URL for the image compression tool
+      zh_Hans: 用于图片URL的主机地址
+      pt_BR: The host URL for the image compression tool
+    llm_description: The host URL for the image compression tool
+    form: form
+  - name: target_size
+    type: number
+    required: true
+    default: 1
+    label:
+      en_US: Target size (MB)
+      zh_Hans: 目标大小（MB）
+      pt_BR: Target size (MB)
+    human_description:
+      en_US: The target size for the image
+      zh_Hans: 目标大小
+      pt_BR: The target size for the image
+    llm_description: The target size for the image compression tool
+    form: form
+extra:
+  python:
+    source: tools/image-compression.py

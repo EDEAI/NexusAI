@@ -1,0 +1,34 @@
+identity:
+  name: update_profile_config
+  author: acane0320
+  label:
+    en_US: Updates the current profile config
+    zh_Hans: 更新当前的配置文件
+    ja_Jp: 現在のプロファイル設定を更新します
+    pt_BR: Atualiza a configuração de perfil atual
+description:
+  human:
+    en_US: Updates the current profile entry for the user's memory profile
+    zh_Hans: 更新当前的配置文件
+    ja_Jp: 現在のプロファイルエントリを更新します
+    pt_BR: Atualiza a configuração de perfil atual
+  llm: Use this tool to update the current profile entry for the user's memory profile.
+parameters:
+  - name: profile_config
+    type: string
+    required: true
+    label:
+      en_US: Profile Config
+      zh_Hans: 配置文件
+      ja_Jp: プロファイル設定
+      pt_BR: Configuração de Perfil
+    human_description:
+      en_US: The profile configuration to update for the user's memory profile
+      zh_Hans: 要更新的用户记忆配置文件
+      ja_Jp: ユーザープロファイルの設定を更新します
+      pt_BR: A configuração de perfil a ser atualizada para o perfil de memória do usuário
+    llm_description: The profile configuration to update for the user's memory profile.
+    form: llm
+extra:
+  python:
+    source: tools/user_profile/update_profile_config.py

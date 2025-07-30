@@ -1,0 +1,45 @@
+identity:
+  name: delete_tweet
+  author: stvlynn
+  label:
+    en_US: Delete Tweet
+    ja_JP: ツイートを削除
+    zh_Hans: 删除推文
+description:
+  human:
+    en_US: Delete a tweet using the X API
+    ja_JP: X APIを使用してツイートを削除します
+    zh_Hans: 使用X API删除推文
+  llm: Delete an existing tweet using its ID via the X API V2 endpoint /2/tweets/:id
+parameters:
+  - name: tweet_id
+    type: string
+    required: true
+    label:
+      en_US: Tweet ID
+      ja_JP: ツイートID
+      zh_Hans: 推文ID
+    human_description:
+      en_US: The ID of the tweet to delete
+      ja_JP: 削除するツイートのID
+      zh_Hans: 要删除的推文的ID
+    llm_description: The ID of the tweet to delete, obtained when the tweet was published. Only tweets from the authenticated user can be deleted.
+    form: llm
+response:
+  success:
+    description:
+      en_US: The tweet was successfully deleted
+      ja_JP: ツイートが正常に削除されました
+      zh_Hans: 推文已成功删除
+    schema:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Success status
+        message:
+          type: string
+          description: Success message confirming tweet deletion
+extra:
+  python:
+    source: tools/delete_tweet.py

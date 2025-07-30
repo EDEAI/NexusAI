@@ -1,0 +1,15 @@
+identity:
+  author: junjiem
+  name: knowledge_extractor
+  label:
+    en_US: Knowledge Extractor
+    zh_Hans: 知识提取器
+  description:
+    en_US: Use LLM to Extract knowledge & summary from large text.
+    zh_Hans: 利用 LLM 从大文本中提取知识 & 总结摘要。
+  icon: icon.svg
+tools:
+  - tools/knowledge_extractor.yaml
+extra:
+  python:
+    source: provider/knowledge_extractor.py

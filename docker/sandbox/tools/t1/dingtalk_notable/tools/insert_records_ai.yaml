@@ -1,0 +1,59 @@
+description:
+  human:
+    en_US: Insert Records in AI Table Sheet
+    zh_Hans: 在AI表格数据表中插入记录
+  llm: A tool for inserting records in an AI Table sheet. (在AI表格数据表中插入记录)
+extra:
+  python:
+    source: tools/insert_records_ai.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: Insert Records in AI Table Sheet
+    zh_Hans: 在AI表格数据表中插入记录
+  name: insert_records_ai
+parameters:
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID of the AI Table (baseId)
+    zh_Hans: AI表格的ID (baseId)
+  label:
+    en_US: Base ID
+    zh_Hans: AI表格ID
+  llm_description: AI表格的ID (baseId)
+  name: base_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: The ID or name of the sheet
+    zh_Hans: 数据表ID或名称
+  label:
+    en_US: Sheet ID or Name
+    zh_Hans: 数据表ID或名称
+  llm_description: 数据表ID或名称
+  name: sheet_id_or_name
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: JSON array of records to insert, e.g., [{"fields":{"Field1":"Value1","Field2":100}}]
+    zh_Hans: 要插入的记录JSON数组，例如：[{"fields":{"字段1":"值1","字段2":100}}]
+  label:
+    en_US: Records
+    zh_Hans: 记录数据
+  llm_description: 要插入的记录JSON数组，例如：[{"fields":{"字段1":"值1","字段2":100}}]
+  name: records
+  required: true
+  type: string 

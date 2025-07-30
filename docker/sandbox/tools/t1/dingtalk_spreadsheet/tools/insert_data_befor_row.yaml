@@ -1,0 +1,107 @@
+description:
+  human:
+    en_US: Insert Data Before the Row
+    zh_Hans: 指定行向上新增多行数据
+  llm: A tool for Insert Data Before the Row（multiple rows） (指定行向上新增多行数据)
+extra:
+  python:
+    source: tools/insert_data_befor_row.py
+identity:
+  author: Wit Meng
+  label:
+    en_US: Insert Data Before the Row
+    zh_Hans: 指定行向上新增多行数据
+  name: insert_data_befor_row
+parameters:
+- form: llm
+  human_description:
+    en_US: the unionId of Operator
+    zh_Hans: 操作人的unionId
+  label:
+    en_US: the unionId
+    zh_Hans: 操作人的unionId
+  llm_description: 操作人的unionId
+  name: operator_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Spreadsheet ID or URL, e.g., XXXXSlNkL2dUTCJcPRgentXXX or https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+    zh_Hans: 电子表格的ID或者URL，如：XXXXSlNkL2dUTCJcPRgentXXX或者https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+  label:
+    en_US: Spreadsheet ID or URL
+    zh_Hans: 表格的ID或者URL
+  llm_description: 电子表格的ID或者URL，如：XXXXSlNkL2dUTCJcPRgentXXX或者https://alidocs.dingtalk.com/i/nodes/XXXXSlNkL2dUTCJcPRgentXXX
+  name: table_id
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: Sheet ID, either sheet_id or sheet_name must be filled.
+    zh_Hans: 工作表 ID，与 sheet_name 二者其一必填。
+  label:
+    en_US: sheet_id
+    zh_Hans: 工作表 ID
+  llm_description: 工作表 ID，与 sheet_name 二者其一必填。
+  name: sheet_id
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: Sheet name, either sheet_id or sheet_name must be filled.
+    zh_Hans: 工作表名称，与 sheet_id 二者其一必填。
+  label:
+    en_US: sheet_name
+    zh_Hans: 工作表名称
+  llm_description: 工作表名称，与 sheet_id 二者其一必填。
+  name: sheet_name
+  required: false
+  type: string
+- form: llm
+  human_description:
+    en_US: the Row number
+    zh_Hans: 指定的行号
+  label:
+    en_US: the Row number
+    zh_Hans: 指定的行号
+  llm_description: 指定具体的行号
+  name: start_row
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: the Count of Rows, 0 means automatic calculation
+    zh_Hans: 增加行数,0表示根据数据自动计算
+  label:
+    en_US: the Count of Rows
+    zh_Hans: 增加行数
+  llm_description: 增加行数
+  name: row_count
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: the Column code
+    zh_Hans: 数据指定列号（A-ZZ）
+  label:
+    en_US: the Column code
+    zh_Hans: 数据指定列号（A-ZZ）
+  llm_description: 从指定的列开始更新数据
+  name: start_col
+  required: true
+  type: string
+- form: llm
+  human_description:
+    en_US: 'Content of the new rows, array of objects in string format, each array
+      represents a row of table data, format like: [ [ "ID","Name","Age" ],[ 1,"Zhang
+      San",10 ],[ 2,"Li Si",11 ] ].
+
+      '
+    zh_Hans: 新增行的表格内容，数组对象字符串，每个数组一行表格数据，格式,如：[["编号","姓名","年龄"],[1,"张三",10],[2,"李四",11]]。
+  label:
+    en_US: values
+    zh_Hans: 插入表格的内容
+  llm_description: 新增行的表格内容，数组对象字符串，每个数组一行表格数据，格式,如：[["编号","姓名","年龄"],[1,"张三",10],[2,"李四",11]]。
+  name: values
+  required: false
+  type: string

@@ -11,7 +11,7 @@ from core.database.models.agent_abilities import AgentAbilities
 from core.database.models.agent_chat_messages import AgentChatMessages
 from core.database.models.agent_callable_items import AgentCallableItems
 
-from core.database.models import ChatroomAgentRelation
+from core.database.models import ChatroomAgentRelation, CustomTools, MCPToolUseRecords, Workflows
 from core.workflow.nodes import AgentNode
 from core.workflow.variables import create_variable_from_dict
 from core.llm.prompt import create_prompt_from_dict, Prompt
@@ -1167,6 +1167,8 @@ async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = 
         ]
         
     )
+    if not result:
+        return response_error(get_language_content("app_run_error"))
 
     if 'status' in result:
         result_status = result['status']
@@ -1195,8 +1197,45 @@ async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = 
     # result['prompt_data'] = {}
     # result['prompt_data'] = messages
     result['prompt_data'] = []
-    if not result:
-        return response_error(get_language_content("app_run_error"))
+
+    mcp_tool_use_records = []
+    for record in MCPToolUseRecords().get_mcp_tool_use_records_by_agent_run_id(app_run_id):
+        mcp_tool_use_record = {
+            'id': record['id'],
+            'name': record['tool_name'],
+            'files_to_upload': record['files_to_upload'],
+            'workflow_run_id': (
+                record['workflow_run_id']
+                if record['tool_name'].startswith('nexusai__workflow-')
+                else 0
+            ),
+            'workflow_confirmation_status': record['workflow_run_status'],
+            'args': record['args'],
+            'result': record['result']
+        }
+        # Get skill or workflow name
+        if record['tool_name'].startswith('nexusai__skill-'):
+            skill_id = record['skill_id']
+            skill = CustomTools().get_skill_by_id(skill_id)
+            if not skill:
+                mcp_tool_use_record['skill_or_workflow_name'] = 'Not found'
+            else:
+                app = Apps().get_app_by_id(skill['app_id'])
+                mcp_tool_use_record['skill_or_workflow_name'] = app['name']
+        elif record['tool_name'].startswith('nexusai__workflow-'):
+            workflow_id = record['workflow_id']
+            workflow = Workflows().get_workflow_app(workflow_id)
+            if not workflow:
+                mcp_tool_use_record['skill_or_workflow_name'] = 'Not found'
+            else:
+                mcp_tool_use_record['skill_or_workflow_name'] = workflow['name']
+        else:
+            mcp_tool_use_record['skill_or_workflow_name'] = None
+        
+        mcp_tool_use_records.append(mcp_tool_use_record)
+
+    result['mcp_tool_use_records'] = mcp_tool_use_records
+
     return response_success(result)
 
 
@@ -1411,14 +1450,17 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                 if app_info:
                     # Process avatar
                     if app_info.get("avatar"):
-                        app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
-                    # 只替换name, description, avatar
+                        if item['avatar'].find('head_icon') == -1:
+                            app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+                        else:
+                            app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
+                    # Only replace name, description, avatar
                     new_item["name"] = app_info.get("name", new_item.get("name"))
                     new_item["description"] = app_info.get("description", new_item.get("description"))
                     new_item["avatar"] = app_info.get("avatar", new_item.get("avatar"))
                     processed_assistants.append(new_item)
-                    # 查不到app_info时不加入
-                    # agent_id不存在时也不加入
+                    # Don't add when app_info is not found
+                    # Don't add when agent_id doesn't exist
         processed_data["assistants"] = processed_assistants
 
     # Process workflows
@@ -1440,14 +1482,17 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                 if app_info:
                     # Process avatar
                     if app_info.get("avatar"):
-                        app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
-                    # 只替换name, description, avatar
+                        if item['avatar'].find('head_icon') == -1:
+                            app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+                        else:
+                            app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
+                    # Only replace name, description, avatar
                     new_item["name"] = app_info.get("name", new_item.get("name"))
                     new_item["description"] = app_info.get("description", new_item.get("description"))
                     new_item["avatar"] = app_info.get("avatar", new_item.get("avatar"))
                     processed_workflows.append(new_item)
-                # 查不到app_info时不加入
-            # app_id不存在时也不加入
+                # Don't add when app_info is not found
+            # Don't add when app_id doesn't exist
         processed_data["workflows"] = processed_workflows
 
     # Process discussions
@@ -1472,8 +1517,11 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                 if app_info:
                     # Process avatar
                     if app_info.get("avatar"):
-                        app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
-                    # 更新name, description, avatar
+                        if item['avatar'].find('head_icon') == -1:
+                            app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
+                        else:
+                            app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
+                    # Update name, description, avatar
                     current_discussion = discussion_item.copy()
                     current_discussion["name"] = app_info.get("name", current_discussion.get("name"))
                     current_discussion["description"] = app_info.get("description", current_discussion.get("description"))
@@ -1484,7 +1532,10 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                     for item in processed_agent_list:
                         new_item = {key: value for key, value in item.items() if key not in ['user_id', 'active']}
                         if item.get('avatar'):
-                            item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                            if item['avatar'].find('head_icon') == -1:
+                                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                            else:
+                                item["avatar"] = f"{settings.ICON_URL}/{item['avatar']}"
                         processed_agent_list_cleaned.append(new_item)
                     current_discussion["agent_list"] = processed_agent_list_cleaned
                     processed_discussions.append(current_discussion)
@@ -1508,13 +1559,13 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
             #                 # Process avatar
             #                 if app_info.get("avatar"):
             #                     app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
-            #                 # 只替换name, description, avatar
+            #                 # Only replace name, description, avatar
             #                 new_agent_item["name"] = app_info.get("name", new_agent_item.get("name"))
             #                 new_agent_item["description"] = app_info.get("description", new_agent_item.get("description"))
             #                 new_agent_item["avatar"] = app_info.get("avatar", new_agent_item.get("avatar"))
             #                 processed_agent_list.append(new_agent_item)
-            #             # 查不到app_info时不加入
-            #         # agent_id不存在时也不加入
+            #             # Don't add when app_info is not found
+            #         # Don't add when agent_id doesn't exist
             #     # Replace the original agent_list with the processed one
             #     current_discussion["agent_list"] = processed_agent_list
 

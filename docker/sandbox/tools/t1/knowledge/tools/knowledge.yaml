@@ -1,0 +1,125 @@
+identity:
+  name: knowledge
+  author: hjlarry
+  label:
+    en_US: Create Document
+    zh_Hans: 创建文档
+description:
+  human:
+    en_US: Add the content produced by dify's workflow to its knowledge base
+    zh_Hans: 将dify的工作流生成的内容直接添加至其知识库
+  llm: Add the content produced by dify's workflow to its knowledge base
+parameters:
+  - name: text
+    type: string
+    required: true
+    label:
+      en_US: Content
+      zh_Hans: 内容
+    human_description:
+      en_US: the content you want to add to knowledge base
+      zh_Hans: 你想要添加到知识库的内容
+    llm_description: the content you want to add to knowledge base
+    form: llm
+  - name: dataset_id
+    type: string
+    required: true
+    label:
+      en_US: Dataset ID
+      zh_Hans: 数据集 ID
+    human_description:
+      en_US: which dataset you want to add to
+      zh_Hans: 你想要添加到哪个数据集
+    llm_description: which dataset you want to add to
+    form: llm
+  - name: name
+    type: string
+    required: true
+    label:
+      en_US: Document Name
+      zh_Hans: 文档名称
+    human_description:
+      en_US: the name of the document
+      zh_Hans: 文档的名称
+    llm_description: the name of the document
+    form: llm
+  - name: indexing_technique
+    type: select
+    required: true
+    label:
+      en_US: Index Method
+      zh_Hans: 索引方式
+    default: high_quality
+    options:
+      - value: high_quality
+        label:
+          en_US: High Quality
+          zh_Hans: 高质量
+      - value: economy
+        label:
+          en_US: Economy
+          zh_Hans: 经济
+    human_description:
+      en_US: the indexing technique you want to use
+      zh_Hans: 你想要使用的索引方式
+    form: form
+  - name: doc_form
+    type: select
+    required: true
+    label:
+      en_US: Chunk Method
+      zh_Hans: 分段方式
+    default: text_model
+    options:
+      - value: text_model
+        label:
+          en_US: General
+          zh_Hans: 通用
+      - value: hierarchical_model
+        label:
+          en_US: Parent-child
+          zh_Hans: 父子分段
+      - value: qa_model
+        label:
+          en_US: Q&A
+          zh_Hans: Q&A分段
+    human_description:
+      en_US: the chunk settings
+      zh_Hans: 分段方式
+    form: form
+  - name: doc_language
+    type: select
+    required: false
+    label:
+      en_US: Document Language
+      zh_Hans: 文档语言
+    options:
+      - value: English
+        label:
+          en_US: English
+          zh_Hans: 英语
+      - value: Chinese
+        label:
+          en_US: Chinese
+          zh_Hans: 中文
+    human_description:
+      en_US: only for Q&A Chunk Method
+      zh_Hans: 仅适用于 Q&A 分段方式
+    form: form
+  - name: process_rule
+    type: string
+    default: |
+      {"mode": "automatic"}
+    required: true
+    label:
+      en_US: Process Rule
+      zh_Hans: 处理规则
+    human_description:
+      en_US: |
+        Must be a valid JSON string, See plugin detail page for more details
+      zh_Hans: |
+        必须是一个有效的 JSON 字符串，请参考插件详情页获取更多信息
+    form: form
+extra:
+  python:
+    source: tools/knowledge.py

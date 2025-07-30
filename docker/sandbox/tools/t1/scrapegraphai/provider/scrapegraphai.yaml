@@ -1,0 +1,37 @@
+#General information about the provider
+identity:
+  author: scrapegraphai
+  name: scrapegraphai
+  label:
+    en_US: ScrapeGraphAI
+    zh_Hans: ScrapeGraphAI
+    pt_BR: ScrapeGraphAI
+  description:
+    en_US: ScrapeGraphAI integration for LLM powered scraping
+    zh_Hans: ScrapeGraphAI 集成，用于 LLM 驱动的网页抓取
+    pt_BR: Integração ScrapeGraphAI para web scraping com LLM
+  icon: icon.svg
+tools:
+  - tools/scrapegraphai.yaml
+extra:
+  python:
+    source: provider/scrapegraphai.py
+
+#Credentials for provider
+credentials_for_provider:
+    scrapegraphai_api_key: # This is the internal name of the credential, to be used in Python code
+        type: secret-input # Input type is a password field
+        required: true # This credential is required
+        label: # Label displayed in the Dify UI (supports multiple languages)
+            en_US: ScrapeGraphAI API Key
+            zh_Hans: ScrapeGraphAI API 密钥
+            pt_BR: Chave API ScrapeGraphAI
+        placeholder: # Placeholder text for the input field (supports multiple languages)
+            en_US: Enter your ScrapeGraphAI API Key
+            zh_Hans: 请输入您的 ScrapeGraphAI API 密钥
+            pt_BR: Digite sua chave API ScrapeGraphAI
+        help: # Help prompt information (supports multiple languages)
+            en_US: How to get your ScrapeGraphAI API Key
+            zh_Hans: 如何获取您的 ScrapeGraphAI API 密钥
+            pt_BR: Como obter sua chave API ScrapeGraphAI
+        url: https://dashboard.scrapegraphai.com/ # URL to jump to when clicking the help prompt

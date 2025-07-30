@@ -1,0 +1,21 @@
+identity:
+  author: alterxyz
+  name: data_function_conversation_memory
+  label:
+    en_US: Conversational Memory
+    zh_Hans: 会话记忆
+    pt_BR: Memória Conversacional
+    ja_JP: 会話メモリ
+  description:
+    en_US: store and access conversations
+    zh_Hans: 存储和访问会话
+    pt_BR: armazenar e acessar conversas
+    ja_JP: 会話を保存してアクセスする
+  icon: book-solid.svg
+tools:
+  - tools/init.yaml
+  - tools/get_conversation.yaml
+  - tools/put_message.yaml
+extra:
+  python:
+    source: provider/data_function_conversation_memory.py

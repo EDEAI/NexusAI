@@ -1,0 +1,32 @@
+identity:
+  author: jaguarliuu
+  name: rookie_rss
+  label:
+    en_US: rookie_rss
+    zh_Hans: rookie_rss
+    pt_BR: rookie_rss
+  description:
+    en_US: rookie rss 多平台新闻聚合插件
+    zh_Hans: rookie rss 多平台新闻聚合插件
+    pt_BR: rookie rss 多平台新闻聚合插件
+  icon: rss.svg
+credentials_for_provider:
+  daily_hot_url:
+    type: text-input
+    required: false
+    default: https://api-hot.imsyy.top/
+    label:
+      en_US: Daily Hot URL
+      zh_Hans: 每日热榜 URL
+    placeholder:
+      en_US: Please input your Daily Hot URL
+      zh_Hans: 请配置你的每日热榜 URL
+    help:
+      en_US: Get your Daily Hot URL from https://github.com/imsyy/DailyHotApi
+      zh_Hans: 从 https://github.com/imsyy/DailyHotApi 获取你的每日热榜 URL
+    url: https://github.com/imsyy/DailyHotApi
+tools:
+  - tools/rookie_rss.yaml
+extra:
+  python:
+    source: provider/rookie_rss.py

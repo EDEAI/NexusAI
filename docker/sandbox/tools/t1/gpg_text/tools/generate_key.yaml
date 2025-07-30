@@ -1,0 +1,80 @@
+identity:
+  name: generate_key # Corrected name
+  author: alterxyz
+  label:
+    en_US: GPG Generate Key Pair
+    zh_Hans: GPG 生成密钥对
+description:
+  human:
+    en_US: Generates a new GPG key pair (public and private keys).
+    zh_Hans: 生成一个新的 GPG 密钥对（公钥和私钥）。
+  llm: Use this tool to generate a new PGP/GPG key pair. Requires a real name and email address. Optionally accepts a passphrase to protect the private key, a key type (e.g., EdDSA, RSAEncryptOrSign), and key parameters (e.g., curve name or key length). Returns both the public and private keys in ASCII-armored format.
+parameters:
+  - name: real_name # Corrected parameter
+    type: string
+    required: true
+    label:
+      en_US: Real Name
+      zh_Hans: 真实姓名
+    human_description:
+      en_US: The name associated with the key (e.g., "Alice Wonderland").
+      zh_Hans: 与密钥关联的名称（例如，“张三”）。
+    llm_description: The real name to be included in the User ID of the generated key.
+    form: llm
+  - name: email # Corrected parameter
+    type: string
+    required: true
+    label:
+      en_US: Email Address
+      zh_Hans: 电子邮件地址
+    human_description:
+      en_US: The email address associated with the key (e.g., "alice@example.com").
+      zh_Hans: 与密钥关联的电子邮件地址（例如，“zhangsan@example.com”）。
+    llm_description: The email address to be included in the User ID of the generated key.
+    form: llm
+  - name: passphrase # Corrected parameter
+    type: string # Use 'secret-input' if you prefer UI masking, but string works for LLM
+    required: false
+    label:
+      en_US: Passphrase (Optional)
+      zh_Hans: 密码短语（可选）
+    human_description:
+      en_US: An optional passphrase to protect the generated private key. Highly recommended.
+      zh_Hans: 用于保护生成的私钥的可选密码短语。强烈推荐使用。
+    llm_description: An optional secret passphrase to encrypt the generated private key. If not provided, the private key will not be password-protected.
+    form: llm
+  - name: key_type # Corrected parameter
+    type: string
+    required: false
+    label:
+      en_US: Key Type (Optional)
+      zh_Hans: 密钥类型（可选）
+    human_description:
+      en_US: The algorithm for the primary key (e.g., EdDSA, RSAEncryptOrSign, ECDSA). Defaults to EdDSA.
+      zh_Hans: 主密钥的算法（例如，EdDSA、RSAEncryptOrSign、ECDSA）。默认为 EdDSA。
+    llm_description: "The desired primary key algorithm. Common choices: 'EdDSA' (modern, default), 'ECDSA', 'RSAEncryptOrSign' (legacy compatibility). If a signing-only type is chosen (EdDSA, ECDSA, RSASign), an appropriate encryption subkey will be added automatically."
+    form: form # Better as a dropdown/selection in UI
+    default: EdDSA
+  - name: key_param # Corrected parameter
+    type: string
+    required: false
+    label:
+      en_US: Key Parameter (Optional)
+      zh_Hans: 密钥参数（可选）
+    human_description:
+      en_US: Key length (e.g., 3072 for RSA) or curve name (e.g., Ed25519 for EdDSA, NIST_P256 for ECDSA). Defaults depend on Key Type.
+      zh_Hans: 密钥长度（例如，RSA 为 3072）或曲线名称（例如，EdDSA 为 Ed25519，ECDSA 为 NIST_P256）。默认值取决于密钥类型。
+    llm_description: "Optional parameter specific to the key type. For RSA/DSA/ElGamal, this is the key length in bits (e.g., '3072'). For EdDSA/ECDSA/ECDH, this is the curve name (e.g., 'Ed25519', 'NIST_P256', 'Curve25519'). If omitted, suitable defaults will be used based on the key_type."
+    form: form # Better as text input in UI
+extra:
+  python:
+    source: tools/generate_key.py # Corrected source path
+output_schema: # Added output schema
+  type: object
+  properties:
+    public_key:
+      type: string
+      description: The generated public key in ASCII-armored format.
+    private_key:
+      type: string
+      description: The generated private key in ASCII-armored format. Handle with extreme care.

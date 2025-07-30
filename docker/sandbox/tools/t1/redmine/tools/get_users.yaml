@@ -1,0 +1,81 @@
+identity:
+  name: get_users
+  author: yasu89
+  label:
+    en_US: Get List of Users
+    zh_Hans: 获取用户列表
+    pt_BR: Obter Lista de Usuários
+    ja_JP: ユーザーのリストを取得
+description:
+  human:
+    en_US: Returns a list of users from Redmine
+    zh_Hans: 从Redmine获取用户列表
+    pt_BR: Retorna uma lista de usuários do Redmine
+    ja_JP: Redmineからユーザーリストを返す
+  llm: Retrieve and list users from a Redmine project management system with filtering options
+parameters:
+  - name: status
+    type: number
+    min: 1
+    max: 3
+    required: false
+    label:
+      en_US: Status
+      zh_Hans: 状态
+      pt_BR: Status
+      ja_JP: ステータス
+    human_description:
+      en_US: "User status to filter by (1=Active - can login, 2=Registered - not confirmed, 3=Locked - cannot login)"
+      zh_Hans: "按用户状态过滤（1=活跃-可登录, 2=已注册-未确认, 3=已锁定-无法登录）"
+      pt_BR: "Status do usuário para filtrar (1=Ativo - pode logar, 2=Registrado - não confirmado, 3=Bloqueado - não pode logar)"
+      ja_JP: "フィルタリングするユーザーステータス（1=アクティブ-ログイン可能, 2=登録済み-未確認, 3=ロック済み-ログイン不可）"
+    placeholder:
+      en_US: "1"
+      zh_Hans: "1"
+      pt_BR: "1"
+      ja_JP: "1"
+    llm_description: Filter users by status (1=Active can login, 2=Registered not confirmed, 3=Locked cannot login)
+    form: llm
+  - name: name
+    type: string
+    required: false
+    label:
+      en_US: Name Filter
+      zh_Hans: 姓名过滤器
+      pt_BR: Filtro de Nome
+      ja_JP: 名前フィルター
+    human_description:
+      en_US: Filter users by login, firstname, lastname, or email
+      zh_Hans: 按登录名、名字、姓氏或邮箱过滤用户
+      pt_BR: Filtrar usuários por login, nome, sobrenome ou email
+      ja_JP: ログイン名、名前、姓、またはメールでユーザーをフィルタリング
+    placeholder:
+      en_US: "john smith"
+      zh_Hans: "张三"
+      pt_BR: "joão silva"
+      ja_JP: "田中太郎"
+    llm_description: Filter users by name, login, or email address
+    form: llm
+  - name: group_id
+    type: string
+    required: false
+    label:
+      en_US: Group ID
+      zh_Hans: 组ID
+      pt_BR: ID do Grupo
+      ja_JP: グループID
+    human_description:
+      en_US: Filter users who are members of the specified group
+      zh_Hans: 过滤指定组的成员用户
+      pt_BR: Filtrar usuários que são membros do grupo especificado
+      ja_JP: 指定されたグループのメンバーであるユーザーをフィルタリング
+    placeholder:
+      en_US: "5"
+      zh_Hans: "5"
+      pt_BR: "5"
+      ja_JP: "5"
+    llm_description: Filter users by group membership
+    form: llm
+extra:
+  python:
+    source: tools/get_users.py

@@ -1,0 +1,43 @@
+identity:
+  name: rabbit_consumer_plugin
+  author: zxp088
+  label:
+    en_US: rabbit_consumer_plugin
+    zh_Hans: rabbit消费插件
+    pt_BR: rabbit_consumer_plugin
+description:
+  human:
+    en_US: consumer data from rabbit server
+    zh_Hans: 从rabbitmq消费数据
+    pt_BR: consumer data from rabbit server
+  llm: consumer data from rabbit server
+parameters:
+  - name: Queue
+    type: string
+    required: true
+    label:
+      en_US: QueueName
+      zh_Hans: 队列
+      pt_BR: QueueName
+    human_description:
+      en_US: Queue Name
+      zh_Hans: 队列名称
+      pt_BR: Queue Name
+    llm_description: Queue Name
+    form: llm
+  - name: Count
+    type: number
+    required: false
+    label:
+      en_US: MessageCount
+      zh_Hans: 消息条数
+      pt_BR: MessageCount
+    human_description:
+      en_US: Message Count
+      zh_Hans: 消费的消息条数
+      pt_BR: Message Count
+    llm_description: Message Count
+    form: llm
+extra:
+  python:
+    source: tools/rabbit_consumer_plugin.py
