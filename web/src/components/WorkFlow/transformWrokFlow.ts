@@ -929,7 +929,8 @@ export const transformer = {
                 provider: node.data?.baseData?.groupName,
                 tool_name: node.data?.baseData?.identity?.name,
             };
-
+            
+            params.output = node.data?.baseData?.output
             return new ToolNode(params);
         },
         context1(freeNode) {

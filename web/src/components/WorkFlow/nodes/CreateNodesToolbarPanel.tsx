@@ -160,6 +160,7 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     }
                     
                 }
+                debugger
             } else {
                 createData = {
                     title: item.title,

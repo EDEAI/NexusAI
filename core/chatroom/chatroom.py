@@ -874,7 +874,7 @@ class Chatroom:
                                 return
                         
                         if skill_match:
-                            if SandboxBaseNode.check_venv_exists(mcp_tool_use['skill_dependencies']):
+                            if not SandboxBaseNode.check_venv_exists(mcp_tool_use['skill_dependencies']):
                                 await self._ws_manager.send_instruction(
                                     self._chatroom_id,
                                     'SHOWTOOLMSG',

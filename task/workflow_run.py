@@ -253,7 +253,7 @@ def push_workflow_debug_message(
         elif node.data['type'] in ['recursive_task_generation', 'recursive_task_execution']:
             task_dict = json.loads(get_first_variable_value(create_variable_from_dict(outputs)))
             node_exec_data['outputs_md'] = create_recursive_task_category_from_dict(task_dict).to_markdown()
-        elif node.data['type'] in ['skill', 'custom_code', 'end']:
+        elif node.data['type'] in ['skill', 'custom_code', 'end', 'tool']:
             from api.utils.common import extract_file_list_from_skill_output
             file_list = extract_file_list_from_skill_output(node_exec_data['outputs'], node.data['output'].to_dict())
             # skill_output = node_exec_data['outputs']
@@ -577,13 +577,12 @@ def check_if_node_need_installing_dependencies(node: Node) -> bool:
         else:
             category = 't1'
         current_file = os.path.realpath(__file__)
-        # Go up from core/tool/sandbox_tool_runner.py to project root
-        project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
+        project_root = os.path.dirname(os.path.dirname(current_file))
         sandbox_path = os.path.join(project_root, 'docker', 'sandbox')
         tool_dir = os.path.join(sandbox_path, 'tools', category, provider)
         runner = SandboxToolRunner()
         dependencies = runner.load_requirements_from_file(tool_dir)
-    return SandboxBaseNode.check_venv_exists(dependencies)
+    return not SandboxBaseNode.check_venv_exists(dependencies)
 
 def task_delay_thread():
     """

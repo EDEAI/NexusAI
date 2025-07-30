@@ -16,6 +16,7 @@ class ToolNode extends Node {
      * @param {string} title - The title of the node.
      * @param {string} desc - The description of the node.
      * @param {ObjectVariable} input - The input variable.
+     * @param {ObjectVariable} output - The output variable.
      * @param {Object.<string, string>} tool - The tool configuration.
      * @param {boolean} wait_for_all_predecessors - Whether to wait for all predecessors.
      * @param {boolean} manual_confirmation - Whether manual confirmation is required.
@@ -26,6 +27,7 @@ class ToolNode extends Node {
         title = '',
         desc = '',
         input = null,
+        output = null,
         tool = {},
         wait_for_all_predecessors = false,
         manual_confirmation = false,
@@ -40,6 +42,7 @@ class ToolNode extends Node {
             title: title,
             desc: desc,
             input: input,
+            output: output,
             tool: tool,
             wait_for_all_predecessors: wait_for_all_predecessors,
             manual_confirmation: manual_confirmation,
