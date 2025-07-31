@@ -1,21 +1,22 @@
 /*
  * @LastEditors: biz
  */
+import { ObjectVariable, Variable } from '@/py2js/variables.js';
 import { SearchOutlined } from '@ant-design/icons';
 import autoAnimate from '@formkit/auto-animate';
 import { Node, NodeProps, NodeToolbar, Position, useNodeId, useReactFlow } from '@xyflow/react';
-import { useHover, useMount } from 'ahooks';
+import { useHover, useMount, useUpdateEffect } from 'ahooks';
 import type { TabsProps } from 'antd';
-import { Input, Tabs, Tooltip, Typography } from 'antd';
-import { memo, useEffect, useRef, useState } from 'react';
+import { Input, Tabs, Tooltip } from 'antd';
+import Fuse from 'fuse.js';
+import { debounce } from 'lodash';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { getLocale, useIntl } from 'umi';
-import { ObjectVariable, Variable } from '@/py2js/variables.js';
 import UserCon from '../components/UserCon';
 import useOutsideClick from '../hooks/useOutsideClick';
 import useStore from '../store';
 import { BlockEnum } from '../types';
 import { getBaseNode } from './nodeDisperse';
-import NodePanelContent from '../components/NodePanel/components/NodePanelContent';
 interface CreateNodesToolbarProps {
     position: 'right' | 'left';
     className?: string;
@@ -74,6 +75,12 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
         props?.show && setToolsShow(true);
     }, [tools, props?.show]);
 
+    useUpdateEffect(() => {
+        if (!toolsShow) {
+            setTabIndex('1');
+            setSearchNode(trandformData('1'));
+        }
+    }, [toolsShow]);
     // useEffect(() => {
     //     setShowAddNodeBtn(props.data.selected);
     //     if (!props.data.selected) {
@@ -84,32 +91,54 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
         setToolsShow(false);
     });
 
-    const trandformData = e => {
-        let setData = null;
-        if (e == '1') {
-            setData = baseNodes;
-        } else if (e == '2') {
-            setData =
-                agentList.map(item => {
-                    return {
-                        ...item,
-                        title: item.name,
-                    
-                    };
-                }) || [];
-        } else if (e == '3') {
-            setData = [];
-        } else if (e == '4') {
-            setData =
-                skillList?.map(item => {
-                    return {
-                        ...item,
-                        title: item.name
-                    };
-                }) || [];
-        }
-        return setData;
-    };
+    const trandformData = useCallback(
+        e => {
+            let setData = null;
+            if (e == '1') {
+                setData = baseNodes;
+            } else if (e == '2') {
+                setData =
+                    agentList.map(item => {
+                        return {
+                            ...item,
+                            title: item.name,
+                        };
+                    }) || [];
+            } else if (e == '3') {
+                setData = [];
+                toolData?.list?.forEach((category, categoryIndex) => {
+                    category.tools?.forEach((tool, toolIndex) => {
+                        setData.push({
+                            ...tool,
+                            title:
+                                tool?.identity?.label[lang] ||
+                                intl.formatMessage({
+                                    id: 'workflow.tool',
+                                    defaultMessage: '',
+                                }),
+                            categoryName: category?.identity?.label[lang],
+                            categoryIcon: category?.identity?.icon,
+                            authorization_status: category.authorization_status,
+                            groupName: category?.identity?.name,
+                            credentials_for_provider: category?.credentials_for_provider,
+                            categoryIndex,
+                            toolIndex,
+                        });
+                    });
+                });
+            } else if (e == '4') {
+                setData =
+                    skillList?.map(item => {
+                        return {
+                            ...item,
+                            title: item.name,
+                        };
+                    }) || [];
+            }
+            return setData;
+        },
+        [baseNodes, agentList, toolData, skillList, lang, intl],
+    );
 
     const onTabChange = e => {
         console.log('onTabChange', e);
@@ -117,13 +146,61 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
         setSearchNode(trandformData(e));
     };
 
+    const performSearch = useCallback(
+        (keyword: string, currentTabIndex: string) => {
+            let searchFrom = trandformData(currentTabIndex);
+
+            if (!keyword) {
+                setSearchNode(searchFrom);
+                return;
+            }
+
+            let searchKeys: string[] = [];
+            if (currentTabIndex === '1') {
+                searchKeys = ['title', 'type', 'data.desc', 'data.title'];
+            } else if (currentTabIndex === '2') {
+                searchKeys = ['title', 'name', 'description'];
+            } else if (currentTabIndex === '3') {
+                searchKeys = [
+                    'title',
+                    'categoryName',
+                    'description.human.zh_Hans',
+                    'description.human.en_US',
+                ];
+            } else if (currentTabIndex === '4') {
+                searchKeys = ['title', 'name', 'description'];
+            }
+
+            const fuse = new Fuse(searchFrom, {
+                keys: searchKeys,
+                threshold: 0.3,
+                includeScore: true,
+            });
+
+            const results = fuse.search(keyword);
+            const searchResults = results.map(result => result.item);
+            setSearchNode(searchResults);
+        },
+        [trandformData],
+    );
+
+    const debouncedSearch = useCallback(
+        debounce((keyword: string, currentTabIndex: string) => {
+            performSearch(keyword, currentTabIndex);
+        }, 300),
+        [performSearch],
+    );
+
     const search = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let searchFrom = trandformData(tabIndex);
-        const searchNode = searchFrom.filter(item =>
-            item.title.toLowerCase().includes(e.target.value.toLowerCase()),
-        );
-        setSearchNode(searchNode);
+        const keyword = e.target.value;
+        debouncedSearch(keyword, tabIndex);
     };
+
+    useEffect(() => {
+        return () => {
+            debouncedSearch.cancel();
+        };
+    }, [debouncedSearch]);
 
     const createNode = item => {
         let createType;
@@ -136,7 +213,8 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
         }
 
         const currentNode = getNode(nodeId);
-        let createData = {};
+        let createData: any = {};
+
         if (createType) {
             if (createType == BlockEnum.Tool) {
                 createData = {
@@ -144,23 +222,22 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                         item?.identity?.label[lang] ||
                         intl.formatMessage({ id: 'workflow.tool', defaultMessage: '' }),
                     desc: item.description?.human[lang] || item.description?.llm || '',
-                    icon: item?.icon,
+                    icon: item?.icon || item?.categoryIcon,
                     baseData: item,
                 };
-                if(item.output){
-                    if(Array.isArray(item.output)&&item.output.length>0){
-                        const toolVariables = new ObjectVariable('output','object')
-                        item.output.forEach(item=>{
-                            const variable= new Variable(item.name,item.type)
-                            toolVariables.addProperty(item.name,variable)
-                        })
+
+                if (item.output) {
+                    if (Array.isArray(item.output) && item.output.length > 0) {
+                        const toolVariables = new ObjectVariable('output', 'object');
+                        item.output.forEach(item => {
+                            const variable = new Variable(item.name, item.type);
+                            toolVariables.addProperty(item.name, variable);
+                        });
                         createData.outputInfo = toolVariables.toObject();
-                    }else{
+                    } else {
                         createData.outputInfo = item.output;
                     }
-                    
                 }
-                debugger
             } else {
                 createData = {
                     title: item.title,
@@ -171,7 +248,6 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     createData.icon = item.icon;
                 }
             }
-            
         }
 
         const newNode = storeCreateNode(createType || item.icon, {
@@ -272,72 +348,69 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                         items={tabItems}
                     ></Tabs>
                     <div style={{ maxHeight: 'calc(100vh - 500px)' }} className="overflow-y-auto">
-                        {tabIndex != '3'
-                            ? searchNode.map((item, index) => (
-                                  <Tooltip placement="left" title={item?.base?.data?.['descTools']}>
+                        {tabIndex == '3'
+                            ? (() => {
+                                  const groupedTools = searchNode.reduce(
+                                      (groups: any, tool: any) => {
+                                          const categoryName = tool.categoryName || 'Unknown';
+                                          if (!groups[categoryName]) {
+                                              groups[categoryName] = {
+                                                  categoryName,
+                                                  categoryIcon: tool.categoryIcon,
+                                                  tools: [],
+                                              };
+                                          }
+                                          groups[categoryName].tools.push(tool);
+                                          return groups;
+                                      },
+                                      {},
+                                  );
+
+                                  return Object.values(groupedTools).map(
+                                      (group: any, groupIndex) => (
+                                          <div key={groupIndex}>
+                                              <div className="py-2">
+                                                  <UserCon
+                                                      title={group.categoryName}
+                                                      icon={group.categoryIcon}
+                                                  />
+                                              </div>
+                                              <div>
+                                                  {group.tools.map((tool, toolIndex) => (
+                                                      <div
+                                                          key={toolIndex}
+                                                          className="flex items-center gap-2 px-2 hover:bg-slate-100 rounded py-2 text-gray-500"
+                                                          onClick={e => {
+                                                              e.stopPropagation();
+                                                              createNode(tool);
+                                                          }}
+                                                      >
+                                                          {tool.title}
+                                                      </div>
+                                                  ))}
+                                              </div>
+                                          </div>
+                                      ),
+                                  );
+                              })()
+                            : searchNode.map((item, index) => (
+                                  <Tooltip
+                                      key={index}
+                                      placement="left"
+                                      title={item?.base?.data?.['descTools']}
+                                  >
                                       <div
                                           onClick={e => {
                                               console.log(item);
-
                                               e.stopPropagation();
                                               createNode(item);
                                           }}
                                           className="hover:bg-slate-100 px-2 rounded"
-                                          key={index}
                                       >
-                                          <UserCon
-                                              key={index}
-                                              title={item.title}
-                                              icon={item.icon}
-                                          ></UserCon>
+                                          <UserCon title={item.title} icon={item.icon} />
                                       </div>
                                   </Tooltip>
-                              ))
-                            : toolData?.list?.map(item => {
-                                  return (
-                                      <div>
-                                          <div className="py-2">
-                                              <Typography.Title level={5}>
-                                                  {item?.identity?.label[lang]}
-                                              </Typography.Title>
-                                          </div>
-                                          <div>
-                                              {item?.tools?.map((tool, toolIndex) => {
-                                                  return (
-                                                      <div
-                                                          className="flex items-center gap-2 px-2 hover:bg-slate-100 "
-                                                          onClick={e => {
-                                                              e.stopPropagation();
-                                                              createNode({
-                                                                  ...tool,
-                                                                  authorization_status:
-                                                                      item.authorization_status,
-                                                                  icon: item?.identity?.icon,
-                                                                  groupName: item?.identity?.name,
-                                                                  credentials_for_provider:
-                                                                      item?.credentials_for_provider,
-                                                              });
-                                                          }}
-                                                      >
-                                                          <UserCon
-                                                              key={toolIndex}
-                                                              title={
-                                                                  tool?.identity?.label[lang] ||
-                                                                  intl.formatMessage({
-                                                                      id: 'workflow.tool',
-                                                                      defaultMessage: '',
-                                                                  })
-                                                              }
-                                                              icon={item?.identity?.icon}
-                                                          ></UserCon>
-                                                   
-                                                      </div>
-                                                  );
-                                              })}
-                                          </div>
-                                      </div>
-                                  );
-                              })}
+                              ))}
                     </div>
                 </div>
             </NodeToolbar>
