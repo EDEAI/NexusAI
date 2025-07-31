@@ -6,7 +6,7 @@ import { useTagStore } from '@/store/tags';
 import { SearchOutlined } from '@ant-design/icons';
 import { ProForm, ProFormItem, ProFormRadio, ProFormText } from '@ant-design/pro-components';
 import { getLocale, useIntl } from '@umijs/max';
-import { useSetState, useTrackedEffect } from 'ahooks';
+import { useSetState } from 'ahooks';
 import { Spin, Tabs, TabsProps } from 'antd';
 import Fuse from 'fuse.js';
 import { debounce } from 'lodash';
@@ -360,7 +360,29 @@ export default memo(
                 const [containerHeight, setContainerHeight] = useState(500);
                 const containerRef = useRef<HTMLDivElement>(null);
                 const dataFetchedRef = useRef(false);
-                const itemHeight = 54;
+
+              
+                const getItemHeight = useCallback(
+                    (item?: any) => {
+                        if (currentConfig?.type === 'tools' && item) {
+                          
+                            const titleHeight = 60;
+                            const toolItemHeight = 36;
+                            const toolsCount = item.tools?.length || 0;
+                            return titleHeight + toolsCount * toolItemHeight;
+                        }
+                        return 54; 
+                    },
+                    [currentConfig?.type],
+                );
+
+            
+                const getEstimatedTotalHeight = useCallback(() => {
+                    if (currentConfig?.type === 'tools') {
+                        return list.reduce((total, item) => total + getItemHeight(item), 0);
+                    }
+                    return list.length * getItemHeight();
+                }, [currentConfig?.type, list, getItemHeight]);
 
                 useEffect(() => {
                     const updateContainerHeight = () => {
@@ -434,16 +456,38 @@ export default memo(
                     fetchData();
                 }, [currentConfig, filterData, pageSize]);
 
+                const loadMoreData = useCallback(() => {
+                    const currentLength = displayList.length;
+                    if (currentLength < list.length) {
+                        const nextItems = list.slice(currentLength, currentLength + pageSize);
+                        setDisplayList(prev => [...prev, ...nextItems]);
+                    }
+                }, [displayList.length, list, pageSize]);
+
+                const debouncedLoadMore = useCallback(debounce(loadMoreData, 100), [loadMoreData]);
+
                 const onScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
-                    if (
-                        e.currentTarget.scrollHeight - e.currentTarget.scrollTop ===
-                        containerHeight
-                    ) {
-                        const currentLength = displayList.length;
-                        if (currentLength < list.length) {
-                            const nextItems = list.slice(currentLength, currentLength + pageSize);
-                            setDisplayList(prev => [...prev, ...nextItems]);
-                        }
+                    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+                    const isNearBottom = scrollHeight - scrollTop - clientHeight < 10;
+
+                    if (isNearBottom) {
+                        debouncedLoadMore();
+                    }
+                };
+
+                const onToolsScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
+                    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+                    let displayedContentHeight = 0;
+                    for (let i = 0; i < displayList.length; i++) {
+                        displayedContentHeight += getItemHeight(displayList[i]);
+                    }
+
+                    const isNearDisplayedBottom =
+                        scrollTop + clientHeight >= displayedContentHeight - 50;
+
+                    if (isNearDisplayedBottom && displayList.length < list.length) {
+                        debouncedLoadMore();
                     }
                 };
 
@@ -513,11 +557,41 @@ export default memo(
                                         />
                                     ))}
                                 </div>
+                            ) : currentConfig.type === 'tools' ? (
+                                <div
+                                    className="overflow-y-auto"
+                                    style={{ height: containerHeight }}
+                                    onScroll={onToolsScroll}
+                                >
+                                    <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2">
+                                        {displayList.map(item => (
+                                            <ListItem
+                                                key={item.id}
+                                                data={item}
+                                                index={displayList.indexOf(item)}
+                                                onDragStart={onDragStart}
+                                                onItemClick={handleItemClick}
+                                                type={currentConfig.type}
+                                                typeBadge={
+                                                    filterData?.keyword &&
+                                                    currentConfig.tabKey != 'node'
+                                                        ? {
+                                                              icon: `/icons/${currentConfig.tabKey}.svg`,
+                                                              tooltip: currentConfig.tabKey,
+                                                              color: '#1b64f3',
+                                                          }
+                                                        : undefined
+                                                }
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
                             ) : (
+                             
                                 <VirtualList
                                     data={displayList}
                                     height={containerHeight}
-                                    itemHeight={itemHeight}
+                                    itemHeight={getItemHeight()}
                                     itemKey="id"
                                     onScroll={onScroll}
                                 >
