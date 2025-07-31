@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 from datetime import datetime
+import json
 from . import Node
 from ..context import Context, replace_variable_value_with_context
 from ..variables import Variable, ObjectVariable, validate_required_variable
@@ -89,7 +90,7 @@ class ToolNode(Node):
             # if validate_credentials(provider=provider,credentials=credentials):
             from core.tool.sandbox_tool_runner import SandboxToolRunner
             runner = SandboxToolRunner()
-            self.data['output'] = runner.run_sandbox_tool(
+            response = runner.run_sandbox_tool(
                 category=tool_category,
                 provider=provider,
                 tool_name=tool_name,
@@ -98,6 +99,42 @@ class ToolNode(Node):
                 app_run_id=app_run_id,
                 workflow_id=workflow_id
             )
+            
+            # Handle response and create output Variable
+            if 'status' in response:
+                status = response['status']
+                if status == 0:
+                    # Parse stdout if available
+                    stdout_text = response['data']['stdout']
+                    if stdout_text:
+                        try:
+                            if 'nexus_ai_file_path' in stdout_text:
+                                stdout_dict = runner.skill_file_handler(json.loads(stdout_text), app_run_id=app_run_id, workflow_id=workflow_id)
+                                self.data['output'] = ObjectVariable(name='output')
+                                self.data['output'].add_property('output', value=Variable(name='output',display_name='Nexus AI File Path',type='file',value=stdout_dict['nexus_ai_file_path']))
+                            else:
+                                self.data['output'] = ObjectVariable(name='output')
+                                self.data['output'].add_property('output', value=Variable(name='output',display_name='Content',type='string',value=stdout_text))
+                        except json.JSONDecodeError as e:
+                            return {
+                                'status': 'failed',
+                                'message': f"Failed to parse stdout as JSON: {e}"
+                            }
+                    else:
+                        return {
+                            'status': 'failed',
+                            'message': response['data']['stderr']
+                        }
+                else:
+                    return {
+                        'status': 'failed',
+                        'message': str(response['data']['stderr'])
+                    }
+            else:
+                return {
+                    'status': 'failed',
+                    'message': response['detail']
+                }
             # else:
             #     raise Exception("Invalid credentials")
             end_time = datetime.now()

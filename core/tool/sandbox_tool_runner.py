@@ -55,191 +55,131 @@ class SandboxToolRunner(SandboxBaseNode):
         
         return packages
     
-    def _find_tool_class_in_file(self, tool_file_path: str, tool_name: str = None) -> str:
+    def _discover_tool_and_generate_code(self, category: str, provider: str, 
+                                       tool_name: str, credentials: dict, 
+                                       parameters) -> tuple[str, str]:
         """
-        Find the Tool class name in a Python file that matches the tool_name.
+        Discover tool configuration and generate Python code to invoke the tool.
         
-        Args:
-            tool_file_path (str): Path to the tool Python file
-            tool_name (str): Expected tool name to match against
-            
-        Returns:
-            str: Name of the Tool class
-        """
-        try:
-            with open(tool_file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            
-            # Parse the AST to find classes that inherit from Tool
-            tree = ast.parse(content)
-            
-            # If tool_name is provided, try to find matching YAML config first
-            if tool_name:
-                yaml_file_path = tool_file_path.replace('.py', '.yaml')
-                if os.path.exists(yaml_file_path):
-                    try:
-                        import yaml
-                        with open(yaml_file_path, 'r', encoding='utf-8') as yaml_file:
-                            yaml_config = yaml.safe_load(yaml_file)
-                            yaml_tool_name = yaml_config.get('identity', {}).get('name', '')
-                            
-                            # If YAML tool name matches the expected tool_name, find the Tool class
-                            if yaml_tool_name == tool_name:
-                                for node in ast.walk(tree):
-                                    if isinstance(node, ast.ClassDef):
-                                        # Check if the class inherits from Tool
-                                        for base in node.bases:
-                                            if isinstance(base, ast.Name) and base.id == 'Tool':
-                                                return node.name
-                                            elif isinstance(base, ast.Attribute) and base.attr == 'Tool':
-                                                return node.name
-                                
-                                raise ValueError(f"No Tool class found in {tool_file_path} for tool_name: {tool_name}")
-                            else:
-                                # Tool name doesn't match, skip this file
-                                raise ValueError(f"Tool name mismatch. Expected: {tool_name}, Found: {yaml_tool_name}")
-                    except Exception as yaml_error:
-                        # If YAML parsing fails, fall back to original behavior
-                        print(f"Warning: Could not parse YAML config for {tool_file_path}: {yaml_error}")
-            
-            # Fallback: find any Tool class if no tool_name provided or YAML parsing failed
-            for node in ast.walk(tree):
-                if isinstance(node, ast.ClassDef):
-                    # Check if the class inherits from Tool
-                    for base in node.bases:
-                        if isinstance(base, ast.Name) and base.id == 'Tool':
-                            return node.name
-                        elif isinstance(base, ast.Attribute) and base.attr == 'Tool':
-                            return node.name
-            
-            raise ValueError(f"No Tool class found in {tool_file_path}")
-        
-        except Exception as e:
-            raise ValueError(f"Error parsing tool file {tool_file_path}: {e}")
-    
-    def _generate_tool_invocation_code(self, category: str, provider: str, 
-                                     tool_name: str, credentials: dict, 
-                                     parameters) -> str:
-        """
-        Generate Python code to invoke a specific tool.
+        This method follows a step-by-step process:
+        1. Locate the category directory
+        2. Locate the provider directory within the category
+        3. Find the provider's YAML configuration file
+        4. Traverse through the tools directory
+        5. Search for tool YAML files and match by identity.name
+        6. Extract the Python source file from extra.python.source
+        7. Find the Tool class that inherits from Tool base class
         
         Args:
             category (str): Tool category (e.g., 't1')
             provider (str): Provider name
-            tool_name (str): Tool name
+            tool_name (str): Tool name to search for
             credentials (dict): Tool credentials
             parameters: Tool parameters (can be dict or ObjectVariable)
             
         Returns:
-            str: Generated Python code
+            tuple[str, str]: (tool_class_name, generated_code)
         """
-        # Import flatten_variable_with_values if parameters is not a dict
         from core.workflow.variables import flatten_variable_with_values
         
         # Convert parameters to dict if it's an ObjectVariable
         if not isinstance(parameters, dict):
             parameters = flatten_variable_with_values(parameters)
         
-        # Find tool directory - get project root correctly
+        # Step 1: Locate the category directory
         current_file = os.path.realpath(__file__)
-        # Go up from core/tool/sandbox_tool_runner.py to project root
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
         sandbox_path = os.path.join(project_root, 'docker', 'sandbox')
-        tool_dir = os.path.join(sandbox_path, 'tools', category, provider)
+        category_dir = os.path.join(sandbox_path, 'tools', category)
         
-        if not os.path.exists(tool_dir):
-            raise FileNotFoundError(f"Tool directory not found: {tool_dir}")
+        if not os.path.exists(category_dir):
+            raise FileNotFoundError(f"Category directory not found: {category_dir}")
         
-        # Find tool Python file by reading provider yaml file
-        provider_yaml_path = os.path.join(tool_dir, 'provider', f'{provider}.yaml')
-        tool_file = None
+        # Step 2: Locate the provider directory within the category
+        provider_dir = os.path.join(category_dir, provider)
+        if not os.path.exists(provider_dir):
+            raise FileNotFoundError(f"Provider directory not found: {provider_dir}")
         
-        if os.path.exists(provider_yaml_path):
+        # Step 3: Find the provider's YAML configuration file and read tools paths
+        provider_yaml_path = os.path.join(provider_dir, 'provider', f'{provider}.yaml')
+        if not os.path.exists(provider_yaml_path):
+            raise FileNotFoundError(f"Provider YAML file not found: {provider_yaml_path}")
+        
+        # Read the provider YAML file to get tools configuration
+        try:
+            import yaml
+            with open(provider_yaml_path, 'r', encoding='utf-8') as provider_yaml_file:
+                provider_config = yaml.safe_load(provider_yaml_file)
+        except Exception as e:
+            raise ValueError(f"Failed to parse provider YAML file {provider_yaml_path}: {e}")
+        
+        # Step 4: Get tools paths from provider YAML configuration
+        tools_config = provider_config.get('tools', [])
+        if not tools_config:
+            raise ValueError(f"No tools configuration found in provider YAML: {provider_yaml_path}")
+        
+        # Step 5: Search for tool YAML files and match by identity.name
+        tool_yaml_path = None
+        tool_config = None
+        
+        # Iterate through tools list in provider YAML to find matching tool_name
+        for tool_yaml_relative_path in tools_config:
+            if not tool_yaml_relative_path:
+                continue
+            
+            # Construct full path to tool YAML file
+            tool_yaml_full_path = os.path.join(provider_dir, tool_yaml_relative_path)
+            
+            if not os.path.exists(tool_yaml_full_path):
+                print(f"Warning: Tool YAML file not found: {tool_yaml_full_path}")
+                continue
+            
             try:
-                import yaml
-                with open(provider_yaml_path, 'r', encoding='utf-8') as yaml_file:
-                    provider_config = yaml.safe_load(yaml_file)
-                    tools_list = provider_config.get('tools', [])
+                with open(tool_yaml_full_path, 'r', encoding='utf-8') as tool_yaml_file:
+                    config = yaml.safe_load(tool_yaml_file)
+                    # Check if identity.name matches the tool_name
+                    identity_name = config.get('identity', {}).get('name', '')
                     
-                    # Iterate through tools defined in provider yaml
-                    for tool_path in tools_list:
-                        # tool_path format: tools/insert/config.yaml
-                        # Extract tool name from path: tools/insert/config.yaml -> insert
-                        tool_name_from_path = tool_path.split('/')[1] if len(tool_path.split('/')) > 1 else None
-                        
-                        if tool_name_from_path == tool_name:
-                            # Found matching tool, look for corresponding Python file
-                            tools_dir = os.path.join(tool_dir, 'tools')
-                            if os.path.exists(tools_dir):
-                                # Look for Python file in the tool subdirectory
-                                tool_subdir = os.path.join(tools_dir, tool_name_from_path)
-                                if os.path.exists(tool_subdir):
-                                    # Look for invoke.py file first (common pattern)
-                                    invoke_file = os.path.join(tool_subdir, 'invoke.py')
-                                    if os.path.exists(invoke_file):
-                                        try:
-                                            tool_class_name = self._find_tool_class_in_file(invoke_file, tool_name)
-                                            tool_file = os.path.join(tool_name_from_path, 'invoke.py')
-                                            break
-                                        except ValueError:
-                                            pass
-                                    
-                                    # If invoke.py not found or doesn't have Tool class, try any Python file
-                                    for file in os.listdir(tool_subdir):
-                                        if file.endswith('.py') and not file.startswith('__'):
-                                            tool_file_path = os.path.join(tool_subdir, file)
-                                            try:
-                                                tool_class_name = self._find_tool_class_in_file(tool_file_path, tool_name)
-                                                tool_file = os.path.join(tool_name_from_path, file)
-                                                break
-                                            except ValueError:
-                                                continue
-                                    if tool_file:
-                                        break
-            except Exception as yaml_error:
-                # If provider yaml parsing fails, fallback to directory scanning
-                pass
+                    if identity_name == tool_name:
+                        tool_yaml_path = tool_yaml_full_path
+                        tool_config = config
+                        break
+            except Exception as e:
+                print(f"Warning: Could not parse tool YAML config {tool_yaml_full_path}: {e}")
+                continue
         
-        # Fallback: if not found by provider yaml, try to find any file with Tool class
-        if not tool_file:
-            tools_dir = os.path.join(tool_dir, 'tools')
-            if os.path.exists(tools_dir):
-                for file in os.listdir(tools_dir):
-                    if file.endswith('.py') and not file.startswith('__'):
-                        tool_file_path = os.path.join(tools_dir, file)
-                        try:
-                            tool_class_name = self._find_tool_class_in_file(tool_file_path)
-                            # If we found a tool class, we'll use this file
-                            tool_file = file
-                            break
-                        except ValueError:
-                            continue
+        if not tool_yaml_path:
+            raise ValueError(f"No tool found with identity.name matching tool_name: {tool_name}")
         
-        if not tool_file:
-            raise FileNotFoundError(f"No valid tool file found in {tools_dir}")
+        # Step 6: Extract the Python source file from extra.python.source
+        python_source = tool_config.get('extra', {}).get('python', {}).get('source', '')
+        if not python_source:
+            raise ValueError(f"No python.source specified in YAML config: {tool_yaml_path}")
         
-        # Get tool class name and handle subdirectory paths
-        if '/' in tool_file:
-            # Tool file is in a subdirectory (e.g., insert/invoke.py)
-            tool_file_path = os.path.join(tools_dir, tool_file)
-            import_module = tool_file.replace('.py', '').replace('/', '.')
+        # Determine the Python file path relative to the provider directory
+        # The python source path should be relative to the provider directory, not the tool YAML directory
+        if python_source.endswith('.py'):
+            python_file_path = os.path.join(provider_dir, python_source)
         else:
-            # Tool file is directly in tools directory
-            tool_file_path = os.path.join(tools_dir, tool_file)
-            import_module = tool_file.replace('.py', '')
+            python_file_path = os.path.join(provider_dir, f"{python_source}.py")
         
-        tool_class_name = self._find_tool_class_in_file(tool_file_path, tool_name)
+        if not os.path.exists(python_file_path):
+            raise FileNotFoundError(f"Python file not found: {python_file_path}")
+        # Step 7: Find the Tool class that inherits from Tool base class
+        tool_class_name = self._find_tool_class_in_file(python_file_path, tool_name)
+        import_module = python_source.replace('.py', '').replace('/','.')
         
-        # Generate credentials assignment
+        # Generate credentials code for the tool invocation
         credentials_code = ""
         for key, value in credentials.items():
             credentials_code += f'    "{key}": {repr(value)},\n'
         
-        # Generate parameters assignment
+        # Generate parameters code for the tool invocation
         parameters_code = ""
         for key, value in parameters.items():
             parameters_code += f'    "{key}": {repr(value)},\n'
         
+        # Generate the complete Python code for tool execution
         code = '''
 import os
 import uuid
@@ -254,10 +194,18 @@ def run_tool():
     from gevent import monkey
     monkey.patch_all(sys=True)
 
-    # Import the tool class
-    from tools.''' + import_module + ''' import ''' + tool_class_name + '''
+    from ''' + import_module + ''' import ''' + tool_class_name + '''
     
     def detect_file_type_from_binary(binary_data):
+        """
+        Detect file type from binary data header.
+        
+        Args:
+            binary_data (bytes): Binary data to analyze
+            
+        Returns:
+            str: File extension based on binary header
+        """
         if not binary_data:
             return '.bin'
         
@@ -412,8 +360,18 @@ def run_tool():
                 return '.png'
         
         return '.bin'
+    
     def save_binary_to_storage(binary_data, filename):
-        """Save binary data to /storage directory"""
+        """
+        Save binary data to storage directory.
+        
+        Args:
+            binary_data (bytes): Binary data to save
+            filename (str): Name of the file to save
+            
+        Returns:
+            str: Path to the saved file
+        """
         storage_dir = '/storage'
         os.makedirs(storage_dir, exist_ok=True)
         
@@ -459,13 +417,85 @@ def run_tool():
         else:
             return result
 
-# Execute the tool
 run_tool()
 '''
+        return tool_class_name, code
+    
+    def _find_tool_class_in_file(self, tool_file_path: str, tool_name: str = None) -> str:
+        """
+        Find the Tool class name in a Python file that matches the tool_name.
+        
+        Args:
+            tool_file_path (str): Path to the tool Python file
+            tool_name (str): Expected tool name to match against
+            
+        Returns:
+            str: Name of the Tool class
+        """
+        try:
+            with open(tool_file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            tree = ast.parse(content)
+            
+            if tool_name:
+                yaml_file_path = tool_file_path.replace('.py', '.yaml')
+                if os.path.exists(yaml_file_path):
+                    try:
+                        import yaml
+                        with open(yaml_file_path, 'r', encoding='utf-8') as yaml_file:
+                            yaml_config = yaml.safe_load(yaml_file)
+                            yaml_tool_name = yaml_config.get('identity', {}).get('name', '')
+                            
+                            if yaml_tool_name == tool_name:
+                                for node in ast.walk(tree):
+                                    if isinstance(node, ast.ClassDef):
+                                        for base in node.bases:
+                                            if isinstance(base, ast.Name) and base.id == 'Tool':
+                                                return node.name
+                                            elif isinstance(base, ast.Attribute) and base.attr == 'Tool':
+                                                return node.name
+                                
+                                raise ValueError(f"No Tool class found in {tool_file_path} for tool_name: {tool_name}")
+                            else:
+                                raise ValueError(f"Tool name mismatch. Expected: {tool_name}, Found: {yaml_tool_name}")
+                    except Exception as yaml_error:
+                        print(f"Warning: Could not parse YAML config for {tool_file_path}: {yaml_error}")
+            
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef):
+                    for base in node.bases:
+                        if isinstance(base, ast.Name) and base.id == 'Tool':
+                            return node.name
+                        elif isinstance(base, ast.Attribute) and base.attr == 'Tool':
+                            return node.name
+            
+            raise ValueError(f"No Tool class found in {tool_file_path}")
+        
+        except Exception as e:
+            raise ValueError(f"Error parsing tool file {tool_file_path}: {e}")
+    
+    def _generate_tool_invocation_code(self, category: str, provider: str, 
+                                     tool_name: str, credentials: dict, 
+                                     parameters) -> str:
+        """
+        Generate Python code to invoke a specific tool.
+        
+        Args:
+            category (str): Tool category (e.g., 't1')
+            provider (str): Provider name
+            tool_name (str): Tool name
+            credentials (dict): Tool credentials
+            parameters: Tool parameters (can be dict or ObjectVariable)
+            
+        Returns:
+            str: Generated Python code
+        """
+        _, code = self._discover_tool_and_generate_code(category, provider, tool_name, credentials, parameters)
         return code
     
     def run_sandbox_tool(self, category: str, provider: str, tool_name: str, 
-                        credentials: dict, parameters, app_run_id: int = 0, workflow_id: int = 0) -> Variable:
+                        credentials: dict, parameters, app_run_id: int = 0, workflow_id: int = 0) -> dict:
         """
         Run a tool through the sandbox API using inherited run_custom_code method.
         
@@ -477,22 +507,17 @@ run_tool()
             parameters: Tool parameters (can be dict or ObjectVariable)
             
         Returns:
-            Variable: Tool execution result as Variable object
+            dict: Raw response from sandbox API
         """
-        start_time = datetime.now()
-        # Find tool directory - get project root correctly
         current_file = os.path.realpath(__file__)
-        # Go up from core/tool/sandbox_tool_runner.py to project root
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
         sandbox_path = os.path.join(project_root, 'docker', 'sandbox')
         tool_dir = os.path.join(sandbox_path, 'tools', category, provider)
         
-        # Load pip packages from requirements.txt
         pip_packages = self.load_requirements_from_file(tool_dir)
         
-        # Generate tool invocation code
-        code = self._generate_tool_invocation_code(category, provider, 
-                                                    tool_name, credentials, parameters)
+        _, code = self._discover_tool_and_generate_code(category, provider, 
+                                                       tool_name, credentials, parameters)
         
         # Set up data for sandbox API using inherited method
         self.data = {
@@ -504,27 +529,5 @@ run_tool()
             'tool_name': provider   # Add tool_name parameter
         }
         
-        # Use inherited run_custom_code method
-        response = self.run_custom_code()
-        
-        if 'status' in response:
-            status = response['status']
-            if status == 0:
-                # Parse stdout if available
-                stdout_text = response['data']['stdout']
-                if stdout_text:
-                    try:
-                        if 'nexus_ai_file_path' in stdout_text:
-                            stdout_dict = self.skill_file_handler(json.loads(stdout_text), app_run_id=app_run_id, workflow_id=workflow_id)
-                            self.data['output'].add_property('output', value=Variable(name='output',display_name='Nexus AI File Path',type='file',value=stdout_dict['nexus_ai_file_path']))
-                            return self.data['output']
-                        self.data['output'].add_property('output', value=Variable(name='output',display_name='Content',type='string',value=stdout_text))
-                        return self.data['output']
-                    except json.JSONDecodeError as e:
-                        raise Exception(f"Failed to parse stdout as JSON: {e}")
-                else:
-                    raise Exception(response['data']['stderr'])
-            else:
-                raise Exception(response['data']['stderr'])
-        else:
-            raise Exception(response['detail'])
+        # Use inherited run_custom_code method and return raw response
+        return self.run_custom_code()
