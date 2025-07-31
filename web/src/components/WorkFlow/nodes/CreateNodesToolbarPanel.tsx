@@ -78,9 +78,10 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
     useUpdateEffect(() => {
         if (!toolsShow) {
             setTabIndex('1');
-            setSearchNode(trandformData('1'));
+           
+            setSearchNode(baseNodes);
         }
-    }, [toolsShow]);
+    }, [toolsShow, baseNodes]);
     // useEffect(() => {
     //     setShowAddNodeBtn(props.data.selected);
     //     if (!props.data.selected) {
@@ -106,26 +107,39 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     }) || [];
             } else if (e == '3') {
                 setData = [];
-                toolData?.list?.forEach((category, categoryIndex) => {
-                    category.tools?.forEach((tool, toolIndex) => {
-                        setData.push({
-                            ...tool,
-                            title:
-                                tool?.identity?.label[lang] ||
-                                intl.formatMessage({
-                                    id: 'workflow.tool',
-                                    defaultMessage: '',
-                                }),
-                            categoryName: category?.identity?.label[lang],
-                            categoryIcon: category?.identity?.icon,
-                            authorization_status: category.authorization_status,
-                            groupName: category?.identity?.name,
-                            credentials_for_provider: category?.credentials_for_provider,
-                            categoryIndex,
-                            toolIndex,
-                        });
+              
+                if (toolData?.list && Array.isArray(toolData.list)) {
+                    toolData.list.forEach((category, categoryIndex) => {
+                    
+                        if (category && category.tools && Array.isArray(category.tools)) {
+                            category.tools.forEach((tool, toolIndex) => {
+                               
+                                if (tool && tool.identity) {
+                                    setData.push({
+                                        ...tool,
+                                        title:
+                                            tool?.identity?.label?.[lang] ||
+                                            tool?.identity?.label?.['en_US'] ||
+                                            intl.formatMessage({
+                                                id: 'workflow.tool',
+                                                defaultMessage: 'Tool',
+                                            }),
+                                        categoryName: 
+                                            category?.identity?.label?.[lang] || 
+                                            category?.identity?.label?.['en_US'] || 
+                                            'Unknown Category',
+                                        categoryIcon: category?.identity?.icon,
+                                        authorization_status: category.authorization_status,
+                                        groupName: category?.identity?.name,
+                                        credentials_for_provider: category?.credentials_for_provider,
+                                        categoryIndex,
+                                        toolIndex,
+                                    });
+                                }
+                            });
+                        }
                     });
-                });
+                }
             } else if (e == '4') {
                 setData =
                     skillList?.map(item => {
@@ -196,11 +210,20 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
         debouncedSearch(keyword, tabIndex);
     };
 
+  
     useEffect(() => {
         return () => {
             debouncedSearch.cancel();
         };
     }, [debouncedSearch]);
+
+   
+    useEffect(() => {
+        if (tabIndex === '3' && toolData?.list) {
+            const newData = trandformData('3');
+            setSearchNode(newData);
+        }
+    }, [toolData, tabIndex, trandformData]);
 
     const createNode = item => {
         let createType;
@@ -220,8 +243,9 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                 createData = {
                     title:
                         item?.identity?.label[lang] ||
+                        item?.identity?.label['en_US'] ||
                         intl.formatMessage({ id: 'workflow.tool', defaultMessage: '' }),
-                    desc: item.description?.human[lang] || item.description?.llm || '',
+                    desc: item.description?.human[lang] || item.description?.human['en_US'] || item.description?.llm || '',
                     icon: item?.icon || item?.categoryIcon,
                     baseData: item,
                 };
@@ -350,8 +374,22 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     <div style={{ maxHeight: 'calc(100vh - 500px)' }} className="overflow-y-auto">
                         {tabIndex == '3'
                             ? (() => {
+                                 
+                                  if (!searchNode || !Array.isArray(searchNode) || searchNode.length === 0) {
+                                      return (
+                                          <div className="text-center py-4 text-gray-500">
+                                              {toolData?.list ? '' : 'loading...'}
+                                          </div>
+                                      );
+                                  }
+
                                   const groupedTools = searchNode.reduce(
                                       (groups: any, tool: any) => {
+                                      
+                                          if (!tool || !tool.title) {
+                                              return groups;
+                                          }
+                                          
                                           const categoryName = tool.categoryName || 'Unknown';
                                           if (!groups[categoryName]) {
                                               groups[categoryName] = {
