@@ -85,6 +85,9 @@ def extract_file_list_from_skill_output(outputs: dict, node_data_dict: dict) -> 
     storage_url = f"{settings.STORAGE_URL}/file"
     output_vars = create_variable_from_dict(node_data_dict)
     for key, value in outputs.items():
+
+        if not isinstance(value, str):
+            continue
         # Ensure path starts with /
         if not value.startswith('/'):
             value = '/' + value
@@ -97,7 +100,6 @@ def extract_file_list_from_skill_output(outputs: dict, node_data_dict: dict) -> 
         if re.match(WORKFLOW_PATH_PATTERN, value):
             output_vars.properties[key].type = 'file'
     file_vars = output_vars.extract_file_variables()
-    
     
     for var in file_vars.properties.values():
         if var.name in outputs:
