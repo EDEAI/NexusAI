@@ -465,7 +465,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
-                {'raw_user_prompt': self.data['prompt'].get_user()}
+                {
+                    'raw_user_prompt': (
+                        self.data['prompt'].get_user()
+                        if chatroom_prompt_args is None
+                        else self.data['prompt'].get_user().format(**chatroom_prompt_args)
+                    )
+                }
             )
             
             # RAG chain generation
@@ -800,7 +806,13 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     ))
             AppRuns().update(
                 {'column': 'id', 'value': agent_run_id},
-                {'raw_user_prompt': self.data['prompt'].get_user()}
+                {
+                    'raw_user_prompt': (
+                        self.data['prompt'].get_user()
+                        if chatroom_prompt_args is None
+                        else self.data['prompt'].get_user().format(**chatroom_prompt_args)
+                    )
+                }
             )
             
             # RAG chain generation
