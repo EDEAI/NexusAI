@@ -463,16 +463,23 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         value=file_var_value
                     ))
             
-            AppRuns().update(
-                {'column': 'id', 'value': agent_run_id},
-                {
-                    'raw_user_prompt': (
-                        self.data['prompt'].get_user()
-                        if chatroom_prompt_args is None
-                        else self.data['prompt'].get_user().format(**chatroom_prompt_args)
-                    )
-                }
-            )
+            if chatroom_prompt_args is None:
+                AppRuns().update(
+                    {'column': 'id', 'value': agent_run_id},
+                    {'raw_user_prompt': self.data['prompt'].get_user()}
+                )
+            else:
+                formatted_prompt = self.data['prompt'].get_user().format(**chatroom_prompt_args)
+                AppRuns().update(
+                    {'column': 'id', 'value': agent_run_id},
+                    {
+                        'raw_user_prompt': (
+                            formatted_prompt
+                            if len(formatted_prompt) < 65536
+                            else formatted_prompt[:65536] + '...'
+                        )
+                    }
+                )
             
             # RAG chain generation
             if override_dataset_id:
@@ -804,17 +811,25 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                         sub_type="image",
                         value=file_var_value
                     ))
-            AppRuns().update(
-                {'column': 'id', 'value': agent_run_id},
-                {
-                    'raw_user_prompt': (
-                        self.data['prompt'].get_user()
-                        if chatroom_prompt_args is None
-                        else self.data['prompt'].get_user().format(**chatroom_prompt_args)
-                    )
-                }
-            )
             
+            if chatroom_prompt_args is None:
+                AppRuns().update(
+                    {'column': 'id', 'value': agent_run_id},
+                    {'raw_user_prompt': self.data['prompt'].get_user()}
+                )
+            else:
+                formatted_prompt = self.data['prompt'].get_user().format(**chatroom_prompt_args)
+                AppRuns().update(
+                    {'column': 'id', 'value': agent_run_id},
+                    {
+                        'raw_user_prompt': (
+                            formatted_prompt
+                            if len(formatted_prompt) < 65536
+                            else formatted_prompt[:65536] + '...'
+                        )
+                    }
+                )
+
             # RAG chain generation
             if override_dataset_id:
                 datasets = [override_dataset_id]
