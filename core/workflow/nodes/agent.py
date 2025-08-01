@@ -385,6 +385,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         is_chat: bool = False,
         override_file_list: Optional[List[Union[int, str]]] = None,
         mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
+        chatroom_prompt_args: Optional[Dict[str, Any]] = None,
+        group_messages: bool = False,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -521,7 +523,9 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 is_chat=is_chat,
                 user_id=user_id,
                 agent_id=agent_id,
-                mcp_tool_list=all_mcp_tools
+                mcp_tool_list=all_mcp_tools,
+                chatroom_prompt_args=chatroom_prompt_args,
+                group_messages=group_messages
             )
             model_data['tools'] = all_mcp_tools
             print(model_data)
@@ -714,6 +718,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         override_file_list: Optional[List[Union[int, str]]] = None,
         mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
         is_desktop: bool = False,
+        chatroom_prompt_args: Optional[Dict[str, Any]] = None,
+        group_messages: bool = False,
         **kwargs
     ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
@@ -839,7 +845,9 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 return_json=False,
                 correct_llm_output=correct_llm_output,
                 override_rag_input=override_rag_input,
-                mcp_tool_list=all_mcp_tools
+                mcp_tool_list=all_mcp_tools,
+                chatroom_prompt_args=chatroom_prompt_args,
+                group_messages=group_messages
             )
 
             full_chunk: Optional[AIMessageChunk] = None

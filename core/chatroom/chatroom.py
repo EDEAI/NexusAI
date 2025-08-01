@@ -202,7 +202,7 @@ class Chatroom:
             # if (topic := message['topic']) is not None:
             #     message_for_llm['topic'] = topic
             messages.append(message_for_llm)
-        messages = truncate_messages_by_token_limit(messages, self._model_configs[model_config_id])
+        # messages = truncate_messages_by_token_limit(messages, self._model_configs[model_config_id])
         messages_in_last_section = deque()
         for message in reversed(messages):
             messages_in_last_section.appendleft(message)
@@ -215,62 +215,6 @@ class Chatroom:
         return (
             messages,
             list(messages_in_last_section),
-            user_messages
-        )
-    
-    def _get_history_messages_list_grouped(self, model_config_id: int) -> Tuple[
-        List[List[Dict[str, Union[int, str]]]],
-        List[Dict[str, Union[int, str]]],
-        List[str],
-    ]:
-        '''
-        Get all history messages (grouped by sections) and the last section of them as JSON strings in an AI prompt.
-        Each section starts with a user message and includes all subsequent agent messages until the next user message.
-        
-        Returns:
-            Tuple containing:
-            - List of message sections, where each section is a list of message dictionaries
-            - List of messages in the last section (from the last user message)
-            - List of all user messages
-        '''
-        # Process individual messages as in the original function
-        messages = []
-        for message in self._history_messages:
-            user_str = get_language_content('chatroom_role_user', self._user_id, append_ret_lang_prompt=False)
-            agent_str = get_language_content('chatroom_role_agent', self._user_id, append_ret_lang_prompt=False)
-            agent_id = message['agent_id']
-            message_for_llm = {
-                'id': agent_id,
-                'name': user_str if agent_id == 0 else self._all_agents[agent_id]['name'],
-                'role': user_str if agent_id == 0 else agent_str,
-                'type': message['type'],
-                'message': message['message']
-            }
-            messages.append(message_for_llm)
-        
-        # Truncate messages based on token limit
-        messages = truncate_messages_by_token_limit(messages, self._model_configs[model_config_id])
-        
-        # Group messages into sections
-        message_sections = []
-        current_section = []
-        for message in messages:
-            if message['id'] == 0 and message['type'] == 'text' and current_section:  # When encountering a user message and current section is not empty
-                message_sections.append(current_section)
-                current_section = []
-            current_section.append(message)
-        if current_section:  # Add the last section
-            message_sections.append(current_section)
-                
-        # Get all user messages
-        user_messages = []
-        for message in messages:
-            if message['id'] == 0 and message['type'] == 'text':
-                user_messages.append(message['message'])
-                
-        return (
-            message_sections,
-            message_sections[-1],
             user_messages
         )
     
@@ -380,16 +324,16 @@ class Chatroom:
                         self._user_id,
                         append_ret_lang_prompt=False
                     )
-            messages, messages_in_last_section, user_messages = self._get_history_messages_list_grouped(self._model_config_ids[0])
-            user_prompt = user_prompt.format(
-                agent_count = len(self._model_config_ids) - 1,
-                agents = self._get_agents_info(),
-                user_message = messages_in_last_section[0]['message'],
-                topic = self._topic,
-                messages = json.dumps(messages, ensure_ascii=False),
-                messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
-                user_messages = user_messages
-            )
+            messages, messages_in_last_section, user_messages = self._get_history_messages_list(self._model_config_ids[0])
+            # user_prompt = user_prompt.format(
+            #     # agent_count = len(self._model_config_ids) - 1,
+            #     agents = self._get_agents_info(),
+            #     # user_message = messages_in_last_section[0]['message'],
+            #     topic = self._topic,
+            #     messages = json.dumps(messages, ensure_ascii=False),
+            #     # messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
+            #     # user_messages = user_messages
+            # )
             if i > 0:
                 # the Speaker Selector has tried more than once
                 user_prompt = get_language_content(
@@ -413,7 +357,13 @@ class Chatroom:
                 asyncio.to_thread(
                     llm_node.run,
                     return_json=True,
-                    override_file_list=self._image_list if self._current_round == 0 else None
+                    override_file_list=self._image_list if self._current_round == 0 else None,
+                    chatroom_prompt_args={
+                        'messages': messages,
+                        'topic': self._topic,
+                        'agents': self._get_agents_info()
+                    },
+                    group_messages=True
                 ),
                 timeout=120
             )
@@ -981,20 +931,21 @@ class Chatroom:
             for _ in range(20):
                 agent_message = ''
 
-                messages, messages_in_last_section, user_messages = self._get_history_messages_list_grouped(self._model_config_ids[agent_id])
+                messages, messages_in_last_section, user_messages = self._get_history_messages_list(self._model_config_ids[agent_id])
                 user_message = messages_in_last_section[0]['message']
                 agent_user_subprompt = get_language_content(
                     'chatroom_agent_user_subprompt',
                     self._user_id,
                     append_ret_lang_prompt=False
-                ).format(
-                    messages = json.dumps(messages, ensure_ascii=False),
-                    topic = self._topic,
-                    user_message = user_message,
-                    messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
-                    user_messages = user_messages,
-                    chat_file_list = json.dumps([str(file) for file in self._chat_files], ensure_ascii=False)
                 )
+                # ).format(
+                #     messages = json.dumps(messages, ensure_ascii=False),
+                #     topic = self._topic,
+                #     # user_message = user_message,
+                #     # messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
+                #     # user_messages = user_messages,
+                #     chat_file_list = json.dumps([str(file) for file in self._chat_files], ensure_ascii=False)
+                # )
                 prompt = Prompt(user=agent_user_subprompt)
                 agent_node = AgentNode(
                     title=f'Agent {agent_id}',
@@ -1017,7 +968,13 @@ class Chatroom:
                     override_dataset_id=override_dataset['id'] if override_dataset else None,
                     override_file_list=self._image_list if self._current_round == 0 else None,
                     mcp_tool_list=self._desktop_mcp_tool_list,
-                    is_desktop=self._is_desktop
+                    is_desktop=self._is_desktop,
+                    chatroom_prompt_args={
+                        'messages': messages,
+                        'topic': self._topic,
+                        'chat_file_list': json.dumps([str(file) for file in self._chat_files], ensure_ascii=False)
+                    },
+                    group_messages=True
                 ):
                     if not reply_started:
                         await self._ws_manager.start_agent_reply(self._chatroom_id, agent_id, self._ability_id)
@@ -1330,7 +1287,13 @@ class Chatroom:
             model_config_id=self._model_config_ids[0],
             prompt=Prompt(system_prompt, user_prompt)
         )
-        result = llm_node.run()
+        result = await asyncio.wait_for(
+            asyncio.to_thread(
+                llm_node.run,
+                chatroom_prompt_args={'messages': messages}
+            ),
+            timeout=120
+        )
         assert result['status'] == 'success', result['message']
         
         result_data = result['data']
