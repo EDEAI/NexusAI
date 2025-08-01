@@ -494,6 +494,7 @@ class LLMPipeline:
         Handles different types of responses:
         1. Anthropic responses (structured/unstructured output)
         2. Google responses (structured output with tool calls)
+        3. Tongyi responses (with token usage from response metadata)
         Other suppliers' responses are returned as-is.
 
         Args:
@@ -575,6 +576,28 @@ class LLMPipeline:
                         'completion_tokens': usage_metadata.get('output_tokens', 0),
                         'total_tokens': usage_metadata.get('total_tokens', 0)
                     }
+                }
+            })
+            return standardized_response
+
+        elif self.supplier == 'Tongyi':
+            # Handle Tongyi responses
+            content = response.content
+            
+            # Extract token usage from response metadata
+            token_usage = {}
+            if hasattr(response, 'response_metadata') and response.response_metadata:
+                metadata_token_usage = response.response_metadata.get('token_usage', {})
+                token_usage = {
+                    'prompt_tokens': metadata_token_usage.get('input_tokens', 0),
+                    'completion_tokens': metadata_token_usage.get('output_tokens', 0),
+                    'total_tokens': metadata_token_usage.get('total_tokens', 0)
+                }
+            
+            standardized_response = type('StandardizedResponse', (), {
+                'content': content,
+                'response_metadata': {
+                    'token_usage': token_usage
                 }
             })
             return standardized_response

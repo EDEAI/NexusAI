@@ -848,11 +848,24 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             total_tokens = 0
             async for chunk in ainvoke():
                 full_chunk = chunk if full_chunk is None else full_chunk + chunk
-                # Get token usage
-                if usage_metadata := chunk.usage_metadata:
-                    prompt_tokens += usage_metadata['input_tokens']
-                    completion_tokens += usage_metadata['output_tokens']
-                    total_tokens += usage_metadata['total_tokens']
+                # Extract token usage from chunk (support different formats)
+                token_usage = None
+                
+                # Try getting token usage from usage_metadata first (original format)
+                if hasattr(chunk, 'usage_metadata') and chunk.usage_metadata:
+                    token_usage = chunk.usage_metadata
+                
+                # Try getting token usage from response_metadata (new format)
+                elif hasattr(chunk, 'response_metadata') and chunk.response_metadata:
+                    if 'token_usage' in chunk.response_metadata:
+                        token_usage = chunk.response_metadata['token_usage']
+                
+                # Update token counts if token usage is found
+                if token_usage:
+                    prompt_tokens += token_usage.get('input_tokens', 0)
+                    completion_tokens += token_usage.get('output_tokens', 0)
+                    total_tokens += token_usage.get('total_tokens', 0)
+                    
                 yield chunk
                 
             if retrieval_token_counter:
