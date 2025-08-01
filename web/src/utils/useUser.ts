@@ -18,50 +18,110 @@ export const headportrait = (type: string, headId?: number): any => {
     const profilephoto = [
         {
             id: 1,
-            image: '/icons/headportrait/Android.svg',
+            image: '/icons/headportrait/human1.png',
         },
         {
             id: 2,
-            image: '/icons/headportrait/Viewprocess.svg',
+            image: '/icons/headportrait/human2.png',
         },
         {
             id: 3,
-            image: '/icons/headportrait/map.svg',
+            image: '/icons/headportrait/human3.png',
         },
         {
             id: 4,
-            image: '/icons/headportrait/consultingfee.svg',
+            image: '/icons/headportrait/human4.png',
         },
         {
             id: 5,
-            image: '/icons/headportrait/science.svg',
+            image: '/icons/headportrait/human5.png',
         },
         {
             id: 6,
-            image: '/icons/headportrait/leaf.svg',
+            image: '/icons/headportrait/human6.png',
         },
         {
             id: 7,
-            image: '/icons/headportrait/travel.svg',
+            image: '/icons/headportrait/human7.png',
         },
         {
             id: 8,
-            image: '/icons/headportrait/aircraft.svg',
+            image: '/icons/headportrait/human8.png',
         },
         {
             id: 9,
-            image: '/icons/headportrait/mainprocess.svg',
+            image: '/icons/headportrait/human9.png',
         },
         {
             id: 10,
-            image: '/icons/headportrait/subprocess.svg',
+            image: '/icons/headportrait/human10.png',
         },
         {
             id: 11,
-            image: '/icons/headportrait/python.svg',
+            image: '/icons/headportrait/human11.png',
         },
         {
             id: 12,
+            image: '/icons/headportrait/human12.png',
+        },
+        {
+            id: 13,
+            image: '/icons/headportrait/human13.png',
+        },
+        {
+            id: 14,
+            image: '/icons/headportrait/human14.png',
+        },
+        {
+            id: 15,
+            image: '/icons/headportrait/human15.png',
+        },
+        {
+            id: 16,
+            image: '/icons/headportrait/Android.svg',
+        },
+        {
+            id: 17,
+            image: '/icons/headportrait/Viewprocess.svg',
+        },
+        {
+            id: 18,
+            image: '/icons/headportrait/map.svg',
+        },
+        {
+            id: 19,
+            image: '/icons/headportrait/consultingfee.svg',
+        },
+        {
+            id: 20,
+            image: '/icons/headportrait/science.svg',
+        },
+        {
+            id: 21,
+            image: '/icons/headportrait/leaf.svg',
+        },
+        {
+            id: 22,
+            image: '/icons/headportrait/travel.svg',
+        },
+        {
+            id: 23,
+            image: '/icons/headportrait/aircraft.svg',
+        },
+        {
+            id: 24,
+            image: '/icons/headportrait/mainprocess.svg',
+        },
+        {
+            id: 25,
+            image: '/icons/headportrait/subprocess.svg',
+        },
+        {
+            id: 26,
+            image: '/icons/headportrait/python.svg',
+        },
+        {
+            id: 27,
             image: '/icons/headportrait/SQL.svg',
         },
     ];
