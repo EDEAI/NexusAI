@@ -328,7 +328,7 @@ class Chatroom:
             # user_prompt = user_prompt.format(
             #     # agent_count = len(self._model_config_ids) - 1,
             #     agents = self._get_agents_info(),
-            #     # user_message = messages_in_last_section[0]['message'],
+            #     user_message = messages_in_last_section[0]['message'],
             #     topic = self._topic,
             #     messages = json.dumps(messages, ensure_ascii=False),
             #     # messages_in_last_section = json.dumps(messages_in_last_section, ensure_ascii=False),
@@ -360,6 +360,7 @@ class Chatroom:
                     override_file_list=self._image_list if self._current_round == 0 else None,
                     chatroom_prompt_args={
                         'messages': messages,
+                        'user_message': messages_in_last_section[0]['message'],
                         'topic': self._topic,
                         'agents': self._get_agents_info()
                     },
