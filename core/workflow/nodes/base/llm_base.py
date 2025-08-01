@@ -12,6 +12,7 @@ from langchain_core.documents import Document
 from langchain_core.messages import AIMessageChunk
 from langchain_core.runnables import Runnable, RunnableParallel, RunnablePassthrough
 from langchain_core.runnables.utils import Input, Output
+from tokenizers import Encoding, Tokenizer
 
 from core.database.models.agent_chat_messages import AgentChatMessages
 from core.document import DocumentLoader
@@ -66,7 +67,7 @@ class LLMBaseNode(Node):
         return text.replace("{", "{{").replace("}", "}}")
 
     @classmethod
-    def _get_tokenizer(cls, model_name: str, api_key: str) -> Union[tiktoken.Encoding, Anthropic]:
+    def _get_tokenizer(cls, model_name: str, api_key: str) -> Callable[[str], int]:
         """
         Get the appropriate tokenizer based on the model name
         
@@ -74,21 +75,24 @@ class LLMBaseNode(Node):
             model_name (str): Model name, e.g., 'gpt-3.5-turbo', 'gpt-4', 'claude-3-opus'
             
         Returns:
-            Union[tiktoken.Encoding, Anthropic]: Tokenizer object
+            Callable[[str], int]: A function that takes a string and returns the number of tokens.
         """
         # if model_name.startswith('claude') and ANTHROPIC_AVAILABLE:
-        #     anthropic = Anthropic(api_key=api_key)
-        #     def anthropic_token_counter(text: str) -> int:
-        #         return anthropic.messages.count_tokens(
-        #             model=model_name,
-        #             messages=[{'role': 'user', 'content': text}],
-        #         ).input_tokens
-        #     return anthropic_token_counter
+        #     # anthropic = Anthropic(api_key=api_key)
+        #     # def anthropic_token_counter(text: str) -> int:
+        #     #     return anthropic.messages.count_tokens(
+        #     #         model=model_name,
+        #     #         messages=[{'role': 'user', 'content': text}],
+        #     #     ).input_tokens
+        #     # return anthropic_token_counter
+        #     tokenizer = Tokenizer.from_file(str(project_root.joinpath('core/helper/claude-tokenizer.json')))
+        #     return lambda text: len(tokenizer.encode(text).ids)
         # else:
         try:
-            return tiktoken.encoding_for_model(model_name)
+            encoding = tiktoken.encoding_for_model(model_name)
         except:
-            return tiktoken.get_encoding("cl100k_base")
+            encoding = tiktoken.get_encoding("cl100k_base")
+        return lambda text: len(encoding.encode(text))
 
     @classmethod
     def _group_chatroom_messages(
@@ -110,7 +114,7 @@ class LLMBaseNode(Node):
     @classmethod
     def _count_tokens(
         cls,
-        tokenizer: Union[tiktoken.Encoding, Callable[[str], int]],
+        tokenizer: Callable[[str], int],
         messages: Messages,
         chatroom_prompt_args: Dict[str, Any],
         mcp_tool_list: Optional[List[Dict[str, Any]]],
@@ -152,11 +156,7 @@ class LLMBaseNode(Node):
         text = json.dumps(message_list, ensure_ascii=False)
         if mcp_tool_list:
             text += json.dumps(mcp_tool_list, ensure_ascii=False)
-        if isinstance(tokenizer, tiktoken.Encoding):
-            return len(tokenizer.encode(text))
-        elif ANTHROPIC_AVAILABLE and isinstance(tokenizer, Callable):
-            return tokenizer(text)
-        return 0
+        return tokenizer(text)
 
     def _truncate_chatroom_messages_by_token_limit(
         self,
