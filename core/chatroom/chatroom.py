@@ -1278,8 +1278,6 @@ class Chatroom:
             'chatroom_title_user',
             self._user_id,
             append_ret_lang_prompt=False
-        ).format(
-            messages=json.dumps(messages, ensure_ascii=False)
         )
 
         llm_node = LLMNode(
