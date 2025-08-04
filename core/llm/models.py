@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
@@ -488,6 +489,52 @@ class LLMPipeline:
         llm_chain = prompt_template | self.llm
         return llm_chain
 
+    def _convert_messages_for_tongyi(self, messages):
+        """
+        Convert standard message format to Tongyi vision format.
+        Transforms image_url format to Tongyi's expected format.
+        
+        Args:
+            messages: List of messages or single message to convert
+            
+        Returns:
+            Converted messages compatible with Tongyi vision models
+        """
+        if not isinstance(messages, list):
+            return messages
+            
+        converted_messages = []
+        
+        for message in messages:
+            # Only convert HumanMessage with content list that contains images
+            if hasattr(message, 'content') and isinstance(message.content, list):
+                converted_content = []
+                
+                for item in message.content:
+                    if isinstance(item, dict):
+                        # Convert standard image_url format to Tongyi format
+                        if item.get('type') == 'image_url' and 'image_url' in item:
+                            image_url = item['image_url']['url']
+                            converted_content.append({"image": image_url})
+                        # Convert standard text format to Tongyi format
+                        elif item.get('type') == 'text' and 'text' in item:
+                            converted_content.append({"text": item['text']})
+                        # Keep other formats as-is
+                        else:
+                            converted_content.append(item)
+                    else:
+                        converted_content.append(item)
+                
+                # Create new message with converted content
+                converted_message = deepcopy(message)
+                converted_message.content = converted_content
+                converted_messages.append(converted_message)
+            else:
+                # Keep non-list content messages as-is
+                converted_messages.append(message)
+                
+        return converted_messages
+
     def standardize_response(self, response):
         """
         Standardize the response format to match OpenAI's structure.
@@ -615,6 +662,10 @@ class LLMPipeline:
         Returns:
             The standardized output of the pipeline chain.
         """
+        # Convert messages for Tongyi if needed
+        if self.supplier == 'Tongyi':
+            messages = self._convert_messages_for_tongyi(messages)
+            
         response = self.chain(messages).invoke(input)
         return self.standardize_response(response)
     
@@ -622,6 +673,10 @@ class LLMPipeline:
         """
         Invoke the LLM model with the provided prompt.
         """
+        # Convert messages for Tongyi if needed
+        if self.supplier == 'Tongyi':
+            messages = self._convert_messages_for_tongyi(messages)
+            
         response = self.llm.invoke(messages, **kwargs)
         return self.standardize_response(response)
 
@@ -629,6 +684,10 @@ class LLMPipeline:
         """
         Stream the LLM model with the provided prompt.
         """
+        # Convert messages for Tongyi if needed
+        if self.supplier == 'Tongyi':
+            messages = self._convert_messages_for_tongyi(messages)
+            
         # Handle Google/Gemini supplier streaming issue
         if self.supplier == 'Google':
             # For Google, create async wrapper for synchronous streaming
