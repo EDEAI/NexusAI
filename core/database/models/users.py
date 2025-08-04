@@ -138,11 +138,11 @@ class Users(MySQL):
                 'last_login_ip': last_login_ip,
                 'last_login_time': formatted_time
             }
-            if nickname is not None:
+            if nickname and nickname.strip():
                 update_data['nickname'] = nickname
-            if avatar is not None:
+            if avatar and avatar.strip():
                 update_data['avatar'] = avatar
-            if language is not None:
+            if language and language.strip():
                 update_data['language'] = language
             # if phone:
             #     update_data['phone'] = phone
@@ -155,15 +155,16 @@ class Users(MySQL):
                     'last_login_ip':last_login_ip,
                     'last_login_time': formatted_time
                 }
-                if nickname is not None:
+                if nickname and nickname.strip():
                     new_data['nickname'] = nickname
-                if avatar is not None:
+                if avatar and avatar.strip():
                     new_data['avatar'] = avatar
                 user_info = self.select_one(columns=['id','phone','email'], conditions=[{'column': 'id', 'value': user_id}, {'column': 'status', 'value': 1}])
 
-                if phone is not None and user_info['phone'] is None:
+                # if phone is not None and user_info['phone'] is None:
+                if phone and phone.strip() and user_info['phone'] is None:
                     new_data['phone'] = phone
-                if email is not None and user_info['email'] is None:
+                if email and email.strip()  and user_info['email'] is None:
                     new_data['email'] = email
                 if user_id != existing_user['id']:
                     self.update(
@@ -249,15 +250,15 @@ class Users(MySQL):
                 'last_login_ip': last_login_ip,
                 'last_login_time': formatted_time
             }
-            if nickname is not None:
+            if nickname and nickname.strip():
                 update_data['nickname'] = nickname
-            if avatar is not None:
+            if avatar and avatar.strip():
                 update_data['avatar'] = avatar
-            if language is not None:
+            if language and language.strip():
                 update_data['language'] = language
-            if phone is not None:
+            if phone and phone.strip():
                 update_data['phone'] = phone
-            if email is not None:
+            if email and email.strip():
                 update_data['email'] = email
             self.update(
                 [{'column': 'id', 'value': user_id}],
@@ -433,11 +434,11 @@ class Users(MySQL):
                 'last_login_ip': last_login_ip,
                 'last_login_time': formatted_time
             }
-            if nickname is not None:
+            if nickname and nickname.strip():
                 update_data['nickname'] = nickname
-            if avatar is not None:
+            if avatar and avatar.strip():
                 update_data['avatar'] = avatar
-            if language is not None:
+            if language and language.strip():
                 update_data['language'] = language
             # if phone:
             #     update_data['phone'] = phone
@@ -456,9 +457,9 @@ class Users(MySQL):
                     new_data['avatar'] = avatar
                 user_info = self.select_one(columns=['id','phone','email'], conditions=[{'column': 'id', 'value': user_id}, {'column': 'status', 'value': 1}])
 
-                if phone is not None and user_info['phone'] is None:
+                if phone and phone.strip() and user_info['phone'] is None:
                     new_data['phone'] = phone
-                if email is not None and user_info['email'] is None:
+                if email and email.strip() and user_info['email'] is None:
                     new_data['email'] = email
                 if user_id != existing_user['id']:
                     self.update(
@@ -504,7 +505,7 @@ class Users(MySQL):
                             'updated_at': formatted_time
                         }
                     )
-                    
+
                 UserThreeParties().update(
                     [{'column': 'user_id', 'value': existing_user['id']}],
                     {
