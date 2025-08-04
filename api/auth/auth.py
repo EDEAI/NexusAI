@@ -236,17 +236,6 @@ async def get_user_info(userinfo: TokenData = Depends(get_current_user)):
                 {'column': 'user_id', 'value': uid}
             ]
         )
-
-        if user_info['avatar']:
-            if user_info['avatar'].find('head_icon') == -1:
-                user_info['avatar'] = f"{settings.STORAGE_URL}/upload/{user_info['avatar']}"
-            else:
-                user_info["avatar"] = f"{settings.ICON_URL}/{user_info['avatar']}"
-        else:
-            if user_info['icon']:
-                user_info['avatar'] = f"{settings.ICON_URL}/head_icon/{user_info['icon']}.png"
-            else:
-                user_info['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
     else:
         return response_error("User not found")
     
