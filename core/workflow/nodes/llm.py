@@ -77,6 +77,8 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
         task: Optional[Dict[str, RecursiveTaskCategory]] = None,
         correct_llm_output: bool = False,
         override_file_list: Optional[List[Union[int, str]]] = None,
+        chatroom_prompt_args: Optional[Dict[str, Any]] = None,
+        group_messages: bool = False,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -117,7 +119,7 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             # Escape braces in the prompt
             if system_prompt := prompt.get_system():
                 prompt.system.value = self.duplicate_braces(system_prompt)
-            if user_prompt := prompt.get_user():
+            if user_prompt := prompt.get_user() and chatroom_prompt_args is None:
                 prompt.user.value = self.duplicate_braces(user_prompt)
             if assistant_prompt := prompt.get_assistant():
                 prompt.assistant.value = self.duplicate_braces(assistant_prompt)
@@ -168,7 +170,9 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
                 input=invoke_input,
                 file_list=file_list,
                 correct_llm_output=correct_llm_output,
-                return_json=kwargs.get('return_json', False)
+                return_json=kwargs.get('return_json', False),
+                chatroom_prompt_args=chatroom_prompt_args,
+                group_messages=group_messages
             )
             if isinstance(content, (dict, list)):
                 outputs = Variable(name="text", type="json", value=json.dumps(content, ensure_ascii=False))

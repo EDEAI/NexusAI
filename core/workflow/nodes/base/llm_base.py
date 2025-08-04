@@ -2,13 +2,17 @@ import asyncio, sys, json, re
 from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent.parent))
 
+from collections import deque
 from copy import deepcopy
-from typing import Any, AsyncIterator, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, AsyncIterator, Callable, Dict, Iterable, List, Optional, Tuple, Union
+
+import tiktoken
 
 from langchain_core.documents import Document
 from langchain_core.messages import AIMessageChunk
 from langchain_core.runnables import Runnable, RunnableParallel, RunnablePassthrough
 from langchain_core.runnables.utils import Input, Output
+from tokenizers import Encoding, Tokenizer
 
 from core.database.models.agent_chat_messages import AgentChatMessages
 from core.document import DocumentLoader
@@ -23,6 +27,11 @@ from llm.messages import Messages, create_messages_from_serialized_format
 
 from core.helper import truncate_agent_messages_by_token_limit, get_file_content_list
 from core.database.models import (Models, Users)
+try:
+    from anthropic import Anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
 
 
 project_root = Path(__file__).absolute().parent.parent.parent.parent.parent
@@ -56,6 +65,195 @@ class LLMBaseNode(Node):
             str: The text with duplicated braces.
         """
         return text.replace("{", "{{").replace("}", "}}")
+
+    @classmethod
+    def _get_tokenizer(cls, model_name: str, api_key: str) -> Callable[[str], int]:
+        """
+        Get the appropriate tokenizer based on the model name
+        
+        Args:
+            model_name (str): Model name, e.g., 'gpt-3.5-turbo', 'gpt-4', 'claude-3-opus'
+            
+        Returns:
+            Callable[[str], int]: A function that takes a string and returns the number of tokens.
+        """
+        # if model_name.startswith('claude') and ANTHROPIC_AVAILABLE:
+        #     # anthropic = Anthropic(api_key=api_key)
+        #     # def anthropic_token_counter(text: str) -> int:
+        #     #     return anthropic.messages.count_tokens(
+        #     #         model=model_name,
+        #     #         messages=[{'role': 'user', 'content': text}],
+        #     #     ).input_tokens
+        #     # return anthropic_token_counter
+        #     tokenizer = Tokenizer.from_file(str(project_root.joinpath('core/helper/claude-tokenizer.json')))
+        #     return lambda text: len(tokenizer.encode(text).ids)
+        # else:
+        try:
+            encoding = tiktoken.encoding_for_model(model_name)
+        except:
+            encoding = tiktoken.get_encoding("cl100k_base")
+        return lambda text: len(encoding.encode(text))
+
+    @classmethod
+    def _group_chatroom_messages(
+        cls,
+        messages: Iterable[Dict[str, Union[int, str]]]
+    ) -> List[List[Dict[str, Union[int, str]]]]:
+        # Group messages into sections
+        message_sections = []
+        current_section = []
+        for message in messages:
+            if message['id'] == 0 and message['type'] == 'text' and current_section:  # When encountering a user message and current section is not empty
+                message_sections.append(current_section)
+                current_section = []
+            current_section.append(message)
+        if current_section:  # Add the last section
+            message_sections.append(current_section)
+        return message_sections
+
+    @classmethod
+    def _count_tokens(
+        cls,
+        tokenizer: Callable[[str], int],
+        messages: Messages,
+        chatroom_prompt_args: Dict[str, Any],
+        mcp_tool_list: Optional[List[Dict[str, Any]]],
+        group_messages: bool,
+        model_config: Dict[str, Any],
+        restrict_max_rounds: bool,
+        input_variables: Optional[Dict[str, Any]]
+    ) -> int:
+        chatroom_messages = chatroom_prompt_args['messages']
+        if group_messages:
+            chatroom_messages = cls._group_chatroom_messages(chatroom_messages)
+        else:
+            chatroom_messages = list(chatroom_messages)
+        chatroom_prompt_args['messages'] = json.dumps(chatroom_messages, ensure_ascii=False)
+        if 'user_prompt' in input_variables:
+            input_variables['user_prompt'] = input_variables['user_prompt'].format(**chatroom_prompt_args)
+        else:
+            input_variables.update(chatroom_prompt_args)
+        messages_as_langchain_format = messages.to_langchain_format(
+            model_config['model_name'],
+            model_config['supplier_name'],
+            restrict_max_rounds,
+            input_variables=input_variables
+        )
+        message_list = []
+        for msg in messages_as_langchain_format:
+            if isinstance(msg, tuple):
+                message_list.append(msg)
+            else:
+                msg_role = msg.type
+                msg_content = msg.content
+                if isinstance(msg_content, str):
+                    message_list.append((msg_role, msg_content))
+                else:
+                    for sub_msg in msg_content:
+                        if sub_msg['type'] == 'text':
+                            message_list.append((msg_role, sub_msg))
+                        # else sub_msg is an image, just ignore it
+        text = json.dumps(message_list, ensure_ascii=False)
+        if mcp_tool_list:
+            text += json.dumps(mcp_tool_list, ensure_ascii=False)
+        return tokenizer(text)
+
+    def _truncate_chatroom_messages_by_token_limit(
+        self,
+        messages: Messages,
+        chatroom_prompt_args: Dict[str, Any],
+        mcp_tool_list: Optional[List[Dict[str, Any]]],
+        group_messages: bool,
+        model_config: Dict[str, Any],
+        restrict_max_rounds: bool,
+        input_variables: Optional[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        chatroom_messages = chatroom_prompt_args['messages']
+            
+        # Get model information
+        model_name = model_config['model_name']
+        api_key = model_config['supplier_config']['api_key']
+        max_context_tokens = model_config['max_context_tokens']
+        max_output_tokens = model_config['max_output_tokens']
+        token_limit = max_context_tokens - max_output_tokens - 8192
+        
+        # Get appropriate tokenizer
+        tokenizer = self._get_tokenizer(model_name, api_key)
+
+        # Find the start index of current dialog (last user message)
+        current_dialog_start = 0
+        for i in reversed(range(len(chatroom_messages))):
+            msg = chatroom_messages[i]
+            if msg['id'] == 0 and msg['type'] == 'text':
+                current_dialog_start = i  # Track the last user message position
+                break
+
+        # Split messages into history and current dialog
+        history_messages = chatroom_messages[:current_dialog_start]
+        current_dialog_messages = chatroom_messages[current_dialog_start:]
+        
+        truncated_messages = deque(current_dialog_messages)
+        chatroom_prompt_args['messages'] = list(truncated_messages)
+        current_tokens = self._count_tokens(
+            tokenizer,
+            messages, chatroom_prompt_args, mcp_tool_list, group_messages,
+            model_config, restrict_max_rounds, input_variables.copy()
+        )
+        
+        if current_tokens > token_limit:
+            stop_truncating = False
+            for msg in truncated_messages:
+                if msg['type'] == 'tool_result':
+                    # Skip if already truncated
+                    if msg['message'] == '...':
+                        continue
+
+                    original_content = msg['message']
+
+                    # Binary search for maximum allowable content length
+                    low, high = 0, len(original_content)
+                    while low <= high:
+                        mid = (low + high) // 2
+                        truncated_content = original_content[:mid] + '...'
+                        msg['message'] = truncated_content
+
+                        # Check if this truncation would bring total under limit
+                        chatroom_prompt_args['messages'] = list(truncated_messages)
+                        current_tokens = self._count_tokens(
+                            tokenizer,
+                            messages, chatroom_prompt_args, mcp_tool_list, group_messages,
+                            model_config, restrict_max_rounds, input_variables.copy()
+                        )
+                        if current_tokens <= token_limit:
+                            stop_truncating = True
+                            low = mid + 1
+                        else:
+                            stop_truncating = False
+                            high = mid - 1
+                    if stop_truncating:
+                        break
+        else:
+            # Traverse messages from newest to oldest
+            for message in reversed(history_messages):
+                chatroom_prompt_args['messages'] = [message] + list(truncated_messages)
+                current_tokens = self._count_tokens(
+                    tokenizer,
+                    messages, chatroom_prompt_args, mcp_tool_list, group_messages,
+                    model_config, restrict_max_rounds, input_variables.copy()
+                )
+                if current_tokens > token_limit:
+                    break
+                truncated_messages.appendleft(message)
+        if group_messages:
+            chatroom_messages = self._group_chatroom_messages(truncated_messages)
+        else:
+            chatroom_messages = list(truncated_messages)
+        chatroom_prompt_args['messages'] = json.dumps(chatroom_messages, ensure_ascii=False)
+        if 'user_prompt' in input_variables:
+            input_variables['user_prompt'] = input_variables['user_prompt'].format(**chatroom_prompt_args)
+        else:
+            input_variables.update(chatroom_prompt_args)
+        return input_variables
     
     def _prepare_messages_and_input(
         self, 
@@ -244,7 +442,9 @@ class LLMBaseNode(Node):
         is_chat: bool = False,
         user_id: int = 0,
         agent_id: int = 0,
-        mcp_tool_list: Optional[List[Dict[str, Any]]] = None
+        mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
+        chatroom_prompt_args: Optional[Dict[str, Any]] = None,
+        group_messages: bool = False
     ) -> Tuple[Dict[str, Any], str, int, int, int]:
         """
         Workflow node invokes the LLM model to generate text using the language model.
@@ -292,6 +492,11 @@ class LLMBaseNode(Node):
         if model_info["supplier_name"] in ["Anthropic", "Google"]:
             messages.reorganize_messages()
 
+        if chatroom_prompt_args:
+            input = self._truncate_chatroom_messages_by_token_limit(
+                messages, chatroom_prompt_args, mcp_tool_list, group_messages,
+                model_info, not is_chat, input
+            )
         messages_as_langchain_format = messages.to_langchain_format(
             model_info["model_name"],
             model_info["supplier_name"],
@@ -336,7 +541,9 @@ class LLMBaseNode(Node):
         return_json: bool = False,
         correct_llm_output: bool = False,
         override_rag_input: Optional[str] = None,
-        mcp_tool_list: Optional[List[Dict[str, Any]]] = None
+        mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
+        chatroom_prompt_args: Optional[Dict[str, Any]] = None,
+        group_messages: bool = False
     ) -> Tuple[Dict[str, Any], Callable[[], AsyncIterator[AIMessageChunk]]]:
         """
         This function is used to get the model data and the async AI invoke function.
@@ -376,6 +583,12 @@ class LLMBaseNode(Node):
         
         if model_info["supplier_name"] in ["Anthropic", "Google"]:
             messages.reorganize_messages()
+
+        if chatroom_prompt_args:
+            input = self._truncate_chatroom_messages_by_token_limit(
+                messages, chatroom_prompt_args, mcp_tool_list, group_messages,
+                model_info, True, input
+            )
 
         async def ainvoke():
             llm_input = messages.to_langchain_format(

@@ -2,7 +2,7 @@
  * @Author: wnagchi 1305bcd@gmail.com
  * @Date: 2024-12-30 17:31:04
  * @LastEditors: biz
- * @LastEditTime: 2025-07-29 11:44:59
+ * @LastEditTime: 2025-07-31 09:49:02
  * @FilePath: \NexusAI_GITHUB\web\src\components\WorkFlow\components\DraggableList\index.tsx
  */
 import { getBaseNode } from '@/components/WorkFlow/nodes/nodeDisperse';
@@ -260,11 +260,11 @@ const ToolCategory = memo(
                         icon={category?.identity?.icon}
                         typeBadge={typeBadge}
                     />
-                    <Tooltip placement="right" title={category?.identity?.description[lang]}>
+                    <Tooltip placement="right" title={category?.identity?.description?.[lang]||category?.identity?.description?.['en_US']}>
                         <QuestionCircleOutlined className="cursor-pointer ml-1" />
                     </Tooltip>
                 </div>
-                {category.tools.map((tool, toolIndex) => (
+                {category?.tools?.map((tool, toolIndex) => (
                     <div className='pl-6'>
                         <ToolNodeItem
                             key={toolIndex}

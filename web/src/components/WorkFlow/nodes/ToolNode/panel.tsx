@@ -9,7 +9,7 @@ import {
     ProFormSwitch,
     ProFormText,
 } from '@ant-design/pro-components';
-import { useIntl } from '@umijs/max';
+import { getLocale, useIntl } from '@umijs/max';
 import { useMount, useUpdateEffect } from 'ahooks';
 import Link from 'antd/lib/typography/Link';
 import { debounce } from 'lodash';
@@ -192,7 +192,7 @@ export default memo(({ node }: { node: AppNode }) => {
             formRef.current.setFieldsValue({ [name]: newValue });
         }
     }, []);
-
+    const lang = getLocale() === 'en-US' ? 'en_US' : 'zh_Hans';
     return (
         <>
             <div className="pt-4">
@@ -219,20 +219,20 @@ export default memo(({ node }: { node: AppNode }) => {
                                     <div key={e.name}>
                                         <ProFormText
                                             tooltip={
-                                                <Link href={e?.url} underline target="_blank">
-                                                    {e?.help?.zh_Hans}
-                                                </Link>
+                                                e?.help?.[lang]?<Link href={e?.url} underline target="_blank">
+                                                    {e?.help?.[lang]}
+                                                </Link>:null
                                             }
                                             required={e.required}
-                                            placeholder={e.placeholder?.zh_Hans}
+                                            placeholder={e.placeholder?.[lang]}
                                             rules={[
                                                 {
                                                     required: e.required,
-                                                    message: e.placeholder?.zh_Hans,
+                                                    message: e.placeholder?.[lang],
                                                 },
                                             ]}
                                             name={e.name}
-                                            label={e?.label?.zh_Hans}
+                                            label={e?.label?.[lang]}
                                         ></ProFormText>
                                     </div>
                                 );
