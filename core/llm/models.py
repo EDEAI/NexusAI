@@ -1,6 +1,4 @@
 import json
-from copy import deepcopy
-
 from langchain_core.prompts import PromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_anthropic import ChatAnthropic
@@ -22,7 +20,6 @@ from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_community.chat_models import ChatOllama
 from langchain_community.chat_models import ChatSparkLLM
 from langchain_together import ChatTogether
-from langchain_community.chat_models.tongyi import ChatTongyi
 from langchain_google_vertexai import ChatVertexAI
 from langchain_community.chat_models import VolcEngineMaasChat
 from langchain_community.chat_models import QianfanChatEndpoint
@@ -351,7 +348,7 @@ class LLMPipeline:
             }
             '''
             self.llm = ChatOllama(**config)
-        elif self.supplier in ['OpenAI', 'Doubao']:
+        elif self.supplier in ['OpenAI', 'Doubao', 'Tongyi']:
             self.llm = ChatOpenAI(**config)
         elif self.supplier == 'Spark':
             '''
@@ -379,18 +376,6 @@ class LLMPipeline:
             }
             '''
             self.llm = ChatTogether(**config)
-        elif self.supplier == 'Tongyi':
-            '''
-               config = {
-                "model": "qwen-turbo",  # Model name to use.
-                "model_kwargs": {},  # Additional keyword arguments for the model.
-                "top_p": 0.8,  # Total probability mass of tokens to consider at each step.
-                "api_key": None,  # Dashscope API key provided by Alibaba Cloud.
-                "streaming": False,  # Whether to stream the results or not.
-                "max_retries": 10,  # Maximum number of retries to make when generating.
-            }
-            '''
-            self.llm = ChatTongyi(**config)
         elif self.supplier == 'VertexAI':
             '''
             config = {
@@ -489,52 +474,6 @@ class LLMPipeline:
         llm_chain = prompt_template | self.llm
         return llm_chain
 
-    def _convert_messages_for_tongyi(self, messages):
-        """
-        Convert standard message format to Tongyi vision format.
-        Transforms image_url format to Tongyi's expected format.
-        
-        Args:
-            messages: List of messages or single message to convert
-            
-        Returns:
-            Converted messages compatible with Tongyi vision models
-        """
-        if not isinstance(messages, list):
-            return messages
-            
-        converted_messages = []
-        
-        for message in messages:
-            # Only convert HumanMessage with content list that contains images
-            if hasattr(message, 'content') and isinstance(message.content, list):
-                converted_content = []
-                
-                for item in message.content:
-                    if isinstance(item, dict):
-                        # Convert standard image_url format to Tongyi format
-                        if item.get('type') == 'image_url' and 'image_url' in item:
-                            image_url = item['image_url']['url']
-                            converted_content.append({"image": image_url})
-                        # Convert standard text format to Tongyi format
-                        elif item.get('type') == 'text' and 'text' in item:
-                            converted_content.append({"text": item['text']})
-                        # Keep other formats as-is
-                        else:
-                            converted_content.append(item)
-                    else:
-                        converted_content.append(item)
-                
-                # Create new message with converted content
-                converted_message = deepcopy(message)
-                converted_message.content = converted_content
-                converted_messages.append(converted_message)
-            else:
-                # Keep non-list content messages as-is
-                converted_messages.append(message)
-                
-        return converted_messages
-
     def standardize_response(self, response):
         """
         Standardize the response format to match OpenAI's structure.
@@ -627,28 +566,6 @@ class LLMPipeline:
             })
             return standardized_response
 
-        elif self.supplier == 'Tongyi':
-            # Handle Tongyi responses
-            content = response.content
-            
-            # Extract token usage from response metadata
-            token_usage = {}
-            if hasattr(response, 'response_metadata') and response.response_metadata:
-                metadata_token_usage = response.response_metadata.get('token_usage', {})
-                token_usage = {
-                    'prompt_tokens': metadata_token_usage.get('input_tokens', 0),
-                    'completion_tokens': metadata_token_usage.get('output_tokens', 0),
-                    'total_tokens': metadata_token_usage.get('total_tokens', 0)
-                }
-            
-            standardized_response = type('StandardizedResponse', (), {
-                'content': content,
-                'response_metadata': {
-                    'token_usage': token_usage
-                }
-            })
-            return standardized_response
-
         return response
 
     def invoke(self, messages, input={}):
@@ -662,10 +579,6 @@ class LLMPipeline:
         Returns:
             The standardized output of the pipeline chain.
         """
-        # Convert messages for Tongyi if needed
-        if self.supplier == 'Tongyi':
-            messages = self._convert_messages_for_tongyi(messages)
-            
         response = self.chain(messages).invoke(input)
         return self.standardize_response(response)
     
@@ -673,10 +586,6 @@ class LLMPipeline:
         """
         Invoke the LLM model with the provided prompt.
         """
-        # Convert messages for Tongyi if needed
-        if self.supplier == 'Tongyi':
-            messages = self._convert_messages_for_tongyi(messages)
-            
         response = self.llm.invoke(messages, **kwargs)
         return self.standardize_response(response)
 
@@ -684,10 +593,6 @@ class LLMPipeline:
         """
         Stream the LLM model with the provided prompt.
         """
-        # Convert messages for Tongyi if needed
-        if self.supplier == 'Tongyi':
-            messages = self._convert_messages_for_tongyi(messages)
-            
         # Handle Google/Gemini supplier streaming issue
         if self.supplier == 'Google':
             # For Google, create async wrapper for synchronous streaming

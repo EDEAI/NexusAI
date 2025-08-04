@@ -49,84 +49,84 @@ INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_
 
 -- Qwen3-Plus configuration (default_used = 1 only for team_id = 1, sort_order = 87)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 50, '{"model": "qwen-plus-latest", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 50, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen-plus-latest", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 87, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen3-Turbo configuration (sort_order = 88)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 51, '{"model": "qwen-turbo-latest", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 51, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen-turbo-latest", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 88, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen2.5-Max configuration (sort_order = 89)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 52, '{"model": "qwen-max-latest", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 52, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen-max-latest", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 89, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen3-Coder-Plus configuration (sort_order = 90)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 53, '{"model": "qwen3-coder-plus", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 53, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen3-coder-plus", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 90, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen3-Coder-480B-A35B-Instruct configuration (sort_order = 91)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 54, '{"model": "qwen3-coder-480b-a35b-instruct", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 54, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen3-coder-480b-a35b-instruct", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 91, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen3-MT-Plus configuration (sort_order = 92)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 55, '{"model": "qwen-mt-plus", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 55, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen-mt-plus", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 92, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen3-MT-Turbo configuration (sort_order = 93)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 56, '{"model": "qwen-mt-turbo", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 56, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen-mt-turbo", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 93, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen-VL-Max configuration (sort_order = 94)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 57, '{"model": "qwen-vl-max-latest", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 57, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen-vl-max-latest", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 94, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen-VL-Plus configuration (sort_order = 95)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 58, '{"model": "qwen-vl-plus-latest", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 58, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen-vl-plus-latest", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 95, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen-QVQ-Max configuration (sort_order = 96)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 59, '{"model": "qvq-max-latest", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 59, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qvq-max-latest", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 96, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen-QVQ-Plus configuration (sort_order = 97)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 60, '{"model": "qvq-plus-latest", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 60, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qvq-plus-latest", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 97, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen-2.5-VL-72B configuration (sort_order = 98)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 61, '{"model": "qwen2.5-vl-72b-instruct", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 61, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen2.5-vl-72b-instruct", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 98, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen-2.5-VL-32B configuration (sort_order = 99)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 62, '{"model": "qwen2.5-vl-32b-instruct", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 62, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen2.5-vl-32b-instruct", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 99, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Qwen-VL-OCR configuration (sort_order = 100)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 63, '{"model": "qwen-vl-ocr-latest", "top_p": 0.8, "streaming": false, "max_retries": 10, "model_kwargs": {}}', 
+SELECT NULL, t.id, 63, '{"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen-vl-ocr-latest", "streaming": false, "max_retries": 2, "temperature": 1, "model_kwargs": {}}', 
        0, 100, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
