@@ -18,10 +18,9 @@ FROM users
 WHERE platform IS NOT NULL AND openid IS NOT NULL;
 
 -- Drop indexes on platform and openid columns in users table
-DROP INDEX IF EXISTS idx_users_platform ON users;
-DROP INDEX IF EXISTS idx_users_openid ON users;
+ALTER TABLE `users` DROP INDEX `idx_platform`;
+ALTER TABLE `users` DROP INDEX `idx_openid`;
 
 -- Drop platform and openid columns from users table
-ALTER TABLE users 
-DROP COLUMN IF EXISTS platform,
-DROP COLUMN IF EXISTS openid;
+ALTER TABLE users DROP COLUMN platform;
+ALTER TABLE users DROP COLUMN openid;
