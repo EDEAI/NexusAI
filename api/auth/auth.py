@@ -756,7 +756,42 @@ async def cancel_third_party_binding(request_data: OpenidList, userinfo: TokenDa
             deleted_count += 1
         except Exception as e:
             return response_error(get_language_content('cancel_binding_failed') + f': {openid}')
-    
+
+     
+    select_user_three_parties = UserThreeParties().select(
+        columns=['id'],
+        conditions=[
+            {'column': 'user_id', 'value': user_id}
+        ]
+    )
+    if not select_user_three_parties or len(select_user_three_parties) == 0:
+        team_type_id = Teams().select_one(columns=['id'], conditions=[{'column': 'type', 'value': 2}])
+
+        UserTeamRelations().delete(
+            [
+                {'column': 'user_id', 'value': user_id},
+                {'column': 'team_id', 'value': team_type_id['id']}
+            ]
+        )
+
+        find_user_team_type_not_two = UserTeamRelations().select_one(
+            columns=['team_id','role','role_id','inviter_id'], 
+            conditions=[
+                {'column': 'user_id', 'value': user_id}
+            ]
+        )
+        user_update_data = {
+            "team_id":find_user_team_type_not_two['team_id'],
+            "role":find_user_team_type_not_two['role'],
+            "role_id":find_user_team_type_not_two['role_id'],
+            "inviter_id":find_user_team_type_not_two['inviter_id']
+        }
+        
+        Users().update(
+            [{'column': 'id', 'value': user_id}],
+            user_update_data
+        )
+        
     return response_success({
         'msg': get_language_content('cancel_binding_successful'),
         'deleted_count': deleted_count
