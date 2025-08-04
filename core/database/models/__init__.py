@@ -47,6 +47,8 @@ from .roles import Roles
 from .permissions import Permission
 from .role_permission import RolePermission
 from .user_team_relations import UserTeamRelations
+from .user_three_parties import UserThreeParties
+
 
 
 
@@ -92,5 +94,6 @@ __all__ = [
     'Roles',
     'Permission',
     'RolePermission',
-    'UserTeamRelations'
+    'UserTeamRelations',
+    'UserThreeParties'
 ]

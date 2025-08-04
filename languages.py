@@ -297,7 +297,10 @@ language_packs = {
         "third_party_login_platform_empty": "Login failed, Platform cannot be empty",
         "third_party_login_openid_empty": "Login failed, OpenID cannot be empty",
         "third_party_login_failed": "Third-party login failed, please try again",
+        "third_party_login_platform_empty_return": "Platform cannot be empty",
+        "third_party_login_openid_empty_return": "OpenID cannot be empty",
         "third_party_login_success": "Third-party login successful",
+        "user_contact_info_missing": "The current third-party account has been linked to another user",
 
         "login_time_last_year": "Last year",
         "login_time_a_month_ago": "A month ago",
@@ -306,6 +309,7 @@ language_packs = {
         "login_time_minutes_ago": "Minutes ago",
         "login_time_just": "Just",
         "login_time_never_logged_in": "Never logged in",
+        "the_current_third_party_account_has_not_been_authorized_to_login":'The current third-party account has not been authorized to log in',
         # lnvitation
         'lnvitation_already_failed': 'Invitation failed, the email has already been registered',
         'lnvitation_role_failed': 'Invitation failed, insufficient role permissions',
@@ -1135,7 +1139,13 @@ language_packs = {
         'roundtable_administrator': 'Roundtable administrator',
         'knowledge_base_administrator': 'Knowledge_base administrator',
 
-        'msg_preparing_environment': 'Need to initialize the runtime environment, please wait patiently'
+        'msg_preparing_environment': 'Need to initialize the runtime environment, please wait patiently',
+        'the_current_account_has_been_bound': 'The current account has been bound',
+        'binding_successful': 'Binding successful',
+        'openid_list_empty': 'OpenId List Empty',
+        'third_party_binding_not_found': 'Third Party Binding Not Found',
+        'cancel_binding_failed': 'Cancel Binding Failed',
+        'cancel_binding_successful': 'Cancel Binding Successful',
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1180,8 +1190,11 @@ language_packs = {
         # third-party login
         "third_party_login_platform_empty": "登录失败，平台标识不能为空",
         "third_party_login_openid_empty": "登录失败，OpenID不能为空",
+        "third_party_login_platform_empty_return": "平台标识不能为空",
+        "third_party_login_openid_empty_return": "OpenID不能为空",
         "third_party_login_failed": "第三方登录失败，请重试",
         "third_party_login_success": "第三方登录成功",
+        "user_contact_info_missing": "当前三方账号已绑定其他的用户",
 
         "login_time_last_year": "年前",
         "login_time_a_month_ago": "月前",
@@ -1190,6 +1203,7 @@ language_packs = {
         "login_time_minutes_ago": "分钟前",
         "login_time_just": "刚刚",
         "login_time_never_logged_in": "从未登录",
+        "the_current_third_party_account_has_not_been_authorized_to_login":'当前三方账号未进行授权登录',
 
         'lnvitation_already_failed': '邀请失败，该邮箱已注册',
         'lnvitation_role_failed': '邀请失败，角色权限不足',
@@ -1481,7 +1495,13 @@ language_packs = {
         'roundtable_administrator': '圆桌管理员',
         'knowledge_base_administrator': '知识库管理员',
 
-        'msg_preparing_environment': '需要初始化运行环境，请耐心等待'
+        'msg_preparing_environment': '需要初始化运行环境，请耐心等待',
+        'the_current_account_has_been_bound': '当前账号已绑定',
+        'binding_successful': '绑定成功',
+        'openid_list_empty': 'OpenId列表为空',
+        'third_party_binding_not_found': '未找到第三方绑定',
+        'cancel_binding_failed': '取消绑定失败',
+        'cancel_binding_successful': '取消绑定成功',
     }
 }
 
