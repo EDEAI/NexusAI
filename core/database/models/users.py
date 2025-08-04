@@ -243,7 +243,7 @@ class Users(MySQL):
                 [{'column': 'id', 'value': user_id}],
                 update_data
             )
-
+            
             UserThreeParties().insert(
                 {
                     'user_id':user_id,
@@ -253,14 +253,21 @@ class Users(MySQL):
                     'created_at': formatted_time
                 }
             )
-            
-            user_team_data = {
-                'user_id':user_id,
-                'team_id':team_id,
-                'role_id':1,
-                'created_time': formatted_time
-            }
-            UserTeamRelations().insert(user_team_data)
+            team_find = UserTeamRelations().select(
+                columns=['id'],
+                conditions=[
+                    {'column': 'user_id', 'value': user_id},
+                    {'column': 'team_id', 'value': team_id}
+                ]
+            )
+            if not team_find or len(team_find) == 0:
+                user_team_data = {
+                    'user_id':user_id,
+                    'team_id':team_id,
+                    'role_id':1,
+                    'created_time': formatted_time
+                }
+                UserTeamRelations().insert(user_team_data)
 
             return user_id
         else:
