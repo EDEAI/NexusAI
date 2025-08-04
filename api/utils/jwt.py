@@ -77,18 +77,18 @@ def verify_token(token: str, credentials_exception):
         stored_token = redis.get(redis_key)
 
         user_info = Users().get_user_by_id(uid)
-        if user_info['team_id']!= team_id['team_id']:
+        if user_info['team_id']!= team_id:
 
             user_info = UserTeamRelations().select_one(
                 columns="*",
                 conditions=[
                     {"column": "user_id", "value": uid},
-                    {"column": "team_id", "value": team_id['team_id']}
+                    {"column": "team_id", "value": team_id}
                 ]
             )
             
             user_update_data = {
-                "team_id":team_id['team_id'],
+                "team_id":team_id,
                 "role":user_info['role'],
                 "inviter_id":user_info['inviter_id'],
                 "role_id":user_info['role_id']
@@ -97,7 +97,6 @@ def verify_token(token: str, credentials_exception):
                 [{'column': 'id', 'value': uid}],
                 user_update_data
             )
-            team_id= team_id['team_id']
 
         # Verify if token matches
         if not stored_token or stored_token.decode('utf-8') != token:
