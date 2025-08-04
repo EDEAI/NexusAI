@@ -20,6 +20,7 @@ from core.database import redis,SQLDatabase
 from api.utils.auth import get_uid_user_info,update_uid_language,set_current_language,set_current_user_id
 from dateutil.relativedelta import relativedelta
 
+from config import settings
 # create router object
 router = APIRouter()
 
@@ -786,7 +787,7 @@ async def cancel_third_party_binding(request_data: OpenidList, userinfo: TokenDa
             "role_id":find_user_team_type_not_two['role_id'],
             "inviter_id":find_user_team_type_not_two['inviter_id']
         }
-        
+
         Users().update(
             [{'column': 'id', 'value': user_id}],
             user_update_data

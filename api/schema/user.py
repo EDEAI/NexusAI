@@ -10,6 +10,7 @@ class UserData(BaseModel):
     team_id: Optional[int] = None
     nickname: Optional[str] = None
     phone: Optional[str] = None
+    avatar: Optional[str] = None
     email: Optional[str] = None
     role: Optional[int] = None
     language: Optional[str] = None

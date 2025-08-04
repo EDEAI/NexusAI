@@ -208,12 +208,32 @@ class Users(MySQL):
                         'updated_at': formatted_time
                     }
                 )
+
+                if sundry is not None and sundry != '' and sundry.strip() != '':
+                    UserThreeParties().update(
+                        [{'column': 'user_id', 'value': existing_user['id']}],
+                        {
+                            'sundry':sundry,
+                            'updated_at': formatted_time
+                        }
+                    )
+
                 return user_id
             else:
+                if sundry is not None and sundry != '' and sundry.strip() != '':
+                    UserThreeParties().update(
+                        [{'column': 'user_id', 'value': existing_user['id']}],
+                        {
+                            'sundry':sundry,
+                            'updated_at': formatted_time
+                        }
+                    )
+
                 self.update(
                     [{'column': 'id', 'value': existing_user['id']}],
                     update_data
                 )
+                
                 return existing_user['id']
 
         # Step 2: Try to find user by email or phone
@@ -476,6 +496,15 @@ class Users(MySQL):
                     [{'column': 'id', 'value': user_id}],
                     new_data
                 )
+                if sundry is not None and sundry != '' and sundry.strip() != '':
+                    UserThreeParties().update(
+                        [{'column': 'user_id', 'value': existing_user['id']}],
+                        {
+                            'sundry':sundry,
+                            'updated_at': formatted_time
+                        }
+                    )
+                    
                 UserThreeParties().update(
                     [{'column': 'user_id', 'value': existing_user['id']}],
                     {
@@ -485,6 +514,15 @@ class Users(MySQL):
                 )
                 return user_id
             else:
+                if sundry is not None and sundry != '' and sundry.strip() != '':
+                    UserThreeParties().update(
+                        [{'column': 'user_id', 'value': existing_user['id']}],
+                        {
+                            'sundry':sundry,
+                            'updated_at': formatted_time
+                        }
+                    )
+
                 self.update(
                     [{'column': 'id', 'value': existing_user['id']}],
                     update_data
