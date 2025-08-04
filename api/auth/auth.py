@@ -20,6 +20,7 @@ from core.database import redis,SQLDatabase
 from api.utils.auth import get_uid_user_info,update_uid_language,set_current_language,set_current_user_id
 from dateutil.relativedelta import relativedelta
 
+from config import settings
 # create router object
 router = APIRouter()
 
