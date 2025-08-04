@@ -384,4 +384,5 @@ dependencies:
       - xxhash==3.4.1
       - yarg==0.1.9
       - yarl==1.9.4
+      - dashscope==1.24.0
 prefix: /root/anaconda3/envs/nexus_ai
