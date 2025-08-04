@@ -3,7 +3,7 @@ import re
 from base64 import b64decode
 from hashlib import md5
 from traceback import format_exc
-from typing import Any, Callable, Coroutine, Dict
+from typing import Any, Callable, Coroutine, Dict, Union
 from Crypto.Cipher import AES
 from fastapi import HTTPException, Request, APIRouter, Depends, status
 from core.database import redis, SQLDatabase
@@ -235,7 +235,7 @@ def get_current_language(uid:int = 0) -> str:
         redis.set("user_language:{}".format(user_id), user_language if user_language in language_packs else 'en')
         return user_language
 
-def authenticate_third_party_user(platform: str, openid: str, nickname: str = None, 
+def authenticate_third_party_user(platform: str, openid: str, sundry: Union[str, int, None] = None, nickname: str = None, 
                                   avatar: str = None, language: str = 'en', 
                                   client_ip: str = None, phone: str = None, email: str = None):
     """
@@ -256,6 +256,7 @@ def authenticate_third_party_user(platform: str, openid: str, nickname: str = No
         user_id = user_model.create_or_update_third_party_user(
             platform=platform,
             openid=openid,
+            sundry=sundry,
             nickname=nickname,
             avatar=avatar,
             language=language,
@@ -275,7 +276,8 @@ def authenticate_third_party_user(platform: str, openid: str, nickname: str = No
                 {'column': 'status', 'value': 1}
             ]
         )
-        
+        user['openid'] = openid
+        user['platform'] = platform
         if user:
             return user
         else:
@@ -304,4 +306,56 @@ def get_third_party_user_info(uid: int):
     if not user:
         return False
     return user
+
+def authenticate_third_party_user_binding(platform: str, openid: str, sundry: Union[str, int, None] = None, nickname: str = None, 
+                                  avatar: str = None, language: str = 'en', 
+                                  client_ip: str = None, phone: str = None, email: str = None):
+    """
+    Authenticate or register a third-party user.
+    
+    :param platform: The third-party platform identifier.
+    :param openid: The user's openid on the platform.
+    :param nickname: The user's nickname (optional).
+    :param avatar: The user's avatar URL (optional).
+    :param language: The user's language preference.
+    :param client_ip: The user's login IP.
+    :return: The user data if successful, False otherwise.
+    """
+    try:
+        user_model = Users()
+        
+        # Create or update user and get user ID
+        user_id = user_model.create_or_update_third_party_user_binding(
+            platform=platform,
+            openid=openid,
+            sundry=sundry,
+            nickname=nickname,
+            avatar=avatar,
+            language=language,
+            last_login_ip=client_ip,
+            phone=phone,
+            email=email
+        )
+        # Commit the transaction
+        SQLDatabase.commit()
+        SQLDatabase.close()
+        # Get the complete user data
+        user = user_model.select_one(
+            columns='*',
+            conditions=[
+                {'column': 'id', 'value': user_id},
+                {'column': 'status', 'value': 1}
+            ]
+        )
+        user['openid'] = openid
+        user['platform'] = platform
+        if user:
+            return user
+        else:
+            return False
+    except Exception as e:
+        SQLDatabase.rollback()
+        SQLDatabase.close()
+        print(f"Error in authenticate_third_party_user: {e}")
+        return False
 

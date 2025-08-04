@@ -14,6 +14,7 @@ class UserData(BaseModel):
     role: Optional[int] = None
     language: Optional[str] = None
     team_type: Optional[int] = None
+    three_list: List[Any]
     
 class RegisterTeamData(BaseModel):
     team_id: Optional[int] = 1
@@ -58,6 +59,7 @@ class SwitchLanguageSchema(BaseModel):
 class ThirdPartyLoginData(BaseModel):
     platform: str
     openid: str
+    sundry: Union[str, int]
     nickname: Optional[str] = None
     avatar: Optional[str] = None
     phone: Optional[str] = None
@@ -76,3 +78,12 @@ class ResThirdPartyLoginSchema(BaseModel):
     code: int = 0
     detail: str = 'OK'
     data: Dict[str, Any]
+
+class AccountBindingWithThreeParties(BaseModel):
+    platform: str
+    openid: str
+    nickname: Optional[str] = None
+    avatar: Optional[str] = None
+
+class OpenidList(BaseModel):
+    openid_list: List[Any]
