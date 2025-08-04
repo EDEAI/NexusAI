@@ -451,9 +451,9 @@ class Users(MySQL):
                     'last_login_ip':last_login_ip,
                     'last_login_time': formatted_time
                 }
-                if nickname is not None:
+                if nickname and nickname.strip():
                     new_data['nickname'] = nickname
-                if avatar is not None:
+                if avatar and avatar.strip():
                     new_data['avatar'] = avatar
                 user_info = self.select_one(columns=['id','phone','email'], conditions=[{'column': 'id', 'value': user_id}, {'column': 'status', 'value': 1}])
 
