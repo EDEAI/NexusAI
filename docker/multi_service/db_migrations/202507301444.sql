@@ -18,10 +18,10 @@ INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_
 INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (54, 6, 'Qwen3-Coder-480B-A35B-Instruct', 1, 1, 256000, 0, 0, CURRENT_TIMESTAMP, NULL, 1);
 
 -- Qwen3-MT-Plus - 4K context
-INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (55, 6, 'Qwen3-MT-Plus', 1, 1, 4000, 0, 0, CURRENT_TIMESTAMP, NULL, 1);
+INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (55, 6, 'Qwen3-MT-Plus', 1, 1, 4000, 0, 0, CURRENT_TIMESTAMP, NULL, 2);
 
 -- Qwen3-MT-Turbo - 4K context
-INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (56, 6, 'Qwen3-MT-Turbo', 1, 1, 4000, 0, 0, CURRENT_TIMESTAMP, NULL, 1);
+INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (56, 6, 'Qwen3-MT-Turbo', 1, 1, 4000, 0, 0, CURRENT_TIMESTAMP, NULL, 2);
 
 -- Qwen-VL-Max - 128K context, supports image
 INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (57, 6, 'Qwen-VL-Max', 1, 1, 128000, 0, 1, CURRENT_TIMESTAMP, NULL, 1);
