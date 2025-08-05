@@ -98,10 +98,14 @@ class Users(MySQL):
         #     ]
         # )
         user_three_parties_info = UserThreeParties().select_one(
-            columns=['user_id AS id','platform','openid'],
+            columns=['user_three_parties.user_id AS id','user_three_parties.platform','user_three_parties.openid'],
+            joins=[
+                ["left", "users", "user_three_parties.user_id = users.id"],
+            ],
             conditions=[
-                {'column': 'platform', 'value': platform},
-                {'column': 'openid', 'value': openid}
+                {'column': 'user_three_parties.platform', 'value': platform},
+                {'column': 'user_three_parties.openid', 'value': openid},
+                {'column': 'users.status', 'value': 1}
             ]
         )
         return user_three_parties_info
