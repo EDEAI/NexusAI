@@ -85,6 +85,7 @@ class AccountBindingWithThreeParties(BaseModel):
     openid: str
     nickname: Optional[str] = None
     avatar: Optional[str] = None
+    sundry: Union[str, int]
 
 class OpenidList(BaseModel):
     openid_list: List[Any]
