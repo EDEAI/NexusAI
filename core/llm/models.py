@@ -348,7 +348,7 @@ class LLMPipeline:
             }
             '''
             self.llm = ChatOllama(**config)
-        elif self.supplier in ['OpenAI', 'Doubao', 'Tongyi']:
+        elif self.supplier in ['OpenAI', 'Doubao', 'Tongyi', 'DeepSeek']:
             self.llm = ChatOpenAI(**config)
         elif self.supplier == 'Spark':
             '''
