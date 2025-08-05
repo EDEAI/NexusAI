@@ -1,5 +1,4 @@
 import json
-
 from langchain_core.prompts import PromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_anthropic import ChatAnthropic
@@ -21,7 +20,6 @@ from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_community.chat_models import ChatOllama
 from langchain_community.chat_models import ChatSparkLLM
 from langchain_together import ChatTogether
-from langchain_community.chat_models.tongyi import ChatTongyi
 from langchain_google_vertexai import ChatVertexAI
 from langchain_community.chat_models import VolcEngineMaasChat
 from langchain_community.chat_models import QianfanChatEndpoint
@@ -350,7 +348,7 @@ class LLMPipeline:
             }
             '''
             self.llm = ChatOllama(**config)
-        elif self.supplier in ['OpenAI', 'Doubao']:
+        elif self.supplier in ['OpenAI', 'Doubao', 'Tongyi']:
             self.llm = ChatOpenAI(**config)
         elif self.supplier == 'Spark':
             '''
@@ -378,18 +376,6 @@ class LLMPipeline:
             }
             '''
             self.llm = ChatTogether(**config)
-        elif self.supplier == 'Tongyi':
-            '''
-               config = {
-                "model": "qwen-turbo",  # Model name to use.
-                "model_kwargs": {},  # Additional keyword arguments for the model.
-                "top_p": 0.8,  # Total probability mass of tokens to consider at each step.
-                "api_key": None,  # Dashscope API key provided by Alibaba Cloud.
-                "streaming": False,  # Whether to stream the results or not.
-                "max_retries": 10,  # Maximum number of retries to make when generating.
-            }
-            '''
-            self.llm = ChatTongyi(**config)
         elif self.supplier == 'VertexAI':
             '''
             config = {
@@ -494,6 +480,7 @@ class LLMPipeline:
         Handles different types of responses:
         1. Anthropic responses (structured/unstructured output)
         2. Google responses (structured output with tool calls)
+        3. Tongyi responses (with token usage from response metadata)
         Other suppliers' responses are returned as-is.
 
         Args:

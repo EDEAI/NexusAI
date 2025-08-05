@@ -598,6 +598,7 @@ async def account_binding_with_three_parties(user_return_data: AccountBindingWit
     openid = user_return_data.openid
     nickname = user_return_data.nickname
     avatar = user_return_data.avatar
+    sundry = user_return_data.sundry
 
     user_id = userinfo.uid
 
@@ -611,9 +612,9 @@ async def account_binding_with_three_parties(user_return_data: AccountBindingWit
         return response_error(get_language_content('third_party_login_platform_empty_return'))
     if not openid or openid.strip() == '':
         return response_error(get_language_content('third_party_login_openid_empty_return'))
-    if nickname:
+    if nickname and nickname.strip():
         new_data['nickname'] = nickname
-    if avatar:
+    if avatar and avatar.strip():
         new_data['avatar'] = avatar
         
 
@@ -634,6 +635,7 @@ async def account_binding_with_three_parties(user_return_data: AccountBindingWit
             {'column': 'openid', 'value': openid}
         ]
     )
+
     team_type_id = Teams().select_one(columns=['id'], conditions=[{'column': 'type', 'value': 2}])
     find_user_team_type_not_two = UserTeamRelations().select_one(
         columns=['id'], 
@@ -705,6 +707,7 @@ async def account_binding_with_three_parties(user_return_data: AccountBindingWit
         'user_id':user_id,
         'platform':platform,
         'openid':openid,
+        'sundry':sundry,
         'created_at':formatted_time
     }
     UserThreeParties().insert(data)
