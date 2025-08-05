@@ -619,10 +619,14 @@ async def account_binding_with_three_parties(user_return_data: AccountBindingWit
         
 
     find_three_data= UserThreeParties().select_one(
-        columns=['id'], 
+        columns=['user_three_parties.id'], 
+        joins=[
+            ["left", "users", "user_three_parties.user_id = users.id"],
+        ],
         conditions=[
-            {'column': 'user_id', 'value': user_id}, 
-            {'column': 'openid', 'value': openid}
+            {'column': 'user_three_parties.user_id', 'value': user_id}, 
+            {'column': 'user_three_parties.openid', 'value': openid}, 
+            {'column': 'users.status', 'value': 1}
         ]
     )
     if find_three_data:
@@ -630,9 +634,13 @@ async def account_binding_with_three_parties(user_return_data: AccountBindingWit
         return response_success({'msg':msg_ok})
 
     have_user = UserThreeParties().select_one(
-        columns=['user_id'], 
+        columns=['user_three_parties.user_id'], 
+        joins=[
+            ["left", "users", "user_three_parties.user_id = users.id"],
+        ],
         conditions=[
-            {'column': 'openid', 'value': openid}
+            {'column': 'user_three_parties.openid', 'value': openid}, 
+            {'column': 'users.status', 'value': 1}
         ]
     )
 
@@ -736,10 +744,14 @@ async def cancel_third_party_binding(request_data: OpenidList, userinfo: TokenDa
     not_found_openids = []
     for openid in openid_list:
         existing_record = UserThreeParties().select_one(
-            columns=['id'],
+            columns=['user_three_parties.id'],
+            joins=[
+                ["left", "users", "user_three_parties.user_id = users.id"],
+            ],
             conditions=[
-                {'column': 'user_id', 'value': user_id},
-                {'column': 'openid', 'value': openid}
+                {'column': 'user_three_parties.user_id', 'value': user_id},
+                {'column': 'user_three_parties.openid', 'value': openid},
+                {'column': 'users.status', 'value': 1}
             ]
         )
         if not existing_record:
