@@ -47,3 +47,10 @@ UPDATE `model_configurations` SET `sort_order` = 92 WHERE `model_id` = 35;
 
 -- Update model_id = 36 sort_order to 93
 UPDATE `model_configurations` SET `sort_order` = 93 WHERE `model_id` = 36;
+
+-- Change team type=2 name to "Public Workspace"
+UPDATE `teams` SET `name` = 'Public Workspace' WHERE `type` = 2;
+
+-- Update type field comment to describe team types
+-- 1: Regular team, 2: Public Workspace
+ALTER TABLE `teams` MODIFY COLUMN `type` int NOT NULL DEFAULT 1 COMMENT '1: Regular team, 2: Public Workspace';
