@@ -22,6 +22,7 @@ interface DataType {
     last_login_time: string;
     nickname: string;
     role: number;
+    role_title: string;
 }
 
 const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
@@ -61,11 +62,8 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                     {/* <a>Invite {record.name}</a> */}
                     <div>
                         {record.role == 1
-                            ? intl.formatMessage({ id: 'user.admin', defaultMessage: '' })
-                            : intl.formatMessage({
-                                  id: 'user.regularMember',
-                                  defaultMessage: '',
-                              })}
+                            ? intl.formatMessage({ id: 'user.teamAdmin', defaultMessage: '' })
+                            : record.role_title}
                     </div>
                 </Space>
             ),
