@@ -13,7 +13,7 @@ class Roles(MySQL):
     have_updated_time = False
     
 
-    def get_roles_list(self, page: int = 1, page_size: int = 10, name: str = "", team_id = int) -> dict:
+    def get_roles_list(self, page: int = 1, page_size: int = 10, status: int = 1, name: str = "", team_id = int) -> dict:
         """
         Retrieves a list of roles with pagination and name filtering.
 
@@ -34,38 +34,63 @@ class Roles(MySQL):
             conditions.append({"column": "name", "op": "like", "value": f"%{name}%"})
             conditions.append({"column": "built_in", "op": "!=", "value": 1})
 
-        # Get total count
-        total_count = self.select_one(
-            aggregates={"id": "count"},
-            conditions=conditions
-        )["count_id"]
+        if status == 1:
+            # Get total count
+            total_count = self.select_one(
+                aggregates={"id": "count"},
+                conditions=conditions
+            )["count_id"]
 
-        # Get list data with time fields
-        role_list = self.select(
-            columns=[
-                "id",
-                "name",
-                "built_in",
-                "description",
-                "status",
-                "created_at",
-                "updated_at"
-            ],
-            conditions=conditions,
-            order_by="id ASC",
-            limit=page_size,
-            offset=(page - 1) * page_size
-        )
+            # Get list data with time fields
+            role_list = self.select(
+                columns=[
+                    "id",
+                    "name",
+                    "built_in",
+                    "description",
+                    "status",
+                    "created_at",
+                    "updated_at"
+                ],
+                conditions=conditions,
+                order_by="id ASC",
+                limit=page_size,
+                offset=(page - 1) * page_size
+            )
+        else:
+            total_count = self.select_one(
+                aggregates={"id": "count"},
+                conditions=conditions
+            )["count_id"]
+
+            role_list = self.select(
+                columns=[
+                    "id",
+                    "name",
+                    "built_in",
+                    "description",
+                    "status",
+                    "created_at",
+                    "updated_at"
+                ],
+                conditions=conditions,
+                order_by="id ASC"
+            )
 
         from languages import get_language_content
         for role in role_list:
             if role.get('built_in') == 1:
                 role['name'] = get_language_content(role['name'])
-
+        if status == 1:
+            total_pages =  math.ceil(total_count / page_size)
+            page_size = page_size
+        else:
+            total_pages = 1
+            page_size = total_count
         return {
             "list": role_list,
             "total_count": total_count,
-            "total_pages": math.ceil(total_count / page_size),
+            "total_pages": total_pages,
             "page": page,
             "page_size": page_size
         }
