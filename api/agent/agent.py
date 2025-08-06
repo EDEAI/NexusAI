@@ -1450,7 +1450,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                 if app_info:
                     # Process avatar
                     if app_info.get("avatar"):
-                        if item['avatar'].find('head_icon') == -1:
+                        if app_info['avatar'].find('head_icon') == -1:
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                         else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
@@ -1482,7 +1482,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                 if app_info:
                     # Process avatar
                     if app_info.get("avatar"):
-                        if item['avatar'].find('head_icon') == -1:
+                        if app_info['avatar'].find('head_icon') == -1:
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                         else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
@@ -1517,7 +1517,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                 if app_info:
                     # Process avatar
                     if app_info.get("avatar"):
-                        if item['avatar'].find('head_icon') == -1:
+                        if app_info['avatar'].find('head_icon') == -1:
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                         else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
