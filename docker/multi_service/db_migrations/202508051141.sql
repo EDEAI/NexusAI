@@ -3,10 +3,10 @@ INSERT INTO `suppliers` (`id`, `name`, `mode`, `created_time`, `updated_time`, `
 
 -- Add DeepSeek models
 -- deepseek-chat - 64K context, 8192 max output tokens, supports image
-INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (64, 7, 'deepseek-chat', 1, 1, 64000, 8192, 1, CURRENT_TIMESTAMP, NULL, 1);
+INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (64, 7, 'deepseek-chat', 1, 1, 64000, 8192, 0, CURRENT_TIMESTAMP, NULL, 1);
 
 -- deepseek-reasoner - 64K context, 0 max output tokens, supports image
-INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (65, 7, 'deepseek-reasoner', 1, 1, 64000, 0, 1, CURRENT_TIMESTAMP, NULL, 1);
+INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_tokens`, `max_output_tokens`, `support_image`, `created_time`, `updated_time`, `status`) VALUES (65, 7, 'deepseek-reasoner', 1, 1, 64000, 0, 0, CURRENT_TIMESTAMP, NULL, 1);
 
 -- Add model configurations for all teams
 -- deepseek-chat configuration (sort_order = 99)
