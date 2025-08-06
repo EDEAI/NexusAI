@@ -119,7 +119,7 @@ class LLMNode(ImportToKBBaseNode, LLMBaseNode):
             # Escape braces in the prompt
             if system_prompt := prompt.get_system():
                 prompt.system.value = self.duplicate_braces(system_prompt)
-            if user_prompt := prompt.get_user() and chatroom_prompt_args is None:
+            if (user_prompt := prompt.get_user()) and chatroom_prompt_args is None:
                 prompt.user.value = self.duplicate_braces(user_prompt)
             if assistant_prompt := prompt.get_assistant():
                 prompt.assistant.value = self.duplicate_braces(assistant_prompt)
