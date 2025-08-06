@@ -4,7 +4,7 @@ import type { TableProps } from 'antd';
 import { Avatar, Button, Input, message, Modal, Select, Space, Table, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import gandUp from '../../public/icons/gandUp.svg';
-import { getTeamList, postInviteUser } from '../api/team';
+import { getTeamList, postInviteUser, getRoleList } from '../api/team';
 const { TextArea } = Input;
 const { Paragraph, Text } = Typography;
 
@@ -75,10 +75,11 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     const [isModalOpen2, setIsModalOpen2] = useState(false);
     const [EmailList, setEmaillist] = useState('');
     const [processedEmails, setProcessedEmails] = useState<string[]>([]);
-    const [roleid, setRoleid] = useState(2);
+    const [roleid, setRoleid] = useState('admin_user');
     const [isBtn, setIsBtn] = useState(true);
     const [isModalOpen3, setIsModalOpen3] = useState(false);
     const [gainEmail, setGainEmail] = useState(null);
+    const [roleList, setRoleList] = useState<any[]>([]);
 
     useEffect(() => {}, []);
 
@@ -88,6 +89,17 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
             const res = await getTeamList();
             console.log(res, '');
             setTeammemberList(res.data);
+        }
+    };
+
+    const fetchRoleList = async () => {
+        try {
+            const res = await getRoleList();
+            if (res.code === 0) {
+                setRoleList(res.data.list || []);
+            }
+        } catch (error) {
+            console.error('Failed to fetch role list:', error);
         }
     };
 
@@ -149,9 +161,11 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
         });
 
         if (newintcode.length > 0) {
+            // Handle role parameter: admin_user for team admin, role id for member roles
+            const roleParam = roleid === 'admin_user' ? 'admin_user' : roleid;
 
             const params = {
-                role: roleid,
+                role: roleParam,
                 email_list: newintcode,
             };
             const res = await postInviteUser(params);
@@ -199,7 +213,10 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                         </div>
                     </div>
                     <div>
-                        <Button icon={<UserOutlined />} onClick={() => setIsModalOpen2(true)}>
+                        <Button icon={<UserOutlined />} onClick={() => {
+                            setIsModalOpen2(true);
+                            fetchRoleList();
+                        }}>
                             {intl.formatMessage({ id: 'user.add', defaultMessage: '' })}
                         </Button>
                     </div>
@@ -253,19 +270,21 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                         value={roleid}
                         options={[
                             {
-                                value: 1,
+                                value: 'admin_user',
                                 label: intl.formatMessage({
-                                    id: 'user.admin',
+                                    id: 'user.teamAdmin',
+                                    defaultMessage: '',
+                                }),
+                                title: intl.formatMessage({
+                                    id: 'user.teamAdminDesc',
                                     defaultMessage: '',
                                 }),
                             },
-                            {
-                                value: 2,
-                                label: intl.formatMessage({
-                                    id: 'user.member',
-                                    defaultMessage: '',
-                                }),
-                            },
+                            ...roleList.map(role => ({
+                                value: role.id,
+                                label: role.name,
+                                title: role.description || role.name, // Tooltip text
+                            }))
                         ]}
                     />
                 </div>

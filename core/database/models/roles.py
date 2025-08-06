@@ -80,7 +80,12 @@ class Roles(MySQL):
         from languages import get_language_content
         for role in role_list:
             if role.get('built_in') == 1:
-                role['name'] = get_language_content(role['name'])
+                # For built-in roles, the name field contains the language key
+                role_key = role['name']  # e.g., 'comprehensive_administrator'
+                # Translate role name
+                role['name'] = get_language_content(role_key)
+                # Set role description using the corresponding _desc key
+                role['description'] = get_language_content(f"{role_key}_desc")
         if status == 1:
             total_pages =  math.ceil(total_count / page_size)
             page_size = page_size
