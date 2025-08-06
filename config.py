@@ -3268,6 +3268,31 @@ model_config = [
             'text2img': [],
             'moderation': []
         }
+    },
+    {
+        'supplier': 'DeepSeek',
+        'mode': 1,
+        'config': [
+            {
+                "key": "api_key",
+                "type": "str",
+                "value": "",
+                "secret": True,
+                "options": None,
+                "optional": False,
+                "description": "The API Key is an important credential for you to request the DeepSeek model service.",
+                "default_value": ""
+            }
+        ],
+        'models': {
+            'text-generation': [],
+            'embeddings': [],
+            'reranking': [],
+            'speech2text': [],
+            'tts': [],
+            'text2img': [],
+            'moderation': []
+        }
     }
 ]
 

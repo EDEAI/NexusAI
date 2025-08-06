@@ -36,11 +36,11 @@ from log import Logger
 sql_logger = Logger.get_logger("sql")
 
 # Listen to SQLAlchemy events and record SQL execution logs
-@event.listens_for(Engine, "before_cursor_execute")
-def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-    sql_logger.info(f"SQL Statement: {statement}")
-    sql_logger.info(f"Parameters: {parameters}")
-    sql_logger.info(f"SQL Statement & Parameters: {statement % parameters}")
+# @event.listens_for(Engine, "before_cursor_execute")
+# def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+#     sql_logger.info(f"SQL Statement: {statement}")
+#     sql_logger.info(f"Parameters: {parameters}")
+#     sql_logger.info(f"SQL Statement & Parameters: {statement % parameters}")
 
 
 class OAuth2PasswordBearerWithCookie(OAuth2Model):

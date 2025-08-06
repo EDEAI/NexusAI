@@ -1139,6 +1139,14 @@ language_packs = {
         'roundtable_administrator': 'Roundtable administrator',
         'knowledge_base_administrator': 'Knowledge_base administrator',
 
+        # Role descriptions - optimized for user-friendly display
+        'comprehensive_administrator_desc': 'Versatile manager who can create and manage all types of AI applications, including agents, workflows, skills, and more',
+        'agent_administrator_desc': 'Specializes in creating, configuring and managing intelligent agents to build personalized AI assistants',
+        'workflow_administrator_desc': 'Focuses on designing and optimizing workflows to automate business processes efficiently',
+        'skill_administrator_desc': 'Dedicated to skill development and management, expanding new capabilities for AI systems',
+        'roundtable_administrator_desc': 'Responsible for organizing and managing roundtable meetings to facilitate team collaboration',
+        'knowledge_base_administrator_desc': 'Manages enterprise knowledge assets and maintains knowledge base content for optimal information access',
+
         'msg_preparing_environment': 'Need to initialize the runtime environment, please wait patiently',
         'the_current_account_has_been_bound': 'The current account has been bound',
         'binding_successful': 'Binding successful',
@@ -1146,6 +1154,7 @@ language_packs = {
         'third_party_binding_not_found': 'Third Party Binding Not Found',
         'cancel_binding_failed': 'Cancel Binding Failed',
         'cancel_binding_successful': 'Cancel Binding Successful',
+        'roles_status_only_one_or_two': 'Can only select 1 and 2 for displaying all character statuses'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1495,6 +1504,14 @@ language_packs = {
         'roundtable_administrator': '圆桌管理员',
         'knowledge_base_administrator': '知识库管理员',
 
+        # 角色描述 - 用户友好的显示文案
+        'comprehensive_administrator_desc': '全能型管理者，可以创建和管理所有类型的AI应用，包括智能体、工作流、技能等',
+        'agent_administrator_desc': '专注于智能体的创建、配置和管理，打造个性化的AI助手',
+        'workflow_administrator_desc': '专门负责工作流的设计和优化，高效自动化业务流程',
+        'skill_administrator_desc': '专注于技能开发和管理，为AI系统扩展新能力',
+        'roundtable_administrator_desc': '负责圆桌会议的组织和管理，促进团队协作交流',
+        'knowledge_base_administrator_desc': '专门管理企业知识资产，维护和优化知识库内容，提供最佳信息获取体验',
+
         'msg_preparing_environment': '需要初始化运行环境，请耐心等待',
         'the_current_account_has_been_bound': '当前账号已绑定',
         'binding_successful': '绑定成功',
@@ -1502,6 +1519,7 @@ language_packs = {
         'third_party_binding_not_found': '未找到第三方绑定',
         'cancel_binding_failed': '取消绑定失败',
         'cancel_binding_successful': '取消绑定成功',
+        'roles_status_only_one_or_two': '是否显示全部角色状态只能选择1和2'
     }
 }
 

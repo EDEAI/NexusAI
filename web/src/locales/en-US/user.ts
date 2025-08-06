@@ -6,6 +6,8 @@ export default {
     'user.lastActivityTime': 'Last Activity Time',
     'user.role': 'Role',
     'user.admin': 'Admin',
+    'user.teamAdmin': 'Team Admin',
+    'user.teamAdminDesc': 'Full team management permissions, can manage members, set permissions and operate all functions',
     'user.regularMember': 'Regular Member',
     'user.invitationSentSuccessfully': 'Invitation Sent Successfully',
     'user.enterValidEmail': 'Please enter a valid email',

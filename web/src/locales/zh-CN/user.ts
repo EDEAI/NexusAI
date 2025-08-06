@@ -6,6 +6,8 @@ export default {
     'user.lastActivityTime': '上次活动时间',
     'user.role': '角色',
     'user.admin': '管理员',
+    'user.teamAdmin': '团队管理员',
+    'user.teamAdminDesc': '拥有团队的完全管理权限，可以管理成员、设置权限并操作所有功能',
     'user.regularMember': '普通成员',
     'user.invitationSentSuccessfully': '邀请发送成功',
     'user.enterValidEmail': '请输入正确的邮箱',

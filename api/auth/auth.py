@@ -282,8 +282,6 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
         role_id = None
     else:
         role = 2
-        # role_id = role_id
-        role_id = 1
     email_list = invite_data.email_list
 
     if not email_list:

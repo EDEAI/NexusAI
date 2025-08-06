@@ -14,3 +14,8 @@ export const postInviteUser = async (data: any) => {
 export const postRegisterUser = async (data: any) => {
     return await aniRequest<any>(`/v1/auth/register_user`, { method: 'POST', data: data });
 };
+
+// Get role list
+export const getRoleList = async () => {
+    return await aniRequest<any>(`/v1/roles/`, { method: 'GET', data: { status: 2 } });
+};
