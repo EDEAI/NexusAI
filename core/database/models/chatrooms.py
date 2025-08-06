@@ -349,7 +349,7 @@ class Chatrooms(MySQL):
                     )
                     if agent_info:
                         if agent_info.get('avatar'):
-                            if item['avatar'].find('head_icon') == -1:
+                            if agent_info['avatar'].find('head_icon') == -1:
                                 agent_info['avatar'] = f"{settings.STORAGE_URL}/upload/{agent_info['avatar']}"
                             else:
                                 agent_info["avatar"] = f"{settings.ICON_URL}/{agent_info['avatar']}"
