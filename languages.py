@@ -1146,6 +1146,7 @@ language_packs = {
         'third_party_binding_not_found': 'Third Party Binding Not Found',
         'cancel_binding_failed': 'Cancel Binding Failed',
         'cancel_binding_successful': 'Cancel Binding Successful',
+        'roles_status_only_one_or_two': 'Can only select 1 and 2 for displaying all character statuses'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1502,6 +1503,7 @@ language_packs = {
         'third_party_binding_not_found': '未找到第三方绑定',
         'cancel_binding_failed': '取消绑定失败',
         'cancel_binding_successful': '取消绑定成功',
+        'roles_status_only_one_or_two': '是否显示全部角色状态只能选择1和2'
     }
 }
 

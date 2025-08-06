@@ -14,7 +14,7 @@ from languages import get_language_content
 router = APIRouter()
 
 @router.get("/", response_model=RolesListResponse, summary="Get Roles List")
-async def roles_list(page: int = 1, page_size: int = 10, name: str = "", userinfo: TokenData = Depends(get_current_user)):
+async def roles_list(page: int = 1, page_size: int = 10, status: int = 1, name: str = "", userinfo: TokenData = Depends(get_current_user)):
     """
     Retrieve a list of roles with pagination and optional name filtering.
     Args:
@@ -29,7 +29,10 @@ async def roles_list(page: int = 1, page_size: int = 10, name: str = "", userinf
     """
     team_id = userinfo.team_id
     roles = Roles()
-    result = roles.get_roles_list(page, page_size, name, team_id)
+
+    if status not in [1, 2]:
+        return response_error(get_language_content("roles_status_only_one_or_two"))
+    result = roles.get_roles_list(page, page_size, status, name, team_id)
     return response_success(result)
 
 
