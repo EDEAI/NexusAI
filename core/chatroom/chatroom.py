@@ -750,7 +750,7 @@ class Chatroom:
                         files_to_upload = []
                         input_variables: Dict[str, Any] = mcp_tool_use['args']['input_variables']
                         graph = create_graph_from_dict(workflow['graph'])
-                        workflow_input_variables = graph.nodes.nodes[0].data['input'].to_dict()
+                        workflow_input_variables = graph.nodes.nodes[0].data['input'].to_dict()['properties']
                         for k, v in input_variables.items():
                             if k.startswith('file_parameter__') and v == 'need_upload':
                                 workflow_var = workflow_input_variables[k[16:]]
