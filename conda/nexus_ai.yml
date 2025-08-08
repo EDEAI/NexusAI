@@ -130,6 +130,7 @@ dependencies:
       - contourpy==1.2.1
       - cryptography==43.0.3
       - cycler==0.12.1
+      - dashscope==1.24.1
       - dataclasses-json==0.6.7
       - datasets==2.20.0
       - decorator==5.1.1
@@ -176,6 +177,7 @@ dependencies:
       - google-cloud-storage==2.19.0
       - google-cloud-vision==3.8.0
       - google-crc32c==1.5.0
+      - google-genai==1.29.0
       - google-generativeai==0.8.4
       - google-resumable-media==2.7.2
       - googleapis-common-protos==1.63.2
@@ -376,6 +378,7 @@ dependencies:
       - watchfiles==0.22.0
       - wcwidth==0.2.13
       - webencodings==0.5.1
+      - websocket-client==1.8.0
       - websockets==15.0.1
       - win32-setctime==1.1.0
       - wrapt==1.16.0
