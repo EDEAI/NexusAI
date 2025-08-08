@@ -204,7 +204,7 @@ class LLMBaseNode(Node):
         chatroom_messages = chatroom_prompt_args['messages']
             
         # Get model information
-        model_name = model_config['model_name']
+        model_name = model_config['model_config']['model']
         supplier_name = model_config['supplier_name']
 
         api_key = model_config['supplier_config']['api_key']
