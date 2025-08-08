@@ -204,8 +204,12 @@ class LLMBaseNode(Node):
         chatroom_messages = chatroom_prompt_args['messages']
             
         # Get model information
-        model_name = model_config['model_config']['model']
         supplier_name = model_config['supplier_name']
+        if supplier_name == 'Anthropic':
+            model_name = model_config['model_config']['model_name']
+        else:
+            model_name = model_config['model_config']['model']
+
 
         api_key = model_config['supplier_config']['api_key']
         max_context_tokens = model_config['max_context_tokens']
