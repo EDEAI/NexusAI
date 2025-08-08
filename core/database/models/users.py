@@ -533,3 +533,12 @@ class Users(MySQL):
                     update_data
                 )
                 return existing_user['id']
+    def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
+        user = self.select_one(
+            columns=['id'],
+            conditions=[
+                {'column': 'email', 'value': email},
+                {'column': 'status', 'value': 1}
+            ]
+        )
+        return user

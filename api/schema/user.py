@@ -89,3 +89,19 @@ class AccountBindingWithThreeParties(BaseModel):
 
 class OpenidList(BaseModel):
     openid_list: List[Any]
+
+class ResetPasswordData(BaseModel):
+    email: str
+    password: str
+    confirm_password: str
+
+
+
+class ResetVerificationCodeData(BaseModel):
+    email: str
+    verification_code: str
+
+
+
+class ResetEmailData(BaseModel):
+    email: str
