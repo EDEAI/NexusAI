@@ -12,6 +12,7 @@ from uuid import uuid4
 
 from langchain_core.messages import AIMessageChunk
 
+from .dict_processor import process_dict
 from .websocket import WebSocketManager, WorkflowWebSocketManager
 from config import settings
 from core.database.models import (
@@ -20,7 +21,7 @@ from core.database.models import (
     Datasets, Models, MCPToolUseRecords,
     UploadFiles, Workflows
 )
-from core.helper import truncate_messages_by_token_limit, get_file_content_list
+from core.helper import get_file_content_list
 from core.llm import Prompt
 from core.mcp.app_executor import skill_run, workflow_run
 from core.mcp.client import MCPClient
@@ -49,6 +50,7 @@ workflows = Workflows()
 
 skill_pattern = re.compile(r'nexusai__skill-(\d+)')
 workflow_pattern = re.compile(r'nexusai__workflow-(\d+)')
+MCP_TOOL_RESULT_MAX_LEN = 65535
 
 class Chatroom:
     @staticmethod
@@ -451,7 +453,13 @@ class Chatroom:
                 'workflow_run_id': mcp_tool_use['workflow_run_id'],
                 'workflow_confirmation_status': mcp_tool_use['workflow_confirmation_status'],
                 'args': mcp_tool_use['args'],
-                'result': mcp_tool_use['result']
+                'result': mcp_tool_use['result'],
+                'result_is_truncated': mcp_tool_use['result_is_truncated'],
+                'msg': (
+                    get_language_content('msg_mcp_tool_result_is_truncated', uid=self._user_id).format(
+                        length=MCP_TOOL_RESULT_MAX_LEN
+                    ) if mcp_tool_use['result_is_truncated'] else ''
+                )
             }, ensure_ascii=False)
             agent_message += (
                 '<<<mcp-tool-start>>>'
@@ -523,8 +531,6 @@ class Chatroom:
             raise Exception('MCP tool use has finished!')
         self._console_log(f'MCP tool result: \033[91m{result}\033[0m\n')
         mcp_tool_use_update_data = {}
-        mcp_tool_use['result'] = result
-        mcp_tool_use_update_data['result'] = result
         if (
             skill_pattern.fullmatch(mcp_tool_use['name'])
             or workflow_pattern.fullmatch(mcp_tool_use['name'])
@@ -542,8 +548,19 @@ class Chatroom:
                 self._update_chat_file_list(file_list)
             else:
                 mcp_tool_use_update_data['status'] = 5  # Failed
+            if len(result) > MCP_TOOL_RESULT_MAX_LEN:
+                mcp_tool_use['result_is_truncated'] = True
+                mcp_tool_use_update_data['result_is_truncated'] = 1
+                result_dict = process_dict(result_dict, MCP_TOOL_RESULT_MAX_LEN)
+                result = json.dumps(result_dict, ensure_ascii=False)
         else:
             mcp_tool_use_update_data['status'] = 4  # Finished
+            if len(result) > MCP_TOOL_RESULT_MAX_LEN:
+                mcp_tool_use['result_is_truncated'] = True
+                mcp_tool_use_update_data['result_is_truncated'] = 1
+                result = result[:MCP_TOOL_RESULT_MAX_LEN-3] + '...'
+        mcp_tool_use['result'] = result
+        mcp_tool_use_update_data['result'] = result
         self._update_chatroom_message()
         mcp_tool_use_records.update(
             {'column': 'id', 'value': mcp_tool_use_id},
@@ -551,8 +568,16 @@ class Chatroom:
         )
         await self._ws_manager.send_instruction(
             self._chatroom_id,
-            'WITHMCPTOOLRESULT', 
-            {'id': mcp_tool_use_id, 'result': result}
+            'WITHMCPTOOLRESULT',
+            {
+                'id': mcp_tool_use_id,
+                'result': result,
+                'msg': (
+                    get_language_content('msg_mcp_tool_result_is_truncated', uid=self._user_id).format(
+                        length=MCP_TOOL_RESULT_MAX_LEN
+                    ) if mcp_tool_use['result_is_truncated'] else ''
+                )
+            }
         )
         if workflow_run_id := mcp_tool_use['workflow_run_id']:
             self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
@@ -657,7 +682,11 @@ class Chatroom:
                 await self._ws_manager.send_instruction(
                     self._chatroom_id,
                     'WITHMCPTOOLRESULT',
-                    {'id': mcp_tool_use['id'], 'result': result}
+                    {
+                        'id': mcp_tool_use['id'], 
+                        'result': result,
+                        'msg': ''
+                    }
                 )
                 if workflow_run_id := mcp_tool_use['workflow_run_id']:
                     self._workflow_ws_manager.remove_workflow_run(self._user_id, workflow_run_id)
@@ -798,7 +827,11 @@ class Chatroom:
                 await self._ws_manager.send_instruction(
                     self._chatroom_id,
                     'WITHMCPTOOLRESULT', 
-                    {'id': mcp_tool_use['id'], 'result': result}
+                    {
+                        'id': mcp_tool_use['id'], 
+                        'result': result, 
+                        'msg': ''
+                    }
                 )
 
     async def _wait_for_mcp_tool_uses(self) -> None:
@@ -1016,7 +1049,8 @@ class Chatroom:
                                         'workflow_run_id': 0,
                                         'workflow_confirmation_status': None,
                                         'args': '',
-                                        'result': None
+                                        'result': None,
+                                        'result_is_truncated': False
                                     })
                                 if mcp_tool_input := tool_call_chunk['args']:
                                     self._console_log(mcp_tool_input)

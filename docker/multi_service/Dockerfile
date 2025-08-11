@@ -22,7 +22,7 @@ COPY celery_app.py /NexusAI/celery_app.py
 COPY config.py /NexusAI/config.py
 COPY languages.py /NexusAI/languages.py
 COPY log.py /NexusAI/log.py
-COPY websocket.py /NexusAI/websocket.py
+COPY websocket_server.py /NexusAI/websocket_server.py
 
 WORKDIR /NexusAI
 

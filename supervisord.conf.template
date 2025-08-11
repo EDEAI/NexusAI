@@ -58,7 +58,7 @@ stderr_logfile_backups=5
 # environment=HTTP_PROXY="http://192.168.0.241:10809",HTTPS_PROXY="http://192.168.0.241:10809",NO_PROXY="localhost,127.0.0.1"
 
 [program:websocket]
-command=python websocket.py
+command=python websocket_server.py
 autostart=true
 autorestart=true
 startretries=3

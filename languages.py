@@ -1148,6 +1148,7 @@ language_packs = {
         'knowledge_base_administrator_desc': 'Manages enterprise knowledge assets and maintains knowledge base content for optimal information access',
 
         'msg_preparing_environment': 'Need to initialize the runtime environment, please wait patiently',
+        'msg_mcp_tool_result_is_truncated': 'The output of the tool exceeds the specified character limit (more than {length} characters); therefore, only partial content will be saved',
         'the_current_account_has_been_bound': 'The current account has been bound',
         'binding_successful': 'Binding successful',
         'openid_list_empty': 'OpenId List Empty',
@@ -1513,6 +1514,7 @@ language_packs = {
         'knowledge_base_administrator_desc': '专门管理企业知识资产，维护和优化知识库内容，提供最佳信息获取体验',
 
         'msg_preparing_environment': '需要初始化运行环境，请耐心等待',
+        'msg_mcp_tool_result_is_truncated': '工具输出内容过长（字符数大于{length}），因此只会保存部分内容',
         'the_current_account_has_been_bound': '当前账号已绑定',
         'binding_successful': '绑定成功',
         'openid_list_empty': 'OpenId列表为空',
