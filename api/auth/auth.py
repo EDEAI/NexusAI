@@ -123,6 +123,7 @@ async def register_user(register_user: RegisterUserData):
     email = register_user.email
     password = register_user.password
     nickname = register_user.nickname
+    position = register_user.position
     if not nickname:
         return response_error(get_language_content('register_nickname_empty'))
     if len(nickname.encode('utf-8')) > 50:
@@ -153,9 +154,12 @@ async def register_user(register_user: RegisterUserData):
 
     current_time = datetime.now()
     formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+    if position is None or position == '' or position.strip() == '':
+        position = user_data['position']
 
     register_user_data = {
         'nickname': nickname,
+        'position': position,
         'email': email,
         'password': password_with_salt,
         'password_salt': password_salt,
@@ -520,6 +524,7 @@ async def third_party_login(request: Request, login_data: ThirdPartyLoginData):
         openid=login_data.openid,
         sundry=login_data.sundry,
         nickname=login_data.nickname,
+        position=login_data.position,
         avatar=login_data.avatar,
         language=login_data.language or 'en',
         client_ip=client_ip,
@@ -864,6 +869,7 @@ async def third_party_login_binding(request: Request, login_data: ThirdPartyLogi
         platform=login_data.platform,
         openid=login_data.openid,
         sundry=login_data.sundry,
+        position=login_data.position,
         nickname=login_data.nickname,
         avatar=login_data.avatar,
         language=login_data.language or 'en',
