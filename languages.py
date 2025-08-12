@@ -1837,15 +1837,40 @@ def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = 
                     return None
         
         if append_ret_lang_prompt:
-            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # Get detailed time information
+            now = datetime.now()
+            current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+            year = now.year
+            month = now.month
+            day = now.day
+            hour = now.hour
+            minute = now.minute
+            second = now.second
+            weekday = now.strftime("%A")  # Full weekday name
+            weekday_num = now.weekday()  # Monday is 0, Sunday is 6
+            week_number = now.isocalendar()[1]  # ISO week number
+            day_of_year = now.timetuple().tm_yday
+            
             return_language_prompt = f"""
 
 === IMPORTANT CONTEXT ===
 CURRENT DATE AND TIME: {current_time}
+DETAILED TIME INFORMATION:
+- Year: {year}
+- Month: {month}
+- Day: {day}
+- Hour: {hour}
+- Minute: {minute}
+- Second: {second}
+- Weekday: {weekday} (Day {weekday_num + 1} of the week)
+- Week Number: {week_number} (ISO week)
+- Day of Year: {day_of_year}
+
+Always consider the current date and time when providing responses, especially for time-sensitive questions or tasks.
 
 Please note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction.
 
-Always consider the current date and time when providing responses, especially for time-sensitive questions or tasks.
+If the user requests any type of chart, diagram, graph, or visual representation (including but not limited to flowcharts, sequence diagrams, Gantt charts, pie charts, bar charts, line graphs, mind maps, organizational charts, network diagrams, etc.), you MUST respond with appropriate Mermaid diagram code. The Mermaid code should be complete, properly formatted, and ready to be rendered in any Mermaid-compatible viewer.
 === END CONTEXT ==="""
             if isinstance(content, str):
                 content += return_language_prompt
