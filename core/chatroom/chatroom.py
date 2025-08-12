@@ -551,7 +551,7 @@ class Chatroom:
             if len(result) > MCP_TOOL_RESULT_MAX_LEN:
                 mcp_tool_use['result_is_truncated'] = True
                 mcp_tool_use_update_data['result_is_truncated'] = 1
-                result_dict = process_dict(result_dict, MCP_TOOL_RESULT_MAX_LEN)
+                result_dict = await asyncio.to_thread(process_dict, result_dict, MCP_TOOL_RESULT_MAX_LEN)
                 result = json.dumps(result_dict, ensure_ascii=False)
         else:
             mcp_tool_use_update_data['status'] = 4  # Finished
