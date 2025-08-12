@@ -416,9 +416,7 @@ async def agent_run(data: ReqAgentRunSchema, userinfo: TokenData = Depends(get_c
 
     task = run_app.delay(app_type="agent", id_=agent_id, user_id=uid, input_dict=input_dict, ability_id=ability_id,
                          prompt=prompt, data_source_run_id=data_source_run_id)
-    while not task.ready():
-        await asyncio.sleep(0.1)
-    result = task.get()
+    result = await asyncio.to_thread(task.get)
     if result["status"] != "success":
         return response_error(result["message"])
 

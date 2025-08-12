@@ -298,9 +298,7 @@ async def skill_run(data: ReqSkillRunSchema, userinfo: TokenData = Depends(get_c
         if app["status"] != 1:
             return response_error(get_language_content("app_status_not_normal"))
     task = run_app.delay(app_type="skill", id_=skill_id, user_id=uid, input_dict=input_dict)
-    while not task.ready():
-        await asyncio.sleep(0.1)
-    result = task.get()
+    result = await asyncio.to_thread(task.get)
     if result["status"] != "success":
         return response_success({"outputs":{
                 'error': result["message"]
@@ -540,10 +538,8 @@ async def skill_debug(data: ReqSkillDebugSchema, userinfo: TokenData = Depends(g
     """
     task = run_app.delay(app_type="skill", id_=0, user_id=userinfo.uid, input_dict=data.test_input,
                          custom_data=data.dict(exclude_unset=True))
-    while not task.ready():
-        await asyncio.sleep(0.1)
     try:
-        result = task.get()
+        result = await asyncio.to_thread(task.get)
         if result["status"] != "success":
             return response_success({"outputs":{
                 'error': result["message"]
