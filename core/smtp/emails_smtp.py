@@ -3,8 +3,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
 import logging
+import os
 # import sys
-# import os
 # from dotenv import load_dotenv
 from config import settings
 
@@ -301,6 +301,13 @@ class SMTPEmailSender:
             message.attach(MIMEText(content, content_type, 'utf-8'))
             
             # Connect to SMTP server and send
+            # Check if proxy is configured
+            proxy_url = os.environ.get('SOCKS_PROXY')
+            if proxy_url:
+                # Configure SOCKS proxy globally
+                self._setup_socks_proxy(proxy_url)
+            
+            # Create SMTP connection
             server = smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=self.timeout)
             
             if self.use_tls:
@@ -329,6 +336,43 @@ class SMTPEmailSender:
             error_msg = f"Email sending failed: {str(e)}"
             logging.error(error_msg)
             return False, error_msg
+    
+    def _setup_socks_proxy(self, proxy_url):
+        """
+        Setup SOCKS proxy globally for smtplib
+        :param proxy_url: Proxy URL (e.g., socks5://proxy.example.com:1080)
+        """
+        try:
+            # Import PySocks for SOCKS proxy support
+            import socks
+        except ImportError:
+            raise Exception("PySocks library is required for SOCKS proxy support. Install with: pip install PySocks")
+        
+        # Parse proxy URL
+        if proxy_url.startswith('socks5://'):
+            proxy_url = proxy_url[9:]  # Remove socks5://
+            proxy_type = socks.PROXY_TYPE_SOCKS5
+        elif proxy_url.startswith('socks4://'):
+            proxy_url = proxy_url[9:]  # Remove socks4://
+            proxy_type = socks.PROXY_TYPE_SOCKS4
+        elif proxy_url.startswith('socks://'):
+            proxy_url = proxy_url[8:]  # Remove socks://
+            proxy_type = socks.PROXY_TYPE_SOCKS5
+        else:
+            # Default to SOCKS5 if no protocol specified
+            proxy_type = socks.PROXY_TYPE_SOCKS5
+        
+        # Split proxy host and port
+        if ':' in proxy_url:
+            proxy_host, proxy_port = proxy_url.split(':', 1)
+            proxy_port = int(proxy_port)
+        else:
+            proxy_host = proxy_url
+            proxy_port = 1080  # Default SOCKS proxy port
+        
+        # Set global SOCKS proxy
+        socks.setdefaultproxy(proxy_type, proxy_host, proxy_port)
+        socks.wrapmodule(smtplib)
     
     def _validate_config(self):
         """Validate if SMTP configuration is complete"""
