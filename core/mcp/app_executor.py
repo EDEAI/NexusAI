@@ -100,10 +100,7 @@ async def skill_run(
 
     # Execute skill
     task = run_app.delay(app_type="skill", id_=skill_id, user_id=user_id, input_dict=input_obj.to_dict())
-    while not task.ready():
-        await asyncio.sleep(0.1)
-    
-    result = task.get()
+    result = await asyncio.to_thread(task.get)
     if result["status"] != "success":
         return {
             "status": "failed",
