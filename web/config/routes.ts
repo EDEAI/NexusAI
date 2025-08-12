@@ -1,4 +1,4 @@
-﻿
+
 export default [
     {
         path: '/user',
@@ -14,6 +14,21 @@ export default [
                 name: 'register',
                 path: '/user/register',
                 component: './User/Register',
+            },
+            {
+                name: 'forgot-password',
+                path: '/user/forgot-password',
+                component: './User/ForgotPassword/Step1',
+            },
+            {
+                name: 'forgot-password-step2',
+                path: '/user/forgot-password/step2',
+                component: './User/ForgotPassword/Step2',
+            },
+            {
+                name: 'forgot-password-step3',
+                path: '/user/forgot-password/step3',
+                component: './User/ForgotPassword/Step3',
             },
         ],
     },
