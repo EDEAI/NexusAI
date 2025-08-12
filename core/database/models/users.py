@@ -110,7 +110,7 @@ class Users(MySQL):
         )
         return user_three_parties_info
 
-    def create_or_update_third_party_user(self, platform: str, openid: str, sundry: Union[str, int, None] = None, nickname: str = None, 
+    def create_or_update_third_party_user(self, platform: str, openid: str, sundry: Union[str, int, None] = None, nickname: str = None, position: str = None,
                                           avatar: str = None, language: str = 'en', 
                                           last_login_ip: str = None, phone: str = None, email: str = None):
         """
@@ -144,6 +144,8 @@ class Users(MySQL):
             }
             if nickname and nickname.strip():
                 update_data['nickname'] = nickname
+            if position and position.strip():
+                update_data['position'] = position
             if avatar and avatar.strip():
                 update_data['avatar'] = avatar
             if language and language.strip():
@@ -161,6 +163,8 @@ class Users(MySQL):
                 }
                 if nickname and nickname.strip():
                     new_data['nickname'] = nickname
+                if position and position.strip():
+                    new_data['position'] = position
                 if avatar and avatar.strip():
                     new_data['avatar'] = avatar
                 user_info = self.select_one(columns=['id','phone','email'], conditions=[{'column': 'id', 'value': user_id}, {'column': 'status', 'value': 1}])
@@ -256,6 +260,8 @@ class Users(MySQL):
             }
             if nickname and nickname.strip():
                 update_data['nickname'] = nickname
+            if position and position.strip():
+                update_data['position'] = position
             if avatar and avatar.strip():
                 update_data['avatar'] = avatar
             if language and language.strip():
@@ -306,6 +312,7 @@ class Users(MySQL):
                 'role_id': 1,
                 'inviter_id': 0,
                 'nickname': nickname or f'{platform}_user',
+                'position': position,
                 'phone': phone,
                 'email': email,
                 'password': 'third_party_default',
@@ -406,7 +413,7 @@ class Users(MySQL):
             return user["id"]
         return None
 
-    def create_or_update_third_party_user_binding(self, platform: str, openid: str, sundry: Union[str, int, None] = None, nickname: str = None, 
+    def create_or_update_third_party_user_binding(self, platform: str, openid: str, sundry: Union[str, int, None] = None, nickname: str = None,position: str = None, 
                                           avatar: str = None, language: str = 'en', 
                                           last_login_ip: str = None, phone: str = None, email: str = None):
         """
@@ -440,6 +447,8 @@ class Users(MySQL):
             }
             if nickname and nickname.strip():
                 update_data['nickname'] = nickname
+            if position and position.strip():
+                update_data['position'] = position
             if avatar and avatar.strip():
                 update_data['avatar'] = avatar
             if language and language.strip():
@@ -457,6 +466,8 @@ class Users(MySQL):
                 }
                 if nickname and nickname.strip():
                     new_data['nickname'] = nickname
+                if position and position.strip():
+                    new_data['position'] = position
                 if avatar and avatar.strip():
                     new_data['avatar'] = avatar
                 user_info = self.select_one(columns=['id','phone','email'], conditions=[{'column': 'id', 'value': user_id}, {'column': 'status', 'value': 1}])
@@ -533,3 +544,12 @@ class Users(MySQL):
                     update_data
                 )
                 return existing_user['id']
+    def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
+        user = self.select_one(
+            columns=['id'],
+            conditions=[
+                {'column': 'email', 'value': email},
+                {'column': 'status', 'value': 1}
+            ]
+        )
+        return user

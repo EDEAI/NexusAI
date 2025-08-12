@@ -123,6 +123,7 @@ async def register_user(register_user: RegisterUserData):
     email = register_user.email
     password = register_user.password
     nickname = register_user.nickname
+    position = register_user.position
     if not nickname:
         return response_error(get_language_content('register_nickname_empty'))
     if len(nickname.encode('utf-8')) > 50:
@@ -153,9 +154,12 @@ async def register_user(register_user: RegisterUserData):
 
     current_time = datetime.now()
     formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+    if position is None or position == '' or position.strip() == '':
+        position = user_data['position']
 
     register_user_data = {
         'nickname': nickname,
+        'position': position,
         'email': email,
         'password': password_with_salt,
         'password_salt': password_salt,
@@ -520,6 +524,7 @@ async def third_party_login(request: Request, login_data: ThirdPartyLoginData):
         openid=login_data.openid,
         sundry=login_data.sundry,
         nickname=login_data.nickname,
+        position=login_data.position,
         avatar=login_data.avatar,
         language=login_data.language or 'en',
         client_ip=client_ip,
@@ -864,6 +869,7 @@ async def third_party_login_binding(request: Request, login_data: ThirdPartyLogi
         platform=login_data.platform,
         openid=login_data.openid,
         sundry=login_data.sundry,
+        position=login_data.position,
         nickname=login_data.nickname,
         avatar=login_data.avatar,
         language=login_data.language or 'en',
@@ -922,3 +928,223 @@ async def third_party_login_binding(request: Request, login_data: ThirdPartyLogi
     }
     
     return response_success(response_data)
+
+
+@router.post('/send_email_verification_code', response_model=ResDictSchema)
+async def send_email_verification_code(request_data: ResetEmailData):
+    """
+    Send email verification code
+    
+    Args:
+        request_data (dict): Request data containing email address
+    
+    Returns:
+        A success response indicating the verification code has been sent, or an error response if the email is not found.
+    """
+    import random
+    import string
+    from core.smtp.emails_smtp import SMTPEmailSender
+    
+    email = request_data.email
+    
+    # Validate email format
+    if not email or not is_valid_email(email):
+        return response_error(get_language_content('email_format_incorrect'))
+    
+    # Check if user exists
+    user = Users().get_user_by_email(email)
+    if not user:
+        return response_error(get_language_content('the_current_email_address_is_not_registered'))
+    
+    try:
+        # Generate 6-digit alphanumeric verification code
+        verification_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        
+        # Store verification code in Redis with 15 minutes expiration and verification status
+        redis_key = f"email_verification_code:{email}"
+        verification_data = {
+            'code': verification_code,
+            'status': '0'  # 0: not verified, 1: verified
+        }
+        redis.set(redis_key, json.dumps(verification_data), ex=900)  # 15 minutes expiration
+        
+        # Get SMTP configuration and send email
+        email_sender = SMTPEmailSender()
+        
+        # Send verification code email
+        success, message = email_sender.send_password_reset_code_simple(
+            to_email=email,
+            code=verification_code,
+            expire_minutes=15
+        )
+        
+        if success:
+            msg = get_language_content('verification_code_sent_successfully')
+            return response_success({
+                'msg': msg,
+                'email': email
+            })
+        else:
+            msg = get_language_content('email_sending_failed')
+            return response_error(f"{msg}: {message}")
+            
+    except Exception as e:
+        msg = get_language_content('an_error_occurred_while_sending_the_verification_code')
+        return response_error(f"{msg}: {str(e)}")
+
+
+@router.post('/verify_email_code', response_model=ResDictSchema)
+async def verify_email_code(request_data: ResetVerificationCodeData):
+    """
+    Verify email verification code
+    
+    Args:
+        request_data (dict): Request data containing email and verification code
+    
+    Returns:
+        A success response if verification is successful, or an error response if verification fails.
+    """
+    email = request_data.email
+    verification_code = request_data.verification_code
+    
+    # Validate email format
+    if not email or not is_valid_email(email):
+        return response_error(get_language_content('email_format_incorrect'))
+    
+    # Validate verification code is not empty
+    if not verification_code or not verification_code.strip():
+        return response_error(get_language_content('verification_code_cannot_be_empty'))
+    
+    # Check if user exists
+    user = Users().get_user_by_email(email)
+    if not user:
+        return response_error(get_language_content('the_current_email_address_is_not_registered'))
+    
+    try:
+        # Get verification data from Redis
+        redis_key = f"email_verification_code:{email}"
+        stored_data = redis.get(redis_key)
+        
+        if not stored_data:
+            return response_error(get_language_content('verification_code_expired_or_not_exist'))
+        
+        # Parse stored verification data
+        try:
+            verification_data = json.loads(str(stored_data, 'utf-8'))
+            stored_code = verification_data.get('code')
+        except (json.JSONDecodeError, KeyError):
+            return response_error(get_language_content('verification_code_expired_or_not_exist'))
+        
+        # Compare verification codes
+        if stored_code != verification_code.strip():
+            return response_error(get_language_content('verification_code_incorrect'))
+        
+        # Verification successful, update status to verified (1) instead of deleting
+        verification_data['status'] = '1'
+        redis.set(redis_key, json.dumps(verification_data), ex=900)  # Keep same expiration time
+        
+        msg = get_language_content('email_verification_successful')
+        return response_success({
+            'msg': msg,
+            'email': email,
+            'verified': True
+        })
+        
+    except Exception as e:
+        msg = get_language_content('email_verification_failed')
+        return response_error(f"{msg}: {str(e)}")
+
+
+@router.post('/reset_password', response_model=ResDictSchema)
+async def reset_password(reset_data: ResetPasswordData):
+    """
+    Reset user password
+    
+    Args:
+        reset_data (ResetPasswordData): Reset password data containing email, new password and confirm password
+    
+    Returns:
+        A success response if password reset is successful, or an error response if reset fails.
+    """
+    email = reset_data.email
+    password = reset_data.password
+    confirm_password = reset_data.confirm_password
+    
+    # Validate email format
+    if not email or not is_valid_email(email):
+        return response_error(get_language_content('email_format_incorrect'))
+    
+    # Validate password is not empty
+    if not password or not password.strip():
+        return response_error(get_language_content('password_cannot_be_empty'))
+    
+    # Validate confirm password is not empty
+    if not confirm_password or not confirm_password.strip():
+        return response_error(get_language_content('confirm_password_cannot_be_empty'))
+    
+    # Validate password and confirm password match
+    if password != confirm_password:
+        return response_error(get_language_content('passwords_do_not_match'))
+    
+    # Check if user exists
+    user = Users().get_user_by_email(email)
+    if not user:
+        return response_error(get_language_content('the_current_email_address_is_not_registered'))
+    
+    try:
+        # Check if email verification is completed
+        redis_key = f"email_verification_code:{email}"
+        stored_data = redis.get(redis_key)
+        
+        if not stored_data:
+            return response_error(get_language_content('email_verification_not_completed'))
+        
+        # Parse stored verification data
+        try:
+            verification_data = json.loads(str(stored_data, 'utf-8'))
+            verification_status = verification_data.get('status')
+        except (json.JSONDecodeError, KeyError):
+            return response_error(get_language_content('verification_status_invalid'))
+        
+        # Check if verification status is successful (1)
+        if verification_status != '1':
+            return response_error(get_language_content('email_verification_not_completed'))
+        
+        # Generate password salt and encrypted password following register_user method logic
+        password_salt = str(int(datetime.now().timestamp()))
+        password_with_salt = hashlib.md5((hashlib.md5(password.encode()).hexdigest() + password_salt).encode()).hexdigest()
+        
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Update user password
+        update_data = {
+            'password': password_with_salt,
+            'password_salt': password_salt,
+            'updated_time': formatted_time
+        }
+        
+        result = Users().update(
+            [{'column': 'id', 'value': user['id']}],
+            update_data
+        )
+        
+        SQLDatabase.commit()
+        SQLDatabase.close()
+        
+        if result:
+            # Password reset successful, delete verification data from Redis
+            redis.delete(redis_key)
+            
+            msg = get_language_content('password_reset_successful')
+            return response_success({
+                'msg': msg,
+                'email': email
+            })
+        else:
+            msg = get_language_content('password_reset_failed')
+            return response_error(msg)
+            
+    except Exception as e:
+        msg = get_language_content('password_reset_failed')
+        return response_error(f"{msg}: {str(e)}")

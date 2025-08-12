@@ -12,6 +12,7 @@ class UserData(BaseModel):
     phone: Optional[str] = None
     avatar: Optional[str] = None
     email: Optional[str] = None
+    position: Optional[str] = None
     role: Optional[int] = None
     language: Optional[str] = None
     team_type: Optional[int] = None
@@ -29,6 +30,7 @@ class RegisterUserData(BaseModel):
     email: Optional[str] = None
     password: Optional[str] = None
     nickname: Optional[str] = None
+    position: Optional[str] = None
 
 class ResRegisterUserSchema(BaseModel):
     code: int = 0
@@ -62,9 +64,11 @@ class ThirdPartyLoginData(BaseModel):
     openid: str
     sundry: Union[str, int]
     nickname: Optional[str] = None
+    position: Optional[str] = None
     avatar: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
+    position: Optional[str] = None
     language: Optional[str] = 'en'
 
 class ThirdPartyUserData(BaseModel):
@@ -89,3 +93,19 @@ class AccountBindingWithThreeParties(BaseModel):
 
 class OpenidList(BaseModel):
     openid_list: List[Any]
+
+class ResetPasswordData(BaseModel):
+    email: str
+    password: str
+    confirm_password: str
+
+
+
+class ResetVerificationCodeData(BaseModel):
+    email: str
+    verification_code: str
+
+
+
+class ResetEmailData(BaseModel):
+    email: str

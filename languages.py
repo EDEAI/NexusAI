@@ -1155,7 +1155,24 @@ language_packs = {
         'third_party_binding_not_found': 'Third Party Binding Not Found',
         'cancel_binding_failed': 'Cancel Binding Failed',
         'cancel_binding_successful': 'Cancel Binding Successful',
-        'roles_status_only_one_or_two': 'Can only select 1 and 2 for displaying all character statuses'
+        'roles_status_only_one_or_two': 'Can only select 1 and 2 for displaying all character statuses',
+        'the_current_email_address_is_not_registered': 'The current email address is not registered',
+        'verification_code_sent_successfully': 'Verification code sent successfully',
+        'email_sending_failed': 'Email sending failed',
+        'an_error_occurred_while_sending_the_verification_code': 'An error occurred while sending the verification code',
+        'verification_code_cannot_be_empty': 'Verification code cannot be empty',
+        'verification_code_expired_or_not_exist': 'Verification code has expired or does not exist',
+        'verification_code_incorrect': 'Verification code is incorrect',
+        'email_verification_successful': 'Email verification successful',
+        'email_verification_failed': 'Email verification failed',
+        'email_format_incorrect': 'Email format is incorrect',
+        'password_cannot_be_empty': 'Password cannot be empty',
+        'confirm_password_cannot_be_empty': 'Confirm password cannot be empty',
+        'passwords_do_not_match': 'Password and confirm password do not match',
+        'password_reset_successful': 'Password reset successful',
+        'password_reset_failed': 'Password reset failed',
+        'email_verification_not_completed': 'Email verification not completed, please verify your email first',
+        'verification_status_invalid': 'Verification status is invalid, please re-verify your email'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1521,7 +1538,24 @@ language_packs = {
         'third_party_binding_not_found': '未找到第三方绑定',
         'cancel_binding_failed': '取消绑定失败',
         'cancel_binding_successful': '取消绑定成功',
-        'roles_status_only_one_or_two': '是否显示全部角色状态只能选择1和2'
+        'roles_status_only_one_or_two': '是否显示全部角色状态只能选择1和2',
+        'the_current_email_address_is_not_registered': '当前邮箱未注册',
+        'verification_code_sent_successfully': '验证码发送成功',
+        'email_sending_failed': '邮件发送失败',
+        'an_error_occurred_while_sending_the_verification_code': '发送验证码时发生错误',
+        'verification_code_cannot_be_empty': '验证码不能为空',
+        'verification_code_expired_or_not_exist': '验证码已过期或不存在',
+        'verification_code_incorrect': '验证码错误',
+        'email_verification_successful': '邮箱验证成功',
+        'email_verification_failed': '邮箱验证失败',
+        'email_format_incorrect': '邮箱格式不正确',
+        'password_cannot_be_empty': '密码不能为空',
+        'confirm_password_cannot_be_empty': '确认密码不能为空',
+        'passwords_do_not_match': '密码和确认密码不一致',
+        'password_reset_successful': '密码重置成功',
+        'password_reset_failed': '密码重置失败',
+        'email_verification_not_completed': '邮箱验证未完成，请先进行邮箱验证',
+        'verification_status_invalid': '验证状态无效，请重新进行邮箱验证'
     }
 }
 
