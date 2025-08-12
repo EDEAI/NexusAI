@@ -66,6 +66,13 @@ class Settings(BaseSettings):
     API_PORT: int = int(os.environ.get('API_PORT', os.getenv('API_PORT', 9472)))
     STORAGE_URL: str = str(os.environ.get('STORAGE_URL', os.getenv('STORAGE_URL', '')))
 
+    SMTP_SERVER: str = os.environ.get('SMTP_SERVER', os.getenv('SMTP_SERVER'))
+    SMTP_PORT: int = int(os.environ.get('SMTP_PORT', os.getenv('SMTP_PORT')))
+    SMTP_USERNAME: str = os.environ.get('SMTP_USERNAME', os.getenv('SMTP_USERNAME'))
+    SMTP_PASSWORD: str = os.environ.get('SMTP_PASSWORD', os.getenv('SMTP_PASSWORD'))
+    SMTP_USE_TLS: str = os.environ.get('SMTP_USE_TLS', os.getenv('SMTP_USE_TLS'))
+    SMTP_TIMEOUT: int = int(os.environ.get('SMTP_TIMEOUT', os.getenv('SMTP_TIMEOUT')))
+
 
 settings = Settings()
 

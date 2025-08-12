@@ -3,17 +3,18 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
 import logging
-import sys
-import os
-from dotenv import load_dotenv
+# import sys
+# import os
+# from dotenv import load_dotenv
+from config import settings
 
 # Add project root directory to Python path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(os.path.dirname(current_dir))
-sys.path.insert(0, project_root)
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+# project_root = os.path.dirname(os.path.dirname(current_dir))
+# sys.path.insert(0, project_root)
 
 # Load environment variables
-load_dotenv(os.path.join(project_root, '.env'))
+# load_dotenv(os.path.join(project_root, '.env'))
 
 def get_smtp_config():
     """
@@ -21,12 +22,12 @@ def get_smtp_config():
     :return: SMTP configuration dictionary
     """
     return {
-        'smtp_server': os.getenv('SMTP_SERVER'),
-        'smtp_port': int(os.getenv('SMTP_PORT', 587)),
-        'username': os.getenv('SMTP_USERNAME'),
-        'password': os.getenv('SMTP_PASSWORD'),
-        'use_tls': os.getenv('SMTP_USE_TLS', 'True').lower() == 'true',
-        'timeout': int(os.getenv('SMTP_TIMEOUT', 30))
+        'smtp_server': settings.SMTP_SERVER,
+        'smtp_port': settings.SMTP_PORT,
+        'username': settings.SMTP_USERNAME,
+        'password': settings.SMTP_PASSWORD,
+        'use_tls': settings.SMTP_USE_TLS,
+        'timeout': settings.SMTP_TIMEOUT
     }
 
 
