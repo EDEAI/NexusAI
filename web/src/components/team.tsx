@@ -21,6 +21,7 @@ interface DataType {
     email: string;
     last_login_time: string;
     nickname: string;
+    position: string;
     role: number;
     role_title: string;
 }
@@ -32,15 +33,21 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
             title: intl.formatMessage({ id: 'user.name', defaultMessage: '' }),
             dataIndex: 'name',
             key: 'name',
-            width: '50%',
+            width: '30%',
             render: (_, record) => (
-                <div className="flex items-center" key={_}>
-                    <Avatar src={gandUp} />
-                    <div>
-                        <div> {record.nickname}</div>
-                        <div className="text-gray-300">{record.email}</div>
-                    </div>
+                <div key={_}>
+                    <div>{record.nickname}</div>
+                    <div className="text-gray-300">{record.email}</div>
                 </div>
+            ),
+        },
+        {
+            title: intl.formatMessage({ id: 'user.position', defaultMessage: '' }),
+            dataIndex: 'position',
+            key: 'position',
+            width: '20%',
+            render: (_, record) => (
+                <div key={_}>{record.position || '-'}</div>
             ),
         },
         {
@@ -50,13 +57,13 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
             }),
             dataIndex: 'age',
             key: 'age',
-            width: '30%',
+            width: '25%',
             render: (_, record) => <div key={_}>{record.last_login_time}</div>,
         },
         {
             title: intl.formatMessage({ id: 'user.role', defaultMessage: '' }),
             key: 'action',
-            width: '20%',
+            width: '25%',
             render: (_, record) => (
                 <Space size="middle" key={_}>
                     {/* <a>Invite {record.name}</a> */}
