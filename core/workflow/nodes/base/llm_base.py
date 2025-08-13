@@ -16,7 +16,6 @@ from langchain_core.documents import Document
 from langchain_core.messages import AIMessageChunk
 from langchain_core.runnables import Runnable, RunnableParallel, RunnablePassthrough
 from langchain_core.runnables.utils import Input, Output
-from transformers import AutoTokenizer
 
 
 from core.database.models.agent_chat_messages import AgentChatMessages
@@ -97,6 +96,7 @@ class LLMBaseNode(Node):
                 tokenizer = dashscope.get_tokenizer('qwen-turbo')
                 return lambda text: len(tokenizer.encode(text))
             case 'DeepSeek':
+                from transformers import AutoTokenizer
                 chat_tokenizer_dir = project_root.joinpath('core/helper/deepseek-tokenizer')
                 tokenizer = AutoTokenizer.from_pretrained(chat_tokenizer_dir, trust_remote_code=True)
                 return lambda text: len(tokenizer.encode(text))
