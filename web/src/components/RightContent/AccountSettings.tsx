@@ -55,6 +55,10 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ isModalOpen, setIsMod
       setUserInfo(updatedUserInfo);
       // Update localStorage for global user info
       userinfodata('SET', updatedUserInfo);
+      // Trigger custom event to update AvatarName component
+      window.dispatchEvent(new CustomEvent('userInfoUpdated', { 
+        detail: { type: 'userInfoUpdated' } 
+      }));
     } finally {
       setLoading(false);
     }

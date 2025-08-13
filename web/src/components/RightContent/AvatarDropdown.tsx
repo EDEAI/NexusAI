@@ -10,7 +10,7 @@ import { history, useIntl, useModel } from '@umijs/max';
 import { Spin } from 'antd';
 import { createStyles } from 'antd-style';
 import { stringify } from 'querystring';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
 import Modelsetup from '../ModelSetup';
@@ -23,11 +23,38 @@ export type GlobalHeaderRightProps = {
 };
 
 export const AvatarName = () => {
-    // const { initialState } = useModel('@@initialState');
-    // const { currentUser } = initialState || {};
+    const [nickname, setNickname] = useState<string>('');
+    
+    useEffect(() => {
+        // Initial load
+        const userInfo = userinfodata('GET');
+        setNickname(userInfo?.nickname || '');
+        
+        // Listen for storage changes
+        const handleStorageChange = () => {
+            const userInfo = userinfodata('GET');
+            setNickname(userInfo?.nickname || '');
+        };
+        
+        // Custom event for same-tab updates
+        const handleCustomEvent = (event: CustomEvent) => {
+            if (event.detail?.type === 'userInfoUpdated') {
+                handleStorageChange();
+            }
+        };
+        
+        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('userInfoUpdated', handleCustomEvent as EventListener);
+        
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('userInfoUpdated', handleCustomEvent as EventListener);
+        };
+    }, []);
+    
     return (
         <div className=" w-[100px] truncate">
-            <span className="">{userinfodata('GET')?.nickname}</span>
+            <span className="">{nickname}</span>
         </div>
     );
 };
