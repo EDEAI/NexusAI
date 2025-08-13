@@ -133,8 +133,19 @@ def authenticate_user(username: str, password: str):
     Authenticate the user.
     """
     user_model = Users()
+
+    conditions = [
+        {"column": "status", "value": 1},
+        [
+            {"column": "email", "value": email, "op": "=", "logic": "or"},
+            {"column": "phone", "value": email, "op": "="}
+        ]
+    ]
+
     user = user_model.select_one(
-        columns='*', conditions=[{'column': 'phone', 'value': username, 'logic': 'or'},{'column': 'email', 'value': username}]
+        columns='*', 
+        conditions=conditions
+        # conditions=[{'column': 'phone', 'value': username, 'logic': 'or'},{'column': 'email', 'value': username}]
     )
     if not user:
         return False

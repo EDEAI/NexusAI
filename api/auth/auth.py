@@ -135,13 +135,6 @@ async def register_user(register_user: RegisterUserData):
     if not password:
         return response_error(get_language_content('register_password_failed'))
 
-    # if not is_valid_phone_number(phone):
-    #     return response_error(get_language_content('register_phone_illegality'))
-    # if phone == '':
-    #     return response_error(get_language_content('register_phone_failed'))
-    # if get_repeat_phone(phone):
-    #     return response_error(get_language_content('register_phone_repeat'))
-
     conditions = [
         {"column": "status", "value": 1},
         [
@@ -153,21 +146,6 @@ async def register_user(register_user: RegisterUserData):
     user_data = Users().select_one(
         columns='*', 
         conditions = conditions
-        # conditions=[
-        #     {
-        #         'logic': 'and',
-        #         'conditions': [
-        #             {
-        #                 'logic': 'or', 
-        #                 'conditions': [
-        #                     {'column': 'email', 'value': email},
-        #                     {'column': 'phone', 'value': email}
-        #                 ]
-        #             },
-        #             {'column': 'status', 'value': 1}
-        #         ]
-        #     }
-        # ]
     )
 
     if not user_data:
@@ -1336,7 +1314,7 @@ async def update_profile(profile_data: UpdateProfileData, userinfo: TokenData = 
             
     except Exception as e:
         msg = get_language_content('profile_update_failed')
-        return response_error(f"{msg}: {str(e)}")
+        return response_error(f"{msg}")
 
 
 @router.post('/change_password', response_model=ResDictSchema)
@@ -1420,4 +1398,4 @@ async def change_password(password_data: ChangePasswordData, userinfo: TokenData
             
     except Exception as e:
         msg = get_language_content('password_change_failed')
-        return response_error(f"{msg}: {str(e)}")
+        return response_error(f"{msg}")
