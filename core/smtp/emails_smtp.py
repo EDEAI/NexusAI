@@ -340,7 +340,7 @@ class SMTPEmailSender:
     def _setup_socks_proxy(self, proxy_url):
         """
         Setup SOCKS proxy globally for smtplib
-        :param proxy_url: Proxy URL (e.g., socks5://proxy.example.com:1080)
+        :param proxy_url: Proxy URL (e.g., socks5://proxy.example.com:1080 or socks5://user:pass@proxy.example.com:1080)
         """
         try:
             # Import PySocks for SOCKS proxy support
@@ -349,6 +349,9 @@ class SMTPEmailSender:
             raise Exception("PySocks library is required for SOCKS proxy support. Install with: pip install PySocks")
         
         # Parse proxy URL
+        username = None
+        password = None
+        
         if proxy_url.startswith('socks5://'):
             proxy_url = proxy_url[9:]  # Remove socks5://
             proxy_type = socks.PROXY_TYPE_SOCKS5
@@ -362,6 +365,12 @@ class SMTPEmailSender:
             # Default to SOCKS5 if no protocol specified
             proxy_type = socks.PROXY_TYPE_SOCKS5
         
+        # Check for username:password in proxy URL
+        if '@' in proxy_url:
+            auth, proxy_url = proxy_url.split('@', 1)
+            if ':' in auth:
+                username, password = auth.split(':', 1)
+        
         # Split proxy host and port
         if ':' in proxy_url:
             proxy_host, proxy_port = proxy_url.split(':', 1)
@@ -370,8 +379,8 @@ class SMTPEmailSender:
             proxy_host = proxy_url
             proxy_port = 1080  # Default SOCKS proxy port
         
-        # Set global SOCKS proxy
-        socks.setdefaultproxy(proxy_type, proxy_host, proxy_port)
+        # Set global SOCKS proxy with rdns=True for proper DNS resolution through proxy
+        socks.setdefaultproxy(proxy_type, proxy_host, proxy_port, True, username, password)
         socks.wrapmodule(smtplib)
     
     def _validate_config(self):
