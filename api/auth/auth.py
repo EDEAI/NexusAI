@@ -279,6 +279,8 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
     """
     email_list_res = []
     url_list = []
+    already_registered_emails = []  # Store already registered emails
+    valid_emails = []  # Store valid emails that can be invited
 
     role_id = invite_data.role
     if role_id == 'admin_user':
@@ -287,6 +289,7 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
     else:
         role = 2
     email_list = invite_data.email_list
+    send_email = invite_data.send_email  # 0: return links, 1: send emails
 
     if not email_list:
         return response_error(get_language_content('lnvitation_email_failed'))
@@ -296,24 +299,29 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
         return response_error(get_language_content('lnvitation_team_failed'))
     
     # Check if there are any existing users in the invitation list
-    user_info = Users().select(columns='*', conditions=[{'column': 'email', 'op' : 'in', 'value': email_list}])
+    user_info = Users().select(columns='*', conditions=[{'column': 'email', 'op' : 'in', 'value': email_list},{'column': 'status', 'value': 1}])
+    
     if user_info:
         for value in user_info:
             if value['password'] == 'nexus_ai123456':
+                # Unregistered user (default password), can be invited
                 url_list.append(
                     settings.WEB_URL + '/user/register?email=' + value['email'] + '&team=' + team['name']
                 )
+                email_list_res.append(value['email'])
+                valid_emails.append(value['email'])
             else:
-                url_list.append(
-                    settings.WEB_URL + '/user/login?email=' + value['email']
-                )
+                # Already registered user (non-default password), record as registered
+                already_registered_emails.append(value['email'])
+            
             UserTeamRelations().ensure_team_id_exists(userinfo.team_id, value['email'], role, role_id)
-            email_list_res.append(value['email'])
-    # Remove identical elements from two lists
-    common_elements = set(email_list_res) & set(email_list)
-    email_list = list(filter(lambda x: x not in common_elements, email_list))
-    # Organize data
-    for val in email_list:
+    
+    # Remove identical elements from two lists (exclude processed emails)
+    processed_emails = set(email_list_res) | set(already_registered_emails)
+    remaining_emails = list(filter(lambda x: x not in processed_emails, email_list))
+    
+    # Organize data for new users
+    for val in remaining_emails:
         current_time = datetime.now()
         formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
         user_data = {
@@ -335,9 +343,78 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
         url_list.append(
             settings.WEB_URL + '/user/register?email=' + val + '&team=' + team['name']
         )
+        valid_emails.append(val)
         SQLDatabase.commit()
         SQLDatabase.close()
-    return response_success({'email_list': url_list})
+    
+    # Build return result
+    result_data = {'email_list': url_list}
+    
+    # Build message list
+    messages = []
+    
+    # Email sending logic
+    if send_email == 1 and valid_emails:
+        from core.smtp.emails_smtp import SMTPEmailSender
+        
+        # Get current user info as inviter
+        current_user_info = Users().select_one(
+            columns=['nickname'], 
+            conditions=[{'column': 'id', 'value': userinfo.uid}]
+        )
+        inviter_name = current_user_info.get('nickname', '') if current_user_info else ''
+        
+        email_sender = SMTPEmailSender()
+        email_success_count = 0
+        email_failed_count = 0
+        
+        # Send email to each valid email address
+        for i, email_addr in enumerate(valid_emails):
+            if i < len(url_list):
+                invitation_url = url_list[i]
+                try:
+                    success, message = email_sender.send_user_invitation(
+                        to_email=email_addr,
+                        invitation_url=invitation_url,
+                        team_name=team['name'],
+                        inviter_name=inviter_name
+                    )
+                    
+                    if success:
+                        email_success_count += 1
+                    else:
+                        email_failed_count += 1
+                        
+                except Exception as e:
+                    email_failed_count += 1
+        
+        # Add email sending result message
+        if email_failed_count == 0:
+            messages.append(get_language_content('invitation_emails_sent_successfully'))
+        else:
+            messages.append(f"Email sending completed, {email_success_count} successful, {email_failed_count} failed")
+    
+    elif send_email == 0:
+        # Only return links case
+        if valid_emails:
+            messages.append(get_language_content('invitation_links_generated_successfully'))
+    
+    # Add already registered emails message
+    if already_registered_emails:
+        registered_emails_str = ', '.join(already_registered_emails)
+        if len(already_registered_emails) == 1:
+            messages.append(get_language_content('email_already_registered').format(email=registered_emails_str))
+        else:
+            messages.append(f"{get_language_content('some_emails_already_registered')}: {registered_emails_str}")
+    
+    # Set final msg
+    if messages:
+        result_data['msg'] = '; '.join(messages)
+    else:
+        result_data['msg'] = get_language_content('invitation_links_generated_successfully')
+    
+    return response_success(result_data)
+
 
 @router.get("/team_member_list", response_model=ResDictSchema)
 async def invite_user(userinfo: TokenData = Depends(get_current_user)):

@@ -1172,7 +1172,18 @@ language_packs = {
         'password_reset_successful': 'Password reset successful',
         'password_reset_failed': 'Password reset failed',
         'email_verification_not_completed': 'Email verification not completed, please verify your email first',
-        'verification_status_invalid': 'Verification status is invalid, please re-verify your email'
+        'verification_status_invalid': 'Verification status is invalid, please re-verify your email',
+        'invitation_links_generated_successfully': 'Invitation links generated successfully',
+        'invitation_emails_sent_successfully': 'Invitation emails sent successfully',
+        'some_emails_already_registered': 'Some emails are already registered',
+        'email_already_registered': '{email} is already registered',
+        'invitation_email_sent_successfully': 'Invitation emails sent successfully',
+        'invitation_email_send_failed': 'Some invitation emails failed to send',
+        'invitation_email_send_exception': 'Email sending exception',
+        'email_already_registered': 'Email {email} is already registered',
+        'some_emails_already_registered': 'Some emails are already registered',
+        'invitation_links_generated_successfully': 'Invitation links generated successfully',
+        'invitation_emails_sent_successfully': 'All invitation emails sent successfully'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1555,7 +1566,18 @@ language_packs = {
         'password_reset_successful': '密码重置成功',
         'password_reset_failed': '密码重置失败',
         'email_verification_not_completed': '邮箱验证未完成，请先进行邮箱验证',
-        'verification_status_invalid': '验证状态无效，请重新进行邮箱验证'
+        'verification_status_invalid': '验证状态无效，请重新进行邮箱验证',
+        'invitation_links_generated_successfully': '邀请链接生成成功',
+        'invitation_emails_sent_successfully': '邀请邮件发送成功',
+        'some_emails_already_registered': '部分邮箱已注册',
+        'email_already_registered': '{email} 已注册',
+        'invitation_email_sent_successfully': '邀请邮件发送成功',
+        'invitation_email_send_failed': '部分邀请邮件发送失败',
+        'invitation_email_send_exception': '邮件发送异常',
+        'email_already_registered': '邮箱 {email} 已经注册过了',
+        'some_emails_already_registered': '部分邮箱已经注册过了',
+        'invitation_links_generated_successfully': '邀请链接生成成功',
+        'invitation_emails_sent_successfully': '所有邀请邮件发送成功'
     }
 }
 

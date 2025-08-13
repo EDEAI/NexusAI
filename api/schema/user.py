@@ -54,6 +54,7 @@ class ResDictSchema(BaseModel):
 class CreateDataEmailList(BaseModel):
     role: Union[str, int]
     email_list: List[Any]
+    send_email: int = 0
 # switch_the_language
 class SwitchLanguageSchema(BaseModel):
     language: str = 'en'
