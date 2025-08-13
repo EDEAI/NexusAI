@@ -137,8 +137,8 @@ def authenticate_user(username: str, password: str):
     conditions = [
         {"column": "status", "value": 1},
         [
-            {"column": "email", "value": email, "op": "=", "logic": "or"},
-            {"column": "phone", "value": email, "op": "="}
+            {"column": "email", "value": username, "op": "=", "logic": "or"},
+            {"column": "phone", "value": username, "op": "="}
         ]
     ]
 
