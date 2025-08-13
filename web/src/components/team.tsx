@@ -78,6 +78,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     const [isModalOpen3, setIsModalOpen3] = useState(false);
     const [gainEmail, setGainEmail] = useState(null);
     const [roleList, setRoleList] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {}, []);
 
@@ -145,7 +146,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
         }
     };
 
-    const Sendaninvitation = async () => {
+    const Sendaninvitation = async (sendEmail: number = 0) => {
         let newintcode = [];
         const pattern =
             /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/; //
@@ -159,27 +160,42 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
         });
 
         if (newintcode.length > 0) {
+            setLoading(true);
             // Handle role parameter: admin_user for team admin, role id for member roles
             const roleParam = roleid === 'admin_user' ? 'admin_user' : roleid;
 
             const params = {
                 role: roleParam,
                 email_list: newintcode,
+                send_email: sendEmail,
             };
             const res = await postInviteUser(params);
+            setLoading(false);
 
             if (res.code == 0) {
-                setGainEmail(res.data.email_list);
-                setIsModalOpen3(true);
-                setIsModalOpen2(false);
-                setEmaillist('');
-                setProcessedEmails([]);
-                message.success(
-                    intl.formatMessage({
-                        id: 'user.invitationSentSuccessfully',
-                        defaultMessage: '',
-                    }),
-                );
+                if (sendEmail === 1) {
+                    setIsModalOpen2(false);
+                    setEmaillist('');
+                    setProcessedEmails([]);
+                    message.success(
+                        intl.formatMessage({
+                            id: 'user.invitationEmailSentSuccessfully',
+                            defaultMessage: '',
+                        }),
+                    );
+                } else {
+                    setGainEmail(res.data.email_list);
+                    setIsModalOpen3(true);
+                    setIsModalOpen2(false);
+                    setEmaillist('');
+                    setProcessedEmails([]);
+                    message.success(
+                        intl.formatMessage({
+                            id: 'user.invitationSentSuccessfully',
+                            defaultMessage: '',
+                        }),
+                    );
+                }
             }
         } else {
             message.error(
@@ -286,7 +302,23 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                         ]}
                     />
                 </div>
-                <Button type="primary" block disabled={isBtn} onClick={Sendaninvitation}>
+                <Button 
+                    type="primary" 
+                    block 
+                    disabled={isBtn || loading} 
+                    onClick={() => Sendaninvitation(1)}
+                    loading={loading}
+                    className="mb-4"
+                >
+                    {intl.formatMessage({ id: 'user.sendInvitationEmail', defaultMessage: '' })}
+                </Button>
+                <Button 
+                    type="default" 
+                    block 
+                    disabled={isBtn || loading} 
+                    onClick={() => Sendaninvitation(0)}
+                    loading={loading}
+                >
                     {intl.formatMessage({ id: 'user.sendInvitation', defaultMessage: '' })}
                 </Button>
             </Modal>

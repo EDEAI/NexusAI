@@ -10,6 +10,7 @@ export default {
     'user.teamAdminDesc': '拥有团队的完全管理权限，可以管理成员、设置权限并操作所有功能',
     'user.regularMember': '普通成员',
     'user.invitationSentSuccessfully': '邀请发送成功',
+
     'user.enterValidEmail': '请输入正确的邮箱',
     'user.teamMember': '团队成员',
     'user.add': '添加',
@@ -20,6 +21,8 @@ export default {
     'user.inviteAsMemberUser': '邀请为成员用户',
     'user.member': '成员',
     'user.sendInvitation': '生成邀请链接',
+    'user.sendInvitationEmail': '发送邀请邮件',
+    'user.invitationEmailSentSuccessfully': '邀请邮件发送成功',
     'user.invitationSent': '邀请',
     'user.invitationSentLoginNexusAI': '请对方登录 NEXUS AI',
     'user.invitationLink': '邀请链接',
@@ -33,21 +36,21 @@ export default {
     'user.settings': '设置',
     'user.numberOfModels': '个模型',
 
-
     "register.success": "注册成功！",
-  "register.error": "注册失败！",
-  "register.password.required": "请输入密码。",
-  "register.confirm.required": "请确认密码。",
-  "register.confirm.error": "两次输入的密码不一致。",
-  "register.nickname.required": "请输入昵称。",
-  "register.join": "加入",
-  "register.invite": "邀请你加入",
-  "register.email": "电子邮件",
-  "register.password": "密码",
-  "register.confirm": "确认密码",
-  "register.nickname": "昵称",
-  "register.nickname.tooltip": "你希望别人怎么称呼你？",
-  "register.register": "注册"
-
-
+    "register.error": "注册失败！",
+    "register.password.required": "请输入密码。",
+    "register.confirm.required": "请确认密码。",
+    "register.confirm.error": "两次输入的密码不一致。",
+    "register.nickname.required": "请输入昵称。",
+    "register.join": "加入",
+    "register.invite": "邀请你加入",
+    "register.email": "电子邮件",
+    "register.password": "密码",
+    "register.confirm": "确认密码",
+    "register.nickname": "姓名",
+    "register.nickname.tooltip": "请输入您的真实姓名",
+    "register.position": "职位",
+    "register.position.tooltip": "您在公司或团队中的职位，如：产品经理、软件工程师、设计师等",
+    "register.position.required": "请输入职位",
+    "register.register": "注册"
 };
