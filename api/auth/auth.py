@@ -142,7 +142,7 @@ async def register_user(register_user: RegisterUserData):
     # if get_repeat_phone(phone):
     #     return response_error(get_language_content('register_phone_repeat'))
 
-    user_data = Users().select_one(columns='*', conditions=[{'column': 'email', 'value': email, 'logic':'or'},{'column': 'phone', 'value': email}])
+    user_data = Users().select_one(columns='*', conditions=[{'column': 'email', 'value': email, 'logic':'or'},{'column': 'phone', 'value': email},{'column': 'status', 'value': 1}])
 
     if not user_data:
         return response_error(get_language_content('register_email_empty'))
