@@ -142,23 +142,32 @@ async def register_user(register_user: RegisterUserData):
     # if get_repeat_phone(phone):
     #     return response_error(get_language_content('register_phone_repeat'))
 
+    conditions = [
+        {"column": "status", "value": 1},
+        [
+            {"column": "email", "value": email, "op": "=", "logic": "or"},
+            {"column": "phone", "value": email, "op": "="}
+        ]
+    ]
+
     user_data = Users().select_one(
         columns='*', 
-        conditions=[
-            {
-                'logic': 'and',
-                'conditions': [
-                    {
-                        'logic': 'or', 
-                        'conditions': [
-                            {'column': 'email', 'value': email},
-                            {'column': 'phone', 'value': email}
-                        ]
-                    },
-                    {'column': 'status', 'value': 1}
-                ]
-            }
-        ]
+        conditions = conditions
+        # conditions=[
+        #     {
+        #         'logic': 'and',
+        #         'conditions': [
+        #             {
+        #                 'logic': 'or', 
+        #                 'conditions': [
+        #                     {'column': 'email', 'value': email},
+        #                     {'column': 'phone', 'value': email}
+        #                 ]
+        #             },
+        #             {'column': 'status', 'value': 1}
+        #         ]
+        #     }
+        # ]
     )
 
     if not user_data:
