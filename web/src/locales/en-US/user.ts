@@ -47,7 +47,10 @@ export default {
     "register.email": "Email",
     "register.password": "Password",
     "register.confirm": "Confirm Password",
-    "register.nickname": "Nickname",
-    "register.nickname.tooltip": "What do you want others to call you?",
+    "register.nickname": "Name",
+    "register.nickname.tooltip": "Please enter your real name",
+    "register.position": "Position",
+    "register.position.tooltip": "Your position in the company or team, such as: Product Manager, Software Engineer, Designer, etc.",
+    "register.position.required": "Please enter your position",
     "register.register": "Register"
 };
