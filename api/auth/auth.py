@@ -236,7 +236,13 @@ async def get_user_info(userinfo: TokenData = Depends(get_current_user)):
             user_info['team_type'] = team_type
         else:
             user_info['team_type'] = 1
-        
+        user_info['team_name'] =  Teams().select_one(
+            columns=['name'], 
+            conditions=[
+                {'column': 'id', 'value': user_info['team_id']}, 
+                {'column': 'status', 'value': 1}
+            ]
+        )['name']
         # Always include three_list regardless of team_id
         user_info['three_list'] = UserThreeParties().select(
             columns=['platform','openid','sundry'], 
@@ -437,6 +443,7 @@ async def invite_user(userinfo: TokenData = Depends(get_current_user)):
             'users.avatar',
             'users.nickname',
             'users.role',
+            'users.position',
             'users.role_id'
         ],
         conditions=[{'column': 'user_team_relations.team_id', 'value': team_id}],
@@ -456,10 +463,13 @@ async def invite_user(userinfo: TokenData = Depends(get_current_user)):
                 user_title = '管理员'
             else:
                 role_data = Roles().select_one(columns='*', conditions=[{'column': 'id', 'value': value['role_id']}])
-                if role_data['built_in'] == 1:
-                    user_title = get_language_content(role_data['name'])
+                if role_data:
+                    if role_data['built_in'] == 1:
+                        user_title = get_language_content(role_data['name'])
+                    else:
+                        user_title = role_data['name']
                 else:
-                    user_title = role_data['name']
+                    user_title = 'Unknown Role'  # 默认角色名称，当角色不存在时
             if value['email']:
                 if value['last_login_time']:
                     delta = now - value['last_login_time']
@@ -492,6 +502,7 @@ async def invite_user(userinfo: TokenData = Depends(get_current_user)):
                     'nickname': value['nickname'],
                     'email': value['email'],
                     'role': value['role'],
+                    'position': value['position'],
                     'role_title': user_title,
                     'last_login_time': time_text
                 }

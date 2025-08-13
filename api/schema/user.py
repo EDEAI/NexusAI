@@ -8,6 +8,7 @@ class Token(BaseModel):
 class UserData(BaseModel):
     uid: Optional[int] = None
     team_id: Optional[int] = None
+    team_name: Optional[str] = None
     nickname: Optional[str] = None
     phone: Optional[str] = None
     avatar: Optional[str] = None
