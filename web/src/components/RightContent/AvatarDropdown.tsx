@@ -15,6 +15,7 @@ import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
 import Modelsetup from '../ModelSetup';
 import Team from '../team';
+import AccountSettings from './AccountSettings';
 
 export type GlobalHeaderRightProps = {
     menu?: boolean;
@@ -71,6 +72,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     const { initialState, setInitialState } = useModel('@@initialState');
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [ModelSetupOpen, setModelSetupOpen] = useState<boolean>(false);
+    const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState<boolean>(false);
 
     const onMenuClick = useCallback(
         event => {
@@ -86,6 +88,8 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
                 setIsModalOpen(true);
             } else if (key === 'Modelsetup') {
                 setModelSetupOpen(true);
+            } else if (key === 'accountSettings') {
+                setIsAccountSettingsOpen(true);
             } else {
                 history.push(`/account/${key}`);
             }
@@ -116,6 +120,14 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     // }
 
     const menuItems = [
+        {
+            key: 'accountSettings',
+            icon: <SettingOutlined />,
+            label: intl.formatMessage({
+                id: 'workflow.menu.accountSettings',
+                defaultMessage: '',
+            }),
+        },
         ...(menu
             ? [
                   {
@@ -179,6 +191,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
             </HeaderDropdown>
             <Team isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
             <Modelsetup isModalOpen={ModelSetupOpen} setIsModalOpen={setModelSetupOpen} />
+            <AccountSettings isModalOpen={isAccountSettingsOpen} setIsModalOpen={setIsAccountSettingsOpen} />
         </div>
     );
 };
