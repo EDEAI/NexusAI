@@ -1,3 +1,6 @@
+import os
+os.environ['DATABASE_AUTO_COMMIT'] = 'True'
+
 import uvicorn
 import asyncio
 from fastapi import FastAPI
