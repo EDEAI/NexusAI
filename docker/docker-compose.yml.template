@@ -53,6 +53,8 @@ x-common-environment-frontend: &common-environment-frontend
 # x-common-environment-proxy: &common-environment-proxy
 #   HTTP_PROXY: http://192.168.0.241:10809
 #   HTTPS_PROXY: http://192.168.0.241:10809
+#   SOCKS_PROXY: socks5://192.168.0.241:10808
+#   NO_PROXY: localhost,127.0.0.1
 
 services:
   multi_service:
