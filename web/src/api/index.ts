@@ -115,3 +115,25 @@ export const reset_password = async (data: ResetPasswordParams) => {
     });
     return res;
 };
+
+// Update user profile
+export const updateProfile = async (data: { nickname: string; position?: string }) => {
+    const res = await apiRequest<any>('/v1/auth/update_profile', {
+        method: 'POST',
+        data,
+    });
+    return res;
+};
+
+// Change password
+export const changePassword = async (data: { 
+    old_password: string; 
+    new_password: string; 
+    confirm_password: string; 
+}) => {
+    const res = await apiRequest<any>('/v1/auth/change_password', {
+        method: 'POST',
+        data,
+    });
+    return res;
+};

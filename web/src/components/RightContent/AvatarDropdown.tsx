@@ -10,11 +10,12 @@ import { history, useIntl, useModel } from '@umijs/max';
 import { Spin } from 'antd';
 import { createStyles } from 'antd-style';
 import { stringify } from 'querystring';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
 import Modelsetup from '../ModelSetup';
 import Team from '../team';
+import AccountSettings from './AccountSettings';
 
 export type GlobalHeaderRightProps = {
     menu?: boolean;
@@ -22,11 +23,38 @@ export type GlobalHeaderRightProps = {
 };
 
 export const AvatarName = () => {
-    // const { initialState } = useModel('@@initialState');
-    // const { currentUser } = initialState || {};
+    const [nickname, setNickname] = useState<string>('');
+    
+    useEffect(() => {
+        // Initial load
+        const userInfo = userinfodata('GET');
+        setNickname(userInfo?.nickname || '');
+        
+        // Listen for storage changes
+        const handleStorageChange = () => {
+            const userInfo = userinfodata('GET');
+            setNickname(userInfo?.nickname || '');
+        };
+        
+        // Custom event for same-tab updates
+        const handleCustomEvent = (event: CustomEvent) => {
+            if (event.detail?.type === 'userInfoUpdated') {
+                handleStorageChange();
+            }
+        };
+        
+        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('userInfoUpdated', handleCustomEvent as EventListener);
+        
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('userInfoUpdated', handleCustomEvent as EventListener);
+        };
+    }, []);
+    
     return (
         <div className=" w-[100px] truncate">
-            <span className="">{userinfodata('GET')?.nickname}</span>
+            <span className="">{nickname}</span>
         </div>
     );
 };
@@ -71,6 +99,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     const { initialState, setInitialState } = useModel('@@initialState');
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [ModelSetupOpen, setModelSetupOpen] = useState<boolean>(false);
+    const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState<boolean>(false);
 
     const onMenuClick = useCallback(
         event => {
@@ -86,6 +115,8 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
                 setIsModalOpen(true);
             } else if (key === 'Modelsetup') {
                 setModelSetupOpen(true);
+            } else if (key === 'accountSettings') {
+                setIsAccountSettingsOpen(true);
             } else {
                 history.push(`/account/${key}`);
             }
@@ -116,6 +147,14 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     // }
 
     const menuItems = [
+        {
+            key: 'accountSettings',
+            icon: <SettingOutlined />,
+            label: intl.formatMessage({
+                id: 'workflow.menu.accountSettings',
+                defaultMessage: '',
+            }),
+        },
         ...(menu
             ? [
                   {
@@ -179,6 +218,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
             </HeaderDropdown>
             <Team isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
             <Modelsetup isModalOpen={ModelSetupOpen} setIsModalOpen={setModelSetupOpen} />
+            <AccountSettings isModalOpen={isAccountSettingsOpen} setIsModalOpen={setIsAccountSettingsOpen} />
         </div>
     );
 };

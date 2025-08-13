@@ -244,6 +244,7 @@ export default {
     'workflow.menu.personalSettings': '个人设置',
     'workflow.menu.teamAndMembers': '团队和成员',
     'workflow.menu.modelSetup': '模型设置',
+    'workflow.menu.accountSettings': '账号设置',
     'workflow.menu.logout': '退出登录',
     'app.workflow.ra.empty': '暂无最近活跃',
     'workflow.label.selectKnowledgeBaseTask': '任务关联检索知识库',
