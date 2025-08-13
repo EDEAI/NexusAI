@@ -1225,3 +1225,173 @@ async def reset_password(reset_data: ResetPasswordData):
     except Exception as e:
         msg = get_language_content('password_reset_failed')
         return response_error(f"{msg}: {str(e)}")
+
+
+@router.post('/update_profile', response_model=ResDictSchema)
+async def update_profile(profile_data: UpdateProfileData, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Update user profile (nickname and position)
+    
+    Args:
+        profile_data (UpdateProfileData): Profile data containing nickname and optional position
+        userinfo (TokenData): The token data for the current authenticated user
+    
+    Returns:
+        A success response if profile update is successful, or an error response if update fails.
+    """
+    nickname = profile_data.nickname
+    position = profile_data.position
+    
+    # Validate nickname is not empty
+    if not nickname or not nickname.strip():
+        return response_error(get_language_content('register_nickname_empty'))
+    
+    # Validate nickname length
+    if len(nickname.encode('utf-8')) > 50:
+        return response_error(get_language_content('register_nickname_long'))
+    
+    try:
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Prepare update data
+        update_data = {
+            'nickname': nickname.strip(),
+            'updated_time': formatted_time
+        }
+        
+        # Only update position if it's provided and not empty
+        if position is not None and position.strip():
+            update_data['position'] = position.strip()
+        
+        # Update user profile
+        result = Users().update(
+            [{'column': 'id', 'value': userinfo.uid}],
+            update_data
+        )
+        
+        SQLDatabase.commit()
+        SQLDatabase.close()
+        
+        if result:
+            # Update Redis cache with new user info
+            updated_user_info = Users().select_one(
+                columns=['nickname', 'position'], 
+                conditions=[{'column': 'id', 'value': userinfo.uid}]
+            )
+            
+            # Update Redis cache if user info exists
+            if updated_user_info:
+                redis_key = f"user_info:{userinfo.uid}"
+                try:
+                    # Get existing cache data
+                    cached_data = redis.get(redis_key)
+                    if cached_data:
+                        user_cache = json.loads(str(cached_data, 'utf-8'))
+                        user_cache['nickname'] = updated_user_info['nickname']
+                        if 'position' in updated_user_info and updated_user_info['position']:
+                            user_cache['position'] = updated_user_info['position']
+                        # Update cache with 1 hour expiration
+                        redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60  # expiration time (using token expiration time)
+                        redis.set(redis_key, json.dumps(user_cache), ex=redis_expiry_seconds)
+                except Exception as cache_error:
+                    # Cache update failed, but profile update succeeded
+                    pass
+            
+            msg = get_language_content('profile_updated_successfully')
+            return response_success({
+                'msg': msg,
+                'nickname': updated_user_info['nickname'],
+                'position': updated_user_info.get('position', '')
+            })
+        else:
+            msg = get_language_content('profile_update_failed')
+            return response_error(msg)
+            
+    except Exception as e:
+        msg = get_language_content('profile_update_failed')
+        return response_error(f"{msg}: {str(e)}")
+
+
+@router.post('/change_password', response_model=ResDictSchema)
+async def change_password(password_data: ChangePasswordData, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Change user password
+    
+    Args:
+        password_data (ChangePasswordData): Password data containing old password, new password and confirm password
+        userinfo (TokenData): The token data for the current authenticated user
+    
+    Returns:
+        A success response if password change is successful, or an error response if change fails.
+    """
+    old_password = password_data.old_password
+    new_password = password_data.new_password
+    confirm_password = password_data.confirm_password
+    
+    # Validate old password is not empty
+    if not old_password or not old_password.strip():
+        return response_error(get_language_content('old_password_cannot_be_empty'))
+    
+    # Validate new password is not empty
+    if not new_password or not new_password.strip():
+        return response_error(get_language_content('new_password_cannot_be_empty'))
+    
+    # Validate confirm password is not empty
+    if not confirm_password or not confirm_password.strip():
+        return response_error(get_language_content('confirm_password_cannot_be_empty'))
+    
+    # Validate new password and confirm password match
+    if new_password != confirm_password:
+        return response_error(get_language_content('new_passwords_do_not_match'))
+    
+    try:
+        # Get current user data
+        uid = userinfo.uid
+        # Get user info (works for both regular and third-party users)
+        user_info = get_uid_user_info(uid)
+        
+        # Verify old password
+        old_password_with_salt = hashlib.md5(
+            (hashlib.md5(old_password.encode()).hexdigest() + user_info['password_salt']).encode()
+        ).hexdigest()
+        
+        if old_password_with_salt != user_info['password']:
+            return response_error(get_language_content('old_password_incorrect'))
+        
+        # Generate new password salt and encrypted password
+        new_password_salt = str(int(datetime.now().timestamp()))
+        new_password_with_salt = hashlib.md5(
+            (hashlib.md5(new_password.encode()).hexdigest() + new_password_salt).encode()
+        ).hexdigest()
+        
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Update user password
+        update_data = {
+            'password': new_password_with_salt,
+            'password_salt': new_password_salt,
+            'updated_time': formatted_time
+        }
+        
+        result = Users().update(
+            [{'column': 'id', 'value': userinfo.uid}],
+            update_data
+        )
+        
+        SQLDatabase.commit()
+        SQLDatabase.close()
+        
+        if result:
+            msg = get_language_content('password_changed_successfully')
+            return response_success({
+                'msg': msg
+            })
+        else:
+            msg = get_language_content('password_change_failed')
+            return response_error(msg)
+            
+    except Exception as e:
+        msg = get_language_content('password_change_failed')
+        return response_error(f"{msg}: {str(e)}")

@@ -1183,7 +1183,16 @@ language_packs = {
         'email_already_registered': 'Email {email} is already registered',
         'some_emails_already_registered': 'Some emails are already registered',
         'invitation_links_generated_successfully': 'Invitation links generated successfully',
-        'invitation_emails_sent_successfully': 'All invitation emails sent successfully'
+        'invitation_emails_sent_successfully': 'All invitation emails sent successfully',
+        'profile_updated_successfully': 'Profile updated successfully',
+        'profile_update_failed': 'Profile update failed',
+        'old_password_incorrect': 'Old password is incorrect',
+        'new_passwords_do_not_match': 'New password and confirm password do not match',
+        'password_changed_successfully': 'Password changed successfully',
+        'password_change_failed': 'Password change failed',
+        'old_password_cannot_be_empty': 'Old password cannot be empty',
+        'new_password_cannot_be_empty': 'New password cannot be empty',
+        'confirm_password_cannot_be_empty': 'Confirm password cannot be empty'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1577,7 +1586,16 @@ language_packs = {
         'email_already_registered': '邮箱 {email} 已经注册过了',
         'some_emails_already_registered': '部分邮箱已经注册过了',
         'invitation_links_generated_successfully': '邀请链接生成成功',
-        'invitation_emails_sent_successfully': '所有邀请邮件发送成功'
+        'invitation_emails_sent_successfully': '所有邀请邮件发送成功',
+        'profile_updated_successfully': '个人资料更新成功',
+        'profile_update_failed': '个人资料更新失败',
+        'old_password_incorrect': '旧密码不正确',
+        'new_passwords_do_not_match': '新密码和确认密码不一致',
+        'password_changed_successfully': '密码修改成功',
+        'password_change_failed': '密码修改失败',
+        'old_password_cannot_be_empty': '旧密码不能为空',
+        'new_password_cannot_be_empty': '新密码不能为空',
+        'confirm_password_cannot_be_empty': '确认密码不能为空'
     }
 }
 

@@ -110,3 +110,12 @@ class ResetVerificationCodeData(BaseModel):
 
 class ResetEmailData(BaseModel):
     email: str
+
+class UpdateProfileData(BaseModel):
+    nickname: str
+    position: Optional[str] = None
+
+class ChangePasswordData(BaseModel):
+    old_password: str
+    new_password: str
+    confirm_password: str
