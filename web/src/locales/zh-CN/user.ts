@@ -10,6 +10,7 @@ export default {
     'user.teamAdminDesc': '拥有团队的完全管理权限，可以管理成员、设置权限并操作所有功能',
     'user.regularMember': '普通成员',
     'user.invitationSentSuccessfully': '邀请发送成功',
+
     'user.enterValidEmail': '请输入正确的邮箱',
     'user.teamMember': '团队成员',
     'user.add': '添加',
@@ -20,6 +21,8 @@ export default {
     'user.inviteAsMemberUser': '邀请为成员用户',
     'user.member': '成员',
     'user.sendInvitation': '生成邀请链接',
+    'user.sendInvitationEmail': '发送邀请邮件',
+    'user.invitationEmailSentSuccessfully': '邀请邮件发送成功',
     'user.invitationSent': '邀请',
     'user.invitationSentLoginNexusAI': '请对方登录 NEXUS AI',
     'user.invitationLink': '邀请链接',

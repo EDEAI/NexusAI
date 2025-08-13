@@ -20,6 +20,9 @@ export default {
     'user.inviteAsMemberUser': 'Invite as Member User',
     'user.member': 'Member',
     'user.sendInvitation': 'Generate Invitation Link',
+    'user.sendInvitationEmail': 'Send Invitation Email',
+    'user.invitationEmailSentSuccessfully': 'Invitation email sent successfully',
+  
     'user.invitationSent': 'Invitation',
     'user.invitationSentLoginNexusAI': 'Please log in to NEXUS AI',
     'user.invitationLink': 'Invitation Link',
