@@ -256,6 +256,97 @@ class SMTPEmailSender:
         """
         return self.send_html_email(to_email, subject, html_content)
     
+    def send_user_invitation(self, to_email, invitation_url, team_name=None, inviter_name=None):
+        """
+        Send user invitation email
+        :param to_email: Recipient email
+        :param invitation_url: Invitation URL link
+        :param team_name: Team name (optional)
+        :param inviter_name: Inviter name (optional)
+        :return: (success: bool, message: str)
+        """
+        subject = "You're Invited to Join NexusAI"
+        
+        # Set default values if not provided
+        team_display = f" to {team_name}" if team_name else ""
+        inviter_display = f" by {inviter_name}" if inviter_name else ""
+        
+        html_content = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Invitation to Join NexusAI</title>
+        </head>
+        <body style="margin: 0; padding: 20px; font-family: 'Microsoft YaHei', Arial, sans-serif; background-color: #f5f7fa; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden;">
+                
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 28px; font-weight: 300;">You're Invited!</h1>
+                    <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Join NexusAI{team_display}</p>
+                </div>
+                
+                <!-- Content Area -->
+                <div style="padding: 40px 30px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h2 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 24px; font-weight: 400;">Welcome to NexusAI</h2>
+                        <p style="color: #7f8c8d; font-size: 16px; line-height: 1.6; margin: 0;">
+                            You have been invited{inviter_display} to join our AI-powered platform.
+                        </p>
+                    </div>
+                    
+                    <!-- Invitation Details -->
+                    <div style="background-color: #f8f9ff; border-left: 4px solid #667eea; padding: 25px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+                        <h3 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 18px;">🚀 What's Next?</h3>
+                        <ul style="color: #34495e; margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.8;">
+                            <li>Click the invitation link below to get started</li>
+                            <li>Create your account or sign in if you already have one</li>
+                            <li>Start exploring powerful AI tools and features</li>
+                            <li>Collaborate with your team members</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Invitation Button -->
+                    <div style="text-align: center; margin: 40px 0;">
+                        <a href="{invitation_url}" style="display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 50px; font-size: 16px; font-weight: 500; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); transition: all 0.3s ease;">
+                            🎯 Accept Invitation
+                        </a>
+                    </div>
+                    
+                    <!-- Alternative Link -->
+                    <div style="background-color: #f8f9fa; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                        <p style="color: #6c757d; margin: 0 0 10px 0; font-size: 14px; text-align: center;">
+                            If the button doesn't work, copy and paste this link into your browser:
+                        </p>
+                        <div style="background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; padding: 12px; word-break: break-all; font-family: 'Courier New', monospace; font-size: 13px; color: #495057;">
+                            {invitation_url}
+                        </div>
+                    </div>
+                    
+                    <!-- Important Notice -->
+                    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 25px 0;">
+                        <div style="display: flex; align-items: flex-start;">
+                            <div style="color: #f39c12; font-size: 18px; margin-right: 12px;">⏰</div>
+                            <div>
+                                <h4 style="color: #856404; margin: 0 0 8px 0; font-size: 16px;">Important Notice</h4>
+                                <p style="color: #856404; margin: 0; font-size: 14px; line-height: 1.6;">
+                                    This invitation link is valid and secure. If you didn't expect this invitation, you can safely ignore this email.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Email Bottom Spacing -->
+            <div style="height: 50px;"></div>
+        </body>
+        </html>
+        """
+        return self.send_html_email(to_email, subject, html_content)
+    
     def _send_email(self, to_email, subject, content, content_type='plain', cc_emails=None, bcc_emails=None):
         """
         Internal email sending method
@@ -413,13 +504,22 @@ if __name__ == "__main__":
     # print(f"Password reset email (simple version): {message}")
     
     # 5. Send HTML email example
-    success, message = email_sender.send_password_reset_code_simple(
+    # success, message = email_sender.send_password_reset_code_simple(
+    #     to_email='1833706710@qq.com',
+    #     code='AB123C',
+    #     expire_minutes=15
+    # )
+    # print(success)
+    # print(f"Password reset email (simple version): {message}")
+    
+    # 9. Send user invitation email
+    success, message = email_sender.send_user_invitation(
         to_email='1833706710@qq.com',
-        code='AB123C',
-        expire_minutes=15
+        invitation_url='https://nexusai.com/invite?token=abc123&team=myteam',
+        team_name='Development Team',
+        inviter_name='John Doe'
     )
-    print(success)
-    print(f"Password reset email (simple version): {message}")
+    print(f"User invitation email: {message}")
     
     # # 6. Send verification code email
     # success, message = email_sender.send_verification_code(
