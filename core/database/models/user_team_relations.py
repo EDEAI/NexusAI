@@ -38,3 +38,35 @@ class UserTeamRelations(MySQL):
                     "created_time": current_time
                 }
                 self.insert(data)
+
+    def update_user_position(self, user_id: int, team_id: int, position: str) -> bool:
+        """
+        Update the position of a user in a specific team.
+        :param user_id: The user ID.
+        :param team_id: The team ID.
+        :param position: The new position to set.
+        :return: True if update was successful, False otherwise.
+        """
+        conditions = [
+            {"column": "user_id", "value": user_id},
+            {"column": "team_id", "value": team_id}
+        ]
+        
+        data = {"position": position}
+        
+        result = self.update(data=data, conditions=conditions)
+        return result
+
+    def get_user_team_relation(self, user_id: int, team_id: int) -> Dict[str, Any]:
+        """
+        Get the user team relation record by user_id and team_id.
+        :param user_id: The user ID.
+        :param team_id: The team ID.
+        :return: Dictionary containing all columns of the matching record, or None if not found.
+        """
+        conditions = [
+            {"column": "user_id", "value": user_id},
+            {"column": "team_id", "value": team_id}
+        ]
+        
+        return self.select_one(columns='*',conditions=conditions)

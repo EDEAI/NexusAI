@@ -158,12 +158,10 @@ async def register_user(register_user: RegisterUserData):
 
     current_time = datetime.now()
     formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
-    if position is None or position == '' or position.strip() == '':
-        position = user_data['position']
 
     register_user_data = {
         'nickname': nickname,
-        'position': position,
+        # 'position': position,
         'email': email,
         'password': password_with_salt,
         'password_salt': password_salt,
@@ -174,11 +172,21 @@ async def register_user(register_user: RegisterUserData):
         [{'column': 'id', 'value': user_data['id']}],
         register_user_data
     )
+
+    if position is not None and position != '' and position.strip() != '':
+        team_id = user_data['team_id']
+        user_id = user_data['id']
+        UserTeamRelations().update_user_position(user_id, team_id, position)
     SQLDatabase.commit()
     SQLDatabase.close()
     if not user_id:
         return response_error(get_language_content('register_password_failed'))
     user_info = Users().select_one(columns='*', conditions=[{'column': 'id', 'value': user_data['id']}])
+    get_user_team_relation = UserTeamRelations().get_user_team_relation(user_info['id'],user_info['team_id'])
+    if get_user_team_relation:
+        user_info['position'] = get_user_team_relation['position']
+    else:
+        user_info['position'] = ''
     return response_success({"user_info": user_info})
 
 @router.post("/logout", response_model=ResUserLogoutSchema)
@@ -250,6 +258,13 @@ async def get_user_info(userinfo: TokenData = Depends(get_current_user)):
                 {'column': 'user_id', 'value': uid}
             ]
         )
+
+        get_user_team_relation = UserTeamRelations().get_user_team_relation(user_info['id'],user_info['team_id'])
+        if get_user_team_relation:
+            user_info['position'] = get_user_team_relation['position']
+        else:
+            user_info['position'] = ''
+
     else:
         return response_error("User not found")
     
@@ -399,10 +414,10 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
                     email_failed_count += 1
         
         # Add email sending result message
-        if email_failed_count == 0:
-            messages.append(get_language_content('invitation_emails_sent_successfully'))
-        else:
-            messages.append(f"Email sending completed, {email_success_count} successful, {email_failed_count} failed")
+        # if email_failed_count == 0:
+        messages.append(get_language_content('invitation_emails_sent_successfully'))
+        # else:
+            # messages.append(f"Email sending completed, {email_success_count} successful, {email_failed_count} failed")
     
     elif send_email == 0:
         # Only return links case
@@ -411,11 +426,12 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
     
     # Add already registered emails message
     if already_registered_emails:
-        registered_emails_str = ', '.join(already_registered_emails)
-        if len(already_registered_emails) == 1:
-            messages.append(get_language_content('email_already_registered').format(email=registered_emails_str))
-        else:
-            messages.append(f"{get_language_content('some_emails_already_registered')}: {registered_emails_str}")
+        message = ''
+        # registered_emails_str = ', '.join(already_registered_emails)
+        # if len(already_registered_emails) == 1:
+        #     messages.append(get_language_content('email_already_registered').format(email=registered_emails_str))
+        # else:
+        #     messages.append(f"{get_language_content('some_emails_already_registered')}: {registered_emails_str}")
     
     # Set final msg
     if messages:
@@ -443,7 +459,7 @@ async def invite_user(userinfo: TokenData = Depends(get_current_user)):
             'users.avatar',
             'users.nickname',
             'users.role',
-            'users.position',
+            'user_team_relations.position',
             'users.role_id'
         ],
         conditions=[{'column': 'user_team_relations.team_id', 'value': team_id}],
@@ -540,13 +556,31 @@ async def get_user_teams(platform: int, userinfo: TokenData = Depends(get_curren
             'teams.created_time',
             'teams.updated_time',
             'teams.status',
-            'teams.type'
+            'teams.type',
+            'user_team_relations.position',
+            'user_team_relations.role'
         ],
         conditions=conditions,
         joins=[
             ["left", "teams", "user_team_relations.team_id = teams.id"]
         ]
     )
+    
+    # Process each team to add role_name and member_count
+    for team in user_teams:
+        # Set role name based on role value
+        if team['role'] == 1:
+            team['role_name'] = '管理员'
+        else:
+            team['role_name'] = '成员'
+        
+        # Count total members in this team
+        team_members = UserTeamRelations().select(
+            columns=['id'],
+            conditions=[{'column': 'team_id', 'value': team['id']}]
+        )
+        team['member_count'] = len(team_members) if team_members else 0
+    
     return response_success({'teams': user_teams})
 
 @router.post('/switch_team', response_model=ResDictSchema)
@@ -1256,6 +1290,9 @@ async def update_profile(profile_data: UpdateProfileData, userinfo: TokenData = 
     """
     nickname = profile_data.nickname
     position = profile_data.position
+
+    team_id = userinfo.team_id
+    user_id = userinfo.uid
     
     # Validate nickname is not empty
     if not nickname or not nickname.strip():
@@ -1277,12 +1314,13 @@ async def update_profile(profile_data: UpdateProfileData, userinfo: TokenData = 
         
         # Only update position if it's provided and not empty
         if position is not None and position.strip():
-            update_data['position'] = position.strip()
+            UserTeamRelations().update_user_position(user_id, team_id, position)
+            # update_data['position'] = position.strip()
         
         # Update user profile
         result = Users().update(
-            [{'column': 'id', 'value': userinfo.uid}],
-            update_data
+            data=update_data,
+            conditions=[{'column': 'id', 'value': user_id}]
         )
         
         SQLDatabase.commit()
@@ -1291,24 +1329,33 @@ async def update_profile(profile_data: UpdateProfileData, userinfo: TokenData = 
         if result:
             # Update Redis cache with new user info
             updated_user_info = Users().select_one(
-                columns=['nickname', 'position'], 
-                conditions=[{'column': 'id', 'value': userinfo.uid}]
+                columns=['nickname'], 
+                conditions=[{'column': 'id', 'value': user_id}]
             )
+            
+            # Initialize user_cache with default values
+            user_cache = {'nickname': updated_user_info['nickname'], 'position': ''}
             
             # Update Redis cache if user info exists
             if updated_user_info:
-                redis_key = f"user_info:{userinfo.uid}"
+                redis_key = f"user_info:{user_id}"
                 try:
                     # Get existing cache data
                     cached_data = redis.get(redis_key)
                     if cached_data:
                         user_cache = json.loads(str(cached_data, 'utf-8'))
                         user_cache['nickname'] = updated_user_info['nickname']
-                        if 'position' in updated_user_info and updated_user_info['position']:
-                            user_cache['position'] = updated_user_info['position']
-                        # Update cache with 1 hour expiration
-                        redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60  # expiration time (using token expiration time)
-                        redis.set(redis_key, json.dumps(user_cache), ex=redis_expiry_seconds)
+                    
+                    # Get position from user_team_relations
+                    get_user_team_relation = UserTeamRelations().get_user_team_relation(user_id, team_id)
+                    if get_user_team_relation and get_user_team_relation.get('position'):
+                        user_cache['position'] = get_user_team_relation['position']
+                    else:
+                        user_cache['position'] = ''
+                    
+                    # Update cache with 1 hour expiration
+                    redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60
+                    redis.set(redis_key, json.dumps(user_cache), ex=redis_expiry_seconds)
                 except Exception as cache_error:
                     # Cache update failed, but profile update succeeded
                     pass
@@ -1317,15 +1364,17 @@ async def update_profile(profile_data: UpdateProfileData, userinfo: TokenData = 
             return response_success({
                 'msg': msg,
                 'nickname': updated_user_info['nickname'],
-                'position': updated_user_info.get('position', '')
+                'position': user_cache.get('position', '')
             })
         else:
             msg = get_language_content('profile_update_failed')
             return response_error(msg)
             
     except Exception as e:
+        # Log the actual error for debugging
+        # print(f"Profile update error: {str(e)}")
         msg = get_language_content('profile_update_failed')
-        return response_error(f"{msg}")
+        return response_error(msg)
 
 
 @router.post('/change_password', response_model=ResDictSchema)
