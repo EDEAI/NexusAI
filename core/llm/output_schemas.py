@@ -22,42 +22,37 @@ LLM_OUTPUT_SCHEMAS = {
         "description": "Task data with hierarchical recursive structure",
         "input_schema": {
             "type": "object",
-            "$defs": {
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Task ID with format 'task-{parent_ids}-{current_id}'"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Task name"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Task description"
+                },
+                "keywords": {
+                    "type": "string",
+                    "description": "Task keywords separated by commas"
+                },
                 "task": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "type": "string",
-                            "description": "Task ID with format 'task-{parent_ids}-{current_id}'"
-                        },
-                        "name": {
-                            "type": "string",
-                            "description": "Task name"
-                        },
-                        "description": {
-                            "type": "string",
-                            "description": "Task description"
-                        },
-                        "keywords": {
-                            "type": "string",
-                            "description": "Task keywords separated by commas"
-                        },
-                        "task": {
-                            "type": "string",
-                            "description": "Specific task content"
-                        },
-                        "subcategories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/$defs/task"
-                            },
-                            "description": "Sub-task list with same structure as parent"
-                        }
+                    "type": "string",
+                    "description": "Specific task content"
+                },
+                "subcategories": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "description": "Further sub-tasks (structure handled programmatically)"
                     },
-                    "required": ["id", "name", "description", "keywords", "task", "subcategories"],
+                    "description": "Sub-task list with same structure as parent"
                 }
             },
-            "$ref": "#/$defs/task"
+            "required": ["id", "name", "description", "keywords", "task", "subcategories"],
         }
     },
     "chatroom_manager_system": {
