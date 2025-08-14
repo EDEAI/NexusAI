@@ -558,7 +558,8 @@ async def get_user_teams(platform: int, userinfo: TokenData = Depends(get_curren
             'teams.status',
             'teams.type',
             'user_team_relations.position',
-            'user_team_relations.role'
+            'user_team_relations.role',
+            'user_team_relations.role_id'
         ],
         conditions=conditions,
         joins=[
@@ -569,11 +570,20 @@ async def get_user_teams(platform: int, userinfo: TokenData = Depends(get_curren
     # Process each team to add role_name and member_count
     for team in user_teams:
         # Set role name based on role value
+
+
         if team['role'] == 1:
-            team['role_name'] = '管理员'
+            user_title = '管理员'
         else:
-            team['role_name'] = '成员'
-        
+            role_data = Roles().select_one(columns='*', conditions=[{'column': 'id', 'value': team['role_id']}])
+            if role_data:
+                if role_data['built_in'] == 1:
+                    user_title = get_language_content(role_data['name'])
+                else:
+                    user_title = role_data['name']
+            else:
+                user_title = 'Unknown Role'  # 默认角色名称，当角色不存在时
+        team['role_name']= user_title
         # Count total members in this team
         team_members = UserTeamRelations().select(
             columns=['id'],
