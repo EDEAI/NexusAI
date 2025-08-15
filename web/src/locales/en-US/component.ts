@@ -28,5 +28,15 @@ export default {
     'component.menu.arrange': 'Arrange',
     'component.menu.accessAPI': 'Access API',
     'component.tooltip.enableAPIFirst': 'Please enable the API first',
-    'component.menu.log': 'Log'
+    'component.menu.log': 'Log',
+    'component.team.currentTeam': 'Current team: {name}',
+    'component.team.switchTeam': 'Switch Team',
+    'component.team.currentTeamLabel': 'Current Team:',
+    'component.team.selectTeamToSwitch': 'Select team to switch:',
+    'component.team.selectTeam': 'Select Team',
+    'component.team.memberCount': '{count} members',
+    'component.team.switchConfirmWithPosition': 'After switching to "{name}", you will access the team as {position} {role}',
+    'component.team.switchConfirmWithoutPosition': 'After switching to "{name}", you will access the team as {role}',
+    'component.team.switchSuccess': 'Team switched successfully',
+    'component.team.cancel': 'Cancel'
 };
