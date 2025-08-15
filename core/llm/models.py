@@ -1,6 +1,8 @@
 import json
+from langchain_core.output_parsers.openai_tools import JsonOutputToolsParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import AzureChatOpenAI
 from langchain_openai import ChatOpenAI
@@ -24,6 +26,7 @@ from langchain_google_vertexai import ChatVertexAI
 from langchain_community.chat_models import VolcEngineMaasChat
 from langchain_community.chat_models import QianfanChatEndpoint
 from langchain_community.chat_models import ChatZhipuAI
+from operator import itemgetter
 from .output_schemas import LLM_OUTPUT_SCHEMAS
 
 
@@ -189,7 +192,14 @@ class LLMPipeline:
 
             # Initialize Google with schema if available
             if schema:
-                self.llm = ChatGoogleGenerativeAI(**config).with_structured_output(schema=schema, include_raw=True)
+                llm = ChatGoogleGenerativeAI(**config).bind_tools([schema])
+                parser_with_fallback = RunnablePassthrough.assign(
+                    parsed=itemgetter("raw") | JsonOutputToolsParser(), parsing_error=lambda _: None
+                ).with_fallbacks(
+                    [RunnablePassthrough.assign(parsed=lambda _: None)],
+                    exception_key="parsing_error",
+                )
+                self.llm = {"raw": llm} | parser_with_fallback
             else:
                 self.llm = ChatGoogleGenerativeAI(**config)
         elif self.supplier == 'Groq':
@@ -536,6 +546,8 @@ class LLMPipeline:
                     function_call = raw_response.additional_kwargs.get('function_call')
                     if function_call and 'arguments' in function_call:
                         content = function_call['arguments']
+                elif hasattr(raw_response, 'content') and raw_response.content:
+                    content = raw_response.content
                 
                 # Create standardized response
                 standardized_response = type('StandardizedResponse', (), {

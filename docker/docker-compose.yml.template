@@ -42,6 +42,12 @@ x-common-environment-backend: &common-environment-backend
   APP_API_TIMEOUT: 60
   FASTAPI_WORKERS: 2
   CELERY_WORKERS: 4
+  SMTP_SERVER: 
+  SMTP_PORT: 587
+  SMTP_USERNAME: 
+  SMTP_PASSWORD: 
+  SMTP_USE_TLS: true
+  SMTP_TIMEOUT: 30
   INIT_ADMIN_PASSWORD: nexusaipwd
 
 x-common-environment-frontend: &common-environment-frontend
