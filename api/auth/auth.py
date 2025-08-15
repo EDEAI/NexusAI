@@ -624,45 +624,24 @@ async def switch_user_team(team_id: SwitchTeamId, userinfo: TokenData = Depends(
         {"team_id": team_id_value, "role":relation['role'], "inviter_id":relation['inviter_id'], "role_id":relation['role_id']}
     )
     
-    # Update token information in Redis
-    # Determine Redis key based on user type
-    if userinfo.user_type == "third_party":
-        redis_key = f"third_party_access_token:{user_id}"
-    else:
-        redis_key = f"access_token:{user_id}"
+    # Update user information cache in Redis
+    user_cache_key = f"user_info:{user_id}"
+    cached_user_info = redis.get(user_cache_key)
     
-    # Get complete user information for generating new token
-    updated_user = Users().select_one(
-        columns='*',
-        conditions=[{"column": "id", "value": user_id}]
-    )
-    
-    if updated_user:
-        # Create new token data
-        token_data = {
-            "uid": updated_user["id"],
-            "team_id": updated_user["team_id"],
-            "nickname": updated_user["nickname"],
-            "phone": updated_user["phone"],
-            "email": updated_user["email"],
-            "inviter_id": updated_user["inviter_id"],
-            "role": updated_user["role"]
-        }
-        
-        # If it's a third-party user, add third-party related fields
-        if userinfo.user_type == "third_party":
-            token_data.update({
-                "platform": userinfo.platform,
-                "openid": userinfo.openid,
-                "user_type": "third_party"
-            })
-        
-        # Generate new access token
-        new_access_token = create_access_token(data=token_data)
-        
-        # Update token in Redis
-        redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60
-        redis.set(redis_key, new_access_token, ex=redis_expiry_seconds)
+    if cached_user_info:
+        # If user info cache exists in Redis, update related fields
+        try:
+            user_info = json.loads(cached_user_info.decode('utf-8'))
+            user_info['team_id'] = team_id_value
+            user_info['role'] = relation['role']
+            user_info['inviter_id'] = relation['inviter_id']
+            user_info['role_id'] = relation['role_id']
+            
+            # Store back to Redis, keeping original expiration time
+            redis.set(user_cache_key, json.dumps(user_info))
+        except (json.JSONDecodeError, AttributeError):
+            # If parsing fails, delete cache to let system retrieve from database
+            redis.delete(user_cache_key)
     
     return response_success({"team_id": team_id_value})
 
