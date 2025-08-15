@@ -476,7 +476,7 @@ async def invite_user(userinfo: TokenData = Depends(get_current_user)):
         now = datetime.now()
         for index, value in enumerate(user_info_list):
             if value['role'] == 1:
-                user_title = '管理员'
+                user_title = 'Administrator'
             else:
                 role_data = Roles().select_one(columns='*', conditions=[{'column': 'id', 'value': value['role_id']}])
                 if role_data:
@@ -485,7 +485,7 @@ async def invite_user(userinfo: TokenData = Depends(get_current_user)):
                     else:
                         user_title = role_data['name']
                 else:
-                    user_title = 'Unknown Role'  # 默认角色名称，当角色不存在时
+                    user_title = 'Unknown Role'  # Default role name when role doesn't exist
             if value['email']:
                 if value['last_login_time']:
                     delta = now - value['last_login_time']
@@ -573,7 +573,7 @@ async def get_user_teams(platform: int, userinfo: TokenData = Depends(get_curren
 
 
         if team['role'] == 1:
-            user_title = '管理员'
+            user_title = 'Administrator'
         else:
             role_data = Roles().select_one(columns='*', conditions=[{'column': 'id', 'value': team['role_id']}])
             if role_data:
@@ -582,7 +582,7 @@ async def get_user_teams(platform: int, userinfo: TokenData = Depends(get_curren
                 else:
                     user_title = role_data['name']
             else:
-                user_title = 'Unknown Role'  # 默认角色名称，当角色不存在时
+                user_title = 'Unknown Role'  # Default role name when role doesn't exist
         team['role_name']= user_title
         # Count total members in this team
         team_members = UserTeamRelations().select(
@@ -617,10 +617,53 @@ async def switch_user_team(team_id: SwitchTeamId, userinfo: TokenData = Depends(
     )
     if not relation:
         return response_error(get_language_content('user_does_not_belong_to_this_team'))
+    
+    # Update user information to database
     Users().update(
         [{"column": "id", "value": user_id}],
         {"team_id": team_id_value, "role":relation['role'], "inviter_id":relation['inviter_id'], "role_id":relation['role_id']}
     )
+    
+    # Update token information in Redis
+    # Determine Redis key based on user type
+    if userinfo.user_type == "third_party":
+        redis_key = f"third_party_access_token:{user_id}"
+    else:
+        redis_key = f"access_token:{user_id}"
+    
+    # Get complete user information for generating new token
+    updated_user = Users().select_one(
+        columns='*',
+        conditions=[{"column": "id", "value": user_id}]
+    )
+    
+    if updated_user:
+        # Create new token data
+        token_data = {
+            "uid": updated_user["id"],
+            "team_id": updated_user["team_id"],
+            "nickname": updated_user["nickname"],
+            "phone": updated_user["phone"],
+            "email": updated_user["email"],
+            "inviter_id": updated_user["inviter_id"],
+            "role": updated_user["role"]
+        }
+        
+        # If it's a third-party user, add third-party related fields
+        if userinfo.user_type == "third_party":
+            token_data.update({
+                "platform": userinfo.platform,
+                "openid": userinfo.openid,
+                "user_type": "third_party"
+            })
+        
+        # Generate new access token
+        new_access_token = create_access_token(data=token_data)
+        
+        # Update token in Redis
+        redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        redis.set(redis_key, new_access_token, ex=redis_expiry_seconds)
+    
     return response_success({"team_id": team_id_value})
 
 @router.post('/third_party_login', response_model=ResThirdPartyLoginSchema)
