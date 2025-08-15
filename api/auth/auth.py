@@ -596,7 +596,7 @@ async def get_user_teams(platform: int, userinfo: TokenData = Depends(get_curren
 @router.post('/switch_team', response_model=ResDictSchema)
 async def switch_user_team(team_id: SwitchTeamId, userinfo: TokenData = Depends(get_current_user)):
     """
-    Switches the current user's team_id and saves it.
+    Switches the current user's team_id and saves it to both database and Redis cache.
 
     Args:
         team_id (int): The ID of the team to switch to.
@@ -624,26 +624,57 @@ async def switch_user_team(team_id: SwitchTeamId, userinfo: TokenData = Depends(
         {"team_id": team_id_value, "role":relation['role'], "inviter_id":relation['inviter_id'], "role_id":relation['role_id']}
     )
     
-    # Update user information cache in Redis
-    user_cache_key = f"user_info:{user_id}"
-    cached_user_info = redis.get(user_cache_key)
+    # Update Redis token cache with new team information
+    # Determine Redis key based on user type
+    if hasattr(userinfo, 'user_type') and userinfo.user_type == "third_party":
+        token_redis_key = f"third_party_access_token:{user_id}"
+    else:
+        token_redis_key = f"access_token:{user_id}"
     
-    if cached_user_info:
-        # If user info cache exists in Redis, update related fields
-        try:
-            user_info = json.loads(cached_user_info.decode('utf-8'))
-            user_info['team_id'] = team_id_value
-            user_info['role'] = relation['role']
-            user_info['inviter_id'] = relation['inviter_id']
-            user_info['role_id'] = relation['role_id']
+    new_access_token = None
+    # Check if token exists in Redis and update it with new team information
+    existing_token = redis.get(token_redis_key)
+    if existing_token:
+        # Get updated user information from database
+        updated_user = Users().select_one(
+            columns=['id', 'team_id', 'nickname', 'phone', 'email', 'inviter_id', 'role'],
+            conditions=[{"column": "id", "value": user_id}]
+        )
+        
+        if updated_user:
+            # Create new token with updated team information
+            token_data = {
+                "uid": updated_user["id"], 
+                "team_id": updated_user["team_id"], 
+                "nickname": updated_user["nickname"], 
+                "phone": updated_user["phone"],
+                "email": updated_user["email"],
+                "inviter_id": updated_user["inviter_id"],
+                "role": updated_user["role"]
+            }
             
-            # Store back to Redis, keeping original expiration time
-            redis.set(user_cache_key, json.dumps(user_info))
-        except (json.JSONDecodeError, AttributeError):
-            # If parsing fails, delete cache to let system retrieve from database
-            redis.delete(user_cache_key)
+            # Add additional fields for third-party users
+            if hasattr(userinfo, 'user_type') and userinfo.user_type == "third_party":
+                token_data.update({
+                    "platform": getattr(userinfo, 'platform', ''),
+                    "openid": getattr(userinfo, 'openid', ''),
+                    "language": getattr(userinfo, 'language', 'en'),
+                    "user_type": "third_party"
+                })
+            
+            # Create new access token with updated data
+            new_access_token = create_access_token(data=token_data)
+            
+            # Update Redis with new token
+            redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60
+            redis.set(token_redis_key, new_access_token, ex=redis_expiry_seconds)
     
-    return response_success({"team_id": team_id_value})
+    # Prepare response data
+    response_data = {"team_id": team_id_value}
+    if new_access_token:
+        response_data["access_token"] = new_access_token
+    
+    return response_success(response_data)
 
 @router.post('/third_party_login', response_model=ResThirdPartyLoginSchema)
 async def third_party_login(request: Request, login_data: ThirdPartyLoginData):
