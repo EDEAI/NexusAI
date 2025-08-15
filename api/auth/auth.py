@@ -594,7 +594,7 @@ async def get_user_teams(platform: int, userinfo: TokenData = Depends(get_curren
     return response_success({'teams': user_teams})
 
 @router.post('/switch_team', response_model=ResDictSchema)
-async def switch_user_team(team_id: int, userinfo: TokenData = Depends(get_current_user)):
+async def switch_user_team(team_id: SwitchTeamId, userinfo: TokenData = Depends(get_current_user)):
     """
     Switches the current user's team_id and saves it.
 
@@ -605,22 +605,23 @@ async def switch_user_team(team_id: int, userinfo: TokenData = Depends(get_curre
     Returns:
         A success response with the new team_id if the switch is successful, otherwise an error response.
     """
+    team_id_value = team_id.team_id
     user_id = userinfo.uid
     # Check if the user belongs to the specified team
     relation = UserTeamRelations().select_one(
         columns='*',
         conditions=[
             {"column": "user_id", "value": user_id},
-            {"column": "team_id", "value": team_id}
+            {"column": "team_id", "value": team_id_value}
         ]
     )
     if not relation:
         return response_error(get_language_content('user_does_not_belong_to_this_team'))
     Users().update(
         [{"column": "id", "value": user_id}],
-        {"team_id": team_id, "role":relation['role'], "inviter_id":relation['inviter_id'], "role_id":relation['role_id']}
+        {"team_id": team_id_value, "role":relation['role'], "inviter_id":relation['inviter_id'], "role_id":relation['role_id']}
     )
-    return response_success({"team_id": team_id})
+    return response_success({"team_id": team_id_value})
 
 @router.post('/third_party_login', response_model=ResThirdPartyLoginSchema)
 async def third_party_login(request: Request, login_data: ThirdPartyLoginData):

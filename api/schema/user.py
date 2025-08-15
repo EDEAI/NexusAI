@@ -72,7 +72,8 @@ class ThirdPartyLoginData(BaseModel):
     email: Optional[str] = None
     position: Optional[str] = None
     language: Optional[str] = 'en'
-
+class SwitchTeamId(BaseModel):
+    team_id: Optional[int] = 1
 class ThirdPartyUserData(BaseModel):
     uid: Optional[int] = None
     nickname: Optional[str] = None
