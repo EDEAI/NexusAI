@@ -37,12 +37,13 @@ async def roles_list(page: int = 1, page_size: int = 10, status: int = 1, name: 
 
 
 @router.get("/permission_list", response_model=PermissionListResponse, summary="Get Permission List")
-async def permission_list(page: int = 1, page_size: int = 10, name: str = "", userinfo: TokenData = Depends(get_current_user)):
+async def permission_list(page: int = 1, page_size: int = 10, status: int = 1, name: str = "", userinfo: TokenData = Depends(get_current_user)):
     """
     Retrieve a list of permissions with pagination and optional name filtering.
     Args:
         page (int): Current page number for pagination. Default is 1.
         page_size (int): Number of items per page. Default is 10.
+        status (int): Status filter (1 for pagination, 2 for all records). Default is 1.
         name (str): Optional permission name for fuzzy search filtering.
         userinfo (TokenData): Current user information, obtained through authentication.
     Returns:
@@ -52,7 +53,11 @@ async def permission_list(page: int = 1, page_size: int = 10, name: str = "", us
     """
     permission = Permission()
     uid = userinfo.uid
-    result = permission.get_permission_list(page, page_size, uid, name)
+    
+    if status not in [1, 2]:
+        return response_error(get_language_content("permission_status_only_one_or_two"))
+    
+    result = permission.get_permission_list(page, page_size, uid, name, status)
     return response_success(result)
 
 

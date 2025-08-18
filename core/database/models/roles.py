@@ -117,7 +117,9 @@ class Roles(MySQL):
                 'description',
                 'status',
                 'created_at',
-                'updated_at'
+                'updated_at',
+                'team_id',
+                'built_in'
             ],
             conditions=[
                 {"column": "id", "value": role_id},

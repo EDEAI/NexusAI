@@ -121,3 +121,7 @@ class ChangePasswordData(BaseModel):
     old_password: str
     new_password: str
     confirm_password: str
+
+class SwitchMemberRoleData(BaseModel):
+    user_id: int
+    role_id: int

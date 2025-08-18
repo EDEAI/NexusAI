@@ -13,14 +13,16 @@ class Permission(MySQL):
     """
     have_updated_time = False
 
-    def get_permission_list(self, page: int = 1, page_size: int = 10, uid: int = 0, name: str = "") -> dict:
+    def get_permission_list(self, page: int = 1, page_size: int = 10, uid: int = 0, name: str = "", status: int = 1) -> dict:
         """
         Retrieves a list of permissions with pagination and Chinese title filtering.
 
         Args:
             page: Current page number for pagination
             page_size: Number of items per page
+            uid: User ID for language preference
             name: Permission Chinese title for fuzzy search filtering
+            status: Status filter (1 for pagination, 2 for all records)
 
         Returns:
             A dictionary containing the permission list and pagination information
@@ -60,21 +62,36 @@ class Permission(MySQL):
         )["count_id"]
         
         # Get list data with time fields
-        permission_list = self.select(
-            columns=columns,
-            conditions=conditions,
-            order_by="id DESC",
-            limit=page_size,
-            offset=(page - 1) * page_size
-        )
-
-        return {
-            "list": permission_list,
-            "total_count": total_count,
-            "total_pages": math.ceil(total_count / page_size),
-            "page": page,
-            "page_size": page_size
-        }
+        if status == 1:
+            # Pagination mode
+            permission_list = self.select(
+                columns=columns,
+                conditions=conditions,
+                order_by="id DESC",
+                limit=page_size,
+                offset=(page - 1) * page_size
+            )
+            return {
+                "list": permission_list,
+                "total_count": total_count,
+                "total_pages": math.ceil(total_count / page_size),
+                "page": page,
+                "page_size": page_size
+            }
+        else:
+            # Return all records without pagination
+            permission_list = self.select(
+                columns=columns,
+                conditions=conditions,
+                order_by="id DESC"
+            )
+            return {
+                "list": permission_list,
+                "total_count": total_count,
+                "total_pages": 1,
+                "page": 1,
+                "page_size": total_count
+            }
 
     def check_permissions_exist(self, permission_ids: list) -> bool:
         """

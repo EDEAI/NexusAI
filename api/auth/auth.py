@@ -1523,3 +1523,101 @@ async def change_password(password_data: ChangePasswordData, userinfo: TokenData
     except Exception as e:
         msg = get_language_content('password_change_failed')
         return response_error(f"{msg}")
+
+
+@router.post('/switch_member_role', response_model=ResDictSchema)
+async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Switch team member's role (Admin only)
+    
+    Args:
+        role_data (SwitchMemberRoleData): Role data containing user_id and role_id
+        userinfo (TokenData): The token data for the current authenticated user
+    
+    Returns:
+        A success response if role switch is successful, or an error response if switch fails.
+    """
+    target_user_id = role_data.user_id
+    new_role_id = role_data.role_id
+    current_user_id = userinfo.uid
+    current_team_id = userinfo.team_id
+    
+    # Validate required parameters
+    if not target_user_id or target_user_id <= 0:
+        return response_error(get_language_content('invalid_user_id'))
+    
+    if not new_role_id or new_role_id <= 0:
+        return response_error(get_language_content('invalid_role_id'))
+    
+    try:
+        # Check if current user is admin (role = 1) in the current team
+        current_user_relation = UserTeamRelations().get_user_team_relation(current_user_id, current_team_id)
+        if not current_user_relation or current_user_relation.get('role') != 1:
+            return response_error(get_language_content('only_admin_can_switch_member_roles'))
+        
+        # Check if user is trying to modify their own role
+        if target_user_id == current_user_id:
+            return response_error(get_language_content('cannot_modify_own_role'))
+        
+        # Check if target user exists in the same team
+        target_user_relation = UserTeamRelations().get_user_team_relation(target_user_id, current_team_id)
+        if not target_user_relation:
+            return response_error(get_language_content('target_user_not_in_current_team'))
+        
+        # Check if target user is admin (role = 1) and ensure at least one admin remains
+        if target_user_relation.get('role') == 1:
+            # Count total admins in the current team
+            admin_count = UserTeamRelations().select(
+                columns=['id'],
+                conditions=[
+                    {'column': 'team_id', 'value': current_team_id},
+                    {'column': 'role', 'value': 1}
+                ]
+            )
+            
+            # If there's only one admin (the target user), don't allow modification
+            if len(admin_count) <= 1:
+                return response_error(get_language_content('cannot_modify_last_admin_role'))
+        
+        # Get role information by role_id
+        role_info = Roles().get_role_by_id(new_role_id)
+        if not role_info:
+            return response_error(get_language_content('role_not_found'))
+        
+        # Check if role belongs to current team or is built-in role
+        if role_info.get('team_id') != current_team_id and role_info.get('built_in') != 1:
+            return response_error(get_language_content('role_not_available_for_current_team'))
+        
+        # Update user's role in user_team_relations
+        # current_time = datetime.now()
+        # formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        
+        update_data = {
+            'role_id': new_role_id
+        }
+        result = UserTeamRelations().update(
+            conditions=[
+                {'column': 'user_id', 'value': target_user_id},
+                {'column': 'team_id', 'value': current_team_id}
+            ],
+            data=update_data
+        )
+        
+        SQLDatabase.commit()
+        SQLDatabase.close()
+        
+        if result:
+            msg = get_language_content('member_role_switched_successfully')
+            return response_success({
+                'msg': msg,
+                'user_id': target_user_id,
+                'new_role_id': new_role_id,
+                'role_name': role_info.get('name', '')
+            })
+        else:
+            msg = get_language_content('member_role_switch_failed')
+            return response_error(msg)
+            
+    except Exception as e:
+        msg = get_language_content('member_role_switch_failed')
+        return response_error(f"{msg}: {str(e)}")
