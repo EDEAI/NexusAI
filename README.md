@@ -109,7 +109,7 @@ nexusai-docker-milvus-standalone   milvusdb/milvus:v2.3.1                     "/
 nexusai-docker-multi-service       edeai/multi_service:0.0.3                  "supervisord -c /etc…"   multi_service       50 minutes ago   Up 50 minutes
 nexusai-docker-nginx               nginx:latest                               "/docker-entrypoint.…"   nginx               50 minutes ago   Up 40 minutes             0.0.0.0:9470->80/tcp
 nexusai-docker-redis               redis:6.2                                  "docker-entrypoint.s…"   redis               50 minutes ago   Up 50 minutes             0.0.0.0:9462->6379/tcp
-nexusai-docker-sandbox             edeai/sandbox:0.0.3                        "python api_server.py"   sandbox             50 minutes ago   Up 50 minutes             0.0.0.0:9464->8001/tcp
+nexusai-docker-sandbox             edeai/sandbox:0.0.4                        "python api_server.py"   sandbox             50 minutes ago   Up 50 minutes             0.0.0.0:9464->8001/tcp
 nexusai-docker-web                 edeai/web:0.0.2                            "docker-entrypoint.s…"   web                 50 minutes ago   Up 50 minutes
 ```
 
