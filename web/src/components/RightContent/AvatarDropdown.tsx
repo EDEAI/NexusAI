@@ -16,6 +16,7 @@ import HeaderDropdown from '../HeaderDropdown';
 import Modelsetup from '../ModelSetup';
 import Team from '../team';
 import AccountSettings from './AccountSettings';
+import RoleManagement from '../RoleManagement';
 
 export type GlobalHeaderRightProps = {
     menu?: boolean;
@@ -100,6 +101,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [ModelSetupOpen, setModelSetupOpen] = useState<boolean>(false);
     const [isAccountSettingsOpen, setIsAccountSettingsOpen] = useState<boolean>(false);
+    const [isRoleManagementOpen, setIsRoleManagementOpen] = useState<boolean>(false);
 
     const onMenuClick = useCallback(
         event => {
@@ -117,6 +119,8 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
                 setModelSetupOpen(true);
             } else if (key === 'accountSettings') {
                 setIsAccountSettingsOpen(true);
+            } else if (key === 'roleManagement') {
+                setIsRoleManagementOpen(true);
             } else {
                 history.push(`/account/${key}`);
             }
@@ -153,6 +157,14 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
             label: intl.formatMessage({
                 id: 'workflow.menu.accountSettings',
                 defaultMessage: '',
+            }),
+        },
+        {
+            key: 'roleManagement',
+            icon: <UserOutlined />,
+            label: intl.formatMessage({
+                id: 'workflow.menu.roleManagement',
+                defaultMessage: 'Role Management',
             }),
         },
         ...(menu
@@ -219,6 +231,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
             <Team isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
             <Modelsetup isModalOpen={ModelSetupOpen} setIsModalOpen={setModelSetupOpen} />
             <AccountSettings isModalOpen={isAccountSettingsOpen} setIsModalOpen={setIsAccountSettingsOpen} />
+            <RoleManagement visible={isRoleManagementOpen} onClose={() => setIsRoleManagementOpen(false)} />
         </div>
     );
 };

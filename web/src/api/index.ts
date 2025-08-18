@@ -137,3 +137,136 @@ export const changePassword = async (data: {
     });
     return res;
 };
+
+// Role management related interfaces
+export const ROLES_URL = '/v1/roles/';
+export const ROLES_PERMISSION_LIST_URL = '/v1/roles/permission_list';
+export const ROLES_CREATE_URL = '/v1/roles/create_role';
+export const ROLES_UPDATE_URL = '/v1/roles/update_role';
+export const ROLES_DETAIL_URL = '/v1/roles/role_detail';
+
+// Define role related interfaces
+interface Role {
+    id: number;
+    name: string;
+    description: string;
+    status: number;
+    created_at: string;
+    updated_at: string | null;
+}
+
+interface Permission {
+    id: number;
+    title: string;
+}
+
+interface RoleDetail {
+    id: number;
+    name: string;
+    description: string;
+    permissions: Permission[];
+}
+
+interface RoleListResponse {
+    list: Role[];
+    total_count: number;
+    total_pages: number;
+    page: number;
+    page_size: number;
+}
+
+interface PermissionListResponse {
+    list: Permission[];
+    total_count: number;
+    total_pages: number;
+    page: number;
+    page_size: number;
+}
+
+interface CreateRoleParams {
+    name: string;
+    description: string;
+    list: number[]; // Permission IDs
+}
+
+interface UpdateRoleParams {
+    id: number;
+    name: string;
+    description: string;
+    list: number[]; // Permission IDs
+}
+
+/**
+ * Get roles list
+ * @param params Query parameters
+ * @returns Promise with roles list response
+ */
+export const getRolesList = async (params?: { page?: number; page_size?: number; status?: number }) => {
+    const res = await apiRequest<RoleListResponse>(ROLES_URL, {
+        method: 'GET',
+        data: params || {},
+    });
+    return res;
+};
+
+/**
+ * Get permissions list
+ * @returns Promise with permissions list response
+ */
+export const getPermissionsList = async () => {
+    const res = await apiRequest<PermissionListResponse>(ROLES_PERMISSION_LIST_URL, {
+        method: 'GET',
+        data: { page: 1, page_size: 20, status: 2 },
+    });
+    return res;
+};
+
+/**
+ * Create new role
+ * @param data Role creation parameters
+ * @returns Promise with creation response
+ */
+export const createRole = async (data: CreateRoleParams) => {
+    const res = await apiRequest<any>(ROLES_CREATE_URL, {
+        method: 'POST',
+        data,
+    });
+    return res;
+};
+
+/**
+ * Update existing role
+ * @param data Role update parameters
+ * @returns Promise with update response
+ */
+export const updateRole = async (data: UpdateRoleParams) => {
+    const res = await apiRequest<any>(`${ROLES_UPDATE_URL}/${data.id}`, {
+        method: 'PUT',
+        data,
+    });
+    return res;
+};
+
+/**
+ * Delete role by ID
+ * @param roleId Role ID to delete
+ * @returns Promise with deletion response
+ */
+export const deleteRole = async (roleId: number) => {
+    const res = await apiRequest<any>(`${ROLES_URL}${roleId}`, {
+        method: 'DELETE',
+    });
+    return res;
+};
+
+/**
+ * Get role detail by ID
+ * @param roleId Role ID to get detail
+ * @returns Promise with role detail response
+ */
+export const getRoleDetail = async (roleId: number) => {
+    const res = await apiRequest<RoleDetail>(`${ROLES_DETAIL_URL}/${roleId}`, {
+        method: 'GET',
+    });
+    return res;
+};

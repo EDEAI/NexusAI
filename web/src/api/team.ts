@@ -1,4 +1,5 @@
 import aniRequest from './request';
+import { getRolesList, RoleListResponse } from './index';
 
 // Get team list
 export const getTeamList = async () => {
@@ -16,8 +17,8 @@ export const postRegisterUser = async (data: any) => {
 };
 
 // Get role list
-export const getRoleList = async () => {
-    return await aniRequest<any>(`/v1/roles/`, { method: 'GET', data: { status: 2 } });
+export const getRoleList = async (): Promise<RoleListResponse> => {
+    return await getRolesList({ status: 2 });
 };
 
 // Get user teams list

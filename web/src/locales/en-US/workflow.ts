@@ -257,6 +257,7 @@ export default {
     'workflow.menu.teamAndMembers': 'Team and Members',
     'workflow.menu.modelSetup': 'Model Setup',
     'workflow.menu.accountSettings': 'Account Settings',
+    'workflow.menu.roleManagement': 'Role Management',
     'workflow.menu.logout': 'Logout',
     'workflow.label.selectKnowledgeBaseTask': 'Task associated with knowledge base retrieval',
     'workflow.import': 'Import',
