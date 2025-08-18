@@ -86,7 +86,7 @@ services:
 
   sandbox:
     container_name: nexusai-docker-sandbox
-    image: edeai/sandbox:0.0.3
+    image: edeai/sandbox:0.0.4
     environment:
       <<: *common-environment-backend
     volumes:
