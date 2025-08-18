@@ -185,7 +185,7 @@ async def delete_chatroom(role_id: int, userinfo: TokenData = Depends(get_curren
     return response_success({'msg': get_language_content("role_delete_success")})
 
 
-@router.get("/role_detail/{role_id}", response_model=RoleDetailResponse, summary="Get Role Detail")
+@router.get("/role_detail", response_model=RoleDetailResponse, summary="Get Role Detail")
 async def get_role_detail(role_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
     Get role details including associated permissions.
@@ -207,5 +207,13 @@ async def get_role_detail(role_id: int, userinfo: TokenData = Depends(get_curren
     
     if not role_detail:
         return response_error(get_language_content("role_not_found"))
+
+    if role_detail.get('built_in') == 1:
+        # For built-in roles, the name field contains the language key
+        role_key = role_detail['name']  # e.g., 'comprehensive_administrator'
+        # Translate role name
+        role_detail['name'] = get_language_content(role_key)
+        # Set role description using the corresponding _desc key
+        role_detail['description'] = get_language_content(f"{role_key}_desc")
     
     return response_success(role_detail)
