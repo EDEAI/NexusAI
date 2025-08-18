@@ -904,7 +904,6 @@ class DatasetRetrieval:
                             -doc.metadata.get('score', 0.0)
                         )
                     )
-                    retrieval_result.extend(result)
                     for document_segment in result:
                         index_id = str(document_segment.metadata['index_id'])
                         try:
@@ -913,6 +912,7 @@ class DatasetRetrieval:
                             logger.warning(f'Segment {index_id} not found! Deleting from vector database...')
                             vdb.delete([index_id])
                             continue
+                        retrieval_result.append(document_segment)
                         document = documents.get_document_by_id(segment['document_id'])
                         document_segments.increment_hit_count(segment['id'])
                         document_segment_rag_records.insert(
