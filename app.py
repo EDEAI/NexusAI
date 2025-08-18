@@ -33,6 +33,12 @@ from sqlalchemy.engine import Engine
 from config import settings
 from log import Logger
 
+original_uvicorn_is_alive = uvicorn.supervisors.multiprocess.Process.is_alive
+def patched_is_alive(self: Any) -> bool:
+    timeout = 20
+    return original_uvicorn_is_alive(self, timeout)
+uvicorn.supervisors.multiprocess.Process.is_alive = patched_is_alive
+
 sql_logger = Logger.get_logger("sql")
 
 # Listen to SQLAlchemy events and record SQL execution logs
