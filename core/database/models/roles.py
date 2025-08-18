@@ -128,6 +128,87 @@ class Roles(MySQL):
         )
         return role
 
+    def get_role_detail_with_permissions(self, role_id: int, uid: int = 0) -> Dict[str, Any]:
+        """
+        Get role details with associated permissions.
+
+        Args:
+            role_id (int): The ID of the role to retrieve.
+            uid (int): User ID for language preference.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the role information and permissions.
+        """
+        from core.database.models.users import Users
+        from core.database.models.role_permission import RolePermission
+        from core.database.models.permissions import Permission
+        
+        # Get role basic information
+        role = self.select_one(
+            columns=[
+                'id',
+                'name',
+                'description',
+                'status',
+                'created_at',
+                'updated_at',
+                'team_id',
+                'built_in'
+            ],
+            conditions=[
+                {"column": "id", "value": role_id},
+                {"column": "status", "value": 1}
+            ]
+        )
+        
+        if not role:
+            return None
+        
+        # Get user language preference
+        user_language = Users().get_user_language(uid)
+        
+        # Get permissions for this role
+        role_perm_model = RolePermission()
+        permission_model = Permission()
+        
+        # Get permission IDs for this role
+        permission_ids = role_perm_model.get_permission_ids_by_role_id(role_id)
+        
+        permissions = []
+        if permission_ids:
+            # Determine columns based on language
+            if user_language == 'zh':
+                permission_columns = [
+                    "id",
+                    "title_cn AS title",
+                    "status",
+                    "created_at",
+                    "updated_at"
+                ]
+            else:
+                permission_columns = [
+                    "id",
+                    "title_en AS title",
+                    "status",
+                    "created_at",
+                    "updated_at"
+                ]
+            
+            # Get permission details
+            permissions = permission_model.select(
+                columns=permission_columns,
+                conditions=[
+                    {"column": "id", "op": "in", "value": permission_ids},
+                    {"column": "status", "value": 1}
+                ],
+                order_by="id ASC"
+            )
+        
+        # Add permissions to role data
+        role['permissions'] = permissions
+        
+        return role
+
     def check_role_deletable(self, role_id: int, mode: int = None) -> bool:
         """
         Check if a role can be deleted based on its name and mode.
