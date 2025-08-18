@@ -9,6 +9,12 @@ from config import settings
 from core.websocket.websocket_manager import websocket_router
 from core.websocket.websocket_queue_pop import queue_processor
 
+original_uvicorn_is_alive = uvicorn.supervisors.multiprocess.Process.is_alive
+def patched_is_alive(self) -> bool:
+    timeout = 20
+    return original_uvicorn_is_alive(self, timeout)
+uvicorn.supervisors.multiprocess.Process.is_alive = patched_is_alive
+
 app = FastAPI(
     title="NexusAI WebSocket Server",
     description="WebSocket server for handling real-time connections.",
