@@ -185,7 +185,7 @@ async def delete_chatroom(role_id: int, userinfo: TokenData = Depends(get_curren
     return response_success({'msg': get_language_content("role_delete_success")})
 
 
-@router.get("/role_detail", response_model=RoleDetailResponse, summary="Get Role Detail")
+@router.get("/role_detail/{role_id}", response_model=RoleDetailResponse, summary="Get Role Detail")
 async def get_role_detail(role_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
     Get role details including associated permissions.
