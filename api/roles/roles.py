@@ -185,19 +185,18 @@ async def delete_chatroom(role_id: int, userinfo: TokenData = Depends(get_curren
     return response_success({'msg': get_language_content("role_delete_success")})
 
 
-@router.post("/role_detail", response_model=RoleDetailResponse, summary="Get Role Detail")
-async def get_role_detail(role_request: RoleDetailRequest, userinfo: TokenData = Depends(get_current_user)):
+@router.get("/role_detail", response_model=RoleDetailResponse, summary="Get Role Detail")
+async def get_role_detail(role_id: int, userinfo: TokenData = Depends(get_current_user)):
     """
     Get role details including associated permissions.
     Args:
-        role_request (RoleDetailRequest): Request body containing role_id.
+        role_id (int): The ID of the role to retrieve.
         userinfo (TokenData): Current user information, obtained through authentication.
     Returns:
         Dict with role details including permissions list.
     Raises:
         HTTPException: When role is not found or query execution fails.
     """
-    role_id = role_request.role_id
     uid = userinfo.uid
     
     if not role_id or role_id <= 0:
