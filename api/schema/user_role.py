@@ -7,6 +7,7 @@ class RolesInfo(BaseModel):
     name: str
     description: Optional[str] = None
     status: int
+    built_in: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
