@@ -399,6 +399,14 @@ class Workspaces(MySQL):
         WHERE (apps.user_id = {uid} OR app_runs.user_id = {uid})
         """
 
+        from api.utils.auth import get_uid_user_info
+        userInfo = get_uid_user_info({uid})
+        if userInfo:
+            where_clause = f"""
+            {base_where}
+            AND apps.team_id = {userInfo['team_id']} 
+            """
+
         if show_status == 0:
             # All records
             where_clause = f"""
