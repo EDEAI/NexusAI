@@ -182,7 +182,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         {
             key: 'team',
             icon: <TeamOutlined />,
-            disabled: userinfodata('GET')?.role == 1 ? false : true,
+            disabled: false,
             label: intl.formatMessage({
                 id: 'workflow.menu.teamAndMembers',
                 defaultMessage: '',

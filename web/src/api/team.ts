@@ -19,3 +19,13 @@ export const postRegisterUser = async (data: any) => {
 export const getRoleList = async () => {
     return await aniRequest<any>(`/v1/roles/`, { method: 'GET', data: { status: 2 } });
 };
+
+// Get user teams list
+export const getUserTeams = async () => {
+    return await aniRequest<any>(`/v1/auth/user_teams`, { method: 'GET', data: { platform: 1 } });
+};
+
+// Switch user team
+export const switchUserTeam = async (teamId: number) => {
+    return await aniRequest<any>(`/v1/auth/switch_team`, { method: 'POST', data: { team_id: teamId } });
+};

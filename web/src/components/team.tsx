@@ -1,10 +1,13 @@
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, SwitcherOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import type { TableProps } from 'antd';
 import { Avatar, Button, Input, message, Modal, Select, Space, Table, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import gandUp from '../../public/icons/gandUp.svg';
-import { getTeamList, postInviteUser, getRoleList } from '../api/team';
+import { getTeamList, postInviteUser, getRoleList, getUserTeams, switchUserTeam } from '../api/team';
+import { userinfo } from '../api/index';
+import { userinfodata } from '../utils/useUser';
+import TeamSwitcher from './TeamSwitcher';
 const { TextArea } = Input;
 const { Paragraph, Text } = Typography;
 
@@ -86,15 +89,71 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     const [gainEmail, setGainEmail] = useState(null);
     const [roleList, setRoleList] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    
+    const [teams, setTeams] = useState<any[]>([]);
+    const [currentTeam, setCurrentTeam] = useState<any>(null);
+    const [loadingTeams, setLoadingTeams] = useState(false);
+    
+    const handleTeamChange = async (team: any) => {
+        try {
+            const res = await switchUserTeam(team.id);
+            if (res.code === 0) {
+                setCurrentTeam(team);
+                message.success(intl.formatMessage({ id: 'component.team.switchSuccess' }));
+                if (res.data && res.data.access_token) {
+                    localStorage.setItem('token', res.data.access_token);
+                }
+                
+                // Get latest user info to update role cache
+                const userInfoRes = await userinfo();
+                if (userInfoRes.code === 0 && userInfoRes.data) {
+                    userinfodata('SET', userInfoRes.data);
+                }
+                
+                window.location.reload();
+            }
+        } finally {
 
-    useEffect(() => {}, []);
+        }
+    };
 
     const TeamList = async (param: boolean) => {
-        console.log('', param);
         if (param) {
             const res = await getTeamList();
-            console.log(res, '');
             setTeammemberList(res.data);
+        }
+    };
+
+    const fetchUserTeams = async () => {
+        setLoadingTeams(true);
+        try {
+            const res = await getUserTeams();
+            if (res.code === 0 && res.data && res.data.teams) {
+                const teamsData = res.data.teams.map((team: any) => ({
+                    id: team.id,
+                    name: team.name,
+                    role: team.role,
+                    roleName: team.role_name,
+                    position: team.position,
+                    memberCount: team.member_count
+                }));
+                setTeams(teamsData);
+
+                // Get current team ID from user_info API
+                const userInfoRes = await userinfo();
+                const currentTeamId = userInfoRes?.data?.team_id;
+                
+                if (teamsData.length > 0) {
+                    if (currentTeamId) {
+                        const currentTeam = teamsData.find(team => team.id === currentTeamId);
+                        setCurrentTeam(currentTeam);
+                    } else {
+                        setCurrentTeam(teamsData[0]);
+                    }
+                }
+            }
+        } finally {
+            setLoadingTeams(false);
         }
     };
 
@@ -184,25 +243,21 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                     setIsModalOpen2(false);
                     setEmaillist('');
                     setProcessedEmails([]);
-                    message.success(
-                        intl.formatMessage({
-                            id: 'user.invitationEmailSentSuccessfully',
-                            defaultMessage: '',
-                        }),
-                    );
                 } else {
-                    setGainEmail(res.data.email_list);
-                    setIsModalOpen3(true);
-                    setIsModalOpen2(false);
-                    setEmaillist('');
-                    setProcessedEmails([]);
-                    message.success(
-                        intl.formatMessage({
-                            id: 'user.invitationSentSuccessfully',
-                            defaultMessage: '',
-                        }),
-                    );
+                    // Check if email_list is empty array
+                    if (res.data.email_list && res.data.email_list.length === 0) {
+                        setIsModalOpen2(false);
+                        setEmaillist('');
+                        setProcessedEmails([]);
+                    } else {
+                        setGainEmail(res.data.email_list);
+                        setIsModalOpen3(true);
+                        setIsModalOpen2(false);
+                        setEmaillist('');
+                        setProcessedEmails([]);
+                    }
                 }
+                message.success(res.data.msg);
             }
         } else {
             message.error(
@@ -222,22 +277,32 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                 open={isModalOpen}
                 footer={false}
                 onCancel={handleCancel1}
-                afterOpenChange={TeamList}
+                afterOpenChange={(open) => {
+                    if (open) {
+                        // Fetch teams data when modal is opened
+                        fetchUserTeams();
+                        TeamList(true);
+                    }
+                }}
             >
                 <div className="h-12 bg-gray-50 rounded flex items-center justify-between px-4 mb-8 ">
-                    <div className="flex">
-                        <div>
-                            <img src={gandUp} alt="" />
-                        </div>
-                        <div className="ml-4 font-normal">
-                            {teammemberList && teammemberList.team_name}
-                        </div>
+                    <div className="flex items-center">
+                        <TeamSwitcher 
+                            currentTeam={currentTeam}
+                            teams={teams}
+                            onTeamChange={handleTeamChange}
+                            loading={loadingTeams}
+                        />
                     </div>
                     <div>
-                        <Button icon={<UserOutlined />} onClick={() => {
-                            setIsModalOpen2(true);
-                            fetchRoleList();
-                        }}>
+                        <Button 
+                            icon={<UserOutlined />} 
+                            onClick={() => {
+                                setIsModalOpen2(true);
+                                fetchRoleList();
+                            }}
+                            disabled={userinfodata('GET')?.role !== 1}
+                        >
                             {intl.formatMessage({ id: 'user.add', defaultMessage: '' })}
                         </Button>
                     </div>
