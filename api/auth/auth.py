@@ -262,8 +262,60 @@ async def get_user_info(userinfo: TokenData = Depends(get_current_user)):
         get_user_team_relation = UserTeamRelations().get_user_team_relation(user_info['id'],user_info['team_id'])
         if get_user_team_relation:
             user_info['position'] = get_user_team_relation['position']
+            user_info['role_id'] = get_user_team_relation['role_id']
+            
+            # Get user's role permissions
+            if get_user_team_relation['role_id']:
+                from core.database.models.role_permission import RolePermission
+                from core.database.models.permissions import Permission
+                from core.database.models.users import Users
+                
+                role_perm_model = RolePermission()
+                permission_model = Permission()
+                
+                # Get permission IDs for this role
+                permission_ids = role_perm_model.get_permission_ids_by_role_id(get_user_team_relation['role_id'])
+                
+                user_permissions = []
+                if permission_ids:
+                    # Get user language preference
+                    user_language = Users().get_user_language(uid)
+                    
+                    # Determine columns based on language
+                    if user_language == 'zh':
+                        permission_columns = [
+                            "id",
+                            "title_cn AS title",
+                            "status",
+                            "created_at",
+                            "updated_at"
+                        ]
+                    else:
+                        permission_columns = [
+                            "id",
+                            "title_en AS title",
+                            "status",
+                            "created_at",
+                            "updated_at"
+                        ]
+                    
+                    # Get permission details
+                    user_permissions = permission_model.select(
+                        columns=permission_columns,
+                        conditions=[
+                            {"column": "id", "op": "in", "value": permission_ids},
+                            {"column": "status", "value": 1}
+                        ],
+                        order_by="id ASC"
+                    )
+                
+                user_info['permissions'] = user_permissions
+            else:
+                user_info['permissions'] = []
         else:
             user_info['position'] = ''
+            user_info['role_id'] = None
+            user_info['permissions'] = []
 
     else:
         return response_error("User not found")
@@ -1538,6 +1590,7 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
         A success response if role switch is successful, or an error response if switch fails.
     """
     target_user_id = role_data.user_id
+    role = role_data.role
     new_role_id = role_data.role_id
     current_user_id = userinfo.uid
     current_team_id = userinfo.team_id
@@ -1546,8 +1599,18 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
     if not target_user_id or target_user_id <= 0:
         return response_error(get_language_content('invalid_user_id'))
     
-    if not new_role_id or new_role_id <= 0:
-        return response_error(get_language_content('invalid_role_id'))
+    # Validate role parameter
+    if role not in [1, 2]:
+        return response_error(get_language_content('role_must_be_1_or_2'))
+    
+    # Validate role_id based on role value
+    if role == 1:
+        # For admin role, role_id should be None/empty (set to None even if 0 is provided)
+        new_role_id = None
+    elif role == 2:
+        # For regular role, role_id is required
+        if new_role_id is None or new_role_id <= 0:
+            return response_error(get_language_content('role_id_required_for_regular_role'))
     
     try:
         # Check if current user is admin (role = 1) in the current team
@@ -1555,9 +1618,20 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
         if not current_user_relation or current_user_relation.get('role') != 1:
             return response_error(get_language_content('only_admin_can_switch_member_roles'))
         
-        # Check if user is trying to modify their own role
-        if target_user_id == current_user_id:
-            return response_error(get_language_content('cannot_modify_own_role'))
+        # Check if user is trying to modify their own role from admin to regular user
+        if target_user_id == current_user_id and current_user_relation.get('role') == 1 and role == 2:
+            # Count total admins in the current team
+            admin_count = UserTeamRelations().select(
+                columns=['id'],
+                conditions=[
+                    {'column': 'team_id', 'value': current_team_id},
+                    {'column': 'role', 'value': 1}
+                ]
+            )
+            
+            # If there's only one admin (the current user), don't allow modification
+            if len(admin_count) <= 1:
+                return response_error(get_language_content('cannot_modify_last_admin_role'))
         
         # Check if target user exists in the same team
         target_user_relation = UserTeamRelations().get_user_team_relation(target_user_id, current_team_id)
@@ -1565,7 +1639,8 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
             return response_error(get_language_content('target_user_not_in_current_team'))
         
         # Check if target user is admin (role = 1) and ensure at least one admin remains
-        if target_user_relation.get('role') == 1:
+        # Skip this check if we already checked it for self-modification above
+        if target_user_relation.get('role') == 1 and target_user_id != current_user_id and role == 2:
             # Count total admins in the current team
             admin_count = UserTeamRelations().select(
                 columns=['id'],
@@ -1579,20 +1654,20 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
             if len(admin_count) <= 1:
                 return response_error(get_language_content('cannot_modify_last_admin_role'))
         
-        # Get role information by role_id
-        role_info = Roles().get_role_by_id(new_role_id)
-        if not role_info:
-            return response_error(get_language_content('role_not_found'))
-        
-        # Check if role belongs to current team or is built-in role
-        if role_info.get('team_id') != current_team_id and role_info.get('built_in') != 1:
-            return response_error(get_language_content('role_not_available_for_current_team'))
+        # Validate role_id if it's provided (for role = 2)
+        role_info = None
+        if role == 2 and new_role_id is not None:
+            role_info = Roles().get_role_by_id(new_role_id)
+            if not role_info:
+                return response_error(get_language_content('role_not_found'))
+            
+            # Check if role belongs to current team or is built-in role
+            if role_info.get('team_id') != current_team_id and role_info.get('built_in') != 1:
+                return response_error(get_language_content('role_not_available_for_current_team'))
         
         # Update user's role in user_team_relations
-        # current_time = datetime.now()
-        # formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
-        
         update_data = {
+            'role': role,
             'role_id': new_role_id
         }
         result = UserTeamRelations().update(
@@ -1611,8 +1686,9 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
             return response_success({
                 'msg': msg,
                 'user_id': target_user_id,
+                'role': role,
                 'new_role_id': new_role_id,
-                'role_name': role_info.get('name', '')
+                'role_name': role_info.get('name', '') if role_info is not None else ('Administrator' if role == 1 else '')
             })
         else:
             msg = get_language_content('member_role_switch_failed')
@@ -1620,4 +1696,4 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
             
     except Exception as e:
         msg = get_language_content('member_role_switch_failed')
-        return response_error(f"{msg}: {str(e)}")
+        return response_error(msg)
