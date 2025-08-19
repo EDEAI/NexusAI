@@ -247,6 +247,7 @@ const RoleManagement: React.FC<RoleManagementProps> = ({ visible, onClose }) => 
             dataSource={roles}
             rowKey="id"
             loading={loading}
+            scroll={{ y: 340 }}
             locale={{
               emptyText: intl.formatMessage({ id: 'role.noData', defaultMessage: 'No role data' }),
             }}

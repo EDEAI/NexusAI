@@ -28,11 +28,14 @@ import { history } from 'umi';
 import CreationModal from '../../components/creationModal';
 import AddCreation from './components/AddCreation';
 import Profilephoto from './components/profilephoto';
+import { usePermissions } from '@/hooks/usePermissions';
+import { PERMISSION_IDS } from '@/utils/permissions';
 const { Text, Paragraph } = Typography;
 
 const { TextArea } = Input;
 const Creation: React.FC = () => {
     const intl = useIntl();
+    const { hasPermission } = usePermissions();
     const [CreationList, setCreationList] = useState(null);
     const [apppage, setAPPPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -316,18 +319,66 @@ const Creation: React.FC = () => {
             setShowModelType(false);
         }
         setEstablishModal(true);
-        setcreationType(
-            newtype[0]?.apps_mode !== 6
-                ? newtype[0]
-                : {
-                      name: 'Agent',
-                      path: 'Agents',
-                      icon: '/icons/creation/agent.svg',
-                      pitchicon: '/icons/creation/pitchagent.svg',
-                      signicon: '/icons/creation/pitchagent.svg',
-                      apps_mode: 1,
-                  },
-        );
+        
+        // Check route-specific permissions
+        if (location.pathname === '/knowledgebase') {
+            // For knowledge base route, only allow knowledge base creation
+            if (newtype[0]?.apps_mode === 3 && hasPermission(PERMISSION_IDS.CREATE_KNOWLEDGE_BASE)) {
+                setcreationType(newtype[0]);
+                return;
+            }
+            // If current selection is not knowledge base or no permission, set to knowledge base
+            const kbType = optionsModal.find(option => option.apps_mode === 3);
+            if (kbType) {
+                setcreationType(kbType);
+            }
+            return;
+        } else {
+            // For creation route, only allow agent, workflow, skill creation
+            if (newtype[0]?.apps_mode !== 6 && newtype[0]?.apps_mode !== 3) {
+                const selectedType = newtype[0];
+                const hasPermissionForType = 
+                    (selectedType.apps_mode === 1 && hasPermission(PERMISSION_IDS.CREATE_AGENT)) ||
+                    (selectedType.apps_mode === 2 && hasPermission(PERMISSION_IDS.CREATE_WORKFLOW)) ||
+                    (selectedType.apps_mode === 4 && hasPermission(PERMISSION_IDS.CREATE_SKILL));
+                
+                if (hasPermissionForType) {
+                    setcreationType(selectedType);
+                    return;
+                }
+            }
+            
+            // Find the first type user has permission for (excluding knowledge base)
+            const availableTypes = [
+                { apps_mode: 1, permission: hasPermission(PERMISSION_IDS.CREATE_AGENT) },
+                { apps_mode: 2, permission: hasPermission(PERMISSION_IDS.CREATE_WORKFLOW) },
+                { apps_mode: 4, permission: hasPermission(PERMISSION_IDS.CREATE_SKILL) }
+            ];
+            
+            const firstAvailableType = availableTypes.find(type => type.permission);
+            
+            if (firstAvailableType) {
+                const typeConfig = optionsModal.find(option => option.apps_mode === firstAvailableType.apps_mode);
+                setcreationType(typeConfig || {
+                    name: 'Agent',
+                    path: 'Agents',
+                    icon: '/icons/creation/agent.svg',
+                    pitchicon: '/icons/creation/pitchagent.svg',
+                    signicon: '/icons/creation/pitchagent.svg',
+                    apps_mode: 1,
+                });
+            } else {
+                // Fallback to Agent if no permissions (shouldn't happen in normal flow)
+                setcreationType({
+                    name: 'Agent',
+                    path: 'Agents',
+                    icon: '/icons/creation/agent.svg',
+                    pitchicon: '/icons/creation/pitchagent.svg',
+                    signicon: '/icons/creation/pitchagent.svg',
+                    apps_mode: 1,
+                });
+            }
+        }
     };
     const setRunId = useUserStore(state => state.setRunId);
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
@@ -1010,6 +1061,35 @@ const Creation: React.FC = () => {
                                         {' '}
                                         <Button
                                             color="primary"
+                                            disabled={(() => {
+                                                if (location.pathname === '/knowledgebase') {
+                                                    return !hasPermission(PERMISSION_IDS.CREATE_KNOWLEDGE_BASE);
+                                                }
+                                                // For creation route, only check agent, workflow, and skill permissions
+                                                const currentModalId = creationsearchdata('GET').optionsModalId;
+                                                if (currentModalId === 1) return !hasPermission(PERMISSION_IDS.CREATE_AGENT);
+                                                if (currentModalId === 2) return !hasPermission(PERMISSION_IDS.CREATE_WORKFLOW);
+                                                if (currentModalId === 4) return !hasPermission(PERMISSION_IDS.CREATE_SKILL);
+                                                // For "All" tab (currentModalId === 6) in creation route, only check agent, workflow, and skill permissions
+                                                return !(hasPermission(PERMISSION_IDS.CREATE_AGENT) || 
+                                                        hasPermission(PERMISSION_IDS.CREATE_WORKFLOW) || 
+                                                        hasPermission(PERMISSION_IDS.CREATE_SKILL));
+                                            })()}
+                                            className={(() => {
+                                                if (location.pathname === '/knowledgebase') {
+                                                    return !hasPermission(PERMISSION_IDS.CREATE_KNOWLEDGE_BASE) ? 'cursor-not-allowed opacity-50' : '';
+                                                }
+                                                // For creation route, only check agent, workflow, and skill permissions
+                                                const currentModalId = creationsearchdata('GET').optionsModalId;
+                                                let isDisabled = false;
+                                                if (currentModalId === 1) isDisabled = !hasPermission(PERMISSION_IDS.CREATE_AGENT);
+                                                else if (currentModalId === 2) isDisabled = !hasPermission(PERMISSION_IDS.CREATE_WORKFLOW);
+                                                else if (currentModalId === 4) isDisabled = !hasPermission(PERMISSION_IDS.CREATE_SKILL);
+                                                else isDisabled = !(hasPermission(PERMISSION_IDS.CREATE_AGENT) || 
+                                                                   hasPermission(PERMISSION_IDS.CREATE_WORKFLOW) || 
+                                                                   hasPermission(PERMISSION_IDS.CREATE_SKILL));
+                                                return isDisabled ? 'cursor-not-allowed opacity-50' : '';
+                                            })()}
                                             onClick={() => {
                                                 creationshowModal();
                                             }}

@@ -12,6 +12,8 @@ import { Button, Col, Empty, Row, Spin,Tooltip,Tag } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 import {useBacklogList} from  '@/hooks/useBacklogList'
+import { usePermissions } from '@/hooks/usePermissions';
+import { PERMISSION_IDS } from '@/utils/permissions';
 // import Menus from '../components/Menus/index';
 
 // Subtitle
@@ -123,18 +125,27 @@ const OperationButton :React.FC<{operationObj:any}> = parmas => {
     );
 };
 // Add
-const Addbtn :React.FC<{bindAdd: any,type:any}> = parmas => {
-    let {bindAdd,type} = parmas;
+const Addbtn :React.FC<{bindAdd: any,type:any,disabled?:boolean}> = parmas => {
+    let {bindAdd,type,disabled = false} = parmas;
     return (
         <>
             {
-                <div onClick={bindAdd}>
+                <div 
+                    onClick={disabled ? undefined : bindAdd}
+                    className={disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
+                >
                     <a
-                        style={{ color: '#0077ED', fontSize: '0' }}
+                        style={{ color: disabled ? '#CCCCCC' : '#0077ED', fontSize: '0' }}
                         className="flex items-center  gap-x-[5px]"
                     >
-                        <img src="/icons/plaza_add.svg" className="w-[16px] h-[16px] shrink-0" />
-                        <span className="text-[#1B64F3]" style={{ fontSize: '12px' }}>
+                        <img 
+                            src="/icons/plaza_add.svg" 
+                            className={`w-[16px] h-[16px] shrink-0 ${disabled ? 'opacity-50' : ''}`} 
+                        />
+                        <span 
+                            className={disabled ? 'text-[#CCCCCC]' : 'text-[#1B64F3]'} 
+                            style={{ fontSize: '12px' }}
+                        >
                             {type}
                         </span>
                     </a>
@@ -501,7 +512,9 @@ interface MoreOrAddparmas{
 }
 const MoreOrAdd :React.FC<MoreOrAddparmas> = parmas => {
     const intl = useIntl();
+    const { hasPermission } = usePermissions();
     let {item,setIsModalOpen,setCreationType} = parmas
+    
     const Addel = () => {
         let addCreationTyp =
             item.key == 'my_agent'
@@ -515,6 +528,15 @@ const MoreOrAdd :React.FC<MoreOrAddparmas> = parmas => {
         });
         setIsModalOpen(true);
     };
+    
+    // Check permissions for creation buttons
+    const canCreateAgent = hasPermission(PERMISSION_IDS.CREATE_AGENT);
+    const canCreateWorkflow = hasPermission(PERMISSION_IDS.CREATE_WORKFLOW);
+    
+    // Determine if user can create based on item type
+    const canCreate = item.key === 'my_agent' ? canCreateAgent : 
+                     item.key === 'my_workflow' ? canCreateWorkflow : false;
+    
     let typeName =
         item.key == 'my_agent'
             ? intl.formatMessage({ id: 'app.dashboard.title_button_1.1' })
@@ -523,7 +545,7 @@ const MoreOrAdd :React.FC<MoreOrAddparmas> = parmas => {
             : '';
     return (
         <div className="flex gap-x-[30px] items-center">
-            {item.isAdd && <Addbtn bindAdd={Addel} type={item.isAdd && typeName}></Addbtn>}
+            {item.isAdd && <Addbtn bindAdd={Addel} type={item.isAdd && typeName} disabled={!canCreate}></Addbtn>}
             <MoreList item={item}></MoreList>
         </div>
     );

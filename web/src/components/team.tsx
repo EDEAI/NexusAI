@@ -1,12 +1,15 @@
 import { UserOutlined, SwitcherOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import type { TableProps } from 'antd';
-import { Avatar, Button, Input, message, Modal, Select, Space, Table, Typography } from 'antd';
+import { Avatar, Button, Input, message, Modal, Select, Space, Table, Tooltip, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import gandUp from '../../public/icons/gandUp.svg';
 import { getTeamList, postInviteUser, getRoleList, getUserTeams, switchUserTeam } from '../api/team';
-import { userinfo } from '../api/index';
+import { userinfo, getRolesList, switchMemberRole, type RoleListResponse } from '../api/index';
+import type { REQ_TYPE } from '../api/request';
 import { userinfodata } from '../utils/useUser';
+import { usePermissions } from '../hooks/usePermissions';
+import { PERMISSION_IDS } from '../utils/permissions';
 import TeamSwitcher from './TeamSwitcher';
 const { TextArea } = Input;
 const { Paragraph, Text } = Typography;
@@ -27,10 +30,13 @@ interface DataType {
     position: string;
     role: number;
     role_title: string;
+    role_id: number; // Add role_id for role matching
+    user_id?: number; // Add user_id for role switching
 }
 
 const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     const intl = useIntl();
+    const { userInfo, hasPermission, isTeamAdmin } = usePermissions();
     const columns: TableProps<DataType>['columns'] = [
         {
             title: intl.formatMessage({ id: 'user.name', defaultMessage: '' }),
@@ -67,19 +73,49 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
             title: intl.formatMessage({ id: 'user.role', defaultMessage: '' }),
             key: 'action',
             width: '25%',
-            render: (_, record) => (
-                <Space size="middle" key={_}>
-                    {/* <a>Invite {record.name}</a> */}
-                    <div>
-                        {record.role == 1
-                            ? intl.formatMessage({ id: 'user.teamAdmin', defaultMessage: '' })
-                            : record.role_title}
-                    </div>
-                </Space>
-            ),
+            render: (_, record) => {
+                // Get current user info to check if this is the user's own role
+                const currentUserInfo = userinfodata('GET');
+                const isOwnRole = currentUserInfo && record.user_id === currentUserInfo.uid;
+                
+                return (
+                    <Space size="middle" key={_}>
+                        {/* <a>Invite {record.name}</a> */}
+                        {isTeamAdmin() && !isOwnRole ? (
+                            // User with role assignment permission can change roles, but not their own
+                            <Select
+                                value={record.role === 1 ? 'admin' : record.role_id}
+                                style={{ width: 150 }}
+                                onChange={(value) => handleRoleChange(record, value)}
+                                // Allow changing admin role if user has permission
+                            >
+                                <Select.Option value="admin">
+                                    <Tooltip title={intl.formatMessage({ id: 'user.teamAdminDesc', defaultMessage: 'Team administrator with full access rights' })}>
+                                        <div>{intl.formatMessage({ id: 'user.teamAdmin', defaultMessage: '' })}</div>
+                                    </Tooltip>
+                                </Select.Option>
+                                {allRolesList.map(role => (
+                                    <Select.Option key={role.id} value={role.id}>
+                                        <Tooltip title={role.description || role.name}>
+                                            <div>{role.name}</div>
+                                        </Tooltip>
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        ) : (
+                            // User without permission or viewing own role can only view roles
+                            <div>
+                                {record.role == 1
+                                    ? intl.formatMessage({ id: 'user.teamAdmin', defaultMessage: '' })
+                                    : record.role_title}
+                            </div>
+                        )}
+                    </Space>
+                );
+            },
         },
     ];
-    const [teammemberList, setTeammemberList] = useState<any>(null);
+    const [teammemberList, setTeammemberList] = useState<any>([]);
     const [isModalOpen2, setIsModalOpen2] = useState(false);
     const [EmailList, setEmaillist] = useState('');
     const [processedEmails, setProcessedEmails] = useState<string[]>([]);
@@ -89,10 +125,22 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     const [gainEmail, setGainEmail] = useState(null);
     const [roleList, setRoleList] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [allRolesList, setAllRolesList] = useState<any[]>([]); // Store all roles from getRolesList
+    const [currentUserRole, setCurrentUserRole] = useState<number | null>(null); // Store current user's role
     
     const [teams, setTeams] = useState<any[]>([]);
     const [currentTeam, setCurrentTeam] = useState<any>(null);
     const [loadingTeams, setLoadingTeams] = useState(false);
+    
+    // Search related state
+    const [searchKeyword, setSearchKeyword] = useState('');
+    const [searchLoading, setSearchLoading] = useState(false);
+    
+    // Add useEffect to fetch roles and user info on component mount
+    useEffect(() => {
+        fetchAllRolesList();
+        getCurrentUserRole();
+    }, []);
     
     const handleTeamChange = async (team: any) => {
         try {
@@ -117,10 +165,42 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
         }
     };
 
-    const TeamList = async (param: boolean) => {
+    const TeamList = async (param: boolean, keyword?: string) => {
         if (param) {
-            const res = await getTeamList();
-            setTeammemberList(res.data);
+            const res = await getTeamList(keyword ? { keyword } : undefined);
+            // Ensure team_member_list contains user_id field
+            const memberList = res.data.team_member_list || [];
+            setTeammemberList(memberList);
+        }
+    };
+
+    // Handle search functionality
+    const handleSearch = async () => {
+        if (!searchKeyword.trim()) {
+            return;
+        }
+        
+        setSearchLoading(true);
+        try {
+            await TeamList(true, searchKeyword.trim());
+        } catch (error) {
+            console.error('Search failed:', error);
+            message.error('Search failed');
+        } finally {
+            setSearchLoading(false);
+        }
+    };
+
+    // Handle clear search
+    const handleClearSearch = async () => {
+        setSearchKeyword('');
+        setSearchLoading(true);
+        try {
+            await TeamList(true); // Load all members without search
+        } catch (error) {
+            console.error('Clear search failed:', error);
+        } finally {
+            setSearchLoading(false);
         }
     };
 
@@ -160,11 +240,76 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     const fetchRoleList = async () => {
         try {
             const res = await getRoleList();
-            if (res.code === 0) {
-                setRoleList(res.data.list || []);
-            }
+            setRoleList(res.list || []);
         } catch (error) {
             console.error('Failed to fetch role list:', error);
+        }
+    };
+
+    // Fetch all roles using getRolesList for role switching
+    const fetchAllRolesList = async () => {
+        try {
+            const res = await getRolesList({ page: 1, page_size: 100, status: 2 }); // Get active roles
+            if (res.code === 0) {
+                setAllRolesList(res.data?.list || []);
+            }
+        } catch (error) {
+            console.error('Failed to fetch all roles list:', error);
+        }
+    };
+
+    // Get current user role from userinfo
+    const getCurrentUserRole = async () => {
+        try {
+            const userInfoRes = await userinfo();
+            if (userInfoRes.code === 0 && userInfoRes.data) {
+                setCurrentUserRole(userInfoRes.data.role);
+            }
+        } catch (error) {
+            console.error('Failed to get current user role:', error);
+        }
+    };
+
+    // Handle role change for team members
+    const handleRoleChange = async (record: DataType, newRoleId: number | string) => {
+        if (!record.user_id) {
+            return; // Cannot change role without user_id
+        }
+
+        try {
+            setLoading(true);
+            
+            // Determine role and role_id based on new role selection
+            let role: number;
+            let roleId: number;
+            
+            if (newRoleId === 'admin') {
+                // Changing to team admin
+                role = 1;
+                roleId = 0;
+            } else {
+                // Changing to other roles
+                role = 2;
+                roleId = Number(newRoleId);
+            }
+            
+            const res = await switchMemberRole({
+                user_id: record.user_id,
+                role: role,
+                role_id: roleId
+            });
+
+            if (res.code === 0) {
+                message.success(res.data.msg);
+                // Refresh team member list
+                TeamList(true);
+            } else {
+                message.error(res.data.msg);
+            }
+        } catch (error) {
+            console.error('Failed to change member role:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -282,6 +427,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                         // Fetch teams data when modal is opened
                         fetchUserTeams();
                         TeamList(true);
+                        fetchRoleList();
                     }
                 }}
             >
@@ -301,18 +447,53 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                                 setIsModalOpen2(true);
                                 fetchRoleList();
                             }}
-                            disabled={userinfodata('GET')?.role !== 1}
+                            disabled={!isTeamAdmin()}
                         >
                             {intl.formatMessage({ id: 'user.add', defaultMessage: '' })}
                         </Button>
                     </div>
                 </div>
 
+                {/* Search functionality */}
+                <div className="mb-4 flex items-center gap-2">
+                    <Input
+                        placeholder={intl.formatMessage({
+                            id: 'role.search.placeholder',
+                            defaultMessage: 'Search by account or name',
+                        })}
+                        value={searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        onPressEnter={handleSearch}
+                        style={{ width: 300 }}
+                    />
+                    <Button 
+                        type="primary" 
+                        onClick={handleSearch}
+                        loading={searchLoading}
+                    >
+                        {intl.formatMessage({
+                            id: 'role.search.button',
+                            defaultMessage: 'Search',
+                        })}
+                    </Button>
+                    {searchKeyword && (
+                        <Button 
+                            onClick={handleClearSearch}
+                        >
+                            {intl.formatMessage({
+                                id: 'role.search.clear',
+                                defaultMessage: 'Clear',
+                            })}
+                        </Button>
+                    )}
+                </div>
+
                 <Table
                     columns={columns}
-                    dataSource={teammemberList && teammemberList.team_member_list}
+                    dataSource={teammemberList}
+                    rowKey="user_id"
                     pagination={{ pageSize: 20 }}
-                    scroll={{ y: 360 }}
+                    scroll={{ y: 340 }}
                 />
             </Modal>
             <Modal

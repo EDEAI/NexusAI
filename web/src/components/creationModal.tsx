@@ -6,6 +6,8 @@ import { Button, Input, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
 import Profilephoto from '../pages/Creation/components/profilephoto';
+import { usePermissions } from '@/hooks/usePermissions';
+import { PERMISSION_IDS } from '@/utils/permissions';
 const { TextArea } = Input;
 
 interface ChildProps {
@@ -37,6 +39,11 @@ const CreationModal: React.FC<ChildProps> = ({
         icon: '/icons/headportrait/Android.svg',
     });
     const { setAgentCreateOpen, setSkillCreateOpen } = useUserStore();
+    const { hasPermission } = usePermissions();
+    const canCreateAgent = hasPermission(PERMISSION_IDS.CREATE_AGENT);
+    const canCreateWorkflow = hasPermission(PERMISSION_IDS.CREATE_WORKFLOW);
+    const canCreateSkill = hasPermission(PERMISSION_IDS.CREATE_SKILL);
+    const canCreateKnowledgeBase = hasPermission(PERMISSION_IDS.CREATE_KNOWLEDGE_BASE);
 
 
     const IconName = (e: any) => {
@@ -92,9 +99,13 @@ const CreationModal: React.FC<ChildProps> = ({
                 <div className="flex items-center">
                     {CreationType.apps_mode == 1 && (
                         <Button
+                            disabled={!canCreateAgent}
+                            className={!canCreateAgent ? 'cursor-not-allowed opacity-50' : ''}
                             onClick={() => {
-                                setAgentCreateOpen(true);
-                                setIsModalOpen(false);
+                                if (canCreateAgent) {
+                                    setAgentCreateOpen(true);
+                                    setIsModalOpen(false);
+                                }
                             }}
                         >
                             {intl.formatMessage({ id: 'agent.creation.button.ai' })}
@@ -102,9 +113,13 @@ const CreationModal: React.FC<ChildProps> = ({
                     )}
                     {CreationType.apps_mode == 4 && (
                         <Button
+                            disabled={!canCreateSkill}
+                            className={!canCreateSkill ? 'cursor-not-allowed opacity-50' : ''}
                             onClick={() => {
-                                setSkillCreateOpen(true);
-                                setIsModalOpen(false);
+                                if (canCreateSkill) {
+                                    setSkillCreateOpen(true);
+                                    setIsModalOpen(false);
+                                }
                             }}
                         >
                             {intl.formatMessage({ id: 'agent.creation.button.skill.ai' })}
@@ -155,9 +170,17 @@ const CreationModal: React.FC<ChildProps> = ({
                                 </Radio.Group> */}
                             {transformData &&
                                 transformData.map((item: any) => {
+                                    const isDisabled = 
+                                        (item.apps_mode === 1 && !canCreateAgent) ||
+                                        (item.apps_mode === 2 && !canCreateWorkflow) ||
+                                        (item.apps_mode === 3 && !canCreateKnowledgeBase) ||
+                                        (item.apps_mode === 4 && !canCreateSkill);
+                                    
                                     return (
                                         <div
-                                            className="w-44 h-24 rounded-lg text-center bg-[url('/images/bg.png')] bg-[length:176px_96px] cursor-pointer"
+                                            className={`w-44 h-24 rounded-lg text-center bg-[url('/images/bg.png')] bg-[length:176px_96px] ${
+                                                isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                                            }`}
                                             style={{
                                                 border:
                                                     item.apps_mode === CreationType.apps_mode
@@ -165,17 +188,23 @@ const CreationModal: React.FC<ChildProps> = ({
                                                         : '1px solid #eeeeee',
                                             }}
                                             onClick={() => {
-                                                RadioChange(item);
+                                                if (!isDisabled) {
+                                                    RadioChange(item);
+                                                }
                                             }}
                                         >
                                             <div className="flex items-center justify-center mt-5 mb-2.5">
                                                 <img
-                                                    className="w-6 h-6"
+                                                    className={`w-6 h-6 ${
+                                                        isDisabled ? 'grayscale' : ''
+                                                    }`}
                                                     src={item.signicon}
                                                     alt=""
                                                 />
                                             </div>
-                                            <div className="text-p[#213044] text-base font-normal">
+                                            <div className={`text-base font-normal ${
+                                                isDisabled ? 'text-gray-400' : 'text-p[#213044]'
+                                            }`}>
                                                 {item.name}
                                             </div>
                                         </div>

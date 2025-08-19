@@ -32,4 +32,9 @@ export default {
   'role.deleteError': 'Failed to delete role',
   'role.updateError': 'Failed to update role',
   'role.createError': 'Failed to create role',
+  
+  // Team Member Search
+  'role.search.placeholder': 'Search by account or name',
+  'role.search.button': 'Search',
+  'role.search.clear': 'Clear',
 };

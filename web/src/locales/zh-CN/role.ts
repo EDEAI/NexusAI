@@ -32,4 +32,9 @@ export default {
   'role.deleteError': '删除角色失败',
   'role.updateError': '更新角色失败',
   'role.createError': '创建角色失败',
+  
+  // Team Member Search
+  'role.search.placeholder': '搜索账号或姓名',
+  'role.search.button': '搜索',
+  'role.search.clear': '清除',
 };

@@ -2,8 +2,11 @@ import aniRequest from './request';
 import { getRolesList, RoleListResponse } from './index';
 
 // Get team list
-export const getTeamList = async () => {
-    return await aniRequest<any>(`/v1/auth/team_member_list`, { method: 'GET' });
+export const getTeamList = async (params?: { keyword?: string }) => {
+    return await aniRequest<any>(`/v1/auth/team_member_list`, { 
+        method: 'GET', 
+        data: params?.keyword ? { keyword: params.keyword } : {} 
+    });
 };
 
 // Generate invitation link
