@@ -583,6 +583,7 @@ async def invite_user(keyword: str = None, userinfo: TokenData = Depends(get_cur
                     'nickname': value['nickname'],
                     'email': value['email'],
                     'role': value['role'],
+                    'role_id': value['role_id'],
                     'position': value['position'],
                     'role_title': user_title,
                     'last_login_time': time_text
