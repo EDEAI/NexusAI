@@ -70,3 +70,24 @@ class UserTeamRelations(MySQL):
         ]
         
         return self.select_one(columns='*',conditions=conditions)
+
+    def get_secure_admin_user_ids(self, team_id: int) -> List[int]:
+        """
+        Get the list of admin user_ids in a team EXCLUDING users whose password equals the default 'nexus_ai123456'.
+
+        :param team_id: The team ID.
+        :return: A list of user IDs that are admins with non-default passwords.
+        """
+        rows = self.select(
+            columns=['user_team_relations.user_id', 'users.password'],
+            conditions=[
+                {'column': 'user_team_relations.team_id', 'value': team_id},
+                {'column': 'user_team_relations.role', 'value': 1}
+            ],
+            joins=[
+                ["left", "users", "user_team_relations.user_id = users.id"]
+            ]
+        )
+        if not rows:
+            return []
+        return [row['user_id'] for row in rows if row.get('password') != 'nexus_ai123456']

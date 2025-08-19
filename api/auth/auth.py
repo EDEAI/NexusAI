@@ -263,6 +263,7 @@ async def get_user_info(userinfo: TokenData = Depends(get_current_user)):
         if get_user_team_relation:
             user_info['position'] = get_user_team_relation['position']
             user_info['role_id'] = get_user_team_relation['role_id']
+            user_info['role'] = get_user_team_relation['role']
             
             # Get user's role permissions
             if get_user_team_relation['role_id']:
@@ -522,9 +523,9 @@ async def invite_user(keyword: str = None, userinfo: TokenData = Depends(get_cur
             'users.id',
             'users.avatar',
             'users.nickname',
-            'users.role',
+            'user_team_relations.role',
             'user_team_relations.position',
-            'users.role_id'
+            'user_team_relations.role_id'
         ],
         conditions=conditions,
         joins=[
@@ -1632,17 +1633,9 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
         
         # Check if user is trying to modify their own role from admin to regular user
         if target_user_id == current_user_id and current_user_relation.get('role') == 1 and role == 2:
-            # Count total admins in the current team
-            admin_count = UserTeamRelations().select(
-                columns=['id'],
-                conditions=[
-                    {'column': 'team_id', 'value': current_team_id},
-                    {'column': 'role', 'value': 1}
-                ]
-            )
-            
-            # If there's only one admin (the current user), don't allow modification
-            if len(admin_count) <= 1:
+            # Count secure admins (exclude users with default password value)
+            secure_admin_ids = UserTeamRelations().get_secure_admin_user_ids(current_team_id)
+            if target_user_id in secure_admin_ids and len(secure_admin_ids) <= 1:
                 return response_error(get_language_content('cannot_modify_last_admin_role'))
         
         # Check if target user exists in the same team
@@ -1653,17 +1646,9 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
         # Check if target user is admin (role = 1) and ensure at least one admin remains
         # Skip this check if we already checked it for self-modification above
         if target_user_relation.get('role') == 1 and target_user_id != current_user_id and role == 2:
-            # Count total admins in the current team
-            admin_count = UserTeamRelations().select(
-                columns=['id'],
-                conditions=[
-                    {'column': 'team_id', 'value': current_team_id},
-                    {'column': 'role', 'value': 1}
-                ]
-            )
-            
-            # If there's only one admin (the target user), don't allow modification
-            if len(admin_count) <= 1:
+            # Count secure admins (exclude users with default password value)
+            secure_admin_ids = UserTeamRelations().get_secure_admin_user_ids(current_team_id)
+            if target_user_id in secure_admin_ids and len(secure_admin_ids) <= 1:
                 return response_error(get_language_content('cannot_modify_last_admin_role'))
         
         # Validate role_id if it's provided (for role = 2)
@@ -1692,7 +1677,6 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
         
         SQLDatabase.commit()
         SQLDatabase.close()
-        
         if result:
             msg = get_language_content('member_role_switched_successfully')
             return response_success({
