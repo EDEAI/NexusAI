@@ -495,14 +495,26 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
 
 
 @router.get("/team_member_list", response_model=ResDictSchema)
-async def invite_user(userinfo: TokenData = Depends(get_current_user)):
+async def invite_user(keyword: str = None, userinfo: TokenData = Depends(get_current_user)):
     """
       team_id: int, team id.(Reserved fields may not be transmitted)
       role: When role equals 1, use the frontend language pack; when role equals 2, use user_title.
+      keyword: Optional search keyword for nickname and email
     """
     team_id = userinfo.team_id
     team_member_list = []
-    # user_info_list = Users().select(columns='*', conditions=[{'column': 'team_id', 'value': team_id},{'column': 'status', 'value': 1}])
+    
+    # Build conditions for the query
+    conditions = [{'column': 'user_team_relations.team_id', 'value': team_id}]
+    
+    # Add keyword search conditions if keyword is provided
+    if keyword:
+        like_value = f"%{keyword}%"
+        conditions.append([
+            {'logic': 'or', 'column': 'users.nickname', 'op': 'like', 'value': like_value},
+            {'column': 'users.email', 'op': 'like', 'value': like_value}
+        ])
+    
     user_info_list = UserTeamRelations().select(
         columns=[
             'users.email',
@@ -514,12 +526,12 @@ async def invite_user(userinfo: TokenData = Depends(get_current_user)):
             'user_team_relations.position',
             'users.role_id'
         ],
-        conditions=[{'column': 'user_team_relations.team_id', 'value': team_id}],
+        conditions=conditions,
         joins=[
             ["left", "users", "user_team_relations.user_id = users.id"]
         ]
     )
-
+    
     team_data = Teams().select_one(columns='*', conditions=[{'column': 'id', 'value': team_id}])
     team_name = 'No team currently available'
     if team_data:
