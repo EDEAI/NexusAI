@@ -435,11 +435,6 @@ Password:
 nexusaipwd
 ```
 
-Note: To update the initial administrator password
-```bash
-python scripts/init_admin_password.py
-```
-
 ## Pull NexusAI
 1. Pull the updated content from the git repository
 ```bash
