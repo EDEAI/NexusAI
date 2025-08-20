@@ -66,6 +66,13 @@ class Settings(BaseSettings):
     API_PORT: int = int(os.environ.get('API_PORT', os.getenv('API_PORT', 9472)))
     STORAGE_URL: str = str(os.environ.get('STORAGE_URL', os.getenv('STORAGE_URL', '')))
 
+    SMTP_SERVER: str = os.environ.get('SMTP_SERVER', os.getenv('SMTP_SERVER'))
+    SMTP_PORT: int = int(os.environ.get('SMTP_PORT', os.getenv('SMTP_PORT')))
+    SMTP_USERNAME: str = os.environ.get('SMTP_USERNAME', os.getenv('SMTP_USERNAME'))
+    SMTP_PASSWORD: str = os.environ.get('SMTP_PASSWORD', os.getenv('SMTP_PASSWORD'))
+    SMTP_USE_TLS: str = os.environ.get('SMTP_USE_TLS', os.getenv('SMTP_USE_TLS'))
+    SMTP_TIMEOUT: int = int(os.environ.get('SMTP_TIMEOUT', os.getenv('SMTP_TIMEOUT')))
+
 
 settings = Settings()
 
@@ -3293,6 +3300,32 @@ model_config = [
             'text2img': [],
             'moderation': []
         }
+    },
+    {
+        'supplier': 'SiliconFlow',
+        'mode': 1,
+        'config': [
+            {
+                "key": "api_key",
+                "type": "str",
+                "value": "",
+                "secret": True,
+                "options": None,
+                "optional": False,
+                "description": "The API Key is an important credential for you to request the SiliconFlow model service.",
+                "default_value": ""
+            },
+            {
+                "key": "base_url",
+                "type": "str",
+                "value": "https://api.siliconflow.cn/v1/rerank",
+                "secret": False,
+                "options": None,
+                "optional": False,
+                "description": "Base URL for API requests",
+                "default_value": "https://api.siliconflow.cn/v1/rerank"
+            }
+        ]
     }
 ]
 
@@ -3394,7 +3427,7 @@ model_type = {
         'type': 'EMBEDDING'
     },
     3: {
-        'type': 'RERANK'
+        'type': 'RERANKING'
     },
     4: {
         'type': 'SPEECH2TEXT'

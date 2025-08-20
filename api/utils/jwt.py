@@ -77,8 +77,16 @@ def verify_token(token: str, credentials_exception):
         stored_token = redis.get(redis_key)
 
         user_info = Users().get_user_by_id(uid)
-        if user_info['team_id']!= team_id:
+        # Check if user exists
+        if not user_info:
+            print(f"User {uid} not found")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
+        if user_info['team_id']!= team_id:
             user_info = UserTeamRelations().select_one(
                 columns="*",
                 conditions=[
@@ -152,13 +160,3 @@ def blacklist_token(token: str):
     """
     redis.sadd('blacklisted_tokens', token)
     
-async def get_ws_current_user(token: str):
-    """
-    Get the current user for websocket.
-    """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    return verify_token(token, credentials_exception)

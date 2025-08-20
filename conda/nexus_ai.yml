@@ -387,4 +387,6 @@ dependencies:
       - xxhash==3.4.1
       - yarg==0.1.9
       - yarl==1.9.4
+      - yagmail==0.15.293
+      - emails==0.6
 prefix: /root/anaconda3/envs/nexus_ai

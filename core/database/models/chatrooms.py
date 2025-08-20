@@ -107,7 +107,7 @@ class Chatrooms(MySQL):
         else:
             return {'status': 0}
 
-    def all_chat_room_list(self, page: int = 1, page_size: int = 10, uid: int = 0, name: str = "", is_temporary: bool = False):
+    def all_chat_room_list(self, page: int = 1, page_size: int = 10, uid: int = 0 ,team_id: int = 0, name: str = "", is_temporary: bool = False):
         """
         Retrieves a list of chat rooms with pagination, filtering by user ID and chat room name.
 
@@ -121,7 +121,9 @@ class Chatrooms(MySQL):
             {"column": "chatrooms.status", "value": 1},
             {"column": "apps.status", "value": 1},
             {"column": "apps.mode", "value": 5},
+            {"column": "apps.team_id", "value": team_id},
             {"column": "chatrooms.user_id", "value": uid},
+            {"column": "chatrooms.team_id", "value": team_id},
             {"column": "chatrooms.chat_agent_id", "value": 0},
         ]
 

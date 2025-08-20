@@ -73,6 +73,7 @@ class Agents(MySQL):
         if agent_search_type == 1:
             conditions = [
                 {"column": "agents.user_id", "value": uid},
+                {"column": "agents.team_id", "value": team_id},
                 {"column": "agents.publish_status", "value": 0},
                 {"column": "agents.status", "op": "in", "value": [1, 2]},
                 {"column": "apps.mode", "value": 1},
@@ -91,6 +92,7 @@ class Agents(MySQL):
         else:
             conditions = [
                 {"column": "agents.user_id", "value": uid},
+                {"column": "agents.team_id", "value": team_id},
                 {"column": "agents.publish_status", "value": 1},
                 {"column": "agents.status", "value": 1},
                 {"column": "apps.mode", "value": 1},

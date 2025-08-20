@@ -123,6 +123,7 @@ async def register_user(register_user: RegisterUserData):
     email = register_user.email
     password = register_user.password
     nickname = register_user.nickname
+    position = register_user.position
     if not nickname:
         return response_error(get_language_content('register_nickname_empty'))
     if len(nickname.encode('utf-8')) > 50:
@@ -134,14 +135,18 @@ async def register_user(register_user: RegisterUserData):
     if not password:
         return response_error(get_language_content('register_password_failed'))
 
-    # if not is_valid_phone_number(phone):
-    #     return response_error(get_language_content('register_phone_illegality'))
-    # if phone == '':
-    #     return response_error(get_language_content('register_phone_failed'))
-    # if get_repeat_phone(phone):
-    #     return response_error(get_language_content('register_phone_repeat'))
+    conditions = [
+        {"column": "status", "value": 1},
+        [
+            {"column": "email", "value": email, "op": "=", "logic": "or"},
+            {"column": "phone", "value": email, "op": "="}
+        ]
+    ]
 
-    user_data = Users().select_one(columns='*', conditions=[{'column': 'email', 'value': email, 'logic':'or'},{'column': 'phone', 'value': email}])
+    user_data = Users().select_one(
+        columns='*', 
+        conditions = conditions
+    )
 
     if not user_data:
         return response_error(get_language_content('register_email_empty'))
@@ -156,6 +161,7 @@ async def register_user(register_user: RegisterUserData):
 
     register_user_data = {
         'nickname': nickname,
+        # 'position': position,
         'email': email,
         'password': password_with_salt,
         'password_salt': password_salt,
@@ -166,11 +172,21 @@ async def register_user(register_user: RegisterUserData):
         [{'column': 'id', 'value': user_data['id']}],
         register_user_data
     )
+
+    if position is not None and position != '' and position.strip() != '':
+        team_id = user_data['team_id']
+        user_id = user_data['id']
+        UserTeamRelations().update_user_position(user_id, team_id, position)
     SQLDatabase.commit()
     SQLDatabase.close()
     if not user_id:
         return response_error(get_language_content('register_password_failed'))
     user_info = Users().select_one(columns='*', conditions=[{'column': 'id', 'value': user_data['id']}])
+    get_user_team_relation = UserTeamRelations().get_user_team_relation(user_info['id'],user_info['team_id'])
+    if get_user_team_relation:
+        user_info['position'] = get_user_team_relation['position']
+    else:
+        user_info['position'] = ''
     return response_success({"user_info": user_info})
 
 @router.post("/logout", response_model=ResUserLogoutSchema)
@@ -228,7 +244,13 @@ async def get_user_info(userinfo: TokenData = Depends(get_current_user)):
             user_info['team_type'] = team_type
         else:
             user_info['team_type'] = 1
-        
+        user_info['team_name'] =  Teams().select_one(
+            columns=['name'], 
+            conditions=[
+                {'column': 'id', 'value': user_info['team_id']}, 
+                {'column': 'status', 'value': 1}
+            ]
+        )['name']
         # Always include three_list regardless of team_id
         user_info['three_list'] = UserThreeParties().select(
             columns=['platform','openid','sundry'], 
@@ -236,6 +258,66 @@ async def get_user_info(userinfo: TokenData = Depends(get_current_user)):
                 {'column': 'user_id', 'value': uid}
             ]
         )
+
+        get_user_team_relation = UserTeamRelations().get_user_team_relation(user_info['id'],user_info['team_id'])
+        if get_user_team_relation:
+            user_info['position'] = get_user_team_relation['position']
+            user_info['role_id'] = get_user_team_relation['role_id']
+            user_info['role'] = get_user_team_relation['role']
+            
+            # Get user's role permissions
+            if get_user_team_relation['role_id']:
+                from core.database.models.role_permission import RolePermission
+                from core.database.models.permissions import Permission
+                from core.database.models.users import Users
+                
+                role_perm_model = RolePermission()
+                permission_model = Permission()
+                
+                # Get permission IDs for this role
+                permission_ids = role_perm_model.get_permission_ids_by_role_id(get_user_team_relation['role_id'])
+                
+                user_permissions = []
+                if permission_ids:
+                    # Get user language preference
+                    user_language = Users().get_user_language(uid)
+                    
+                    # Determine columns based on language
+                    if user_language == 'zh':
+                        permission_columns = [
+                            "id",
+                            "title_cn AS title",
+                            "status",
+                            "created_at",
+                            "updated_at"
+                        ]
+                    else:
+                        permission_columns = [
+                            "id",
+                            "title_en AS title",
+                            "status",
+                            "created_at",
+                            "updated_at"
+                        ]
+                    
+                    # Get permission details
+                    user_permissions = permission_model.select(
+                        columns=permission_columns,
+                        conditions=[
+                            {"column": "id", "op": "in", "value": permission_ids},
+                            {"column": "status", "value": 1}
+                        ],
+                        order_by="id ASC"
+                    )
+                
+                user_info['permissions'] = user_permissions
+            else:
+                user_info['permissions'] = []
+        else:
+            user_info['position'] = ''
+            user_info['role_id'] = None
+            user_info['permissions'] = []
+
     else:
         return response_error("User not found")
     
@@ -275,6 +357,8 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
     """
     email_list_res = []
     url_list = []
+    already_registered_emails = []  # Store already registered emails
+    valid_emails = []  # Store valid emails that can be invited
 
     role_id = invite_data.role
     if role_id == 'admin_user':
@@ -283,6 +367,7 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
     else:
         role = 2
     email_list = invite_data.email_list
+    send_email = invite_data.send_email  # 0: return links, 1: send emails
 
     if not email_list:
         return response_error(get_language_content('lnvitation_email_failed'))
@@ -292,24 +377,29 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
         return response_error(get_language_content('lnvitation_team_failed'))
     
     # Check if there are any existing users in the invitation list
-    user_info = Users().select(columns='*', conditions=[{'column': 'email', 'op' : 'in', 'value': email_list}])
+    user_info = Users().select(columns='*', conditions=[{'column': 'email', 'op' : 'in', 'value': email_list},{'column': 'status', 'value': 1}])
+    
     if user_info:
         for value in user_info:
             if value['password'] == 'nexus_ai123456':
+                # Unregistered user (default password), can be invited
                 url_list.append(
                     settings.WEB_URL + '/user/register?email=' + value['email'] + '&team=' + team['name']
                 )
+                email_list_res.append(value['email'])
+                valid_emails.append(value['email'])
             else:
-                url_list.append(
-                    settings.WEB_URL + '/user/login?email=' + value['email']
-                )
+                # Already registered user (non-default password), record as registered
+                already_registered_emails.append(value['email'])
+            
             UserTeamRelations().ensure_team_id_exists(userinfo.team_id, value['email'], role, role_id)
-            email_list_res.append(value['email'])
-    # Remove identical elements from two lists
-    common_elements = set(email_list_res) & set(email_list)
-    email_list = list(filter(lambda x: x not in common_elements, email_list))
-    # Organize data
-    for val in email_list:
+    
+    # Remove identical elements from two lists (exclude processed emails)
+    processed_emails = set(email_list_res) | set(already_registered_emails)
+    remaining_emails = list(filter(lambda x: x not in processed_emails, email_list))
+    
+    # Organize data for new users
+    for val in remaining_emails:
         current_time = datetime.now()
         formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
         user_data = {
@@ -331,19 +421,101 @@ async def invite_user(invite_data: CreateDataEmailList,request:Request, userinfo
         url_list.append(
             settings.WEB_URL + '/user/register?email=' + val + '&team=' + team['name']
         )
+        valid_emails.append(val)
         SQLDatabase.commit()
         SQLDatabase.close()
-    return response_success({'email_list': url_list})
+    
+    # Build return result
+    result_data = {'email_list': url_list}
+    
+    # Build message list
+    messages = []
+    
+    # Email sending logic
+    if send_email == 1 and valid_emails:
+        from core.smtp.emails_smtp import SMTPEmailSender
+        
+        # Get current user info as inviter
+        current_user_info = Users().select_one(
+            columns=['nickname'], 
+            conditions=[{'column': 'id', 'value': userinfo.uid}]
+        )
+        inviter_name = current_user_info.get('nickname', '') if current_user_info else ''
+        
+        email_sender = SMTPEmailSender()
+        email_success_count = 0
+        email_failed_count = 0
+        
+        # Send email to each valid email address
+        for i, email_addr in enumerate(valid_emails):
+            if i < len(url_list):
+                invitation_url = url_list[i]
+                try:
+                    success, message = email_sender.send_user_invitation(
+                        to_email=email_addr,
+                        invitation_url=invitation_url,
+                        team_name=team['name'],
+                        inviter_name=inviter_name
+                    )
+                    
+                    if success:
+                        email_success_count += 1
+                    else:
+                        email_failed_count += 1
+                        
+                except Exception as e:
+                    email_failed_count += 1
+        
+        # Add email sending result message
+        # if email_failed_count == 0:
+        messages.append(get_language_content('invitation_emails_sent_successfully'))
+        # else:
+            # messages.append(f"Email sending completed, {email_success_count} successful, {email_failed_count} failed")
+    
+    elif send_email == 0:
+        # Only return links case
+        if valid_emails:
+            messages.append(get_language_content('invitation_links_generated_successfully'))
+    
+    # Add already registered emails message
+    if already_registered_emails:
+        message = ''
+        # registered_emails_str = ', '.join(already_registered_emails)
+        # if len(already_registered_emails) == 1:
+        #     messages.append(get_language_content('email_already_registered').format(email=registered_emails_str))
+        # else:
+        #     messages.append(f"{get_language_content('some_emails_already_registered')}: {registered_emails_str}")
+    
+    # Set final msg
+    if messages:
+        result_data['msg'] = '; '.join(messages)
+    else:
+        result_data['msg'] = get_language_content('invitation_links_generated_successfully')
+    
+    return response_success(result_data)
+
 
 @router.get("/team_member_list", response_model=ResDictSchema)
-async def invite_user(userinfo: TokenData = Depends(get_current_user)):
+async def invite_user(keyword: str = None, userinfo: TokenData = Depends(get_current_user)):
     """
       team_id: int, team id.(Reserved fields may not be transmitted)
       role: When role equals 1, use the frontend language pack; when role equals 2, use user_title.
+      keyword: Optional search keyword for nickname and email
     """
     team_id = userinfo.team_id
     team_member_list = []
-    # user_info_list = Users().select(columns='*', conditions=[{'column': 'team_id', 'value': team_id},{'column': 'status', 'value': 1}])
+    
+    # Build conditions for the query
+    conditions = [{'column': 'user_team_relations.team_id', 'value': team_id}]
+    
+    # Add keyword search conditions if keyword is provided
+    if keyword:
+        like_value = f"%{keyword}%"
+        conditions.append([
+            {'logic': 'or', 'column': 'users.nickname', 'op': 'like', 'value': like_value},
+            {'column': 'users.email', 'op': 'like', 'value': like_value}
+        ])
+    
     user_info_list = UserTeamRelations().select(
         columns=[
             'users.email',
@@ -351,15 +523,16 @@ async def invite_user(userinfo: TokenData = Depends(get_current_user)):
             'users.id',
             'users.avatar',
             'users.nickname',
-            'users.role',
-            'users.role_id'
+            'user_team_relations.role',
+            'user_team_relations.position',
+            'user_team_relations.role_id'
         ],
-        conditions=[{'column': 'user_team_relations.team_id', 'value': team_id}],
+        conditions=conditions,
         joins=[
             ["left", "users", "user_team_relations.user_id = users.id"]
         ]
     )
-
+    
     team_data = Teams().select_one(columns='*', conditions=[{'column': 'id', 'value': team_id}])
     team_name = 'No team currently available'
     if team_data:
@@ -368,13 +541,16 @@ async def invite_user(userinfo: TokenData = Depends(get_current_user)):
         now = datetime.now()
         for index, value in enumerate(user_info_list):
             if value['role'] == 1:
-                user_title = '管理员'
+                user_title = 'Administrator'
             else:
                 role_data = Roles().select_one(columns='*', conditions=[{'column': 'id', 'value': value['role_id']}])
-                if role_data['built_in'] == 1:
-                    user_title = get_language_content(role_data['name'])
+                if role_data:
+                    if role_data['built_in'] == 1:
+                        user_title = get_language_content(role_data['name'])
+                    else:
+                        user_title = role_data['name']
                 else:
-                    user_title = role_data['name']
+                    user_title = 'Unknown Role'  # Default role name when role doesn't exist
             if value['email']:
                 if value['last_login_time']:
                     delta = now - value['last_login_time']
@@ -407,6 +583,8 @@ async def invite_user(userinfo: TokenData = Depends(get_current_user)):
                     'nickname': value['nickname'],
                     'email': value['email'],
                     'role': value['role'],
+                    'role_id': value['role_id'],
+                    'position': value['position'],
                     'role_title': user_title,
                     'last_login_time': time_text
                 }
@@ -444,19 +622,47 @@ async def get_user_teams(platform: int, userinfo: TokenData = Depends(get_curren
             'teams.created_time',
             'teams.updated_time',
             'teams.status',
-            'teams.type'
+            'teams.type',
+            'user_team_relations.position',
+            'user_team_relations.role',
+            'user_team_relations.role_id'
         ],
         conditions=conditions,
         joins=[
             ["left", "teams", "user_team_relations.team_id = teams.id"]
         ]
     )
+    
+    # Process each team to add role_name and member_count
+    for team in user_teams:
+        # Set role name based on role value
+
+
+        if team['role'] == 1:
+            user_title = 'Administrator'
+        else:
+            role_data = Roles().select_one(columns='*', conditions=[{'column': 'id', 'value': team['role_id']}])
+            if role_data:
+                if role_data['built_in'] == 1:
+                    user_title = get_language_content(role_data['name'])
+                else:
+                    user_title = role_data['name']
+            else:
+                user_title = 'Unknown Role'  # Default role name when role doesn't exist
+        team['role_name']= user_title
+        # Count total members in this team
+        team_members = UserTeamRelations().select(
+            columns=['id'],
+            conditions=[{'column': 'team_id', 'value': team['id']}]
+        )
+        team['member_count'] = len(team_members) if team_members else 0
+    
     return response_success({'teams': user_teams})
 
 @router.post('/switch_team', response_model=ResDictSchema)
-async def switch_user_team(team_id: int, userinfo: TokenData = Depends(get_current_user)):
+async def switch_user_team(team_id: SwitchTeamId, userinfo: TokenData = Depends(get_current_user)):
     """
-    Switches the current user's team_id and saves it.
+    Switches the current user's team_id and saves it to both database and Redis cache.
 
     Args:
         team_id (int): The ID of the team to switch to.
@@ -465,22 +671,76 @@ async def switch_user_team(team_id: int, userinfo: TokenData = Depends(get_curre
     Returns:
         A success response with the new team_id if the switch is successful, otherwise an error response.
     """
+    team_id_value = team_id.team_id
     user_id = userinfo.uid
     # Check if the user belongs to the specified team
     relation = UserTeamRelations().select_one(
         columns='*',
         conditions=[
             {"column": "user_id", "value": user_id},
-            {"column": "team_id", "value": team_id}
+            {"column": "team_id", "value": team_id_value}
         ]
     )
     if not relation:
         return response_error(get_language_content('user_does_not_belong_to_this_team'))
+    
+    # Update user information to database
     Users().update(
         [{"column": "id", "value": user_id}],
-        {"team_id": team_id, "role":relation['role'], "inviter_id":relation['inviter_id'], "role_id":relation['role_id']}
+        {"team_id": team_id_value, "role":relation['role'], "inviter_id":relation['inviter_id'], "role_id":relation['role_id']}
     )
-    return response_success({"team_id": team_id})
+    
+    # Update Redis token cache with new team information
+    # Determine Redis key based on user type
+    if hasattr(userinfo, 'user_type') and userinfo.user_type == "third_party":
+        token_redis_key = f"third_party_access_token:{user_id}"
+    else:
+        token_redis_key = f"access_token:{user_id}"
+    
+    new_access_token = None
+    # Check if token exists in Redis and update it with new team information
+    existing_token = redis.get(token_redis_key)
+    if existing_token:
+        # Get updated user information from database
+        updated_user = Users().select_one(
+            columns=['id', 'team_id', 'nickname', 'phone', 'email', 'inviter_id', 'role'],
+            conditions=[{"column": "id", "value": user_id}]
+        )
+        
+        if updated_user:
+            # Create new token with updated team information
+            token_data = {
+                "uid": updated_user["id"], 
+                "team_id": updated_user["team_id"], 
+                "nickname": updated_user["nickname"], 
+                "phone": updated_user["phone"],
+                "email": updated_user["email"],
+                "inviter_id": updated_user["inviter_id"],
+                "role": updated_user["role"]
+            }
+            
+            # Add additional fields for third-party users
+            if hasattr(userinfo, 'user_type') and userinfo.user_type == "third_party":
+                token_data.update({
+                    "platform": getattr(userinfo, 'platform', ''),
+                    "openid": getattr(userinfo, 'openid', ''),
+                    "language": getattr(userinfo, 'language', 'en'),
+                    "user_type": "third_party"
+                })
+            
+            # Create new access token with updated data
+            new_access_token = create_access_token(data=token_data)
+            
+            # Update Redis with new token
+            redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60
+            redis.set(token_redis_key, new_access_token, ex=redis_expiry_seconds)
+    
+    # Prepare response data
+    response_data = {"team_id": team_id_value}
+    if new_access_token:
+        response_data["access_token"] = new_access_token
+    
+    return response_success(response_data)
 
 @router.post('/third_party_login', response_model=ResThirdPartyLoginSchema)
 async def third_party_login(request: Request, login_data: ThirdPartyLoginData):
@@ -520,6 +780,7 @@ async def third_party_login(request: Request, login_data: ThirdPartyLoginData):
         openid=login_data.openid,
         sundry=login_data.sundry,
         nickname=login_data.nickname,
+        position=login_data.position,
         avatar=login_data.avatar,
         language=login_data.language or 'en',
         client_ip=client_ip,
@@ -864,6 +1125,7 @@ async def third_party_login_binding(request: Request, login_data: ThirdPartyLogi
         platform=login_data.platform,
         openid=login_data.openid,
         sundry=login_data.sundry,
+        position=login_data.position,
         nickname=login_data.nickname,
         avatar=login_data.avatar,
         language=login_data.language or 'en',
@@ -922,3 +1184,540 @@ async def third_party_login_binding(request: Request, login_data: ThirdPartyLogi
     }
     
     return response_success(response_data)
+
+
+@router.post('/send_email_verification_code', response_model=ResDictSchema)
+async def send_email_verification_code(request_data: ResetEmailData):
+    """
+    Send email verification code
+    
+    Args:
+        request_data (dict): Request data containing email address
+    
+    Returns:
+        A success response indicating the verification code has been sent, or an error response if the email is not found.
+    """
+    import random
+    import string
+    from core.smtp.emails_smtp import SMTPEmailSender
+    
+    email = request_data.email
+    
+    # Validate email format
+    if not email or not is_valid_email(email):
+        return response_error(get_language_content('email_format_incorrect'))
+    
+    # Check if user exists
+    user = Users().get_user_by_email(email)
+    if not user:
+        return response_error(get_language_content('the_current_email_address_is_not_registered'))
+    
+    try:
+        # Generate 6-digit alphanumeric verification code
+        verification_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        
+        # Store verification code in Redis with 15 minutes expiration and verification status
+        redis_key = f"email_verification_code:{email}"
+        verification_data = {
+            'code': verification_code,
+            'status': '0'  # 0: not verified, 1: verified
+        }
+        redis.set(redis_key, json.dumps(verification_data), ex=900)  # 15 minutes expiration
+        
+        # Get SMTP configuration and send email
+        email_sender = SMTPEmailSender()
+        
+        # Send verification code email
+        success, message = email_sender.send_password_reset_code_simple(
+            to_email=email,
+            code=verification_code,
+            expire_minutes=15
+        )
+        
+        if success:
+            msg = get_language_content('verification_code_sent_successfully')
+            return response_success({
+                'msg': msg,
+                'email': email
+            })
+        else:
+            msg = get_language_content('email_sending_failed')
+            return response_error(f"{msg}: {message}")
+            
+    except Exception as e:
+        msg = get_language_content('an_error_occurred_while_sending_the_verification_code')
+        return response_error(f"{msg}: {str(e)}")
+
+
+@router.post('/verify_email_code', response_model=ResDictSchema)
+async def verify_email_code(request_data: ResetVerificationCodeData):
+    """
+    Verify email verification code
+    
+    Args:
+        request_data (dict): Request data containing email and verification code
+    
+    Returns:
+        A success response if verification is successful, or an error response if verification fails.
+    """
+    email = request_data.email
+    verification_code = request_data.verification_code
+    
+    # Validate email format
+    if not email or not is_valid_email(email):
+        return response_error(get_language_content('email_format_incorrect'))
+    
+    # Validate verification code is not empty
+    if not verification_code or not verification_code.strip():
+        return response_error(get_language_content('verification_code_cannot_be_empty'))
+    
+    # Check if user exists
+    user = Users().get_user_by_email(email)
+    if not user:
+        return response_error(get_language_content('the_current_email_address_is_not_registered'))
+    
+    try:
+        # Get verification data from Redis
+        redis_key = f"email_verification_code:{email}"
+        stored_data = redis.get(redis_key)
+        
+        if not stored_data:
+            return response_error(get_language_content('verification_code_expired_or_not_exist'))
+        
+        # Parse stored verification data
+        try:
+            verification_data = json.loads(str(stored_data, 'utf-8'))
+            stored_code = verification_data.get('code')
+        except (json.JSONDecodeError, KeyError):
+            return response_error(get_language_content('verification_code_expired_or_not_exist'))
+        
+        # Compare verification codes
+        if stored_code != verification_code.strip():
+            return response_error(get_language_content('verification_code_incorrect'))
+        
+        # Verification successful, update status to verified (1) instead of deleting
+        verification_data['status'] = '1'
+        redis.set(redis_key, json.dumps(verification_data), ex=900)  # Keep same expiration time
+        
+        msg = get_language_content('email_verification_successful')
+        return response_success({
+            'msg': msg,
+            'email': email,
+            'verified': True
+        })
+        
+    except Exception as e:
+        msg = get_language_content('email_verification_failed')
+        return response_error(f"{msg}: {str(e)}")
+
+
+@router.post('/reset_password', response_model=ResDictSchema)
+async def reset_password(reset_data: ResetPasswordData):
+    """
+    Reset user password
+    
+    Args:
+        reset_data (ResetPasswordData): Reset password data containing email, new password and confirm password
+    
+    Returns:
+        A success response if password reset is successful, or an error response if reset fails.
+    """
+    email = reset_data.email
+    password = reset_data.password
+    confirm_password = reset_data.confirm_password
+    
+    # Validate email format
+    if not email or not is_valid_email(email):
+        return response_error(get_language_content('email_format_incorrect'))
+    
+    # Validate password is not empty
+    if not password or not password.strip():
+        return response_error(get_language_content('password_cannot_be_empty'))
+    
+    # Validate confirm password is not empty
+    if not confirm_password or not confirm_password.strip():
+        return response_error(get_language_content('confirm_password_cannot_be_empty'))
+    
+    # Validate password and confirm password match
+    if password != confirm_password:
+        return response_error(get_language_content('passwords_do_not_match'))
+    
+    # Check if user exists
+    user = Users().get_user_by_email(email)
+    if not user:
+        return response_error(get_language_content('the_current_email_address_is_not_registered'))
+    
+    try:
+        # Check if email verification is completed
+        redis_key = f"email_verification_code:{email}"
+        stored_data = redis.get(redis_key)
+        
+        if not stored_data:
+            return response_error(get_language_content('email_verification_not_completed'))
+        
+        # Parse stored verification data
+        try:
+            verification_data = json.loads(str(stored_data, 'utf-8'))
+            verification_status = verification_data.get('status')
+        except (json.JSONDecodeError, KeyError):
+            return response_error(get_language_content('verification_status_invalid'))
+        
+        # Check if verification status is successful (1)
+        if verification_status != '1':
+            return response_error(get_language_content('email_verification_not_completed'))
+        
+        # Generate password salt and encrypted password following register_user method logic
+        password_salt = str(int(datetime.now().timestamp()))
+        password_with_salt = hashlib.md5((hashlib.md5(password.encode()).hexdigest() + password_salt).encode()).hexdigest()
+        
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Update user password
+        update_data = {
+            'password': password_with_salt,
+            'password_salt': password_salt,
+            'updated_time': formatted_time
+        }
+        
+        result = Users().update(
+            [{'column': 'id', 'value': user['id']}],
+            update_data
+        )
+        
+        SQLDatabase.commit()
+        SQLDatabase.close()
+        
+        if result:
+            # Password reset successful, delete verification data from Redis
+            redis.delete(redis_key)
+            
+            msg = get_language_content('password_reset_successful')
+            return response_success({
+                'msg': msg,
+                'email': email
+            })
+        else:
+            msg = get_language_content('password_reset_failed')
+            return response_error(msg)
+            
+    except Exception as e:
+        msg = get_language_content('password_reset_failed')
+        return response_error(f"{msg}: {str(e)}")
+
+
+@router.post('/update_profile', response_model=ResDictSchema)
+async def update_profile(profile_data: UpdateProfileData, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Update user profile (nickname and position)
+    
+    Args:
+        profile_data (UpdateProfileData): Profile data containing nickname and optional position
+        userinfo (TokenData): The token data for the current authenticated user
+    
+    Returns:
+        A success response if profile update is successful, or an error response if update fails.
+    """
+    nickname = profile_data.nickname
+    position = profile_data.position
+
+    team_id = userinfo.team_id
+    user_id = userinfo.uid
+    
+    # Validate nickname is not empty
+    if not nickname or not nickname.strip():
+        return response_error(get_language_content('register_nickname_empty'))
+    
+    # Validate nickname length
+    if len(nickname.encode('utf-8')) > 50:
+        return response_error(get_language_content('register_nickname_long'))
+    
+    try:
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Prepare update data
+        update_data = {
+            'nickname': nickname.strip(),
+            'updated_time': formatted_time
+        }
+        
+        # Only update position if it's provided and not empty
+        if position is not None and position.strip():
+            UserTeamRelations().update_user_position(user_id, team_id, position)
+            # update_data['position'] = position.strip()
+        
+        # Update user profile
+        result = Users().update(
+            data=update_data,
+            conditions=[{'column': 'id', 'value': user_id}]
+        )
+        
+        SQLDatabase.commit()
+        SQLDatabase.close()
+        
+        if result:
+            # Update Redis cache with new user info
+            updated_user_info = Users().select_one(
+                columns=['nickname'], 
+                conditions=[{'column': 'id', 'value': user_id}]
+            )
+            
+            # Initialize user_cache with default values
+            user_cache = {'nickname': updated_user_info['nickname'], 'position': ''}
+            
+            # Update Redis cache if user info exists
+            if updated_user_info:
+                redis_key = f"user_info:{user_id}"
+                try:
+                    # Get existing cache data
+                    cached_data = redis.get(redis_key)
+                    if cached_data:
+                        user_cache = json.loads(str(cached_data, 'utf-8'))
+                        user_cache['nickname'] = updated_user_info['nickname']
+                    
+                    # Get position from user_team_relations
+                    get_user_team_relation = UserTeamRelations().get_user_team_relation(user_id, team_id)
+                    if get_user_team_relation and get_user_team_relation.get('position'):
+                        user_cache['position'] = get_user_team_relation['position']
+                    else:
+                        user_cache['position'] = ''
+                    
+                    # Update cache with 1 hour expiration
+                    redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60
+                    redis.set(redis_key, json.dumps(user_cache), ex=redis_expiry_seconds)
+                except Exception as cache_error:
+                    # Cache update failed, but profile update succeeded
+                    pass
+            
+            msg = get_language_content('profile_updated_successfully')
+            return response_success({
+                'msg': msg,
+                'nickname': updated_user_info['nickname'],
+                'position': user_cache.get('position', '')
+            })
+        else:
+            msg = get_language_content('profile_update_failed')
+            return response_error(msg)
+            
+    except Exception as e:
+        # Log the actual error for debugging
+        # print(f"Profile update error: {str(e)}")
+        msg = get_language_content('profile_update_failed')
+        return response_error(msg)
+
+
+@router.post('/change_password', response_model=ResDictSchema)
+async def change_password(password_data: ChangePasswordData, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Change user password
+    
+    Args:
+        password_data (ChangePasswordData): Password data containing old password, new password and confirm password
+        userinfo (TokenData): The token data for the current authenticated user
+    
+    Returns:
+        A success response if password change is successful, or an error response if change fails.
+    """
+    old_password = password_data.old_password
+    new_password = password_data.new_password
+    confirm_password = password_data.confirm_password
+    
+    # Validate old password is not empty
+    if not old_password or not old_password.strip():
+        return response_error(get_language_content('old_password_cannot_be_empty'))
+    
+    # Validate new password is not empty
+    if not new_password or not new_password.strip():
+        return response_error(get_language_content('new_password_cannot_be_empty'))
+    
+    # Validate confirm password is not empty
+    if not confirm_password or not confirm_password.strip():
+        return response_error(get_language_content('confirm_password_cannot_be_empty'))
+    
+    # Validate new password and confirm password match
+    if new_password != confirm_password:
+        return response_error(get_language_content('new_passwords_do_not_match'))
+    
+    try:
+        # Get current user data
+        uid = userinfo.uid
+        # Get user info (works for both regular and third-party users)
+        user_info = get_uid_user_info(uid)
+        
+        # Verify old password
+        old_password_with_salt = hashlib.md5(
+            (hashlib.md5(old_password.encode()).hexdigest() + user_info['password_salt']).encode()
+        ).hexdigest()
+        
+        if old_password_with_salt != user_info['password']:
+            return response_error(get_language_content('old_password_incorrect'))
+        
+        # Generate new password salt and encrypted password
+        new_password_salt = str(int(datetime.now().timestamp()))
+        new_password_with_salt = hashlib.md5(
+            (hashlib.md5(new_password.encode()).hexdigest() + new_password_salt).encode()
+        ).hexdigest()
+        
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Update user password
+        update_data = {
+            'password': new_password_with_salt,
+            'password_salt': new_password_salt,
+            'updated_time': formatted_time
+        }
+        
+        result = Users().update(
+            [{'column': 'id', 'value': userinfo.uid}],
+            update_data
+        )
+        
+        SQLDatabase.commit()
+        SQLDatabase.close()
+        
+        if result:
+            msg = get_language_content('password_changed_successfully')
+            return response_success({
+                'msg': msg
+            })
+        else:
+            msg = get_language_content('password_change_failed')
+            return response_error(msg)
+            
+    except Exception as e:
+        msg = get_language_content('password_change_failed')
+        return response_error(f"{msg}")
+
+
+@router.post('/switch_member_role', response_model=ResDictSchema)
+async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Switch team member's role (Admin only)
+    
+    Args:
+        role_data (SwitchMemberRoleData): Role data containing user_id and role_id
+        userinfo (TokenData): The token data for the current authenticated user
+    
+    Returns:
+        A success response if role switch is successful, or an error response if switch fails.
+    """
+    target_user_id = role_data.user_id
+    role = role_data.role
+    new_role_id = role_data.role_id
+    current_user_id = userinfo.uid
+    current_team_id = userinfo.team_id
+    
+    # Validate required parameters
+    if not target_user_id or target_user_id <= 0:
+        return response_error(get_language_content('invalid_user_id'))
+    
+    # Validate role parameter
+    if role not in [1, 2]:
+        return response_error(get_language_content('role_must_be_1_or_2'))
+    
+    # Validate role_id based on role value
+    if role == 1:
+        # For admin role, role_id should be None/empty (set to None even if 0 is provided)
+        new_role_id = None
+    elif role == 2:
+        # For regular role, role_id is required
+        if new_role_id is None or new_role_id <= 0:
+            return response_error(get_language_content('role_id_required_for_regular_role'))
+    
+    try:
+        # Check if current user is admin (role = 1) in the current team
+        current_user_relation = UserTeamRelations().get_user_team_relation(current_user_id, current_team_id)
+        if not current_user_relation or current_user_relation.get('role') != 1:
+            return response_error(get_language_content('only_admin_can_switch_member_roles'))
+        
+        # Check if user is trying to modify their own role from admin to regular user
+        if target_user_id == current_user_id and current_user_relation.get('role') == 1 and role == 2:
+            # Count secure admins (exclude users with default password value)
+            secure_admin_ids = UserTeamRelations().get_secure_admin_user_ids(current_team_id)
+            if target_user_id in secure_admin_ids and len(secure_admin_ids) <= 1:
+                return response_error(get_language_content('cannot_modify_last_admin_role'))
+        
+        # Check if target user exists in the same team
+        target_user_relation = UserTeamRelations().get_user_team_relation(target_user_id, current_team_id)
+        if not target_user_relation:
+            return response_error(get_language_content('target_user_not_in_current_team'))
+        
+        # Check if target user is admin (role = 1) and ensure at least one admin remains
+        # Skip this check if we already checked it for self-modification above
+        if target_user_relation.get('role') == 1 and target_user_id != current_user_id and role == 2:
+            # Count secure admins (exclude users with default password value)
+            secure_admin_ids = UserTeamRelations().get_secure_admin_user_ids(current_team_id)
+            if target_user_id in secure_admin_ids and len(secure_admin_ids) <= 1:
+                return response_error(get_language_content('cannot_modify_last_admin_role'))
+        
+        # Validate role_id if it's provided (for role = 2)
+        role_info = None
+        if role == 2 and new_role_id is not None:
+            role_info = Roles().get_role_by_id(new_role_id)
+            if not role_info:
+                return response_error(get_language_content('role_not_found'))
+            
+            # Check if role belongs to current team or is built-in role
+            if role_info.get('team_id') != current_team_id and role_info.get('built_in') != 1:
+                return response_error(get_language_content('role_not_available_for_current_team'))
+        
+        # Update user's role in user_team_relations
+        update_data = {
+            'role': role,
+            'role_id': new_role_id
+        }
+        result = UserTeamRelations().update(
+            conditions=[
+                {'column': 'user_id', 'value': target_user_id},
+                {'column': 'team_id', 'value': current_team_id}
+            ],
+            data=update_data
+        )
+        
+        SQLDatabase.commit()
+        SQLDatabase.close()
+        if result:
+            # Clear Redis cache for the user whose role was switched
+            try:
+                # Get information of the user whose role was switched
+                target_user_info = get_uid_user_info(target_user_id)
+                if target_user_info:
+                    # Determine user type and set Redis key
+                    password = target_user_info.get('password', '')
+                    redis_key = None
+                    
+                    # Determine password type
+                    if password == 'nexus_ai123456':
+                        # Regular user
+                        redis_key = f"access_token:{target_user_id}"
+                    elif password == 'third_party_default':
+                        # Third-party user
+                        redis_key = f"third_party_access_token:{target_user_id}"
+                    else:
+                        # Other regular users
+                        redis_key = f"access_token:{target_user_id}"
+                    
+                    # Check if the key exists in Redis, delete if it exists
+                    if redis.exists(redis_key):
+                        redis.delete(redis_key)
+            except Exception as e:
+                # Cache clearing failure should not affect the main process
+                print(f"Failed to clear user Redis cache: {e}")
+            
+            msg = get_language_content('member_role_switched_successfully')
+            return response_success({
+                'msg': msg,
+                'user_id': target_user_id,
+                'role': role,
+                'new_role_id': new_role_id,
+                'role_name': role_info.get('name', '') if role_info is not None else ('Administrator' if role == 1 else '')
+            })
+        else:
+            msg = get_language_content('member_role_switch_failed')
+            return response_error(msg)
+            
+    except Exception as e:
+        msg = get_language_content('member_role_switch_failed')
+        return response_error(msg)

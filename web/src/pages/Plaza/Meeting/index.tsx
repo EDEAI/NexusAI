@@ -10,23 +10,36 @@ import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 import CreationChatRoom from '../components/CreationChatRoom/index';
 import ChatRoomAvatar from '@/components/ChatRoomAvatar';
+import { usePermissions } from '@/hooks/usePermissions';
+import { PERMISSION_IDS } from '@/utils/permissions';
 // import Menus from '../components/Menus/index';
 
 // Add new application
 const AddRoom = (obj: any) => {
+    const { hasPermission } = usePermissions();
+    const canCreate = hasPermission(PERMISSION_IDS.CREATE_MEETING);
+    
     return (
         <Col className="gutter-row" xs={24} sm={24} md={12} lg={8} xl={6}>
             <div
-                className="h-[236px] rounded-[8px] bg-[#EFF0F2] flex flex-col items-center justify-center gap-y-[10px] cursor-pointer"
+                className={`h-[236px] rounded-[8px] bg-[#EFF0F2] flex flex-col items-center justify-center gap-y-[10px] ${
+                    canCreate ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+                }`}
                 style={{ border: '1px solid #E9E9E9' }}
-                onClick={() => {
+                onClick={canCreate ? () => {
                     obj.setCreateShow(true);
                     obj.isUpdataChatRoom.current = false;
                     obj.upDataId.current = 0;
-                }}
+                } : undefined}
             >
-                <img src="/icons/plaza_m2_c2.svg" className="w-[42px] h-[42px]" alt="" />
-                <span className="text-[#213044] text-[12px]">
+                <img 
+                    src="/icons/plaza_m2_c2.svg" 
+                    className={`w-[42px] h-[42px] ${canCreate ? '' : 'opacity-50'}`} 
+                    alt="" 
+                />
+                <span className={`text-[12px] ${
+                    canCreate ? 'text-[#213044]' : 'text-[#CCCCCC]'
+                }`}>
                     {obj.intl.formatMessage({ id: 'app.chatroom_list.create' })}
                 </span>
             </div>
@@ -137,6 +150,7 @@ const Operation = ({ item, resetList, setCreateShow, isUpdataChatRoom, upDataId,
 };
 const MeetingCont = () => {
     const intl = useIntl();
+    const { hasPermission } = usePermissions();
 
     const [meeting, setMeeting] = useState(null);
 
@@ -431,6 +445,7 @@ const MeetingCont = () => {
                                                 {' '}
                                                 <Button
                                                     color="primary"
+                                                    disabled={!hasPermission(PERMISSION_IDS.CREATE_MEETING)}
                                                     onClick={() => {
                                                         setCreateShow(true);
                                                         isUpdataChatRoom.current = false;

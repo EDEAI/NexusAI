@@ -7,6 +7,7 @@ class RolesInfo(BaseModel):
     name: str
     description: Optional[str] = None
     status: int
+    built_in: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -64,3 +65,22 @@ class OperationResponse(BaseModel):
     code: int = 200
     message: str = "success"
     data: Optional[OperationBase] = None
+
+class RoleDetailRequest(BaseModel):
+    role_id: int
+
+class RoleDetailInfo(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+    status: int
+    team_id: Optional[int] = None
+    built_in: Optional[int] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    permissions: List[PermissionInfo]
+
+class RoleDetailResponse(BaseModel):
+    code: int = 200
+    message: str = "success"
+    data: RoleDetailInfo

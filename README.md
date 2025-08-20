@@ -64,7 +64,7 @@ Enter the Docker directory of the NexusAI source code
 cd NexusAI/docker
 ```
 
-Copy `docker-compose.yml` and replace `SANDBOX_HOST` with the real IP address of the host
+Copy `docker-compose.yml` and modify the `docker-compose.yml` configuration items as needed. For configuration instructions, refer to [docker-compose.yml configuration instructions](#docker-composeyml-configuration-instructions)
 ```bash
 cp docker-compose.yml.template docker-compose.yml
 ```
@@ -232,6 +232,14 @@ FASTAPI_WORKERS: 2
 
 # Number of celery service workers
 CELERY_WORKERS: 4
+
+# SMTP email configuration
+SMTP_SERVER: 
+SMTP_PORT: 587
+SMTP_USERNAME: 
+SMTP_PASSWORD: 
+SMTP_USE_TLS: true
+SMTP_TIMEOUT: 30
 
 # Initial administrator password. After changing this configuration, restart NexusAI to take effect.
 INIT_ADMIN_PASSWORD: nexusaiadmin
@@ -425,11 +433,6 @@ admin@nexusai.com
 
 Password:
 nexusaipwd
-```
-
-Note: To update the initial administrator password
-```bash
-python scripts/init_admin_password.py
 ```
 
 ## Pull NexusAI

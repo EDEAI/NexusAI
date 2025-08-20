@@ -136,6 +136,10 @@ class AppRuns(MySQL):
 
         if data['user_id'] > 0:
             conditions.append({"column": "app_node_user_relation.user_id", "value": data['user_id']})
+            from api.utils.auth import get_uid_user_info
+            userInfo = get_uid_user_info(data['user_id'])
+            if userInfo:
+                conditions.append({"column": "apps.team_id", "value": userInfo['team_id']})
         else:
             conditions.append({"column": "app_node_user_relation.user_id", "value": 0})
 
@@ -217,6 +221,11 @@ class AppRuns(MySQL):
         ]
 
         if 'user_id' in data:
+            from api.utils.auth import get_uid_user_info
+            userInfo = get_uid_user_info(data['user_id'])
+            conditions.append([
+                {"column": "apps.team_id", "value": userInfo['team_id']},
+            ])
             conditions.append([
                 {"column": "apps.user_id", "value": data['user_id'], 'logic': 'or'},
                 {"column": "app_runs.user_id", "value": data['user_id']}
@@ -350,6 +359,12 @@ class AppRuns(MySQL):
             {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]},
             {'column': 'app_runs.app_id', 'op': '>', 'value': 0}
         ]
+
+        from api.utils.auth import get_uid_user_info
+        userInfo = get_uid_user_info(user_id)
+        conditions.append([
+            {"column": "apps.team_id", "value": userInfo['team_id']},
+        ])
 
         total_count = self.select_one(
             aggregates={"id": "count"},

@@ -72,6 +72,7 @@ const Register: React.FC = () => {
             email: myEmail,
             password: values.password,
             nickname: values.nickname,
+            position: values.position,
         };
         const res = await postRegisterUser(param);
         if (res.code === 0) {
@@ -103,6 +104,24 @@ const Register: React.FC = () => {
                 </Form.Item>
                 <Form.Item name="email" label={intl.formatMessage({ id: 'register.email' })}>
                     <div className="text-base">{myEmail && myEmail}</div>
+                </Form.Item>
+
+                <Form.Item
+                    name="nickname"
+                    label={intl.formatMessage({ id: 'register.nickname' })}
+                    tooltip={intl.formatMessage({ id: 'register.nickname.tooltip' })}
+                    rules={[{ required: true, message: intl.formatMessage({ id: 'register.nickname.required' }), whitespace: true }]}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
+                    name="position"
+                    label={intl.formatMessage({ id: 'register.position' })}
+                    tooltip={intl.formatMessage({ id: 'register.position.tooltip' })}
+                    rules={[{ required: true, message: intl.formatMessage({ id: 'register.position.required' }), whitespace: true }]}
+                >
+                    <Input />
                 </Form.Item>
 
                 <Form.Item
@@ -139,14 +158,6 @@ const Register: React.FC = () => {
                     ]}
                 >
                     <Input.Password />
-                </Form.Item>
-                <Form.Item
-                    name="nickname"
-                    label={intl.formatMessage({ id: 'register.nickname' })}
-                    tooltip={intl.formatMessage({ id: 'register.nickname.tooltip' })}
-                    rules={[{ required: true, message: intl.formatMessage({ id: 'register.nickname.required' }), whitespace: true }]}
-                >
-                    <Input />
                 </Form.Item>
                 <Form.Item {...tailFormItemLayout}>
                     <Button type="primary" htmlType="submit" block>

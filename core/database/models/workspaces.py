@@ -399,6 +399,14 @@ class Workspaces(MySQL):
         WHERE (apps.user_id = {uid} OR app_runs.user_id = {uid})
         """
 
+        from api.utils.auth import get_uid_user_info
+        userInfo = get_uid_user_info({uid})
+        if userInfo:
+            base_where = f"""
+            {base_where}
+            AND apps.team_id = {userInfo['team_id']} 
+            """
+
         if show_status == 0:
             # All records
             where_clause = f"""
@@ -471,7 +479,9 @@ class Workspaces(MySQL):
         ORDER BY app_runs.id DESC
         LIMIT {offset}, {page_size}
         """
-        
+        print('----------------------------------------------------------------------------------------')
+        print(list_sql)
+        print('----------------------------------------------------------------------------------------')
         log_list_result = self.execute_query(list_sql)
         log_list = [dict(row._mapping) for row in log_list_result]
 
