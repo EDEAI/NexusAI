@@ -1679,6 +1679,33 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
         SQLDatabase.commit()
         SQLDatabase.close()
         if result:
+            # Clear Redis cache for the user whose role was switched
+            try:
+                # Get information of the user whose role was switched
+                target_user_info = get_uid_user_info(target_user_id)
+                if target_user_info:
+                    # Determine user type and set Redis key
+                    password = target_user_info.get('password', '')
+                    redis_key = None
+                    
+                    # Determine password type
+                    if password == 'nexus_ai123456':
+                        # Regular user
+                        redis_key = f"access_token:{target_user_id}"
+                    elif password == 'third_party_default':
+                        # Third-party user
+                        redis_key = f"third_party_access_token:{target_user_id}"
+                    else:
+                        # Other regular users
+                        redis_key = f"access_token:{target_user_id}"
+                    
+                    # Check if the key exists in Redis, delete if it exists
+                    if redis.exists(redis_key):
+                        redis.delete(redis_key)
+            except Exception as e:
+                # Cache clearing failure should not affect the main process
+                print(f"Failed to clear user Redis cache: {e}")
+            
             msg = get_language_content('member_role_switched_successfully')
             return response_success({
                 'msg': msg,
