@@ -3427,7 +3427,7 @@ model_type = {
         'type': 'EMBEDDING'
     },
     3: {
-        'type': 'RERANK'
+        'type': 'RERANKING'
     },
     4: {
         'type': 'SPEECH2TEXT'
