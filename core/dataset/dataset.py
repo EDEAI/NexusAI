@@ -128,7 +128,10 @@ def get_reranker(team_id: int) -> Reranker:
         reranker = all_rerankers[team_id]
     else:
         reranker_config = {}
-        reranker_data = models.get_model_by_type(3, team_id)
+        try:
+            reranker_data = models.get_model_by_type(3, team_id, indexing_mode=1)
+        except AssertionError:
+            reranker_data = models.get_model_by_type(3, team_id, indexing_mode=0)
         for key, value in reranker_data['supplier_config'].items():
             reranker_config[key] = value
         for key, value in reranker_data['model_config'].items():
@@ -136,12 +139,17 @@ def get_reranker(team_id: int) -> Reranker:
             reranker_config[key] = value
         reranker_type, reranker_config = convert_to_type_and_config(reranker_config)
         reranker_kwargs = {}
-        if reranker_type == 'CrossEncoderReranker':
-            reranker_kwargs['model_type'] = reranker_config['model_type']
-            reranker_kwargs['model_kwargs'] = {
-                'model_name': './models/bge-reranker-v2-m3'
-            }
-            reranker_kwargs['top_n'] = settings.RETRIEVER_K
+        match reranker_type:
+            case 'CrossEncoderReranker':
+                reranker_kwargs['model_type'] = reranker_config['model_type']
+                reranker_kwargs['model_kwargs'] = {
+                    'model_name': './models/bge-reranker-v2-m3'
+                }
+            case 'SiliconFlowReranker':
+                reranker_kwargs['base_url'] = reranker_config['base_url']
+                reranker_kwargs['model'] = reranker_config['model']
+                reranker_kwargs['api_key'] = reranker_config['api_key']
+        reranker_kwargs['top_n'] = settings.RETRIEVER_K
         reranker = Reranker(reranker_type, **reranker_kwargs)
         if reranker_data['model_mode'] == 2:
             # Cache local models

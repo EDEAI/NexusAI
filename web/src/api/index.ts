@@ -167,7 +167,7 @@ interface RoleDetail {
     permissions: Permission[];
 }
 
-interface RoleListResponse {
+export interface RoleListResponse {
     list: Role[];
     total_count: number;
     total_pages: number;
@@ -267,6 +267,28 @@ export const deleteRole = async (roleId: number) => {
 export const getRoleDetail = async (roleId: number) => {
     const res = await apiRequest<RoleDetail>(`${ROLES_DETAIL_URL}/${roleId}`, {
         method: 'GET',
+    });
+    return res;
+};
+
+// Switch member role interface
+export const SWITCH_MEMBER_ROLE_URL = '/v1/auth/switch_member_role';
+
+interface SwitchMemberRoleParams {
+    user_id: number;
+    role: number; // 1 for team admin, 2 for other roles
+    role_id: number; // 0 for team admin, actual role_id for other roles
+}
+
+/**
+ * Switch team member's role (Admin only)
+ * @param data Parameters containing user_id, role and role_id
+ * @returns Promise with switch result response
+ */
+export const switchMemberRole = async (data: SwitchMemberRoleParams) => {
+    const res = await apiRequest<any>(SWITCH_MEMBER_ROLE_URL, {
+        method: 'POST',
+        data,
     });
     return res;
 };
