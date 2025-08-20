@@ -62,7 +62,7 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
             icon: '/icons/creation/jienng1.svg',
             pitchicon: '/icons/creation/pitchzhishik.svg',
             signicon: '/icons/creation/signzhishik.svg',
-            unselected: '/icons/creation/unselectedrepository.svg',
+            unselected: '/icons/creation/unselectedskill.svg',
             apps_mode: 4,
         },
     ];
@@ -323,6 +323,8 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
                                             width: '16px',
                                             height: '16px',
                                             margin: '0 5px 0 10px',
+                                            opacity: hasPermission ? 1 : 0.2,
+                                            filter: hasPermission ? 'none' : 'grayscale(100%)'
                                         }}
                                         alt=""
                                     />
