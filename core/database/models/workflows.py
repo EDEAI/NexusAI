@@ -443,6 +443,7 @@ class Workflows(MySQL):
                      "app_runs.elapsed_time", "app_runs.finished_time",
                      "app_runs.status AS app_runs_status", "app_runs.completed_steps", "app_runs.total_steps",
                      "app_runs.total_tokens",
+                     "app_runs.paused",
                      "users.nickname"
                      ],
             joins=[

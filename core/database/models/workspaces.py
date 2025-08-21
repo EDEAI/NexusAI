@@ -344,7 +344,7 @@ class Workspaces(MySQL):
                     "app_id", "workflow_id", "id AS app_run_id", "type", "level", "status", "error",
                     "completed_steps", "actual_completed_steps", "need_human_confirm", "elapsed_time", "prompt_tokens",
                     "completion_tokens", "total_tokens", "embedding_tokens", "reranking_tokens",
-                    "total_steps", "finished_time", "created_time"
+                    "total_steps", "finished_time", "created_time", "paused"
                 ],
                 conditions=[{'column': 'id', 'value': app_runs_id}]
             )

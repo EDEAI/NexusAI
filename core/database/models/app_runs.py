@@ -81,7 +81,7 @@ class AppRuns(MySQL):
         data = self.select_one(
             columns=['app_runs.id AS app_run_id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.workflow_id', 'app_runs.type', 'app_runs.level', 'app_runs.context', 'app_runs.completed_steps', 'app_runs.actual_completed_steps', 'app_runs.completed_edges', 'app_runs.status', 'app_runs.elapsed_time',
                 'app_runs.prompt_tokens', 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens', 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.finished_time' ,'apps.avatar' ,'apps.icon'],
-            conditions=[{"column": "id", "value": app_run_id}, {"column": "status", "op": "in", "value": [2, 4]}],
+            conditions=[{"column": "id", "value": app_run_id},{"column": "paused", "value": 0}, {"column": "status", "op": "in", "value": [2, 4]}],
             joins=[
                 ["left", "apps", "app_runs.app_id = apps.id"]
             ]
@@ -238,7 +238,7 @@ class AppRuns(MySQL):
         list = self.select(
             columns=['app_runs.id AS app_run_id', 'apps.name AS apps_name', 'app_runs.name AS app_runs_name',
                      'app_runs.workflow_id', 'app_runs.created_time', 'app_runs.elapsed_time', 'app_runs.status',
-                     'app_runs.completed_steps', 'app_runs.total_steps', 'app_runs.need_human_confirm', 'apps.icon', "apps.avatar", 'apps.icon_background'],
+                     'app_runs.completed_steps', 'app_runs.total_steps', 'app_runs.need_human_confirm', 'apps.icon', "apps.avatar", 'apps.icon_background', 'app_runs.paused'],
             joins=[('inner', 'apps', 'app_runs.app_id = apps.id')],
             conditions=conditions,
             order_by = "app_runs.id DESC",
@@ -326,6 +326,35 @@ class AppRuns(MySQL):
             ]
         )
         return result
+
+    def has_access_to_app_run(self, app_run_id: int, user_id: int) -> bool:
+        """
+        Check whether the given user has permission to access the specified app_run.
+
+        Permission rule:
+        - If the user is the owner of the app_run (app_runs.user_id == user_id) -> True
+        - Else, if the user is the owner of the associated workflow (workflows.user_id == user_id) -> True
+        - Otherwise -> False
+        """
+        record = self.select_one(
+            columns=[
+                'app_runs.user_id AS app_run_user_id',
+                'workflows.user_id AS workflow_user_id'
+            ],
+            joins=[
+                ["left", "workflows", "app_runs.workflow_id = workflows.id"]
+            ],
+            conditions=[
+                {"column": "app_runs.id", "value": app_run_id}
+            ]
+        )
+        if not record:
+            return False
+        if record.get('app_run_user_id') == user_id:
+            return True
+        if record.get('workflow_user_id') == user_id:
+            return True
+        return False
 
     def get_app_run_info(self, app_run_id: int, user_id: int) -> Dict[str, Any]:
         return self.select_one(

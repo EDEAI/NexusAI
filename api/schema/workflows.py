@@ -101,6 +101,7 @@ class ResWorkflowsPublish(BaseModel):
 
 class WorkflowLogListData(BaseModel):
     workflows_id: Optional[int] = None
+    paused: Optional[int] = None
     user_id: Optional[int] = None
     app_id: Optional[int] = None
     name: Optional[str] = None
@@ -309,3 +310,14 @@ class ResWorkflowCopySchema(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
     data: Optional[WorkflowCopySchema] = None
+
+
+# ===== App Run Pause Switch =====
+class AppRunPauseSchema(BaseModel):
+    app_run_id: int
+    paused: int
+
+class AppRunPauseSchemaResponse(BaseModel):
+    code: int
+    detail: str
+    data: Optional[Any] = None  # modified to support nested response structures

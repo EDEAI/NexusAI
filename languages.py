@@ -683,6 +683,7 @@ language_packs = {
         'chatroom_app_run_id_not_found': 'Current appRunID not found',
 
         'app_run_error': 'App run record not found',
+        'paused_param_invalid': 'The paused parameter can only be 0 or 1',
         'api_agent_generate_failed': 'Agent generate failed',
         'api_agent_user_prompt_required': 'Agent user prompt required',
         'api_agent_batch_size_invalid': 'Agent batch size invalid',
@@ -1102,6 +1103,7 @@ language_packs = {
         'skill_update_success': 'Skill update success',
         # Skill related messages
         "publish_status_invalid": "publish status can only input 0 or 1",
+        "paused_param_invalid": "paused can only input 0 or 1",
         "invalid_app_id": "Invalid app ID",
         "update_error": "Update failed",
         "skill_not_exist": "Skill does not exist",
@@ -1503,6 +1505,7 @@ language_packs = {
         'chatroom_request_sent_successfully': '请求成功，请等待',
 
         'app_run_error': 'app运行记录不存在',
+        'paused_param_invalid': 'paused参数只能为0或1',
         'api_agent_generate_failed': 'agent生成记录失败',
         'api_agent_user_prompt_required': '提示词不能为空',
         'api_agent_batch_size_invalid': '批量生成数量有误',
