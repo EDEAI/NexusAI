@@ -128,7 +128,7 @@ Password:
 nexusaipwd
 ```
 
-Note that the initial administrator password is updated through the environment variable `INIT_ADMIN_PASSWORD` in `docker-compose.yml`
+Note that the initial administrator password can be changed through the web interface after first login
 
 ## Pull NexusAI
 Please execute the commands in the following order:
@@ -240,9 +240,6 @@ SMTP_USERNAME:
 SMTP_PASSWORD: 
 SMTP_USE_TLS: true
 SMTP_TIMEOUT: 30
-
-# Initial administrator password. After changing this configuration, restart NexusAI to take effect.
-INIT_ADMIN_PASSWORD: nexusaiadmin
 ```
 
 Front-end environment variables
@@ -433,11 +430,6 @@ admin@nexusai.com
 
 Password:
 nexusaipwd
-```
-
-Note: To update the initial administrator password
-```bash
-python scripts/init_admin_password.py
 ```
 
 ## Pull NexusAI

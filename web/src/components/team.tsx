@@ -4,7 +4,7 @@ import type { TableProps } from 'antd';
 import { Avatar, Button, Input, message, Modal, Select, Space, Table, Tooltip, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import gandUp from '../../public/icons/gandUp.svg';
-import { getTeamList, postInviteUser, getRoleList, getUserTeams, switchUserTeam } from '../api/team';
+import { getTeamList, postInviteUser, getUserTeams, switchUserTeam } from '../api/team';
 import { userinfo, getRolesList, switchMemberRole, type RoleListResponse } from '../api/index';
 import type { REQ_TYPE } from '../api/request';
 import { userinfodata } from '../utils/useUser';
@@ -123,7 +123,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     const [isBtn, setIsBtn] = useState(true);
     const [isModalOpen3, setIsModalOpen3] = useState(false);
     const [gainEmail, setGainEmail] = useState(null);
-    const [roleList, setRoleList] = useState<any[]>([]);
+
     const [loading, setLoading] = useState(false);
     const [allRolesList, setAllRolesList] = useState<any[]>([]); // Store all roles from getRolesList
     const [currentUserRole, setCurrentUserRole] = useState<number | null>(null); // Store current user's role
@@ -237,14 +237,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
         }
     };
 
-    const fetchRoleList = async () => {
-        try {
-            const res = await getRoleList();
-            setRoleList(res.list || []);
-        } catch (error) {
-            console.error('Failed to fetch role list:', error);
-        }
-    };
+
 
     // Fetch all roles using getRolesList for role switching
     const fetchAllRolesList = async () => {
@@ -427,7 +420,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                         // Fetch teams data when modal is opened
                         fetchUserTeams();
                         TeamList(true);
-                        fetchRoleList();
+                        fetchAllRolesList();
                     }
                 }}
             >
@@ -445,7 +438,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                             icon={<UserOutlined />} 
                             onClick={() => {
                                 setIsModalOpen2(true);
-                                fetchRoleList();
+                                fetchAllRolesList();
                             }}
                             disabled={!isTeamAdmin()}
                         >
@@ -547,7 +540,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                                     defaultMessage: '',
                                 }),
                             },
-                            ...roleList.map(role => ({
+                            ...allRolesList.map(role => ({
                                 value: role.id,
                                 label: role.name,
                                 title: role.description || role.name, // Tooltip text

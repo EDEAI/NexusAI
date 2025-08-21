@@ -19,11 +19,6 @@ export const postRegisterUser = async (data: any) => {
     return await aniRequest<any>(`/v1/auth/register_user`, { method: 'POST', data: data });
 };
 
-// Get role list
-export const getRoleList = async (): Promise<RoleListResponse> => {
-    return await getRolesList({ status: 2 });
-};
-
 // Get user teams list
 export const getUserTeams = async () => {
     return await aniRequest<any>(`/v1/auth/user_teams`, { method: 'GET', data: { platform: 1 } });
