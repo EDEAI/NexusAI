@@ -1,0 +1,1 @@
+ALTER TABLE `app_runs` ADD `paused` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Pause operation 0: No 1: Yes' AFTER `need_correct_llm`, ADD INDEX (`paused`);
