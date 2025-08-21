@@ -86,13 +86,17 @@ class AppRuns(MySQL):
                 ["left", "apps", "app_runs.app_id = apps.id"]
             ]
         )
+        
+        if data is None:
+            return None
+            
         if data and data.get('avatar'):
             if data['avatar'].find('head_icon') == -1:
                 data['avatar'] = f"{settings.STORAGE_URL}/upload/{data['avatar']}"
             else:
                 data["avatar"] = f"{settings.ICON_URL}/{data['avatar']}"
         else:
-            if data['icon']:
+            if data.get('icon'):
                 data['avatar'] = f"{settings.ICON_URL}/head_icon/{data['icon']}.png"
             else:
                 data['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
