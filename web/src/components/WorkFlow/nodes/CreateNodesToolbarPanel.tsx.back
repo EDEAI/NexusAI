@@ -1,0 +1,367 @@
+/*
+ * @LastEditors: biz
+ */
+import { ObjectVariable, Variable } from '@/py2js/variables.js';
+import { SearchOutlined } from '@ant-design/icons';
+import autoAnimate from '@formkit/auto-animate';
+import { Node, NodeProps, NodeToolbar, Position, useNodeId, useReactFlow } from '@xyflow/react';
+import { useHover } from 'ahooks';
+import { Input, Tabs, Tooltip } from 'antd';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useIntl } from 'umi';
+import UserCon from '../components/UserCon';
+import useOutsideClick from '../hooks/useOutsideClick';
+import useStore from '../store';
+import { BlockEnum } from '../types';
+import { useCreateNodesToolbar } from '@/hooks/useNodePanel';
+interface CreateNodesToolbarProps {
+    position: 'right' | 'left';
+    className?: string;
+    style?: object;
+    sourceHandle?: string;
+    targetHandle?: string;
+    show: boolean;
+    onSelect?: (e) => void;
+}
+
+export function getNodePosition(currentNode: Node, position: 'right' | 'left' = 'right') {
+    let x = currentNode.position.x + currentNode.measured.width + 30;
+    const y = currentNode.position.y;
+    if (position == 'left') {
+        x = currentNode.position.x - currentNode.measured.width - 30;
+    }
+    return { x, y };
+}
+export default memo((props: NodeProps & CreateNodesToolbarProps) => {
+    const intl = useIntl();
+    const tools = useRef<HTMLDivElement | null>(null);
+    const nodeId = useNodeId();
+    const panelRef = tools; // alias for clarity
+    const [panelSide, setPanelSide] = useState<'left' | 'right'>(props.position);
+    const [verticalShift, setVerticalShift] = useState<number>(0);
+    const viewportMargin = 12;
+
+    // Use the new hook for data management
+    const {
+        tabIndex,
+        searchNode,
+        toolsShow,
+        setToolsShow,
+        tabItems,
+        groupedTools,
+        onTabChange,
+        handleSearch,
+        lang,
+    } = useCreateNodesToolbar();
+
+    const storeCreateNode = useStore(state => state.createNode);
+    const setPreventScrolling = useStore(state => state.setPreventScrolling);
+
+    const { getNode, addEdges, setCenter } = useReactFlow();
+    const ref = useRef(null);
+    const isHovering = useHover(tools, {
+        onChange: isHover => {
+            setPreventScrolling(!isHover);
+        },
+    });
+    useEffect(() => {
+        tools.current && autoAnimate(tools.current);
+        props?.show && setToolsShow(true);
+    }, [tools, props?.show]);
+
+    // When panel shows, move canvas center to where the panel will appear
+    useEffect(() => {
+        if (!toolsShow) return;
+        const currentNode = getNode(nodeId);
+        if (!currentNode) return;
+        const panelWidth = 240; // should match panel width
+        const offset = 20; // should match NodeToolbar offset
+        const nodeW = (currentNode as any).measured?.width || 0;
+        const nodeH = (currentNode as any).measured?.height || 0;
+
+        const anchorX = props.position === 'left'
+            ? currentNode.position.x - offset - panelWidth / 2
+            : currentNode.position.x + nodeW + offset + panelWidth / 2;
+        const anchorY = currentNode.position.y + nodeH / 2;
+
+        try {
+            setCenter(anchorX, anchorY, { duration: 300 });
+        } catch (e) {
+            // ignore if setCenter is unavailable in runtime
+        }
+    }, [toolsShow, props.position, getNode, nodeId, setCenter]);
+
+    useOutsideClick(tools, () => {
+        setToolsShow(false);
+    });
+
+    // Measure and adjust panel to keep inside viewport
+    const measureAndAdjust = useCallback(() => {
+        const el = panelRef.current as HTMLDivElement | null;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        // Horizontal side adjustment
+        let nextSide: 'left' | 'right' = panelSide;
+        if (panelSide === 'right' && rect.right > vw - viewportMargin) {
+            nextSide = 'left';
+        } else if (panelSide === 'left' && rect.left < viewportMargin) {
+            nextSide = 'right';
+        }
+        if (nextSide !== panelSide) {
+            setPanelSide(nextSide);
+            // wait for reposition then re-measure in next frame
+            requestAnimationFrame(() => {
+                const r2 = el.getBoundingClientRect();
+                let dy2 = 0;
+                // clamp to viewport
+                if (r2.top + dy2 < viewportMargin) dy2 += viewportMargin - (r2.top + dy2);
+                if (r2.bottom + dy2 > vh - viewportMargin)
+                    dy2 -= (r2.bottom + dy2) - (vh - viewportMargin);
+                setVerticalShift(dy2);
+                // run a second pass to account for transform application
+                requestAnimationFrame(() => {
+                    const r3 = el.getBoundingClientRect();
+                    let dy3 = verticalShift;
+                    if (r3.top + dy3 < viewportMargin) dy3 += viewportMargin - (r3.top + dy3);
+                    if (r3.bottom + dy3 > vh - viewportMargin)
+                        dy3 -= (r3.bottom + dy3) - (vh - viewportMargin);
+                    if (dy3 !== verticalShift) setVerticalShift(dy3);
+                });
+            });
+            return;
+        }
+
+        // Vertical shift adjustment
+        let dy = 0;
+        // clamp to viewport using current rect + dy
+        if (rect.top + dy < viewportMargin) dy += viewportMargin - (rect.top + dy);
+        if (rect.bottom + dy > vh - viewportMargin) dy -= (rect.bottom + dy) - (vh - viewportMargin);
+        if (dy !== verticalShift) setVerticalShift(dy);
+    }, [panelRef, panelSide, verticalShift]);
+
+    // Recalculate on open/resize/scroll/content changes
+    useEffect(() => {
+        if (!toolsShow) return;
+        const raf = requestAnimationFrame(measureAndAdjust);
+        const onResize = () => requestAnimationFrame(measureAndAdjust);
+        const onScroll = () => requestAnimationFrame(measureAndAdjust);
+        window.addEventListener('resize', onResize);
+        window.addEventListener('scroll', onScroll, true);
+        let ro: ResizeObserver | null = null;
+        if (panelRef.current) {
+            ro = new ResizeObserver(() => requestAnimationFrame(measureAndAdjust));
+            ro.observe(panelRef.current);
+        }
+        return () => {
+            cancelAnimationFrame(raf);
+            window.removeEventListener('resize', onResize);
+            window.removeEventListener('scroll', onScroll, true);
+            ro && ro.disconnect();
+        };
+    }, [toolsShow, measureAndAdjust, tabIndex, searchNode]);
+
+    const search = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const keyword = e.target.value;
+        handleSearch(keyword);
+    };
+
+    const createNode = item => {
+        let createType;
+        if (tabIndex == '2') {
+            createType = BlockEnum.Agent;
+        } else if (tabIndex == '3') {
+            createType = BlockEnum.Tool;
+        } else if (tabIndex == '4') {
+            createType = BlockEnum.Skill;
+        }
+
+        const currentNode = getNode(nodeId);
+        let createData: any = {};
+
+        if (createType) {
+            if (createType == BlockEnum.Tool) {
+                createData = {
+                    title:
+                        item?.identity?.label[lang] ||
+                        item?.identity?.label['en_US'] ||
+                        intl.formatMessage({ id: 'workflow.tool', defaultMessage: '' }),
+                    desc: item.description?.human[lang] || item.description?.human['en_US'] || item.description?.llm || '',
+                    icon: item?.icon || item?.categoryIcon,
+                    baseData: item,
+                };
+
+                if (item.output) {
+                    if (Array.isArray(item.output) && item.output.length > 0) {
+                        const toolVariables = new ObjectVariable('output', 'object');
+                        item.output.forEach(item => {
+                            const variable = new Variable(item.name, item.type);
+                            toolVariables.addProperty(item.name, variable);
+                        });
+                        createData.outputInfo = toolVariables.toObject();
+                    } else {
+                        createData.outputInfo = item.output;
+                    }
+                }
+            } else {
+                createData = {
+                    title: item.title,
+                    desc: item.description || '',
+                    baseData: item,
+                };
+                if (item.icon) {
+                    createData.icon = item.icon;
+                }
+            }
+        }
+
+        const newNode = storeCreateNode(createType || item.icon, {
+            position: getNodePosition(currentNode, props.position),
+            data: createData,
+        });
+        const edgeInfo: any = {
+            id: `${currentNode.id}-${newNode.id}-${props.sourceHandle}`,
+            source: props.position == 'right' ? currentNode.id : newNode.id,
+            target: props.position == 'right' ? newNode.id : currentNode.id,
+        };
+
+        if (props.sourceHandle) {
+            if (props.position == 'right') {
+                edgeInfo.sourceHandle = props.sourceHandle;
+            } else {
+                edgeInfo.targetHandle = props.sourceHandle;
+            }
+        }
+        if (props.targetHandle) {
+            if (props.position == 'right') {
+                edgeInfo.targetHandle = props.targetHandle;
+            } else {
+                edgeInfo.sourceHandle = props.targetHandle;
+            }
+        }
+        addEdges([edgeInfo]);
+        setToolsShow(false);
+        props.onSelect && props.onSelect(item);
+        setPreventScrolling(true);
+    };
+
+    const scrollRef = useRef(null);
+
+    useEffect(() => {
+        const handleWheel = event => {
+            event.stopPropagation();
+        };
+
+        const container = scrollRef.current;
+        if (!container?.addEventListener) return;
+        container.addEventListener('wheel', handleWheel, { passive: false });
+
+        return () => {
+            container.removeEventListener('wheel', handleWheel);
+        };
+    }, []);
+
+
+    return (
+        <div
+            ref={ref}
+            style={{ top: 'calc(50% - 9px)' }}
+            className={` ${isHovering ? 'bg-slate-700' : ''}`}
+        >
+            <NodeToolbar
+                offset={20}
+                isVisible={toolsShow}
+                position={panelSide === 'left' ? Position.Left : Position.Right}
+            >
+                <div
+                    ref={tools}
+                    className="p-2 w-[240px] pt-4 bg-white rounded-md cursor-pointer border border-blue-100 shadow-lg"
+                    style={{
+                        transform: `translateY(${verticalShift}px)`,
+                        maxHeight: `calc(100vh - ${viewportMargin * 2}px)`,
+                        overflowY: 'auto',
+                        width: 'min(240px, calc(100vw - 24px))',
+                    }}
+                >
+                    {/* <NodePanelContent onItemClick={(e)=>{
+                        console.log('onItemClick',e);
+                    }}></NodePanelContent> */}
+                    <Input
+                        onChange={search}
+                        allowClear
+                        placeholder={intl.formatMessage({
+                            id: 'workflow.searchNode',
+                            defaultMessage: '',
+                        })}
+                        prefix={<SearchOutlined />}
+                    />
+                    <Tabs
+                        defaultActiveKey={tabIndex}
+                        onChange={e => onTabChange(e)}
+                        items={tabItems}
+                    ></Tabs>
+                    <div style={{ maxHeight: 'calc(100vh - 500px)' }} className="overflow-y-auto">
+                        {tabIndex === '3'
+                            ? (() => {
+                                  if (!searchNode || !Array.isArray(searchNode) || searchNode.length === 0) {
+                                      return (
+                                          <div className="text-center py-4 text-gray-500">
+                                              {/* Display loading message if no data */}
+                                              loading...
+                                          </div>
+                                      );
+                                  }
+
+                                  return groupedTools && Object.values(groupedTools).map(
+                                      (group: any, groupIndex) => (
+                                          <div key={groupIndex}>
+                                              <div className="py-2">
+                                                  <UserCon
+                                                      title={group.categoryName}
+                                                      icon={group.categoryIcon}
+                                                  />
+                                              </div>
+                                              <div>
+                                                  {group.tools.map((tool, toolIndex) => (
+                                                      <div
+                                                          key={toolIndex}
+                                                          className="flex items-center gap-2 px-2 hover:bg-slate-100 rounded py-2 text-gray-500"
+                                                          onClick={e => {
+                                                              e.stopPropagation();
+                                                              createNode(tool);
+                                                          }}
+                                                      >
+                                                          {tool.title}
+                                                      </div>
+                                                  ))}
+                                              </div>
+                                          </div>
+                                      ),
+                                  );
+                              })()
+                            : searchNode.map((item, index) => (
+                                  <Tooltip
+                                      key={index}
+                                      placement="left"
+                                      title={item?.base?.data?.['descTools']}
+                                  >
+                                      <div
+                                          onClick={e => {
+                                              console.log(item);
+                                              e.stopPropagation();
+                                              createNode(item);
+                                          }}
+                                          className="hover:bg-slate-100 px-2 rounded"
+                                      >
+                                          <UserCon title={item.title} icon={item.icon} />
+                                      </div>
+                                  </Tooltip>
+                              ))}
+                    </div>
+                </div>
+            </NodeToolbar>
+        </div>
+    );
+});
