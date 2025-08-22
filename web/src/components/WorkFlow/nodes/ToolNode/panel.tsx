@@ -280,28 +280,30 @@ export default memo(({ node }: { node: AppNode }) => {
                             },
                         }}
                     >
+                        
                         {credentialsProvider &&
                             Object.values(credentialsProvider).map((e: CredentialsProviderItem) => {
                                 return (
                                     <div key={e.name}>
+                                      
                                         <ProFormText
                                             tooltip={
-                                                e?.help?.[lang] ? (
+                                                e?.help?.[lang]||e?.help?.['zh_CN'] ? (
                                                     <Link href={e?.url} underline target="_blank">
-                                                        {e?.help?.[lang]}
+                                                        {e?.help?.[lang]||e?.help?.['zh_CN']}
                                                     </Link>
                                                 ) : null
                                             }
                                             required={e.required}
-                                            placeholder={e.placeholder?.[lang]}
+                                            placeholder={e.placeholder?.[lang]||e.placeholder?.['zh_CN']}
                                             rules={[
                                                 {
                                                     required: e.required,
-                                                    message: e.placeholder?.[lang],
+                                                    message: e.placeholder?.[lang]||e.placeholder?.['zh_CN'],
                                                 },
                                             ]}
                                             name={e.name}
-                                            label={e?.label?.[lang]}
+                                            label={e?.label?.[lang]||e?.label?.['zh_CN']}
                                         ></ProFormText>
                                     </div>
                                 );
@@ -336,22 +338,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                         })}
                                     </Tag>
                                 )}
-                                {authorizationStatus == 3 && (
-                                    <Tag 
-                                        icon={<ExclamationCircleOutlined />} 
-                                        color="warning" 
-                                        className="flex items-center gap-1 px-3 py-1 text-sm font-medium"
-                                        title={intl.formatMessage({
-                                            id: 'workflow.authorization.tooltip.unauthorized',
-                                            defaultMessage: 'This tool is not authorized and needs to be authorized first',
-                                        })}
-                                    >
-                                        {intl.formatMessage({
-                                            id: 'workflow.authorization.unauthorized',
-                                            defaultMessage: 'Unauthorized',
-                                        })}
-                                    </Tag>
-                                )}
+                            
                             </Space>
                             {authorizationStatus == 1 && authorizationStatus != 3 && (
                                 <div className='flex items-center gap-2'>

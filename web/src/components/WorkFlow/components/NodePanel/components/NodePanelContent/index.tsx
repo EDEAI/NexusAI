@@ -84,7 +84,7 @@ export default memo(
         //     onDragStart,
         //     lang])
         const RenderNodeList = useCallback(
-            ({ tabIndex, showName = true }) => {
+            ({ tabIndex, showName = true,autoHeight=false }) => {
                 const currentConfig = tabConfigs.find(config => config.key === tabIndex);
                 const [list, setList] = useState<any[]>([]);
                 const [loading, setLoading] = useState(true);
@@ -303,7 +303,7 @@ export default memo(
                             ) : currentConfig.type === 'tools' ? (
                                 <div
                                     className="overflow-y-auto"
-                                    style={{ height: containerHeight }}
+                                    style={{ height: autoHeight?containerHeight:undefined }}
                                     onScroll={onToolsScroll}
                                 >
                                     <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2">
@@ -333,7 +333,7 @@ export default memo(
                              
                                 <VirtualList
                                     data={displayList}
-                                    height={containerHeight}
+                                    height={autoHeight?containerHeight:undefined}
                                     itemHeight={getItemHeight()}
                                     itemKey="id"
                                     onScroll={onScroll}
@@ -472,6 +472,7 @@ export default memo(
                                         key={item.key}
                                         tabIndex={index + 1 + ''}
                                         showName={!isMinWidth}
+                                        autoHeight={true}
                                     />
                                 </div>
                             ))}
