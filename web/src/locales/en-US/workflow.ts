@@ -392,4 +392,8 @@ export default {
     'workflow.form.splitTaskByLine.tooltip': 'If enabled, the input variable will be split into tasks by line directly, without analysis and splitting by the large language model.',
     'workflow.split_task_by_line': 'Split tasks by line',
     'workflow.split_task_by_lineDes': 'If enabled, the input variable will be split into tasks by line directly, without analysis and splitting by the large language model.',
+
+    'workflow.noAppRunId': 'No app run ID found',
+    'workflow.resumeRun': 'Resume Run',
+    'workflow.pauseRun': 'Pause Run',
 };

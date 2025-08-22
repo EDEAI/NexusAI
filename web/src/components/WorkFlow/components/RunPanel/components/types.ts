@@ -66,4 +66,7 @@ export interface ContainerProps {
   activeKey: string;
   onTabChange: (key: string) => void;
   children?: React.ReactNode;
-} 
+  showPauseResume?: boolean;
+  isPaused?: boolean;
+  onPauseResume?: () => void;
+}

@@ -301,7 +301,10 @@ async def update_app_run_paused(data: AppRunPauseSchema, userinfo: TokenData = D
         {"column": "id", "value": data.app_run_id},
         {"paused": data.paused}
     )
-    return response_success({"app_run_id": data.app_run_id, "paused": data.paused})
+    
+    # Return success message with appropriate language pack message
+    success_message = get_language_content("app_run_pause_success" if data.paused == 1 else "app_run_resume_success")
+    return response_success({"app_run_id": data.app_run_id, "paused": data.paused, "msg": success_message})
     
 
 @router.get("/workflow_start_condition/{app_id}", response_model=ResWorkflowStartConditionSchema)

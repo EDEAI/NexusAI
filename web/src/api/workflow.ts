@@ -671,3 +671,16 @@ export const skillDataCreate= async (createData) => {
     });
 };
 
+// Pause or resume workflow run
+// @param {number} app_run_id - App run ID
+// @param {number} paused - Pause status (0: resume, 1: pause)
+// @returns {Promise<any>} - Returns a Promise object with the pause/resume result
+export const pauseResumeWorkflow = async (app_run_id: number, paused: number) => {
+    return await aniRequest<any>(`/v1/workflow/paused`, {
+        method: 'POST',
+        data: {
+            app_run_id,
+            paused,
+        },
+    });
+};

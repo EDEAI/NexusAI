@@ -33,6 +33,9 @@ const RunPanel = memo(() => {
     setDealtWithData,
     flowMessage,
     setFlowMessage,
+    isPaused,
+    showPauseResume,
+    handlePauseResume,
   } = useRunPanelState();
   
   // Process run list updates
@@ -45,6 +48,9 @@ const RunPanel = memo(() => {
       runPanelShow={runPanelShow}
       setRunPanelShow={setRunPanelShow}
       title={intl.formatMessage({ id: 'workflow.run' })}
+      showPauseResume={showPauseResume}
+      isPaused={isPaused}
+      onPauseResume={handlePauseResume}
       tabItems={[
         {
           label: intl.formatMessage({ id: 'workflow.inputs' }),
@@ -103,4 +109,4 @@ export { default as DetailContent } from './DetailContent';
 export { default as TrackContent } from './TrackContent';
 export * from './hooks';
 export * from './types';
-export * from './utils'; 
+export * from './utils';

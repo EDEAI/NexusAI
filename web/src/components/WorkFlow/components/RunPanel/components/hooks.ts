@@ -1,7 +1,7 @@
 /*
  * @LastEditors: biz
  */
-import { runWorkFlow } from '@/api/workflow';
+import { runWorkFlow, pauseResumeWorkflow } from '@/api/workflow';
 import { ArrayVariable, ObjectVariable, Variable } from '@/py2js/variables';
 import useSocketStore from '@/store/websocket';
 import { useIntl } from '@umijs/max';
@@ -27,6 +27,8 @@ export const useRunPanelState = () => {
   const [tabKey, setTabKey] = useState('1');
   const [endRun, setEndRun] = useState<RunPanelData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const [showPauseResume, setShowPauseResume] = useState(false);
   
   // Use the existing useSaveWorkFlow hook from the project
   const saveWorkFlow = useSaveWorkFlow();
@@ -36,6 +38,15 @@ export const useRunPanelState = () => {
     setRunResultInfo(e.data);
     setHasResult(true);
     setTabKey('4');
+    
+    // Show pause/resume buttons when workflow starts (e.data contains app_run_id)
+    // The status field is not available in the initial response from start_workflow
+    if (e.data?.app_run_id) {
+      setShowPauseResume(true);
+      setIsPaused(false); // Initially not paused when workflow starts
+    } else {
+      setShowPauseResume(false);
+    }
   }, []);
 
   const processRunList = useCallback(() => {
@@ -128,6 +139,7 @@ export const useRunPanelState = () => {
     const foundEndRun = runList.find(x => x?.data?.status === 2);
     if (foundEndRun) {
       setEndRun(runList[runList.length - 1]);
+      setShowPauseResume(false); // Hide pause/resume buttons when workflow ends
     }
 
     setRunList(runList);
@@ -232,6 +244,8 @@ export const useRunPanelState = () => {
         return null;
       }
       
+      // Button visibility will be handled by runResult callback based on actual workflow status
+      
       return res;
     } catch (err) {
       setLoading(false);
@@ -244,6 +258,32 @@ export const useRunPanelState = () => {
       return null;
     }
   }, [intl, setLoading, saveWorkFlow]);
+
+  // Handle pause/resume workflow
+  const handlePauseResume = useCallback(async () => {
+    if (!runResultInfo?.app_run_id) {
+      message.error(intl.formatMessage({ id: 'workflow.noAppRunId', defaultMessage: 'No app run ID found' }));
+      return;
+    }
+
+    try {
+      const pausedValue = isPaused ? 0 : 1; // 0 for resume, 1 for pause
+      const res = await pauseResumeWorkflow(Number(runResultInfo.app_run_id), pausedValue);
+      
+      if (res?.code === 0) {
+         setIsPaused(!isPaused);
+         // Display message from API response
+         if (res?.data?.msg) {
+           message.success(res.data.msg);
+         }
+       } else {
+         message.error(res?.message);
+       }
+     } catch (err) {
+       console.error('Error pausing/resuming workflow:', err);
+       // Only console.error for exceptions, no message.error
+    }
+  }, [runResultInfo, isPaused, intl]);
 
   return {
     runPanelShow,
@@ -266,5 +306,10 @@ export const useRunPanelState = () => {
     runResult,
     processRunList,
     runWorkflow,
+    isPaused,
+    setIsPaused,
+    showPauseResume,
+    setShowPauseResume,
+    handlePauseResume,
   };
-}; 
+};
