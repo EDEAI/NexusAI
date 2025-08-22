@@ -156,9 +156,7 @@ async def node_run(data: WorkflowsNodeRunSchema,
             draft_info['id'],
             context.to_dict()
         )
-        while not task.ready():
-            await asyncio.sleep(0.1)
-        result = task.get(timeout=100)
+        result = await asyncio.to_thread(task.get, timeout=100)
         if node_data.data['type'] in ['skill', 'custom_code', 'end', 'tool'] and result['status'] == 'success':
             node_data_dict = node_data.to_dict()
             file_list = extract_file_list_from_skill_output(result['data']['outputs'], node_data_dict["data"]["output"])
@@ -263,6 +261,48 @@ async def workflow_app_delete(request: Request, app_id: int, userinfo: TokenData
 
     elif result['status'] == 2:
         return response_error(get_language_content(result['message']))
+
+
+@router.post("/paused", response_model=AppRunPauseSchemaResponse)
+async def update_app_run_paused(data: AppRunPauseSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Pause or resume an app run.
+
+    app_run_id: int, App run ID
+    paused: int, Pause status (0: resume, 1: pause)
+
+    This endpoint requires token authentication. It validates the input, checks whether
+    the current user has permission to operate on the app run (either the owner of the
+    app run or the owner of the associated workflow), and updates the 'paused' field
+    of the app run when authorized.
+    """
+    # Validate paused only 0 or 1
+    if data.paused not in [0, 1]:
+        return response_error(get_language_content("paused_param_invalid"))
+
+    from core.database.models.app_runs import AppRuns
+    app_runs_model = AppRuns()
+
+    # Check app_run existence
+    exists = app_runs_model.select_one(
+        columns=["id"],
+        conditions=[{"column": "id", "value": data.app_run_id}]
+    )
+    if not exists:
+        return response_error(get_language_content("app_run_error"))
+
+    has_access = app_runs_model.has_access_to_app_run(data.app_run_id, userinfo.uid)
+    # Permission check
+    if not has_access:
+        return response_error(get_language_content("the_current_user_does_not_have_permission"))
+
+    # Update paused field
+    app_runs_model.update(
+        {"column": "id", "value": data.app_run_id},
+        {"paused": data.paused}
+    )
+    return response_success({"app_run_id": data.app_run_id, "paused": data.paused})
+    
 
 @router.get("/workflow_start_condition/{app_id}", response_model=ResWorkflowStartConditionSchema)
 async def workflow_start_condition(app_id: int, userinfo: TokenData = Depends(get_current_user)):

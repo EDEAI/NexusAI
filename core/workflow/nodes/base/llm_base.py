@@ -6,13 +6,17 @@ from collections import deque
 from copy import deepcopy
 from typing import Any, AsyncIterator, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
+import dashscope
+from google import genai
+import httpx
 import tiktoken
 
+from anthropic import Anthropic
 from langchain_core.documents import Document
 from langchain_core.messages import AIMessageChunk
 from langchain_core.runnables import Runnable, RunnableParallel, RunnablePassthrough
 from langchain_core.runnables.utils import Input, Output
-from tokenizers import Encoding, Tokenizer
+
 
 from core.database.models.agent_chat_messages import AgentChatMessages
 from core.document import DocumentLoader
@@ -27,11 +31,6 @@ from llm.messages import Messages, create_messages_from_serialized_format
 
 from core.helper import truncate_agent_messages_by_token_limit, get_file_content_list
 from core.database.models import (Models, Users)
-try:
-    from anthropic import Anthropic
-    ANTHROPIC_AVAILABLE = True
-except ImportError:
-    ANTHROPIC_AVAILABLE = False
 
 
 project_root = Path(__file__).absolute().parent.parent.parent.parent.parent
@@ -67,32 +66,66 @@ class LLMBaseNode(Node):
         return text.replace("{", "{{").replace("}", "}}")
 
     @classmethod
-    def _get_tokenizer(cls, model_name: str, api_key: str) -> Callable[[str], int]:
+    def _get_tokenizer(cls, supplier_name: str, model_name: str, api_key: str) -> Callable[[str], int]:
+
         """
         Get the appropriate tokenizer based on the model name
         
         Args:
+            supplier_name (str): Supplier name, e.g., 'OpenAI', 'Anthropic'
             model_name (str): Model name, e.g., 'gpt-3.5-turbo', 'gpt-4', 'claude-3-opus'
+            api_key (str): API key for the supplier
             
         Returns:
             Callable[[str], int]: A function that takes a string and returns the number of tokens.
         """
-        # if model_name.startswith('claude') and ANTHROPIC_AVAILABLE:
-        #     # anthropic = Anthropic(api_key=api_key)
-        #     # def anthropic_token_counter(text: str) -> int:
-        #     #     return anthropic.messages.count_tokens(
-        #     #         model=model_name,
-        #     #         messages=[{'role': 'user', 'content': text}],
-        #     #     ).input_tokens
-        #     # return anthropic_token_counter
-        #     tokenizer = Tokenizer.from_file(str(project_root.joinpath('core/helper/claude-tokenizer.json')))
-        #     return lambda text: len(tokenizer.encode(text).ids)
-        # else:
-        try:
-            encoding = tiktoken.encoding_for_model(model_name)
-        except:
-            encoding = tiktoken.get_encoding("cl100k_base")
-        return lambda text: len(encoding.encode(text))
+        match supplier_name:
+            case 'OpenAI':
+                try:
+                    encoding = tiktoken.encoding_for_model(model_name)
+                except:
+                    encoding = tiktoken.get_encoding("cl100k_base")
+                return lambda text: len(encoding.encode(text))
+            case 'Anthropic':
+                anthropic = Anthropic(api_key=api_key)
+                return lambda text: anthropic.messages.count_tokens(
+                    model=model_name,
+                    messages=[{'role': 'user', 'content': text}],
+                ).input_tokens
+            case 'Tongyi':
+                tokenizer = dashscope.get_tokenizer('qwen-turbo')
+                return lambda text: len(tokenizer.encode(text))
+            case 'DeepSeek':
+                from transformers import AutoTokenizer
+                chat_tokenizer_dir = project_root.joinpath('core/helper/deepseek-tokenizer')
+                tokenizer = AutoTokenizer.from_pretrained(chat_tokenizer_dir, trust_remote_code=True)
+                return lambda text: len(tokenizer.encode(text))
+            case 'Doubao':
+                def _count_tokens(text: str) -> int:
+                    response = httpx.post(
+                        'https://ark.cn-beijing.volces.com/api/v3/tokenization',
+                        json={
+                            'model': model_name,
+                            'text': text,
+                        },
+                        headers={
+                            'Authorization': f'Bearer {api_key}',
+                            'Content-Type': 'application/json',
+                        }
+                    )
+                    response_data = response.json()
+                    return response_data['data'][0]['total_tokens']
+
+                return _count_tokens
+            case 'Google':
+                client = genai.Client(api_key=api_key)
+                return lambda text: client.models.count_tokens(
+                    model=model_name,
+                    contents=text,
+                ).total_tokens
+            case _:
+                return lambda _: 0
+
 
     @classmethod
     def _group_chatroom_messages(
@@ -171,14 +204,20 @@ class LLMBaseNode(Node):
         chatroom_messages = chatroom_prompt_args['messages']
             
         # Get model information
-        model_name = model_config['model_name']
+        supplier_name = model_config['supplier_name']
+        if supplier_name == 'Anthropic':
+            model_name = model_config['model_config']['model_name']
+        else:
+            model_name = model_config['model_config']['model']
+
+
         api_key = model_config['supplier_config']['api_key']
         max_context_tokens = model_config['max_context_tokens']
         max_output_tokens = model_config['max_output_tokens']
         token_limit = max_context_tokens - max_output_tokens - 8192
         
         # Get appropriate tokenizer
-        tokenizer = self._get_tokenizer(model_name, api_key)
+        tokenizer = self._get_tokenizer(supplier_name, model_name, api_key)
 
         # Find the start index of current dialog (last user message)
         current_dialog_start = 0

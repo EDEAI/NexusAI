@@ -291,9 +291,26 @@ const Login: React.FC = () => {
                     )}
                     <div
                         style={{
-                            marginBottom: 24,
+                            marginTop: -14,
+                            marginBottom: 8,
+                            textAlign: 'right',
                         }}
-                    ></div>
+                    >
+                        <a
+                            onClick={() => {
+                                history.push('/user/forgot-password');
+                            }}
+                            style={{
+                                color: '#1890ff',
+                                textDecoration: 'none',
+                            }}
+                        >
+                            {intl.formatMessage({
+                                id: 'pages.login.forgotPassword',
+                                defaultMessage: 'Forgot Password ?',
+                            })}
+                        </a>
+                    </div>
                 </LoginForm>
             </div>
             <Footer />

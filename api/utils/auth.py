@@ -133,8 +133,19 @@ def authenticate_user(username: str, password: str):
     Authenticate the user.
     """
     user_model = Users()
+
+    conditions = [
+        {"column": "status", "value": 1},
+        [
+            {"column": "email", "value": username, "op": "=", "logic": "or"},
+            {"column": "phone", "value": username, "op": "="}
+        ]
+    ]
+
     user = user_model.select_one(
-        columns='*', conditions=[{'column': 'phone', 'value': username, 'logic': 'or'},{'column': 'email', 'value': username}]
+        columns='*', 
+        conditions=conditions
+        # conditions=[{'column': 'phone', 'value': username, 'logic': 'or'},{'column': 'email', 'value': username}]
     )
     if not user:
         return False
@@ -235,7 +246,7 @@ def get_current_language(uid:int = 0) -> str:
         redis.set("user_language:{}".format(user_id), user_language if user_language in language_packs else 'en')
         return user_language
 
-def authenticate_third_party_user(platform: str, openid: str, sundry: Union[str, int, None] = None, nickname: str = None, 
+def authenticate_third_party_user(platform: str, openid: str, sundry: Union[str, int, None] = None, nickname: str = None, position: str = None,
                                   avatar: str = None, language: str = 'en', 
                                   client_ip: str = None, phone: str = None, email: str = None):
     """
@@ -258,6 +269,7 @@ def authenticate_third_party_user(platform: str, openid: str, sundry: Union[str,
             openid=openid,
             sundry=sundry,
             nickname=nickname,
+            position=position,
             avatar=avatar,
             language=language,
             last_login_ip=client_ip,
@@ -307,7 +319,7 @@ def get_third_party_user_info(uid: int):
         return False
     return user
 
-def authenticate_third_party_user_binding(platform: str, openid: str, sundry: Union[str, int, None] = None, nickname: str = None, 
+def authenticate_third_party_user_binding(platform: str, openid: str, sundry: Union[str, int, None] = None, nickname: str = None, position: str = None,
                                   avatar: str = None, language: str = 'en', 
                                   client_ip: str = None, phone: str = None, email: str = None):
     """
@@ -330,6 +342,7 @@ def authenticate_third_party_user_binding(platform: str, openid: str, sundry: Un
             openid=openid,
             sundry=sundry,
             nickname=nickname,
+            position=position,
             avatar=avatar,
             language=language,
             last_login_ip=client_ip,

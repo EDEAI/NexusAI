@@ -69,6 +69,7 @@ class ResWorkspaceListSchema(BaseModel):
 class AppRunsLog(BaseModel):
     app_id: Optional[int] = None
     workflow_id: Optional[int] = None
+    paused: Optional[int] = None
     app_run_id: Optional[int] = None
     type: Optional[int] = None
     level: Optional[int] = None

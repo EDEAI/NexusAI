@@ -42,7 +42,12 @@ x-common-environment-backend: &common-environment-backend
   APP_API_TIMEOUT: 60
   FASTAPI_WORKERS: 2
   CELERY_WORKERS: 4
-  INIT_ADMIN_PASSWORD: nexusaipwd
+  SMTP_SERVER: 
+  SMTP_PORT: 587
+  SMTP_USERNAME: 
+  SMTP_PASSWORD: 
+  SMTP_USE_TLS: true
+  SMTP_TIMEOUT: 30
 
 x-common-environment-frontend: &common-environment-frontend
   WEB_API_URL: http://127.0.0.1:9470
@@ -53,6 +58,8 @@ x-common-environment-frontend: &common-environment-frontend
 # x-common-environment-proxy: &common-environment-proxy
 #   HTTP_PROXY: http://192.168.0.241:10809
 #   HTTPS_PROXY: http://192.168.0.241:10809
+#   SOCKS_PROXY: socks5://192.168.0.241:10808
+#   NO_PROXY: localhost,127.0.0.1
 
 services:
   multi_service:
@@ -86,7 +93,7 @@ services:
 
   sandbox:
     container_name: nexusai-docker-sandbox
-    image: edeai/sandbox:0.0.3
+    image: edeai/sandbox:0.0.4
     environment:
       <<: *common-environment-backend
     volumes:

@@ -185,6 +185,7 @@ import os
 import uuid
 import sys
 import base64
+import importlib.util
 
 
 def run_tool():
@@ -194,7 +195,14 @@ def run_tool():
     from gevent import monkey
     monkey.patch_all(sys=True)
 
-    from ''' + import_module + ''' import ''' + tool_class_name + '''
+    spec = importlib.util.spec_from_file_location(''' + repr(tool_name) + ''', sys.path[0] + "/" + ''' + repr(python_source) + ''')
+    if spec is None:
+        raise ImportError(f"Could not find module")
+
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[''' + repr(tool_name) + '''] = module
+    spec.loader.exec_module(module)
+    ''' + tool_class_name + ''' = module.''' + tool_class_name + '''
     
     def detect_file_type_from_binary(binary_data):
         """

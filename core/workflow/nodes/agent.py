@@ -862,7 +862,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets),
                 callable_skills, callable_workflows, True, True
             )
-            model_data, ainvoke = self.get_ainvoke_func(
+            model_data, ainvoke = await asyncio.to_thread(
+                self.get_ainvoke_func,
                 app_run_id=app_run_id, 
                 edge_id=edge_id,
                 context=context,

@@ -16,6 +16,7 @@ import skill from './zh-CN/skill';
 import user from './zh-CN/user';
 import workflow from './zh-CN/workflow';
 import chatroom from './zh-CN/chatroom';
+import role from './zh-CN/role';
 
 export default {
     'navBar.lang': '语言',
@@ -40,6 +41,7 @@ export default {
     ...user,
     ...plaza,
     ...chatroom,
+    ...role,
     'skill.downloadFiles': '输出文件',
     'skill.download': '下载',
     'app.workflow.log.filter.all': '全部日志',

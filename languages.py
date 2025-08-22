@@ -683,6 +683,7 @@ language_packs = {
         'chatroom_app_run_id_not_found': 'Current appRunID not found',
 
         'app_run_error': 'App run record not found',
+        'paused_param_invalid': 'The paused parameter can only be 0 or 1',
         'api_agent_generate_failed': 'Agent generate failed',
         'api_agent_user_prompt_required': 'Agent user prompt required',
         'api_agent_batch_size_invalid': 'Agent batch size invalid',
@@ -1102,6 +1103,7 @@ language_packs = {
         'skill_update_success': 'Skill update success',
         # Skill related messages
         "publish_status_invalid": "publish status can only input 0 or 1",
+        "paused_param_invalid": "paused can only input 0 or 1",
         "invalid_app_id": "Invalid app ID",
         "update_error": "Update failed",
         "skill_not_exist": "Skill does not exist",
@@ -1132,6 +1134,20 @@ language_packs = {
         'role_id_is_required': 'Role ID is required',
         'user_does_not_belong_to_this_team': 'User does not belong to this team.',
         'the_current_user_does_not_have_permission': 'The current user does not have permission',
+        'invalid_user_id': 'Invalid user ID',
+        'invalid_role_id': 'Invalid role ID',
+        'only_admin_can_switch_member_roles': 'Only administrators can switch member roles',
+        'target_user_not_in_current_team': 'Target user is not in the current team',
+        'role_not_found': 'Role not found',
+        'role_not_available_for_current_team': 'Role is not available for the current team',
+        'member_role_switched_successfully': 'Member role switched successfully',
+        'member_role_switch_failed': 'Failed to switch member role',
+        'cannot_modify_own_role': 'You cannot modify your own role',
+        'cannot_modify_last_admin_role': 'Cannot modify the role of the last administrator in the team',
+        'cannot_delete_built_in_role': 'Cannot delete built-in roles',
+        'cannot_delete_role_in_use': 'Cannot delete role that is currently in use by team members',
+        'role_must_be_1_or_2': 'Role must be 1 (admin) or 2 (regular user)',
+        'role_id_required_for_regular_role': 'Role ID is required when setting user as regular role (role=2)',
         'comprehensive_administrator': 'Comprehensive administrator',
         'agent_administrator': 'Agent administrator',
         'workflow_administrator': 'Workflow administrator',
@@ -1148,13 +1164,52 @@ language_packs = {
         'knowledge_base_administrator_desc': 'Manages enterprise knowledge assets and maintains knowledge base content for optimal information access',
 
         'msg_preparing_environment': 'Need to initialize the runtime environment, please wait patiently',
+        'msg_mcp_tool_result_is_truncated': 'The output of the tool exceeds the specified character limit (more than {length} characters); therefore, only partial content will be saved',
         'the_current_account_has_been_bound': 'The current account has been bound',
         'binding_successful': 'Binding successful',
         'openid_list_empty': 'OpenId List Empty',
         'third_party_binding_not_found': 'Third Party Binding Not Found',
         'cancel_binding_failed': 'Cancel Binding Failed',
         'cancel_binding_successful': 'Cancel Binding Successful',
-        'roles_status_only_one_or_two': 'Can only select 1 and 2 for displaying all character statuses'
+        'roles_status_only_one_or_two': 'Can only select 1 and 2 for displaying all character statuses',
+        'permission_status_only_one_or_two': 'Can only select 1 and 2 for displaying all permission statuses',
+        'the_current_email_address_is_not_registered': 'The current email address is not registered',
+        'verification_code_sent_successfully': 'Verification code sent successfully',
+        'email_sending_failed': 'Email sending failed',
+        'an_error_occurred_while_sending_the_verification_code': 'An error occurred while sending the verification code',
+        'verification_code_cannot_be_empty': 'Verification code cannot be empty',
+        'verification_code_expired_or_not_exist': 'Verification code has expired or does not exist',
+        'verification_code_incorrect': 'Verification code is incorrect',
+        'email_verification_successful': 'Email verification successful',
+        'email_verification_failed': 'Email verification failed',
+        'email_format_incorrect': 'Email format is incorrect',
+        'password_cannot_be_empty': 'Password cannot be empty',
+        'confirm_password_cannot_be_empty': 'Confirm password cannot be empty',
+        'passwords_do_not_match': 'Password and confirm password do not match',
+        'password_reset_successful': 'Password reset successful',
+        'password_reset_failed': 'Password reset failed',
+        'email_verification_not_completed': 'Email verification not completed, please verify your email first',
+        'verification_status_invalid': 'Verification status is invalid, please re-verify your email',
+        'invitation_links_generated_successfully': 'Invitation successfully',
+        'invitation_emails_sent_successfully': 'Invitation emails sent successfully',
+        'some_emails_already_registered': 'Some emails are already registered',
+        'email_already_registered': '{email} is already registered',
+        'invitation_email_sent_successfully': 'Invitation emails sent successfully',
+        'invitation_email_send_failed': 'Some invitation emails failed to send',
+        'invitation_email_send_exception': 'Email sending exception',
+        'email_already_registered': 'Email {email} is already registered',
+        'some_emails_already_registered': 'Some emails are already registered',
+        'invitation_links_generated_successfully': 'Invitation successfully',
+        'invitation_emails_sent_successfully': 'All invitation emails sent successfully',
+        'profile_updated_successfully': 'Profile updated successfully',
+        'profile_update_failed': 'Profile update failed',
+        'old_password_incorrect': 'Old password is incorrect',
+        'new_passwords_do_not_match': 'New password and confirm password do not match',
+        'password_changed_successfully': 'Password changed successfully',
+        'password_change_failed': 'Password change failed',
+        'old_password_cannot_be_empty': 'Old password cannot be empty',
+        'new_password_cannot_be_empty': 'New password cannot be empty',
+        'confirm_password_cannot_be_empty': 'Confirm password cannot be empty'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1450,6 +1505,7 @@ language_packs = {
         'chatroom_request_sent_successfully': '请求成功，请等待',
 
         'app_run_error': 'app运行记录不存在',
+        'paused_param_invalid': 'paused参数只能为0或1',
         'api_agent_generate_failed': 'agent生成记录失败',
         'api_agent_user_prompt_required': '提示词不能为空',
         'api_agent_batch_size_invalid': '批量生成数量有误',
@@ -1497,6 +1553,20 @@ language_packs = {
         'role_id_is_required': '角色ID不能为空',
         'user_does_not_belong_to_this_team': '用户不属于该团队，无法进行切换',
         'the_current_user_does_not_have_permission': '当前用户暂无权限',
+        'invalid_user_id': '无效的用户ID',
+        'invalid_role_id': '无效的角色ID',
+        'only_admin_can_switch_member_roles': '只有管理员才能切换成员角色',
+        'target_user_not_in_current_team': '目标用户不在当前团队中',
+        'role_not_found': '角色不存在',
+        'role_not_available_for_current_team': '该角色不适用于当前团队',
+        'member_role_switched_successfully': '成员角色切换成功',
+        'member_role_switch_failed': '成员角色切换失败',
+        'cannot_modify_own_role': '您不能修改自己的角色',
+        'cannot_modify_last_admin_role': '不能修改团队中最后一个管理员的角色',
+        'cannot_delete_built_in_role': '不能删除内置角色',
+        'cannot_delete_role_in_use': '不能删除正在被团队成员使用的角色',
+        'role_must_be_1_or_2': '角色类型必须是1（管理员）或2（普通用户）',
+        'role_id_required_for_regular_role': '设置为普通用户角色（role=2）时，必须提供角色ID',
         'comprehensive_administrator': '综合管理员',
         'agent_administrator': '智能体管理员',
         'workflow_administrator': '工作流管理员',
@@ -1513,13 +1583,52 @@ language_packs = {
         'knowledge_base_administrator_desc': '专门管理企业知识资产，维护和优化知识库内容，提供最佳信息获取体验',
 
         'msg_preparing_environment': '需要初始化运行环境，请耐心等待',
+        'msg_mcp_tool_result_is_truncated': '工具输出内容过长（字符数大于{length}），因此只会保存部分内容',
         'the_current_account_has_been_bound': '当前账号已绑定',
         'binding_successful': '绑定成功',
         'openid_list_empty': 'OpenId列表为空',
         'third_party_binding_not_found': '未找到第三方绑定',
         'cancel_binding_failed': '取消绑定失败',
         'cancel_binding_successful': '取消绑定成功',
-        'roles_status_only_one_or_two': '是否显示全部角色状态只能选择1和2'
+        'roles_status_only_one_or_two': '是否显示全部角色状态只能选择1和2',
+        'permission_status_only_one_or_two': '是否显示全部权限状态只能选择1和2',
+        'the_current_email_address_is_not_registered': '当前邮箱未注册',
+        'verification_code_sent_successfully': '验证码发送成功',
+        'email_sending_failed': '邮件发送失败',
+        'an_error_occurred_while_sending_the_verification_code': '发送验证码时发生错误',
+        'verification_code_cannot_be_empty': '验证码不能为空',
+        'verification_code_expired_or_not_exist': '验证码已过期或不存在',
+        'verification_code_incorrect': '验证码错误',
+        'email_verification_successful': '邮箱验证成功',
+        'email_verification_failed': '邮箱验证失败',
+        'email_format_incorrect': '邮箱格式不正确',
+        'password_cannot_be_empty': '密码不能为空',
+        'confirm_password_cannot_be_empty': '确认密码不能为空',
+        'passwords_do_not_match': '密码和确认密码不一致',
+        'password_reset_successful': '密码重置成功',
+        'password_reset_failed': '密码重置失败',
+        'email_verification_not_completed': '邮箱验证未完成，请先进行邮箱验证',
+        'verification_status_invalid': '验证状态无效，请重新进行邮箱验证',
+        'invitation_links_generated_successfully': '邀请成功',
+        'invitation_emails_sent_successfully': '邀请邮件发送成功',
+        'some_emails_already_registered': '部分邮箱已注册',
+        'email_already_registered': '{email} 已注册',
+        'invitation_email_sent_successfully': '邀请邮件发送成功',
+        'invitation_email_send_failed': '部分邀请邮件发送失败',
+        'invitation_email_send_exception': '邮件发送异常',
+        'email_already_registered': '邮箱 {email} 已经注册过了',
+        'some_emails_already_registered': '部分邮箱已经注册过了',
+        'invitation_links_generated_successfully': '邀请成功',
+        'invitation_emails_sent_successfully': '所有邀请邮件发送成功',
+        'profile_updated_successfully': '个人资料更新成功',
+        'profile_update_failed': '个人资料更新失败',
+        'old_password_incorrect': '旧密码不正确',
+        'new_passwords_do_not_match': '新密码和确认密码不一致',
+        'password_changed_successfully': '密码修改成功',
+        'password_change_failed': '密码修改失败',
+        'old_password_cannot_be_empty': '旧密码不能为空',
+        'new_password_cannot_be_empty': '新密码不能为空',
+        'confirm_password_cannot_be_empty': '确认密码不能为空'
     }
 }
 
@@ -1835,15 +1944,40 @@ def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = 
                     return None
         
         if append_ret_lang_prompt:
-            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # Get detailed time information
+            now = datetime.now()
+            current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+            year = now.year
+            month = now.month
+            day = now.day
+            hour = now.hour
+            minute = now.minute
+            second = now.second
+            weekday = now.strftime("%A")  # Full weekday name
+            weekday_num = now.weekday()  # Monday is 0, Sunday is 6
+            week_number = now.isocalendar()[1]  # ISO week number
+            day_of_year = now.timetuple().tm_yday
+            
             return_language_prompt = f"""
 
 === IMPORTANT CONTEXT ===
 CURRENT DATE AND TIME: {current_time}
+DETAILED TIME INFORMATION:
+- Year: {year}
+- Month: {month}
+- Day: {day}
+- Hour: {hour}
+- Minute: {minute}
+- Second: {second}
+- Weekday: {weekday} (Day {weekday_num + 1} of the week)
+- Week Number: {week_number} (ISO week)
+- Day of Year: {day_of_year}
+
+Always consider the current date and time when providing responses, especially for time-sensitive questions or tasks.
 
 Please note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction.
 
-Always consider the current date and time when providing responses, especially for time-sensitive questions or tasks.
+If the user requests any type of chart, diagram, graph, or visual representation (including but not limited to flowcharts, sequence diagrams, Gantt charts, pie charts, bar charts, line graphs, mind maps, organizational charts, network diagrams, etc.), you MUST respond with appropriate Mermaid diagram code. The Mermaid code should be complete, properly formatted, and ready to be rendered in any Mermaid-compatible viewer.
 === END CONTEXT ==="""
             if isinstance(content, str):
                 content += return_language_prompt

@@ -55,10 +55,10 @@ stdout_logfile_backups=5
 stderr_logfile=logs/supervisor_api_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
-# environment=HTTP_PROXY="http://192.168.0.241:10809",HTTPS_PROXY="http://192.168.0.241:10809",NO_PROXY="localhost,127.0.0.1"
+# environment=HTTP_PROXY="http://192.168.0.241:10809",HTTPS_PROXY="http://192.168.0.241:10809",SOCKS_PROXY="socks5://192.168.6.241:10808",NO_PROXY="localhost,127.0.0.1"
 
 [program:websocket]
-command=python websocket.py
+command=python websocket_server.py
 autostart=true
 autorestart=true
 startretries=3
