@@ -123,7 +123,10 @@ const NodeWrapper = memo(({ children, onDragStart, onClick, type, item }: NodeWr
     <div
         draggable
         onDragStart={e => onDragStart(e, type, item)}
-        onClick={onClick}
+        onClick={(e) => {
+            e.stopPropagation();
+            onClick?.();
+        }}
         className="cursor-pointer hover:bg-blue-100 rounded-md px-2 box-border"
     >
         {children}

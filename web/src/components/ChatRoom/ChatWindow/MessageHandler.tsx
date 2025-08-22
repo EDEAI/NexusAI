@@ -289,7 +289,7 @@ export const useMessageHandler = (
             if (setIsWaitingReply) {
                 setIsWaitingReply(true);
             }
-
+            
             // Use requestAnimationFrame for better performance and avoiding potential memory leaks
             requestAnimationFrame(() => {
                 if (scrollDomRef.current) {
@@ -369,6 +369,10 @@ export const useMessageHandler = (
                 files_to_upload: files_to_upload || [],
                 uploaded_files: []
             });
+            // Clear waiting for reply state
+            if (setIsWaitingReply) {
+                setIsWaitingReply(false);
+            }
 
             // Create MCP block in contentBlocks for ordered rendering
             createMCPBlock(id);
@@ -432,6 +436,10 @@ export const useMessageHandler = (
                     mcpStatus = MCPToolStatus.RUNNING; // Default to running for unknown statuses
                     break;
             }
+            // Clear waiting for reply state
+            if (setIsWaitingReply) {
+                setIsWaitingReply(false);
+            }
 
             // Update workflow with confirmation status
             updateMCPToolState(id, {
@@ -487,6 +495,10 @@ export const useMessageHandler = (
         if (!hasInstructionMarker && chatReturn.current) {
             // Update text accumulator immediately for responsiveness
             agentText.current += data;
+            // Clear waiting for reply state
+            if (setIsWaitingReply) {
+                setIsWaitingReply(false);
+            }
 
             // Batch DOM updates with requestAnimationFrame for better performance
             requestAnimationFrame(() => {
@@ -522,11 +534,7 @@ export const useMessageHandler = (
         if (hasReply && hasInstructionMarker) {
             const agentId = array[1];
 
-            // Clear waiting for reply state
-            if (setIsWaitingReply) {
-                setIsWaitingReply(false);
-            }
-
+            
             let currentAgent = agentList.current.filter((item: any) => item.agent_id == agentId)[0];
 
             // Check if we need to merge with existing message or create new one

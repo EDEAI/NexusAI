@@ -384,4 +384,22 @@ export default {
     'workflow.form.splitTaskByLine.tooltip': '如果开启，则直接将输入变量按行拆分成任务，不再通过大语言模型进行分析和拆分',
     'workflow.split_task_by_line': '是否按行拆分任务',
     'workflow.split_task_by_lineDes': '如果开启，则直接将输入变量按行拆分成任务，不再通过大语言模型进行分析和拆分',
+    
+    // Authorization related translations
+    'workflow.authorization.authorized': '已授权',
+    'workflow.authorization.unauthorized': '未授权',
+    'workflow.authorization.modify': '修改授权',
+    'workflow.authorization.delete': '删除授权',
+    'workflow.authorization.status': '授权状态',
+    'workflow.authorization.success': '授权成功',
+    'workflow.authorization.failed': '授权失败',
+    'workflow.authorization.deleteSuccess': '删除授权成功',
+    'workflow.authorization.deleteFailed': '删除授权失败',
+    'workflow.authorization.confirmDelete': '确认删除授权？',
+    'workflow.authorization.confirmDeleteContent': '删除授权后需要重新进行授权才能使用该工具',
+    'workflow.authorization.tooltip.authorized': '该工具已获得授权，可以正常使用',
+    'workflow.authorization.tooltip.unauthorized': '该工具未获得授权，需要先进行授权',
+    'workflow.authorization.tooltip.modify': '修改当前工具的授权信息',
+    'workflow.authorization.tooltip.delete': '删除当前工具的授权信息',
+    'workflow.cancel': '取消',
 };

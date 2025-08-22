@@ -9,7 +9,7 @@ import { HANDLE_COLOR } from '../config';
 import useOutsideClick from '../hooks/useOutsideClick';
 import useStore from '../store';
 import { BlockEnum } from '../types';
-import CreateNodesToolbarPanel from './CreateNodesToolbarPanel';
+import CreateNodesToolbarPanel from './CreateNodesToolbarPanelUnified';
 
 interface CustomHandleProps {
     id: string;
@@ -63,6 +63,7 @@ const CustomHandle = memo((props: CustomHandleProps & HandleProps) => {
     useUpdateEffect(() => {
         setSelected(params?.data?.selected);
         setToolsShow(false);
+        
     }, [params?.data?.selected]);
 
     const renderToolbarClass = useCallback(() => {
@@ -84,7 +85,7 @@ const CustomHandle = memo((props: CustomHandleProps & HandleProps) => {
         setTimeout(() => {
             setToolsShow(false);
             updateNodeInternals(params?.id);
-        }, 100);
+        }, 200);
     };
     return (
         <Handle
@@ -116,6 +117,10 @@ const CustomHandle = memo((props: CustomHandleProps & HandleProps) => {
                         show={toolsShow}
                         onSelect={onSelect}
                         sourceHandle={props.id}
+                        marginTop={112}
+                        marginRight={12}
+                        marginBottom={12}
+                        marginLeft={350}
                         position={props.type == 'source' ? 'right' : 'left'}
                     />
                 </div>

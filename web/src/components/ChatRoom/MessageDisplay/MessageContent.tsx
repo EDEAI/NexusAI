@@ -37,6 +37,7 @@ export const MessageContent: FC<MessageContentProps> = props => {
         intl,
         isAgent,
         contentId,
+        isCurrentMessage,
         mcpTools,
         updateMCPTool,
         getMCPTool,
@@ -81,7 +82,7 @@ export const MessageContent: FC<MessageContentProps> = props => {
                                       <ReactMarkdown
                                           remarkPlugins={[remarkGfm]}
                                           rehypePlugins={[rehypeHighlight]}
-                                          components={createRenderers(index, intl)}
+                                          components={createRenderers(index, intl,isCurrentMessage)}
                                       >
                                           {block.content}
                                       </ReactMarkdown>

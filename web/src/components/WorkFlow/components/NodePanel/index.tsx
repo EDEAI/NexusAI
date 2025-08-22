@@ -1,10 +1,11 @@
 import DraggablePanel from '@/components/Panel/DraggablePanel';
 import { memo, useState } from 'react';
-import { getBaseNode } from '../../nodes/nodeDisperse';
 import { BlockEnum } from '../../types';
 import WorkFlowLeftMenu from '../Menu/WorkFlowLeftMenu';
 import WorkflowTitle from '../WorkflowTitle';
 import NodePanelContent from './components/NodePanelContent';
+import { useMount } from 'ahooks';
+import { log } from 'mermaid/dist/logger';
 
 interface SearchNodeList {
     [BlockEnum.Agent]?: any;
@@ -47,10 +48,9 @@ export default memo(
         onWidthChange,
         onItemClick,
     }: NodePanelProps) => {
-     
-      
         const [isMinWidth, setIsMinWidth] = useState(false);
         const [isCollapsed, setIsCollapsed] = useState(false);
+
         return (
             <DraggablePanel
                 dragDirection="right"
@@ -61,7 +61,6 @@ export default memo(
                 onChange={(width, height) => {
                     requestAnimationFrame(() => {
                         setIsMinWidth(width < 100);
-
                         onWidthChange?.(width);
                         const containers = document.querySelectorAll('.overflow-y-auto');
                         containers.forEach(container => {

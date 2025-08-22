@@ -1,15 +1,48 @@
 /*
  * @LastEditors: biz
  */
-import React from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Button, Image } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { copyToClipboard } from '../utils/clipboard';
 import { extractTextFromArray } from '../utils';
 import MermaidChart from './MermaidChart';
 
+// Debounced wrapper to delay Mermaid rendering until code is stable for 1s
+type DebouncedMermaidProps = { code: string; index: number; isCurrentMessage: boolean };
+
+const DebouncedMermaidBase: React.FC<DebouncedMermaidProps> = ({ code, index, isCurrentMessage }) => {
+    if(!isCurrentMessage) return <MermaidChart code={code} index={index} />
+    const [ready, setReady] = useState(false);
+
+    useEffect(() => {
+        setReady(false);
+        const timer = setTimeout(() => setReady(true), 1000);
+        return () => clearTimeout(timer);
+    }, [code]);
+
+    if (!ready) {
+        return (
+            <div className="my-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <div className="flex justify-center items-center min-h-[200px] text-gray-500">
+                    <div className="text-sm">Loading Mermaid chart...</div>
+                </div>
+            </div>
+        );
+    }
+
+    return <MermaidChart code={code} index={index} />;
+};
+
+// Memoize DebouncedMermaid to avoid unnecessary re-renders
+const areDebouncedPropsEqual = (prev: DebouncedMermaidProps, next: DebouncedMermaidProps) => {
+    return prev.code === next.code && prev.index === next.index;
+};
+
+const DebouncedMermaid = memo(DebouncedMermaidBase, areDebouncedPropsEqual);
+
 // Markdown renderers for code blocks and images
-export const createRenderers = (index: any, intl: any) => {
+export const createRenderers = (index: any, intl: any,isCurrentMessage:boolean=false) => {
     const downloadFile = (url: string, filename: string) => {
         try {
             const link = document.createElement('a');
@@ -25,15 +58,11 @@ export const createRenderers = (index: any, intl: any) => {
         code: ({ node, className, children, ...props }) => {
             const match = /language-(\w+)/.exec(className || '');
             if (match?.length) {
-                // Handle Mermaid charts
-                // if (match[1] === 'mermaid') {
-                //     return (
-                //         <MermaidChart 
-                //             code={extractTextFromArray(children)} 
-                //             index={index}
-                //         />
-                //     );
-                // }
+                // Handle Mermaid charts with debounce via DebouncedMermaid
+                if (match[1] === 'mermaid') {
+                    const mermaidCode = extractTextFromArray(children);
+                    return <DebouncedMermaid code={mermaidCode} index={index} isCurrentMessage={isCurrentMessage} />;
+                }
                 
                 // Handle regular code blocks
                 const id = Math.random().toString(36).substr(2, 9);

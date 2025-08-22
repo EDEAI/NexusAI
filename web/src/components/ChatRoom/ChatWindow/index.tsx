@@ -96,10 +96,10 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
             
             setCurrentMessage(preparedMessage);
             
-            // 关键改动：设置为true以允许后续流式文本追加
+          
             chatReturn.current = true;
             
-            // 初始化agentText为当前内容，以便正确累积
+            
             agentText.current = preparedMessage.content || '';
             
         } catch (error) {

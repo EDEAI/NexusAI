@@ -391,4 +391,22 @@ export default {
     'workflow.form.splitTaskByLine.tooltip': 'If enabled, the input variable will be split into tasks by line directly, without analysis and splitting by the large language model.',
     'workflow.split_task_by_line': 'Split tasks by line',
     'workflow.split_task_by_lineDes': 'If enabled, the input variable will be split into tasks by line directly, without analysis and splitting by the large language model.',
+    
+    // Authorization related translations
+    'workflow.authorization.authorized': 'Authorized',
+    'workflow.authorization.unauthorized': 'Unauthorized',
+    'workflow.authorization.modify': 'Modify Authorization',
+    'workflow.authorization.delete': 'Delete Authorization',
+    'workflow.authorization.status': 'Authorization Status',
+    'workflow.authorization.success': 'Authorization Successful',
+    'workflow.authorization.failed': 'Authorization Failed',
+    'workflow.authorization.deleteSuccess': 'Delete Authorization Successful',
+    'workflow.authorization.deleteFailed': 'Delete Authorization Failed',
+    'workflow.authorization.confirmDelete': 'Confirm Delete Authorization?',
+    'workflow.authorization.confirmDeleteContent': 'After deleting authorization, you need to re-authorize to use this tool',
+    'workflow.authorization.tooltip.authorized': 'This tool has been authorized and can be used normally',
+    'workflow.authorization.tooltip.unauthorized': 'This tool is not authorized and needs to be authorized first',
+    'workflow.authorization.tooltip.modify': 'Modify the authorization information for the current tool',
+    'workflow.authorization.tooltip.delete': 'Delete the authorization information for the current tool',
+    'workflow.cancel': 'Cancel',
 };
