@@ -3,6 +3,7 @@ from api.schema.tools import toolsResponse, PaginatedToolsResponse, PaginatedToo
 from api.utils.common import *
 from api.utils.jwt import *
 from core.tool.provider.builtin_tool_provider import *
+from core.tool.provider.builtin_tool_provider import get_single_docker_sandbox_tool
 from core.database.models.tool_authorizations import ToolAuthorizations
 from core.tool.provider.builtin_tool_provider import validate_credentials, BuiltinTool
 from core.workflow.nodes.base.sandbox_base import SandboxBaseNode
@@ -145,6 +146,58 @@ async def skill_delete(provider: str, userinfo: TokenData = Depends(get_current_
     except Exception as e:
         # Return error if an exception occurs.
         return response_error(str(e))
+
+
+# Endpoint to get tool details for a specific provider and category
+@router.get("/tool_detail/{provider}")
+async def get_tool_detail(
+    provider: str,
+    tool_category: str = Query('t1', description="Tool category (default: t1)"),
+    userinfo: TokenData = Depends(get_current_user)
+):
+    """
+    Get detailed information for a specific tool provider.
+    
+    Args:
+        provider: Tool provider name
+        tool_category: Tool category (default: 't1')
+        userinfo: Current user information
+        
+    Returns:
+        JSON response with tool provider details including authorization status
+    """
+    try:
+        # Fetch the specific tool provider configuration using optimized function
+        provider_data = get_single_docker_sandbox_tool(tool_category, provider)
+        
+        # Check if provider data was found
+        if not provider_data:
+            return response_error(f"Tool provider '{provider}' not found in category '{tool_category}'")
+        
+        # Check if the tool provider requires credentials and set authorization status
+        if 'credentials_for_provider' in provider_data and provider_data['credentials_for_provider']:
+            tool = ToolAuthorizations()
+            # Get the authorization status of the tool for the current user and team.
+            tool_result = tool.get_tool_info(
+                user_id=userinfo.uid, 
+                team_id=userinfo.team_id, 
+                provider=provider, 
+                tool_category=tool_category
+            )
+            
+            if tool_result["status"] != 1:
+                provider_data['authorization_status'] = 2  # Unauthorized
+            else:
+                provider_data['authorization_status'] = 1  # Authorized
+        else:
+            # No authorization required for this tool provider.
+            provider_data['authorization_status'] = 3  # No authorization required
+        
+        return response_success(provider_data)
+        
+    except Exception as e:
+        print(f"Failed to fetch tool detail: {e}")
+        return response_error(f"Failed to fetch tool detail: {str(e)}")
 
 
 # Endpoint to check if virtual environment exists for given pip packages

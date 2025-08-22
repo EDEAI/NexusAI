@@ -314,6 +314,108 @@ def get_icon_file_info(provider_name: str) -> tuple[str, str]:
     
     return provider_name, default_extension
 
+def get_single_docker_sandbox_tool(category: str, provider: str) -> dict[str, Any]:
+    """
+    Get single tool provider configuration from docker/sandbox directory.
+    This is an optimized version that only loads the specified provider instead of all tools.
+    
+    Args:
+        category: Tool category (e.g., 't1')
+        provider: Provider name
+        
+    Returns:
+        A dictionary containing the specific tool provider configuration
+    """
+    sandbox_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', '..', 'docker', 'sandbox')
+    
+    # Check if sandbox path exists
+    if not os.path.exists(sandbox_path):
+        print(f"Sandbox directory not found: {sandbox_path}")
+        return {}
+    
+    # Navigate to tools directory
+    tools_base_path = os.path.join(sandbox_path, 'tools')
+    if not os.path.exists(tools_base_path):
+        print(f"Tools directory not found: {tools_base_path}")
+        return {}
+    
+    # Navigate to specific category directory
+    category_dir = os.path.join(tools_base_path, category)
+    if not os.path.exists(category_dir) or not os.path.isdir(category_dir):
+        print(f"Category directory not found: {category_dir}")
+        return {}
+    
+    # Navigate to specific provider directory
+    provider_dir = os.path.join(category_dir, provider)
+    if not os.path.exists(provider_dir) or not os.path.isdir(provider_dir):
+        print(f"Provider directory not found: {provider_dir}")
+        return {}
+    
+    provider_config_dir = os.path.join(provider_dir, "provider")
+    yaml_path = os.path.join(provider_config_dir, f"{provider}.yaml")
+    
+    # Check if the YAML file exists for the provider
+    if not os.path.exists(yaml_path):
+        print(f"YAML file missing for provider {provider} in {provider_config_dir}")
+        return {}
+    
+    try:
+        provider_yaml = load_yaml_file(yaml_path, ignore_error=False)
+        
+        # Set icon URL if exists
+        if 'identity' in provider_yaml and 'icon' in provider_yaml['identity']:
+            provider_name = provider_yaml['identity']['name']
+            icon_name, icon_extension = get_icon_file_info(provider_name)
+            provider_yaml['identity']['icon'] = f"{settings.ICON_URL}/tool_icon/{icon_name}.{icon_extension}"
+        
+        # Set the name field in the credentials_for_provider section
+        if 'credentials_for_provider' in provider_yaml and provider_yaml['credentials_for_provider'] is not None:
+            for credential_name, credential_info in provider_yaml['credentials_for_provider'].items():
+                credential_info['name'] = credential_name
+        
+        # Get tools information from provider yaml file
+        tools = []
+        if 'tools' in provider_yaml and provider_yaml['tools']:
+            print(f"Loading tools from provider yaml: {provider_yaml['tools']}")
+            for tool_path_relative in provider_yaml['tools']:
+                # Construct absolute tool file path based on provider directory
+                tool_path = os.path.join(provider_dir, tool_path_relative)
+                print(f"Looking for tool file: {tool_path}")
+                
+                if os.path.exists(tool_path):
+                    try:
+                        tool_yaml = load_yaml_file(tool_path, ignore_error=False)
+                        
+                        # Use ObjectVariable to convert hardcoded data structure
+                        output_variable = ObjectVariable(name='output')
+                        
+                        # Create hardcoded variable dictionary for text output
+                        text_var_dict = {
+                            "name": "output",
+                            "type": "string"
+                        }
+                        
+                        # Add the property to output variable using ObjectVariable
+                        output_variable.add_property("output", create_variable_from_dict(text_var_dict))
+                        
+                        # Convert ObjectVariable to dictionary format
+                        tool_yaml['output'] = output_variable.to_dict()
+                        # Add the processed tool YAML to the tools list
+                        tools.append(tool_yaml)
+                    except Exception as e:
+                        print(f'Cannot load tool YAML {tool_path}: {e}')
+                else:
+                    print(f'Tool file not found: {tool_path}')
+        
+        provider_yaml['tools'] = tools
+        return provider_yaml
+        
+    except Exception as e:
+        # Log error and return empty dict
+        print(f'Cannot load provider YAML for {provider}: {e}')
+        return {}
+
+
 def get_docker_sandbox_tools() -> dict[str, Any]:
     """
     Get all tool configurations from docker/sandbox directory with category structure.
