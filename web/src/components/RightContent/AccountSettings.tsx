@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, message, Tabs } from 'antd';
 import { UserOutlined, LockOutlined, IdcardOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { userinfo, updateProfile, changePassword } from '@/api';
-import { userinfodata } from '@/utils/useUser';
+import { updateProfile, changePassword } from '@/api';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 type AccountSettingsProps = {
   isModalOpen: boolean;
@@ -16,27 +16,17 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ isModalOpen, setIsMod
   const [passwordForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
-  const [userInfo, setUserInfo] = useState<any>(null);
+  const { userInfo, updateUserInfo } = useUserInfo();
 
-  // Get user info when modal opens
+  // Set form values when modal opens and userInfo is available
   useEffect(() => {
-    if (isModalOpen) {
-      fetchUserInfo();
-    }
-  }, [isModalOpen]);
-
-  const fetchUserInfo = async () => {
-    try {
-      const response = await userinfo();
-      setUserInfo(response.data);
+    if (isModalOpen && userInfo) {
       form.setFieldsValue({
-        nickname: response.data.nickname || response.data.nickname,
-        position: response.data.position,
+        nickname: userInfo.nickname || userInfo.nickname,
+        position: userInfo.position,
       });
-    } catch (error) {
-      console.error('Failed to fetch user info:', error);
     }
-  };
+  }, [isModalOpen, userInfo, form]);
 
   const handleProfileSubmit = async (values: any) => {
     setLoading(true);
@@ -46,19 +36,12 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({ isModalOpen, setIsMod
         position: values.position,
       });
       message.success(intl.formatMessage({ id: 'user.profileUpdateSuccess' }));
-      // Update local user info
-      const updatedUserInfo = {
-        ...userInfo,
+      
+      // Update global user info using the hook
+      updateUserInfo({
         nickname: values.nickname,
         position: values.position,
-      };
-      setUserInfo(updatedUserInfo);
-      // Update localStorage for global user info
-      userinfodata('SET', updatedUserInfo);
-      // Trigger custom event to update AvatarName component
-      window.dispatchEvent(new CustomEvent('userInfoUpdated', { 
-        detail: { type: 'userInfoUpdated' } 
-      }));
+      });
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,4 @@
-import { userinfodata } from '@/utils/useUser';
+import { useUserInfo } from '@/hooks/useUserInfo';
 import {
     DeploymentUnitOutlined,
     LogoutOutlined,
@@ -24,38 +24,11 @@ export type GlobalHeaderRightProps = {
 };
 
 export const AvatarName = () => {
-    const [nickname, setNickname] = useState<string>('');
-    
-    useEffect(() => {
-        // Initial load
-        const userInfo = userinfodata('GET');
-        setNickname(userInfo?.nickname || '');
-        
-        // Listen for storage changes
-        const handleStorageChange = () => {
-            const userInfo = userinfodata('GET');
-            setNickname(userInfo?.nickname || '');
-        };
-        
-        // Custom event for same-tab updates
-        const handleCustomEvent = (event: CustomEvent) => {
-            if (event.detail?.type === 'userInfoUpdated') {
-                handleStorageChange();
-            }
-        };
-        
-        window.addEventListener('storage', handleStorageChange);
-        window.addEventListener('userInfoUpdated', handleCustomEvent as EventListener);
-        
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-            window.removeEventListener('userInfoUpdated', handleCustomEvent as EventListener);
-        };
-    }, []);
+    const { userInfo } = useUserInfo();
     
     return (
         <div className=" w-[100px] truncate">
-            <span className="">{nickname}</span>
+            <span className="">{userInfo?.nickname || ''}</span>
         </div>
     );
 };
@@ -79,6 +52,8 @@ const useStyles = createStyles(({ token }) => {
 });
 
 export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, children }) => {
+    const { userInfo } = useUserInfo();
+    
     const loginOut = async () => {
         const { search, pathname } = window.location;
         const urlParams = new URL(window.location.href).searchParams;
@@ -162,7 +137,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         {
             key: 'roleManagement',
             icon: <UserOutlined />,
-            disabled: userinfodata('GET')?.role == 1 ? false : true,
+            disabled: userInfo?.role == 1 ? false : true,
             label: intl.formatMessage({
                 id: 'workflow.menu.roleManagement',
                 defaultMessage: 'Role Management',
@@ -204,7 +179,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         {
             key: 'Modelsetup',
             icon: <DeploymentUnitOutlined />,
-            disabled: userinfodata('GET')?.role == 1 ? false : true,
+            disabled: userInfo?.role == 1 ? false : true,
             label: intl.formatMessage({
                 id: 'workflow.menu.modelSetup',
                 defaultMessage: '',

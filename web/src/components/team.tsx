@@ -5,9 +5,9 @@ import { Avatar, Button, Input, message, Modal, Select, Space, Table, Tooltip, T
 import React, { useEffect, useState } from 'react';
 import gandUp from '../../public/icons/gandUp.svg';
 import { getTeamList, postInviteUser, getUserTeams, switchUserTeam } from '../api/team';
-import { userinfo, getRolesList, switchMemberRole, type RoleListResponse } from '../api/index';
+import { getRolesList, switchMemberRole, type RoleListResponse } from '../api/index';
 import type { REQ_TYPE } from '../api/request';
-import { userinfodata } from '../utils/useUser';
+import { useUserInfo } from '../hooks/useUserInfo';
 import { usePermissions } from '../hooks/usePermissions';
 import { PERMISSION_IDS } from '../utils/permissions';
 import TeamSwitcher from './TeamSwitcher';
@@ -37,6 +37,7 @@ interface DataType {
 const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     const intl = useIntl();
     const { userInfo, hasPermission, isTeamAdmin } = usePermissions();
+    const { refreshUserInfo } = useUserInfo();
     const columns: TableProps<DataType>['columns'] = [
         {
             title: intl.formatMessage({ id: 'user.name', defaultMessage: '' }),
@@ -75,8 +76,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
             width: '25%',
             render: (_, record) => {
                 // Get current user info to check if this is the user's own role
-                const currentUserInfo = userinfodata('GET');
-                const isOwnRole = currentUserInfo && record.user_id === currentUserInfo.uid;
+                const isOwnRole = userInfo && record.user_id === userInfo.uid;
                 
                 return (
                     <Space size="middle" key={_}>
@@ -152,11 +152,8 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                     localStorage.setItem('token', res.data.access_token);
                 }
                 
-                // Get latest user info to update role cache
-                const userInfoRes = await userinfo();
-                if (userInfoRes.code === 0 && userInfoRes.data) {
-                    userinfodata('SET', userInfoRes.data);
-                }
+                // Refresh user info to update role cache
+                await refreshUserInfo();
                 
                 window.location.reload();
             }
@@ -219,9 +216,8 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                 }));
                 setTeams(teamsData);
 
-                // Get current team ID from user_info API
-                const userInfoRes = await userinfo();
-                const currentTeamId = userInfoRes?.data?.team_id;
+                // Get current team ID from user info
+                const currentTeamId = userInfo?.team_id;
                 
                 if (teamsData.length > 0) {
                     if (currentTeamId) {
@@ -254,9 +250,8 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     // Get current user role from userinfo
     const getCurrentUserRole = async () => {
         try {
-            const userInfoRes = await userinfo();
-            if (userInfoRes.code === 0 && userInfoRes.data) {
-                setCurrentUserRole(userInfoRes.data.role);
+            if (userInfo) {
+                setCurrentUserRole(userInfo.role);
             }
         } catch (error) {
             console.error('Failed to get current user role:', error);

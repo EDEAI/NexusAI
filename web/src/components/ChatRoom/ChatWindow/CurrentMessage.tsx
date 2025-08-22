@@ -3,7 +3,7 @@
  */
 import React, { FC } from 'react';
 import Avatar from '@/components/ChatAvatar';
-import { userinfodata } from '@/utils/useUser';
+import { useUserInfo } from '@/hooks/useUserInfo';
 import { MessageContent } from '../MessageDisplay/MessageContent';
 import { parseMCPContent } from '../utils/mcpParser';
 import { MCPToolRuntimeData } from '../types/mcp';
@@ -32,6 +32,7 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
     
     // Use context for setInstruction
     const { setInstruction } = useChatRoomContext();
+    const { userInfo } = useUserInfo();
 
     if (!currentMessage.name) {
         return null;
@@ -63,7 +64,7 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
                 >
                     {currentMessage.name
                         ? currentMessage.name
-                        : userinfodata('GET').nickname}
+                        : userInfo?.nickname || ''}
                 </div>
                 <div
                     className={`flex ${
@@ -91,4 +92,4 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
             </div>
         </div>
     );
-}; 
+};

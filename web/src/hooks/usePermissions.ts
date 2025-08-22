@@ -1,7 +1,7 @@
 // Custom hook for managing user permissions
 
-import { useState, useEffect, useCallback } from 'react';
-import { userinfo } from '../api/index';
+import { useCallback } from 'react';
+import { useUserInfo } from './useUserInfo';
 import { 
   hasPermission, 
   hasAnyPermission, 
@@ -42,39 +42,7 @@ interface UsePermissionsReturn {
  * @returns Object containing user info, permission checking functions, and utility methods
  */
 export const usePermissions = (): UsePermissionsReturn => {
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Fetch user info including permissions
-  const fetchUserInfo = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await userinfo();
-      if (response.code === 0 && response.data) {
-        setUserInfo(response.data);
-      } else {
-        setError('Failed to fetch user information');
-      }
-    } catch (err) {
-      console.error('Error fetching user info:', err);
-      setError('Error fetching user information');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Refresh user info
-  const refreshUserInfo = useCallback(async () => {
-    await fetchUserInfo();
-  }, [fetchUserInfo]);
-
-  // Initialize user info on mount
-  useEffect(() => {
-    fetchUserInfo();
-  }, [fetchUserInfo]);
+  const { userInfo, loading, error, refreshUserInfo } = useUserInfo();
 
   // Permission checking functions
   const checkPermission = useCallback((permissionId: number): boolean => {

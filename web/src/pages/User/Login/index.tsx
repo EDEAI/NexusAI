@@ -1,8 +1,9 @@
 import { Footer } from '@/components';
 
-import { login, userinfo } from '@/api';
+import { login } from '@/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
-import { creationsearchdata, userinfodata } from '@/utils/useUser';
+import { creationsearchdata } from '@/utils/useUser';
+import { useUserInfo } from '@/hooks/useUserInfo';
 import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormCaptcha, ProFormText } from '@ant-design/pro-components';
 import {
@@ -86,14 +87,13 @@ const Login: React.FC = () => {
     const { initialState, setInitialState } = useModel('@@initialState');
     const { styles } = useStyles();
     const intl = useIntl();
+    const { refreshUserInfo, userInfo } = useUserInfo();
 
     const fetchUserInfo = async () => {
-        const userInfo = await userinfo();
-        console.log('user', userInfo.data);
-        userinfodata('SET', userInfo.data);
+        await refreshUserInfo();
         creationsearchdata('SET', 6, false, '');
         setTimeout(() => {
-            setLocale(userInfo?.data?.language == 'en' ? 'en-US' : 'zh-CN');
+            setLocale(userInfo?.language == 'en' ? 'en-US' : 'zh-CN');
         }, 100);
     };
 
