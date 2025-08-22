@@ -137,6 +137,7 @@ class Workflows(MySQL):
         if workflows_search_type == 1:
             conditions = [
                 {"column": "workflows.user_id", "value": uid},
+                {"column": "workflows.team_id", "value": team_id},
                 {"column": "workflows.publish_status", "value": 0},
                 {"column": "workflows.status", "op": "in", "value": [1, 2]},
                 {"column": "apps.mode", "value": 2},
@@ -155,6 +156,7 @@ class Workflows(MySQL):
         else:
             conditions = [
                 {"column": "workflows.user_id", "value": uid},
+                {"column": "workflows.team_id", "value": team_id},
                 {"column": "workflows.publish_status", "value": 1},
                 {"column": "workflows.status", "value": 1},
                 {"column": "apps.mode", "value": 2},
@@ -441,6 +443,7 @@ class Workflows(MySQL):
                      "app_runs.elapsed_time", "app_runs.finished_time",
                      "app_runs.status AS app_runs_status", "app_runs.completed_steps", "app_runs.total_steps",
                      "app_runs.total_tokens",
+                     "app_runs.paused",
                      "users.nickname"
                      ],
             joins=[

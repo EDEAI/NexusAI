@@ -11,6 +11,7 @@ from langchain_core.documents import BaseDocumentCompressor, Document
 
 _module_lookup = {
     'CrossEncoderReranker': 'core.reranker.cross_encoder_rerank',
+    'SiliconFlowReranker': 'core.reranker.siliconflow',
 }
 
 

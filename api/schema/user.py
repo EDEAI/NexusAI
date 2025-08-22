@@ -1,9 +1,17 @@
 from pydantic import BaseModel
 from typing import Optional,Dict,Any,List,Union
+from datetime import datetime
 
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class PermissionData(BaseModel):
+    id: int
+    title: str
+    status: int
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 class UserData(BaseModel):
     uid: Optional[int] = None
@@ -15,9 +23,11 @@ class UserData(BaseModel):
     email: Optional[str] = None
     position: Optional[str] = None
     role: Optional[int] = None
+    role_id: Optional[int] = None
     language: Optional[str] = None
     team_type: Optional[int] = None
     three_list: List[Any]
+    permissions: Optional[List[PermissionData]] = []
     
 class RegisterTeamData(BaseModel):
     team_id: Optional[int] = 1
@@ -72,7 +82,8 @@ class ThirdPartyLoginData(BaseModel):
     email: Optional[str] = None
     position: Optional[str] = None
     language: Optional[str] = 'en'
-
+class SwitchTeamId(BaseModel):
+    team_id: Optional[int] = 1
 class ThirdPartyUserData(BaseModel):
     uid: Optional[int] = None
     nickname: Optional[str] = None
@@ -120,3 +131,8 @@ class ChangePasswordData(BaseModel):
     old_password: str
     new_password: str
     confirm_password: str
+
+class SwitchMemberRoleData(BaseModel):
+    user_id: int
+    role: int = 2
+    role_id: Optional[int] = None

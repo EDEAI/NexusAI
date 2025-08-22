@@ -42,7 +42,7 @@ async def chatroom_list(page: int = 1, page_size: int = 10, name: str = "",is_te
     Raises:
     - HTTPException: If there are issues with pagination parameters or if the user is not authenticated.
     """
-    result = Chatrooms().all_chat_room_list(page, page_size, userinfo.uid, name, is_temporary)
+    result = Chatrooms().all_chat_room_list(page, page_size, userinfo.uid, userinfo.team_id, name, is_temporary)
     return response_success(result)
 
 

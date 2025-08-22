@@ -28,5 +28,15 @@ export default {
     'component.menu.arrange': '编排',
     'component.menu.accessAPI': '访问API',
     'component.tooltip.enableAPIFirst': '请先开启API',
-    'component.menu.log': '日志'
+    'component.menu.log': '日志',
+    'component.team.currentTeam': '当前团队：{name}',
+    'component.team.switchTeam': '切换团队',
+    'component.team.currentTeamLabel': '当前团队：',
+    'component.team.selectTeamToSwitch': '选择要切换的团队：',
+    'component.team.selectTeam': '选择团队',
+    'component.team.memberCount': '{count}人',
+    'component.team.switchConfirmWithPosition': '切换到「{name}」后，您将以{position}职位、{role}身份访问该团队',
+    'component.team.switchConfirmWithoutPosition': '切换到「{name}」后，您将以{role}身份访问该团队',
+    'component.team.switchSuccess': '团队切换成功',
+    'component.team.cancel': '取消'
 };

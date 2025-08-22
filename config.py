@@ -3300,6 +3300,32 @@ model_config = [
             'text2img': [],
             'moderation': []
         }
+    },
+    {
+        'supplier': 'SiliconFlow',
+        'mode': 1,
+        'config': [
+            {
+                "key": "api_key",
+                "type": "str",
+                "value": "",
+                "secret": True,
+                "options": None,
+                "optional": False,
+                "description": "The API Key is an important credential for you to request the SiliconFlow model service.",
+                "default_value": ""
+            },
+            {
+                "key": "base_url",
+                "type": "str",
+                "value": "https://api.siliconflow.cn/v1/rerank",
+                "secret": False,
+                "options": None,
+                "optional": False,
+                "description": "Base URL for API requests",
+                "default_value": "https://api.siliconflow.cn/v1/rerank"
+            }
+        ]
     }
 ]
 
@@ -3401,7 +3427,7 @@ model_type = {
         'type': 'EMBEDDING'
     },
     3: {
-        'type': 'RERANK'
+        'type': 'RERANKING'
     },
     4: {
         'type': 'SPEECH2TEXT'

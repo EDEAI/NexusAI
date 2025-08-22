@@ -144,8 +144,8 @@ class Users(MySQL):
             }
             if nickname and nickname.strip():
                 update_data['nickname'] = nickname
-            if position and position.strip():
-                update_data['position'] = position
+            # if position and position.strip():
+            #     update_data['position'] = position
             if avatar and avatar.strip():
                 update_data['avatar'] = avatar
             if language and language.strip():
@@ -163,8 +163,8 @@ class Users(MySQL):
                 }
                 if nickname and nickname.strip():
                     new_data['nickname'] = nickname
-                if position and position.strip():
-                    new_data['position'] = position
+                # if position and position.strip():
+                #     new_data['position'] = position
                 if avatar and avatar.strip():
                     new_data['avatar'] = avatar
                 user_info = self.select_one(columns=['id','phone','email'], conditions=[{'column': 'id', 'value': user_id}, {'column': 'status', 'value': 1}])
@@ -210,6 +210,15 @@ class Users(MySQL):
                     [{'column': 'id', 'value': user_id}],
                     new_data
                 )
+                if position and position.strip():
+                    from api.utils.auth import get_uid_user_info
+                    userInfos=get_uid_user_info(user_id)
+                    UserTeamRelations().update(
+                        [{'column': 'user_id', 'value': user_id},{'column': 'team_id', 'value': userInfos['team_id']}],
+                        {
+                            'position':position
+                        }
+                    )
                 UserThreeParties().update(
                     [{'column': 'user_id', 'value': existing_user['id']}],
                     {
@@ -242,6 +251,16 @@ class Users(MySQL):
                     [{'column': 'id', 'value': existing_user['id']}],
                     update_data
                 )
+
+                if position and position.strip():
+                    from api.utils.auth import get_uid_user_info
+                    userInfos=get_uid_user_info(existing_user['id'])
+                    UserTeamRelations().update(
+                        [{'column': 'user_id', 'value': existing_user['id']},{'column': 'team_id', 'value': userInfos['team_id']}],
+                        {
+                            'position':position
+                        }
+                    )
                 
                 return existing_user['id']
 
@@ -260,8 +279,8 @@ class Users(MySQL):
             }
             if nickname and nickname.strip():
                 update_data['nickname'] = nickname
-            if position and position.strip():
-                update_data['position'] = position
+            # if position and position.strip():
+            #     update_data['position'] = position
             if avatar and avatar.strip():
                 update_data['avatar'] = avatar
             if language and language.strip():
@@ -274,6 +293,16 @@ class Users(MySQL):
                 [{'column': 'id', 'value': user_id}],
                 update_data
             )
+
+            if position and position.strip():
+                from api.utils.auth import get_uid_user_info
+                userInfos=get_uid_user_info(user_id)
+                UserTeamRelations().update(
+                    [{'column': 'user_id', 'value': user_id},{'column': 'team_id', 'value': userInfos['team_id']}],
+                    {
+                        'position':position
+                    }
+                )
             
             UserThreeParties().insert(
                 {
@@ -312,7 +341,7 @@ class Users(MySQL):
                 'role_id': 1,
                 'inviter_id': 0,
                 'nickname': nickname or f'{platform}_user',
-                'position': position,
+                # 'position': position,
                 'phone': phone,
                 'email': email,
                 'password': 'third_party_default',
@@ -343,6 +372,7 @@ class Users(MySQL):
             user_team_data = {
                 'user_id':user_id,
                 'team_id':team_id,
+                'position':position,
                 'role':2,
                 'role_id': 1,
                 'inviter_id': 0,
@@ -447,8 +477,8 @@ class Users(MySQL):
             }
             if nickname and nickname.strip():
                 update_data['nickname'] = nickname
-            if position and position.strip():
-                update_data['position'] = position
+            # if position and position.strip():
+            #     update_data['position'] = position
             if avatar and avatar.strip():
                 update_data['avatar'] = avatar
             if language and language.strip():
@@ -466,8 +496,8 @@ class Users(MySQL):
                 }
                 if nickname and nickname.strip():
                     new_data['nickname'] = nickname
-                if position and position.strip():
-                    new_data['position'] = position
+                # if position and position.strip():
+                #     new_data['position'] = position
                 if avatar and avatar.strip():
                     new_data['avatar'] = avatar
                 user_info = self.select_one(columns=['id','phone','email'], conditions=[{'column': 'id', 'value': user_id}, {'column': 'status', 'value': 1}])
@@ -512,6 +542,16 @@ class Users(MySQL):
                     [{'column': 'id', 'value': user_id}],
                     new_data
                 )
+
+                if position and position.strip():
+                    from api.utils.auth import get_uid_user_info
+                    userInfos=get_uid_user_info(user_id)
+                    UserTeamRelations().update(
+                        [{'column': 'user_id', 'value': user_id},{'column': 'team_id', 'value': userInfos['team_id']}],
+                        {
+                            'position':position
+                        }
+                    )
                 if sundry is not None and sundry != '' and sundry.strip() != '':
                     UserThreeParties().update(
                         [{'column': 'user_id', 'value': existing_user['id']}],
@@ -543,6 +583,17 @@ class Users(MySQL):
                     [{'column': 'id', 'value': existing_user['id']}],
                     update_data
                 )
+
+                if position and position.strip():
+                    from api.utils.auth import get_uid_user_info
+                    userInfos=get_uid_user_info(existing_user['id'])
+                    UserTeamRelations().update(
+                        [{'column': 'user_id', 'value': existing_user['id']},{'column': 'team_id', 'value': userInfos['team_id']}],
+                        {
+                            'position':position
+                        }
+                    )
+
                 return existing_user['id']
     def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         user = self.select_one(

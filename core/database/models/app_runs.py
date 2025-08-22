@@ -81,18 +81,22 @@ class AppRuns(MySQL):
         data = self.select_one(
             columns=['app_runs.id AS app_run_id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.workflow_id', 'app_runs.type', 'app_runs.level', 'app_runs.context', 'app_runs.completed_steps', 'app_runs.actual_completed_steps', 'app_runs.completed_edges', 'app_runs.status', 'app_runs.elapsed_time',
                 'app_runs.prompt_tokens', 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens', 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.finished_time' ,'apps.avatar' ,'apps.icon'],
-            conditions=[{"column": "id", "value": app_run_id}, {"column": "status", "op": "in", "value": [2, 4]}],
+            conditions=[{"column": "id", "value": app_run_id},{"column": "paused", "value": 0}, {"column": "status", "op": "in", "value": [2, 4]}],
             joins=[
                 ["left", "apps", "app_runs.app_id = apps.id"]
             ]
         )
+        
+        if data is None:
+            return None
+            
         if data and data.get('avatar'):
             if data['avatar'].find('head_icon') == -1:
                 data['avatar'] = f"{settings.STORAGE_URL}/upload/{data['avatar']}"
             else:
                 data["avatar"] = f"{settings.ICON_URL}/{data['avatar']}"
         else:
-            if data['icon']:
+            if data.get('icon'):
                 data['avatar'] = f"{settings.ICON_URL}/head_icon/{data['icon']}.png"
             else:
                 data['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
@@ -136,6 +140,10 @@ class AppRuns(MySQL):
 
         if data['user_id'] > 0:
             conditions.append({"column": "app_node_user_relation.user_id", "value": data['user_id']})
+            from api.utils.auth import get_uid_user_info
+            userInfo = get_uid_user_info(data['user_id'])
+            if userInfo:
+                conditions.append({"column": "apps.team_id", "value": userInfo['team_id']})
         else:
             conditions.append({"column": "app_node_user_relation.user_id", "value": 0})
 
@@ -217,6 +225,11 @@ class AppRuns(MySQL):
         ]
 
         if 'user_id' in data:
+            from api.utils.auth import get_uid_user_info
+            userInfo = get_uid_user_info(data['user_id'])
+            conditions.append([
+                {"column": "apps.team_id", "value": userInfo['team_id']},
+            ])
             conditions.append([
                 {"column": "apps.user_id", "value": data['user_id'], 'logic': 'or'},
                 {"column": "app_runs.user_id", "value": data['user_id']}
@@ -225,7 +238,7 @@ class AppRuns(MySQL):
         list = self.select(
             columns=['app_runs.id AS app_run_id', 'apps.name AS apps_name', 'app_runs.name AS app_runs_name',
                      'app_runs.workflow_id', 'app_runs.created_time', 'app_runs.elapsed_time', 'app_runs.status',
-                     'app_runs.completed_steps', 'app_runs.total_steps', 'app_runs.need_human_confirm', 'apps.icon', "apps.avatar", 'apps.icon_background'],
+                     'app_runs.completed_steps', 'app_runs.total_steps', 'app_runs.need_human_confirm', 'apps.icon', "apps.avatar", 'apps.icon_background', 'app_runs.paused'],
             joins=[('inner', 'apps', 'app_runs.app_id = apps.id')],
             conditions=conditions,
             order_by = "app_runs.id DESC",
@@ -314,6 +327,35 @@ class AppRuns(MySQL):
         )
         return result
 
+    def has_access_to_app_run(self, app_run_id: int, user_id: int) -> bool:
+        """
+        Check whether the given user has permission to access the specified app_run.
+
+        Permission rule:
+        - If the user is the owner of the app_run (app_runs.user_id == user_id) -> True
+        - Else, if the user is the owner of the associated workflow (workflows.user_id == user_id) -> True
+        - Otherwise -> False
+        """
+        record = self.select_one(
+            columns=[
+                'app_runs.user_id AS app_run_user_id',
+                'workflows.user_id AS workflow_user_id'
+            ],
+            joins=[
+                ["left", "workflows", "app_runs.workflow_id = workflows.id"]
+            ],
+            conditions=[
+                {"column": "app_runs.id", "value": app_run_id}
+            ]
+        )
+        if not record:
+            return False
+        if record.get('app_run_user_id') == user_id:
+            return True
+        if record.get('workflow_user_id') == user_id:
+            return True
+        return False
+
     def get_app_run_info(self, app_run_id: int, user_id: int) -> Dict[str, Any]:
         return self.select_one(
             columns=["id"],
@@ -350,6 +392,12 @@ class AppRuns(MySQL):
             {'column': 'app_runs.status', 'op': 'in', 'value': [3, 4]},
             {'column': 'app_runs.app_id', 'op': '>', 'value': 0}
         ]
+
+        from api.utils.auth import get_uid_user_info
+        userInfo = get_uid_user_info(user_id)
+        conditions.append([
+            {"column": "apps.team_id", "value": userInfo['team_id']},
+        ])
 
         total_count = self.select_one(
             aggregates={"id": "count"},

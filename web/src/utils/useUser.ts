@@ -2,16 +2,6 @@ import { getModelList } from '@/api/workflow';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
 let llm_model_list = [];
 
-export const userinfodata = (type: string, values?: any): any => {
-    if (type === 'SET') {
-        localStorage.setItem('userInfo', JSON.stringify(values));
-    } else if (type === 'GET') {
-        return JSON.parse(localStorage.getItem('userInfo'));
-    } else if (type === 'REMOVE') {
-        localStorage.removeItem('userInfo');
-    }
-};
-
 export const headportrait = (type: string, headId?: number): any => {
 
 

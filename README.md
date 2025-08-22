@@ -64,7 +64,7 @@ Enter the Docker directory of the NexusAI source code
 cd NexusAI/docker
 ```
 
-Copy `docker-compose.yml` and replace `SANDBOX_HOST` with the real IP address of the host
+Copy `docker-compose.yml` and modify the `docker-compose.yml` configuration items as needed. For configuration instructions, refer to [docker-compose.yml configuration instructions](#docker-composeyml-configuration-instructions)
 ```bash
 cp docker-compose.yml.template docker-compose.yml
 ```
@@ -109,7 +109,7 @@ nexusai-docker-milvus-standalone   milvusdb/milvus:v2.3.1                     "/
 nexusai-docker-multi-service       edeai/multi_service:0.0.3                  "supervisord -c /etc…"   multi_service       50 minutes ago   Up 50 minutes
 nexusai-docker-nginx               nginx:latest                               "/docker-entrypoint.…"   nginx               50 minutes ago   Up 40 minutes             0.0.0.0:9470->80/tcp
 nexusai-docker-redis               redis:6.2                                  "docker-entrypoint.s…"   redis               50 minutes ago   Up 50 minutes             0.0.0.0:9462->6379/tcp
-nexusai-docker-sandbox             edeai/sandbox:0.0.3                        "python api_server.py"   sandbox             50 minutes ago   Up 50 minutes             0.0.0.0:9464->8001/tcp
+nexusai-docker-sandbox             edeai/sandbox:0.0.4                        "python api_server.py"   sandbox             50 minutes ago   Up 50 minutes             0.0.0.0:9464->8001/tcp
 nexusai-docker-web                 edeai/web:0.0.2                            "docker-entrypoint.s…"   web                 50 minutes ago   Up 50 minutes
 ```
 
@@ -128,7 +128,7 @@ Password:
 nexusaipwd
 ```
 
-Note that the initial administrator password is updated through the environment variable `INIT_ADMIN_PASSWORD` in `docker-compose.yml`
+Note that the initial administrator password can be changed through the web interface after first login
 
 ## Pull NexusAI
 Please execute the commands in the following order:
@@ -233,8 +233,13 @@ FASTAPI_WORKERS: 2
 # Number of celery service workers
 CELERY_WORKERS: 4
 
-# Initial administrator password. After changing this configuration, restart NexusAI to take effect.
-INIT_ADMIN_PASSWORD: nexusaiadmin
+# SMTP email configuration
+SMTP_SERVER: 
+SMTP_PORT: 587
+SMTP_USERNAME: 
+SMTP_PASSWORD: 
+SMTP_USE_TLS: true
+SMTP_TIMEOUT: 30
 ```
 
 Front-end environment variables
@@ -425,11 +430,6 @@ admin@nexusai.com
 
 Password:
 nexusaipwd
-```
-
-Note: To update the initial administrator password
-```bash
-python scripts/init_admin_password.py
 ```
 
 ## Pull NexusAI

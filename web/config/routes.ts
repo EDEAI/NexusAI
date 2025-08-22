@@ -73,6 +73,21 @@ export default [
         component: './Creation/index',
     },
     {
+        name: 'role-management',
+        path: '/role-management',
+        component: './RoleManagement',
+    },
+    {
+        name: 'role-create',
+        path: '/role-management/create',
+        component: './RoleManagement/Create',
+    },
+    {
+        name: 'role-edit',
+        path: '/role-management/edit/:id',
+        component: './RoleManagement/Edit',
+    },
+    {
         path: '/creation',
         name: 'creation',
         component: './Creation/index',

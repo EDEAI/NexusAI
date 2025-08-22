@@ -74,11 +74,13 @@ class Apps(MySQL):
         if search_type == 1:
             conditions = [
                 {"column": "apps.user_id", "value": user_id},
+                {"column": "apps.team_id", "value": team_id},
                 {"column": "apps.status", "op": "in", "value": [1, 2]},
             ]
         elif search_type == 3:
             conditions = [
                 {"column": "apps.user_id", "value": user_id},
+                {"column": "apps.team_id", "value": team_id},
                 {"column": "apps.publish_status", "value": 1},
                 {"column": "apps.status", "value": 1},
             ]

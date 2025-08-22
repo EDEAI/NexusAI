@@ -4,7 +4,7 @@
 import React, { FC, useEffect } from 'react';
 import { useIntl } from '@umijs/max';
 import Avatar from '@/components/ChatAvatar';
-import { userinfodata } from '@/utils/useUser';
+import { useUserInfo } from '@/hooks/useUserInfo';
 import { MessageContent } from './MessageContent';
 import { MessageActions } from './MessageActions';
 import { MCPToolRuntimeData } from '../types/mcp';
@@ -41,6 +41,7 @@ export const MessageItem: FC<MessageItemProps> = props => {
     } = props;
     const intl = useIntl();
     const isAgent = item.is_agent === 1;
+    const { userInfo } = useUserInfo();
 
     // New: Smart content check - hide empty historical messages
     if (!hasMessageContent(item)) {
@@ -67,7 +68,7 @@ export const MessageItem: FC<MessageItemProps> = props => {
                         isAgent ? 'text-left' : 'text-right'
                     } font-[500] text-[14px] text-[#213044] pb-[8px]`}
                 >
-                    {item.name ? item.name : userinfodata('GET').nickname}
+                    {item.name ? item.name : userInfo?.nickname || ''}
                     {item.ability_id > 0 && (
                         <>
                             {' '}
@@ -111,4 +112,4 @@ export const MessageItem: FC<MessageItemProps> = props => {
             </div>
         </div>
     );
-}; 
+};
