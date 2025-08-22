@@ -245,6 +245,14 @@ export const getToolAuthorizationStatus = async (name, data) => {
     return await aniRequest<any>(`/v1/tool/tools_authorization/${name}`, { method: 'PUT', data });
 };
 
+export const delToolAuthorization = async (name) => {
+    return await aniRequest<any>(`/v1/tool/tools_delete_authorization/${name}`, { method: 'DELETE' });
+};
+
+export const getToolDetail = async (name) => {
+    return await aniRequest<any>(`/v1/tool/tool_detail/${name}`, { method: 'GET' });
+};
+
 /**
  * Get node confirm user list
  * @returns {Promise<any>} Returns a Promise object with the node confirm user list

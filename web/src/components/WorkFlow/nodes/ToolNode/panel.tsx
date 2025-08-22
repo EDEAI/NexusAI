@@ -1,7 +1,7 @@
 /*
  * @LastEditors: biz
  */
-import { getToolAuthorizationStatus } from '@/api/workflow';
+import { delToolAuthorization, getToolAuthorizationStatus, getToolDetail } from '@/api/workflow';
 import {
     ProForm,
     ProFormDigit,
@@ -11,6 +11,8 @@ import {
 } from '@ant-design/pro-components';
 import { getLocale, useIntl } from '@umijs/max';
 import { useMount, useUpdateEffect } from 'ahooks';
+import { Button, Tag, Space, Modal } from 'antd';
+import { CheckCircleOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import Link from 'antd/lib/typography/Link';
 import { debounce } from 'lodash';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -83,6 +85,7 @@ export default memo(({ node }: { node: AppNode }) => {
     const intl = useIntl();
     const updateNodeData = useStore(state => state.updateNodeData);
     const getVariables = useStore(state => state.getOutputVariables);
+    const nodes = useStore(state => state.nodes);
     const [params, setParams] = useState<any>([]);
     const [authorizationStatus, setAuthorizationStatus] = useState<any>(1);
     const [credentialsProvider, setCredentialsProvider] = useState<Record<
@@ -102,13 +105,21 @@ export default memo(({ node }: { node: AppNode }) => {
         loadingRef.current = loading;
     });
 
+    const getGroupDetail = async () => {
+        const res = await getToolDetail(node.data?.baseData?.groupName);
+        if(res?.code==0){
+            // setToolDetail(res?.data);
+            setAuthorizationStatus(res?.data?.authorization_status);
+        }
+    };
     useMount(() => {
         setLoading(true);
         const nodeData = node.data as any;
         setParams(nodeData?.baseData?.parameters || []);
-        setAuthorizationStatus(nodeData?.baseData?.authorization_status || 1);
+        
+        // setAuthorizationStatus(nodeData?.baseData?.authorization_status || 1);
         setCredentialsProvider(nodeData?.baseData?.credentials_for_provider || null);
-
+        getGroupDetail();
         const vars = getVariables(node.id);
         setEditorOptions(vars);
 
@@ -118,17 +129,30 @@ export default memo(({ node }: { node: AppNode }) => {
                 setLoading(false);
                 return;
             }
+            debugger
             fieldNames
                 // .filter(x => nodeData['form']?.[x])
                 .forEach(e => {
                     if (nodeData['form']?.[e] && nodeData['form']?.[e] != '') {
                         formRef.current.setFieldsValue({ [e]: nodeData['form']?.[e] });
+                        debugger
                     } else {
                         const hasDefault = nodeData?.baseData?.parameters?.find(
                             x => x.name == e && x.default,
                         );
                         if (hasDefault) {
-                            setEditorValue(e, hasDefault.default);
+                            switch(hasDefault.type){
+                                case "object":
+                                case "json":
+                                case "array":
+                                case "string":
+                                    setEditorValue(e, hasDefault.default);
+                                    break;
+                                default:
+                                    formRef.current.setFieldsValue({ [e]: hasDefault.default });
+                                    break;
+                            }
+                         
                         }
                     }
                 });
@@ -174,6 +198,15 @@ export default memo(({ node }: { node: AppNode }) => {
                     authorization_status: 1,
                 },
             });
+            const nodeList = nodes.filter(x=>x.data?.baseData?.groupName==nodeData?.baseData?.groupName);
+            nodeList.forEach(x=>{
+                updateNodeData(x.id, {
+                    baseData: {
+                        ...x.data?.baseData,
+                        authorization_status: 1,
+                    },
+                });
+            });
         }
     };
 
@@ -192,6 +225,40 @@ export default memo(({ node }: { node: AppNode }) => {
             formRef.current.setFieldsValue({ [name]: newValue });
         }
     }, []);
+
+    const delAuthorization = async () => {
+        Modal.confirm({
+            title: intl.formatMessage({
+                id: 'workflow.authorization.confirmDelete',
+                defaultMessage: 'Confirm Delete Authorization?',
+            }),
+            content: intl.formatMessage({
+                id: 'workflow.authorization.confirmDeleteContent',
+                defaultMessage: 'After deleting authorization, you need to re-authorize to use this tool',
+            }),
+            okText: intl.formatMessage({
+                id: 'workflow.authorization.delete',
+                defaultMessage: 'Delete Authorization',
+            }),
+            cancelText: intl.formatMessage({
+                id: 'workflow.cancel',
+                defaultMessage: 'Cancel',
+            }),
+            onOk: async () => {
+                const res = await delToolAuthorization(node.data?.baseData?.groupName);
+                if (res?.code == 0) {
+                    setAuthorizationStatus(2);
+                    const nodeData = node.data as any;
+                    updateNodeData(node.id, {
+                        baseData: {
+                            ...nodeData?.baseData,
+                            authorization_status: 2,
+                        },
+                    });
+                }
+            },
+        });
+    };
     const lang = getLocale() === 'en-US' ? 'en_US' : 'zh_Hans';
     return (
         <>
@@ -219,9 +286,11 @@ export default memo(({ node }: { node: AppNode }) => {
                                     <div key={e.name}>
                                         <ProFormText
                                             tooltip={
-                                                e?.help?.[lang]?<Link href={e?.url} underline target="_blank">
-                                                    {e?.help?.[lang]}
-                                                </Link>:null
+                                                e?.help?.[lang] ? (
+                                                    <Link href={e?.url} underline target="_blank">
+                                                        {e?.help?.[lang]}
+                                                    </Link>
+                                                ) : null
                                             }
                                             required={e.required}
                                             placeholder={e.placeholder?.[lang]}
@@ -245,9 +314,67 @@ export default memo(({ node }: { node: AppNode }) => {
                         }}
                         formRef={formRef}
                         omitNil={false}
+                        className='user-form'
                         onValuesChange={setNodeChange}
                         initialValues={(node.data as any)?.form || {}}
                     >
+                        <div className="mb-4 flex items-center justify-between gap-3  rounded-lg  border-gray-200">
+                            <Space align="center">
+                                {authorizationStatus != 3 && (
+                                    <Tag 
+                                        icon={<CheckCircleOutlined />} 
+                                        color="success" 
+                                        className="flex items-center gap-1 px-3 py-1 text-sm font-medium"
+                                        title={intl.formatMessage({
+                                            id: 'workflow.authorization.tooltip.authorized',
+                                            defaultMessage: 'This tool has been authorized and can be used normally',
+                                        })}
+                                    >
+                                        {intl.formatMessage({
+                                            id: 'workflow.authorization.authorized',
+                                            defaultMessage: 'Authorized',
+                                        })}
+                                    </Tag>
+                                )}
+                                {authorizationStatus == 3 && (
+                                    <Tag 
+                                        icon={<ExclamationCircleOutlined />} 
+                                        color="warning" 
+                                        className="flex items-center gap-1 px-3 py-1 text-sm font-medium"
+                                        title={intl.formatMessage({
+                                            id: 'workflow.authorization.tooltip.unauthorized',
+                                            defaultMessage: 'This tool is not authorized and needs to be authorized first',
+                                        })}
+                                    >
+                                        {intl.formatMessage({
+                                            id: 'workflow.authorization.unauthorized',
+                                            defaultMessage: 'Unauthorized',
+                                        })}
+                                    </Tag>
+                                )}
+                            </Space>
+                            {authorizationStatus == 1 && authorizationStatus != 3 && (
+                                <div className='flex items-center gap-2'>
+                                    <Button 
+                                    type="primary" 
+                                    icon={<EditOutlined />}
+                                    onClick={() => setAuthorizationStatus(2)}
+                                    className="flex items-center gap-1"
+                                    title={intl.formatMessage({
+                                        id: 'workflow.authorization.tooltip.modify',
+                                        defaultMessage: 'Modify the authorization information for the current tool',
+                                    })}
+                                >
+                                    {intl.formatMessage({
+                                        id: 'workflow.authorization.modify',
+                                        defaultMessage: 'Modify Authorization',
+                                    })}
+                                </Button>
+                               
+                                </div>
+                            )}
+                        </div>
+
                         <div className="user-form row">
                             <ProFormSwitch
                                 name="manual_confirmation"
@@ -339,7 +466,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                         />
                                     );
                                 case 'number':
-                                    return <ProFormDigit {...baseProps} />;
+                                    return <><ProFormDigit {...baseProps} /></>;
                                 case 'select':
                                     return (
                                         <ProFormSelect
@@ -352,6 +479,8 @@ export default memo(({ node }: { node: AppNode }) => {
                                             })}
                                         />
                                     );
+                                case 'boolean':
+                                    return <div className='user-form row'><ProFormSwitch {...baseProps} /></div>;
                             }
                         })}
 

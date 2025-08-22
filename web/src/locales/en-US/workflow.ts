@@ -396,4 +396,22 @@ export default {
     'workflow.noAppRunId': 'No app run ID found',
     'workflow.resumeRun': 'Resume Run',
     'workflow.pauseRun': 'Pause Run',
+    
+    // Authorization related translations
+    'workflow.authorization.authorized': 'Authorized',
+    'workflow.authorization.unauthorized': 'Unauthorized',
+    'workflow.authorization.modify': 'Modify Authorization',
+    'workflow.authorization.delete': 'Delete Authorization',
+    'workflow.authorization.status': 'Authorization Status',
+    'workflow.authorization.success': 'Authorization Successful',
+    'workflow.authorization.failed': 'Authorization Failed',
+    'workflow.authorization.deleteSuccess': 'Delete Authorization Successful',
+    'workflow.authorization.deleteFailed': 'Delete Authorization Failed',
+    'workflow.authorization.confirmDelete': 'Confirm Delete Authorization?',
+    'workflow.authorization.confirmDeleteContent': 'After deleting authorization, you need to re-authorize to use this tool',
+    'workflow.authorization.tooltip.authorized': 'This tool has been authorized and can be used normally',
+    'workflow.authorization.tooltip.unauthorized': 'This tool is not authorized and needs to be authorized first',
+    'workflow.authorization.tooltip.modify': 'Modify the authorization information for the current tool',
+    'workflow.authorization.tooltip.delete': 'Delete the authorization information for the current tool',
+    'workflow.cancel': 'Cancel',
 };

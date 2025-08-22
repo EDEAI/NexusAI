@@ -1,60 +1,27 @@
-import { getAppListByMode } from '@/api/workflow';
 import { TagSelect } from '@/components/TagSearch';
-import { getBaseNode } from '@/components/WorkFlow/nodes/nodeDisperse';
-import { BlockEnum, TabConfig } from '@/components/WorkFlow/types';
 import { useTagStore } from '@/store/tags';
+import { useNodePanel } from '@/hooks/useNodePanel';
 import { SearchOutlined } from '@ant-design/icons';
 import { ProForm, ProFormItem, ProFormRadio, ProFormText } from '@ant-design/pro-components';
-import { getLocale, useIntl } from '@umijs/max';
-import { useSetState } from 'ahooks';
-import { Spin, Tabs, TabsProps } from 'antd';
-import Fuse from 'fuse.js';
+import { useIntl } from '@umijs/max';
+import { Spin, Tabs } from 'antd';
 import { debounce } from 'lodash';
 import VirtualList from 'rc-virtual-list';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import useStore from '../../../../store';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import DraggableList from '../DraggableList';
+import { useMount, useTrackedEffect, useUpdateEffect, useWhyDidYouUpdate } from 'ahooks';
 
-interface AppItemResponse {
-    name: string;
-    description: string;
-    [key: string]: any;
-}
 
-interface AppListResponse {
-    code: number;
-    data: {
-        list: AppItemResponse[];
-        [key: string]: any;
-    };
-    [key: string]: any;
-}
-
-interface SearchNodeList {
-    [BlockEnum.Agent]?: any;
-    [BlockEnum.Skill]?: any;
-    workflow?: any;
-}
-
-interface CacheData {
-    [key: string]: {
-        data: any[];
-        timestamp: number;
-        params: {
-            team: number;
-            keyword: string;
-            tag: any[];
-        };
-    };
-}
 
 interface NodePanelContentProps {
     visibleTabs?: ('node' | 'agent' | 'tool' | 'skill' | 'workflow')[];
     defaultActiveTab?: string;
     showTeamSwitch?: boolean;
+    showTagSearch?: boolean;
     isMinWidth?: boolean;
     isCollapsed?: boolean;
     onWidthChange?: (width: number) => void;
+    isNodePanel?: boolean;
     onItemClick?: (item: any, type?: string) => void;
 }
 
@@ -76,280 +43,46 @@ export default memo(
         visibleTabs,
         defaultActiveTab,
         showTeamSwitch = true,
+        showTagSearch = true,
         isMinWidth = false,
         isCollapsed = false,
         onItemClick,
+        isNodePanel = false,
     }: NodePanelContentProps) => {
         const intl = useIntl();
-        const lang = getLocale() == 'en-US' ? 'en_US' : 'zh_Hans';
-        const originNodes = getBaseNode();
-
-        const baseNodes = useMemo(() => {
-            return Object.values(originNodes)
-                .filter(
-                    item =>
-                        ![
-                            BlockEnum.Start,
-                            BlockEnum.Agent,
-                            BlockEnum.Tool,
-                            BlockEnum.Skill,
-                        ].includes(item.base.type),
-                )
-                .map(item => item.base);
-        }, [originNodes]);
-
-        const [tabIndex, setTabIndex] = useState(defaultActiveTab || '1');
-        const [searchNode, setSearchNode] = useState(baseNodes);
-        const [searchTools, setSearchTools] = useState([]);
         const { tags } = useTagStore();
-        const [searchNodeList, setSearchNodeList] = useSetState<SearchNodeList>({
-            [BlockEnum.Agent]: [],
-            [BlockEnum.Skill]: [],
-            ['workflow']: [],
-        });
-        const [filterData, setFilterData] = useState({
-            team: 1,
-            keyword: '',
-            tag: [],
-        });
-
-        const dataCache = useRef<CacheData>({});
-
-        const CACHE_EXPIRY = 60000;
-
-        const toolData = useStore(state => state.toolData);
-
-        // useTrackedEffect(
-        //     changes => {
-        //         console.log('toolData', changes);
-        //     },
-        //     [
-        //         toolData,
-        //         filterData,
-        //         searchNode,
-        //         searchNodeList,
-        //         searchTools,
-        //         visibleTabs,
-        //         defaultActiveTab,
-        //         showTeamSwitch,
-        //         isMinWidth,
-        //         isCollapsed,
-        //         onItemClick,
-        //     ],
-        // );
-
-        useEffect(() => {
-            setSearchTools(toolData?.list || []);
-        }, [toolData]);
-
-        const onDragStart = useCallback((event, nodeType, item) => {
-            event.dataTransfer.setData(
-                'application/reactflow',
-                JSON.stringify({ type: nodeType, item }),
-            );
-            event.dataTransfer.effectAllowed = 'move';
-        }, []);
-
-        const searchNodesByKeyword = useCallback((nodes: any[], keyword: string) => {
-            if (!keyword) return nodes;
-
-            const fuse = new Fuse(nodes, {
-                keys: ['data.title', 'type', 'data.desc'],
-                threshold: 0.3,
-                includeScore: true,
-            });
-
-            const results = fuse.search(keyword);
-            return results.map(result => result.item);
-        }, []);
-
-        const searchToolsByKeyword = useCallback(
-            (tools: any[], keyword: string) => {
-                if (!keyword) return tools;
-
-                const flattenedTools = tools.map(category => ({
-                    ...category,
-                    tools: category.tools?.map(tool => ({
-                        ...tool,
-                        categoryName: category.identity?.label?.[lang],
-                        categoryIcon: category.identity?.icon,
-                    })),
-                }));
-
-                const fuse = new Fuse(flattenedTools, {
-                    keys: [
-                        'identity.label.zh_Hans',
-                        'identity.label.en_US',
-                        'identity.description.zh_Hans',
-                        'identity.description.en_US',
-                        'tools.identity.label.zh_Hans',
-                        'tools.identity.label.en_US',
-                        'tools.description.human.zh_Hans',
-                        'tools.description.human.en_US',
-                    ],
-                    threshold: 0.4,
-                    includeScore: true,
-                    useExtendedSearch: true,
-                });
-
-                const results = fuse.search(keyword);
-
-                return results
-                    .map(result => ({
-                        ...result.item,
-                        tools: result.item.tools.filter(tool => {
-                            const toolFuse = new Fuse([tool], {
-                                keys: [
-                                    'identity.label.zh_Hans',
-                                    'identity.label.en_US',
-                                    'description.human.zh_Hans',
-                                    'description.human.en_US',
-                                ],
-                                threshold: 0.4,
-                            });
-                            return toolFuse.search(keyword).length > 0;
-                        }),
-                    }))
-                    .filter(item => item.tools.length > 0);
-            },
-            [lang],
-        );
-
-        const getAppsData = useCallback(
-            async (nodeType: BlockEnum.Agent | BlockEnum.Skill | 'workflow') => {
-                const cacheKey = `${nodeType}-${filterData.team}-${
-                    filterData.keyword
-                }-${filterData.tag.join(',')}`;
-                const cachedItem = dataCache.current[cacheKey];
-
-                if (
-                    cachedItem &&
-                    Date.now() - cachedItem.timestamp < CACHE_EXPIRY &&
-                    JSON.stringify(cachedItem.params) === JSON.stringify(filterData)
-                ) {
-                    console.log(`[Cache hit] Using cached data for ${nodeType}`);
-                    return cachedItem.data;
-                }
-
-                console.log(`[Cache miss] Fetching data for ${nodeType}`);
-                try {
-                    const resData = await getAppListByMode(nodeType, {
-                        search_type: filterData.team,
-                        apps_name: filterData.keyword,
-                        tag_ids: filterData.tag?.join(',') || '',
-                    });
-
-                    if (
-                        resData?.code === 0 &&
-                        resData?.data &&
-                        Array.isArray((resData.data as any).list) &&
-                        (resData.data as any).list.length > 0
-                    ) {
-                        const dataList = (resData.data as any).list;
-                        const list = dataList
-                            .filter(item => item.publish_status == 1)
-                            .map((item: any) => ({
-                                ...originNodes[nodeType]?.base,
-                                data: {
-                                    ...originNodes[nodeType]?.base.data,
-                                    title: item.name,
-                                    desc: item.description,
-                                },
-                                baseData: item,
-                            }));
-
-                        dataCache.current[cacheKey] = {
-                            data: list,
-                            timestamp: Date.now(),
-                            params: { ...filterData },
-                        };
-
-                        setSearchNodeList({ [nodeType]: list });
-                        return list;
-                    }
-                    return [];
-                } catch (error) {
-                    console.error(`Failed to fetch ${nodeType} data:`, error);
-                    return [];
-                }
-            },
-            [filterData, originNodes, setSearchNodeList],
-        );
-
-        const tabConfigs: TabConfig[] = useMemo(() => {
-            const allTabs: TabConfig[] = [
-                {
-                    tabKey: 'node' as const,
-                    label: 'workflow.node',
-                    defaultMessage: 'Node',
-                    type: 'normal' as const,
-                    getData: () =>
-                        filterData.keyword
-                            ? searchNodesByKeyword(searchNode, filterData.keyword)
-                            : searchNode,
-                },
-                {
-                    tabKey: 'agent' as const,
-                    label: 'workflow.agent',
-                    defaultMessage: 'Agent',
-                    type: 'normal' as const,
-                    getData: () => getAppsData(BlockEnum.Agent),
-                },
-                {
-                    tabKey: 'tool' as const,
-                    label: 'workflow.tool',
-                    defaultMessage: 'Tool',
-                    type: 'tools' as const,
-                    getData: () =>
-                        filterData.keyword
-                            ? searchToolsByKeyword(searchTools, filterData.keyword)
-                            : searchTools,
-                },
-                {
-                    tabKey: 'skill' as const,
-                    label: 'workflow.skill',
-                    defaultMessage: 'Skill',
-                    type: 'normal' as const,
-                    getData: async () => await getAppsData(BlockEnum.Skill),
-                },
-                // {
-                //     tabKey: 'workflow' as const,
-                //     label: 'workflow.list',
-                //     defaultMessage: 'Workflow',
-                //     type: 'workflow' as const,
-                //     getData: async () => await getAppsData('workflow'),
-                // },
-            ];
-            const tabList = visibleTabs?.length
-                ? allTabs.filter(tab => visibleTabs.includes(tab.tabKey))
-                : allTabs;
-
-            return tabList.map((item, index) => {
-                return { ...item, key: index + 1 + '' };
-            });
-        }, [
-            searchNode,
-            searchNodeList,
-            searchTools,
-            visibleTabs,
+        const isFirstGettingData = useRef(true);
+        useMount(()=>{
+            console.log('131');
+            
+        })
+        // Use the new hook to manage all node panel functionality
+        const {
             filterData,
-            searchNodesByKeyword,
-            searchToolsByKeyword,
-            getAppsData,
-        ]);
-
-        const tabItems: TabsProps['items'] = useMemo(
-            () =>
-                tabConfigs.map(config => ({
-                    key: config.key,
-                    label: intl.formatMessage({
-                        id: config.label,
-                        defaultMessage: config.defaultMessage,
-                    }),
-                })),
-            [tabConfigs, intl],
-        );
-
+            onFilterChange,
+            tabIndex,
+            setTabIndex,
+            tabConfigs,
+            tabItems,
+            getCurrentTabConfig,
+            onDragStart,
+            lang,
+        } = useNodePanel({
+            visibleTabs,
+            defaultActiveTab,
+            cacheExpiry: 60000,
+        });
+        // useTrackedEffect((changes)=>{
+        //     console.log('Index of changed dependencies: ', changes);
+        // },[ filterData,
+        //     onFilterChange,
+        //     tabIndex,
+        //     setTabIndex,
+        //     tabConfigs,
+        //     tabItems,
+        //     getCurrentTabConfig,
+        //     onDragStart,
+        //     lang])
         const RenderNodeList = useCallback(
             ({ tabIndex, showName = true }) => {
                 const currentConfig = tabConfigs.find(config => config.key === tabIndex);
@@ -360,7 +93,7 @@ export default memo(
                 const [containerHeight, setContainerHeight] = useState(500);
                 const containerRef = useRef<HTMLDivElement>(null);
                 const dataFetchedRef = useRef(false);
-
+              
               
                 const getItemHeight = useCallback(
                     (item?: any) => {
@@ -423,37 +156,47 @@ export default memo(
                         dataFetchedRef.current = false;
                     };
                 }, [currentConfig?.tabKey]);
+            
+                const fetchData = async () => {
+                    if (
+                        dataFetchedRef.current &&
+                        !filterData.keyword &&
+                        filterData.tag.length === 0
+                    ) {
+                        return;
+                    }
 
-                useEffect(() => {
-                    const fetchData = async () => {
-                        if (
-                            dataFetchedRef.current &&
-                            !filterData.keyword &&
-                            filterData.tag.length === 0
-                        ) {
-                            return;
-                        }
+                    setLoading(true);
+                    try {
+                        if (!currentConfig) return;
+                        const data = await currentConfig.getData();
+                        const processedData =
+                            data?.map((item: any, index: number) => ({
+                                ...item,
+                                id: `${currentConfig.tabKey}-${index}`,
+                            })) || [];
 
-                        setLoading(true);
-                        try {
-                            if (!currentConfig) return;
-                            const data = await currentConfig.getData();
-                            const processedData =
-                                data?.map((item: any, index: number) => ({
-                                    ...item,
-                                    id: `${currentConfig.tabKey}-${index}`,
-                                })) || [];
-
-                            setList(processedData);
-                            setDisplayList(processedData.slice(0, pageSize));
-                            dataFetchedRef.current = true;
-                        } catch (error) {
-                            console.error('Failed to fetch data:', error);
-                        } finally {
-                            setLoading(false);
-                        }
-                    };
+                        setList(processedData);
+                        setDisplayList(processedData.slice(0, pageSize));
+                        dataFetchedRef.current = true;
+                    } catch (error) {
+                        console.error('Failed to fetch data:', error);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                useMount(()=>{
+                    if(!isFirstGettingData.current&&list.length>0){
+                        return;
+                    }
+                    isFirstGettingData.current = false;
                     fetchData();
+                })
+                useWhyDidYouUpdate('RenderNodeList',[list,currentConfig,filterData,pageSize])
+                useUpdateEffect(() => {
+                    
+                    fetchData();
+                    
                 }, [currentConfig, filterData, pageSize]);
 
                 const loadMoreData = useCallback(() => {
@@ -620,34 +363,12 @@ export default memo(
                     </div>
                 );
             },
-            [tabIndex, filterData, isMinWidth, tabConfigs, onDragStart, lang, onItemClick],
+            isNodePanel?[tabIndex]:[tabIndex, filterData, isMinWidth, tabConfigs, onDragStart, lang, onItemClick],
         );
 
-        const debouncedSetFilter = useCallback(
-            debounce(values => {
-                setFilterData(values);
-            }, 500),
-            [],
-        );
 
-        const clearCache = useCallback(() => {
-            dataCache.current = {};
-        }, []);
 
-        useEffect(() => {
-            clearCache();
-        }, [filterData.team, clearCache]);
 
-        const onFilterChange = useCallback(
-            (changedValues, allValues) => {
-                if ('team' in changedValues) {
-                    setFilterData(allValues);
-                } else if ('tag' in changedValues || 'keyword' in changedValues) {
-                    debouncedSetFilter(allValues);
-                }
-            },
-            [debouncedSetFilter],
-        );
 
         return (
             <div className="h-full flex flex-col">
@@ -702,6 +423,9 @@ export default memo(
                                 }}
                                 name="keyword"
                             />
+                            {
+                                showTagSearch && (
+                                    
                             <div className="w-full">
                                 <ProFormItem name={'tag'}>
                                     <TagSelect
@@ -717,6 +441,8 @@ export default memo(
                                     ></TagSelect>
                                 </ProFormItem>
                             </div>
+                                )
+                            }
                         </ProForm>
                         {filterData?.keyword ? null : (
                             <Tabs
