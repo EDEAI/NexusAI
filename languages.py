@@ -1209,7 +1209,33 @@ language_packs = {
         'password_change_failed': 'Password change failed',
         'old_password_cannot_be_empty': 'Old password cannot be empty',
         'new_password_cannot_be_empty': 'New password cannot be empty',
-        'confirm_password_cannot_be_empty': 'Confirm password cannot be empty'
+        'confirm_password_cannot_be_empty': 'Confirm password cannot be empty',
+        
+        # Scheduled task related messages
+        'scheduled_task_name_required': 'Scheduled task name is required',
+        'scheduled_task_app_id_required': 'Application ID is required',
+        'scheduled_task_workflow_id_required': 'Workflow ID is required',
+        'scheduled_task_input_required': 'Input data is required',
+        'scheduled_task_start_time_required': 'Start time is required',
+        'scheduled_task_task_data_required': 'Task data is required',
+        'scheduled_task_app_not_found': 'Application not found or status is abnormal',
+        'scheduled_task_workflow_not_found': 'Workflow not found or status is abnormal',
+        'scheduled_task_create_success': 'Scheduled task created successfully',
+        'scheduled_task_create_failed': 'Failed to create scheduled task',
+        'scheduled_task_update_success': 'Scheduled task updated successfully',
+        'scheduled_task_update_failed': 'Failed to update scheduled task',
+        'scheduled_task_delete_success': 'Scheduled task deleted successfully',
+        'scheduled_task_delete_failed': 'Failed to delete scheduled task',
+        'scheduled_task_not_found': 'Scheduled task not found',
+        'scheduled_task_no_permission': 'No permission to operate this scheduled task',
+        'scheduled_task_invalid_repeat_type': 'Invalid repeat type',
+        'scheduled_task_invalid_repeat_interval': 'Repeat interval must be greater than 0',
+        'scheduled_task_invalid_max_executions': 'Maximum executions cannot be negative',
+        'scheduled_task_end_time_before_start_time': 'End time cannot be earlier than start time',
+        'scheduled_task_repeat_days_invalid': 'Invalid repeat days format',
+        'scheduled_task_repeat_day_of_month_invalid': 'Month repeat day must be between 1-31',
+        'scheduled_task_repeat_month_invalid': 'Year repeat month must be between 1-12',
+        'scheduled_task_repeat_day_of_year_invalid': 'Year repeat day must be between 1-365'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1628,7 +1654,33 @@ language_packs = {
         'password_change_failed': '密码修改失败',
         'old_password_cannot_be_empty': '旧密码不能为空',
         'new_password_cannot_be_empty': '新密码不能为空',
-        'confirm_password_cannot_be_empty': '确认密码不能为空'
+        'confirm_password_cannot_be_empty': '确认密码不能为空',
+        
+        # 定时任务相关提示
+        'scheduled_task_name_required': '定时任务名称不能为空',
+        'scheduled_task_app_id_required': '应用ID不能为空',
+        'scheduled_task_workflow_id_required': '工作流ID不能为空',
+        'scheduled_task_input_required': '输入数据不能为空',
+        'scheduled_task_start_time_required': '开始时间不能为空',
+        'scheduled_task_task_data_required': '任务数据不能为空',
+        'scheduled_task_app_not_found': '应用不存在或状态异常',
+        'scheduled_task_workflow_not_found': '工作流不存在或状态异常',
+        'scheduled_task_create_success': '定时任务创建成功',
+        'scheduled_task_create_failed': '定时任务创建失败',
+        'scheduled_task_update_success': '定时任务更新成功',
+        'scheduled_task_update_failed': '定时任务更新失败',
+        'scheduled_task_delete_success': '定时任务删除成功',
+        'scheduled_task_delete_failed': '定时任务删除失败',
+        'scheduled_task_not_found': '定时任务不存在',
+        'scheduled_task_no_permission': '没有权限操作此定时任务',
+        'scheduled_task_invalid_repeat_type': '无效的重复类型',
+        'scheduled_task_invalid_repeat_interval': '重复间隔必须大于0',
+        'scheduled_task_invalid_max_executions': '最大执行次数不能为负数',
+        'scheduled_task_end_time_before_start_time': '结束时间不能早于开始时间',
+        'scheduled_task_repeat_days_invalid': '重复天数格式无效',
+        'scheduled_task_repeat_day_of_month_invalid': '月重复日期必须在1-31之间',
+        'scheduled_task_repeat_month_invalid': '年重复月份必须在1-12之间',
+        'scheduled_task_repeat_day_of_year_invalid': '年重复日期必须在1-365之间'
     }
 }
 

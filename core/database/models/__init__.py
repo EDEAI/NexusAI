@@ -48,6 +48,9 @@ from .permissions import Permission
 from .role_permission import RolePermission
 from .user_team_relations import UserTeamRelations
 from .user_three_parties import UserThreeParties
+from .scheduled_tasks import ScheduledTasks
+
+
 
 
 
@@ -95,5 +98,6 @@ __all__ = [
     'Permission',
     'RolePermission',
     'UserTeamRelations',
-    'UserThreeParties'
+    'UserThreeParties',
+    'ScheduledTasks'
 ]
