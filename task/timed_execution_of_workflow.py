@@ -58,7 +58,8 @@ class ScheduledTaskExecutor:
         inputs: dict,
         knowledge_base_mapping = None,
         node_confirm_users = None,
-        data_source_run_id: int = 0
+        data_source_run_id: int = 0,
+        scheduled_task_id: int = 0
     ):
         """
         修复版本的start_workflow函数，正确处理输入验证
@@ -134,7 +135,8 @@ class ScheduledTaskExecutor:
             'graph': graph.to_dict(),
             'inputs': validated_inputs,
             'status': 1,
-            'total_steps': graph.get_total_steps()
+            'total_steps': graph.get_total_steps(),
+            'scheduled_task_id': scheduled_task_id
         }
         
         if knowledge_base_mapping is not None:
@@ -293,7 +295,8 @@ class ScheduledTaskExecutor:
                     inputs=inputs,
                     knowledge_base_mapping=None,
                     node_confirm_users=None,
-                    data_source_run_id=0
+                    data_source_run_id=0,
+                    scheduled_task_id=task_id
                 )
             except Exception as workflow_error:
                 # 如果是输入验证错误，提供更详细的错误信息
