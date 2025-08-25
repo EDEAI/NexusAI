@@ -48,6 +48,7 @@ class AppRuns(MySQL):
             ],
             conditions=[
                 {"column": "status", "value": 1},
+                {"column": "paused", "value": 0},
                 {"column": "workflows.status", "value": 1},
                 {"column": "apps.status", "value": 1},
                 [
@@ -81,7 +82,7 @@ class AppRuns(MySQL):
         data = self.select_one(
             columns=['app_runs.id AS app_run_id', 'app_runs.user_id', 'app_runs.app_id', 'app_runs.workflow_id', 'app_runs.type', 'app_runs.level', 'app_runs.context', 'app_runs.completed_steps', 'app_runs.actual_completed_steps', 'app_runs.completed_edges', 'app_runs.status', 'app_runs.elapsed_time',
                 'app_runs.prompt_tokens', 'app_runs.completion_tokens', 'app_runs.total_tokens', 'app_runs.embedding_tokens', 'app_runs.reranking_tokens', 'app_runs.total_steps', 'app_runs.created_time', 'app_runs.finished_time' ,'apps.avatar' ,'apps.icon'],
-            conditions=[{"column": "id", "value": app_run_id},{"column": "paused", "value": 0}, {"column": "status", "op": "in", "value": [2, 4]}],
+            conditions=[{"column": "id", "value": app_run_id}, {"column": "status", "op": "in", "value": [2, 4]}],
             joins=[
                 ["left", "apps", "app_runs.app_id = apps.id"]
             ]

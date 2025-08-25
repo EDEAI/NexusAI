@@ -683,7 +683,9 @@ language_packs = {
         'chatroom_app_run_id_not_found': 'Current appRunID not found',
 
         'app_run_error': 'App run record not found',
-        'paused_param_invalid': 'The paused parameter can only be 0 or 1',
+        'paused_param_invalid': 'Paused parameter can only be 0 or 1',
+        'app_run_pause_success': 'Workflow paused successfully',
+        'app_run_resume_success': 'Workflow resumed successfully',
         'api_agent_generate_failed': 'Agent generate failed',
         'api_agent_user_prompt_required': 'Agent user prompt required',
         'api_agent_batch_size_invalid': 'Agent batch size invalid',
@@ -1532,6 +1534,8 @@ language_packs = {
 
         'app_run_error': 'app运行记录不存在',
         'paused_param_invalid': 'paused参数只能为0或1',
+        'app_run_pause_success': '工作流暂停成功',
+        'app_run_resume_success': '工作流恢复成功',
         'api_agent_generate_failed': 'agent生成记录失败',
         'api_agent_user_prompt_required': '提示词不能为空',
         'api_agent_batch_size_invalid': '批量生成数量有误',

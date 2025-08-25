@@ -392,6 +392,10 @@ export default {
     'workflow.form.splitTaskByLine.tooltip': 'If enabled, the input variable will be split into tasks by line directly, without analysis and splitting by the large language model.',
     'workflow.split_task_by_line': 'Split tasks by line',
     'workflow.split_task_by_lineDes': 'If enabled, the input variable will be split into tasks by line directly, without analysis and splitting by the large language model.',
+
+    'workflow.noAppRunId': 'No app run ID found',
+    'workflow.resumeRun': 'Resume Run',
+    'workflow.pauseRun': 'Pause Run',
     
     // Authorization related translations
     'workflow.authorization.authorized': 'Authorized',
@@ -410,4 +414,10 @@ export default {
     'workflow.authorization.tooltip.modify': 'Modify the authorization information for the current tool',
     'workflow.authorization.tooltip.delete': 'Delete the authorization information for the current tool',
     'workflow.cancel': 'Cancel',
+    
+    // Empty state translations
+    'workflow.noSearchResults': 'No search results found',
+    'workflow.noData': 'No data available',
+    'workflow.tryDifferentKeyword': 'Try a different keyword',
+    'workflow.checkLater': 'Check back later',
 };

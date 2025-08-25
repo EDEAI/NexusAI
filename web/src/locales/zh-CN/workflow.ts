@@ -385,6 +385,10 @@ export default {
     'workflow.form.splitTaskByLine.tooltip': '如果开启，则直接将输入变量按行拆分成任务，不再通过大语言模型进行分析和拆分',
     'workflow.split_task_by_line': '是否按行拆分任务',
     'workflow.split_task_by_lineDes': '如果开启，则直接将输入变量按行拆分成任务，不再通过大语言模型进行分析和拆分',
+
+    'workflow.noAppRunId': '未找到应用运行ID',
+    'workflow.resumeRun': '恢复运行',
+    'workflow.pauseRun': '暂停运行',
     
     // Authorization related translations
     'workflow.authorization.authorized': '已授权',
@@ -403,4 +407,10 @@ export default {
     'workflow.authorization.tooltip.modify': '修改当前工具的授权信息',
     'workflow.authorization.tooltip.delete': '删除当前工具的授权信息',
     'workflow.cancel': '取消',
+    
+    // Empty state translations
+    'workflow.noSearchResults': '未找到搜索结果',
+    'workflow.noData': '暂无数据',
+    'workflow.tryDifferentKeyword': '请尝试其他关键词',
+    'workflow.checkLater': '请稍后再试',
 };

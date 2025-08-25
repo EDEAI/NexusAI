@@ -93,7 +93,7 @@ export default memo(
                 const [containerHeight, setContainerHeight] = useState(500);
                 const containerRef = useRef<HTMLDivElement>(null);
                 const dataFetchedRef = useRef(false);
-              
+                const autoHeight=false
               
                 const getItemHeight = useCallback(
                     (item?: any) => {
@@ -121,6 +121,7 @@ export default memo(
                     const updateContainerHeight = () => {
                         if (containerRef.current) {
                             const height = containerRef.current.clientHeight;
+                            
                             setContainerHeight(height);
                         }
                     };
@@ -161,7 +162,8 @@ export default memo(
                     if (
                         dataFetchedRef.current &&
                         !filterData.keyword &&
-                        filterData.tag.length === 0
+                        filterData.tag.length === 0 &&
+                        !isNodePanel
                     ) {
                         return;
                     }
@@ -274,10 +276,49 @@ export default memo(
 
                 if (!currentConfig) return null;
 
+                // Empty state component
+                const EmptyState = () => (
+                    <div className="flex flex-col items-center justify-center h-full py-8 text-gray-500">
+                        <div className="w-16 h-16 mb-4 flex items-center justify-center">
+                            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                            </svg>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-sm font-medium mb-1">
+                                {filterData?.keyword 
+                                    ? intl.formatMessage({
+                                        id: 'workflow.noSearchResults',
+                                        defaultMessage: 'No search results found'
+                                    })
+                                    : intl.formatMessage({
+                                        id: 'workflow.noData',
+                                        defaultMessage: 'No data available'
+                                    })
+                                }
+                            </p>
+                            <p className="text-xs text-gray-400">
+                                {filterData?.keyword 
+                                    ? intl.formatMessage({
+                                        id: 'workflow.tryDifferentKeyword',
+                                        defaultMessage: 'Try a different keyword'
+                                    })
+                                    : intl.formatMessage({
+                                        id: 'workflow.checkLater',
+                                        defaultMessage: 'Check back later'
+                                    })
+                                }
+                            </p>
+                        </div>
+                    </div>
+                );
+
                 return (
                     <div ref={containerRef} className="overflow-y-auto h-full">
                         <Spin spinning={loading}>
-                            {filterData?.keyword ? (
+                            {!loading && displayList.length === 0 ? (
+                                <EmptyState />
+                            ) : filterData?.keyword ? (
                                 <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2">
                                     {displayList.map(item => (
                                         <ListItem
@@ -363,7 +404,7 @@ export default memo(
                     </div>
                 );
             },
-            isNodePanel?[tabIndex]:[tabIndex, filterData, isMinWidth, tabConfigs, onDragStart, lang, onItemClick],
+            isNodePanel?[tabIndex, filterData]:[tabIndex, filterData, isMinWidth, tabConfigs, onDragStart, lang, onItemClick],
         );
 
 
@@ -444,7 +485,7 @@ export default memo(
                                 )
                             }
                         </ProForm>
-                        {filterData?.keyword ? null : (
+                        {(filterData?.keyword&&!isNodePanel) ? null : (
                             <Tabs
                                 activeKey={tabIndex}
                                 items={tabItems}
@@ -455,8 +496,8 @@ export default memo(
                         )}
                     </div>
                 )}
-                <div className="flex-1 overflow-y-auto">
-                    {filterData?.keyword ? (
+                <div className={`flex-1 overflow-y-auto ${isNodePanel?'px-4':''}`}>
+                    {(filterData?.keyword&&!isNodePanel) ? (
                         <div className="grid gap-4">
                             {tabConfigs.map((item, index) => (
                                 <div key={item.key} className="space-y-2">
@@ -472,6 +513,7 @@ export default memo(
                                         key={item.key}
                                         tabIndex={index + 1 + ''}
                                         showName={!isMinWidth}
+                                        autoHeight={true}
                                     />
                                 </div>
                             ))}
