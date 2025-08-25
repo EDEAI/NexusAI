@@ -36,6 +36,9 @@ class ScheduledTasks(MySQL):
                     raise ValueError('repeat_days must be a list')
                 if len(data['repeat_days']) == 0:
                     data['repeat_days'] = None
+                else:
+                    # 将列表转换为JSON字符串存储到数据库
+                    data['repeat_days'] = json.dumps(data['repeat_days'])
             else:
                 # Not passed or None: save as NULL
                 data['repeat_days'] = None
@@ -103,6 +106,9 @@ class ScheduledTasks(MySQL):
                         raise ValueError('repeat_days must be a list')
                     if len(data['repeat_days']) == 0:
                         data['repeat_days'] = None
+                    else:
+                        # 将列表转换为JSON字符串存储到数据库
+                        data['repeat_days'] = json.dumps(data['repeat_days'])
 
             # input: Parse as dict and validate
             if 'input' in data and data['input'] is not None:
