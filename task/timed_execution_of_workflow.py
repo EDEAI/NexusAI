@@ -56,7 +56,6 @@ class ScheduledTaskExecutor:
         run_type: int, 
         run_name: str, 
         inputs: dict,
-        scheduled_task_id: int,
         knowledge_base_mapping = None,
         node_confirm_users = None,
         data_source_run_id: int = 0
@@ -135,7 +134,6 @@ class ScheduledTaskExecutor:
             'graph': graph.to_dict(),
             'inputs': validated_inputs,
             'status': 1,
-            'scheduled_task_id':scheduled_task_id,
             'total_steps': graph.get_total_steps()
         }
         
@@ -295,8 +293,7 @@ class ScheduledTaskExecutor:
                     inputs=inputs,
                     knowledge_base_mapping=None,
                     node_confirm_users=None,
-                    data_source_run_id=0,
-                    scheduled_task_id=task_id
+                    data_source_run_id=0
                 )
             except Exception as workflow_error:
                 # 如果是输入验证错误，提供更详细的错误信息
@@ -533,33 +530,19 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='定时任务执行脚本')
-    parser.add_argument('--mode', choices=['once', 'daemon'], default='daemon',
+    parser.add_argument('--mode', choices=['once', 'daemon'], default='once',
                         help='运行模式：once(执行一次) 或 daemon(守护进程模式)')
     parser.add_argument('--interval', type=int, default=60,
                         help='守护进程模式下的检查间隔（秒），默认60秒')
-    parser.add_argument('--loop', action='store_true',
-                        help='在once模式下循环执行，相当于daemon模式')
     
     args = parser.parse_args()
     
     executor = ScheduledTaskExecutor()
     
     if args.mode == 'once':
-        if args.loop:
-            # once模式下循环执行
-            logger.info(f"Starting scheduled task loop mode with {args.interval}s interval")
-            try:
-                while True:
-                    executed_count = executor.run_once()
-                    print(f"Executed {executed_count} tasks")
-                    time.sleep(args.interval)
-            except KeyboardInterrupt:
-                logger.info("Scheduled task loop stopped by user")
-                print("Stopped by user")
-        else:
-            # 执行一次
-            executed_count = executor.run_once()
-            print(f"Executed {executed_count} tasks")
+        # 执行一次
+        executed_count = executor.run_once()
+        print(f"Executed {executed_count} tasks")
     elif args.mode == 'daemon':
         # 守护进程模式
         executor.run_daemon(args.interval)
