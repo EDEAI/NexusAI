@@ -56,10 +56,10 @@ class ScheduledTaskExecutor:
         run_type: int, 
         run_name: str, 
         inputs: dict,
+        scheduled_task_id: int,
         knowledge_base_mapping = None,
         node_confirm_users = None,
-        data_source_run_id: int = 0,
-        scheduled_task_id: int
+        data_source_run_id: int = 0
     ):
         """
         修复版本的start_workflow函数，正确处理输入验证
