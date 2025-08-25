@@ -1,11 +1,12 @@
 /*
  * @LastEditors: biz
  */
-import { CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined, PauseOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { ProCard } from '@ant-design/pro-components';
-import { Button, Typography } from 'antd';
+import { Button, Typography, Tooltip } from 'antd';
 import { memo } from 'react';
 import { ContainerProps } from './types';
+import { useIntl } from '@umijs/max';
 
 const Container = memo(({
   runPanelShow,
@@ -15,7 +16,11 @@ const Container = memo(({
   activeKey,
   onTabChange,
   children,
+  showPauseResume,
+  isPaused,
+  onPauseResume,
 }: ContainerProps) => {
+  const intl = useIntl();
   if (!runPanelShow) return null;
 
   return (
@@ -27,11 +32,30 @@ const Container = memo(({
         overflow: 'hidden' 
       }}
       extra={
-        <Button
-          type="text"
-          onClick={() => setRunPanelShow(false)}
-          icon={<CloseOutlined />}
-        />
+        <div className="flex items-center gap-3">
+          {showPauseResume && (
+            <Tooltip 
+              title={isPaused 
+                ? intl.formatMessage({ id: 'workflow.resumeRun', defaultMessage: 'Resume Run' })
+                : intl.formatMessage({ id: 'workflow.pauseRun', defaultMessage: 'Pause Run' })
+              }
+            >
+              <Button
+                type="primary"
+                size="small"
+                onClick={onPauseResume}
+                icon={isPaused ? <PlayCircleOutlined /> : <PauseOutlined />}
+                className="bg-blue-500 hover:bg-blue-600 border-blue-500 hover:border-blue-600"
+              >
+              </Button>
+            </Tooltip>
+          )}
+          <Button
+            type="text"
+            onClick={() => setRunPanelShow(false)}
+            icon={<CloseOutlined />}
+          />
+        </div>
       }
       title={
         <Typography.Title level={5} className="truncate">
@@ -63,4 +87,4 @@ const Container = memo(({
   );
 });
 
-export default Container; 
+export default Container;

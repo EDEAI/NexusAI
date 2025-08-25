@@ -1,15 +1,15 @@
 /*
  * @LastEditors: biz
  */
-import { getWorkFlowLogInfo } from '@/api/workflow';
+import { getWorkFlowLogInfo, pauseResumeWorkflow } from '@/api/workflow';
 import FileDownloadList from '@/components/common/FileDownloadList';
 import useUserStore from '@/store/user';
 import useSocketStore from '@/store/websocket';
-import { CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined, PauseOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { ProCard } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useLatest, useUpdateEffect } from 'ahooks';
-import { Button, Descriptions, Skeleton, Tag, Typography } from 'antd';
+import { Button, Descriptions, Skeleton, Tag, Typography, Tooltip, message } from 'antd';
 import { memo, useCallback, useState } from 'react';
 import CodeEditor from '../WorkFlow/components/Editor/CodeEditor';
 import { TrackContent } from './components/TrackContent';
@@ -99,6 +99,8 @@ export default memo(() => {
     const getLastRunWorkflow = useSocketStore(state => state.lastMessage);
 
     const [updateCounter, setUpdateCounter] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
+    const [showPauseResume, setShowPauseResume] = useState(false);
 
     useUpdateEffect(() => {
         const newList = runList.map(item => {
@@ -179,6 +181,16 @@ export default memo(() => {
                     setRunList(list);
                     setDetail(res?.data?.app_run_data?.[0]);
                     const appRunData = res?.data?.app_run_data?.[0];
+                    
+                    // Handle pause/resume button visibility and state
+                    // Only show pause/resume button if status is 1 (running)
+                    if (appRunData?.status === 1) {
+                        setShowPauseResume(true);
+                        setIsPaused(appRunData?.paused === 1);
+                    } else {
+                        setShowPauseResume(false);
+                    }
+                    
                     if (appRunData?.status === 2 || appRunData?.status === 3) {
                         setEndRun({
                             ...appRunData,
@@ -196,6 +208,37 @@ export default memo(() => {
         },
         [appRunId, runPanelLogRecord],
     );
+
+    // Handle pause/resume workflow
+    const handlePauseResume = useCallback(async () => {
+        if (!detail?.app_run_id) {
+            message.error(intl.formatMessage({ id: 'workflow.noAppRunId', defaultMessage: 'No app run ID found' }));
+            return;
+        }
+
+        try {
+            const pausedValue = isPaused ? 0 : 1; // 0 for resume, 1 for pause
+            const res = await pauseResumeWorkflow(Number(detail.app_run_id), pausedValue);
+            
+            if (res?.code === 0) {
+                setIsPaused(!isPaused);
+                // Display message from API response
+                if (res?.data?.msg) {
+                    message.success(res.data.msg);
+                }
+                
+                // Refresh the detail to get updated status
+                if (appRunId) {
+                    getDetail(appRunId);
+                }
+            } else {
+                message.error(res?.message);
+            }
+        } catch (err) {
+            console.error('Error pausing/resuming workflow:', err);
+            // Only console.error for exceptions, no message.error
+        }
+    }, [detail, isPaused, intl, appRunId, getDetail]);
 
     const TrackContentWrapper = memo(() => {
         if (loading) {
@@ -223,7 +266,28 @@ export default memo(() => {
         <ProCard
             className="w-[400px] border user_pro_card_overflow_y border-blue-300 fixed z-20 top-[65px] right-2"
             style={{ height: 'calc(100vh - 10px - 75px)' }}
-            extra={<Button type="text" onClick={onClose} icon={<CloseOutlined />} />}
+            extra={
+                <div className="flex items-center gap-3">
+                    {showPauseResume && (
+                        <Tooltip 
+                            title={isPaused 
+                                ? intl.formatMessage({ id: 'workflow.resumeRun', defaultMessage: 'Resume Run' })
+                                : intl.formatMessage({ id: 'workflow.pauseRun', defaultMessage: 'Pause Run' })
+                            }
+                        >
+                            <Button
+                                type="primary"
+                                size="small"
+                                onClick={handlePauseResume}
+                                icon={isPaused ? <PlayCircleOutlined /> : <PauseOutlined />}
+                                className="bg-blue-500 hover:bg-blue-600 border-blue-500 hover:border-blue-600"
+                            >
+                            </Button>
+                        </Tooltip>
+                    )}
+                    <Button type="text" onClick={onClose} icon={<CloseOutlined />} />
+                </div>
+            }
             title={
                 <Typography.Title level={5}>
                     {intl.formatMessage({ id: 'workflow.runLogs' })}

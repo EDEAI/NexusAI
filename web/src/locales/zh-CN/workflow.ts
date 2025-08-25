@@ -385,6 +385,10 @@ export default {
     'workflow.form.splitTaskByLine.tooltip': '如果开启，则直接将输入变量按行拆分成任务，不再通过大语言模型进行分析和拆分',
     'workflow.split_task_by_line': '是否按行拆分任务',
     'workflow.split_task_by_lineDes': '如果开启，则直接将输入变量按行拆分成任务，不再通过大语言模型进行分析和拆分',
+
+    'workflow.noAppRunId': '未找到应用运行ID',
+    'workflow.resumeRun': '恢复运行',
+    'workflow.pauseRun': '暂停运行',
     
     // Authorization related translations
     'workflow.authorization.authorized': '已授权',
