@@ -149,14 +149,14 @@ export default ({agent_id}:{agent_id:number}) => {
                 style={{ height: 'calc(100% - 20px)' }}
                 scroll={{ y: 'calc(100vh - 230px)' }}
                 request={async (params, sort, filter) => {
-                    console.log(params, sort, filter);
+               
 
                     const res = await getAgentLogList(appId, {
                         page: params.current,
                         page_size: params.pageSize,
                         // app_id: appId,
                     });
-                    console.log(res);
+                   
                     // const uniqueData = _.uniqBy(res.data.list, 'app_runs_id');
                     return {
                         data: res.data.list,

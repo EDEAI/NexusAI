@@ -11,8 +11,6 @@ import _ from 'lodash';
 import { AppNode, BlockEnum } from '../types';
 
 export function customFreeNode(node: AppNode) {
-    console.log('createNode', node);
-
     const { data, type, position, id } = _.cloneDeep(node);
     const createObj = {
         title: data['title'] || '',

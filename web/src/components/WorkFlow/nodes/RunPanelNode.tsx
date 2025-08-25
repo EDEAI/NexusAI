@@ -35,7 +35,7 @@ export default memo(() => {
         setResult(null);
     });
     const runResult = e => {
-        console.log(e);
+   
         setHasResult(true);
         setResult(e.data);
     };
@@ -274,7 +274,7 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
         if (!selectNode?.id) return;
         const vars = getInputVariables(selectNode.id);
         const variable = getOutputVariables(selectNode.id);
-        console.log(vars, variable);
+      
         if (vars?.inputs) {
             if (vars.inputs['type'] == 'object') {
                 const inputs = Object.values(vars.inputs['properties']);
@@ -293,7 +293,7 @@ const InputContent = memo(({ onRunResult }: InputContentProps) => {
                 if (!varItem) {
                     return console.warn('', variable, x.identifier);
                 }
-                console.log(x, varItem);
+              
                 if (!varGroup[x.identifier]) {
                     varGroup[x.identifier] = {
                         name: varItem.title,

@@ -82,7 +82,7 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
 
 
     useEffect(()=>{
-        console.log(summaryParams);
+  
         
         if(summaryParams && summaryParams.id){
             setContentShow(true);
@@ -116,13 +116,13 @@ const MeetingSummary:React.FC<{id:any}>= params =>{
     },[contentShow])
 
     useEffect(() => {
-        console.log(isLoad);
+   
         
         const handleResize = () => {
             if(window.innerWidth < 1280){
                 setbMaxWidth(400)
                 setSlideFixed(true)
-                console.log(scrollDom);
+               
                 setTimeout(()=>{setPackUp(true)},200)
             }else{
                 setbMaxWidth((window.innerWidth - 320)/2)

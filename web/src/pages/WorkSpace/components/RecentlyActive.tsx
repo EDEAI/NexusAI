@@ -13,7 +13,7 @@ export default () => {
 
     const intl = useIntl();
     const toDetail = item => {
-        console.log(item);
+      
         const id = item.app_id || item.apps_id;
         switch (item.type) {
             case 1:
@@ -45,7 +45,7 @@ export default () => {
     const { data, loading, pagination } = usePagination(getDetail, {
         defaultPageSize: 8,
     });
-    console.log(loading);
+
 
     return (
         <div className="flex-grow-0">

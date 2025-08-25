@@ -10,7 +10,7 @@ import rehypeHighlight from 'rehype-highlight';
 // Progress bar subtitle
 export const ProgressContainer: React.FC<{ progressObj: any }> = memo(parmas => {
     let { progressObj } = parmas;
-    console.log(progressObj);
+   
 
     const setEntime = () => {
         return parseFloat(progressObj.elapsed_time).toFixed(6);
@@ -141,7 +141,7 @@ const SummaryHistoryDom: React.FC<{
     }, [list]);
 
     useEffect(()=>{
-        console.log(runid);
+       
         
         setAppRunId(runid)
     },[runid])

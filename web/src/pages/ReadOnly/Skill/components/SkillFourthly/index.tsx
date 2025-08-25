@@ -59,7 +59,7 @@ const SkillFourthly: React.FC<ChildProps> = ({
                 skill_id: Skillinfo.id,
                 input_dict: input_variables,
             };
-            debugger
+            
             SkillRun(param);
         }
     };

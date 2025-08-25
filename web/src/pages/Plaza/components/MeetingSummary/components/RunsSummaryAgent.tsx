@@ -112,7 +112,7 @@ const RunsAgent:FC<params>=(params) =>{
             }
         }  
     },[flowMessage])
-    console.log(selectApp);
+
     
     return (
         <div>

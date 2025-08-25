@@ -135,7 +135,7 @@ const RunsWorkFlow:FC<params>=(params) =>{
         }
     }
     const getWorkFlowStart = async()=>{
-        console.log(appId);
+    
         
         let resData = await getWorkFlowStartCondition(appId);
         if(resData.code == 0){
@@ -166,7 +166,7 @@ const RunsWorkFlow:FC<params>=(params) =>{
                 originalVariate.current = object
                 let prokeys = Object.keys(object.properties);
                 if(prokeys.length){
-                    console.log(object.properties);
+              
                     
                     setcurrentVariate(object.properties);
                 }

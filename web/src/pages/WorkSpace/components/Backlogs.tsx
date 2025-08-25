@@ -28,7 +28,7 @@ export default () => {
     const [pageNumber, setPageNumber] = useSessionStorageState('pageNumber');
 
     const showDealtWith = item => {
-        console.log(item);
+      
         setDealtWithData(item);
     };
 
@@ -110,7 +110,7 @@ export default () => {
                             <div
                                 key={item.exec_id}
                                 onClick={() => {
-                                    console.log(item);
+                                   
 
                                     if (!item.need_human_confirm) return;
                                     setDealtWithData(item);

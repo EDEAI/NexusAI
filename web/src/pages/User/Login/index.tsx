@@ -106,7 +106,7 @@ const Login: React.FC = () => {
                 password,
                 username,
             });
-            console.log(msg);
+          
 
             if (msg?.access_token) {
                 const defaultLoginSuccessMessage = intl.formatMessage({
@@ -119,7 +119,7 @@ const Login: React.FC = () => {
                 history.push('/');
                 return;
             }
-            console.log(msg);
+     
             //
             setUserLoginState({
                 status: 'error',

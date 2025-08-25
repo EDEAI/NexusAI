@@ -223,7 +223,7 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     item?.data?.desc ||
                     item?.desc ||
                     '',
-                icon: item?.icon || item?.categoryIcon || item?.data?.icon,
+                icon: item?.icon || item?.categoryIcon || item?.data?.icon||item?.identity?.icon,
                 baseData: item.baseData || item,
             };
 
@@ -290,7 +290,7 @@ export default memo((props: NodeProps & CreateNodesToolbarProps) => {
                     edgeInfo.sourceHandle = props.targetHandle;
                 }
             }
-
+            
             addEdges([edgeInfo]);
             
             // Close toolbar and notify

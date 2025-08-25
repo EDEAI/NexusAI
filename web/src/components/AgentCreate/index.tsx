@@ -82,7 +82,7 @@ const AgentCreate = memo(() => {
             const res = await agentCreate({
                 agents: [createParams],
             });
-            console.log(res);
+           
             if (res.code == 0) {
                 message.success(
                     lastSingleAgentCreateId?.current

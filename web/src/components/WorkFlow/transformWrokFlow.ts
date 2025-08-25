@@ -897,7 +897,7 @@ export const transformer = {
                 input: new Variable('input', 'string', node.data['variable']),
                 tool: {},
                 manual_confirmation: node.data['manual_confirmation'] || false,
-                wait_for_all_predecessors: node.data['wait_for_all_predecessors'] || false,
+                wait_for_all_predecessors: node.data['wait_for_all_predecessors'] || true,
             };
 
             const paramseters = node.data?.baseData?.parameters;
@@ -935,7 +935,7 @@ export const transformer = {
         },
         context1(freeNode) {
             console.log(freeNode);
-            debugger;
+          
             const input = cloneDeep(freeNode.data.input);
             Object.values(input.properties).forEach(x => {
                 if (!x.required) {

@@ -122,7 +122,7 @@ const DnDFlow = () => {
 
     useEffect(() => {
         const cleanup = onDnD((position: { x: number; y: number }, type, item) => {
-            console.log(position, type, item);
+         
             const createData={
                 // title: item.name,
                 // desc: item.description,
@@ -134,7 +134,7 @@ const DnDFlow = () => {
             if(item.baseData?.output){
                 createData.outputInfo = item.baseData?.output;
             }
-            debugger
+            
             createNode(type, {
                 position,
                 data:createData ,

@@ -33,7 +33,7 @@ const CustomHandle = memo((props: CustomHandleProps & HandleProps) => {
         type: props.type,
         nodeId: params?.id,
         onConnect: () => {
-            console.log('onConnect', props.id, props.type);
+            // console.log('onConnect', props.id, props.type);
         },
     });
 

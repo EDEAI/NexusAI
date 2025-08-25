@@ -94,7 +94,7 @@ const Agents: React.FC = () => {
         setLoading(true);
         try {
             let params = new URLSearchParams(window.location.search);
-            console.log(params.get('type'));
+        
             const res = await GetagentInfo(params.get('app_id'), params.get('type'));
             const data = res.data;
             if (res.data.agent_dataset_relation_list && res.data.agent_dataset_relation_list.length) {

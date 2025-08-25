@@ -80,7 +80,7 @@ export default memo(({ node }: { node: AppNode }) => {
         updateNodeData(node.id, allValues);
     };
     const handleCodeChange = e => {
-        console.log(e);
+    
         updateNodeData(node.id, {
             code: e,
         });

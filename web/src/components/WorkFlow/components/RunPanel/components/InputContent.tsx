@@ -62,11 +62,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
     return initialValues;
   };
 
-  useMount(() => {
-    if (nodes[0]?.id) {
-      console.log(getOutputVariables(nodes[0].id));
-    }
-  });
+
 
   useUpdateEffect(() => {
     if (loading === false) {

@@ -95,7 +95,6 @@ export default memo((props: CreateNodesToolbarProps) => {
     };
 
     const onTabChange = e => {
-        console.log('onTabChange', e);
         setTabIndex(e);
         setSearchNode(trandformData(e));
     };

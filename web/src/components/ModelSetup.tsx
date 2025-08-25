@@ -53,13 +53,13 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     };
 
     const changemodal = async (value: any, id: any) => {
-        console.log(value, id, 'data');
+    
         const data = {
             type: value.model_type,
             model_id: id,
         };
         const res = await postSwitchingModels(data);
-        console.log(res, 'data');
+     
         ModelSetupList(true);
     };
 
@@ -83,7 +83,7 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     const handleOpenModal = (data: any) => {
         setIsModalOpen2(true);
         setModalSingleData(data);
-        console.log(data, 'data');
+     
     };
 
     const uniqueTypeSet = (data: any) => {
@@ -109,7 +109,7 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
         const newdata = suppliers;
         newdata[id].listopen = !newdata[id].listopen;
         setSuppliers(newdata);
-        console.log(newdata, 'suppliers[id].listopen = !suppliers[id].listopenASD');
+      
         // setSuppliers({...suppliers,[id]:{...suppliers[id],listopen:!suppliers[id].listopen}})
         if (id + 1 == pulldownlistid) {
             setPulldownlistid(0);
@@ -119,7 +119,7 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     };
 
     const InputChange = (e: any, index: any) => {
-        console.log(typeof e, 'e');
+      
         const newmodal = JSON.parse(JSON.stringify(modalsingledata));
         // if (newmodal.supplier_config[index].type == 'int' || newmodal.supplier_config[index].type == 'float') {
         //     // if(typeof e ==='number')
