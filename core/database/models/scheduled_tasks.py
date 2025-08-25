@@ -365,6 +365,65 @@ class ScheduledTasks(MySQL):
         except Exception as e:
             print(f"Failed to check if application exists: {e}")
             return False
+    
+    def check_app_permission(self, app_id: int, user_id: int) -> tuple[bool, str]:
+        """
+        Check if user has permission to access the application
+        
+        Args:
+            app_id: Application ID
+            user_id: User ID
+            
+        Returns:
+            (has_permission: bool, error_message: str)
+        """
+        try:
+            from core.database.models.apps import Apps
+            from core.database.models.users import Users
+            
+            apps_model = Apps()
+            users_model = Users()
+            
+            # 1. Check if app exists
+            app = apps_model.select_one(
+                columns=["id", "user_id", "is_public", "team_id"],
+                conditions=[
+                    {"column": "id", "value": app_id},
+                    {"column": "status", "value": 1}  # Normal status
+                ]
+            )
+            
+            if not app:
+                return False, "scheduled_task_app_not_exists"
+            
+            # 2. Check if app is public
+            if app["is_public"] != 1:
+                return False, "scheduled_task_app_not_public"
+            
+            # 3. Check if user is the creator
+            if app["user_id"] == user_id:
+                return True, ""
+            
+            # 4. Check if user belongs to the same team
+            user = users_model.select_one(
+                columns=["team_id"],
+                conditions=[
+                    {"column": "id", "value": user_id},
+                    {"column": "status", "value": 1}
+                ]
+            )
+            
+            if not user:
+                return False, "scheduled_task_app_no_team_permission"
+            
+            if user["team_id"] == app["team_id"]:
+                return True, ""
+            else:
+                return False, "scheduled_task_app_no_team_permission"
+                
+        except Exception as e:
+            print(f"Failed to check app permission: {e}")
+            return False, "scheduled_task_app_not_exists"
 
     def get_pending_tasks_for_execution(self) -> List[Dict[str, Any]]:
         """
@@ -418,14 +477,13 @@ class ScheduledTasks(MySQL):
             print(f"Failed to get pending tasks for execution: {e}")
             return []
 
-    def check_workflow_exists(self, workflow_id: int, app_id: int, user_id: int) -> bool:
+    def check_workflow_exists(self, workflow_id: int, app_id: int) -> bool:
         """
         Check if workflow exists and status is normal
         
         Args:
             workflow_id: Workflow ID
             app_id: Application ID
-            user_id: User ID
             
         Returns:
             Whether workflow exists
@@ -439,7 +497,6 @@ class ScheduledTasks(MySQL):
                 conditions=[
                     {"column": "id", "value": workflow_id},
                     {"column": "app_id", "value": app_id},
-                    {"column": "user_id", "value": user_id},
                     {"column": "status", "value": 1}  # Normal status
                 ]
             )

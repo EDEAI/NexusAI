@@ -99,13 +99,14 @@ async def create_scheduled_task(
     if data.repeat_day_of_year and (data.repeat_day_of_year < 1 or data.repeat_day_of_year > 365):
         return response_error(get_language_content("scheduled_task_repeat_day_of_year_invalid"))
     
-    # Check if application exists
+    # Check if application exists and user has permission
     scheduled_tasks_model = ScheduledTasks()
-    if not scheduled_tasks_model.check_app_exists(data.app_id, userinfo.uid):
-        return response_error(get_language_content("scheduled_task_app_not_found"))
+    has_permission, error_message = scheduled_tasks_model.check_app_permission(data.app_id, userinfo.uid)
+    if not has_permission:
+        return response_error(get_language_content(error_message))
     
     # Check if workflow exists
-    if not scheduled_tasks_model.check_workflow_exists(data.workflow_id, data.app_id, userinfo.uid):
+    if not scheduled_tasks_model.check_workflow_exists(data.workflow_id, data.app_id):
         return response_error(get_language_content("scheduled_task_workflow_not_found"))
     
     # Prepare creation data
