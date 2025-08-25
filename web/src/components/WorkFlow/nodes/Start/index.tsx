@@ -19,6 +19,7 @@ export default memo((props: NodeProps) => {
                 type="source"
                 position={Position.Right}
             ></CustomHandle>
+            
             {/* <CreateNodesToolbar position="right" {...props}></CreateNodesToolbar> */}
             <VariableInNode value={props.data.variables?.value}></VariableInNode>
         </div>

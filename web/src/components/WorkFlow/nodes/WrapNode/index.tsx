@@ -84,7 +84,6 @@ export default memo(
                             </div>
                         )}
                         <div className="">
-                            {children}
                             {React.Children.map(children, child =>
                                 cloneElement(child, { nodeHover }),
                             )}
