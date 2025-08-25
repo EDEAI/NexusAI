@@ -414,4 +414,10 @@ export default {
     'workflow.authorization.tooltip.modify': 'Modify the authorization information for the current tool',
     'workflow.authorization.tooltip.delete': 'Delete the authorization information for the current tool',
     'workflow.cancel': 'Cancel',
+    
+    // Empty state translations
+    'workflow.noSearchResults': 'No search results found',
+    'workflow.noData': 'No data available',
+    'workflow.tryDifferentKeyword': 'Try a different keyword',
+    'workflow.checkLater': 'Check back later',
 };

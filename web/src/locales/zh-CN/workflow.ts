@@ -407,4 +407,10 @@ export default {
     'workflow.authorization.tooltip.modify': '修改当前工具的授权信息',
     'workflow.authorization.tooltip.delete': '删除当前工具的授权信息',
     'workflow.cancel': '取消',
+    
+    // Empty state translations
+    'workflow.noSearchResults': '未找到搜索结果',
+    'workflow.noData': '暂无数据',
+    'workflow.tryDifferentKeyword': '请尝试其他关键词',
+    'workflow.checkLater': '请稍后再试',
 };

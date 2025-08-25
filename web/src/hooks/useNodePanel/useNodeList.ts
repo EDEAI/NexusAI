@@ -41,9 +41,9 @@ export const useNodeList = (options: UseNodeListOptions = {}) => {
 
     const getAppsData = useCallback(
         async (nodeType: BlockEnum.Agent | BlockEnum.Skill | 'workflow', filterData: FilterData) => {
-            const cacheKey = `${nodeType}-${filterData.team}-${
-                filterData.keyword
-            }-${filterData.tag.join(',')}`;
+            const cacheKey = `${nodeType}-${filterData.team||''}-${
+                filterData.keyword||''
+            }-${filterData?.tag?.join(',') || ''}`;
             const cachedItem = dataCache.current[cacheKey];
 
             // Check cache validity

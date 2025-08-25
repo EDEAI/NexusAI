@@ -40,7 +40,7 @@ const MemoNodePanel = memo(({ onItemClick }: { onItemClick: (item: any, type?: s
         <NodePanelContent
             visibleTabs={['node', 'agent', 'tool', 'skill']}
             defaultActiveTab="1"
-            showTeamSwitch={false}
+            showTeamSwitch={true}
             showTagSearch={false}
             isMinWidth={false}
             isCollapsed={false}
