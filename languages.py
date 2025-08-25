@@ -1237,7 +1237,10 @@ language_packs = {
         'scheduled_task_repeat_days_invalid': 'Invalid repeat days format',
         'scheduled_task_repeat_day_of_month_invalid': 'Month repeat day must be between 1-31',
         'scheduled_task_repeat_month_invalid': 'Year repeat month must be between 1-12',
-        'scheduled_task_repeat_day_of_year_invalid': 'Year repeat day must be between 1-365'
+        'scheduled_task_repeat_day_of_year_invalid': 'Year repeat day must be between 1-365',
+        'scheduled_task_app_not_exists': 'Application does not exist',
+        'scheduled_task_app_not_public': 'Application is not public',
+        'scheduled_task_app_no_team_permission': 'No permission to access this application (different team)'
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1684,7 +1687,10 @@ language_packs = {
         'scheduled_task_repeat_days_invalid': '重复天数格式无效',
         'scheduled_task_repeat_day_of_month_invalid': '月重复日期必须在1-31之间',
         'scheduled_task_repeat_month_invalid': '年重复月份必须在1-12之间',
-        'scheduled_task_repeat_day_of_year_invalid': '年重复日期必须在1-365之间'
+        'scheduled_task_repeat_day_of_year_invalid': '年重复日期必须在1-365之间',
+        'scheduled_task_app_not_exists': '应用不存在',
+        'scheduled_task_app_not_public': '应用未公开',
+        'scheduled_task_app_no_team_permission': '无权限访问此应用（不同团队）'
     }
 }
 
