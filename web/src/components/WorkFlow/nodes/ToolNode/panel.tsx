@@ -201,6 +201,9 @@ export default memo(({ node }: { node: AppNode }) => {
                     authorization_status: 1,
                 },
             });
+            setTimeout(()=>{
+                getGroupDetail()
+            },200)
             const nodeList = nodes.filter(x=>x.data?.baseData?.groupName==nodeData?.baseData?.groupName);
             nodeList.forEach(x=>{
                 updateNodeData(x.id, {
