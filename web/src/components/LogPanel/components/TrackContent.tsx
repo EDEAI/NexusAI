@@ -12,6 +12,7 @@ import CodeEditor from '../../WorkFlow/components/Editor/CodeEditor';
 import { NOT_SHOW_INPUT_RESULT_NODE, NOT_SHOW_OUTPUT_RESULT_NODE } from '../../WorkFlow/config';
 import useSaveWorkFlow from '../../WorkFlow/saveWorkFlow';
 import { BlockEnum } from '../../WorkFlow/types';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 interface TrackContentProps {
     runList: any[];
@@ -27,7 +28,8 @@ export const TrackContent = memo(
         const setFlowMessage = useSocketStore(state => state.setFlowMessage);
         const flowMessage = useSocketStore(state => state.flowMessage);
         const saveWorkFlow = useSaveWorkFlow();
-        const userId = JSON.parse(localStorage.getItem('userInfo') || '{}')?.uid;
+        const { userInfo } = useUserInfo();
+        const userId = userInfo?.uid;
         const lastDetail = useLatest(detail);
 
         useEffect(() => {
@@ -47,7 +49,7 @@ export const TrackContent = memo(
 
         // TodoTag 内联定义
         const TodoTag = ({ humanConfirmInfo, userId, onClick }) => {
-            const isSelfTodo = humanConfirmInfo?.some(x => x.user_id == userId);
+            const isSelfTodo = humanConfirmInfo?.some(x => x.user_id === parseInt(userId));
             console.log(runList, detail);
     
             if (lastDetail?.current?.type == 1) {
