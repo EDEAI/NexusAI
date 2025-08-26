@@ -169,6 +169,22 @@ class ScheduledTasks(MySQL):
             print(f"Failed to delete scheduled task: {e}")
             return False
 
+    def delete_scheduled_workflow(self, workflow_id: int) -> bool:
+        """
+        Soft delete scheduled task
+        
+        Args:
+            workflow_id: workflow_id ID
+            
+        Returns:
+            Whether deletion was successful
+        """
+        result = self.update(
+            {"column": "workflow_id", "value": workflow_id},
+            {"status": 4}  # DELETED
+        )
+        return result
+
     def get_scheduled_task_by_id(self, task_id: int, user_id: int) -> Optional[Dict[str, Any]]:
         """
         Get scheduled task details by ID

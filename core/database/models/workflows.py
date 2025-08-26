@@ -10,6 +10,8 @@ from core.database import MySQL
 from core.database.models.agents import Agents
 from core.database.models.app_workflow_relation import AppWorkflowRelations
 from core.database.models.apps import Apps
+from core.database.models.scheduled_tasks import ScheduledTasks
+
 
 from core.database import SQLDatabase
 from core.database.models.custom_tools import CustomTools
@@ -393,6 +395,8 @@ class Workflows(MySQL):
             for workflow_val in workflow:
                 # delete agent
                 delete_agent_res = self.soft_delete([{"column": "id", "value": workflow_val["id"]}])
+                # delete task
+                ScheduledTasks().delete_scheduled_workflow(workflow_val["id"])
                 if not delete_agent_res:
                     return {"status": 2, "message": "delete agent error"}
 
