@@ -189,6 +189,14 @@ async def get_tool_detail(
                 provider_data['authorization_status'] = 2  # Unauthorized
             else:
                 provider_data['authorization_status'] = 1  # Authorized
+                # Merge authorization credentials into provider_data
+                if 'data' in tool_result and tool_result['data'] and 'encrypted_credentials' in tool_result['data']:
+                    encrypted_credentials = tool_result['data']['encrypted_credentials']
+                    # Iterate through credentials_for_provider and merge values from encrypted_credentials
+                    for cred_key, cred_info in provider_data['credentials_for_provider'].items():
+                        if cred_key in encrypted_credentials:
+                            # Add the value from encrypted_credentials to the credential info
+                            cred_info['value'] = encrypted_credentials[cred_key]
         else:
             # No authorization required for this tool provider.
             provider_data['authorization_status'] = 3  # No authorization required

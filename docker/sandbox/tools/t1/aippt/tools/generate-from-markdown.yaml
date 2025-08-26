@@ -58,10 +58,6 @@ parameters:
           zh_Hans: 棕色复古
         value: "6463"
       - label:
-          en_US: Red Business
-          zh_Hans: 红色商务
-        value: "151"
-      - label:
           en_US: Purple Business
           zh_Hans: 紫色商务
         value: "151"
