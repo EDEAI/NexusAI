@@ -1,5 +1,5 @@
 identity:
-  author: pixelbloom
+  author: nexusai
   name: aippt
   label:
     en_US: AiPPT.cn
@@ -38,10 +38,11 @@ credentials_for_provider:
       zh_Hans: 点击如何获取，了解获取方式
     url: https://open.aippt.cn/
 tools:
-  - tools/generate-outline.yaml
-  - tools/generate-content.yaml
-  - tools/template-list.yaml
-  - tools/generate-design.yaml
+  # - tools/generate-outline.yaml
+  # - tools/generate-content.yaml
+  # - tools/template-list.yaml
+  # - tools/generate-design.yaml
+  - tools/generate-from-markdown.yaml
 extra:
   python:
     source: provider/aippt.py

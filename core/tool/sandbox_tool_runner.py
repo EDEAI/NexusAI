@@ -217,7 +217,7 @@ def run_tool():
         if not binary_data:
             return '.bin'
         
-        header = binary_data[:32]
+        header = binary_data[:512]  # Increased header size for better detection
         
         # Image formats
         # PNG signature: 0x89 + "PNG" + CR + LF + 0x1a + LF
@@ -264,9 +264,46 @@ def run_tool():
         elif header.startswith(bytes([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1])):
             return '.doc'  # Could be .doc, .xls, .ppt - default to .doc
         
-        # DOCX/XLSX/PPTX: PK\\x03\\x04 (ZIP format)
-        elif header.startswith(b'PK\\x03\\x04'):
-            return '.docx'  # Could be .docx, .xlsx, .pptx - default to .docx
+        # Modern Office formats (ZIP-based): PK\x03\x04
+        elif header.startswith(b'PK\x03\x04'):
+            # Check for Office Open XML formats by looking for specific content types
+            header_str = header.decode('latin-1', errors='ignore')
+            
+            # PPTX detection - look for presentation-related content
+            if any(indicator in header_str for indicator in [
+                'ppt/presentation.xml',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'ppt/slides/',
+                'ppt/slideLayouts/',
+                'ppt/slideMasters/',
+                '_rels/.rels',
+                'ppt/theme/'
+            ]):
+                return '.pptx'
+            
+            # XLSX detection - look for spreadsheet-related content
+            elif any(indicator in header_str for indicator in [
+                'xl/workbook.xml',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'xl/worksheets/',
+                'xl/sharedStrings.xml',
+                'xl/styles.xml'
+            ]):
+                return '.xlsx'
+            
+            # DOCX detection - look for document-related content
+            elif any(indicator in header_str for indicator in [
+                'word/document.xml',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'word/styles.xml',
+                'word/settings.xml',
+                'word/fontTable.xml'
+            ]):
+                return '.docx'
+            
+            # If no specific Office format detected, check for other ZIP-based formats
+            else:
+                return '.zip'
         
         
         # Text formats
@@ -325,15 +362,19 @@ def run_tool():
                 return '.mkv'
         
         # Archive formats
-        # ZIP signature: PK\\x03\\x04
-        elif header.startswith(b'PK\\x03\\x04'):
-            return '.zip'
+        # JAR files (Java Archive)
+        elif header.startswith(b'PK\x03\x04') and b'META-INF/MANIFEST.MF' in header:
+            return '.jar'
         
-        # RAR signature: Rar!\\x1A\\x07
-        elif header.startswith(b'Rar!\\x1a\\x07'):
+        # RAR signature: Rar!\x1A\x07
+        elif header.startswith(b'Rar!\x1a\x07'):
             return '.rar'
         
-        # 7Z signature: 7z\\xBC\\xAF\\x27\\x1C
+        # Additional ZIP detection for non-Office files
+        elif header.startswith(b'PK\x03\x04'):
+            return '.zip'
+        
+        # 7Z signature: 7z\xBC\xAF\x27\x1C
         elif header.startswith(bytes([0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c])):
             return '.7z'
         
