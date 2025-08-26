@@ -82,6 +82,7 @@ const JSONFormEditor = ({
 
 export default memo(({ node }: { node: AppNode }) => {
     const formRef = useRef(null);
+    const authFormRef = useRef(null);
     const intl = useIntl();
     const updateNodeData = useStore(state => state.updateNodeData);
     const getVariables = useStore(state => state.getOutputVariables);
@@ -94,6 +95,7 @@ export default memo(({ node }: { node: AppNode }) => {
     > | null>(null);
     const [editorOptions, setEditorOptions] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [toolDetail, setToolDetail] = useState<any>(null);
 
     const updateNodeDataRef = useRef(updateNodeData);
     const nodeIdRef = useRef(node.id);
@@ -108,8 +110,9 @@ export default memo(({ node }: { node: AppNode }) => {
     const getGroupDetail = async () => {
         const res = await getToolDetail(node.data?.baseData?.groupName);
         if(res?.code==0){
-            // setToolDetail(res?.data);
+            setToolDetail(res?.data);
             setAuthorizationStatus(res?.data?.authorization_status);
+           
         }
     };
     useMount(() => {
@@ -259,6 +262,22 @@ export default memo(({ node }: { node: AppNode }) => {
             },
         });
     };
+
+    const changeAuthorizationStatus = () => {
+        setAuthorizationStatus(2);
+        if(toolDetail?.authorization_status==1){
+           setTimeout(()=>{
+            const setData = {};
+            Object.keys(toolDetail?.credentials_for_provider).forEach(x=>{
+                if(toolDetail?.credentials_for_provider[x].value){
+                    setData[x] = toolDetail?.credentials_for_provider[x].value;
+                }
+            });
+            authFormRef.current?.setFieldsValue(setData);
+           },200)
+        }
+        
+    }
     const lang = getLocale() === 'en-US' ? 'en_US' : 'zh_Hans';
     return (
         <>
@@ -266,6 +285,7 @@ export default memo(({ node }: { node: AppNode }) => {
                 {authorizationStatus == 2 ? (
                     <ProForm
                         onFinish={getToolAuthorization}
+                        formRef={authFormRef}
                         autoFocusFirstInput={false}
                         submitter={{
                             resetButtonProps: false,
@@ -345,7 +365,7 @@ export default memo(({ node }: { node: AppNode }) => {
                                     <Button 
                                     type="primary" 
                                     icon={<EditOutlined />}
-                                    onClick={() => setAuthorizationStatus(2)}
+                                    onClick={() => changeAuthorizationStatus()}
                                     className="flex items-center gap-1"
                                     title={intl.formatMessage({
                                         id: 'workflow.authorization.tooltip.modify',
