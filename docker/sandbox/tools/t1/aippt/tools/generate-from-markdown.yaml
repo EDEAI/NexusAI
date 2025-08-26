@@ -33,10 +33,66 @@ parameters:
       zh_Hans: Markdown内容
       pt_BR: Markdown Content
     human_description:
-      en_US: Please enter the markdown content for PPT generation
-      zh_Hans: 请输入用于生成PPT的Markdown内容
-      pt_BR: Please enter the markdown content for PPT generation
-    llm_description: Please enter the markdown content for PPT generation
+      en_US: |
+        Please enter the markdown content for PPT generation. Follow this structure:
+        
+        Example format:
+        # Main Title
+        ## 1. First Level Title
+        ### 1.1 Second Level Title
+        #### 1.1.1 Third Level Title
+        - Content item
+        
+        Requirements:
+        1. Only one main title (# Main Title) is allowed
+        2. Multiple first, second, and third level titles are allowed
+        3. Content must be placed under third level titles only
+        4. Do not place content directly under main title or first/second level titles
+      zh_Hans: |
+        请输入用于生成PPT的Markdown内容，请遵循以下结构：
+        
+        示例格式：
+        # 总标题
+        ## 1. 一级标题
+        ### 1.1 二级标题
+        #### 1.1.1 三级标题
+        - 内容
+        
+        要求：
+        1. 总标题只能有一个（# 总标题）
+        2. 一、二、三级标题可以有多个
+        3. 内容必须放在三级标题下面
+        4. 不可以把内容放在总标题或一、二级标题下面
+      pt_BR: |
+        Please enter the markdown content for PPT generation. Follow this structure:
+        
+        Example format:
+        # Main Title
+        ## 1. First Level Title
+        ### 1.1 Second Level Title
+        #### 1.1.1 Third Level Title
+        - Content item
+        
+        Requirements:
+        1. Only one main title (# Main Title) is allowed
+        2. Multiple first, second, and third level titles are allowed
+        3. Content must be placed under third level titles only
+        4. Do not place content directly under main title or first/second level titles
+    llm_description: |
+      Please enter the markdown content for PPT generation. Follow this structure:
+      
+      Example format:
+      # Main Title
+      ## 1. First Level Title
+      ### 1.1 Second Level Title
+      #### 1.1.1 Third Level Title
+      - Content item
+      
+      Requirements:
+      1. Only one main title (# Main Title) is allowed
+      2. Multiple first, second, and third level titles are allowed
+      3. Content must be placed under third level titles only
+      4. Do not place content directly under main title or first/second level titles
     form: llm
   - name: template_id
     type: select
