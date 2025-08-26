@@ -79,7 +79,7 @@ const CreationModal: React.FC<ChildProps> = ({
     const RadioChange = (value: any) => {
         transformData.map((item: any) => {
             if (item.name == value.name) {
-                console.log(item, 'item');
+                
                 setcreationType(item);
             }
         });

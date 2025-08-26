@@ -162,7 +162,7 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
     const RadioChange = (e: any) => {
         transformData.map((item: any) => {
             if (item.name == e.target.value) {
-                console.log(item, 'item');
+            
                 setcreationType(item);
             }
         });
@@ -194,7 +194,7 @@ const AddCreation: React.FC<ChildProps> = ({ optionsModalId }) => {
 
     const handleImportCancel = () => {
         // Add cancel import logic here
-        console.log('Import cancelled');
+    
         setIsImportModalOpen(false);
     };
 

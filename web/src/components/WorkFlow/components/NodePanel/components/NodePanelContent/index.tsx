@@ -67,6 +67,7 @@ export default memo(
             getCurrentTabConfig,
             onDragStart,
             lang,
+            searchTools,
         } = useNodePanel({
             visibleTabs,
             defaultActiveTab,
@@ -165,7 +166,10 @@ export default memo(
                         filterData.tag.length === 0 &&
                         !isNodePanel
                     ) {
-                        return;
+                        // Always refetch for tools to reflect async store updates
+                        if (currentConfig?.type !== 'tools') {
+                            return;
+                        }
                     }
 
                     setLoading(true);
@@ -199,7 +203,7 @@ export default memo(
                     
                     fetchData();
                     
-                }, [currentConfig, filterData, pageSize]);
+                }, [currentConfig, filterData, pageSize, searchTools]);
 
                 const loadMoreData = useCallback(() => {
                     const currentLength = displayList.length;
@@ -313,10 +317,12 @@ export default memo(
                     </div>
                 );
 
+                const toolsLoading = currentConfig?.type === 'tools' && (!searchTools || searchTools.length === 0);
+
                 return (
                     <div ref={containerRef} className="overflow-y-auto h-full">
-                        <Spin spinning={loading}>
-                            {!loading && displayList.length === 0 ? (
+                        <Spin spinning={loading || toolsLoading}>
+                            {!(loading || toolsLoading) && displayList.length === 0 ? (
                                 <EmptyState />
                             ) : filterData?.keyword ? (
                                 <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2">
@@ -513,7 +519,6 @@ export default memo(
                                         key={item.key}
                                         tabIndex={index + 1 + ''}
                                         showName={!isMinWidth}
-                                        autoHeight={true}
                                     />
                                 </div>
                             ))}

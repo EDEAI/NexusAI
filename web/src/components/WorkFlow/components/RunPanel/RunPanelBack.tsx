@@ -155,12 +155,12 @@ export default memo(() => {
 
                 return true;
             });
-            console.log(_.cloneDeep(runList));
+         
 
             const endRun = runList.find(x => x?.data?.status == 2);
             if (endRun) {
                 setEndRun(runList[runList.length - 1]);
-                console.log('endRun');
+             
             }
 
             setRunList(runList);
@@ -498,11 +498,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
     const [submitLoading, setSubmitLoading] = useState(false);
     const saveWorkFlow = useSaveWorkFlow();
     const datasetData = useStore(state => state.datasetData);
-    useMount(() => {
-        console.log(999);
-
-        console.log(getOutputVariables(nodes[0].id));
-    });
+  
 
     useUpdateEffect(() => {
         if (loading == false) {
@@ -560,7 +556,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
 
         runWorkFlow(app_id, params)
             .then(res => {
-                console.log(res);
+           
                 setSubmitLoading(false);
                 onRunResult?.(res);
             })

@@ -129,13 +129,13 @@ export default memo(({ node }: { node: AppNode }) => {
                 setLoading(false);
                 return;
             }
-            debugger
+            
             fieldNames
                 // .filter(x => nodeData['form']?.[x])
                 .forEach(e => {
                     if (nodeData['form']?.[e] && nodeData['form']?.[e] != '') {
                         formRef.current.setFieldsValue({ [e]: nodeData['form']?.[e] });
-                        debugger
+                        
                     } else {
                         const hasDefault = nodeData?.baseData?.parameters?.find(
                             x => x.name == e && x.default,
@@ -370,19 +370,19 @@ export default memo(({ node }: { node: AppNode }) => {
                                     defaultMessage: '',
                                 })}
                             ></ProFormSwitch>
-                            <ProFormSwitch
+                            {/* <ProFormSwitch
                                 name="wait_for_all_predecessors"
                                 label={intl.formatMessage({
                                     id: 'workflow.label.waitForAllPredecessors',
                                     defaultMessage: '',
                                 })}
-                            ></ProFormSwitch>
+                            ></ProFormSwitch> */}
                         </div>
                         {params.map((e, index) => {
                             const baseProps = {
                                 name: e.name,
-                                label: e?.label?.zh_Hans,
-                                tooltip: e?.human_description?.zh_Hans,
+                                label: e?.label?.zh_Hans||e?.label?.['en_US'],
+                                tooltip: e?.human_description?.zh_Hans||e?.human_description?.['en_US'],
                                 key: e.name,
                                 required: e.required,
                             };

@@ -2,7 +2,7 @@
  * @Author: wnagchi 1305bcd@gmail.com
  * @Date: 2024-12-30 17:31:04
  * @LastEditors: biz
- * @LastEditTime: 2025-07-31 09:49:02
+ * @LastEditTime: 2025-08-25 16:36:49
  * @FilePath: \NexusAI_GITHUB\web\src\components\WorkFlow\components\DraggableList\index.tsx
  */
 import { getBaseNode } from '@/components/WorkFlow/nodes/nodeDisperse';
@@ -113,7 +113,7 @@ interface ToolNodeListProps {
 interface NodeWrapperProps {
     children: React.ReactNode;
     onDragStart: DraggableListProps['onDragStart'];
-    onClick?: () => void;
+    onClick?: (item: any) => void;
     type: string;
     item: any;
 }
@@ -125,7 +125,7 @@ const NodeWrapper = memo(({ children, onDragStart, onClick, type, item }: NodeWr
         onDragStart={e => onDragStart(e, type, item)}
         onClick={(e) => {
             e.stopPropagation();
-            onClick?.();
+            onClick?.(item);
         }}
         className="cursor-pointer hover:bg-blue-100 rounded-md px-2 box-border"
     >
@@ -234,7 +234,7 @@ const ToolNodeItem = memo(
                         onDragStart={onDragStart}
                         type={BlockEnum.Tool}
                         item={createItem}
-                        onClick={() => onItemClick?.(category, tool, categoryIndex, toolIndex)}
+                        onClick={() => onItemClick?.(createItem)}
                     >
                         <div className="text-sm py-2 pl-2 text-gray-600">
                             {tool?.identity?.label[lang] || tool?.identity?.label['en_US']}
@@ -275,8 +275,8 @@ const ToolCategory = memo(
                             category={category}
                             onDragStart={onDragStart}
                             typeBadge={typeBadge}
-                            onItemClick={(category, item, catIndex, toolIdx) =>
-                                onItemClick?.(category, item, catIndex, toolIdx)
+                            onItemClick={(createItem) =>
+                                onItemClick?.(createItem)
                             }
                             categoryIndex={categoryIndex}
                             toolIndex={toolIndex}

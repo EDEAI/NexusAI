@@ -530,7 +530,7 @@ export const MCPToolDisplay: FC<MCPToolDisplayProps> = ({
                 sendInstructionQueue(instructions);
             
             }
-            debugger
+            
         } catch (error) {
             console.error('Error handling file upload completion:', error);
             message.error('Failed to process file upload completion');

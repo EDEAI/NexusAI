@@ -180,7 +180,7 @@ export default memo((props: Props) => {
 
     useEffect(() => {
         if (props.data?.detailList?.app?.name != undefined) {
-            console.log(props.data);
+        
             const id = props.data.detailList.agent_chatroom_id;
             const agentId = props.data.detailList.agent.agent_id;
 
@@ -202,11 +202,7 @@ export default memo((props: Props) => {
                 agent_id: agentId,
             };
 
-            console.log('AgentInfo updated:', {
-                m_config_id: newAgentInfo.agent?.m_config_id,
-                agent_id: newAgentInfo.agent_id,
-                name: newAgentInfo.name,
-            });
+         
 
             setAgentInfo(newAgentInfo);
 
@@ -275,14 +271,7 @@ export default memo((props: Props) => {
         }
     }, [listenMessage]);
 
-    // useEffect(() => {
 
-    //     if (props.data?.detailList?.agent?.agent_id) {
-    //         console.log(props);
-    //         debugger
-    //         // getMessageHistory();
-    //     }
-    // }, [props]);
 
     useEffect(() => {
         if (!initialLoading && messages.length > 0) {
@@ -291,7 +280,7 @@ export default memo((props: Props) => {
     }, [initialLoading]);
 
     const handleSubmit = async (values: { content: string; file_list: string[] }) => {
-        console.log(values);
+      
         const val = formRef.current?.getFieldsValue();
         if (!val || !values.content?.trim()) return;
 

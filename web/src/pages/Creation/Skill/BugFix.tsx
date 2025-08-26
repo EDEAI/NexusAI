@@ -63,7 +63,7 @@ const BugFix: React.FC<ChildProps> = ({
     };
 
     const handleDebugRun = async (values: any) => {
-        console.log('Form values:', values);
+
         setLoading(true);
 
         // Save data first, ensure save is successful before executing debug
