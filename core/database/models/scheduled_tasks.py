@@ -37,7 +37,7 @@ class ScheduledTasks(MySQL):
                 if len(data['repeat_days']) == 0:
                     data['repeat_days'] = None
                 else:
-                    # 将列表转换为JSON字符串存储到数据库
+                    # Convert list to JSON string for database storage
                     data['repeat_days'] = json.dumps(data['repeat_days'])
             else:
                 # Not passed or None: save as NULL
@@ -107,7 +107,7 @@ class ScheduledTasks(MySQL):
                     if len(data['repeat_days']) == 0:
                         data['repeat_days'] = None
                     else:
-                        # 将列表转换为JSON字符串存储到数据库
+                        # Convert list to JSON string for database storage
                         data['repeat_days'] = json.dumps(data['repeat_days'])
 
             # input: Parse as dict and validate
@@ -186,7 +186,7 @@ class ScheduledTasks(MySQL):
                 conditions=[
                     {"column": "id", "value": task_id},
                     {"column": "user_id", "value": user_id},
-                    {"column": "status", "op": "!=", "value": 4}  # 排除已删除的
+                    {"column": "status", "op": "!=", "value": 4}  # Exclude deleted records
                 ]
             )
             
@@ -236,7 +236,7 @@ class ScheduledTasks(MySQL):
         try:
             conditions = [
                 {"column": "user_id", "value": user_id},
-                {"column": "status", "op": "!=", "value": 4}  # 排除已删除的
+                {"column": "status", "op": "!=", "value": 4}  # Exclude deleted records
             ]
             
             if app_id:

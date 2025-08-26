@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-定时任务执行脚本
+Scheduled task execution script
 
-功能：
-1. 查询需要执行的定时任务
-2. 根据任务配置执行工作流
-3. 更新任务执行状态和下次执行时间
+Features:
+1. Query scheduled tasks that need to be executed
+2. Execute workflows based on task configuration
+3. Update task execution status and next execution time
 """
 
 import sys
 import os
 from pathlib import Path
 
-# 添加项目根目录到Python路径
+# Add project root directory to Python path
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 import json
@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 from dateutil.relativedelta import relativedelta
 
-# 设置数据库自动提交
+# Set database auto commit
 os.environ['DATABASE_AUTO_COMMIT'] = 'True'
 
 from core.database.models.scheduled_tasks import ScheduledTasks
@@ -36,12 +36,12 @@ from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
 from copy import deepcopy
 from log import Logger
 
-# 初始化日志记录器
+# Initialize logger
 logger = Logger.get_logger('scheduled-tasks')
 
 class ScheduledTaskExecutor:
     """
-    定时任务执行器
+    Scheduled task executor
     """
     
     def __init__(self):
@@ -62,7 +62,7 @@ class ScheduledTaskExecutor:
         scheduled_task_id: int = 0
     ):
         """
-        修复版本的start_workflow函数，正确处理输入验证
+        Fixed version of start_workflow function, correctly handles input validation
         """
         from languages import get_language_content
         
@@ -86,42 +86,42 @@ class ScheduledTaskExecutor:
         if not inputs:
             raise ValueError(get_language_content("graph_validation_errors.inputs_cannot_be_empty"))
         
-        # 正确的输入验证方式：从图中获取start node的input定义
+        # Correct input validation method: get input definition from start node in graph
         graph = create_graph_from_dict(workflow['graph'])
         graph.validate()
         
-        # 获取start node的input定义
-        start_node = graph.nodes.nodes[0]  # 第一个节点是start node
+        # Get input definition from start node
+        start_node = graph.nodes.nodes[0]  # First node is the start node
         input_definition = start_node.data['input']
         
         if input_definition:
-            # 复制input定义并设置值
+            # Copy input definition and set values
             input_obj = deepcopy(input_definition)
             
-            # 为每个定义的变量设置值
+            # Set values for each defined variable
             for key, value in inputs.items():
                 if key in input_obj.properties:
                     input_obj.properties[key].value = value
             
-            # 为缺失的必需变量提供默认值
+            # Provide default values for missing required variables
             for var_name, var_obj in input_obj.properties.items():
                 if getattr(var_obj, 'required', False) and (var_obj.value is None or var_obj.value == ''):
-                    # 根据变量类型提供默认值
+                    # Provide default values based on variable type
                     if var_obj.type == 'string':
                         var_obj.value = f"default_{var_name}"
                     elif var_obj.type == 'number':
                         var_obj.value = 0
                     elif var_obj.type == 'file':
-                        var_obj.value = None  # 文件类型保持为None
+                        var_obj.value = None  # File type remains None
                     else:
                         var_obj.value = f"default_{var_name}"
                     
                     logger.warning(f"Task {workflow['id']}: Missing required variable '{var_name}', using default value: {var_obj.value}")
             
-            # 验证必需变量
+            # Validate required variables
             validate_required_variable(input_obj)
             
-            # 使用处理后的input_obj
+            # Use processed input object
             validated_inputs = input_obj.to_dict()
         else:
             validated_inputs = inputs
@@ -158,32 +158,32 @@ class ScheduledTaskExecutor:
     
     def get_pending_tasks(self) -> List[Dict[str, Any]]:
         """
-        获取需要执行的定时任务
+        Get scheduled tasks that need to be executed
         
         Returns:
-            需要执行的任务列表
+            List of tasks to be executed
         """
         try:
             current_time = datetime.now()
             
-            # 使用数据库模型中的方法获取待执行任务
+            # Use database model method to get pending tasks
             tasks = self.scheduled_tasks_model.get_pending_tasks_for_execution()
             
-            # 过滤任务：检查结束时间和最大执行次数限制
+            # Filter tasks: check end time and maximum execution limit
             pending_tasks = []
             for task in tasks:
-                # 检查结束时间限制
+                # Check end time limit
                 if task.get('end_time') and current_time > task['end_time']:
                     logger.info(f"Task {task['id']} ({task['name']}) has exceeded end time, skipping")
-                    # 将超时的任务状态设置为已完成
+                    # Set expired tasks status to completed
                     self._disable_completed_task(task['id'], "Task has exceeded end time")
                     continue
                 
-                # 检查最大执行次数限制
+                # Check maximum execution limit
                 max_executions = task.get('max_executions', 0)
                 if max_executions > 0 and task.get('execution_count', 0) >= max_executions:
                     logger.info(f"Task {task['id']} ({task['name']}) has reached max executions ({max_executions}), skipping")
-                    # 将达到最大执行次数的任务状态设置为已完成
+                    # Set tasks that reached max executions to completed
                     self._disable_completed_task(task['id'], f"Task has reached max executions ({max_executions})")
                     continue
                 
@@ -230,10 +230,10 @@ class ScheduledTaskExecutor:
         try:
             logger.info(f"Starting execution of task {task_id} ({task_name})")
             
-            # 调试：显示任务的输入配置
+            # Debug: show task's input configuration
             logger.info(f"Task {task_id} input configuration: {task['input']} (type: {type(task['input'])})")
             
-            # 获取用户信息以获取team_id
+            # Get user info to obtain team_id
             user_info = self.users_model.get_user_by_id(task['user_id'])
             if not user_info:
                 logger.error(f"User {task['user_id']} not found for task {task_id}")
@@ -242,7 +242,7 @@ class ScheduledTaskExecutor:
             
             team_id = user_info['team_id']
             
-            # 解析输入参数
+            # Parse input parameters
             inputs = task['input']
             if isinstance(inputs, str):
                 try:
@@ -257,12 +257,12 @@ class ScheduledTaskExecutor:
                 self._update_task_execution_result(task_id, False, "Inputs must be a dictionary")
                 return False
             
-            # 处理复杂的输入格式：如果包含嵌套的变量定义结构，提取实际值
+            # Handle complex input format: if contains nested variable definition structure, extract actual values
             if 'inputs' in inputs and isinstance(inputs['inputs'], dict):
-                # 这是从定时任务API创建的格式，需要提取实际值
+                # This is the format created from scheduled task API, need to extract actual values
                 nested_inputs = inputs['inputs']
                 if 'properties' in nested_inputs:
-                    # 从变量定义中提取值
+                    # Extract values from variable definitions
                     simple_inputs = {}
                     for key, var_def in nested_inputs['properties'].items():
                         if isinstance(var_def, dict) and 'value' in var_def:
@@ -274,23 +274,23 @@ class ScheduledTaskExecutor:
                 else:
                     inputs = nested_inputs
             
-            # 确保inputs是简单的键值对格式
+            # Ensure inputs are in simple key-value format
             if not inputs or not isinstance(inputs, dict):
                 logger.error(f"Task {task_id}: Invalid or empty inputs after processing: {inputs}")
                 self._update_task_execution_result(task_id, False, "Invalid inputs format after processing")
                 return False
             
-            # 生成运行名称
+            # Generate run name
             current_time = datetime.now()
             run_name = f"Scheduled_Task_{task_id}_{current_time.strftime('%Y%m%d_%H%M%S')}"
             
-            # 调用修复版本的工作流执行函数
+            # Call fixed version of workflow execution function
             try:
                 result = self._start_workflow_fixed(
                     team_id=team_id,
                     user_id=task['user_id'],
                     app_id=task['app_id'],
-                    run_type=1,  # 使用发布版本
+                    run_type=1,  # Use published version
                     run_name=run_name,
                     inputs=inputs,
                     knowledge_base_mapping=None,
@@ -299,7 +299,7 @@ class ScheduledTaskExecutor:
                     scheduled_task_id=task_id
                 )
             except Exception as workflow_error:
-                # 如果是输入验证错误，提供更详细的错误信息
+                # If input validation error, provide more detailed error information
                 error_msg = str(workflow_error)
                 if "'name'" in error_msg or "create_variable_from_dict" in error_msg:
                     error_msg = f"Invalid input format for workflow. Task inputs: {inputs}. Original error: {error_msg}"
@@ -325,17 +325,17 @@ class ScheduledTaskExecutor:
     
     def _update_task_execution_result(self, task_id: int, success: bool, message: str = ""):
         """
-        更新任务执行结果
+        Update task execution result
         
         Args:
-            task_id: 任务ID
-            success: 执行是否成功
-            message: 执行消息
+            task_id: Task ID
+            success: Whether execution was successful
+            message: Execution message
         """
         try:
             current_time = datetime.now()
             
-            # 获取任务信息以计算下次执行时间（使用直接查询，不受用户限制）
+            # Get task info to calculate next execution time (use direct query, not restricted by user)
             task = self.scheduled_tasks_model.select_one(
                 columns="*",
                 conditions=[{"column": "id", "value": task_id}]
@@ -344,9 +344,9 @@ class ScheduledTaskExecutor:
                 logger.error(f"Task {task_id} not found when updating execution result")
                 return
             
-            # 更新执行统计
+            # Update execution statistics
             execution_count = task.get('execution_count', 0) + 1
-            last_run_status = 1 if success else 2  # 1: 成功, 2: 失败
+            last_run_status = 1 if success else 2  # 1: Success, 2: Failed
             
             update_data = {
                 'last_run_time': current_time,
@@ -354,17 +354,17 @@ class ScheduledTaskExecutor:
                 'execution_count': execution_count
             }
             
-            # 计算下次执行时间
+            # Calculate next execution time
             next_run_time = self._calculate_next_run_time(task)
             if next_run_time:
                 update_data['next_run_time'] = next_run_time
                 logger.info(f"Task {task_id} next run time: {next_run_time}")
             else:
-                # 如果是一次性任务或无法计算下次执行时间，则禁用任务
-                update_data['status'] = 2  # 禁用
+                # If one-time task or cannot calculate next execution time, disable task
+                update_data['status'] = 2  # Disabled
                 logger.info(f"Task {task_id} completed, no next run time")
             
-            # 更新任务
+            # Update task
             self.scheduled_tasks_model.update(
                 {"column": "id", "value": task_id},
                 update_data
@@ -379,18 +379,18 @@ class ScheduledTaskExecutor:
     
     def _calculate_next_run_time(self, task: Dict[str, Any]) -> Optional[datetime]:
         """
-        计算下次执行时间
+        Calculate next execution time
         
         Args:
-            task: 任务信息
+            task: Task information
             
         Returns:
-            下次执行时间，如果是一次性任务则返回None
+            Next execution time, returns None if one-time task
         """
         try:
             task_type = task.get('task_type')
             if task_type == 'one_time':
-                return None  # 一次性任务没有下次执行时间
+                return None  # One-time task has no next execution time
             
             repeat_type = task.get('repeat_type', 'none')
             if repeat_type == 'none':
@@ -399,7 +399,7 @@ class ScheduledTaskExecutor:
             current_time = datetime.now()
             repeat_interval = task.get('repeat_interval', 1)
             
-            # 基于当前时间计算下次执行时间
+            # Calculate next execution time based on current time
             if repeat_type == 'minute':
                 return current_time + timedelta(minutes=repeat_interval)
             
@@ -412,30 +412,30 @@ class ScheduledTaskExecutor:
             elif repeat_type == 'week':
                 repeat_days = task.get('repeat_days')
                 if repeat_days and isinstance(repeat_days, list):
-                    # 找到下一个应该执行的星期几
+                    # Find next day of week that should be executed
                     next_time = current_time + timedelta(days=1)
-                    for _ in range(7):  # 最多检查7天
+                    for _ in range(7):  # Check at most 7 days
                         weekday = next_time.weekday() + 1  # 1-7 (Monday-Sunday)
                         if weekday in repeat_days:
                             return next_time.replace(hour=current_time.hour, minute=current_time.minute, second=current_time.second)
                         next_time += timedelta(days=1)
                 else:
-                    # 如果没有指定具体的星期几，则按间隔周数计算
+                    # If no specific day of week specified, calculate by week interval
                     return current_time + timedelta(weeks=repeat_interval)
             
             elif repeat_type == 'month':
                 repeat_day_of_month = task.get('repeat_day_of_month')
                 if repeat_day_of_month:
-                    # 指定每月的某一天
+                    # Specify a certain day of each month
                     next_month = current_time + relativedelta(months=repeat_interval)
                     try:
                         return next_month.replace(day=repeat_day_of_month)
                     except ValueError:
-                        # 如果指定的日期在下个月不存在（如2月30日），则使用月末
+                        # If specified date doesn't exist in next month (like Feb 30), use end of month
                         next_month = next_month.replace(day=1) + relativedelta(months=1) - timedelta(days=1)
                         return next_month
                 else:
-                    # 按月份间隔计算
+                    # Calculate by month interval
                     return current_time + relativedelta(months=repeat_interval)
             
             elif repeat_type == 'year':
@@ -443,16 +443,16 @@ class ScheduledTaskExecutor:
                 repeat_day_of_year = task.get('repeat_day_of_year')
                 
                 if repeat_month and repeat_day_of_year:
-                    # 指定每年的某月某日
+                    # Specify a certain month and day of each year
                     next_year = current_time + relativedelta(years=repeat_interval)
                     try:
                         target_date = datetime(next_year.year, repeat_month, repeat_day_of_year)
                         return target_date.replace(hour=current_time.hour, minute=current_time.minute, second=current_time.second)
                     except ValueError:
-                        # 处理无效日期（如2月29日在非闰年）
+                        # Handle invalid dates (like Feb 29 in non-leap year)
                         return current_time + relativedelta(years=repeat_interval)
                 else:
-                    # 按年份间隔计算
+                    # Calculate by year interval
                     return current_time + relativedelta(years=repeat_interval)
             
             else:
@@ -465,15 +465,15 @@ class ScheduledTaskExecutor:
     
     def run_once(self) -> int:
         """
-        执行一次定时任务检查和执行
+        Execute scheduled task check and execution once
         
         Returns:
-            执行的任务数量
+            Number of executed tasks
         """
         try:
             logger.info("Starting scheduled task execution cycle")
             
-            # 获取需要执行的任务
+            # Get tasks that need to be executed
             pending_tasks = self.get_pending_tasks()
             
             if not pending_tasks:
@@ -482,14 +482,14 @@ class ScheduledTaskExecutor:
             
             executed_count = 0
             
-            # 逐个执行任务
+            # Execute tasks one by one
             for task in pending_tasks:
                 try:
                     success = self.execute_task(task)
                     if success:
                         executed_count += 1
                     
-                    # 任务间稍作延迟，避免同时启动太多工作流
+                    # Small delay between tasks to avoid starting too many workflows simultaneously
                     time.sleep(1)
                     
                 except Exception as e:
@@ -506,10 +506,10 @@ class ScheduledTaskExecutor:
     
     def run_daemon(self, check_interval: int = 60):
         """
-        以守护进程模式运行定时任务执行器
+        Run scheduled task executor in daemon mode
         
         Args:
-            check_interval: 检查间隔（秒），默认60秒
+            check_interval: Check interval (seconds), default 60 seconds
         """
         logger.info(f"Starting scheduled task daemon with {check_interval}s check interval")
         
@@ -528,26 +528,26 @@ class ScheduledTaskExecutor:
 
 def main():
     """
-    主函数
+    Main function
     """
     import argparse
     
-    parser = argparse.ArgumentParser(description='定时任务执行脚本')
+    parser = argparse.ArgumentParser(description='Scheduled task execution script')
     parser.add_argument('--mode', choices=['once', 'daemon'], default='once',
-                        help='运行模式：once(执行一次) 或 daemon(守护进程模式)')
+                        help='Run mode: once (execute once) or daemon (daemon mode)')
     parser.add_argument('--interval', type=int, default=60,
-                        help='守护进程模式下的检查间隔（秒），默认60秒')
+                        help='Check interval in daemon mode (seconds), default 60 seconds')
     
     args = parser.parse_args()
     
     executor = ScheduledTaskExecutor()
     
     if args.mode == 'once':
-        # 执行一次
+        # Execute once
         executed_count = executor.run_once()
         print(f"Executed {executed_count} tasks")
     elif args.mode == 'daemon':
-        # 守护进程模式
+        # Daemon mode
         executor.run_daemon(args.interval)
 
 
