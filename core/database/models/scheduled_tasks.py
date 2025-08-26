@@ -37,7 +37,7 @@ class ScheduledTasks(MySQL):
                 if len(data['repeat_days']) == 0:
                     data['repeat_days'] = None
                 else:
-                    # 将列表转换为JSON字符串存储到数据库
+                    # Convert list to JSON string for database storage
                     data['repeat_days'] = json.dumps(data['repeat_days'])
             else:
                 # Not passed or None: save as NULL
@@ -107,7 +107,7 @@ class ScheduledTasks(MySQL):
                     if len(data['repeat_days']) == 0:
                         data['repeat_days'] = None
                     else:
-                        # 将列表转换为JSON字符串存储到数据库
+                        # Convert list to JSON string for database storage
                         data['repeat_days'] = json.dumps(data['repeat_days'])
 
             # input: Parse as dict and validate
@@ -169,6 +169,22 @@ class ScheduledTasks(MySQL):
             print(f"Failed to delete scheduled task: {e}")
             return False
 
+    def delete_scheduled_workflow(self, workflow_id: int) -> bool:
+        """
+        Soft delete scheduled task
+        
+        Args:
+            workflow_id: workflow_id ID
+            
+        Returns:
+            Whether deletion was successful
+        """
+        result = self.update(
+            {"column": "workflow_id", "value": workflow_id},
+            {"status": 4}  # DELETED
+        )
+        return result
+
     def get_scheduled_task_by_id(self, task_id: int, user_id: int) -> Optional[Dict[str, Any]]:
         """
         Get scheduled task details by ID
@@ -186,7 +202,7 @@ class ScheduledTasks(MySQL):
                 conditions=[
                     {"column": "id", "value": task_id},
                     {"column": "user_id", "value": user_id},
-                    {"column": "status", "op": "!=", "value": 4}  # 排除已删除的
+                    {"column": "status", "op": "!=", "value": 4}  # Exclude deleted records
                 ]
             )
             
@@ -236,7 +252,7 @@ class ScheduledTasks(MySQL):
         try:
             conditions = [
                 {"column": "user_id", "value": user_id},
-                {"column": "status", "op": "!=", "value": 4}  # 排除已删除的
+                {"column": "status", "op": "!=", "value": 4}  # Exclude deleted records
             ]
             
             if app_id:

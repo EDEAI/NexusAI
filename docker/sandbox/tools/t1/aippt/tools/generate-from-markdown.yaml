@@ -1,0 +1,107 @@
+identity:
+  name: generate-from-markdown
+  author: aippt
+  label:
+    en_US: Generate PPT from Markdown
+    zh_Hans: 从Markdown生成PPT
+    pt_BR: Generate PPT from Markdown
+description:
+  human:
+    en_US: Generate PPT directly from markdown content with customizable templates
+    zh_Hans: 通过Markdown内容直接生成PPT，支持自定义模板
+    pt_BR: Generate PPT directly from markdown content with customizable templates
+  llm: Generate PPT directly from markdown content with customizable templates
+parameters:
+  - name: title
+    type: string
+    required: true
+    label:
+      en_US: PPT Title
+      zh_Hans: PPT标题
+      pt_BR: PPT Title
+    human_description:
+      en_US: Please enter the PPT title, e.g., Project Report
+      zh_Hans: 请输入PPT标题，如：项目报告
+      pt_BR: Please enter the PPT title, e.g., Project Report
+    llm_description: Please enter the PPT title, e.g., Project Report
+    form: llm
+  - name: content
+    type: string
+    required: true
+    label:
+      en_US: Markdown Content
+      zh_Hans: Markdown内容
+      pt_BR: Markdown Content
+    human_description:
+      en_US: Please enter the markdown content for PPT generation
+      zh_Hans: 请输入用于生成PPT的Markdown内容
+      pt_BR: Please enter the markdown content for PPT generation
+    llm_description: Please enter the markdown content for PPT generation
+    form: llm
+  - name: template_id
+    type: select
+    required: true
+    label:
+      en_US: Template Style
+      zh_Hans: 模板样式
+      pt_BR: Template Style
+    human_description:
+      en_US: Please select a template style for the PPT
+      zh_Hans: 请选择PPT的模板样式
+      pt_BR: Please select a template style for the PPT
+    llm_description: Please select a template style for the PPT
+    form: form
+    default: "6463"
+    options:
+      - label:
+          en_US: Blue Professional
+          zh_Hans: 棕色复古
+        value: "6463"
+      - label:
+          en_US: Purple Business
+          zh_Hans: 紫色商务
+        value: "151"
+      - label:
+          en_US: Green Tech
+          zh_Hans: 绿色科技
+        value: "13656"
+      - label:
+          en_US: Yellow Illustration
+          zh_Hans: 黄色插画
+        value: "15224"
+      - label:
+          en_US: Orange Government
+          zh_Hans: 橙色政务
+        value: "9282"
+      - label:
+          en_US: Blue Diffusion
+          zh_Hans: 蓝色弥散
+        value: "8992"
+      - label:
+          en_US: Black Trendy
+          zh_Hans: 黑色潮流
+        value: "7477"
+      - label:
+          en_US: Gray Chinese Style
+          zh_Hans: 灰色国风
+        value: "4059"
+      - label:
+          en_US: Cyan Stereo
+          zh_Hans: 青色立体
+        value: "1427"
+      - label:
+          en_US: Pink Simple
+          zh_Hans: 粉色简约
+        value: "14062"
+      - label:
+          en_US: Red Grand
+          zh_Hans: 红色大气
+        value: "14993"
+output_schema:
+  type: object
+  properties:
+    url:
+      type: string
+extra:
+  python:
+    source: tools/generate-from-markdown.py

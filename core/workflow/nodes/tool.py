@@ -111,7 +111,7 @@ class ToolNode(Node):
                             if 'nexus_ai_file_path' in stdout_text:
                                 stdout_dict = runner.skill_file_handler(json.loads(stdout_text), app_run_id=app_run_id, workflow_id=workflow_id)
                                 self.data['output'] = ObjectVariable(name='output')
-                                self.data['output'].add_property('output', value=Variable(name='output',display_name='Nexus AI File Path',type='file',value=stdout_dict['nexus_ai_file_path']))
+                                self.data['output'].add_property('output', value=Variable(name='output',display_name='File',type='file',value=stdout_dict['nexus_ai_file_path']))
                             else:
                                 self.data['output'] = ObjectVariable(name='output')
                                 self.data['output'].add_property('output', value=Variable(name='output',display_name='Content',type='string',value=stdout_text))
