@@ -199,16 +199,16 @@ class ScheduledTaskExecutor:
     
     def _disable_completed_task(self, task_id: int, reason: str):
         """
-        禁用已完成的任务
+        Disable completed tasks
         
         Args:
-            task_id: 任务ID
-            reason: 禁用原因
+            task_id: Task ID
+            reason: Disable reason
         """
         try:
             self.scheduled_tasks_model.update(
                 {"column": "id", "value": task_id},
-                {"status": 2}  # 设置为禁用状态
+                {"status": 2}  # Set to disabled status
             )
             logger.info(f"Task {task_id} disabled: {reason}")
         except Exception as e:
@@ -216,13 +216,13 @@ class ScheduledTaskExecutor:
     
     def execute_task(self, task: Dict[str, Any]) -> bool:
         """
-        执行单个定时任务
+        Execute single scheduled task
         
         Args:
-            task: 任务信息
+            task: Task information
             
         Returns:
-            执行是否成功
+            Whether execution was successful
         """
         task_id = task['id']
         task_name = task['name']
