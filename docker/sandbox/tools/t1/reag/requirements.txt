@@ -1,3 +1,0 @@
-dify-plugin
-markitdown
-pydantic

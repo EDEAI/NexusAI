@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/websearch.py
 identity:
-  author: Serply.io
+  author: nexusai
   description:
     en_US: Serply.io is a robust real-time SERP API delivering structured data from
       a collection of search engines including Web Search, Jobs, News, and many more.

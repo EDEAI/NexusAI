@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/crossref.py
 identity:
-  author: Sakura4036
+  author: nexusai
   description:
     en_US: Crossref is a cross-publisher reference linking registration query system
       using DOI technology created in 2000. Crossref establishes cross-database links

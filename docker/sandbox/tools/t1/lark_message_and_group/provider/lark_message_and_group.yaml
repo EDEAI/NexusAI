@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/lark_message_and_group.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: 'Lark message and group, requires the following permissions: im:message、im:message.group_msg.
 

@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/sftp.py
 identity:
-  author: stvlynn
+  author: nexusai
   description:
     en_US: Secure File Transfer Protocol operations
     zh_Hans: 安全文件传输协议操作

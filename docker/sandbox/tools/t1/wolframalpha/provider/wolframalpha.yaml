@@ -21,7 +21,7 @@ extra:
   python:
     source: provider/wolframalpha.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: WolframAlpha is a powerful computational knowledge engine.
     pt_BR: WolframAlpha is a powerful computational knowledge engine.

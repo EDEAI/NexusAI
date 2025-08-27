@@ -36,7 +36,7 @@ extra:
   python:
     source: provider/twilio.py
 identity:
-  author: Yash Parmar
+  author: nexusai
   description:
     en_US: Send messages through SMS or Twilio Messaging Channels.
     pt_BR: Send messages through SMS or Twilio Messaging Channels.

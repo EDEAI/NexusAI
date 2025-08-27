@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/semantic_scholar.py
 identity:
-  author: yusukemurata
+  author: nexusai
   description:
     en_US: Search Semantic Scholar-related academic papers and extract semantic snippets
       using advanced AI-powered search capabilities

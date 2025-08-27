@@ -16,7 +16,7 @@ extra:
   python:
     source: provider/spider.py
 identity:
-  author: William Espegren
+  author: nexusai
   description:
     en_US: Spider API integration, returning LLM-ready data by scraping & crawling
       websites.

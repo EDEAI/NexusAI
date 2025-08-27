@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/feishu_document.py
 identity:
-  author: Doug Lea
+  author: nexusai
   description:
     en_US: 'Lark cloud document, requires the following permissions: docx:document、drive:drive、docs:document.content:read.
 

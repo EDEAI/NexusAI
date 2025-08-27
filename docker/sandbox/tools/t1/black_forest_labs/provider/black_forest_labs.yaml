@@ -9,30 +9,29 @@ credentials_for_provider:
     required: true
     type: secret-input
     url: https://dashboard.bfl.ai/api/keys
-
-identity:
-  author: parkerwen
-  name: black_forest_labs
-  label:
-    en_US: Black Forest Labs
-    zh_Hans: Black Forest Labs
-    pt_BR: Black Forest Labs
-  description:
-    en_US: Black Forest Labs API.
-    zh_Hans: Black Forest Labs API.
-    pt_BR: Black Forest Labs API.
-  icon: favicon.ico
-tools:
-  - tools/flux_kontext_pro_tool.yaml
-  - tools/flux_kontext_max_tool.yaml
-  - tools/flux_pro_11_tool.yaml
-  - tools/flux_pro_tool.yaml
-  - tools/flux_dev_tool.yaml
-  - tools/flux_pro_11_ultra_tool.yaml
-  - tools/flux_pro_fill_tool.yaml
-  - tools/flux_pro_expand_tool.yaml
-  - tools/flux_pro_canny_tool.yaml
-  - tools/flux_pro_depth_tool.yaml
 extra:
   python:
     source: provider/black_forest_labs.py
+identity:
+  author: nexusai
+  description:
+    en_US: Black Forest Labs API.
+    pt_BR: Black Forest Labs API.
+    zh_Hans: Black Forest Labs API.
+  icon: favicon.ico
+  label:
+    en_US: Black Forest Labs
+    pt_BR: Black Forest Labs
+    zh_Hans: Black Forest Labs
+  name: black_forest_labs
+tools:
+- tools/flux_kontext_pro_tool.yaml
+- tools/flux_kontext_max_tool.yaml
+- tools/flux_pro_11_tool.yaml
+- tools/flux_pro_tool.yaml
+- tools/flux_dev_tool.yaml
+- tools/flux_pro_11_ultra_tool.yaml
+- tools/flux_pro_fill_tool.yaml
+- tools/flux_pro_expand_tool.yaml
+- tools/flux_pro_canny_tool.yaml
+- tools/flux_pro_depth_tool.yaml

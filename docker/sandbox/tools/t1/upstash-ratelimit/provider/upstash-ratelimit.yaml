@@ -1,44 +1,45 @@
-identity:
-  author: elifnurdeniz
-  name: upstash-ratelimit
-  label:
-    en_US: upstash-ratelimit
-    zh_Hans: upstash-ratelimit
-  description:
-    en_US: This plugin provides Upstash's Redis-based rate limiting service integrated with Dify AI platform.
-    zh_Hans: 该插件提供了基于 Upstash 的 Redis 与 Dify AI 平台集成的速率限制服务。
-  icon: icon.svg
-  tags:
-    - other
 credentials_for_provider:
-  UPSTASH_REDIS_REST_URL:
-    type: secret-input
-    required: true
-    label:
-      en_US: Upstash Redis Rest URL
-      zh_Hans: Upstash Redis Rest URL
-    placeholder:
-      en_US: Please enter your Upstash Redis Rest URL
-      zh_Hans: 请输入你的 Upstash Redis Rest URL
-    help:
-      en_US: Get your Upstash Redis Rest URL from Upstash
-      zh_Hans: 从 Upstash 获取您的 Upstash Redis Rest URL
-    url: https://console.upstash.com/redis?teamid=0
   UPSTASH_REDIS_REST_TOKEN:
-    type: secret-input
-    required: true
+    help:
+      en_US: Get your Upstash Redis Token from Upstash
+      zh_Hans: 从 Upstash 获取您的 Upstash Redis Token
     label:
       en_US: Upstash Redis Token
       zh_Hans: Upstash Redis Token
     placeholder:
       en_US: Please enter your Upstash Redis Token
       zh_Hans: 请输入你的 Upstash Redis Token
-    help:
-      en_US: Get your Upstash Redis Token from Upstash
-      zh_Hans: 从 Upstash 获取您的 Upstash Redis Token
+    required: true
+    type: secret-input
     url: https://console.upstash.com/redis?teamid=0
-tools:
-  - tools/upstash-ratelimit.yaml
+  UPSTASH_REDIS_REST_URL:
+    help:
+      en_US: Get your Upstash Redis Rest URL from Upstash
+      zh_Hans: 从 Upstash 获取您的 Upstash Redis Rest URL
+    label:
+      en_US: Upstash Redis Rest URL
+      zh_Hans: Upstash Redis Rest URL
+    placeholder:
+      en_US: Please enter your Upstash Redis Rest URL
+      zh_Hans: 请输入你的 Upstash Redis Rest URL
+    required: true
+    type: secret-input
+    url: https://console.upstash.com/redis?teamid=0
 extra:
   python:
     source: provider/upstash-ratelimit.py
+identity:
+  author: nexusai
+  description:
+    en_US: This plugin provides Upstash's Redis-based rate limiting service integrated
+      with Dify AI platform.
+    zh_Hans: 该插件提供了基于 Upstash 的 Redis 与 Dify AI 平台集成的速率限制服务。
+  icon: icon.svg
+  label:
+    en_US: upstash-ratelimit
+    zh_Hans: upstash-ratelimit
+  name: upstash-ratelimit
+  tags:
+  - other
+tools:
+- tools/upstash-ratelimit.yaml

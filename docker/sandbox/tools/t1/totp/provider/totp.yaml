@@ -1,18 +1,18 @@
-identity:
-  author: alterxyz
-  name: totp
-  label:
-    en_US: TOTP
-    zh_Hans: 动态口令 (TOTP)
-    pt_BR: TOTP
-  description:
-    en_US: Time-based one-time password (TOTP)
-    zh_Hans: 动态口令 Time-based one-time password (TOTP)
-    pt_BR: Time-based one-time password (TOTP)
-  icon: lock-password-line.svg
-tools:
-  - tools/totp.yaml
-  - tools/secret_generator.yaml
 extra:
   python:
     source: provider/totp.py
+identity:
+  author: nexusai
+  description:
+    en_US: Time-based one-time password (TOTP)
+    pt_BR: Time-based one-time password (TOTP)
+    zh_Hans: 动态口令 Time-based one-time password (TOTP)
+  icon: lock-password-line.svg
+  label:
+    en_US: TOTP
+    pt_BR: TOTP
+    zh_Hans: 动态口令 (TOTP)
+  name: totp
+tools:
+- tools/totp.yaml
+- tools/secret_generator.yaml

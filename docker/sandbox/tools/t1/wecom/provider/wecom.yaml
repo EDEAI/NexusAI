@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/wecom.py
 identity:
-  author: Bowen Liang
+  author: nexusai
   description:
     en_US: Wecom group bot
     pt_BR: Wecom group bot

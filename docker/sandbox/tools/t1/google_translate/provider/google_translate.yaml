@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/google_translate.py
 identity:
-  author: Ron_Liu
+  author: nexusai
   description:
     en_US: Translate text using Google
     zh_Hans: 使用 Google 进行翻译

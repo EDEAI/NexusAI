@@ -29,7 +29,7 @@ extra:
   python:
     source: provider/crawl4ai.py
 identity:
-  author: "AGIMaster"
+  author: nexusai
   description:
     en_US: Access Crawl4AI capabilities to extract content from web pages
     zh_Hans: 访问Crawl4AI功能，从网页中提取内容

@@ -1,20 +1,21 @@
-identity:
-  author: alterxyz
-  name: gpg_text
-  label:
-    en_US: gpg_text
-    zh_Hans: gpg_text
-    pt_BR: gpg_text
-  description:
-    en_US: Provides tools to encrypt, decrypt, sign, verify text messages, and generate GPG key pairs.
-    zh_Hans: 提供加密、解密、签名、验证文本消息以及生成 GPG 密钥对的工具。
-  icon: icon.svg
-tools:
-  - tools/encrypt.yaml
-  - tools/decrypt.yaml
-  - tools/sign.yaml
-  - tools/verify.yaml
-  - tools/generate_key.yaml
 extra:
   python:
     source: provider/gpg_text.py
+identity:
+  author: nexusai
+  description:
+    en_US: Provides tools to encrypt, decrypt, sign, verify text messages, and generate
+      GPG key pairs.
+    zh_Hans: 提供加密、解密、签名、验证文本消息以及生成 GPG 密钥对的工具。
+  icon: icon.svg
+  label:
+    en_US: gpg_text
+    pt_BR: gpg_text
+    zh_Hans: gpg_text
+  name: gpg_text
+tools:
+- tools/encrypt.yaml
+- tools/decrypt.yaml
+- tools/sign.yaml
+- tools/verify.yaml
+- tools/generate_key.yaml

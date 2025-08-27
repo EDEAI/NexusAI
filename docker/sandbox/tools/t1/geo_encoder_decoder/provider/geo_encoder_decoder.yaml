@@ -1,35 +1,33 @@
-identity:
-  author: Ayush3941
-  name: geo_encoder_decoder
-  label:
-    en_US: Geo Encoder Decoder (OpenCage)
-    ja_JP: ジオエンコーダーデコーダー（OpenCage）
-    zh_Hans: 地理编码器/解码器（OpenCage）
-  description:
-    en_US: Plugin powered by OpenCage API to convert addresses to coordinates and vice versa.
-    ja_JP: OpenCage API による住所と座標の相互変換を行うプラグインです。
-    zh_Hans: 基于 OpenCage API 的插件，可实现地址与坐标之间的相互转换。
-  icon: icon.png
-
 credentials_for_provider:
   api_key:
-    type: text-input
-    required: true
+    help:
+      en_US: Obtain it from the OpenCage developer dashboard
+      zh_Hans: 请从 OpenCage 开发者平台获取
     label:
       en_US: OpenCage API Key
       zh_Hans: OpenCage API 密钥
     placeholder:
       en_US: Enter your OpenCage API Key
       zh_Hans: 请输入您的 OpenCage API 密钥
-    help:
-      en_US: Obtain it from the OpenCage developer dashboard
-      zh_Hans: 请从 OpenCage 开发者平台获取
+    required: true
+    type: text-input
     url: https://opencagedata.com/api
-
-tools:
-  - tools/encode_coordinates.yaml
-  - tools/decode_coordinates.yaml
-
 extra:
   python:
     source: provider/geo_encoder_decoder.py
+identity:
+  author: nexusai
+  description:
+    en_US: Plugin powered by OpenCage API to convert addresses to coordinates and
+      vice versa.
+    ja_JP: OpenCage API による住所と座標の相互変換を行うプラグインです。
+    zh_Hans: 基于 OpenCage API 的插件，可实现地址与坐标之间的相互转换。
+  icon: icon.png
+  label:
+    en_US: Geo Encoder Decoder (OpenCage)
+    ja_JP: ジオエンコーダーデコーダー（OpenCage）
+    zh_Hans: 地理编码器/解码器（OpenCage）
+  name: geo_encoder_decoder
+tools:
+- tools/encode_coordinates.yaml
+- tools/decode_coordinates.yaml

@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/pdf_process.py
 identity:
-  author: kalochin
+  author: nexusai
   description:
     en_US: Tools for processing PDF content
     pt_BR: Tools for processing PDF content

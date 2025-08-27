@@ -16,7 +16,7 @@ extra:
   python:
     source: provider/mistral_ocr.py
 identity:
-  author: inlei
+  author: nexusai
   description:
     en_US: Mistral OCR
     zh_Hans: Mistral OCR
@@ -26,8 +26,8 @@ identity:
     zh_Hans: Mistral OCR
   name: mistral_ocr
   tags:
-    - image
-    - productivity
-    - other
+  - image
+  - productivity
+  - other
 tools:
-  - tools/mistral_ocr_tool.yaml
+- tools/mistral_ocr_tool.yaml

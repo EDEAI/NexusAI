@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/judge0ce.py
 identity:
-  author: Richards_Tu
+  author: nexusai
   description:
     en_US: Judge0 CE is an open-source code execution system. Support various languages,
       including C, C++, Java, Python, Ruby, etc.

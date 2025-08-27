@@ -23,10 +23,12 @@ extra:
   python:
     source: provider/dingtalk_spreadsheet.py
 identity:
-  author: Huthu-Meng
+  author: nexusai
   description:
-    en_US: 'DingTalk Spreadsheet, requires the following permissions: dingtalk-document, user/get. qyapi_get_member_by_mobile'
-    zh_Hans: '釘釘电子表格，需要开通以下权限: 钉钉表格权限，个人信息, 根据手机号获取成员基本信息权限；登录钉钉开发者后台 > 企业内部开发 > 找到需添加权限的应用 > 权限管理 > 通讯录管理页面，勾选企业员工手机号信息和邮箱等个人信息，单击申请权限。'
+    en_US: 'DingTalk Spreadsheet, requires the following permissions: dingtalk-document,
+      user/get. qyapi_get_member_by_mobile'
+    zh_Hans: '釘釘电子表格，需要开通以下权限: 钉钉表格权限，个人信息, 根据手机号获取成员基本信息权限；登录钉钉开发者后台 > 企业内部开发 > 找到需添加权限的应用
+      > 权限管理 > 通讯录管理页面，勾选企业员工手机号信息和邮箱等个人信息，单击申请权限。'
   icon: ding.png
   label:
     en_US: Dingtalk Spreadsheet

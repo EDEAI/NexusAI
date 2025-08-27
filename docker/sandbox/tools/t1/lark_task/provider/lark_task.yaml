@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/lark_task.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: 'Lark Task, requires the following permissions: task:task:write、contact:user.id:readonly.
 

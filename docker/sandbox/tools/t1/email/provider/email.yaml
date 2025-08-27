@@ -45,6 +45,19 @@ credentials_for_provider:
       value: TLS
     required: true
     type: select
+  sender_address:
+    help:
+      en_US: The designated sender address if different to the `email_account`. This
+        may be required for using something like AWS's Simple EMail Service
+      zh_Hans: 指定的发件人地址与 `email_account` 不同。使用类似 AWS 的 Simple EMail Service 时可能需要此设置。
+    label:
+      en_US: Sender Address
+      zh_Hans: 发件人地址
+    placeholder:
+      en_US: sender address
+      zh_Hans: 发件人地址
+    required: false
+    type: text-input
   smtp_port:
     help:
       en_US: smtp server port
@@ -69,23 +82,11 @@ credentials_for_provider:
       zh_Hans: 发信smtp服务器地址
     required: true
     type: text-input
-  sender_address:
-    help:
-      en_US: The designated sender address if different to the `email_account`. This may be required for using something like AWS's Simple EMail Service
-      zh_Hans: 指定的发件人地址与 `email_account` 不同。使用类似 AWS 的 Simple EMail Service 时可能需要此设置。
-    label:
-      en_US: Sender Address
-      zh_Hans: 发件人地址
-    placeholder:
-      en_US: sender address
-      zh_Hans: 发件人地址
-    required: false
-    type: text-input
 extra:
   python:
     source: provider/email.py
 identity:
-  author: wakaka6
+  author: nexusai
   description:
     en_US: send email through smtp protocol
     zh_Hans: 通过smtp协议发送电子邮件
@@ -95,7 +96,7 @@ identity:
     zh_Hans: 电子邮件
   name: email
   tags:
-    - utilities
+  - utilities
 tools:
-  - tools/send_mail_batch.yaml
-  - tools/send_mail.yaml
+- tools/send_mail_batch.yaml
+- tools/send_mail.yaml

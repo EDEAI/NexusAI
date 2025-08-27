@@ -1,15 +1,15 @@
+credentials_for_provider: {}
+extra:
+  python:
+    source: provider/tokenizer.py
 identity:
-  author: jingfelix
-  name: tokenizer
-  label:
-    en_US: Tokenizer
+  author: nexusai
   description:
     en_US: Tokenizing text using various tokenizers. Returns the tokens and token
       count.
   icon: icon.svg
-credentials_for_provider: {}
+  label:
+    en_US: Tokenizer
+  name: tokenizer
 tools:
 - tools/tokenize.yaml
-extra:
-  python:
-    source: provider/tokenizer.py

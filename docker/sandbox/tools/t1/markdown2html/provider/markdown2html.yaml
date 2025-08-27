@@ -1,17 +1,17 @@
-identity:
-  author: migege
-  name: markdown2html
-  label:
-    en_US: markdown2html
-    zh_Hans: markdown2html
-    pt_BR: markdown2html
-  description:
-    en_US: Convert content from Markdown to HTML
-    zh_Hans: 将内容从 Markdown 转换为 HTML
-    pt_BR: Converter conteúdo de Markdown para HTML
-  icon: icon.svg
-tools:
-  - tools/markdown2html.yaml
 extra:
   python:
     source: provider/markdown2html.py
+identity:
+  author: nexusai
+  description:
+    en_US: Convert content from Markdown to HTML
+    pt_BR: Converter conteúdo de Markdown para HTML
+    zh_Hans: 将内容从 Markdown 转换为 HTML
+  icon: icon.svg
+  label:
+    en_US: markdown2html
+    pt_BR: markdown2html
+    zh_Hans: markdown2html
+  name: markdown2html
+tools:
+- tools/markdown2html.yaml

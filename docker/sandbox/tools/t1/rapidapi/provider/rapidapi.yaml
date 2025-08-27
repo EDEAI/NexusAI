@@ -29,7 +29,7 @@ extra:
   python:
     source: provider/rapidapi.py
 identity:
-  author: Steven Sun
+  author: nexusai
   description:
     en_US: RapidAPI is the world's largest API marketplace with over 1,000,000 developers
       and 10,000 APIs.

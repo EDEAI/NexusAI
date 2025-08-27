@@ -1,17 +1,17 @@
-identity:
-  author: stvlynn
-  name: ssh
-  label:
-    en_US: ssh
-    zh_Hans: ssh
-    pt_BR: ssh
-  description:
-    en_US: ssh
-    zh_Hans: ssh
-    pt_BR: ssh
-  icon: icon.svg
-tools:
-  - tools/ssh.yaml
 extra:
   python:
     source: provider/ssh.py
+identity:
+  author: nexusai
+  description:
+    en_US: ssh
+    pt_BR: ssh
+    zh_Hans: ssh
+  icon: icon.svg
+  label:
+    en_US: ssh
+    pt_BR: ssh
+    zh_Hans: ssh
+  name: ssh
+tools:
+- tools/ssh.yaml

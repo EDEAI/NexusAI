@@ -1,115 +1,115 @@
-identity:
-  author: lework
-  name: kafka
-  label:
-    en_US: Kafka Producer
-    zh_Hans: Kafka生产者
-    pt_BR: Kafka Producer
-  description:
-    en_US: Send messages to Kafka topics
-    zh_Hans: 向Kafka主题发送消息
-    pt_BR: Send messages to Kafka topics
-  icon: icon.svg
-tools:
-  - tools/kafka.yaml
-credentials_for_provider: #添加 credentials_for_provider 字段
+credentials_for_provider:
   bootstrap.servers:
-    type: secret-input
-    required: true
-    label:
-      en_US: Bootstrap Servers
-      zh_Hans: 引导服务器
-      pt_BR: Bootstrap Servers
     help:
       en_US: Comma-separated list of Kafka brokers
-      zh_Hans: 逗号分隔的Kafka代理服务器列表
       pt_BR: Comma-separated list of Kafka brokers
+      zh_Hans: 逗号分隔的Kafka代理服务器列表
+    label:
+      en_US: Bootstrap Servers
+      pt_BR: Bootstrap Servers
+      zh_Hans: 引导服务器
     placeholder:
       en_US: broker1:9092,broker2:9092
-      zh_Hans: broker1:9092,broker2:9092
       pt_BR: broker1:9092,broker2:9092
+      zh_Hans: broker1:9092,broker2:9092
+    required: true
+    type: secret-input
     url: https://docs.confluent.io/kafka-clients/python/current/overview.html
-  security.protocol:
-    type: select
-    required: false
-    label:
-      en_US: Security Protocol
-      zh_Hans: 安全协议
-      pt_BR: Security Protocol
-    help:
-      en_US: Protocol used to communicate with brokers
-      zh_Hans: 与代理通信使用的协议
-      pt_BR: Protocol used to communicate with brokers
-    placeholder:
-      en_US: PLAINTEXT
-      zh_Hans: PLAINTEXT
-      pt_BR: PLAINTEXT
-    options:
-      - value: PLAINTEXT
-        label:
-          en_US: PLAINTEXT
-          zh_Hans: PLAINTEXT
-          pt_BR: PLAINTEXT
-      - value: SASL_PLAINTEXT
-        label:
-          en_US: SASL_PLAINTEXT
-          zh_Hans: SASL_PLAINTEXT
-          pt_BR: SASL_PLAINTEXT
-      - value: SASL_SSL
-        label:
-          en_US: SASL_SSL
-          zh_Hans: SASL_SSL
-          pt_BR: SASL_SSL
   sasl.mechanism:
-    type: select
-    required: false
-    label:
-      en_US: SASL Mechanism
-      zh_Hans: SASL机制
-      pt_BR: SASL Mechanism
+    default: PLAIN
     help:
       en_US: SASL mechanism to use for authentication
-      zh_Hans: 用于身份验证的SASL机制
       pt_BR: SASL mechanism to use for authentication
+      zh_Hans: 用于身份验证的SASL机制
+    label:
+      en_US: SASL Mechanism
+      pt_BR: SASL Mechanism
+      zh_Hans: SASL机制
     options:
-      - value: PLAIN
-        label:
-          en_US: PLAIN
-          zh_Hans: PLAIN
-          pt_BR: PLAIN
-      - value: SCRAM-SHA-256
-        label:
-          en_US: SCRAM-SHA-256
-          zh_Hans: SCRAM-SHA-256
-          pt_BR: SCRAM-SHA-256
-      - value: SCRAM-SHA-512
-        label:
-          en_US: SCRAM-SHA-512
-          zh_Hans: SCRAM-SHA-512
-          pt_BR: SCRAM-SHA-512
-    default: PLAIN
-  sasl.username:
-    type: secret-input
+    - label:
+        en_US: PLAIN
+        pt_BR: PLAIN
+        zh_Hans: PLAIN
+      value: PLAIN
+    - label:
+        en_US: SCRAM-SHA-256
+        pt_BR: SCRAM-SHA-256
+        zh_Hans: SCRAM-SHA-256
+      value: SCRAM-SHA-256
+    - label:
+        en_US: SCRAM-SHA-512
+        pt_BR: SCRAM-SHA-512
+        zh_Hans: SCRAM-SHA-512
+      value: SCRAM-SHA-512
     required: false
-    label:
-      en_US: SASL Username
-      zh_Hans: SASL用户名
-      pt_BR: SASL Username
-    help:
-      en_US: SASL username for PLAIN and SCRAM authentication
-      zh_Hans: PLAIN和SCRAM认证的SASL用户名
-      pt_BR: SASL username for PLAIN and SCRAM authentication
+    type: select
   sasl.password:
-    type: secret-input
-    required: false
-    label:
-      en_US: SASL Password
-      zh_Hans: SASL密码
-      pt_BR: SASL Password
     help:
       en_US: SASL password for PLAIN and SCRAM authentication
-      zh_Hans: PLAIN和SCRAM认证的SASL密码
       pt_BR: SASL password for PLAIN and SCRAM authentication
+      zh_Hans: PLAIN和SCRAM认证的SASL密码
+    label:
+      en_US: SASL Password
+      pt_BR: SASL Password
+      zh_Hans: SASL密码
+    required: false
+    type: secret-input
+  sasl.username:
+    help:
+      en_US: SASL username for PLAIN and SCRAM authentication
+      pt_BR: SASL username for PLAIN and SCRAM authentication
+      zh_Hans: PLAIN和SCRAM认证的SASL用户名
+    label:
+      en_US: SASL Username
+      pt_BR: SASL Username
+      zh_Hans: SASL用户名
+    required: false
+    type: secret-input
+  security.protocol:
+    help:
+      en_US: Protocol used to communicate with brokers
+      pt_BR: Protocol used to communicate with brokers
+      zh_Hans: 与代理通信使用的协议
+    label:
+      en_US: Security Protocol
+      pt_BR: Security Protocol
+      zh_Hans: 安全协议
+    options:
+    - label:
+        en_US: PLAINTEXT
+        pt_BR: PLAINTEXT
+        zh_Hans: PLAINTEXT
+      value: PLAINTEXT
+    - label:
+        en_US: SASL_PLAINTEXT
+        pt_BR: SASL_PLAINTEXT
+        zh_Hans: SASL_PLAINTEXT
+      value: SASL_PLAINTEXT
+    - label:
+        en_US: SASL_SSL
+        pt_BR: SASL_SSL
+        zh_Hans: SASL_SSL
+      value: SASL_SSL
+    placeholder:
+      en_US: PLAINTEXT
+      pt_BR: PLAINTEXT
+      zh_Hans: PLAINTEXT
+    required: false
+    type: select
 extra:
   python:
     source: provider/kafka.py
+identity:
+  author: nexusai
+  description:
+    en_US: Send messages to Kafka topics
+    pt_BR: Send messages to Kafka topics
+    zh_Hans: 向Kafka主题发送消息
+  icon: icon.svg
+  label:
+    en_US: Kafka Producer
+    pt_BR: Kafka Producer
+    zh_Hans: Kafka生产者
+  name: kafka
+tools:
+- tools/kafka.yaml

@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/feishu_spreadsheet.py
 identity:
-  author: Doug Lea
+  author: nexusai
   description:
     en_US: 'Feishu Spreadsheet, requires the following permissions: sheets:spreadsheet.
 

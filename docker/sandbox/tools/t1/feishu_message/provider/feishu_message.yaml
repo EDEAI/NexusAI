@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/feishu_message.py
 identity:
-  author: Doug Lea
+  author: nexusai
   description:
     en_US: 'Lark message, requires the following permissions: im:message、im:message.group_msg.
 

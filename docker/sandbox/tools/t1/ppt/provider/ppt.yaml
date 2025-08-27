@@ -1,17 +1,17 @@
-identity:
-  author: stvlynn
-  name: ppt
-  label:
-    en_US: PPT
-    zh_Hans: PPT
-    pt_BR: PPT
-  description:
-    en_US: Convert Markdown content to PowerPoint presentations
-    zh_Hans: 将Markdown内容转换为PowerPoint演示文稿
-    pt_BR: Converter conteúdo Markdown para apresentações PowerPoint
-  icon: icon.svg
-tools:
-  - tools/ppt.yaml
 extra:
   python:
     source: provider/ppt.py
+identity:
+  author: nexusai
+  description:
+    en_US: Convert Markdown content to PowerPoint presentations
+    pt_BR: Converter conteúdo Markdown para apresentações PowerPoint
+    zh_Hans: 将Markdown内容转换为PowerPoint演示文稿
+  icon: icon.svg
+  label:
+    en_US: PPT
+    pt_BR: PPT
+    zh_Hans: PPT
+  name: ppt
+tools:
+- tools/ppt.yaml

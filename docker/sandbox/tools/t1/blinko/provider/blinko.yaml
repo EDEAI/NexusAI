@@ -1,36 +1,36 @@
-identity:
-  author: blinkosapce
-  name: blinko
-  label:
-    en_US: Blinko
-    zh_Hans: Blinko笔记
-    pt_BR: Blinko
-  description:
-    en_US: Save notes to Blinko service
-    zh_Hans: 将笔记内容保存到Blinko服务
-    pt_BR: Save notes to Blinko service
-  icon: icon.png
 credentials_for_provider:
-  BLINKO_TOKEN:
-    type: secret-input
-    required: true
-    label:
-      en_US: Blinko Token
-      zh_Hans: Blinko访问令牌
-    placeholder:
-      en_US: Your Blinko API Token
-      zh_Hans: 您的Blinko API令牌
   BLINKO_DOMAIN:
-    type: text-input
-    required: true
     label:
       en_US: Blinko Domain
       zh_Hans: Blinko服务域名
     placeholder:
       en_US: your domain
       zh_Hans: 您的域名
-tools:
-  - tools/blinko.yaml
+    required: true
+    type: text-input
+  BLINKO_TOKEN:
+    label:
+      en_US: Blinko Token
+      zh_Hans: Blinko访问令牌
+    placeholder:
+      en_US: Your Blinko API Token
+      zh_Hans: 您的Blinko API令牌
+    required: true
+    type: secret-input
 extra:
   python:
     source: provider/blinko.py
+identity:
+  author: nexusai
+  description:
+    en_US: Save notes to Blinko service
+    pt_BR: Save notes to Blinko service
+    zh_Hans: 将笔记内容保存到Blinko服务
+  icon: icon.png
+  label:
+    en_US: Blinko
+    pt_BR: Blinko
+    zh_Hans: Blinko笔记
+  name: blinko
+tools:
+- tools/blinko.yaml

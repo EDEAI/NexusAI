@@ -26,7 +26,7 @@ extra:
   python:
     source: provider/data_analysis.py
 identity:
-  author: digitforce
+  author: nexusai
   description:
     en_US: An intelligent data analysis tool based on LLM and natural language interaction,
       featuring built-in data query and data visualization, as well as report generation

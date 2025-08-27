@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/alphavantage.py
 identity:
-  author: zhuhao
+  author: nexusai
   description:
     en_US: AlphaVantage is an online platform that provides financial market data
       and APIs, making it convenient for individual investors and developers to access

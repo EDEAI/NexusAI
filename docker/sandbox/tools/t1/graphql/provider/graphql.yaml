@@ -1,17 +1,18 @@
-identity:
-  author: jingfelix
-  name: graphql
-  label:
-    en_US: GraphQL
-    zh_Hans: GraphQL
-    pt_BR: GraphQL
-  description:
-    en_US: Send custom GraphQL requests to specified endpoints.
-    zh_Hans: 发送自定义 GraphQL 请求到指定的端点。
-    pt_BR: Um plugin Dify para enviar solicitações GraphQL personalizadas para endpoints especificados.
-  icon: icon.svg
-tools:
-  - tools/graphql.yaml
 extra:
   python:
     source: provider/graphql.py
+identity:
+  author: nexusai
+  description:
+    en_US: Send custom GraphQL requests to specified endpoints.
+    pt_BR: Um plugin Dify para enviar solicitações GraphQL personalizadas para endpoints
+      especificados.
+    zh_Hans: 发送自定义 GraphQL 请求到指定的端点。
+  icon: icon.svg
+  label:
+    en_US: GraphQL
+    pt_BR: GraphQL
+    zh_Hans: GraphQL
+  name: graphql
+tools:
+- tools/graphql.yaml

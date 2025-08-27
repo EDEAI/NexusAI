@@ -1,20 +1,20 @@
 credentials_for_provider:
   webhook_url:
-    type: secret-input
-    required: true
-    label:
-      en_US: "Slack Webhook URL"
-      zh_Hans: "Slack Webhook URL"
-      pt_BR: "URL do Webhook do Slack"
     description:
-      en_US: "Slack Webhook URL"
-      zh_Hans: "Slack Webhook URL"
-      pt_BR: "URL do Webhook do Slack"
+      en_US: Slack Webhook URL
+      pt_BR: URL do Webhook do Slack
+      zh_Hans: Slack Webhook URL
+    label:
+      en_US: Slack Webhook URL
+      pt_BR: URL do Webhook do Slack
+      zh_Hans: Slack Webhook URL
+    required: true
+    type: secret-input
 extra:
   python:
     source: provider/slack.py
 identity:
-  author: Pan YANG
+  author: nexusai
   description:
     en_US: Slack Webhook
     pt_BR: Slack Webhook
@@ -26,7 +26,7 @@ identity:
     zh_Hans: Slack
   name: slack
   tags:
-    - social
-    - productivity
+  - social
+  - productivity
 tools:
-  - tools/slack_webhook.yaml
+- tools/slack_webhook.yaml

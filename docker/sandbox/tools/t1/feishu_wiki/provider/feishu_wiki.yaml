@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/feishu_wiki.py
 identity:
-  author: Doug Lea
+  author: nexusai
   description:
     en_US: 'Feishu Wiki, requires the following permissions: wiki:wiki:readonly.
 

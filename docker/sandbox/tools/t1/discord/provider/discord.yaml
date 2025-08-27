@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/discord.py
 identity:
-  author: Ice Yao
+  author: nexusai
   description:
     en_US: Discord Webhook
     pt_BR: Discord Webhook
@@ -14,7 +14,7 @@ identity:
     zh_Hans: Discord
   name: discord
   tags:
-    - social
-    - productivity
+  - social
+  - productivity
 tools:
-  - tools/discord_webhook.yaml
+- tools/discord_webhook.yaml

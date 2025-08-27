@@ -1,18 +1,43 @@
+credentials_for_provider:
+  api_key:
+    help:
+      en_US: NCBI API key required for PubMed API access. Get it from NCBI account
+        settings.
+      zh_Hans: 访问 PubMed API 所需的 NCBI API 密钥。请从 NCBI 账号设置中获取。
+    label:
+      en_US: NCBI API Key
+      zh_Hans: NCBI API 密钥
+    placeholder:
+      en_US: Enter your NCBI API key (required)
+      zh_Hans: 请输入 NCBI API 密钥（必填）
+    required: true
+    type: secret-input
+  email:
+    help:
+      en_US: Your email address required by NCBI for PubMed API access.
+      zh_Hans: NCBI PubMed API 访问所需的您的电子邮件地址。
+    label:
+      en_US: Email Address
+      zh_Hans: 电子邮件地址
+    placeholder:
+      en_US: Please enter your email address
+      zh_Hans: 请输入您的电子邮件地址
+    required: true
+    type: secret-input
 extra:
   python:
     source: provider/pubmed.py
 identity:
-  author: Pink Banana
+  author: nexusai
   description:
-    en_US: A search engine for biomedical literature.
-    zh_Hans: 一款生物医学文献搜索引擎。
+    en_US: Provides tools to interact with the PubMed database.
+    zh_Hans: 提供与 PubMed 数据库交互的工具。
   icon: icon.svg
   label:
-    en_US: PubMed
-    zh_Hans: PubMed
+    en_US: PubMed Provider
+    zh_Hans: PubMed 提供者
   name: pubmed
-  tags:
-  - medical
-  - search
 tools:
-- tools/pubmed_search.yaml
+- tools/search.yaml
+- tools/fetch_details.yaml
+- tools/advanced_search.yaml

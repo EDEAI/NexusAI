@@ -1,15 +1,3 @@
-identity:
-  author: langgenius
-  name: e2b
-  label:
-    en_US: E2B
-    zh_Hans: E2B
-    pt_BR: E2B
-  description:
-    en_US: Tool for integrate with e2b.dev.
-    zh_Hans: Tool for integrate with e2b.dev.
-    pt_BR: Tool for integrate with e2b.dev.
-  icon: icon.png
 credentials_for_provider:
   api_key:
     description:
@@ -24,11 +12,23 @@ credentials_for_provider:
     required: true
     type: secret-input
     url: https://e2b.dev/dashboard?tab=keys
-tools:
-  - tools/run_code.yaml
-  - tools/run_command.yaml
-  - tools/upload_file.yaml
-  - tools/download_file.yaml
 extra:
   python:
     source: provider/e2b.py
+identity:
+  author: nexusai
+  description:
+    en_US: Tool for integrate with e2b.dev.
+    pt_BR: Tool for integrate with e2b.dev.
+    zh_Hans: Tool for integrate with e2b.dev.
+  icon: icon.png
+  label:
+    en_US: E2B
+    pt_BR: E2B
+    zh_Hans: E2B
+  name: e2b
+tools:
+- tools/run_code.yaml
+- tools/run_command.yaml
+- tools/upload_file.yaml
+- tools/download_file.yaml

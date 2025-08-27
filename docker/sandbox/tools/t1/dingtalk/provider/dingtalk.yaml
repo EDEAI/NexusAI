@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/dingtalk.py
 identity:
-  author: Bowen Liang & LiuHao
+  author: nexusai
   description:
     en_US: DingTalk group robot
     pt_BR: DingTalk group robot
@@ -14,7 +14,7 @@ identity:
     zh_Hans: 钉钉
   name: dingtalk
   tags:
-    - social
-    - productivity
+  - social
+  - productivity
 tools:
-  - tools/dingtalk_group_bot.yaml
+- tools/dingtalk_group_bot.yaml

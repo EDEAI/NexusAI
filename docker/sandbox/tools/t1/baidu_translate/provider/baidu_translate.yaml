@@ -29,7 +29,7 @@ extra:
   python:
     source: provider/baidu_translate.py
 identity:
-  author: Xiao Ley
+  author: nexusai
   description:
     en_US: Translate text using Baidu
     zh_Hans: 使用百度进行翻译

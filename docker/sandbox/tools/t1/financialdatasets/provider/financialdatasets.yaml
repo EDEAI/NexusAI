@@ -1,54 +1,55 @@
-identity:
-  author: financialai
-  name: financialdatasets
-  label:
-    en_US: FinancialDatasets.ai
-    zh_Hans: FinancialDatasets.ai
-    ja_Jp: FinancialDatasets.ai
-    pt_BR: FinancialDatasets.ai
-  description:
-    en_US: Welcome to Financial Datasets, a developer-friendly stock market API.
-    zh_Hans: 欢迎使用金融数据集，这是一个开发人员友好的股票市场 API。
-    ja_Jp: Financial Datasets へようこそ、開発者向けの株式市場 API です。
-    pt_BR: Bem-vindo ao Financial Datasets, uma API de mercado de ações amigável para desenvolvedores.
-  icon: favicon.ico
-  tags:
-    - finance
 credentials_for_provider:
   financial_datasets_api_key:
-    type: secret-input
-    required: true
-    label:
-      en_US: Financial Datasets API key
-      zh_Hans: 金融数据集 API 密钥
-      ja_Jp: Financial Datasets API キー
-      pt_BR: Chave da API do Financial Datasets
-    placeholder:
-      en_US: Please input your Financial Datasets API key
-      zh_Hans: 请输入您的金融数据集 API 密钥
-      ja_Jp: Financial Datasets API キーを入力してください
-      pt_BR: Por favor, insira sua chave da API do Financial Datasets
     help:
       en_US: Get your Financial Datasets API key from financialdatasets.ai
-      zh_Hans: 从 financialdatasets.ai 获取您的金融数据集 API 密钥
       ja_Jp: financialdatasets.ai から Financial Datasets API キーを取得してください
       pt_BR: Obtenha sua chave da API do Financial Datasets em financialdatasets.ai
+      zh_Hans: 从 financialdatasets.ai 获取您的金融数据集 API 密钥
+    label:
+      en_US: Financial Datasets API key
+      ja_Jp: Financial Datasets API キー
+      pt_BR: Chave da API do Financial Datasets
+      zh_Hans: 金融数据集 API 密钥
+    placeholder:
+      en_US: Please input your Financial Datasets API key
+      ja_Jp: Financial Datasets API キーを入力してください
+      pt_BR: Por favor, insira sua chave da API do Financial Datasets
+      zh_Hans: 请输入您的金融数据集 API 密钥
+    required: true
+    type: secret-input
     url: https://www.financialdatasets.ai
-tools:
-  - tools/company_facts/config.yaml
-  - tools/crypto_prices/config.yaml
-  - tools/crypto_snapshot/config.yaml
-  - tools/earnings_press_releases/config.yaml
-  - tools/financial_metrics_historical/config.yaml
-  - tools/financial_metrics_snapshot/config.yaml
-  - tools/financial_statements/config.yaml
-  - tools/insider_trades/config.yaml
-  - tools/institutional_ownership/config.yaml
-  - tools/company_news/config.yaml
-  - tools/stock_prices/config.yaml
-  - tools/stock_snapshot/config.yaml
-  - tools/sec_filings/config.yaml
-  - tools/sec_filings_items/config.yaml
 extra:
   python:
     source: provider/financialdatasets.py
+identity:
+  author: nexusai
+  description:
+    en_US: Welcome to Financial Datasets, a developer-friendly stock market API.
+    ja_Jp: Financial Datasets へようこそ、開発者向けの株式市場 API です。
+    pt_BR: Bem-vindo ao Financial Datasets, uma API de mercado de ações amigável para
+      desenvolvedores.
+    zh_Hans: 欢迎使用金融数据集，这是一个开发人员友好的股票市场 API。
+  icon: favicon.ico
+  label:
+    en_US: FinancialDatasets.ai
+    ja_Jp: FinancialDatasets.ai
+    pt_BR: FinancialDatasets.ai
+    zh_Hans: FinancialDatasets.ai
+  name: financialdatasets
+  tags:
+  - finance
+tools:
+- tools/company_facts/config.yaml
+- tools/crypto_prices/config.yaml
+- tools/crypto_snapshot/config.yaml
+- tools/earnings_press_releases/config.yaml
+- tools/financial_metrics_historical/config.yaml
+- tools/financial_metrics_snapshot/config.yaml
+- tools/financial_statements/config.yaml
+- tools/insider_trades/config.yaml
+- tools/institutional_ownership/config.yaml
+- tools/company_news/config.yaml
+- tools/stock_prices/config.yaml
+- tools/stock_snapshot/config.yaml
+- tools/sec_filings/config.yaml
+- tools/sec_filings_items/config.yaml

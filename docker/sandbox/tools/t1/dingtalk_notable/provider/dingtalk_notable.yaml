@@ -23,10 +23,11 @@ extra:
   python:
     source: provider/dingtalk_notable.py
 identity:
-  author: kaillliu
+  author: nexusai
   description:
-    en_US: 'DingTalk Multi-dimensional (AI) Table, requires the following permissions: Notable.Base., user/get. qyapi_get_member_by_mobile'
-    zh_Hans: '钉钉多维(AI)表格，需要开通以下权限： AI表格读/写权限，个人信息, 根据手机号获取成员基本信息权限；AI表格参考文档：https://alidocs.dingtalk.com/i/nodes/1zknDm0WRz0NZeXQuKA5pLbrWBQEx5rG?iframeQuery=utm_source%3Dportal%26utm_medium%3Dportal_recent'
+    en_US: 'DingTalk Multi-dimensional (AI) Table, requires the following permissions:
+      Notable.Base., user/get. qyapi_get_member_by_mobile'
+    zh_Hans: 钉钉多维(AI)表格，需要开通以下权限： AI表格读/写权限，个人信息, 根据手机号获取成员基本信息权限；AI表格参考文档：https://alidocs.dingtalk.com/i/nodes/1zknDm0WRz0NZeXQuKA5pLbrWBQEx5rG?iframeQuery=utm_source%3Dportal%26utm_medium%3Dportal_recent
   icon: ding.png
   label:
     en_US: Dingtalk Multi-dimensional (AI) Table
@@ -37,18 +38,15 @@ identity:
   - productivity
 tools:
 - tools/get_operator_id.yaml
-
 - tools/create_sheet_ai.yaml
 - tools/get_all_sheets_ai.yaml
 - tools/get_sheet_ai.yaml
 - tools/update_sheet_ai.yaml
 - tools/delete_sheet_ai.yaml
-
 - tools/create_field_ai.yaml
 - tools/get_all_fields_ai.yaml
 - tools/update_field_ai.yaml
 - tools/delete_field_ai.yaml
-
 - tools/insert_records_ai.yaml
 - tools/list_records_ai.yaml
 - tools/get_record_ai.yaml

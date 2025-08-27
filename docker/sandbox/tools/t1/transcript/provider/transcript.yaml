@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/transcript.py
 identity:
-  author: Tao Wang
+  author: nexusai
   description:
     en_US: Get transcripts from YouTube videos
     zh_Hans: 获取 YouTube 视频的字幕/转录文本

@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/lark_document.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: 'Lark cloud document, requires the following permissions: docx:document、drive:drive、docs:document.content:read.
 

@@ -21,7 +21,7 @@ extra:
   python:
     source: provider/mem0.py
 identity:
-  author: yevanchen
+  author: nexusai
   description:
     en_US: mem0
     pt_BR: mem0

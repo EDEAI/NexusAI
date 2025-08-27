@@ -1,24 +1,27 @@
-identity:
-  author: s20ss
-  name: rdkit
-  label:
-    en_US: rdkit
-    zh_Hans: rdkit
-    pt_BR: rdkit
-  description:
-    en_US: Dify plugin for understanding,drawing chemical reactions between different molecules.
-    zh_Hans: Dify plugin for understanding,drawing chemical reactions between different molecules.
-    pt_BR: Dify plugin for understanding,drawing chemical reactions between different molecules.
-  icon: icon.png
-  tags:
-    - education
-    - utilities
-tools:
-  - tools/smiles_to_image.yaml
-  - tools/visualize_chemical_reaction.yaml
-  - tools/name_to_smiles.yaml
-  - tools/get_molecular_weight_from_smiles.yaml
-  - tools/get_molecular_descriptors_from_smiles.yaml
 extra:
   python:
     source: provider/rdkit.py
+identity:
+  author: nexusai
+  description:
+    en_US: Dify plugin for understanding,drawing chemical reactions between different
+      molecules.
+    pt_BR: Dify plugin for understanding,drawing chemical reactions between different
+      molecules.
+    zh_Hans: Dify plugin for understanding,drawing chemical reactions between different
+      molecules.
+  icon: icon.png
+  label:
+    en_US: rdkit
+    pt_BR: rdkit
+    zh_Hans: rdkit
+  name: rdkit
+  tags:
+  - education
+  - utilities
+tools:
+- tools/smiles_to_image.yaml
+- tools/visualize_chemical_reaction.yaml
+- tools/name_to_smiles.yaml
+- tools/get_molecular_weight_from_smiles.yaml
+- tools/get_molecular_descriptors_from_smiles.yaml

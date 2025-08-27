@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/openai_audio.py
 identity:
-  author: logicober
+  author: nexusai
   description:
     en_US: Convert audio to text with OpenAI's Audio API, supporting transcription
       and translation across multiple languages with high accuracy. Supports Whisper-1

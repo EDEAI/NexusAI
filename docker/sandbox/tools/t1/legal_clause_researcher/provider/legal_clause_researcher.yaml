@@ -1,28 +1,31 @@
-identity:
-  author: "pragnyan_ramtha"
-  name: "legal_clause_researcher"
-  label:
-    en_US: legal clause researcher
-    zh_Hans: 法律条款研究者法律条款研究者
-    pt_BR: pesquisador de cláusulas legais
-  description:
-    en_US: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
-    zh_Hans: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
-    pt_BR: "This plugin identifies the presence of predefined legal keywords or phrases within a provided text and provides their meaning according the latest revisions."
-  icon: "icon.svg"
 credentials_for_provider:
   legal_clause_researcher_api_key:
-    type: secret-input
-    required: true
+    help:
+      en_US: Get your Legal Clause Researcher API key from legalclause.com
     label:
       en_US: Legal Clause Researcher API Key
     placeholder:
       en_US: Enter your Legal Clause Researcher API key here
-    help:
-      en_US: Get your Legal Clause Researcher API key from legalclause.com
+    required: true
+    type: secret-input
     url: https://legalclause.com/
-tools:
-  - tools/legal_clause_researcher.yaml
 extra:
   python:
     source: provider/legal_clause_researcher.py
+identity:
+  author: nexusai
+  description:
+    en_US: This plugin identifies the presence of predefined legal keywords or phrases
+      within a provided text and provides their meaning according the latest revisions.
+    pt_BR: This plugin identifies the presence of predefined legal keywords or phrases
+      within a provided text and provides their meaning according the latest revisions.
+    zh_Hans: This plugin identifies the presence of predefined legal keywords or phrases
+      within a provided text and provides their meaning according the latest revisions.
+  icon: icon.svg
+  label:
+    en_US: legal clause researcher
+    pt_BR: pesquisador de cláusulas legais
+    zh_Hans: 法律条款研究者法律条款研究者
+  name: legal_clause_researcher
+tools:
+- tools/legal_clause_researcher.yaml

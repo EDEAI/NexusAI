@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/novitaai.py
 identity:
-  author: Xiao Ley
+  author: nexusai
   description:
     en_US: Innovative AI for Image Generation
     pt_BR: Innovative AI for Image Generation

@@ -1,38 +1,38 @@
-identity:
-  author: "alterxyz"
-  name: "openai_deep_research"
-  label:
-    en_US: "OpenAI Deep Research"
-    zh_Hans: "OpenAI 深度研究"
-    pt_BR: "OpenAI Pesquisa Profunda"
-  description:
-    en_US: "OpenAI Deep Research. Start task, get status or result."
-    zh_Hans: "OpenAI 深度研究。启动任务，获取状态或结果。"
-    pt_BR: "OpenAI Pesquisa Profunda. Iniciar tarefa, obter status ou resultado."
-  icon: "icon.svg"
-tools:
-  - tools/openai_deep_research.yaml
-  - tools/openai_deep_research_get.yaml
-extra:
-  python:
-    source: provider/openai_deep_research.py
 credentials_for_provider:
   apikey:
-    type: secret-input
-    required: true
-    label:
-      en_US: OpenAI API Key
-      ja_JP: OpenAI APIキー
-      zh_Hans: OpenAI API 密钥
-      pt_BR: Chave da API do OpenAI
-    placeholder:
-      en_US: Enter your OpenAI API key
-      ja_JP: OpenAI APIキーを入力してください
-      zh_Hans: 请输入您的 OpenAI API 密钥
-      pt_BR: Digite sua chave da API do OpenAI
     help:
       en_US: How to get your OpenAI API key
       ja_JP: OpenAI APIキーの取得方法
-      zh_Hans: 如何获取 OpenAI API 密钥
       pt_BR: Como obter sua chave da API do OpenAI
+      zh_Hans: 如何获取 OpenAI API 密钥
+    label:
+      en_US: OpenAI API Key
+      ja_JP: OpenAI APIキー
+      pt_BR: Chave da API do OpenAI
+      zh_Hans: OpenAI API 密钥
+    placeholder:
+      en_US: Enter your OpenAI API key
+      ja_JP: OpenAI APIキーを入力してください
+      pt_BR: Digite sua chave da API do OpenAI
+      zh_Hans: 请输入您的 OpenAI API 密钥
+    required: true
+    type: secret-input
     url: https://platform.openai.com/api-keys
+extra:
+  python:
+    source: provider/openai_deep_research.py
+identity:
+  author: nexusai
+  description:
+    en_US: OpenAI Deep Research. Start task, get status or result.
+    pt_BR: OpenAI Pesquisa Profunda. Iniciar tarefa, obter status ou resultado.
+    zh_Hans: OpenAI 深度研究。启动任务，获取状态或结果。
+  icon: icon.svg
+  label:
+    en_US: OpenAI Deep Research
+    pt_BR: OpenAI Pesquisa Profunda
+    zh_Hans: OpenAI 深度研究
+  name: openai_deep_research
+tools:
+- tools/openai_deep_research.yaml
+- tools/openai_deep_research_get.yaml

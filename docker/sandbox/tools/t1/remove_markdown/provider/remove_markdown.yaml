@@ -1,13 +1,13 @@
-identity:
-  author: mystery0
-  name: remove_markdown
-  label:
-    en_US: Remove Markdown
-  description:
-    en_US: Remove Markdown formatting from LLM output
-  icon: icon.svg
-tools:
-  - tools/remove_markdown.yaml
 extra:
   python:
     source: provider/remove_markdown.py
+identity:
+  author: nexusai
+  description:
+    en_US: Remove Markdown formatting from LLM output
+  icon: icon.svg
+  label:
+    en_US: Remove Markdown
+  name: remove_markdown
+tools:
+- tools/remove_markdown.yaml

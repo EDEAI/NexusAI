@@ -30,7 +30,7 @@ extra:
   python:
     source: provider/stablediffusion.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: Stable Diffusion is a tool for generating images which can be deployed
       locally.

@@ -1,45 +1,51 @@
-identity:
-  author: seekerliu
-  name: bocha
-  label:
-    en_US: Bocha
-    ja_JP: Bocha
-    zh_Hans: 博查
-    pt_BR: Bocha
-  description:
-    en_US: Bocha is a Chinese search engine for AI, you can get enhanced search details from billions of web documents, including weather, news, wikis, healthcare, train tickets, images, and more.
-    ja_JP: Bocha is a Chinese search engine for AI, you can get enhanced search details from billions of web documents, including weather, news, wikis, healthcare, train tickets, images, and more.
-    zh_Hans: 博查是一个给AI用的中文搜索引擎，让你的AI应用从近百亿网页和生态内容源中获取高质量的世界知识，涵盖天气、新闻、百科、医疗、火车票、图片等多种领域。
-    pt_BR: Bocha is a Chinese search engine for AI, you can get enhanced search details from billions of web documents, including weather, news, wikis, healthcare, train tickets, images, and more.
-  icon: icon.svg
-  tags:
-    - search
-
 credentials_for_provider:
   bocha_api_key:
-    type: secret-input
-    required: true
+    help:
+      en_US: Please visit the Bocha AI Open Platform (https://open.bochaai.com) to
+        register an account and apply for an API key
+      ja_JP: Please visit the Bocha AI Open Platform (https://open.bochaai.com) to
+        register an account and apply for an API key
+      pt_BR: Please visit the Bocha AI Open Platform (https://open.bochaai.com) to
+        register an account and apply for an API key
+      zh_Hans: 请先前往博查AI开放平台(https://open.bochaai.com)注册账号并获取 API Key
     label:
       en_US: Bocha API key
       ja_JP: Bocha API key
-      zh_Hans: 博查 API Key
       pt_BR: Bocha API key
+      zh_Hans: 博查 API Key
     placeholder:
       en_US: Please input your Bocha API key
       ja_JP: Please input your Bocha API key
-      zh_Hans: 请输入你的博查 API Key
       pt_BR: Please input your Bocha API key
-    help:
-      en_US: Please visit the Bocha AI Open Platform (https://open.bochaai.com) to register an account and apply for an API key
-      ja_JP: Please visit the Bocha AI Open Platform (https://open.bochaai.com) to register an account and apply for an API key
-      zh_Hans: 请先前往博查AI开放平台(https://open.bochaai.com)注册账号并获取 API Key
-      pt_BR: Please visit the Bocha AI Open Platform (https://open.bochaai.com) to register an account and apply for an API key
+      zh_Hans: 请输入你的博查 API Key
+    required: true
+    type: secret-input
     url: https://open.bochaai.com
-
-tools:
-  - tools/bocha_web_search.yaml
-  - tools/bocha_ai_search.yaml
-
 extra:
   python:
     source: provider/bocha.py
+identity:
+  author: nexusai
+  description:
+    en_US: Bocha is a Chinese search engine for AI, you can get enhanced search details
+      from billions of web documents, including weather, news, wikis, healthcare,
+      train tickets, images, and more.
+    ja_JP: Bocha is a Chinese search engine for AI, you can get enhanced search details
+      from billions of web documents, including weather, news, wikis, healthcare,
+      train tickets, images, and more.
+    pt_BR: Bocha is a Chinese search engine for AI, you can get enhanced search details
+      from billions of web documents, including weather, news, wikis, healthcare,
+      train tickets, images, and more.
+    zh_Hans: 博查是一个给AI用的中文搜索引擎，让你的AI应用从近百亿网页和生态内容源中获取高质量的世界知识，涵盖天气、新闻、百科、医疗、火车票、图片等多种领域。
+  icon: icon.svg
+  label:
+    en_US: Bocha
+    ja_JP: Bocha
+    pt_BR: Bocha
+    zh_Hans: 博查
+  name: bocha
+  tags:
+  - search
+tools:
+- tools/bocha_web_search.yaml
+- tools/bocha_ai_search.yaml

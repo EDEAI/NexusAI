@@ -1,46 +1,46 @@
-identity:
-  author: heavi
-  name: qiniu
-  label:
-    en_US: qiniu
-    zh_Hans: 七牛
-    pt_BR: Qiniu
-  description:
-    en_US: qiniu api for file upload
-    zh_Hans: 七牛云文件上传 API
-    pt_BR: API do Qiniu para upload de arquivos
-  icon: icon.ico
-  tags:
-    - other
 credentials_for_provider:
   access_key:
-    type: secret-input
-    required: true
+    help:
+      en_US: Get your Access Key from Qiniu dashboard
+      zh_Hans: 从七牛云控制台获取您的 Access Key
     label:
       en_US: Qiniu Access Key
       zh_Hans: 七牛 Access Key
     placeholder:
       en_US: Please input your Qiniu Access Key
       zh_Hans: 请输入你的七牛 Access Key
-    help:
-      en_US: Get your Access Key from Qiniu dashboard
-      zh_Hans: 从七牛云控制台获取您的 Access Key
+    required: true
+    type: secret-input
     url: https://portal.qiniu.com/developer/user/key
   secret_key:
-    type: secret-input
-    required: true
+    help:
+      en_US: Get your Secret Key from Qiniu dashboard
+      zh_Hans: 从七牛云控制台获取您的 Secret Key
     label:
       en_US: Qiniu Secret Key
       zh_Hans: 七牛 Secret Key
     placeholder:
       en_US: Please input your Qiniu Secret Key
       zh_Hans: 请输入你的七牛 Secret Key
-    help:
-      en_US: Get your Secret Key from Qiniu dashboard
-      zh_Hans: 从七牛云控制台获取您的 Secret Key
+    required: true
+    type: secret-input
     url: https://portal.qiniu.com/developer/user/key
-tools:
-  - tools/qiniu.yaml
 extra:
   python:
     source: provider/qiniu.py
+identity:
+  author: nexusai
+  description:
+    en_US: qiniu api for file upload
+    pt_BR: API do Qiniu para upload de arquivos
+    zh_Hans: 七牛云文件上传 API
+  icon: icon.ico
+  label:
+    en_US: qiniu
+    pt_BR: Qiniu
+    zh_Hans: 七牛
+  name: qiniu
+  tags:
+  - other
+tools:
+- tools/qiniu.yaml

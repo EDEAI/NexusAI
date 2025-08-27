@@ -1,18 +1,18 @@
-identity:
-  author: jingfelix
-  name: npm_registry
-  label:
-    en_US: "npm Registry API"
-    zh_Hans: "npm Registry API"
-    pt_BR: "npm Registry API"
-  description:
-    en_US: "A Dify plugin to access npm Registry API"
-    zh_Hans: "用于访问 npm Registry API 的 Dify 插件"
-    pt_BR: "Um plugin Dify para acessar a API do npm"
-  icon: icon.svg
-tools:
-  - tools/npm_registry_search.yaml
-  - tools/npm_registry_get.yaml
 extra:
   python:
     source: provider/npm_registry.py
+identity:
+  author: nexusai
+  description:
+    en_US: A Dify plugin to access npm Registry API
+    pt_BR: Um plugin Dify para acessar a API do npm
+    zh_Hans: 用于访问 npm Registry API 的 Dify 插件
+  icon: icon.svg
+  label:
+    en_US: npm Registry API
+    pt_BR: npm Registry API
+    zh_Hans: npm Registry API
+  name: npm_registry
+tools:
+- tools/npm_registry_search.yaml
+- tools/npm_registry_get.yaml

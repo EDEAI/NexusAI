@@ -21,7 +21,7 @@ extra:
   python:
     source: provider/getimgai.py
 identity:
-  author: Matri Qi
+  author: nexusai
   description:
     en_US: GetImg API integration for image generation and scraping.
   icon: icon.svg

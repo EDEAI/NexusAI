@@ -1,24 +1,24 @@
-identity:
-  author: tushargururaj
-  name: bitly_shortner
-  label:
-    en_US: Bitly URL Shortener & Analytics
-  description:
-    en_US: Shorten URLs and get analytics using Bitly API.
-  icon: icon.svg
 credentials_for_provider:
   access_token:
-    type: secret-input
-    required: true
+    help:
+      en_US: Get your access token from Bitly Developer Console
     label:
       en_US: Bitly Access Token
     placeholder:
       en_US: Enter your Bitly access token
-    help:
-      en_US: Get your access token from Bitly Developer Console
+    required: true
+    type: secret-input
     url: https://app.bitly.com/settings/api/
-tools:
-  - tools/bitly_shortner.yaml
 extra:
   python:
     source: provider/bitly_shortner.py
+identity:
+  author: nexusai
+  description:
+    en_US: Shorten URLs and get analytics using Bitly API.
+  icon: icon.svg
+  label:
+    en_US: Bitly URL Shortener & Analytics
+  name: bitly_shortner
+tools:
+- tools/bitly_shortner.yaml

@@ -1,68 +1,68 @@
-identity:
-  author: harrywang
-  name: postmark
-  label:
-    en_US: Postmark
-    zh_Hans: Postmark
-    pt_BR: Postmark
-    ja_JP: Postmark
-    zh_Hant: Postmark
-  description:
-    en_US: Send emails using Postmark API
-    zh_Hans: 使用 Postmark API 发送电子邮件
-    pt_BR: Envie emails usando a API Postmark
-    ja_JP: Postmark API を使用してメールを送信する
-    zh_Hant: 使用 Postmark API 發送電子郵件
-  icon: icon.svg
-  tags:
-    - utilities
 credentials_for_provider:
-  server_token:
-    type: secret-input
-    required: true
-    label:
-      en_US: Server Token
-      zh_Hans: 服务器令牌
-      pt_BR: Token do Servidor
-      ja_JP: サーバートークン
-      zh_Hant: 伺服器權杖
-    placeholder:
-      en_US: Please input your Postmark server token
-      zh_Hans: 请输入您的 Postmark 服务器令牌
-      pt_BR: Por favor, insira seu token de servidor Postmark
-      ja_JP: Postmark サーバートークンを入力してください
-      zh_Hant: 請輸入您的 Postmark 伺服器權杖
-    help:
-      en_US: Get your server token from Postmark Account Settings
-      zh_Hans: 从 Postmark 账户设置获取您的服务器令牌
-      pt_BR: Obtenha seu token de servidor nas Configurações da Conta Postmark
-      ja_JP: Postmark アカウント設定からサーバートークンを取得してください
-      zh_Hant: 從 Postmark 帳戶設定獲取您的伺服器權杖
-    url: https://account.postmarkapp.com/servers
   default_from_email:
-    type: text-input
-    required: true
+    help:
+      en_US: Must be a verified sender signature in your Postmark account
+      ja_JP: Postmarkアカウントで検証済みの送信者署名である必要があります
+      pt_BR: Deve ser uma assinatura de remetente verificada em sua conta Postmark
+      zh_Hans: 必须是您 Postmark 账户中的已验证发件人签名
+      zh_Hant: 必須是您 Postmark 帳戶中的已驗證寄件人簽名
     label:
       en_US: Default From Email
-      zh_Hans: 默认发件人邮箱
-      pt_BR: Email de Origem Padrão
       ja_JP: デフォルト送信元メール
+      pt_BR: Email de Origem Padrão
+      zh_Hans: 默认发件人邮箱
       zh_Hant: 預設寄件人郵箱
     placeholder:
       en_US: Please input your verified sender email
-      zh_Hans: 请输入您的已验证发件人邮箱
-      pt_BR: Por favor, insira seu email de remetente verificado
       ja_JP: 検証済みの送信元メールアドレスを入力してください
+      pt_BR: Por favor, insira seu email de remetente verificado
+      zh_Hans: 请输入您的已验证发件人邮箱
       zh_Hant: 請輸入您的已驗證寄件人郵箱
-    help:
-      en_US: Must be a verified sender signature in your Postmark account
-      zh_Hans: 必须是您 Postmark 账户中的已验证发件人签名
-      pt_BR: Deve ser uma assinatura de remetente verificada em sua conta Postmark
-      ja_JP: Postmarkアカウントで検証済みの送信者署名である必要があります
-      zh_Hant: 必須是您 Postmark 帳戶中的已驗證寄件人簽名
+    required: true
+    type: text-input
     url: https://account.postmarkapp.com/signature_domains
-tools:
-  - tools/postmark.yaml
+  server_token:
+    help:
+      en_US: Get your server token from Postmark Account Settings
+      ja_JP: Postmark アカウント設定からサーバートークンを取得してください
+      pt_BR: Obtenha seu token de servidor nas Configurações da Conta Postmark
+      zh_Hans: 从 Postmark 账户设置获取您的服务器令牌
+      zh_Hant: 從 Postmark 帳戶設定獲取您的伺服器權杖
+    label:
+      en_US: Server Token
+      ja_JP: サーバートークン
+      pt_BR: Token do Servidor
+      zh_Hans: 服务器令牌
+      zh_Hant: 伺服器權杖
+    placeholder:
+      en_US: Please input your Postmark server token
+      ja_JP: Postmark サーバートークンを入力してください
+      pt_BR: Por favor, insira seu token de servidor Postmark
+      zh_Hans: 请输入您的 Postmark 服务器令牌
+      zh_Hant: 請輸入您的 Postmark 伺服器權杖
+    required: true
+    type: secret-input
+    url: https://account.postmarkapp.com/servers
 extra:
   python:
     source: provider/postmark.py
+identity:
+  author: nexusai
+  description:
+    en_US: Send emails using Postmark API
+    ja_JP: Postmark API を使用してメールを送信する
+    pt_BR: Envie emails usando a API Postmark
+    zh_Hans: 使用 Postmark API 发送电子邮件
+    zh_Hant: 使用 Postmark API 發送電子郵件
+  icon: icon.svg
+  label:
+    en_US: Postmark
+    ja_JP: Postmark
+    pt_BR: Postmark
+    zh_Hans: Postmark
+    zh_Hant: Postmark
+  name: postmark
+  tags:
+  - utilities
+tools:
+- tools/postmark.yaml

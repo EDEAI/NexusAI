@@ -1,33 +1,33 @@
-identity:
-  author: "pragnyan_ramtha"
-  name: "drug_researcher"
-  label:
-    en_US: drug researcher
-    zh_Hans: 药物研究员
-    pt_BR: pesquisador de drogas
-  description:
-    en_US: "This plugin provides usage and common side effects for a given drug name."
-    zh_Hans: "This plugin provides usage and common side effects for a given drug name."
-    pt_BR: "This plugin provides usage and common side effects for a given drug name."
-  icon: "icon.svg"
 credentials_for_provider:
-  drugbank_api_key:
-    type: secret-input
+  drugbank_api_endpoint:
+    label:
+      en_US: Drugbank API Video Generation Endpoint URL
     required: true
+    type: text-input
+  drugbank_api_key:
+    help:
+      en_US: Get your Drugbank API key from drugbank
     label:
       en_US: drugbank API key
     placeholder:
       en_US: Enter your Drugbank API key here
-    help:
-      en_US: Get your Drugbank API key from drugbank
-    url: hhttps://support.drugbank.com/kb/drugbank-clinical-api
-  drugbank_api_endpoint:
-    type: text-input
     required: true
-    label:
-      en_US: Drugbank API Video Generation Endpoint URL    
-tools:
-  - tools/drug_researcher.yaml
+    type: secret-input
+    url: hhttps://support.drugbank.com/kb/drugbank-clinical-api
 extra:
   python:
     source: provider/drug_researcher.py
+identity:
+  author: nexusai
+  description:
+    en_US: This plugin provides usage and common side effects for a given drug name.
+    pt_BR: This plugin provides usage and common side effects for a given drug name.
+    zh_Hans: This plugin provides usage and common side effects for a given drug name.
+  icon: icon.svg
+  label:
+    en_US: drug researcher
+    pt_BR: pesquisador de drogas
+    zh_Hans: 药物研究员
+  name: drug_researcher
+tools:
+- tools/drug_researcher.yaml

@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/searchapi.py
 identity:
-  author: SearchApi
+  author: nexusai
   description:
     en_US: SearchApi is a robust real-time SERP API delivering structured data from
       a collection of search engines including Google Search, Google Jobs, YouTube,

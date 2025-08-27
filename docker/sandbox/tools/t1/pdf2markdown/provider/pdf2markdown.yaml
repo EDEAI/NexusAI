@@ -1,15 +1,20 @@
-identity:
-  author: textin
-  name: pdf2markdown
-  label:
-    en_US: pdf2markdown
-    zh_Hans: 通用文档解析
-  description:
-    en_US:  Designed specifically for downstream tasks of large language models (LLMs), this service can recognize text from documents or images and intelligently restore the reading order of the content, outputting a standardized Markdown format. It supports OCR recognition across more than 10 common document layouts and over 52 languages, enabling LLMs to more efficiently utilize document content in scenarios such as understanding, generation, and question answering.
-    zh_Hans: 专为大语言模型（LLM）下游任务设计，能够识别文档或图片中的文字信息，并智能还原文档的阅读顺序，输出标准化的Markdown格式。服务支持OCR识别，覆盖10+种常见文档版式，支持52+种语言，助力各类大模型在理解、生成、问答等场景中更高效地利用文档内容。
-  icon: icon.png
-tools:
-  - tools/pdf2markdown.yaml
 extra:
   python:
     source: provider/pdf2markdown.py
+identity:
+  author: nexusai
+  description:
+    en_US: Designed specifically for downstream tasks of large language models (LLMs),
+      this service can recognize text from documents or images and intelligently restore
+      the reading order of the content, outputting a standardized Markdown format.
+      It supports OCR recognition across more than 10 common document layouts and
+      over 52 languages, enabling LLMs to more efficiently utilize document content
+      in scenarios such as understanding, generation, and question answering.
+    zh_Hans: 专为大语言模型（LLM）下游任务设计，能够识别文档或图片中的文字信息，并智能还原文档的阅读顺序，输出标准化的Markdown格式。服务支持OCR识别，覆盖10+种常见文档版式，支持52+种语言，助力各类大模型在理解、生成、问答等场景中更高效地利用文档内容。
+  icon: icon.png
+  label:
+    en_US: pdf2markdown
+    zh_Hans: 通用文档解析
+  name: pdf2markdown
+tools:
+- tools/pdf2markdown.yaml

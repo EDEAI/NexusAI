@@ -1,68 +1,79 @@
-identity:
-  author: easylink-ai
-  name: easydoc
-  label:
-    en_US: EasyDoc
-    ja_JP: EasyDoc
-    zh_Hans: EasyDoc
-    pt_BR: EasyDoc
-  description:
-    en_US: 'EasyDoc is a document parsing service developed by EasyLink AI, powered by its proprietary vision-language model. Designed for developers, EasyDoc offers accurate and efficient processing of unstructured documents across various formats (e.g., PDF, images, Word). It outputs structured data to empower the creation of intelligent and high-performance AI Agent applications across industries such as finance, legal, healthcare, and enterprise automation. '
-    ja_JP: 'EasyDoc は、EasyLink AI によって開発されたドキュメント解析サービスであり、独自のビジョン・ランゲージモデルを搭載しています。開発者向けに設計されており、PDF、画像、Word などのさまざまな形式の非構造化ドキュメントを正確かつ効率的に処理します。構造化データを出力することで、金融、法務、医療、企業自動化などの分野における高度でインテリジェントな AI エージェントアプリケーションの構築を支援します。'
-    zh_Hans: 'EasyDoc 是由 EasyLink AI 开发的文档解析服务，基于其自主研发的视觉语言模型。它专为开发者设计，能够高效、准确地处理各种格式的非结构化文档（如 PDF、图像、Word）。EasyDoc 输出结构化数据，助力金融、法律、医疗、企业自动化等行业构建智能、高性能的 AI Agent 应用。'
-    pt_BR: 'O EasyDoc é um serviço de análise de documentos desenvolvido pela EasyLink AI, alimentado por seu modelo proprietário de visão e linguagem. Projetado para desenvolvedores, o EasyDoc oferece processamento preciso e eficiente de documentos não estruturados em vários formatos (por exemplo, PDF, imagens, Word). Ele gera dados estruturados para viabilizar a criação de aplicações de Agentes de IA inteligentes e de alto desempenho em setores como financeiro, jurídico, saúde e automação empresarial.'
-
-  icon: icon.svg
-tools:
-  - tools/parse.yaml
-extra:
-  python:
-    source: provider/easydoc.py
 credentials_for_provider:
-  base_url:
-    label:
-      en_US: Base URL
-      zh_Hans: EasyDoc服务的Base URL
-      ja_JP: EasyDocサービスのBase URL
-      pt_BR: URL Base do serviço EasyDoc
-    placeholder:
-      en_US: Please input your EasyDoc server's Base URL
-      zh_Hans: 请输入你的 EasyDoc 服务的 Base URL
-      ja_JP: EasyDoc サーバーの Base URL を入力してください
-      pt_BR: Insira a URL base do seu servidor EasyDoc
-    required: true
-    type: text-input
-
   api_key:
-    type: secret-input
-    required: true
+    help:
+      en_US: You can find your EasyDoc API Key in your EasyDoc account settings
+      ja_JP: EasyDoc のアカウント設定で API キーを見つけることができます
+      pt_BR: Você pode encontrar sua chave de API do EasyDoc nas configurações da
+        conta
+      zh_Hans: 您可以在 EasyDoc 帐户设置中找到 API 密钥
+      zh_Hant: 您可以在 EasyDoc 帳戶設定中找到 API 金鑰
     label:
       en_US: API Key
-      zh_Hans: API密钥
-      pt_BR: Chave da API
       ja_JP: APIキー
+      pt_BR: Chave da API
+      zh_Hans: API密钥
       zh_Hant: API金鑰
     placeholder:
       en_US: Please input your EasyDoc API Key
-      zh_Hans: 请输入你的 EasyDoc API密钥
-      pt_BR: Insira sua chave de API do EasyDoc
       ja_JP: EasyDoc の APIキーを入力してください
+      pt_BR: Insira sua chave de API do EasyDoc
+      zh_Hans: 请输入你的 EasyDoc API密钥
       zh_Hant: 請輸入你的 EasyDoc API金鑰
-    help:
-      en_US: You can find your EasyDoc API Key in your EasyDoc account settings
-      zh_Hans: 您可以在 EasyDoc 帐户设置中找到 API 密钥
-      pt_BR: Você pode encontrar sua chave de API do EasyDoc nas configurações da conta
-      ja_JP: EasyDoc のアカウント設定で API キーを見つけることができます
-      zh_Hant: 您可以在 EasyDoc 帳戶設定中找到 API 金鑰
-    url: https://platform.easylink-ai.com/api-keys  # 请根据实际情况修改这个 URL
-
-  
+    required: true
+    type: secret-input
+    url: https://platform.easylink-ai.com/api-keys
+  base_url:
+    label:
+      en_US: Base URL
+      ja_JP: EasyDocサービスのBase URL
+      pt_BR: URL Base do serviço EasyDoc
+      zh_Hans: EasyDoc服务的Base URL
+    placeholder:
+      en_US: Please input your EasyDoc server's Base URL
+      ja_JP: EasyDoc サーバーの Base URL を入力してください
+      pt_BR: Insira a URL base do seu servidor EasyDoc
+      zh_Hans: 请输入你的 EasyDoc 服务的 Base URL
+    required: true
+    type: text-input
   verify_ssl:
+    default: true
     label:
       en_US: Verify SSL
-      zh_Hans: 验证SSL证书
       ja_JP: SSL証明書の検証
       pt_BR: Verificar SSL
+      zh_Hans: 验证SSL证书
     required: false
     type: boolean
-    default: true
+extra:
+  python:
+    source: provider/easydoc.py
+identity:
+  author: nexusai
+  description:
+    en_US: 'EasyDoc is a document parsing service developed by EasyLink AI, powered
+      by its proprietary vision-language model. Designed for developers, EasyDoc offers
+      accurate and efficient processing of unstructured documents across various formats
+      (e.g., PDF, images, Word). It outputs structured data to empower the creation
+      of intelligent and high-performance AI Agent applications across industries
+      such as finance, legal, healthcare, and enterprise automation. '
+    ja_JP: EasyDoc は、EasyLink AI によって開発されたドキュメント解析サービスであり、独自のビジョン・ランゲージモデルを搭載しています。開発者向けに設計されており、PDF、画像、Word
+      などのさまざまな形式の非構造化ドキュメントを正確かつ効率的に処理します。構造化データを出力することで、金融、法務、医療、企業自動化などの分野における高度でインテリジェントな
+      AI エージェントアプリケーションの構築を支援します。
+    pt_BR: O EasyDoc é um serviço de análise de documentos desenvolvido pela EasyLink
+      AI, alimentado por seu modelo proprietário de visão e linguagem. Projetado para
+      desenvolvedores, o EasyDoc oferece processamento preciso e eficiente de documentos
+      não estruturados em vários formatos (por exemplo, PDF, imagens, Word). Ele gera
+      dados estruturados para viabilizar a criação de aplicações de Agentes de IA
+      inteligentes e de alto desempenho em setores como financeiro, jurídico, saúde
+      e automação empresarial.
+    zh_Hans: EasyDoc 是由 EasyLink AI 开发的文档解析服务，基于其自主研发的视觉语言模型。它专为开发者设计，能够高效、准确地处理各种格式的非结构化文档（如
+      PDF、图像、Word）。EasyDoc 输出结构化数据，助力金融、法律、医疗、企业自动化等行业构建智能、高性能的 AI Agent 应用。
+  icon: icon.svg
+  label:
+    en_US: EasyDoc
+    ja_JP: EasyDoc
+    pt_BR: EasyDoc
+    zh_Hans: EasyDoc
+  name: easydoc
+tools:
+- tools/parse.yaml

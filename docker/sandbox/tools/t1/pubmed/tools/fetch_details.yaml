@@ -1,0 +1,26 @@
+identity:
+  name: fetch_details
+  author: svcvit
+  label:
+    en_US: Fetch PubMed Details
+    zh_Hans: 获取 PubMed 详情
+description:
+  human:
+    en_US: Retrieves detailed information (title, abstract, authors, journal, etc.) for a specific PubMed ID (PMID).
+    zh_Hans: 检索指定 PubMed ID (PMID) 的详细信息（标题、摘要、作者、期刊等）。
+  llm: This tool takes a single PubMed ID (PMID), usually obtained from the 'search' tool, and returns detailed information for the article, including title, abstract, authors, publication date, journal, keywords, and MeSH terms. Use this when you need the actual content summary or metadata of a specific article.
+parameters:
+  - name: pmids
+    type: string
+    required: true
+    label:
+      en_US: PubMed ID
+      zh_Hans: PubMed ID
+    human_description:
+      en_US: 'Enter a single PubMed ID (e.g., ''30622344'').'
+      zh_Hans: '输入单个 PubMed ID（例如，''30622344''）。'
+    llm_description: Provide a single PubMed ID (PMID) to fetch its detailed information. The PMID should be a valid number assigned by PubMed.
+    form: llm
+extra:
+  python:
+    source: tools/fetch_details.py # Points to the tool implementation

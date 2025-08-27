@@ -1,3 +1,0 @@
-dify_plugin
-requests~=2.32.3
-loguru~=0.7.2

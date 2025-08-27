@@ -1,25 +1,26 @@
-identity:
-  author: bowenliang123
-  name: cryptography
-  label:
-    en_US: Cryptography
-    zh_Hans: Cryptography 加密/解密/哈希
-  description:
-    en_US: Encryption, decryption, hashing and keypair generation, with AES, RSA, SHA256, MD5, HMAC, Ed25519 etc.
-    zh_Hans: 加密, 解密, 哈希, 密钥生成，支持AES, RSA, SHA256, MD5, HMAC, Ed25519等算法
-  icon: icon.svg
-tools:
-  - tools/sha256sum/sha256sum.yaml
-  - tools/md5sum/md5sum.yaml
-  - tools/hmac_sign/hmac_sign.yaml
-  - tools/rsa_keygen/rsa_keygen.yaml
-  - tools/rsa_encrypt/rsa_encrypt.yaml
-  - tools/rsa_decrypt/rsa_decrypt.yaml
-  - tools/ed25519_keygen/ed25519_keygen.yaml
-  - tools/ed25519_sign/ed25519_sign.yaml
-  - tools/ed25519_verify/ed25519_verify.yaml
-  - tools/aes_encrypt/aes_encrypt.yaml
-  - tools/aes_decrypt/aes_decrypt.yaml
 extra:
   python:
     source: provider/cryptography.py
+identity:
+  author: nexusai
+  description:
+    en_US: Encryption, decryption, hashing and keypair generation, with AES, RSA,
+      SHA256, MD5, HMAC, Ed25519 etc.
+    zh_Hans: 加密, 解密, 哈希, 密钥生成，支持AES, RSA, SHA256, MD5, HMAC, Ed25519等算法
+  icon: icon.svg
+  label:
+    en_US: Cryptography
+    zh_Hans: Cryptography 加密/解密/哈希
+  name: cryptography
+tools:
+- tools/sha256sum/sha256sum.yaml
+- tools/md5sum/md5sum.yaml
+- tools/hmac_sign/hmac_sign.yaml
+- tools/rsa_keygen/rsa_keygen.yaml
+- tools/rsa_encrypt/rsa_encrypt.yaml
+- tools/rsa_decrypt/rsa_decrypt.yaml
+- tools/ed25519_keygen/ed25519_keygen.yaml
+- tools/ed25519_sign/ed25519_sign.yaml
+- tools/ed25519_verify/ed25519_verify.yaml
+- tools/aes_encrypt/aes_encrypt.yaml
+- tools/aes_decrypt/aes_decrypt.yaml

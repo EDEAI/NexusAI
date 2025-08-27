@@ -1,52 +1,52 @@
-identity:
-  author: alterxyz
-  name: data_connector_cloudflare_d1
-  label:
-    en_US: Cloudflare D1
-    zh_Hans: Cloudflare D1
-    pt_BR: Cloudflare D1
-  description:
-    en_US: Connect to external data source -  Cloudflare D1
-    zh_Hans: Connect to external data source -  Cloudflare D1
-    pt_BR: Connect to external data source -  Cloudflare D1
-  icon: icon.svg
 credentials_for_provider:
-  cloudflare_api_token:
-    type: secret-input
-    required: true
-    label:
-      en_US: Cloudflare Token
-      zh_Hans: Cloudflare Token
-      pt_BR: Cloudflare Token
-    placeholder:
-      en_US: Please input your Cloudflare Token
-      zh_Hans: 请输入您的 Cloudflare Token
-      pt_BR: Por favor, insira seu Token do Cloudflare
-    help:
-    en_US: Get your Cloudflare Token
-    zh_Hans: 获取 Cloudflare Token
-    pt_BR: Obtenha seu Token do Cloudflare
-    url: https://developers.cloudflare.com/fundamentals/api/get-started/create-token/
   cloudflare_account_id:
-    type: secret-input
-    required: true
+    en_US: Get your Cloudflare Account ID
+    help: null
     label:
       en_US: Cloudflare Account ID
-      zh_Hans: Cloudflare Account ID
       pt_BR: Cloudflare Account ID
+      zh_Hans: Cloudflare Account ID
     placeholder:
       en_US: Please input your Cloudflare Account ID
-      zh_Hans: 请输入您的 Cloudflare Account ID
       pt_BR: Por favor, insira seu ID de conta do Cloudflare
-    help:
-    en_US: Get your Cloudflare Account ID
-    zh_Hans: 获取 Cloudflare Account ID
+      zh_Hans: 请输入您的 Cloudflare Account ID
     pt_BR: Obtenha seu ID de conta do Cloudflare
+    required: true
+    type: secret-input
     url: https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/
-tools:
-  - tools/cloudflare_verify.yaml
-  - tools/query.yaml
-  - tools/query_advanced.yaml
+    zh_Hans: 获取 Cloudflare Account ID
+  cloudflare_api_token:
+    en_US: Get your Cloudflare Token
+    help: null
+    label:
+      en_US: Cloudflare Token
+      pt_BR: Cloudflare Token
+      zh_Hans: Cloudflare Token
+    placeholder:
+      en_US: Please input your Cloudflare Token
+      pt_BR: Por favor, insira seu Token do Cloudflare
+      zh_Hans: 请输入您的 Cloudflare Token
+    pt_BR: Obtenha seu Token do Cloudflare
+    required: true
+    type: secret-input
+    url: https://developers.cloudflare.com/fundamentals/api/get-started/create-token/
+    zh_Hans: 获取 Cloudflare Token
 extra:
   python:
     source: provider/data_connector_cloudflare_d1.py
+identity:
+  author: nexusai
+  description:
+    en_US: Connect to external data source -  Cloudflare D1
+    pt_BR: Connect to external data source -  Cloudflare D1
+    zh_Hans: Connect to external data source -  Cloudflare D1
+  icon: icon.svg
+  label:
+    en_US: Cloudflare D1
+    pt_BR: Cloudflare D1
+    zh_Hans: Cloudflare D1
+  name: data_connector_cloudflare_d1
+tools:
+- tools/cloudflare_verify.yaml
+- tools/query.yaml
+- tools/query_advanced.yaml

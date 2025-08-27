@@ -1,27 +1,26 @@
-identity:
-  author: tushargururaj
-  name: github_repo_intel
-  label:
-    en_US: GitHub Repository Intelligence
-  description:
-    en_US: Comprehensive GitHub repository analysis and insights tool.
-  icon: icon.svg
-
 credentials_for_provider:
   github_token:
-    type: secret-input
-    required: false
+    help:
+      en_US: Get your personal access token from GitHub Settings > Developer settings
+        > Personal access tokens. Required for advanced features (5,000 requests/hour).
+        Without token, limited to basic features (60 requests/hour).
     label:
       en_US: GitHub Personal Access Token
     placeholder:
       en_US: Please input your GitHub personal access token (optional for basic features)
-    help:
-      en_US: Get your personal access token from GitHub Settings > Developer settings > Personal access tokens. Required for advanced features (5,000 requests/hour). Without token, limited to basic features (60 requests/hour).
+    required: false
+    type: secret-input
     url: https://github.com/settings/tokens
-
-tools:
-  - tools/github_repo_intel.yaml
-
 extra:
   python:
     source: provider/github_repo_intel.py
+identity:
+  author: nexusai
+  description:
+    en_US: Comprehensive GitHub repository analysis and insights tool.
+  icon: icon.svg
+  label:
+    en_US: GitHub Repository Intelligence
+  name: github_repo_intel
+tools:
+- tools/github_repo_intel.yaml

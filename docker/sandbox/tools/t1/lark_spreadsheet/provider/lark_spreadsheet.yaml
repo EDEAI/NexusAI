@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/lark_spreadsheet.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: 'Lark Spreadsheet, requires the following permissions: sheets:spreadsheet.
 

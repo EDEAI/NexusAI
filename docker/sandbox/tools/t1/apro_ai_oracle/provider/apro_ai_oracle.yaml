@@ -1,21 +1,25 @@
-identity:
-  author: apro
-  name: apro_ai_oracle
-  label:
-    en_US: APRO AI oracle
-    zh_Hans: APRO AI oracle
-    pt_BR: APRO AI oracle
-  description:
-    en_US: APRO AI Oracle API. We provide a wide range of oracle data, including market prices and news, and use distributed consensus to ensure data reliability and immutability.
-    zh_Hans: APRO AI Oracle API。我们提供广泛的预言机数据，包括市场价格和新闻，并使用分布式共识确保数据的可靠性和不可变性。
-    pt_BR: APRO AI Oracle API. Fornecemos uma ampla gama de dados de oráculo, incluindo preços de mercado e notícias, e utilizamos consenso distribuído para garantir a confiabilidade e imutabilidade dos dados.
-  icon: icon.svg
-  tags:
-    - finance
-    - utilities
-    - news
-tools:
-  - tools/currency_price.yaml
 extra:
   python:
     source: provider/apro_ai_oracle.py
+identity:
+  author: nexusai
+  description:
+    en_US: APRO AI Oracle API. We provide a wide range of oracle data, including market
+      prices and news, and use distributed consensus to ensure data reliability and
+      immutability.
+    pt_BR: APRO AI Oracle API. Fornecemos uma ampla gama de dados de oráculo, incluindo
+      preços de mercado e notícias, e utilizamos consenso distribuído para garantir
+      a confiabilidade e imutabilidade dos dados.
+    zh_Hans: APRO AI Oracle API。我们提供广泛的预言机数据，包括市场价格和新闻，并使用分布式共识确保数据的可靠性和不可变性。
+  icon: icon.svg
+  label:
+    en_US: APRO AI oracle
+    pt_BR: APRO AI oracle
+    zh_Hans: APRO AI oracle
+  name: apro_ai_oracle
+  tags:
+  - finance
+  - utilities
+  - news
+tools:
+- tools/currency_price.yaml

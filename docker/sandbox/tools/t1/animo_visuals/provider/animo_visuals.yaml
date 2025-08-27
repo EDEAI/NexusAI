@@ -1,110 +1,115 @@
-identity:
-  author: "pragnyan_ramtha"
-  name: "animo_visuals"
-  label:
-    en_US: "animo_visuals"
-    zh_Hans: "animo_visuals"
-    pt_BR: "animo_visuals"
-  description:
-    en_US: "generate stunning visual animations with animo api. Animo is a powerful tool designed to enhance Dify&#39;s capabilities by providing a robust visual creating environtment for any developers that are looking to integrate animations. It leverages the Animo API to perform various visual tasks, making it an essential tool for developers who want to create engaging and dynamic visual content."
-    zh_Hans: "generate stunning visual animations with animo api"
-    pt_BR: "generate stunning visual animations with animo api"
-  icon: "icon.svg"
 credentials_for_provider:
-  animo_api_key:
-    type: secret-input
+  animo_api_endpoint:
+    label:
+      en_US: Animo API Video Generation Endpoint URL
     required: true
+    type: text-input
+  animo_api_key:
+    help:
+      en_US: Get your Tavily API key from tavily
     label:
       en_US: Animo API key
     placeholder:
       en_US: Enter your Animo API key here
-    help:
-      en_US: Get your Tavily API key from tavily
-    url: https://animo.video/dev
-  animo_api_endpoint:
-    type: text-input
     required: true
-    label:
-      en_US: Animo API Video Generation Endpoint URL  
-tools:
-  - tools/animo_visuals.yaml
-
-parameters:
-  type: object
-  properties:
-    prompt:
-      type: string
-      description: The creative prompt or detailed description for the video to be generated.
-      llm:
-        mode: required
-      form:
-        label: Video Prompt
-        type: text-input
-        required: true
-    duration:
-      type: integer
-      description: Desired duration of the video in seconds (e.g., 5, 10, 30).
-      llm:
-        mode: optional
-      form:
-        label: Video Duration (seconds)
-        type: number-input
-        default: 10
-        min: 1
-        max: 60
-    style:
-      type: string
-      description: The artistic style for the video (e.g., "anime", "realistic", "cartoon", "abstract").
-      llm:
-        mode: optional
-      form:
-        label: Video Style
-        type: select
-        options:
-          - value: cinematic
-            label: Cinematic
-          - value: anime
-            label: Anime
-          - value: realistic
-            label: Realistic
-          - value: cartoon
-            label: Cartoon
-          - value: abstract
-            label: Abstract
-        default: cinematic
-    resolution:
-      type: string
-      description: Desired video resolution (e.g., "1920x1080", "1280x720", "720x480").
-      llm:
-        mode: optional
-      form:
-        label: Video Resolution
-        type: select
-        options:
-          - value: 1920x1080
-            label: Full HD (1080p)
-          - value: 1280x720
-            label: HD (720p)
-          - value: 720x480
-            label: SD (480p)
-        default: 1280x720
-  required:
-    - prompt
-
-output:
-  type: object
-  properties:
-    visualization:
-      type: object
-      description: The generated MP4 video file.
-      properties:
-        type:
-          type: string
-          enum: ["video/mp4;base64"]
-        data:
-          type: string
-        description:
-          type: string  
+    type: secret-input
+    url: https://animo.video/dev
 extra:
   python:
     source: provider/animo_visuals.py
+identity:
+  author: nexusai
+  description:
+    en_US: generate stunning visual animations with animo api. Animo is a powerful
+      tool designed to enhance Dify&#39;s capabilities by providing a robust visual
+      creating environtment for any developers that are looking to integrate animations.
+      It leverages the Animo API to perform various visual tasks, making it an essential
+      tool for developers who want to create engaging and dynamic visual content.
+    pt_BR: generate stunning visual animations with animo api
+    zh_Hans: generate stunning visual animations with animo api
+  icon: icon.svg
+  label:
+    en_US: animo_visuals
+    pt_BR: animo_visuals
+    zh_Hans: animo_visuals
+  name: animo_visuals
+output:
+  properties:
+    visualization:
+      description: The generated MP4 video file.
+      properties:
+        data:
+          type: string
+        description:
+          type: string
+        type:
+          enum:
+          - video/mp4;base64
+          type: string
+      type: object
+  type: object
+parameters:
+  properties:
+    duration:
+      description: Desired duration of the video in seconds (e.g., 5, 10, 30).
+      form:
+        default: 10
+        label: Video Duration (seconds)
+        max: 60
+        min: 1
+        type: number-input
+      llm:
+        mode: optional
+      type: integer
+    prompt:
+      description: The creative prompt or detailed description for the video to be
+        generated.
+      form:
+        label: Video Prompt
+        required: true
+        type: text-input
+      llm:
+        mode: required
+      type: string
+    resolution:
+      description: Desired video resolution (e.g., "1920x1080", "1280x720", "720x480").
+      form:
+        default: 1280x720
+        label: Video Resolution
+        options:
+        - label: Full HD (1080p)
+          value: 1920x1080
+        - label: HD (720p)
+          value: 1280x720
+        - label: SD (480p)
+          value: 720x480
+        type: select
+      llm:
+        mode: optional
+      type: string
+    style:
+      description: The artistic style for the video (e.g., "anime", "realistic", "cartoon",
+        "abstract").
+      form:
+        default: cinematic
+        label: Video Style
+        options:
+        - label: Cinematic
+          value: cinematic
+        - label: Anime
+          value: anime
+        - label: Realistic
+          value: realistic
+        - label: Cartoon
+          value: cartoon
+        - label: Abstract
+          value: abstract
+        type: select
+      llm:
+        mode: optional
+      type: string
+  required:
+  - prompt
+  type: object
+tools:
+- tools/animo_visuals.yaml

@@ -13,7 +13,7 @@ extra:
   python:
     source: provider/searxng.py
 identity:
-  author: Junytang
+  author: nexusai
   description:
     en_US: A free internet metasearch engine.
     zh_Hans: 开源免费的互联网元搜索引擎

@@ -25,7 +25,7 @@ extra:
   python:
     source: provider/firecrawl.py
 identity:
-  author: Richards_Tu
+  author: nexusai
   description:
     en_US: Firecrawl API integration for web crawling and scraping.
     zh_Hans: Firecrawl API 集成，用于网页爬取和数据抓取。
@@ -35,10 +35,10 @@ identity:
     zh_CN: Firecrawl
   name: firecrawl
   tags:
-    - search
-    - utilities
+  - search
+  - utilities
 tools:
-  - tools/crawl_job.yaml
-  - tools/crawl.yaml
-  - tools/map.yaml
-  - tools/scrape.yaml
+- tools/crawl_job.yaml
+- tools/crawl.yaml
+- tools/map.yaml
+- tools/scrape.yaml

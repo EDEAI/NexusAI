@@ -1,36 +1,38 @@
-identity:
-  author: caffbyte
-  name: imagetool
-  label:
-    en_US: Image generation tool
-    zh_Hans: 图像生成工具
-    pt_BR: Image generation tool
-  description:
-    en_US: An image generation plugin for the Dify platform, supporting text-to-image conversion, sketch refinement, and automated creative poster generation.
-    zh_Hans: Dify 平台的图像生成插件，支持文本转图像、涂鸦精修，以及创意海报自动生成。
-    pt_BR: An image generation plugin for the Dify platform, supporting text-to-image conversion, sketch refinement, and automated creative poster generation.
-  icon: icon.svg
-  tags:
-    - image
-    - productivity
 credentials_for_provider:
   tonyi_api_key:
-    type: secret-input
-    required: true
+    help:
+      en_US: Get your API key from AliCloud
+      zh_Hans: 从阿里云百炼获取 API Key
     label:
       en_US: Tonyi API key
       zh_Hans: Tonyi API key
     placeholder:
       en_US: Please input your Tonyi API key
       zh_Hans: 请输入你的 Tonyi API key
-    help:
-      en_US: Get your API key from AliCloud
-      zh_Hans: 从阿里云百炼获取 API Key
+    required: true
+    type: secret-input
     url: https://bailian.console.aliyun.com/?apiKey=1#/api-key
-tools:
-  - tools/text2image.yaml
-  - tools/doodle2image.yaml
-  - tools/creative_poster.yaml
 extra:
   python:
     source: provider/imagetool.py
+identity:
+  author: nexusai
+  description:
+    en_US: An image generation plugin for the Dify platform, supporting text-to-image
+      conversion, sketch refinement, and automated creative poster generation.
+    pt_BR: An image generation plugin for the Dify platform, supporting text-to-image
+      conversion, sketch refinement, and automated creative poster generation.
+    zh_Hans: Dify 平台的图像生成插件，支持文本转图像、涂鸦精修，以及创意海报自动生成。
+  icon: icon.svg
+  label:
+    en_US: Image generation tool
+    pt_BR: Image generation tool
+    zh_Hans: 图像生成工具
+  name: imagetool
+  tags:
+  - image
+  - productivity
+tools:
+- tools/text2image.yaml
+- tools/doodle2image.yaml
+- tools/creative_poster.yaml

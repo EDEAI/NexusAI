@@ -35,7 +35,7 @@ extra:
   python:
     source: provider/trello.py
 identity:
-  author: Yash Parmar
+  author: nexusai
   description:
     en_US: 'Trello: A visual tool for organizing your work and life.'
     pt_BR: 'Trello: Uma ferramenta visual para organizar seu trabalho e vida.'
