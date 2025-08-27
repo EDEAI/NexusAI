@@ -110,7 +110,7 @@ const DnDFlow = () => {
         if (nodesInitialized) {
             const allNodes = getNodes();
             const lastNode = allNodes[allNodes.length - 1];
-            if (lastNode.data['drag']) {
+            if (lastNode?.data['drag']) {
                 lastNode.position = {
                     x: lastNode.position.x - lastNode.measured.width / 2,
                     y: lastNode.position.y - lastNode.measured.height / 2,
@@ -163,7 +163,7 @@ const DnDFlow = () => {
         setLoadingWorkflowData(true);
         setAppId(appId);
         getWorkFlowInfo(appId, publishStatus ? 1 : 0).then(res => {
-            if (res.code == 0) {
+            if (res.code == 0&&res.data) {
                 setWorkFlowInfo({
                     ...res.data,
                     isProd: publishStatus,
