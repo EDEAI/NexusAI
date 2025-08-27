@@ -394,7 +394,7 @@ const RunLogs :React.FC<BlockParmas> = parmas =>{
                 const res = await getWorkFlowProcessList({
                     current: 1,
                     pageSize: 10,
-                    showStatus: 0
+                    showStatus: 3  // Only show workflow execution records
                 });
                 if (res.code === 0 && res.data?.list) {
                     setRunData(res.data.list);
