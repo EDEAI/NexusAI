@@ -463,6 +463,9 @@ class Workspaces(MySQL):
             app_runs.status,
             app_runs.completed_steps,
             app_runs.total_steps,
+            app_runs.paused,
+            app_runs.need_human_confirm,
+
             apps.mode,
             IFNULL(apps.icon_background, '') AS icon_background,
             IFNULL(apps.icon, '') AS icon,
@@ -757,6 +760,12 @@ class Workspaces(MySQL):
                     log['agents_data'] = []
                     log['driver_id'] = 0
                     log['associated_chat_room_name'] = ''
+                # Calculate percentage
+                if log['completed_steps'] and log['total_steps']:
+                    log['percentage'] = int((log['completed_steps'] / log['total_steps']) * 100)
+                else:
+                    log['percentage'] = 0
+                    
                 # Default status handling
                 if log['status'] in (1, 2):
                     log['status'] = 1

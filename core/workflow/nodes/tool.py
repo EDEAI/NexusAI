@@ -51,6 +51,7 @@ class ToolNode(Node):
     def run(
         self,
         context: Context,
+        user_id: int = 0,
         app_run_id: int = 0,
         workflow_id: int = 0,
         **kwargs
@@ -80,6 +81,7 @@ class ToolNode(Node):
             tool = ToolAuthorizations().select_one(
                 columns=['encrypted_credentials'],
                 conditions=[
+                    {'column': 'user_id', 'value': user_id},
                     {'column': 'team_id', 'value': workflow['team_id']},
                     {'column': 'provider', 'value': provider},
                     {'column': 'tool_category', 'value': tool_category}

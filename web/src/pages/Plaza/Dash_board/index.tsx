@@ -1,5 +1,6 @@
 // {/* <Coldom /> */}
 import { getIndex } from '@/api/plaza';
+import { getWorkFlowProcessList } from '@/api/workflow';
 import CreationModal from '@/components/creationModal';
 import Footer from '@/components/Footer/index';
 import Graphic from '@/components/Graphic';
@@ -170,7 +171,8 @@ const EmptyDom :React.FC<{}> = parmas =>{
 
 interface BlockParmas{
     data?:any,
-    keyName?:any
+    keyName?:any,
+    getCardList?:any
 }
 // Backlogs
 const Backlogs :React.FC<BlockParmas> = parmas =>{
@@ -370,30 +372,13 @@ const Workflow :React.FC<BlockParmas> = parmas =>{
 }
 // Run Logs
 const RunLogs :React.FC<BlockParmas> = parmas =>{
-    let  {data} = parmas;
+    let  {data,getCardList} = parmas;
     const intl = useIntl();
     const setRunPanelLogRecord = useUserStore(state => state.setRunPanelLogRecord);
     const setDealtWithData = useUserStore(state => state.setDealtWithData);
     const setRunId = useUserStore(state => state.setRunId);
     const [runData,setRunData] = useState(data);
-    const progressConcat = (progress: any, list: any) => {
-        // 创建一个Map来存储progress数据并去重
-        const progressMap = new Map();
-        // 对progress数组内部进行去重
-        progress.forEach((item: any) => {
-            progressMap.set(item.app_run_id, item);
-        });
-        // 创建结果数组，首先添加去重后的progress数据
-        const result = Array.from(progressMap.values());
-        // 添加list中不与progress重复的数据
-        list.forEach((item: any) => {
-            if (!progressMap.has(item.app_run_id)) {
-                result.push(item);
-            }
-        });
-        
-        return result;
-    };
+    // Remove progressConcat function as we no longer merge WebSocket data directly
     const setpercentage = (item: any) => {
         if (item.completed_progress) {
             return parseInt(item.completed_progress.slice(0, -1));
@@ -404,7 +389,23 @@ const RunLogs :React.FC<BlockParmas> = parmas =>{
     const setWebsocktdata = async () => {
         let progress = flowMessage?.filter(item => item.type == 'workflow_run_progress').map(({ data }) => data);
         if(progress && progress.length){
-            setRunData(progressConcat(progress,runData))
+            // Refresh the workspace workflow process log data instead of index data
+            try {
+                const res = await getWorkFlowProcessList({
+                    current: 1,
+                    pageSize: 10,
+                    showStatus: 3  // Only show workflow execution records
+                });
+                if (res.code === 0 && res.data?.list) {
+                    setRunData(res.data.list);
+                }
+            } catch (error) {
+                console.error('Failed to refresh workflow process log:', error);
+                // Fallback to original getCardList if workspace API fails
+                if (getCardList) {
+                    getCardList();
+                }
+            }
         }
     };
     //websockt
@@ -453,10 +454,11 @@ const RunLogs :React.FC<BlockParmas> = parmas =>{
 // CONTENT LIST
 interface contentListparmas{
     item?:any,
-    data?:any
+    data?:any,
+    getCardList?:any
 }
 const ContentList : React.FC<contentListparmas> = params =>{
-    let {item,data} = params;
+    let {item,data,getCardList} = params;
     const isEmptyDom = (data:any,components:any) =>{ 
         return data && data.length ? components : <EmptyDom></EmptyDom>
     }
@@ -464,7 +466,7 @@ const ContentList : React.FC<contentListparmas> = params =>{
         'backlogs':(e:any)=><Backlogs data={e.data}></Backlogs>,
         'my_agent':(e:any)=>isEmptyDom(data,<Agent data={e.data} keyName='my_agent'></Agent>),
         'my_workflow':(e:any)=>isEmptyDom(data,<Workflow data={e.data} keyName='my_workflow'></Workflow>),
-        'workflow_log':(e:any)=><RunLogs data={e.data}></RunLogs>,
+        'workflow_log':(e:any)=><RunLogs data={e.data} getCardList={getCardList}></RunLogs>,
         'more_agent':(e:any)=>isEmptyDom(data,<Agent data={e.data}></Agent>),
         'more_workflow':(e:any)=>isEmptyDom(data,<Workflow data={e.data}></Workflow>),
     }
@@ -644,7 +646,7 @@ const Coldom : React.FC = () => {
                                 className="pt-[5px] pb-[20px] px-[10px]"
                                 style={{ height: 'calc(100% - 62px)' }}
                             >   
-                                {contntList[item.key] ? <ContentList item={item} data={contntList[item.key]} ></ContentList> :<></>}                          
+                                {contntList[item.key] ? <ContentList item={item} data={contntList[item.key]} getCardList={getCardList}></ContentList> :<></>}                          
                             </div>
                         </div>
                     </Col>
