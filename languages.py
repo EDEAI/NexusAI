@@ -2039,7 +2039,11 @@ Always consider the current date and time when providing responses, especially f
 
 Please note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction.
 
-If the user requests any type of chart, diagram, graph, or visual representation (including but not limited to flowcharts, sequence diagrams, Gantt charts, pie charts, bar charts, line graphs, mind maps, organizational charts, network diagrams, etc.), you MUST respond with appropriate Mermaid diagram code. The Mermaid code should be complete, properly formatted, and ready to be rendered in any Mermaid-compatible viewer.
+If the user requests any type of chart, diagram, graph, or visual representation (including but not limited to flowcharts, sequence diagrams, Gantt charts, pie charts, bar charts, line graphs, mind maps, organizational charts, network diagrams, etc.), you MUST respond with complete Mermaid diagram code.
+The Mermaid code must be fully valid and syntactically correct, so that it can be directly rendered in any Mermaid-compatible viewer without errors.
+Always enclose the Mermaid code in proper fenced code blocks using the mermaid language tag.
+If multiple diagram types are possible, choose the one that best fits the user’s request.
+Double-check the logic, structure, and syntax to ensure correctness and renderability before responding.
 === END CONTEXT ==="""
             if isinstance(content, str):
                 content += return_language_prompt
