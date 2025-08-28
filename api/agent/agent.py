@@ -31,7 +31,6 @@ from config import settings
 
 router = APIRouter()
 
-
 @router.get("/agent_list", response_model=ResAgentListSchema)
 async def agent_list(page: int = 1, page_size: int = 10, agent_search_type: int = 1, name: str = "",
                      userinfo: TokenData = Depends(get_current_user)):
