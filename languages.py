@@ -1249,13 +1249,6 @@ language_packs = {
         'generate_workflow_node_system_prompt': '''
             你是一个工作流节点生成助手。
             请根据我的需求和工作流节点数据结构为我生成完整的工作流节点信息。
-            
-            【重要限制】：
-            - 只能生成 type 为 "custom_code" 的节点
-            - 不要生成条件分支、循环、或复杂控制流逻辑
-            - 专注于数据处理、计算、转换等基础功能
-            - 确保生成的代码简单、直接、无条件判断
-            
             注意，工作流节点信息生成后，你需要进行变量命名检查和优化。"input" 和 "output" 属性中的变量名，以及 Python 3 代码中对应的函数输入参数或变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用 Python 关键字。
             请注意只返回工作流节点结构数据，不返回多余内容。
             
@@ -1271,7 +1264,7 @@ language_packs = {
                         "variable_name": {{
                             "name":"变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用 Python 关键字",
                             "type":"变量类型，只能是 ['string', 'number', 'json', 'file'] 中的一种，'string' 对应 Python 中的 str 类型，'number' 对应 Python 中的 int 或 float 类型，'json' 对应 Python 中的 dict 或 list 类型，'file' 类型变量值是一个可以直接用于文件操作的文件路径",
-                            "value":"引用值或默认值，可以使用 <<引用>> 格式来引用其他节点的输出",
+                            "value":"引用值或默认值",
                             "sort_order":"(整数类型) 显示排序",
                             "max_length":"(整数类型) 最大长度限制，0表示无限制"
                         }}
@@ -1303,14 +1296,11 @@ language_packs = {
                 "original_node_id":"唯一节点标识符，可以是 UUID 格式"
             }}
             
-            【关键规则说明】：
-            1. 【节点类型限制】："type" 字段必须且只能是 "custom_code"，不要生成其他类型的节点。
-            
-            2. 【输入变量定义】："input" 定义节点的输入变量。整体结构为对象类型。"properties" 包含所有输入变量，每个输入变量为字典类型。
-            
-            3. 【依赖包管理】："code_dependencies" 是节点代码运行时需要通过 pip 单独安装的 python3 依赖。整体结构为字典类型。内部的 "python3" 是固定键。"python3" 对应列表中的每个元素都是一个依赖名称。
-            
-            4. 【Python代码规范】："custom_code" 是节点的 python3 代码。整体结构为字典类型。内部的 "python3" 是固定键。"python3" 对应的值是 python3 代码。代码为字符串类型。
+            特殊规则说明：
+            1. "type" 字段必须且只能是 "custom_code"，不要生成其他类型的节点。
+            2. "input" 定义节点的输入变量。整体结构为对象类型。"properties" 包含所有输入变量，每个输入变量为字典类型。
+            3. "code_dependencies" 是节点代码运行时需要通过 pip 单独安装的 python3 依赖。整体结构为字典类型。内部的 "python3" 是固定键。"python3" 对应列表中的每个元素都是一个依赖名称。
+            4. "custom_code" 是节点的 python3 代码。整体结构为字典类型。内部的 "python3" 是固定键。"python3" 对应的值是 python3 代码。代码为字符串类型。
                 生成 Python 3 代码时严格遵循以下要求：
                 4.1 只提供一个主函数（main函数），所有代码逻辑都在主函数中实现
                 4.2 不要提供与主函数同级的其他函数。如果需要封装函数，必须在主函数内部定义
@@ -1319,35 +1309,16 @@ language_packs = {
                 4.5 非必需变量必须有默认值，有默认值的变量应放在参数列表最后
                 4.6 必须明确指定函数的返回数据类型为 -> dict
                 4.7 主函数结尾必须返回字典类型的数据，对应节点的输出变量。字典数据的键名是输出变量名
-                4.8 【严禁条件判断语句】：绝对不要在代码中使用 if/elif/else、for/while 循环、try/except 等任何形式的控制流语句
-                4.9 【严禁字符串检查操作】：绝对不要使用 in、not in、startswith、endswith、contains 等字符串或容器检查操作
-                4.10 【严禁复杂逻辑】：不要使用三元运算符（a if condition else b）、逻辑运算符组合（and、or、not）
-                4.11 【严禁异常处理】：不要使用 try/except/finally、raise、assert 等异常处理语句
-                4.12 【严禁迭代操作】：不要使用 for 循环、while 循环、列表推导式、生成器表达式
-                4.13 【推荐操作模式】：只使用直接的赋值、函数调用、数学运算、字符串方法（replace、upper、lower、split、join、strip等）
-                4.14 保持代码简单直接，专注于数据处理、计算、转换等基础功能
+                4.8 严禁在代码中使用条件判断语句（if/elif/else）、循环语句（for/while）、异常处理（try/except）
+                4.9 严禁使用字符串检查操作（in、not in、startswith、endswith、contains）
+                4.10 严禁使用复杂逻辑操作（三元运算符、逻辑运算符组合、列表推导式）
+                4.11 只使用简单的数据处理操作：直接赋值、函数调用、数学运算、字符串方法（replace、upper、lower、split、join、strip等）
+            5. "output" 定义节点运行后的输出变量。整体结构为对象类型。"properties" 包含所有输出变量，每个输出变量为字典类型。
+            6. 注意输出变量的类型。每个输出变量的类型必须与 python3 代码返回数据中对应的数据类型严格匹配：如果 python3 代码返回 "dict" 或 "list"，对应的输出变量类型必须设置为 "json"；如果返回文件路径，对应的输出变量类型必须设置为 "file"；否则（对于字符串、整数、浮点数等）应相应设置为 "string" 或 "number"。返回字典中的每个键都必须对应一个类型匹配的输出变量。
             
-            5. 【输出变量定义】："output" 定义节点运行后的输出变量。整体结构为对象类型。"properties" 包含所有输出变量，每个输出变量为字典类型。
-            
-            6. 【类型匹配规则】：输出变量的类型必须与 python3 代码返回数据中对应的数据类型严格匹配：
-                - 如果 python3 代码返回 dict 或 list，对应的输出变量类型必须设置为 "json"
-                - 如果返回文件路径，对应的输出变量类型必须设置为 "file"
-                - 如果返回字符串，对应的输出变量类型必须设置为 "string"
-                - 如果返回整数或浮点数，对应的输出变量类型必须设置为 "number"
-                返回字典中的每个键都必须对应一个类型匹配的输出变量。
-            
-            7. 【节点控制属性】：
-                - "wait_for_all_predecessors" 决定节点是否应该等待所有前置节点完成后再执行
-                - "manual_confirmation" 决定节点执行前是否需要手动确认
-                - "flow_data" 包含附加的流程控制数据，通常是一个空对象
-                - "original_node_id" 应该是节点的唯一标识符，可以是 UUID 或其他唯一字符串
-            
-            8. 【文件操作规范】：
-                - 文件写入限制：当代码涉及文件写入操作时，目标文件路径必须以 "/storage" 开头。例如：/storage/my_folder/my_file.txt
-                - 文件返回要求：如果代码需要返回文件路径，返回值必须以 "file://" 开头，以便系统正确识别为文件类型。例如：file:///storage/my_folder/my_file.txt
-        ''',
+        '''
         'generate_workflow_node_user': '''
-            My requirements:
+            我的需求：
             {user_prompt}
         '''
     },
