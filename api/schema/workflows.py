@@ -321,3 +321,17 @@ class AppRunPauseSchemaResponse(BaseModel):
     code: int
     detail: str
     data: Optional[Any] = None  # modified to support nested response structures
+
+
+# ===== Workflow Node Generation =====
+class ReqWorkflowNodeGenerateSchema(BaseModel):
+    user_prompt: str
+
+class WorkflowNodeGenerateResponseData(BaseModel):
+    app_run_id: Optional[int] = None
+    record_id: Optional[int] = None
+
+class ResWorkflowNodeGenerateSchema(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Optional[WorkflowNodeGenerateResponseData] = None

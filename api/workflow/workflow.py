@@ -3,6 +3,8 @@ import os
 import traceback
 import random
 import yaml
+import time
+from datetime import datetime
 
 from fastapi import APIRouter, File, Request, Response, UploadFile, WebSocket, WebSocketDisconnect
 from api.utils.common import *
@@ -10,7 +12,8 @@ from api.utils.connection import ConnectionManager
 from api.utils.jwt import *
 from api.schema.workflows import *
 from api.schema.base import *
-from core.database.models import Workflows, AgentDatasetRelation, Apps
+from core.database.models import Workflows, AgentDatasetRelation, Apps, AppRuns, AIToolLLMRecords
+from core.llm.prompt import Prompt
 from celery_app import run_node
 from pprint import pp
 
@@ -579,3 +582,74 @@ async def copy(
         })
     except Exception as e:
         return response_error(f"Error occurred during workflow copy: {str(e)}")
+
+
+@router.post("/node_generate", response_model=ResWorkflowNodeGenerateSchema)
+async def node_generate(data: ReqWorkflowNodeGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Generate workflow node based on user prompt using LLM
+
+    Args:
+        data: Request data containing user prompt for node generation
+        userinfo: User authentication info
+
+    Returns:
+        Dictionary containing:
+        - app_run_id: ID of the app run record
+        - record_id: ID of the LLM execution record
+
+    Flow:
+        1. Validates user prompt
+        2. Creates app run record
+        3. Prepares system and user prompts for LLM
+        4. Initializes LLM execution record
+        5. Returns record IDs for tracking generation progress
+    """
+    # Validate user prompt
+    if not data.user_prompt:
+        return response_error(get_language_content("api_workflow_user_prompt_required"))
+
+    # Create app run record
+    start_datetime_str = datetime.fromtimestamp(time.time()) \
+        .replace(microsecond=0).isoformat(sep='_')
+    app_run_id = AppRuns().insert({
+        'user_id': userinfo.uid,
+        'app_id': 0,
+        'type': 2,  # Workflow node generator type
+        'name': f'Workflow_Node_Generator_{start_datetime_str}',
+        'status': 1  # Initial status
+    })
+
+    # Prepare prompts for LLM
+    system_prompt = get_language_content('generate_workflow_node_system_prompt', userinfo.uid)
+    user_prompt = get_language_content('generate_workflow_node_user', userinfo.uid, False)
+
+    user_prompt = user_prompt.format(
+        user_prompt=data.user_prompt
+    )
+
+    input_ = Prompt(
+        system=system_prompt,
+        user=user_prompt
+    ).to_dict()
+    # print(input_)
+    # Initialize LLM execution record
+    record_id = AIToolLLMRecords().initialize_execution_record(
+        app_run_id=app_run_id,
+        ai_tool_type=6,  # Workflow node generator type
+        inputs=input_,
+        run_type=1,
+        user_prompt=data.user_prompt
+    )
+
+    if not record_id:
+        return response_error(get_language_content("api_workflow_generate_failed"))
+
+    # Return successful response
+    return response_success(
+        {
+            "app_run_id": app_run_id,
+            "record_id": record_id
+        },
+        get_language_content("api_workflow_success")
+    )

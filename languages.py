@@ -1240,7 +1240,84 @@ language_packs = {
         'scheduled_task_repeat_day_of_year_invalid': 'Year repeat day must be between 1-365',
         'scheduled_task_app_not_exists': 'Application does not exist',
         'scheduled_task_app_not_public': 'Application is not public',
-        'scheduled_task_app_no_team_permission': 'No permission to access this application (different team)'
+        'scheduled_task_app_no_team_permission': 'No permission to access this application (different team)',
+        
+        # Workflow node generation messages
+        'api_workflow_success': 'Request successful, please wait',
+        'api_workflow_generate_failed': 'Request failed, please try again later',
+        'api_workflow_user_prompt_required': 'Prompt is required',
+        'generate_workflow_node_system_prompt': '''
+            你是一个工作流节点生成助手。
+            请根据我的需求和工作流节点数据结构为我生成完整的工作流节点信息。
+            注意，工作流节点信息生成后，你需要进行变量命名检查和优化。"input" 和 "output" 属性中的变量名，以及 Python 3 代码中对应的函数输入参数或变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用 Python 关键字。
+            请注意只返回工作流节点结构数据，不返回多余内容。
+            工作流节点数据 json 结构描述：
+            {{
+                "type":"节点类型，目前只支持 'custom_code'",
+                "title":"节点标题，应该简洁且有描述性",
+                "desc":"节点描述，应该解释节点的功能",
+                "input": {{
+                    "name":"input",
+                    "type":"object",
+                    "properties": {{
+                        "variable_name": {{
+                            "name":"变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用 Python 关键字",
+                            "type":"变量类型，包括 ['string', 'number', 'json', 'file']，'string' 对应 Python 中的 str 类型，'number' 对应 Python 中的 int 或 float 类型，'json' 对应 Python 中的 dict 或 list 类型，'file' 类型变量值是一个可以直接用于文件操作的文件路径",
+                            "value":"引用值或默认值",
+                            "sort_order":"(整数类型) 显示排序",
+                            "max_length":"(整数类型) 最大长度限制，0表示无限制"
+                        }}
+                    }},
+                    "sort_order":0
+                }},
+                "code_dependencies": {{
+                    "python3": ["依赖包名称"]
+                }},
+                "custom_code": {{
+                    "python3":"python3 代码。返回内容为字典类型，内容必须与输出变量一致。"
+                }},
+                "output": {{
+                    "name":"output",
+                    "type":"object",
+                    "properties": {{
+                        "result_variable": {{
+                            "name":"变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用 Python 关键字",
+                            "type":"变量类型，包括 ['string', 'number', 'json', 'file']，'string' 对应 Python 中的 str 类型，'number' 对应 Python 中的 int 或 float 类型，'json' 对应 Python 中的 dict 或 list 类型，'file' 用于变量包含文件路径的情况。如果 Python 函数返回文件路径，此变量必须设置为 'file' 类型",
+                            "value":null,
+                            "sort_order":"(整数类型) 显示排序"
+                        }}
+                    }},
+                    "sort_order":0
+                }},
+                "wait_for_all_predecessors":false,
+                "manual_confirmation":false,
+                "flow_data":{{}},
+                "original_node_id":"唯一节点标识符"
+            }}
+            特殊规则说明：
+            1. "input" 定义节点的输入变量。整体结构为对象类型。"properties" 包含所有输入变量，每个输入变量为字典类型。
+            2. "code_dependencies" 是节点代码运行时需要通过 pip 单独安装的 python3 依赖。整体结构为字典类型。内部的 "python3" 是固定键。"python3" 对应列表中的每个元素都是一个依赖名称。
+            3. "custom_code" 是节点的 python3 代码。整体结构为字典类型。内部的 "python3" 是固定键。"python3" 对应的值是 python3 代码。代码为字符串类型。
+                生成 Python 3 代码时注意以下要求：
+                3.1 你只需要提供一个主函数，所有代码逻辑都在主函数中实现
+                3.2 注意不要提供与主函数同级的其他函数。如果需要封装函数，必须在主函数内部封装
+                3.3 不要提供函数调用代码。实际操作时我会自动调用主函数
+                3.4 函数的输入参数对应节点的输入变量。变量名和变量类型必须与 "input" 属性中的定义一致。非必需变量必须有默认值，有默认值的变量应放在最后
+                3.5 必须指定函数的返回数据类型
+                3.6 主函数结尾需要返回字典类型的数据，对应节点的输出变量。字典数据的键名是输出变量名。变量名和变量类型必须与 "output" 属性中的定义一致
+            4. "output" 定义节点运行后的输出变量。整体结构为对象类型。"properties" 包含所有输出变量，每个输出变量为字典类型。
+            5. 注意 "output" 属性中每个输出变量的类型。每个输出变量的类型必须与 python3 代码返回数据中对应的数据类型匹配：如果 python3 代码返回 "dict" 或 "list"，对应的输出变量类型必须设置为 "json"；如果返回文件路径，对应的输出变量类型必须设置为 "file"；否则（对于字符串、整数、浮点数等）应相应设置为 "string" 或 "number"。返回字典中的每个键都必须对应一个类型匹配的输出变量。
+            6. "wait_for_all_predecessors" 决定节点是否应该等待所有前置节点完成后再执行。
+            7. "manual_confirmation" 决定节点执行前是否需要手动确认。
+            8. "flow_data" 包含附加的流程控制数据，通常是一个空对象。
+            9. "original_node_id" 应该是节点的唯一标识符，可以是 UUID 或其他唯一字符串。
+            10. 文件写入限制：当代码涉及文件写入操作时，目标文件路径必须以 "/storage" 开头。例如：/storage/my_folder/my_file.txt。
+                文件返回要求：如果代码需要返回文件路径，返回值必须以 "file://" 开头，以便系统正确识别为文件类型。例如：file:///storage/my_folder/my_file.txt。
+        ''',
+        'generate_workflow_node_user': '''
+            My requirements:
+            {user_prompt}
+        '''
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1690,7 +1767,16 @@ language_packs = {
         'scheduled_task_repeat_day_of_year_invalid': '年重复日期必须在1-365之间',
         'scheduled_task_app_not_exists': '应用不存在',
         'scheduled_task_app_not_public': '应用未公开',
-        'scheduled_task_app_no_team_permission': '无权限访问此应用（不同团队）'
+        'scheduled_task_app_no_team_permission': '无权限访问此应用（不同团队）',
+        
+        # 工作流节点生成相关提示
+        'api_workflow_success': '请求成功，请等待',
+        'api_workflow_generate_failed': '请求失败，请稍后再试',
+        'api_workflow_user_prompt_required': '提示词不能为空',
+        'generate_workflow_node_user': '''
+            我的需求：
+            {user_prompt}
+        '''
     }
 }
 
