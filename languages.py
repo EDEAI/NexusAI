@@ -1249,17 +1249,6 @@ language_packs = {
         'generate_workflow_node_system_prompt': '''
             你是一个专业的工作流节点生成助手。
             请根据我的需求和工作流节点数据结构为我生成完整的工作流节点信息。
-            
-            **重要说明**：
-            - 请始终使用中文进行回复和说明
-            - 生成的代码必须语法正确且可直接执行
-            - 如果需要时间相关功能，请考虑当前时间：2025年8月29日 15:09:20（星期五）
-            - 只返回工作流节点的JSON结构数据，不要包含其他多余内容
-            
-            ⚠️ **错误预防警告**：
-            绝对不能生成会导致"argument of type 'int' is not iterable"错误的代码！
-            禁止使用：in/not in、if/else、for/while、try/except、列表推导式等任何复杂逻辑操作！
-            
             **变量命名规范**：
             工作流节点信息生成后，你需要进行变量命名检查和优化。"input" 和 "output" 属性中的变量名，以及 Python 3 代码中对应的函数输入参数或变量名，必须符合代码变量命名规范：
             - 只能包含字母、数字和下划线
@@ -1308,7 +1297,7 @@ language_packs = {
                 "wait_for_all_predecessors": false,
                 "manual_confirmation": false,
                 "flow_data": {{}},
-                "original_node_id": "唯一节点标识符，可以是 UUID 格式"
+                "original_node_id": "默认给空字符串"
             }}
             
             特殊规则说明：
@@ -1324,52 +1313,9 @@ language_packs = {
                 4.5 非必需变量必须有默认值，有默认值的变量应放在参数列表最后
                 4.6 必须明确指定函数的返回数据类型为 -> dict
                 4.7 主函数结尾必须返回字典类型的数据，对应节点的输出变量。字典数据的键名是输出变量名
-                
-                **严格禁止条款（防止TypeError错误）**：
-                
-                ⚠️ 以下操作将导致"argument of type 'int' is not iterable"错误，严格禁止：
-                4.8 严禁在代码中使用条件判断语句（if/elif/else）、循环语句（for/while）、异常处理（try/except）
-                4.9 严禁使用字符串检查操作（in、not in、startswith、endswith、contains）
-                4.10 严禁使用复杂逻辑操作（三元运算符、逻辑运算符组合、列表推导式）
-                4.11 严禁使用任何对整数类型进行迭代操作的代码
-                4.12 严禁使用任何形式的成员检查操作（如：value in variable）
-                4.13 严禁使用布尔逻辑判断（and、or、not操作符）
-                4.14 严禁使用比较运算符组合（==、!=、>、<、>=、<=的组合使用）
-                
-                ✅ 只允许使用以下安全操作：
-                - 直接赋值：variable = value
-                - 函数调用：len(string)、str(number)、int(string)
-                - 数学运算：+、-、*、/、%、**
-                - 字符串方法：replace()、upper()、lower()、split()、join()、strip()
-                - 时间操作：time.time()、datetime.now()（需导入相应模块）
-                
-                📝 错误示例（严禁使用）：
-                ```python
-                # 这些代码会导致TypeError错误
-                if value in [1, 2, 3]:  # 禁止
-                if "a" in variable:      # 禁止
-                for item in variable:    # 禁止
-                result = value if condition else default  # 禁止
-                ```
-                
-                ✅ 正确示例（推荐使用）：
-                ```python
-                # 安全的代码示例
-                result = str(input_number) + "_suffix"
-                timestamp = int(time.time())
-                formatted_text = input_text.upper().replace(" ", "_")
-                ```
             5. "output" 定义节点运行后的输出变量。整体结构为对象类型。"properties" 包含所有输出变量，每个输出变量为字典类型。
             6. 注意输出变量的类型。每个输出变量的类型必须与 python3 代码返回数据中对应的数据类型严格匹配：如果 python3 代码返回 "dict" 或 "list"，对应的输出变量类型必须设置为 "json"；如果返回文件路径，对应的输出变量类型必须设置为 "file"；否则（对于字符串、整数、浮点数等）应相应设置为 "string" 或 "number"。返回字典中的每个键都必须对应一个类型匹配的输出变量。
-            
-            **输出质量保证**：
-            - 返回的JSON结构必须语法正确，可直接解析和使用
-            - 所有变量名必须符合Python命名规范
-            - 生成的Python代码必须能够直接执行且不产生错误
-            - 严格遵守禁止条款，防止TypeError和其他运行时错误
-            - 只返回符合格式要求的完整JSON结构，无其他内容
-            
-            🔴 **特别提醒**：如果生成的代码包含任何 in/not in/if/for/while/try 等关键字，将被直接拒绝！
+
         ''',
         'generate_workflow_node_user': '''
             我的需求：
