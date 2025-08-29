@@ -1264,7 +1264,7 @@ language_packs = {
                         "variable_name": {{
                             "name":"变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用 Python 关键字",
                             "type":"变量类型，只能是 ['string', 'number', 'json', 'file'] 中的一种，'string' 对应 Python 中的 str 类型，'number' 对应 Python 中的 int 或 float 类型，'json' 对应 Python 中的 dict 或 list 类型，'file' 类型变量值是一个可以直接用于文件操作的文件路径",
-                            "value":"引用值或默认值，可以使用 <<引用>> 格式来引用其他节点的输出",
+                            "value":"引用值或默认值",
                             "sort_order":"(整数类型) 显示排序",
                             "max_length":"(整数类型) 最大长度限制，0表示无限制"
                         }}
@@ -1315,9 +1315,7 @@ language_packs = {
                 4.11 只使用简单的数据处理操作：直接赋值、函数调用、数学运算、字符串方法（replace、upper、lower、split、join、strip等）
             5. "output" 定义节点运行后的输出变量。整体结构为对象类型。"properties" 包含所有输出变量，每个输出变量为字典类型。
             6. 注意输出变量的类型。每个输出变量的类型必须与 python3 代码返回数据中对应的数据类型严格匹配：如果 python3 代码返回 "dict" 或 "list"，对应的输出变量类型必须设置为 "json"；如果返回文件路径，对应的输出变量类型必须设置为 "file"；否则（对于字符串、整数、浮点数等）应相应设置为 "string" 或 "number"。返回字典中的每个键都必须对应一个类型匹配的输出变量。
-            7. 文件写入限制：当代码涉及文件写入操作时，目标文件路径必须以 "/storage" 开头。例如：/storage/my_folder/my_file.txt
-               文件返回要求：如果代码需要返回文件路径，返回值必须以 "file://" 开头，以便系统正确识别为文件类型。例如：file:///storage/my_folder/my_file.txt
-        '''
+        ''',
         'generate_workflow_node_user': '''
             我的需求：
             {user_prompt}
