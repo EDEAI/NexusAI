@@ -1345,66 +1345,6 @@ language_packs = {
             8. 【文件操作规范】：
                 - 文件写入限制：当代码涉及文件写入操作时，目标文件路径必须以 "/storage" 开头。例如：/storage/my_folder/my_file.txt
                 - 文件返回要求：如果代码需要返回文件路径，返回值必须以 "file://" 开头，以便系统正确识别为文件类型。例如：file:///storage/my_folder/my_file.txt
-            
-            【安全代码示例】：
-            ```python
-            # ✅ 正确示例：简单数据处理
-            def main(input_text: str, multiplier: int = 2) -> dict:
-                # 直接的字符串处理
-                processed_text = input_text.upper().replace(" ", "_")
-                # 简单的数学运算
-                result_number = len(input_text) * multiplier
-                # 字符串格式化
-                formatted_result = f"处理结果：{processed_text}_{result_number}"
-                
-                return {
-                    "processed_text": processed_text,
-                    "result_number": result_number,
-                    "formatted_result": formatted_result
-                }
-            ```
-            
-            【严禁的错误模式】：
-            ```python
-            # ❌ 错误：使用条件判断
-            if condition:
-                result = "A"
-            else:
-                result = "B"
-            
-            # ❌ 错误：使用循环
-            for item in items:
-                process(item)
-            
-            # ❌ 错误：使用字符串检查
-            if "keyword" in text:
-                do_something()
-            
-            # ❌ 错误：使用异常处理
-            try:
-                risky_operation()
-            except Exception:
-                handle_error()
-            
-            # ❌ 错误：使用逻辑运算符
-            result = value1 and value2 or default_value
-            ```
-            
-            【推荐的安全模式】：
-            ```python
-            # ✅ 推荐：直接赋值和计算
-            result = input_value * coefficient + offset
-            
-            # ✅ 推荐：字符串方法调用
-            clean_text = input_text.strip().upper().replace("old", "new")
-            
-            # ✅ 推荐：简单的数据转换
-            number_string = str(input_number)
-            text_list = input_text.split(",")
-            
-            # ✅ 推荐：字符串格式化
-            formatted_output = f"前缀_{input_data}_后缀"
-            ```
         ''',
         'generate_workflow_node_user': '''
             My requirements:
@@ -1937,7 +1877,10 @@ prompt_keys = [
     "generate_skill_system_prompt",
     "generate_skill_user",
     "correction_skill_system_prompt",
-    "correction_skill_user"
+    "correction_skill_user",
+    
+    "generate_workflow_node_system_prompt",
+    "generate_workflow_node_user"
 ]
 
 # Dictionary to store prompt function descriptions
@@ -2032,6 +1975,13 @@ prompt_descriptions = {
                 "correction_skill_system_prompt": "AI Correct Skill System Prompt",
                 "correction_skill_user": "AI Correct Skill User Prompt"
             }
+        },
+        {
+            "group_name": "AI Generate Workflow Node",
+            "prompts": {
+                "generate_workflow_node_system_prompt": "AI Generate Workflow Node System Prompt",
+                "generate_workflow_node_user": "AI Generate Workflow Node User Prompt"
+            }
         }
     ],
     "zh": [
@@ -2123,6 +2073,13 @@ prompt_descriptions = {
                 "generate_skill_user": "AI生成技能用户提示词",
                 "correction_skill_system_prompt": "AI修正技能系统提示词",
                 "correction_skill_user": "AI修正技能用户提示词"
+            }
+        },
+        {
+            "group_name": "AI生成工作流节点",
+            "prompts": {
+                "generate_workflow_node_system_prompt": "AI生成工作流节点系统提示词",
+                "generate_workflow_node_user": "AI生成工作流节点用户提示词"
             }
         }
     ]
