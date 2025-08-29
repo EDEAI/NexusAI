@@ -303,6 +303,8 @@ def run_llm_tool(
         ai_tool.schema_key = "chatroom_conference_orientation_system"
     elif 'skill_' in ai_tool_type:
         ai_tool.schema_key = "generate_skill_system_prompt"
+    elif 'generate_workflow_node_' in ai_tool_type:
+        ai_tool.schema_key = "generate_workflow_node_system_prompt"
     return ai_tool.run(app_run_id=app_run_id, return_json=return_json, correct_llm_output=correct_llm_output)
 
 
