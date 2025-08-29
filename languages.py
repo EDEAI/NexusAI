@@ -1254,19 +1254,19 @@ language_packs = {
             
             工作流节点数据 json 结构描述：
             {{
-                "type":"custom_code"（固定值，只能是 custom_code）,
-                "title":"节点标题，应该简洁且有描述性",
-                "desc":"节点描述，应该解释节点的功能",
+                "type": "custom_code",  // 固定值，只能是 custom_code
+                "title": "节点标题，应该简洁且有描述性",
+                "desc": "节点描述，应该解释节点的功能",
                 "input": {{
-                    "name":"input",
-                    "type":"object",
+                    "name": "input",
+                    "type": "object",
                     "properties": {{
                         "variable_name": {{
-                            "name":"变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用 Python 关键字",
-                            "type":"变量类型，只能是 ['string', 'number', 'json', 'file'] 中的一种，'string' 对应 Python 中的 str 类型，'number' 对应 Python 中的 int 或 float 类型，'json' 对应 Python 中的 dict 或 list 类型，'file' 类型变量值是一个可以直接用于文件操作的文件路径",
-                            "value":"引用值或默认值",
-                            "sort_order":"(整数类型) 显示排序",
-                            "max_length":"(整数类型) 最大长度限制，0表示无限制"
+                            "name": "变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用 Python 关键字",
+                            "type": "变量类型，只能是 ['string', 'number', 'json', 'file'] 中的一种，'string' 对应 Python 中的 str 类型，'number' 对应 Python 中的 int 或 float 类型，'json' 对应 Python 中的 dict 或 list 类型，'file' 类型变量值是一个可以直接用于文件操作的文件路径",
+                            "value": "引用值或默认值",
+                            "sort_order": "(整数类型) 显示排序",
+                            "max_length": "(整数类型) 最大长度限制，0表示无限制"
                         }}
                     }},
                     "sort_order":0
@@ -1275,25 +1275,25 @@ language_packs = {
                     "python3": ["依赖包名称列表"]
                 }},
                 "custom_code": {{
-                    "python3":"Python 3 代码，必须包含一个主函数，返回字典类型数据"
+                    "python3": "Python 3 代码，必须包含一个主函数，返回字典类型数据"
                 }},
                 "output": {{
-                    "name":"output",
-                    "type":"object",
+                    "name": "output",
+                    "type": "object",
                     "properties": {{
                         "result_variable": {{
-                            "name":"变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用 Python 关键字",
-                            "type":"变量类型，只能是 ['string', 'number', 'json', 'file'] 中的一种，'string' 对应 Python 中的 str 类型，'number' 对应 Python 中的 int 或 float 类型，'json' 对应 Python 中的 dict 或 list 类型，'file' 用于变量包含文件路径的情况。如果 Python 函数返回文件路径，此变量必须设置为 'file' 类型",
-                            "value":null,
-                            "sort_order":"(整数类型) 显示排序"
+                            "name": "变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用 Python 关键字",
+                            "type": "变量类型，只能是 ['string', 'number', 'json', 'file'] 中的一种，'string' 对应 Python 中的 str 类型，'number' 对应 Python 中的 int 或 float 类型，'json' 对应 Python 中的 dict 或 list 类型，'file' 用于变量包含文件路径的情况。如果 Python 函数返回文件路径，此变量必须设置为 'file' 类型",
+                            "value": null,
+                            "sort_order": "(整数类型) 显示排序"
                         }}
                     }},
                     "sort_order":0
                 }},
-                "wait_for_all_predecessors":false,
-                "manual_confirmation":false,
-                "flow_data":{{}},
-                "original_node_id":"唯一节点标识符，可以是 UUID 格式"
+                "wait_for_all_predecessors": false,
+                "manual_confirmation": false,
+                "flow_data": {{}},
+                "original_node_id": "唯一节点标识符，可以是 UUID 格式"
             }}
             
             特殊规则说明：
