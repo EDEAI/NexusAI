@@ -14,7 +14,7 @@ from api.schema.workflows import *
 from api.schema.base import *
 from core.database.models import Workflows, AgentDatasetRelation, Apps, AppRuns, AIToolLLMRecords
 from core.llm.prompt import Prompt
-from celery_app import run_node
+from celery_app import run_node, run_app
 from pprint import pp
 
 from core.database.models.app_node_user_relation import AppNodeUserRelation
@@ -653,3 +653,185 @@ async def node_generate(data: ReqWorkflowNodeGenerateSchema, userinfo: TokenData
         },
         get_language_content("api_workflow_success")
     )
+
+
+@router.post("/node_correction", response_model=ResWorkflowNodeGenerateSchema)
+async def node_correction(data: ReqWorkflowNodeCorrectionSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Correct/improve existing workflow node based on user feedback using LLM
+
+    Args:
+        data: Request data containing:
+            - app_run_id: ID of original node generation run
+            - correction_prompt: User feedback for improvement
+        userinfo: User authentication info
+
+    Returns:
+        Dictionary containing:
+        - app_run_id: ID of the app run record
+        - record_id: ID of the new LLM correction record
+
+    Flow:
+        1. Validates app run exists and belongs to user
+        2. Retrieves original generation context and results
+        3. Prepares correction prompts with original context
+        4. Creates new LLM execution record for correction
+        5. Returns record IDs for tracking correction progress
+    """
+    # Validate app run id
+    app_run_info = AppRuns().select_one(
+        columns=["id"],
+        conditions=[
+            {"column": "id", "value": data.app_run_id},
+            {"column": "user_id", "value": userinfo.uid}
+        ]
+    )
+
+    if not app_run_info:
+        return response_error(get_language_content('app_run_error'))
+
+    first_record = AIToolLLMRecords().select_one(
+        columns=['id', 'inputs', 'correct_prompt'],
+        conditions=[
+            {"column": "app_run_id", "value": data.app_run_id}
+        ],
+        order_by='id ASC'
+    )
+
+    # Extract original user prompt from inputs
+    base_user_prompt = ""
+    inputs = first_record.get('inputs', {})
+    if inputs is None:
+        inputs = first_record.get('correct_prompt', {})
+
+    try:
+        if isinstance(inputs, dict) and 'user' in inputs:
+            user_dict = inputs['user']
+            if isinstance(user_dict, dict) and 'value' in user_dict:
+                base_user_prompt = user_dict['value']
+    except Exception:
+        base_user_prompt = ""
+
+    # Get last record to extract original node data
+    last_record = AIToolLLMRecords().select_one(
+        columns=['id', 'outputs', 'correct_prompt'],
+        conditions=[
+            {"column": "app_run_id", "value": data.app_run_id}
+        ],
+        order_by='id DESC'
+    )
+
+    # Extract node info from outputs
+    history_node_info = {}
+    try:
+        if isinstance(last_record, dict) and 'outputs' in last_record:
+            outputs_dict = last_record['outputs']
+            if isinstance(outputs_dict, dict) and 'value' in outputs_dict:
+                history_node_info = outputs_dict['value']
+    except Exception:
+        pass
+
+    system_prompt = get_language_content('correction_workflow_node_system_prompt', userinfo.uid)
+
+    user_prompt = get_language_content('correction_workflow_node_user', userinfo.uid, False)
+    user_prompt = user_prompt.format(
+        correction_prompt=data.correction_prompt,
+        history_node=history_node_info
+    )
+
+    input_ = Prompt(system=system_prompt, user=base_user_prompt + user_prompt).to_dict()
+    try:
+        # Update app run status
+        AppRuns().update(
+            {'column': 'id', 'value': data.app_run_id},
+            {'status': 1}
+        )
+
+        # Initialize new correction record
+        record_id = AIToolLLMRecords().initialize_correction_record(
+            app_run_id=data.app_run_id,
+            ai_tool_type=6,
+            correct_prompt=input_,
+            user_prompt=data.correction_prompt
+        )
+
+        if not record_id:
+            return response_error(get_language_content("api_workflow_generate_failed"))
+
+        return response_success(
+            {
+                'app_run_id': data.app_run_id,
+                'record_id': record_id
+            },
+            get_language_content("api_workflow_success")
+        )
+    except Exception:
+        return response_error(get_language_content("api_workflow_correction_failed"))
+
+
+@router.post("/node_debug", response_model=ResWorkflowNodeDebugSchema)
+async def node_debug(data: ReqWorkflowNodeDebugSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Debug workflow node by running it with test data without saving
+    
+    Args:
+        data: The workflow node configuration and test data
+        userinfo: The user info object
+        
+    Returns:
+        Execution results of the workflow node
+    """
+    try:
+        # Create temporary node from the provided data
+        node_data = {
+            "id": "debug_node",
+            "type": "custom_code", 
+            "data": {
+                "type": "custom_code",
+                "title": data.title or "Debug Node",
+                "desc": data.desc or "Debug workflow node",
+                "input": data.input,
+                "output": data.output,
+                "code_dependencies": data.code_dependencies,
+                "custom_code": data.custom_code,
+                "wait_for_all_predecessors": False,
+                "manual_confirmation": False
+            }
+        }
+        
+        # Create node object
+        node_obj = create_node_from_dict(node_data)
+        
+        # Create context for execution
+        context = {
+            "variables": {},
+            "node_run_map": {},
+            "workflow_id": 0,
+            "run_id": 0
+        }
+        
+        # Prepare inputs
+        inputs = None
+        if data.test_input:
+            inputs = create_variable_from_dict(data.test_input)
+        
+        # Run the node
+        task = run_node.delay(
+            node_obj.to_dict(),
+            inputs.to_dict() if inputs else None,
+            userinfo.uid,
+            0,  # workflow_id
+            context
+        )
+        
+        result = await asyncio.to_thread(task.get, timeout=100)
+        
+        if result["status"] != "success":
+            return response_success({"outputs": {
+                'error': result["message"]
+            }})
+            
+        return response_success({"outputs": result["data"]["outputs"]})
+        
+    except Exception as e:
+        return response_error(str(e))

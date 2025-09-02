@@ -335,3 +335,28 @@ class ResWorkflowNodeGenerateSchema(BaseModel):
     code: Optional[int] = None
     detail: Optional[str] = None
     data: Optional[WorkflowNodeGenerateResponseData] = None
+
+
+# ===== Workflow Node Correction =====
+class ReqWorkflowNodeCorrectionSchema(BaseModel):
+    app_run_id: int
+    correction_prompt: str
+
+
+# ===== Workflow Node Debug =====
+class ReqWorkflowNodeDebugSchema(BaseModel):
+    title: Optional[str] = None
+    desc: Optional[str] = None
+    input: Optional[Dict[str, Any]] = None
+    output: Optional[Dict[str, Any]] = None
+    code_dependencies: Optional[Dict[str, List[str]]] = None
+    custom_code: Optional[Dict[str, str]] = None
+    test_input: Optional[Dict[str, Any]] = None
+
+class WorkflowNodeDebugResponseData(BaseModel):
+    outputs: Optional[Dict[str, Any]] = None
+
+class ResWorkflowNodeDebugSchema(BaseModel):
+    code: Optional[int] = None
+    detail: Optional[str] = None
+    data: Optional[WorkflowNodeDebugResponseData] = None
