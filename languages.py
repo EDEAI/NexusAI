@@ -1323,51 +1323,51 @@ language_packs = {
             {user_prompt}
         ''',
         'correction_workflow_node_system_prompt': '''
-            你是一个专业的工作流节点生成助手。
-            你已经生成了一个工作流节点。请根据我提供的修正建议调整生成的工作流节点数据。
-            **变量命名约定**：
-            生成工作流节点信息后，需要进行变量命名检查和优化。"input"和"output"属性中的变量名，以及Python 3代码中对应的函数输入参数或变量名，必须符合代码变量命名规范：
-            - 只能包含字母、数字和下划线
-            - 不能以数字开头
-            - 不能使用Python关键字
-            - 使用有意义的英文单词或缩写
+            You are a professional workflow node generation assistant.
+            You have already generated a workflow node. Please adjust the generated workflow node data according to the correction suggestions I provide.
+            **Variable Naming Convention**:
+            After generating workflow node information, you need to perform variable naming checks and optimization. Variable names in "input" and "output" attributes, as well as corresponding function input parameters or variable names in Python 3 code, must comply with code variable naming conventions:
+            - Can only contain letters, numbers, and underscores
+            - Cannot start with a number
+            - Cannot use Python keywords
+            - Use meaningful English words or abbreviations
             
-            请注意只返回工作流节点结构数据，不要返回冗余内容。
+            Please note that only workflow node structure data should be returned, no redundant content.
             
-            工作流节点数据JSON结构描述：
+            Workflow node data JSON structure description:
             {{
-                "type": "custom_code",  // 固定值，只能是custom_code
-                "title": "节点标题，应简洁而有描述性",
-                "desc": "节点描述，应解释节点的功能",
+                "type": "custom_code",  // Fixed value, can only be custom_code
+                "title": "Node title, should be concise and descriptive",
+                "desc": "Node description, should explain the node's functionality",
                 "input": {{
                     "name": "input",
                     "type": "object",
                     "properties": {{
                         "variable_name": {{
-                            "name": "变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用Python关键字",
-                            "type": "变量类型，只能是['string', 'number', 'json', 'file']之一，'string'对应Python的str类型，'number'对应Python的int或float类型，'json'对应Python的dict或list类型，'file'类型变量值是可以直接用于文件操作的文件路径",
-                            "value": "引用值或默认值",
-                            "sort_order": "(整数类型) 显示排序",
-                            "max_length": "(整数类型) 最大长度限制，0表示无限制"
+                            "name": "Variable name, must comply with code variable naming conventions, can only contain letters, numbers, and underscores, cannot start with a number, cannot use Python keywords",
+                            "type": "Variable type, can only be one of ['string', 'number', 'json', 'file'], 'string' corresponds to Python's str type, 'number' corresponds to Python's int or float type, 'json' corresponds to Python's dict or list type, 'file' type variable value is a file path that can be directly used for file operations",
+                            "value": "Reference value or default value",
+                            "sort_order": "(Integer type) Display sorting",
+                            "max_length": "(Integer type) Maximum length limit, 0 means unlimited"
                         }}
                     }},
                     "sort_order": 0
                 }},
                 "code_dependencies": {{
-                    "python3": ["依赖包名称列表"]
+                    "python3": ["List of dependency package names"]
                 }},
                 "custom_code": {{
-                    "python3": "Python 3代码，必须包含一个返回字典类型数据的main函数"
+                    "python3": "Python 3 code, must contain a main function that returns dictionary type data"
                 }},
                 "output": {{
                     "name": "output",
                     "type": "object",
                     "properties": {{
                         "result_variable": {{
-                            "name": "变量名，必须符合代码变量命名规范，只能包含字母、数字和下划线，不能以数字开头，不能使用Python关键字",
-                            "type": "变量类型，只能是['string', 'number', 'json', 'file']之一，'string'对应Python的str类型，'number'对应Python的int或float类型，'json'对应Python的dict或list类型，'file'在变量包含文件路径时使用。如果Python函数返回文件路径，此变量必须设置为'file'类型",
+                            "name": "Variable name, must comply with code variable naming conventions, can only contain letters, numbers, and underscores, cannot start with a number, cannot use Python keywords",
+                            "type": "Variable type, can only be one of ['string', 'number', 'json', 'file'], 'string' corresponds to Python's str type, 'number' corresponds to Python's int or float type, 'json' corresponds to Python's dict or list type, 'file' is used when the variable contains a file path. If the Python function returns a file path, this variable must be set to 'file' type",
                             "value": null,
-                            "sort_order": "(整数类型) 显示排序"
+                            "sort_order": "(Integer type) Display sorting"
                         }}
                     }},
                     "sort_order": 0
@@ -1375,35 +1375,35 @@ language_packs = {
                 "wait_for_all_predecessors": false,
                 "manual_confirmation": false,
                 "flow_data": {{}},
-                "original_node_id": "默认为空字符串"
+                "original_node_id": "Default to empty string"
             }}
             
-            特殊规则说明：
-            1. "type" 字段必须且只能是 "custom_code"，不要生成其他类型的节点。
-            2. "input" 定义节点的输入变量。整体结构为对象类型。"properties" 包含所有输入变量，每个输入变量为字典类型。
-            3. "code_dependencies" 是节点代码运行时需要通过 pip 单独安装的 python3 依赖。整体结构为字典类型。内部的 "python3" 是固定键。"python3" 对应列表中的每个元素都是一个依赖名称。
-            4. "custom_code" 是节点的 python3 代码。整体结构为字典类型。内部的 "python3" 是固定键。"python3" 对应的值是 python3 代码。代码为字符串类型。
-                **Python 3 代码生成规范**：
-                4.1 只提供一个主函数（main函数），所有代码逻辑都在主函数中实现
-                4.2 不要提供与主函数同级的其他函数。如果需要封装函数，必须在主函数内部定义
-                4.3 不要提供函数调用代码。系统会自动调用主函数
-                4.4 函数的输入参数对应节点的输入变量。变量名和变量类型必须与 "input" 属性中的定义完全一致
-                4.5 非必需变量必须有默认值，有默认值的变量应放在参数列表最后
-                4.6 必须明确指定函数的返回数据类型为 -> dict
-                4.7 主函数结尾必须返回字典类型的数据，对应节点的输出变量。字典数据的键名是输出变量名
-                4.8 严禁条件判断语句（if/elif/else）、循环语句（for/while）、异常处理（try/except）
-                4.9 严禁字符串检查操作（in、not in、startswith、endswith、contains）
-                4.10 严禁复杂逻辑操作（三元运算符、逻辑运算符组合、列表推导式）
-                4.11 严禁任何对整数类型进行迭代操作的代码
-            5. "output" 定义节点运行后的输出变量。整体结构为对象类型。"properties" 包含所有输出变量，每个输出变量为字典类型。
-            6. 注意输出变量的类型。每个输出变量的类型必须与 python3 代码返回数据中对应的数据类型严格匹配：如果 python3 代码返回 "dict" 或 "list"，对应的输出变量类型必须设置为 "json"；如果返回文件路径，对应的输出变量类型必须设置为 "file"；否则（对于字符串、整数、浮点数等）应相应设置为 "string" 或 "number"。返回字典中的每个键都必须对应一个类型匹配的输出变量。
+            Special Rule Descriptions:
+            1. The "type" field must and can only be "custom_code", do not generate other types of nodes.
+            2. "input" defines the input variables of the node. The overall structure is an object type. "properties" contains all input variables, each input variable is a dictionary type.
+            3. "code_dependencies" are the python3 dependencies that need to be installed separately via pip when the node code runs. The overall structure is a dictionary type. The internal "python3" is a fixed key. Each element in the list corresponding to "python3" is a dependency name.
+            4. "custom_code" is the python3 code of the node. The overall structure is a dictionary type. The internal "python3" is a fixed key. The value corresponding to "python3" is python3 code. The code is a string type.
+                **Python 3 Code Generation Specifications**:
+                4.1 Only provide one main function (main function), all code logic is implemented in the main function
+                4.2 Do not provide other functions at the same level as the main function. If you need to encapsulate functions, they must be defined inside the main function
+                4.3 Do not provide function call code. The system will automatically call the main function
+                4.4 The input parameters of the function correspond to the input variables of the node. Variable names and variable types must be completely consistent with the definitions in the "input" attribute
+                4.5 Non-required variables must have default values, variables with default values should be placed at the end of the parameter list
+                4.6 Must explicitly specify the function's return data type as -> dict
+                4.7 The main function must return dictionary type data at the end, corresponding to the output variables of the node. The key names of the dictionary data are the output variable names
+                4.8 Strictly prohibit conditional statements (if/elif/else), loop statements (for/while), exception handling (try/except)
+                4.9 Strictly prohibit string check operations (in, not in, startswith, endswith, contains)
+                4.10 Strictly prohibit complex logical operations (ternary operators, logical operator combinations, list comprehensions)
+                4.11 Strictly prohibit any code that iterates over integer types
+            5. "output" defines the output variables after the node runs. The overall structure is an object type. "properties" contains all output variables, each output variable is a dictionary type.
+            6. Pay attention to the type of output variables. The type of each output variable must strictly match the corresponding data type in the data returned by python3 code: If python3 code returns "dict" or "list", the corresponding output variable type must be set to "json"; if it returns a file path, the corresponding output variable type must be set to "file"; otherwise (for strings, integers, floats, etc.) should be set to "string" or "number" accordingly. Each key in the returned dictionary must correspond to a type-matched output variable.
 
         ''',
         'correction_workflow_node_user': '''
-            修正建议：
+            Correction suggestions:
             {correction_prompt}
             
-            生成的工作流节点数据：
+            Generated workflow node data:
             {history_node}
         '''
     },
