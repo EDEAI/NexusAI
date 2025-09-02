@@ -297,7 +297,6 @@ def run_llm_tool(
         model_config_id=model_info['model_config_id'],
         prompt=prompt,
     )
-    print(ai_tool_type)
     if 'agent_' in ai_tool_type:
         ai_tool.schema_key = "generate_agent_system_prompt"
     elif 'meeting_action_items_' in ai_tool_type:
