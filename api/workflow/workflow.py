@@ -785,7 +785,6 @@ async def node_debug(data: ReqWorkflowNodeDebugSchema, userinfo: TokenData = Dep
         # Create temporary node from the provided data
         node_data = {
             "id": "debug_node",
-            "type": "custom_code", 
             "data": {
                 "type": "custom_code",
                 "title": data.title or "Debug Node",
