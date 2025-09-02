@@ -90,4 +90,17 @@ class UserTeamRelations(MySQL):
         )
         if not rows:
             return []
-        return [row['user_id'] for row in rows if row.get('password') != 'nexus_ai123456']
+    def get_user_role_by_user_and_team(self, user_id: int, team_id: int) -> int:
+        """
+        Get the user role by user_id and team_id.
+        :param user_id: The user ID.
+        :param team_id: The team ID.
+        :return: The role value (integer), or None if not found.
+        """
+        conditions = [
+            {"column": "user_id", "value": user_id},
+            {"column": "team_id", "value": team_id}
+        ]
+        
+        result = self.select_one(columns=["role"], conditions=conditions)
+        return result['role'] if result else None

@@ -1,4 +1,4 @@
-from core.database.models import (Chatrooms, Apps,Teams,Roles, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows, ChatroomDrivenRecords, Models, ModelConfigurations)
+from core.database.models import (Chatrooms, Apps,Teams,Roles, AppRuns, AIToolLLMRecords, ChatroomAgentRelation, ChatroomMessages, Agents, Workflows, ChatroomDrivenRecords, Models, ModelConfigurations, UserTeamRelations)
 from fastapi import APIRouter
 from api.utils.common import *
 from api.utils.jwt import *
@@ -74,7 +74,10 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
     team_id = userinfo.team_id
     team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
-        return response_error(get_language_content("the_current_user_does_not_have_permission"))
+        # Check if user is admin in current team
+        user_role = UserTeamRelations().get_user_role_by_user_and_team(userinfo.uid, team_id)
+        if user_role != 1:
+            return response_error(get_language_content("the_current_user_does_not_have_permission"))
     uid =  userinfo.uid
     user_info = get_uid_user_info(uid)
     if user_info['role']!=1:
@@ -354,7 +357,10 @@ async def update_chatroom(chatroom_id: int, chat_request: ReqChatroomUpdateSchem
     team_id = userinfo.team_id
     team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
-        return response_error(get_language_content("the_current_user_does_not_have_permission"))
+        # Check if user is admin in current team
+        user_role = UserTeamRelations().get_user_role_by_user_and_team(userinfo.uid, team_id)
+        if user_role != 1:
+            return response_error(get_language_content("the_current_user_does_not_have_permission"))
     uid =  userinfo.uid
     user_info = get_uid_user_info(uid)
     if user_info['role']!=1:
