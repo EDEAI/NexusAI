@@ -32,7 +32,7 @@ INSERT INTO users (
     'Admin' as nickname,
     NULL as phone,
     'adminpt@nexusai.com' as email,
-    'e4a7b2c8f1d5e9a3b6c4f8e2d7a5b3c1' as password,
+    '1d11a7267dc2b3288f2f354fffe99798' as password,
     '1735799855' as password_salt,
     NULL as avatar,
     NOW() as created_time,
