@@ -801,29 +801,16 @@ async def node_debug(data: ReqWorkflowNodeDebugSchema, userinfo: TokenData = Dep
         # Create node object
         node_obj = create_node_from_dict(node_data)
         
-        # Create context for execution
-        context = {
-            "variables": {},
-            "node_run_map": {},
-            "workflow_id": 0,
-            "run_id": 0
-        }
-        
         # Prepare inputs
-        inputs = None
         if data.test_input:
-            inputs = create_variable_from_dict(data.test_input)
+            test_input_variable = create_variable_from_dict(data.test_input)
+            node_obj.data['input'] = test_input_variable
         
-        # Run the node
-        task = run_node.delay(
-            node_obj.to_dict(),
-            inputs.to_dict() if inputs else None,
-            userinfo.uid,
-            0,  # workflow_id
-            context
-        )
+        # Create context for execution
+        context = Context()
         
-        result = await asyncio.to_thread(task.get, timeout=100)
+        # Run the node directly (bypass workflow validation for debug)
+        result = node_obj.run(context)
         
         if result["status"] != "success":
             return response_success({"outputs": {
