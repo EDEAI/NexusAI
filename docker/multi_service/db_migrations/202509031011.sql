@@ -1,6 +1,6 @@
 -- Sync model configurations from team_id=1 to teams with type=2
 -- This script will add missing model configurations for type=2 teams based on team_id=1 as the master template
--- It will check for missing combinations of (team_id, model_id) where status=1
+-- It will check for missing combinations of (team_id, model_id)
 
 -- Insert missing model configurations for type=2 teams based on team_id=1 template
 INSERT INTO model_configurations (
@@ -24,14 +24,12 @@ FROM teams t
 CROSS JOIN (
     SELECT model_id, config, default_used, sort_order
     FROM model_configurations 
-    WHERE team_id = 1 AND status = 1
+    WHERE team_id = 1
 ) mc1
 WHERE t.type = 2  -- Only teams with type=2
-AND t.status = 1  -- Only active teams
 AND NOT EXISTS (
     SELECT 1 
     FROM model_configurations mc2 
     WHERE mc2.team_id = t.id 
-    AND mc2.model_id = mc1.model_id 
-    AND mc2.status = 1
+    AND mc2.model_id = mc1.model_id
 );
