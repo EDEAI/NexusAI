@@ -435,7 +435,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                                 setIsModalOpen2(true);
                                 fetchAllRolesList();
                             }}
-                            disabled={!isTeamAdmin()}
+                            disabled={!isTeamAdmin() || userInfo?.team_type === 2}
                         >
                             {intl.formatMessage({ id: 'user.add', defaultMessage: '' })}
                         </Button>
