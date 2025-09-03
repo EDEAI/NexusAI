@@ -38,5 +38,6 @@ export default {
     'component.team.switchConfirmWithPosition': 'After switching to "{name}", you will access the team as {position} {role}',
     'component.team.switchConfirmWithoutPosition': 'After switching to "{name}", you will access the team as {role}',
     'component.team.switchSuccess': 'Team switched successfully',
-    'component.team.cancel': 'Cancel'
+    'component.team.cancel': 'Cancel',
+    'component.team.noTeams': 'Public Workspace'
 };

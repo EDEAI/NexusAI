@@ -137,7 +137,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         {
             key: 'roleManagement',
             icon: <UserOutlined />,
-            disabled: userInfo?.role == 1 ? false : true,
+            disabled: userInfo?.role == 1 && userInfo?.team_type !== 2 ? false : true,
             label: intl.formatMessage({
                 id: 'workflow.menu.roleManagement',
                 defaultMessage: 'Role Management',
