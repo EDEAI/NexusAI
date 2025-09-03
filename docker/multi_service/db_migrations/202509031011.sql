@@ -33,3 +33,17 @@ AND NOT EXISTS (
     WHERE mc2.team_id = t.id 
     AND mc2.model_id = mc1.model_id
 );
+
+-- Set gpt-4.1 model as default for type=2 teams
+UPDATE model_configurations mc
+SET mc.default_used = 1
+WHERE mc.model_id = (
+    SELECT m.id 
+    FROM models m 
+    WHERE m.name = 'gpt-4.1'
+)
+AND mc.team_id IN (
+    SELECT t.id 
+    FROM teams t 
+    WHERE t.type = 2
+);
