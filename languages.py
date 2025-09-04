@@ -756,7 +756,12 @@ language_packs = {
         'agent_correct_system': '''
             You are an AI agent correction assistant.
             Please adjust the provided agent data according to the correction parameters I provided.
-            Note that only the json structure data of the agent is returned, and no redundant content is returned.
+            
+            CRITICAL REQUIREMENTS:
+            - You MUST preserve ALL abilities from the input data, including abilities with agent_ability_id=0 (new abilities)
+            - The agent_ability_id, output_format, and status fields MUST be returned exactly as provided
+            - Return ONLY the json structure data of the agent, no redundant content
+            
             Description of the json structure of agent data:
             {{
                 "name": "(string type) Agent name",
@@ -764,11 +769,11 @@ language_packs = {
                 "obligations": "(string type) Agent functional information (including but not limited to the identity, responsibilities, positions, skills, etc. of the agent)",
                 "abilities": [
                     {{
-                        "agent_ability_id": "(int type) Ability ID, 0 for new abilities",
+                        "agent_ability_id": "(int type) Ability ID, 0 for new abilities - MUST be preserved exactly",
                         "name": "(string type) Ability name",
                         "content": "(string type) Specific content of the ability. When the agent is running, the selected ability content will be submitted to the LLM model as a prompt",
-                        "output_format": "(int type), the output format of the ability, 1: text format, 2: json format, 3: pure code format (excluding non-code content), when the agent is running, the content will be returned according to the output format corresponding to the selected ability",
-                        "status": "(int type) Ability status, 1: enabled, 2: disabled"
+                        "output_format": "(int type), the output format of the ability, 1: text format, 2: json format, 3: pure code format (excluding non-code content) - MUST be preserved exactly",
+                        "status": "(int type) Ability status, 1: enabled, 2: disabled - MUST be preserved exactly"
                     }}
                 ]
             }}
