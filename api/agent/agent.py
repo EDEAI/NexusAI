@@ -1201,11 +1201,7 @@ async def agent_log_details(app_id: int, app_run_id: int, userinfo: TokenData = 
             'id': record['id'],
             'name': record['tool_name'],
             'files_to_upload': record['files_to_upload'],
-            'workflow_run_id': (
-                record['workflow_run_id']
-                if record['tool_name'].startswith('nexusai__workflow-')
-                else 0
-            ),
+            'app_run_id': record['app_run_id'],
             'workflow_confirmation_status': record['workflow_run_status'],
             'args': record['args'],
             'result': record['result']
