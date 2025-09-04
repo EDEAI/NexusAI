@@ -762,6 +762,110 @@ async def agent_supplement(data: ReqAgentSupplementSchema, userinfo: TokenData =
     except Exception:
         return response_error(get_language_content("api_agent_generate_failed"))
 
+
+@router.post('/agent_correct', response_model=ResAgentGenerateSchema)
+async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Correct agent information with direct parameter input
+
+    Args:
+        data (ReqAgentCorrectSchema): Request data containing:
+            name (str): Agent name
+            description (str): Agent description
+            obligations (str): Agent obligations
+            abilities (List[AgentAbilitiesData]): Agent abilities list
+        userinfo (TokenData): User authentication information
+
+    Returns:
+        JSON response containing:
+            app_run_id (int): The ID of the app run
+            record_id (int): The ID of the record
+
+    Raises:
+        - Returns error if agent correction fails
+    """
+    # Validate required fields
+    if not data.name:
+        return response_error(get_language_content("api_agent_abilities_set_abilities_name_required"))
+    if not data.description:
+        return response_error(get_language_content("api_agent_abilities_set_abilities_content_required"))
+    if not data.obligations:
+        return response_error(get_language_content("agent_empty_obligation"))
+
+    # Validate abilities if provided
+    if data.abilities:
+        for ability in data.abilities:
+            if not ability.name:
+                return response_error(get_language_content("api_agent_abilities_set_abilities_name_required"))
+            if not ability.content:
+                return response_error(get_language_content("api_agent_abilities_set_abilities_content_required"))
+            if ability.status not in [1, 2]:
+                return response_error(get_language_content("api_agent_abilities_set_abilities_status_error"))
+            if ability.output_format not in [0, 1, 2, 3]:
+                return response_error(get_language_content("api_agent_abilities_set_output_format_error"))
+
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    try:
+        # Create new app run for agent correction
+        app_runs_model = AppRuns()
+        app_run_data = {
+            "user_id": userinfo.uid,
+            "name": f"Agent_Correction_{current_time}",
+            "created_time": current_time,
+            "updated_time": current_time,
+            "status": 1
+        }
+        app_run_id = app_runs_model.insert(app_run_data)
+        
+        if not app_run_id:
+            return response_error(get_language_content("api_agent_generate_failed"))
+
+        # Prepare system and user prompts
+        system_prompt = get_language_content('agent_correct_system', userinfo.uid)
+        
+        # Prepare history_agent data in the format matching system prompt structure
+        history_agent = {
+            "name": data.name or "",
+            "description": data.description or "",
+            "obligations": data.obligations or "",
+            "abilities": data.abilities or []
+        }
+        
+        # Convert history_agent to formatted JSON string
+        history_agent_str = json.dumps(history_agent, ensure_ascii=False, indent=2)
+        
+        user_prompt = get_language_content('agent_correct_user', userinfo.uid, False)
+        user_prompt = user_prompt.format(
+            agent_supplement=data.agent_supplement or "",
+            history_agent=history_agent_str
+        )
+
+        # Prepare input for LLM
+        input_ = Prompt(system=system_prompt, user=user_prompt).to_dict()
+
+        # Initialize new execution record
+        record_id = AIToolLLMRecords().initialize_execution_record(
+            app_run_id=app_run_id,
+            ai_tool_type=1,
+            inputs=input_,
+            run_type=1
+        )
+
+        if not record_id:
+            return response_error(get_language_content("api_agent_generate_failed"))
+
+        return response_success(
+            {
+                'app_run_id': app_run_id,
+                'record_id': record_id
+            },
+            get_language_content("api_agent_success")
+        )
+
+    except Exception as e:
+        return response_error(get_language_content("api_agent_generate_failed"))
+
 @router.post('/agent_batch_generate', response_model=ResAgentBatchGenerateSchema)
 async def agent_batch_generate(data: ReqAgentBatchGenerateSchema, userinfo: TokenData = Depends(get_current_user)):
     """

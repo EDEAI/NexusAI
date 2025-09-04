@@ -753,6 +753,33 @@ language_packs = {
             Generated agent data:
             {history_agent}
         ''',
+        'agent_correct_system': '''
+            You are an AI agent correction assistant.
+            Please adjust the provided agent data according to the correction parameters I provided.
+            Note that only the json structure data of the agent is returned, and no redundant content is returned.
+            Description of the json structure of agent data:
+            {{
+                "name": "(string type) Agent name",
+                "description": "(string type) Agent description",
+                "obligations": "(string type) Agent functional information (including but not limited to the identity, responsibilities, positions, skills, etc. of the agent)",
+                "abilities": [
+                    {{
+                        "agent_ability_id": "(int type) Ability ID, 0 for new abilities",
+                        "name": "(string type) Ability name",
+                        "content": "(string type) Specific content of the ability. When the agent is running, the selected ability content will be submitted to the LLM model as a prompt",
+                        "output_format": "(int type), the output format of the ability, 1: text format, 2: json format, 3: pure code format (excluding non-code content), when the agent is running, the content will be returned according to the output format corresponding to the selected ability",
+                        "status": "(int type) Ability status, 1: enabled, 2: disabled"
+                    }}
+                ]
+            }}
+        ''',
+        'agent_correct_user': '''
+            Correction suggestions:
+            {agent_supplement}
+
+            Proxy data that needs to be corrected:
+            {history_agent}
+        ''',
         'agent_batch_sample_system': '''
             You are an AI agent generation assistant.
             Please generate a complete sample agent information for me according to the agent data structure based on the requirements for batch generation of agents provided by me.
@@ -1926,6 +1953,8 @@ prompt_keys = [
     "regenerate_agent_user",
     "agent_supplement_system",
     "agent_supplement_user",
+    "agent_correct_system",
+    "agent_correct_user",
     "agent_batch_sample_system",
     "agent_batch_sample_user",
     "agent_batch_one_system",
@@ -2020,6 +2049,8 @@ prompt_descriptions = {
                 "regenerate_agent_user": "AI Regenerate Agent User Prompt",
                 "agent_supplement_system": "AI Correct Agent System Prompt",
                 "agent_supplement_user": "AI Correct Agent User Prompt",
+                "agent_correct_system": "AI Direct Correct Agent System Prompt",
+                "agent_correct_user": "AI Direct Correct Agent User Prompt",
                 "agent_batch_sample_system": "AI Generate Sample Agent System Prompt",
                 "agent_batch_sample_user": "AI Generate Sample Agent User Prompt",
                 "agent_batch_one_system": "AI Batch Generate Agent System Prompt",
@@ -2121,6 +2152,8 @@ prompt_descriptions = {
                 "regenerate_agent_user": "AI重新生成智能体用户提示词",
                 "agent_supplement_system": "AI修正智能体系统提示词",
                 "agent_supplement_user": "AI修正智能体用户提示词",
+                "agent_correct_system": "AI直接修正智能体系统提示词",
+                "agent_correct_user": "AI直接修正智能体用户提示词",
                 "agent_batch_sample_system": "AI生成样例智能体系统提示词",
                 "agent_batch_sample_user": "AI生成样例智能体用户提示词",
                 "agent_batch_one_system": "AI批量生成智能体系统提示词",
