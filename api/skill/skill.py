@@ -562,7 +562,7 @@ async def skill_direct_correction(data: ReqSkillDirectCorrectionSchema, userinfo
             "description": data.description or "",
             "input_variables": data.input_variables or [],
             "dependencies": data.dependencies or {"python3": []},
-            "code": data.code or {"python3": ""},
+            "code": data.code or "",
             "output_type": data.output_type or 1,
             "output_variables": data.output_variables or []
         }

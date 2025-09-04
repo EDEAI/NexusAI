@@ -133,7 +133,7 @@ class ReqSkillDirectCorrectionSchema(BaseModel):
     description: Optional[str] = None
     input_variables: Optional[Dict[str, Any]] = None
     dependencies: Optional[Dict[str, Any]] = None
-    code: Optional[Dict[str, Any]] = None
+    code: Optional[str] = None
     output_type: Optional[int] = None
     output_variables: Optional[Dict[str, Any]] = None
     correction_prompt: Optional[str] = None
