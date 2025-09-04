@@ -810,6 +810,7 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
         app_runs_model = AppRuns()
         app_run_data = {
             "user_id": userinfo.uid,
+            "app_id": 0,  # Set app_id to 0 for agent correction
             "name": f"Agent_Correction_{current_time}",
             "created_time": current_time,
             "updated_time": current_time,
