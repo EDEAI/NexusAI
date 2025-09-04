@@ -829,7 +829,7 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
             "name": data.name or "",
             "description": data.description or "",
             "obligations": data.obligations or "",
-            "abilities": data.abilities or []
+            "abilities": [ability.dict() for ability in data.abilities] if data.abilities else []
         }
         
         # Convert history_agent to formatted JSON string
