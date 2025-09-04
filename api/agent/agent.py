@@ -865,12 +865,6 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
         )
 
     except Exception as e:
-        import traceback
-        print(f"Agent correct error: {str(e)}")
-        print(f"Error type: {type(e).__name__}")
-        print(f"Traceback: {traceback.format_exc()}")
-        print(f"Request data: name={getattr(data, 'name', None)}, description={getattr(data, 'description', None)}, obligations={getattr(data, 'obligations', None)}")
-        print(f"User info: uid={userinfo.uid}, team_id={getattr(userinfo, 'team_id', None)}")
         return response_error(get_language_content("api_agent_generate_failed"))
 
 @router.post('/agent_batch_generate', response_model=ResAgentBatchGenerateSchema)
