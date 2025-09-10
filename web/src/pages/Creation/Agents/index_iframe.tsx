@@ -9,6 +9,8 @@ import { message, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { setLocale } from 'umi';
 import Chat from './Chat';
+const USERNAME = IFRAME_TEST_USERNAME;
+const PASSWORD = IFRAME_TEST_PASSWORD;
 
 const Agents: React.FC = () => {
     const intl = useIntl();
@@ -24,9 +26,10 @@ const Agents: React.FC = () => {
 
     const init = async () => {
         await handleSubmit({
-            password: IFRAME_TEST_USERNAME,
-            username: IFRAME_TEST_PASSWORD,
+            password: PASSWORD,
+            username: USERNAME,
         });
+        
         getAgent();
         document.body.style.overflow = 'hidden';
     };
