@@ -16,7 +16,7 @@ extra:
   python:
     source: provider/tavily.py
 identity:
-  author: Yash Parmar, Kalo Chin
+  author: nexusai
   description:
     en_US: A powerful AI-native search engine and web content extraction tool that
       provides highly relevant search results and raw content extraction from web

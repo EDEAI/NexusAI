@@ -128,6 +128,16 @@ class ReqSkillCorrectionSchema(BaseModel):
     app_run_id: int
     correction_prompt: str
 
+class ReqSkillDirectCorrectionSchema(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    input_variables: Optional[Dict[str, Any]] = None
+    dependencies: Optional[Dict[str, Any]] = None
+    code: Optional[str] = None
+    output_type: Optional[int] = None
+    output_variables: Optional[Dict[str, Any]] = None
+    correction_prompt: Optional[str] = None
+
 class ResSkillCorrectionData(BaseModel):
     app_run_id: Optional[int] = None
     record_id: Optional[int] = None

@@ -38,7 +38,7 @@ extra:
   python:
     source: provider/podcast_generator.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: Generate podcast audio using Text-to-Speech services
     zh_Hans: 使用文字转语音服务生成播客音频

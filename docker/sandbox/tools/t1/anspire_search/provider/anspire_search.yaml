@@ -1,41 +1,43 @@
-identity:
-  author: anspire
-  name: anspire_search
-  label:
-    en_US: anspire_search
-    zh_Hans: 安思派联网搜索
-    pt_BR: anspire_search
-  description:
-    en_US: The next generation of real-time intelligent search engine for AI provides multi-channel and full-network content in a user-friendly format for your applications.
-    zh_Hans: 面向AI的下一代实时智能搜索引擎，为您的应用提供格式友好的多渠道全网内容。
-    pt_BR: The next generation of real-time intelligent search engine for AI provides multi-channel and full-network content in a user-friendly format for your applications.
-  icon: icon.svg
-  tag:
-  - search
 credentials_for_provider:
-  endpoint:
-    type: text-input
-    required: true
-    default: https://plugin.anspire.cn/api/ntsearch
-    label:
-      en_US: Endpoint
-      zh_Hans: 终结点
   api_key:
-    type: secret-input
-    required: true
+    help:
+      en_US: Get Anspire API key from anspire
+      zh_Hans: 从安思派获取 API key
     label:
       en_US: Anspire API key
       zh_Hans: 安思派 API key
     placeholder:
       en_US: Please input your Anspire API key
       zh_Hans: 请输入你的安思派 API key
-    help:
-      en_US: Get Anspire API key from anspire
-      zh_Hans: 从安思派获取 API key
+    required: true
+    type: secret-input
     url: https://open.anspire.cn
-tools:
-- tools/anspire_search.yaml
-- tools/anspire_search_pro.yaml
+  endpoint:
+    default: https://plugin.anspire.cn/api/ntsearch
+    label:
+      en_US: Endpoint
+      zh_Hans: 终结点
+    required: true
+    type: text-input
 extra:
   python:
     source: provider/anspire_search.py
+identity:
+  author: nexusai
+  description:
+    en_US: The next generation of real-time intelligent search engine for AI provides
+      multi-channel and full-network content in a user-friendly format for your applications.
+    pt_BR: The next generation of real-time intelligent search engine for AI provides
+      multi-channel and full-network content in a user-friendly format for your applications.
+    zh_Hans: 面向AI的下一代实时智能搜索引擎，为您的应用提供格式友好的多渠道全网内容。
+  icon: icon.svg
+  label:
+    en_US: anspire_search
+    pt_BR: anspire_search
+    zh_Hans: 安思派联网搜索
+  name: anspire_search
+  tag:
+  - search
+tools:
+- tools/anspire_search.yaml
+- tools/anspire_search_pro.yaml

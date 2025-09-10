@@ -9,7 +9,8 @@ from core.database.models import (
     Models,
     ModelConfigurations,
     Teams,
-    Roles
+    Roles,
+    UserTeamRelations
 )
 from config import *
 from log import Logger
@@ -266,7 +267,10 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
     uid = userinfo.uid
     team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
-        return response_error(get_language_content("the_current_user_does_not_have_permission"))
+        # Check if user is admin in current team
+        user_role = UserTeamRelations().get_user_role_by_user_and_team(uid, team_id)
+        if user_role != 1:
+            return response_error(get_language_content("the_current_user_does_not_have_permission"))
 
     user_info = get_uid_user_info(uid)
     if user_info['role']!=1:
@@ -401,7 +405,10 @@ async def agent_base_update(app_id:int,data:ReqAppBaseCreateSchema, userinfo: To
     team_id = userinfo.team_id
     team_type = Teams().get_team_type_by_id(team_id)
     if team_type == 2:
-        return response_error(get_language_content("the_current_user_does_not_have_permission"))
+        # Check if user is admin in current team
+        user_role = UserTeamRelations().get_user_role_by_user_and_team(userinfo.uid, team_id)
+        if user_role != 1:
+            return response_error(get_language_content("the_current_user_does_not_have_permission"))
     uid =  userinfo.uid
     user_info = get_uid_user_info(uid)
     if user_info['role']!=1:

@@ -1,13 +1,3 @@
-identity:
-  author: rockchinq
-  description:
-    en_US: OneBot v11 protocol tool, provides a set of actions for OneBot v11 protocol
-    zh_Hans: OneBot v11 协议工具，提供 OneBot v11 协议的一组动作 API
-  icon: icon.ico
-  label:
-    en_US: OneBot v11 Protocol Tool
-    zh_Hans: OneBot v11 协议工具
-  name: onebot
 credentials_for_provider:
   access_token:
     description:
@@ -33,9 +23,19 @@ credentials_for_provider:
       zh_Hans: HTTP URL
     required: true
     type: text-input
-tools:
-  - tools/send_group_msg.yaml
-  - tools/send_private_msg.yaml
 extra:
   python:
     source: provider/onebot.py
+identity:
+  author: nexusai
+  description:
+    en_US: OneBot v11 protocol tool, provides a set of actions for OneBot v11 protocol
+    zh_Hans: OneBot v11 协议工具，提供 OneBot v11 协议的一组动作 API
+  icon: icon.ico
+  label:
+    en_US: OneBot v11 Protocol Tool
+    zh_Hans: OneBot v11 协议工具
+  name: onebot
+tools:
+- tools/send_group_msg.yaml
+- tools/send_private_msg.yaml

@@ -265,5 +265,74 @@ LLM_OUTPUT_SCHEMAS = {
             },
             "required": ["name", "description", "input_variables", "dependencies", "code", "output_type", "output_variables"]
         }
+    },
+    "generate_workflow_node_system_prompt": {
+        "name": "generate_workflow_node_system_prompt",
+        "description": "Workflow node generation assistant's output format",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Node type, must be 'custom_code'"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Node title, should be concise and descriptive"
+                },
+                "desc": {
+                    "type": "string",
+                    "description": "Node description, should explain the node's functionality"
+                },
+                "input": {
+                    "type": "object",
+                    "description": "Input variables configuration"
+                },
+                "code_dependencies": {
+                    "type": "object",
+                    "properties": {
+                        "python3": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "List of Python package dependencies"
+                        }
+                    },
+                    "description": "Code dependencies configuration"
+                },
+                "custom_code": {
+                    "type": "object",
+                    "properties": {
+                        "python3": {
+                            "type": "string",
+                            "description": "Python 3 code with main function that returns dictionary"
+                        }
+                    },
+                    "description": "Custom code implementation"
+                },
+                "output": {
+                    "type": "object",
+                    "description": "Output variables configuration"
+                },
+                "wait_for_all_predecessors": {
+                    "type": "boolean",
+                    "description": "Whether to wait for all predecessor nodes"
+                },
+                "manual_confirmation": {
+                    "type": "boolean",
+                    "description": "Whether manual confirmation is required"
+                },
+                "flow_data": {
+                    "type": "object",
+                    "description": "Flow data configuration"
+                },
+                "original_node_id": {
+                    "type": "string",
+                    "description": "Original node ID, default to empty string"
+                }
+            },
+            "required": ["type", "title", "desc", "input", "code_dependencies", "custom_code", "output", "wait_for_all_predecessors", "manual_confirmation", "flow_data", "original_node_id"]
+        }
     }
 }

@@ -49,7 +49,7 @@ extra:
   python:
     source: provider/spark.py
 identity:
-  author: Onelevenvy
+  author: nexusai
   description:
     en_US: Spark Platform Toolkit
     pt_BR: Pacote de Ferramentas da Plataforma Spark

@@ -41,24 +41,42 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
         ]
     )
     if team_type['type'] !=1:
-        user_info = UserTeamRelations().select_one(
-            columns="*",
+        # Check user role in current team
+        current_user_role = UserTeamRelations().select_one(
+            columns=["role"],
             conditions=[
                 {"column": "user_id", "value": user['id']},
-                {"column": "team_id", "value": user['team_id'], "op": "!="}
+                {"column": "team_id", "value": user['team_id']}
             ]
         )
-        user_update_data = {
-            "team_id":user_info['team_id'], 
-            "role":user_info['role'], 
-            "inviter_id":user_info['inviter_id'], 
-            "role_id":user_info['role_id']
-        }
-        Users().update(
-            [{'column': 'id', 'value': user['id']}],
-            user_update_data
-        )
-        user['team_id'] = user_info['team_id']
+        
+        # If user is admin (role=1) in current team, skip team switching logic
+        if current_user_role and current_user_role['role'] == 1:
+            pass  # Admin users don't need team switching, skip directly
+        else:
+            user_info = UserTeamRelations().select_one(
+                columns="*",
+                conditions=[
+                    {"column": "user_id", "value": user['id']},
+                    {"column": "team_id", "value": user['team_id'], "op": "!="}
+                ]
+            )
+            
+            # If user_info query returns no data, return error
+            if not user_info:
+                return response_error(get_language_content('login_access_denied'))
+            
+            user_update_data = {
+                "team_id":user_info['team_id'], 
+                "role":user_info['role'], 
+                "inviter_id":user_info['inviter_id'], 
+                "role_id":user_info['role_id']
+            }
+            Users().update(
+                [{'column': 'id', 'value': user['id']}],
+                user_update_data
+            )
+            user['team_id'] = user_info['team_id']
     # Check if a valid token already exists in Redis
     redis_key = f"access_token:{user['id']}"
     existing_token = redis.get(redis_key)

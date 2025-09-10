@@ -1,17 +1,17 @@
+extra:
+  python:
+    source: provider/jwt.py
 identity:
-  author: bowenliang123
-  name: jwt
-  label:
-    en_US: JWT (JSON Web Token)
-    zh_Hans: JWT (JSON Web Token)
-    pt_BR: JWT (JSON Web Token)
+  author: nexusai
   description:
     en_US: Encode and decode JWT (JSON Web Token).
     zh_Hans: Encode and decode JWT (JSON Web Token).
   icon: icon.svg
+  label:
+    en_US: JWT (JSON Web Token)
+    pt_BR: JWT (JSON Web Token)
+    zh_Hans: JWT (JSON Web Token)
+  name: jwt
 tools:
-  - tools/jwt_encoder.yaml
-  - tools/jwt_decoder.yaml
-extra:
-  python:
-    source: provider/jwt.py
+- tools/jwt_encoder.yaml
+- tools/jwt_decoder.yaml

@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/youtube.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: YouTube
     pt_BR: YouTube é o maior site de compartilhamento de vídeos do mundo, onde os

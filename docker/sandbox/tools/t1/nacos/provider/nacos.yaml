@@ -1,66 +1,67 @@
-identity:
-  author: aias00
-  name: nacos
-  label:
-    en_US: Nacos
-    zh_Hans: Nacos
-    pt_BR: Nacos
-  description:
-    en_US: Nacos client of Naming and Config
-    zh_Hans: Nacos 注册配置客户端
-    pt_BR: Nacos client of Naming and Config
-  icon: nacos-logo.png
-tools:
-  - tools/nacos_reader.yaml
-  - tools/nacos_writer.yaml
-
-extra:
-  python:
-    source: provider/nacos.py
 credentials_for_provider:
-  nacos_addr:
+  nacos_accessKey:
+    label:
+      en_US: Aliyun AccessKey
+      zh_Hans: 阿里云 AccessKey
+    placeholder:
+      en_US: Please enter your Aliyun AccessKey （required when accessing Aliyun MSE
+        Nacos）
+      zh_Hans: 请输入阿里云 AccessKey (访问阿里云 MSE Nacos 时需要）
+    required: false
     type: text-input
-    required: true
-    default: "127.0.0.1:8848"
+  nacos_addr:
+    default: 127.0.0.1:8848
     label:
       en_US: Nacos Server Address
       zh_Hans: Nacos 服务端地址
     placeholder:
       en_US: Please enter your Nacos MCP Registry server address
       zh_Hans: 请输入Nacos MCP Registry 服务端地址
-  nacos_username:
+    required: true
     type: text-input
-    required: false
-    label:
-      en_US: Nacos Username
-      zh_Hans: Nacos 用户名
-    placeholder:
-      en_US: Please enter your Nacos username
-      zh_Hans: 请输入Nacos 用户名
   nacos_password:
-    type: secret-input
-    required: false
     label:
       en_US: Nacos Password
       zh_Hans: Nacos 密码
     placeholder:
       en_US: Please enter your Nacos password
       zh_Hans: 请输入 Nacos 密码
-  nacos_accessKey:
-    type: text-input
     required: false
-    label:
-      en_US: Aliyun AccessKey
-      zh_Hans: 阿里云 AccessKey
-    placeholder:
-      en_US: Please enter your Aliyun AccessKey （required when accessing Aliyun MSE Nacos）
-      zh_Hans: 请输入阿里云 AccessKey (访问阿里云 MSE Nacos 时需要）
-  nacos_secretKey:
     type: secret-input
-    required: false
+  nacos_secretKey:
     label:
       en_US: Aliyun SecretKey
       zh_Hans: 阿里云 SecretKey
     place_holder:
-      en_US: Please enter your Aliyun SecretKey （required when accessing Aliyun MSE Nacos）
+      en_US: Please enter your Aliyun SecretKey （required when accessing Aliyun MSE
+        Nacos）
       zh_Hans: 请输入阿里云 SecretKey (访问阿里云 MSE Nacos 时需要)
+    required: false
+    type: secret-input
+  nacos_username:
+    label:
+      en_US: Nacos Username
+      zh_Hans: Nacos 用户名
+    placeholder:
+      en_US: Please enter your Nacos username
+      zh_Hans: 请输入Nacos 用户名
+    required: false
+    type: text-input
+extra:
+  python:
+    source: provider/nacos.py
+identity:
+  author: nexusai
+  description:
+    en_US: Nacos client of Naming and Config
+    pt_BR: Nacos client of Naming and Config
+    zh_Hans: Nacos 注册配置客户端
+  icon: nacos-logo.png
+  label:
+    en_US: Nacos
+    pt_BR: Nacos
+    zh_Hans: Nacos
+  name: nacos
+tools:
+- tools/nacos_reader.yaml
+- tools/nacos_writer.yaml

@@ -48,7 +48,7 @@ extra:
   python:
     source: provider/cogview.py
 identity:
-  author: Waffle
+  author: nexusai
   description:
     en_US: CogView art
     pt_BR: CogView art

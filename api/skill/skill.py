@@ -14,6 +14,7 @@ from core.database.models.ai_tool_llm_records import AIToolLLMRecords
 from core.llm.prompt import create_prompt_from_dict, Prompt
 from time import time
 import os
+import json
 
 router = APIRouter()
 tools_db = CustomTools()
@@ -497,6 +498,114 @@ async def skill_correction(data: ReqSkillCorrectionSchema, userinfo: TokenData =
             get_language_content("api_skill_success")
         )
     except Exception:
+        return response_error(get_language_content("api_skill_correction_failed"))
+
+
+@router.post("/skill_direct_correction", response_model=ResSkillCorrectionSchema)
+async def skill_direct_correction(data: ReqSkillDirectCorrectionSchema, userinfo: TokenData = Depends(get_current_user)):
+    """
+    Correct/improve skill based on direct parameter input using LLM
+
+    Args:
+        data: Request data containing:
+            - name: Skill name
+            - description: Skill description
+            - input_variables: Input variables configuration
+            - dependencies: Dependencies configuration
+            - code: Code configuration
+            - output_type: Output type
+            - output_variables: Output variables configuration
+            - correction_prompt: User feedback for improvement
+        userinfo: User authentication info
+
+    Returns:
+        Dictionary containing:
+        - app_run_id: ID of the app run record
+        - record_id: ID of the new LLM correction record
+
+    Flow:
+        1. Validates required fields
+        2. Creates new app run record
+        3. Prepares correction prompts with direct parameter input
+        4. Creates new LLM execution record for correction
+        5. Returns record IDs for tracking correction progress
+    """
+    # Validate required fields
+    if not data.name:
+        return response_error(get_language_content("api_skill_name_required"))
+    if not data.description:
+        return response_error(get_language_content("api_skill_description_required"))
+    if not data.correction_prompt:
+        return response_error(get_language_content("api_skill_correction_prompt_required"))
+
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    try:
+        # Create new app run for skill correction
+        app_run_id = AppRuns().insert({
+            'user_id': userinfo.uid,
+            'app_id': 0,  # Set app_id to 0 for skill correction
+            'type': 2,
+            'name': f'Skill_Correction_{current_time}',
+            'status': 1
+        })
+        
+        if not app_run_id:
+            return response_error(get_language_content("api_skill_generate_failed"))
+
+        # Prepare system and user prompts
+        system_prompt = get_language_content('correction_skill_system_prompt', userinfo.uid)
+        
+        # Prepare history_skill data in the format matching system prompt structure
+        history_skill = {
+            "name": data.name or "",
+            "description": data.description or "",
+            "input_variables": data.input_variables or [],
+            "dependencies": data.dependencies or {"python3": []},
+            "code": data.code or "",
+            "output_type": data.output_type or 1,
+            "output_variables": data.output_variables or []
+        }
+        
+        # Convert history_skill to formatted JSON string
+        history_skill_str = json.dumps(history_skill, ensure_ascii=False, indent=2)
+        
+        user_prompt = get_language_content('correction_skill_user', userinfo.uid, False)
+        user_prompt = user_prompt.format(
+            correction_prompt=data.correction_prompt or "",
+            history_skill=history_skill_str
+        )
+
+        # Prepare input for LLM
+        input_ = Prompt(system=system_prompt, user=user_prompt).to_dict()
+
+        # Initialize new execution record
+        record_id = AIToolLLMRecords().initialize_execution_record(
+            app_run_id=app_run_id,
+            ai_tool_type=2,  # Skill generator type
+            inputs=input_,
+            run_type=1,
+            user_prompt=data.correction_prompt
+        )
+
+        if not record_id:
+            return response_error(get_language_content("api_skill_generate_failed"))
+
+        return response_success(
+            {
+                'app_run_id': app_run_id,
+                'record_id': record_id
+            },
+            get_language_content("api_skill_success")
+        )
+
+    except Exception as e:
+        import traceback
+        print(f"Skill direct correction error: {str(e)}")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Traceback: {traceback.format_exc()}")
+        print(f"Request data: name={getattr(data, 'name', None)}, description={getattr(data, 'description', None)}")
+        print(f"User info: uid={userinfo.uid}, team_id={getattr(userinfo, 'team_id', None)}")
         return response_error(get_language_content("api_skill_correction_failed"))
 
 

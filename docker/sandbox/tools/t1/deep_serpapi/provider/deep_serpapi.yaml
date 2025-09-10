@@ -1,22 +1,3 @@
-identity:
-  author: scrapelesshq
-  name: deep_serpapi
-  label:
-    en_US: Deep SerpApi
-    zh_Hans: Deep SerpApi
-    pt_BR: Deep SerpApi
-  description:
-    en_US: Powered by scrapeless.com, this real-time API delivers structured Google Search results at $0.1 per 1,000 queries.
-    zh_Hans: 由 scrapeless.com 提供支持，此实时 API 以每 1,000 次查询 $0.1 的价格提供结构化的 Google 搜索结果。
-    pt_BR: Desenvolvido por scrapeless.com, esta API em tempo real fornece resultados estruturados do Google Search por $0,1 a cada 1.000 consultas.
-  icon: icon.svg
-  tags:
-    - search
-tools:
-  - tools/deep_serpapi_search.yaml
-extra:
-  python:
-    source: provider/deep_serpapi.py
 credentials_for_provider:
   scrapeless_api_key:
     help:
@@ -34,3 +15,24 @@ credentials_for_provider:
     required: true
     type: secret-input
     url: https://app.scrapeless.com/dashboard/settings/api-key
+extra:
+  python:
+    source: provider/deep_serpapi.py
+identity:
+  author: nexusai
+  description:
+    en_US: Powered by scrapeless.com, this real-time API delivers structured Google
+      Search results at $0.1 per 1,000 queries.
+    pt_BR: Desenvolvido por scrapeless.com, esta API em tempo real fornece resultados
+      estruturados do Google Search por $0,1 a cada 1.000 consultas.
+    zh_Hans: 由 scrapeless.com 提供支持，此实时 API 以每 1,000 次查询 $0.1 的价格提供结构化的 Google 搜索结果。
+  icon: icon.svg
+  label:
+    en_US: Deep SerpApi
+    pt_BR: Deep SerpApi
+    zh_Hans: Deep SerpApi
+  name: deep_serpapi
+  tags:
+  - search
+tools:
+- tools/deep_serpapi_search.yaml

@@ -1,84 +1,85 @@
-identity:
-  author: stvlynn
-  name: x
-  label:
-    en_US: X (formerly Twitter)
-    ja_JP: X（旧Twitter）
-    zh_Hans: X（前Twitter）
-  description:
-    en_US: Interact with the X (formerly Twitter) platform through their official API.
-    ja_JP: 公式APIを通じてX（旧Twitter）プラットフォームと対話します。
-    zh_Hans: 通过官方API与X（前Twitter）平台交互。
-  icon: icon.jpg
 credentials_for_provider:
-  api_key:
-    label:
-      en_US: API Key
-      ja_JP: APIキー
-      zh_Hans: API密钥
-    type: secret-input
-    required: true
-    placeholder:
-      en_US: Your X API Key
-      ja_JP: あなたのX APIキー
-      zh_Hans: 您的X API密钥
-    help:
-      en_US: API Key from your X developer account
-      ja_JP: XデベロッパーアカウントからのAPIキー
-      zh_Hans: 您X开发者账户中的API密钥
-    url: https://developer.twitter.com/en/portal/dashboard
-  api_secret:
-    label:
-      en_US: API Secret
-      ja_JP: APIシークレット
-      zh_Hans: API密钥
-    type: secret-input
-    required: true
-    placeholder:
-      en_US: Your X API Secret
-      ja_JP: あなたのX APIシークレット
-      zh_Hans: 您的X API密钥
-    help:
-      en_US: API Secret from your X developer account
-      ja_JP: XデベロッパーアカウントからのAPIシークレット
-      zh_Hans: 您X开发者账户中的API密钥
-    url: https://developer.twitter.com/en/portal/dashboard
   access_token:
-    label:
-      en_US: Access Token
-      ja_JP: アクセストークン
-      zh_Hans: 访问令牌
-    type: secret-input
-    required: true
-    placeholder:
-      en_US: Your X Access Token
-      ja_JP: あなたのXアクセストークン
-      zh_Hans: 您的X访问令牌
     help:
       en_US: OAuth 1.0a Access Token for your X app
       ja_JP: XアプリのOAuth 1.0aアクセストークン
       zh_Hans: 您X应用的OAuth 1.0a访问令牌
+    label:
+      en_US: Access Token
+      ja_JP: アクセストークン
+      zh_Hans: 访问令牌
+    placeholder:
+      en_US: Your X Access Token
+      ja_JP: あなたのXアクセストークン
+      zh_Hans: 您的X访问令牌
+    required: true
+    type: secret-input
     url: https://developer.twitter.com/en/portal/dashboard
   access_token_secret:
-    label:
-      en_US: Access Token Secret
-      ja_JP: アクセストークンシークレット
-      zh_Hans: 访问令牌密钥
-    type: secret-input
-    required: true
-    placeholder:
-      en_US: Your X Access Token Secret
-      ja_JP: あなたのXアクセストークンシークレット
-      zh_Hans: 您的X访问令牌密钥
     help:
       en_US: OAuth 1.0a Access Token Secret for your X app
       ja_JP: XアプリのOAuth 1.0aアクセストークンシークレット
       zh_Hans: 您X应用的OAuth 1.0a访问令牌密钥
+    label:
+      en_US: Access Token Secret
+      ja_JP: アクセストークンシークレット
+      zh_Hans: 访问令牌密钥
+    placeholder:
+      en_US: Your X Access Token Secret
+      ja_JP: あなたのXアクセストークンシークレット
+      zh_Hans: 您的X访问令牌密钥
+    required: true
+    type: secret-input
     url: https://developer.twitter.com/en/portal/dashboard
-tools:
-  - tools/post_tweet.yaml
-  - tools/delete_tweet.yaml
-  - tools/media_tweet.yaml
+  api_key:
+    help:
+      en_US: API Key from your X developer account
+      ja_JP: XデベロッパーアカウントからのAPIキー
+      zh_Hans: 您X开发者账户中的API密钥
+    label:
+      en_US: API Key
+      ja_JP: APIキー
+      zh_Hans: API密钥
+    placeholder:
+      en_US: Your X API Key
+      ja_JP: あなたのX APIキー
+      zh_Hans: 您的X API密钥
+    required: true
+    type: secret-input
+    url: https://developer.twitter.com/en/portal/dashboard
+  api_secret:
+    help:
+      en_US: API Secret from your X developer account
+      ja_JP: XデベロッパーアカウントからのAPIシークレット
+      zh_Hans: 您X开发者账户中的API密钥
+    label:
+      en_US: API Secret
+      ja_JP: APIシークレット
+      zh_Hans: API密钥
+    placeholder:
+      en_US: Your X API Secret
+      ja_JP: あなたのX APIシークレット
+      zh_Hans: 您的X API密钥
+    required: true
+    type: secret-input
+    url: https://developer.twitter.com/en/portal/dashboard
 extra:
   python:
     source: provider/x.py
+identity:
+  author: nexusai
+  description:
+    en_US: Interact with the X (formerly Twitter) platform through their official
+      API.
+    ja_JP: 公式APIを通じてX（旧Twitter）プラットフォームと対話します。
+    zh_Hans: 通过官方API与X（前Twitter）平台交互。
+  icon: icon.jpg
+  label:
+    en_US: X (formerly Twitter)
+    ja_JP: X（旧Twitter）
+    zh_Hans: X（前Twitter）
+  name: x
+tools:
+- tools/post_tweet.yaml
+- tools/delete_tweet.yaml
+- tools/media_tweet.yaml

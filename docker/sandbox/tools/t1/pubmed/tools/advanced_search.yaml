@@ -1,0 +1,151 @@
+identity:
+  name: advanced_search
+  author: svcvit # Or YourNameOrOrg
+  label:
+    en_US: PubMed Advanced Search
+    zh_Hans: PubMed 高级搜索
+description:
+  human:
+    en_US: Performs an advanced search in PubMed targeting specific fields like author, title, journal, MeSH terms, etc. Returns a list of PubMed IDs (PMIDs).
+    zh_Hans: 在 PubMed 中执行高级搜索，可指定作者、标题、期刊、MeSH 术语等字段。返回 PubMed ID (PMID) 列表。
+  llm: Use this tool for targeted PubMed searches. You can specify terms that must appear in specific fields (Author, Title, Journal, Abstract, MeSH Terms, Keywords). You can also combine these with date ranges and sorting. Returns a list of matching PubMed IDs. At least one search field or a general query is required.
+parameters:
+  # --- Specific Field Parameters ---
+  - name: author
+    type: string
+    required: false
+    label:
+      en_US: Author Name(s)
+      zh_Hans: 作者姓名
+    human_description:
+      en_US: 'Search for specific authors (e.g., ''Fauci AS'', ''Zhang Y[AU]'').'
+      zh_Hans: '搜索特定作者（例如，''Fauci AS'', ''Zhang Y[AU]''）。'
+    llm_description: Enter author names to search for. Use format like 'LastName Initials' (e.g., 'Smith J'). You can use boolean operators (AND, OR).
+    form: form
+  - name: title
+    type: string
+    required: false
+    label:
+      en_US: Title Word(s)
+      zh_Hans: 标题词
+    human_description:
+      en_US: 'Keywords that must appear in the article title.'
+      zh_Hans: '必须出现在文章标题中的关键词。'
+    llm_description: Enter words or phrases that must be present in the article title.
+    form: form
+  - name: journal
+    type: string
+    required: false
+    label:
+      en_US: Journal Name
+      zh_Hans: 期刊名称
+    human_description:
+      en_US: 'Search within specific journals (e.g., ''Nature'', ''Lancet'').'
+      zh_Hans: '在特定期刊中搜索（例如，''Nature'', ''Lancet''）。'
+    llm_description: Enter the name or abbreviation of the journal to search within.
+    form: form
+  - name: abstract_keywords
+    type: string
+    required: false
+    label:
+      en_US: Abstract Word(s)
+      zh_Hans: 摘要词
+    human_description:
+      en_US: 'Keywords that must appear in the article abstract.'
+      zh_Hans: '必须出现在文章摘要中的关键词。'
+    llm_description: Enter words or phrases that must be present in the article abstract.
+    form: form
+  - name: mesh_terms
+    type: string
+    required: false
+    label:
+      en_US: MeSH Terms
+      zh_Hans: MeSH 术语
+    human_description:
+      en_US: 'Medical Subject Headings (e.g., ''Neoplasms'', ''Immunotherapy'').'
+      zh_Hans: '医学主题词（例如，''Neoplasms'', ''Immunotherapy''）。'
+    llm_description: Enter specific MeSH terms to find articles indexed with them. Use official MeSH terms.
+    form: form
+  - name: keywords
+    type: string
+    required: false
+    label:
+      en_US: Keywords
+      zh_Hans: 关键词
+    human_description:
+      en_US: 'General keywords provided by authors or indexers.'
+      zh_Hans: '作者或索引员提供的一般关键词。'
+    llm_description: Enter general keywords to search for. This searches a broader keyword field than MeSH terms.
+    form: form
+
+  # --- General Parameters (like basic search) ---
+  - name: general_query
+    type: string
+    required: false # Required only if no specific fields are filled
+    label:
+      en_US: General Query (Optional)
+      zh_Hans: 通用查询（可选）
+    human_description:
+      en_US: 'A general query used if no specific fields (author, title, etc.) are provided.'
+      zh_Hans: '如果未提供特定字段（作者、标题等），则使用通用查询。'
+    llm_description: Optional. If you do not provide terms in specific fields like Author or Title, you can enter a general query here. If specific fields *are* used, this field is ignored.
+    form: llm
+  - name: max_results
+    type: number
+    required: false
+    label:
+      en_US: Maximum Results
+      zh_Hans: 最大结果数
+    human_description:
+      en_US: 'The maximum number of article IDs to return (default: 100).'
+      zh_Hans: '要返回的文章 ID 的最大数量（默认值：100）。'
+    llm_description: Specify the maximum number of PubMed IDs (PMIDs) to retrieve. Defaults to 100 if not specified.
+    form: form
+    default: 100
+  - name: sort
+    type: select
+    required: false
+    label:
+      en_US: Sort By
+      zh_Hans: 排序方式
+    human_description:
+      en_US: 'How to sort the results (default: relevance).'
+      zh_Hans: '如何对结果进行排序（默认值：相关性）。'
+    llm_description: Specifies the sort order for the results.
+    form: form
+    default: relevance
+    options:
+      - value: relevance
+        label:
+          en_US: Relevance
+          zh_Hans: 相关性
+      - value: pub_date
+        label:
+          en_US: Publication Date
+          zh_Hans: 发表日期
+  - name: min_date
+    type: string
+    required: false
+    label:
+      en_US: Start Date (YYYY/MM/DD)
+      zh_Hans: 开始日期 (YYYY/MM/DD)
+    human_description:
+      en_US: 'Optional earliest publication date filter (format YYYY/MM/DD).'
+      zh_Hans: '可选的最早发表日期过滤器（格式 YYYY/MM/DD）。'
+    llm_description: Optional. Filter results to include only articles published on or after this date. Use YYYY/MM/DD format.
+    form: form
+  - name: max_date
+    type: string
+    required: false
+    label:
+      en_US: End Date (YYYY/MM/DD)
+      zh_Hans: 结束日期 (YYYY/MM/DD)
+    human_description:
+      en_US: 'Optional latest publication date filter (format YYYY/MM/DD).'
+      zh_Hans: '可选的最新发表日期过滤器（格式 YYYY/MM/DD）。'
+    llm_description: Optional. Filter results to include only articles published on or before this date. Use YYYY/MM/DD format.
+    form: form
+
+extra:
+  python:
+    source: tools/advanced_search.py # Points to the tool implementation

@@ -63,7 +63,7 @@ extra:
   python:
     source: provider/azuredalle.py
 identity:
-  author: Leslie
+  author: nexusai
   description:
     en_US: Azure DALL-E art
     pt_BR: Azure DALL-E art

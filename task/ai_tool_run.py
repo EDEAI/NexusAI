@@ -306,6 +306,9 @@ def task_delay_thread():
                 elif ai_tool_type == 5:
                     return_json = True
                     ai_tool_type = 'agent_batch_sample_' + run_type
+                elif ai_tool_type == 6:
+                    return_json = True
+                    ai_tool_type = 'generate_workflow_node_' + run_type
                 else:
                     return_json = True
 

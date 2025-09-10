@@ -1,17 +1,17 @@
-identity:
-  author: lzy123
-  name: mc_ping
-  label:
-    en_US: mc_ping
-    zh_Hans: mc_ping
-    pt_BR: mc_ping
-  description:
-    en_US: Get Minecraft server information
-    zh_Hans: Get Minecraft server information
-    pt_BR: Get Minecraft server information
-  icon: icon.svg
-tools:
-  - tools/mc_ping.yaml
 extra:
   python:
     source: provider/mc_ping.py
+identity:
+  author: nexusai
+  description:
+    en_US: Get Minecraft server information
+    pt_BR: Get Minecraft server information
+    zh_Hans: Get Minecraft server information
+  icon: icon.svg
+  label:
+    en_US: mc_ping
+    pt_BR: mc_ping
+    zh_Hans: mc_ping
+  name: mc_ping
+tools:
+- tools/mc_ping.yaml

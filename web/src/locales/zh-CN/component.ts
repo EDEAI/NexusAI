@@ -38,5 +38,6 @@ export default {
     'component.team.switchConfirmWithPosition': '切换到「{name}」后，您将以{position}职位、{role}身份访问该团队',
     'component.team.switchConfirmWithoutPosition': '切换到「{name}」后，您将以{role}身份访问该团队',
     'component.team.switchSuccess': '团队切换成功',
-    'component.team.cancel': '取消'
+    'component.team.cancel': '取消',
+    'component.team.noTeams': '公共工作区'
 };

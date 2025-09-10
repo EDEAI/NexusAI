@@ -1,12 +1,12 @@
 credentials_for_provider:
   base_url:
+    default: https://api.search.brave.com/res/v1/web/search
     label:
       en_US: Brave server's Base URL
       zh_Hans: Brave服务器的API URL
     placeholder:
       en_US: https://api.search.brave.com/res/v1/web/search
     required: false
-    default: https://api.search.brave.com/res/v1/web/search
     type: text-input
   brave_search_api_key:
     help:
@@ -28,7 +28,7 @@ extra:
   python:
     source: provider/brave.py
 identity:
-  author: Yash Parmar
+  author: nexusai
   description:
     en_US: Brave
     pt_BR: Brave
@@ -40,6 +40,6 @@ identity:
     zh_Hans: Brave
   name: brave
   tags:
-    - search
+  - search
 tools:
-  - tools/brave_search.yaml
+- tools/brave_search.yaml

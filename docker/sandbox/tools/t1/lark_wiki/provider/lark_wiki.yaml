@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/lark_wiki.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: 'Lark Wiki, requires the following permissions: wiki:wiki:readonly.
 

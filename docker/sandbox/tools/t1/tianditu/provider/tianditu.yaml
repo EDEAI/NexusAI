@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/tianditu.py
 identity:
-  author: Listeng
+  author: nexusai
   description:
     en_US: The Tianditu tool provided the functions of place name search, geocoding,
       static maps generation, etc. in China region.

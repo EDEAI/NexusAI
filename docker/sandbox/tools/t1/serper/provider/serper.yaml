@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/serper.py
 identity:
-  author: zhuhao
+  author: nexusai
   description:
     en_US: Serper is a powerful real-time search engine tool API that provides structured
       data from Google Search.

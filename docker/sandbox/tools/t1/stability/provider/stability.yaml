@@ -19,7 +19,7 @@ extra:
   python:
     source: provider/stability.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: Activating humanity's potential through generative AI
     pt_BR: Activating humanity's potential through generative AI

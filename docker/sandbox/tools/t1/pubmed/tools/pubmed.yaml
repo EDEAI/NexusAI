@@ -1,0 +1,42 @@
+# dify-plugin-pubmed/provider/pubmed.yaml
+identity:
+  author: svcvit # Or YourNameOrOrg
+  name: pubmed # Match manifest.yaml name
+  label:
+    en_US: PubMed Provider
+    zh_Hans: PubMed 提供者
+  description:
+    en_US: Provides tools to interact with the PubMed database.
+    zh_Hans: 提供与 PubMed 数据库交互的工具。
+  icon: icon.svg
+tools:
+  - tools/search.yaml
+  - tools/fetch_details.yaml # <-- ADD THIS LINE
+extra:
+  python:
+    source: provider/pubmed.py # Points to the provider implementation
+credentials_for_provider:
+  email:
+    help:
+      en_US: Your email address required by NCBI for PubMed API access.
+      zh_Hans: NCBI PubMed API 访问所需的您的电子邮件地址。
+    label:
+      en_US: Email Address
+      zh_Hans: 电子邮件地址
+    placeholder:
+      en_US: Please enter your email address
+      zh_Hans: 请输入您的电子邮件地址
+    required: true
+    type: secret-input
+  api_key:
+    help:
+      en_US: Optional NCBI API key to increase request limits.
+      zh_Hans: 可选的 NCBI API 密钥，用于提高请求限制。
+    label:
+      en_US: NCBI API Key (Optional)
+      zh_Hans: NCBI API 密钥（可选）
+    placeholder:
+      en_US: Enter your NCBI API key if you have one
+      zh_Hans: 如果您有 NCBI API 密钥，请输入
+    required: false
+    type: secret-input

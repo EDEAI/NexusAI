@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/yahoo.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: Finance, and Yahoo! get the latest news, stock quotes, and interactive
       chart with Yahoo!

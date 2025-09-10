@@ -1,0 +1,86 @@
+identity:
+  name: search
+  author: svcvit
+  label:
+    en_US: PubMed Search
+    zh_Hans: PubMed 搜索
+description:
+  human:
+    en_US: Searches the PubMed database for articles based on a query and optional filters. Returns a list of PubMed IDs (PMIDs).
+    zh_Hans: 基于查询和可选过滤器搜索 PubMed 数据库中的文献。返回 PubMed ID (PMID) 列表。
+  llm: This tool searches the PubMed database using a query string and optional filters like date range and sorting. It returns a list of matching PubMed IDs (PMIDs). Use this tool when you need to find relevant medical or life sciences articles.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Search Query
+      zh_Hans: 搜索查询
+    human_description:
+      en_US: 'The search terms (e.g., ''cancer immunotherapy'', ''COVID-19 vaccine efficacy'').'
+      zh_Hans: '搜索词（例如，''cancer immunotherapy'', ''COVID-19 vaccine efficacy''）。'
+    llm_description: The main search query string. Can include keywords, author names, MeSH terms, etc. Use boolean operators (AND, OR, NOT) if needed.
+    form: llm
+
+  - name: max_results
+    type: number
+    required: false
+    label:
+      en_US: Maximum Results
+      zh_Hans: 最大结果数
+    human_description:
+      en_US: 'The maximum number of article IDs to return (default: 100).'
+      zh_Hans: '要返回的文章 ID 的最大数量（默认值：100）。'
+    llm_description: Specify the maximum number of PubMed IDs (PMIDs) to retrieve. Defaults to 100 if not specified.
+    form: form
+    default: 100
+
+  - name: sort
+    type: select
+    required: false
+    label:
+      en_US: Sort By
+      zh_Hans: 排序方式
+    human_description:
+      en_US: 'How to sort the results (default: relevance).'
+      zh_Hans: '如何对结果进行排序（默认值：相关性）。'
+    llm_description: Specifies the sort order for the results. 'relevance' is usually best, 'pub_date' sorts by publication date (newest first).
+    form: form
+    default: relevance
+    options:
+      - value: relevance
+        label:
+          en_US: Relevance
+          zh_Hans: 相关性
+      - value: pub_date
+        label:
+          en_US: Publication Date
+          zh_Hans: 发表日期
+
+  - name: min_date
+    type: string
+    required: false
+    label:
+      en_US: Start Date (YYYY/MM/DD)
+      zh_Hans: 开始日期 (YYYY/MM/DD)
+    human_description:
+      en_US: 'Optional earliest publication date filter (format YYYY/MM/DD).'
+      zh_Hans: '可选的最早发表日期过滤器（格式 YYYY/MM/DD）。'
+    llm_description: Optional. Filter results to include only articles published on or after this date. Use YYYY/MM/DD format (e.g., '2020/01/01').
+    form: form
+
+  - name: max_date
+    type: string
+    required: false
+    label:
+      en_US: End Date (YYYY/MM/DD)
+      zh_Hans: 结束日期 (YYYY/MM/DD)
+    human_description:
+      en_US: 'Optional latest publication date filter (format YYYY/MM/DD).'
+      zh_Hans: '可选的最新发表日期过滤器（格式 YYYY/MM/DD）。'
+    llm_description: Optional. Filter results to include only articles published on or before this date. Use YYYY/MM/DD format (e.g., '2023/12/31').
+    form: form
+
+extra:
+  python:
+    source: tools/search.py # Points to the tool implementation

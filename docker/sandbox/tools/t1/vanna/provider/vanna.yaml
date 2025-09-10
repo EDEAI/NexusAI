@@ -24,7 +24,7 @@ extra:
   python:
     source: provider/vanna.py
 identity:
-  author: qctc
+  author: nexusai
   description:
     en_US: The fastest way to get actionable insights from your database just by asking
       questions.

@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/lark_base.py
 identity:
-  author: Doug Lea
+  author: nexusai
   description:
     en_US: 'Lark base, requires the following permissions: bitable:app.
 

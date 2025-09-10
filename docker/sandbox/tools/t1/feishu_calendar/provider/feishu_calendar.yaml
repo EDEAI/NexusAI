@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/feishu_calendar.py
 identity:
-  author: Doug Lea
+  author: nexusai
   description:
     en_US: 'Feishu calendar, requires the following permissions: calendar:calendar:read、calendar:calendar、contact:user.id:readonly.
 

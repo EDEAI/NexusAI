@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/hap.py
 identity:
-  author: Mingdao
+  author: nexusai
   description:
     en_US: Hyper application platform that is particularly friendly to AI
     pt_BR: Plataforma de aplicação hiper que é particularmente amigável à IA

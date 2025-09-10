@@ -1,23 +1,23 @@
+extra:
+  python:
+    source: provider/text_tools.py
 identity:
-  author: yizixuan
-  name: text_tools
-  label:
-    en_US: Text Tools
-    zh_Hans: 文本处理
+  author: nexusai
   description:
     en_US: A series of text processing tools.
     zh_Hans: 一系列文本处理工具。
   icon: icon.svg
+  label:
+    en_US: Text Tools
+    zh_Hans: 文本处理
+  name: text_tools
   tags:
-    - utilities
-    - productivity
-extra:
-  python:
-    source: provider/text_tools.py
+  - utilities
+  - productivity
 tools:
-  - tools/text_replace.yaml
-  - tools/text_regex_extract.yaml
-  - tools/encode_decode.yaml
-  - tools/hash_calculator.yaml
-  - tools/ds_thought_clean.yaml
-  - tools/word_count.yaml
+- tools/text_replace.yaml
+- tools/text_regex_extract.yaml
+- tools/encode_decode.yaml
+- tools/hash_calculator.yaml
+- tools/ds_thought_clean.yaml
+- tools/word_count.yaml

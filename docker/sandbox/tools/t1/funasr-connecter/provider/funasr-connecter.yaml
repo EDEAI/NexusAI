@@ -1,17 +1,17 @@
-identity:
-  author: "michael_edison"
-  name: "funasr-connecter"
-  label:
-    en_US: "funasr-connecter"
-    zh_Hans: "funasr连接器"
-    pt_BR: "funasr-connecter"
-  description:
-    en_US: "help dify to connect to funasr"
-    zh_Hans: "funasr-connecter是一个dify连接到funasr websocket的工具"
-    pt_BR: "help dify to connect to funasr"
-  icon: "icon.svg"
-tools:
-  - tools/funasr-connecter.yaml
 extra:
   python:
     source: provider/funasr-connecter.py
+identity:
+  author: nexusai
+  description:
+    en_US: help dify to connect to funasr
+    pt_BR: help dify to connect to funasr
+    zh_Hans: funasr-connecter是一个dify连接到funasr websocket的工具
+  icon: icon.svg
+  label:
+    en_US: funasr-connecter
+    pt_BR: funasr-connecter
+    zh_Hans: funasr连接器
+  name: funasr-connecter
+tools:
+- tools/funasr-connecter.yaml

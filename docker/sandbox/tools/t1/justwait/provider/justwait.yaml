@@ -1,19 +1,19 @@
+extra:
+  python:
+    source: provider/justwait.py
 identity:
-  author: "AGIMater"
-  name: justwait
-  label:
-    en_US: JustWait
-    zh_Hans: JustWait
+  author: nexusai
   description:
     en_US: Simple waiting functionality for Dify workflows
     zh_Hans: 为Dify工作流提供简单的等待功能
   icon: icon.svg
+  label:
+    en_US: JustWait
+    zh_Hans: JustWait
+  name: justwait
   tags:
-    - utilities
-    - productivity
+  - utilities
+  - productivity
 tools:
-  - tools/wait.yaml
-  - tools/random_wait.yaml
-extra:
-  python:
-    source: provider/justwait.py 
+- tools/wait.yaml
+- tools/random_wait.yaml

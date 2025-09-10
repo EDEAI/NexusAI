@@ -12,7 +12,7 @@ extra:
   python:
     source: provider/gitee_ai_tool.py
 identity:
-  author: Gitee AI
+  author: nexusai
   description:
     en_US: Quickly experience large models and explore the leading AI open source
       world

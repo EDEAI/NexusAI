@@ -40,7 +40,7 @@ extra:
   python:
     source: provider/gitlab.py
 identity:
-  author: Leo.Wang
+  author: nexusai
   description:
     en_US: GitLab plugin, API v4 only.
     zh_Hans: 用于获取GitLab内容的插件，目前仅支持 API v4。

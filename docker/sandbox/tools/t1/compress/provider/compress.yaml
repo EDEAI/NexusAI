@@ -1,17 +1,17 @@
+extra:
+  python:
+    source: provider/compress.py
 identity:
-  author: hjlarry
-  name: compress
-  label:
-    en_US: Compress
-    zh_Hans: 压缩
+  author: nexusai
   description:
     en_US: a tool to compress the multimodal files
     zh_Hans: 一个压缩多模态文件的工具
   icon: icon.svg
+  label:
+    en_US: Compress
+    zh_Hans: 压缩
+  name: compress
 tools:
-  - tools/image.yaml
-  - tools/video.yaml
-  - tools/audio.yaml
-extra:
-  python:
-    source: provider/compress.py
+- tools/image.yaml
+- tools/video.yaml
+- tools/audio.yaml

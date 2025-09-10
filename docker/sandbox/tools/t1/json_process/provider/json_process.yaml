@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/json_process.py
 identity:
-  author: Mingwei_Zhang
+  author: nexusai
   description:
     en_US: Tools for processing JSON content using jsonpath_ng
     pt_BR: Tools for processing JSON content using jsonpath_ng

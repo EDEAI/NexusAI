@@ -13,7 +13,7 @@ extra:
   python:
     source: provider/flomo.py
 identity:
-  author: crazywoola
+  author: nexusai
   description:
     en_US: A flomo plugin to note down your thoughts
     zh_Hans: 一个用于记录想法的 flomo 插件

@@ -13,7 +13,7 @@ extra:
   python:
     source: provider/slidespeak.py
 identity:
-  author: Kalo Chin
+  author: nexusai
   description:
     en_US: Generate presentation slides using SlideSpeak API
     zh_Hans: 使用 SlideSpeak API 生成演示幻灯片

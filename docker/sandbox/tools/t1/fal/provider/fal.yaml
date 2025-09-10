@@ -11,7 +11,7 @@ extra:
   python:
     source: provider/fal.py
 identity:
-  author: Kalo Chin
+  author: nexusai
   description:
     en_US: The image generation API provided by FAL.
     zh_CN: FAL 提供的图像生成 API。
@@ -21,11 +21,11 @@ identity:
     zh_CN: FAL
   name: fal
   tags:
-    - image
+  - image
 tools:
-  - tools/flux_1_pro_new.yaml
-  - tools/flux_1_1_pro_ultra.yaml
-  - tools/flux_1_dev.yaml
-  - tools/flux_1_1_pro.yaml
-  - tools/wizper.yaml
-  - tools/clarity_upscaler.yaml
+- tools/flux_1_pro_new.yaml
+- tools/flux_1_1_pro_ultra.yaml
+- tools/flux_1_dev.yaml
+- tools/flux_1_1_pro.yaml
+- tools/wizper.yaml
+- tools/clarity_upscaler.yaml

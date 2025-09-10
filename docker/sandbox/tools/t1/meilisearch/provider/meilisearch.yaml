@@ -24,26 +24,26 @@ credentials_for_provider:
     required: true
     type: secret-input
     url: https://www.meilisearch.com/docs/reference/api/keys
+extra:
+  python:
+    source: provider/meilisearch.py
 identity:
-  author: fernvenue
-  name: meilisearch
-  label:
-    en_US: Meilisearch
-    zh_Hans: Meilisearch
-    zh_Hant: Meilisearch
+  author: nexusai
   description:
     en_US: Interact with Meilisearch instance.
     zh_Hans: 与 Meilisearch 实例交互.
     zh_Hant: 與 Meilisearch 實例交互.
   icon: icon.svg
+  label:
+    en_US: Meilisearch
+    zh_Hans: Meilisearch
+    zh_Hant: Meilisearch
+  name: meilisearch
   tags:
-    - search
-    - productivity
-    - utilities
+  - search
+  - productivity
+  - utilities
 tools:
-  - tools/search.yaml
-  - tools/addOrReplaceDocuments.yaml
-  - tools/addOrUpdateDocuments.yaml
-extra:
-  python:
-    source: provider/meilisearch.py
+- tools/search.yaml
+- tools/addOrReplaceDocuments.yaml
+- tools/addOrUpdateDocuments.yaml

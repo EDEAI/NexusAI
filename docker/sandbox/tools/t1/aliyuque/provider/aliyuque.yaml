@@ -16,7 +16,7 @@ extra:
   python:
     source: provider/aliyuque.py
 identity:
-  author: 佐井
+  author: nexusai
   description:
     en_US: Yuque, https://www.yuque.com.
     pt_BR: Yuque, https://www.yuque.com.

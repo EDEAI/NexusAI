@@ -173,6 +173,14 @@ class ReqAgentSupplementSchema(BaseModel):
     supplement_prompt: Optional[str] = None
 
 
+class ReqAgentCorrectSchema(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    obligations: Optional[str] = None
+    abilities: Optional[List[AgentAbilitiesData]] = None
+    agent_supplement: Optional[str] = None
+
+
 class ReqAgentBatchSample(BaseModel):
     app_run_id: Optional[int] = None
     supplement_prompt: Optional[str] = None

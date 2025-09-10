@@ -2,7 +2,7 @@ extra:
   python:
     source: provider/image-compression.py
 identity:
-  author: liuxin
+  author: nexusai
   description:
     en_US: An image compression tool that helps you effectively reduce image file
       size while maintaining acceptable image quality.

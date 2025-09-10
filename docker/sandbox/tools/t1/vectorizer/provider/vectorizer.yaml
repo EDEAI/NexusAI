@@ -28,10 +28,9 @@ extra:
   python:
     source: provider/vectorizer.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
-    en_US:
-      Convert your PNG and JPG images to SVG vectors quickly and easily. Fully
+    en_US: Convert your PNG and JPG images to SVG vectors quickly and easily. Fully
       automatically. Using AI.
     zh_Hans: 一个将 PNG 和 JPG 图像快速轻松地转换为 SVG 矢量图的工具。
   icon: icon.png
@@ -40,7 +39,7 @@ identity:
     zh_Hans: Vectorizer.AI
   name: vectorizer
   tags:
-    - productivity
-    - image
+  - productivity
+  - image
 tools:
-  - tools/vectorizer.yaml
+- tools/vectorizer.yaml

@@ -1,40 +1,50 @@
-identity:
-  author: "pragnyan_ramtha"
-  name: "google_books_explorer"
-  label:
-    en_US: "google_books_explorer"
-    zh_Hans: "google_books_explorer"
-    pt_BR: "google_books_explorer"
-  description:
-    en_US: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
-    zh_Hans: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
-    pt_BR: "A Dify plugin that leverages the Google Books API to perform full-text searches and retrieve detailed information about books, including viewability and eBook availability. Requires a Google Books API key for access. Perfect for discovering, exploring, and accessing book data programmatically."
-  icon: "icon.svg"
 credentials_for_provider:
   google_books_api_key:
-    type: secret-input
-    required: true
+    help:
+      en_US: Get your google books API key from google
     label:
       en_US: google books API key
     placeholder:
       en_US: Enter your google books API key here
-    help:
-      en_US: Get your google books API key from google
+    required: true
+    type: secret-input
     url: https://developers.google.com/books
   max_results:
-    type: text-input
-    required: false
     default: 10
+    help:
+      en_US: The maximum number of results to return from the Google Books API. Default
+        is 10.
     label:
       en_US: Maximum results
+    max: 40
+    min: 1
     placeholder:
       en_US: Enter the maximum number of results to return
-    help:
-      en_US: The maximum number of results to return from the Google Books API. Default is 10.
-    min: 1
-    max: 40        
-tools:
-  - tools/google_books_explorer.yaml
+    required: false
+    type: text-input
 extra:
   python:
     source: provider/google_books_explorer.py
+identity:
+  author: nexusai
+  description:
+    en_US: A Dify plugin that leverages the Google Books API to perform full-text
+      searches and retrieve detailed information about books, including viewability
+      and eBook availability. Requires a Google Books API key for access. Perfect
+      for discovering, exploring, and accessing book data programmatically.
+    pt_BR: A Dify plugin that leverages the Google Books API to perform full-text
+      searches and retrieve detailed information about books, including viewability
+      and eBook availability. Requires a Google Books API key for access. Perfect
+      for discovering, exploring, and accessing book data programmatically.
+    zh_Hans: A Dify plugin that leverages the Google Books API to perform full-text
+      searches and retrieve detailed information about books, including viewability
+      and eBook availability. Requires a Google Books API key for access. Perfect
+      for discovering, exploring, and accessing book data programmatically.
+  icon: icon.svg
+  label:
+    en_US: google_books_explorer
+    pt_BR: google_books_explorer
+    zh_Hans: google_books_explorer
+  name: google_books_explorer
+tools:
+- tools/google_books_explorer.yaml

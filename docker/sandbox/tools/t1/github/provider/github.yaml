@@ -36,7 +36,7 @@ extra:
   python:
     source: provider/github.py
 identity:
-  author: CharlieWei
+  author: nexusai
   description:
     en_US: GitHub is an online software source code hosting service.
     pt_BR: GitHub é uma plataforma online para serviços de hospedagem de código fonte

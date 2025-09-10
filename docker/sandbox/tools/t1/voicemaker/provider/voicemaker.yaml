@@ -1,46 +1,46 @@
-identity:
-  author: heavi
-  name: voicemaker
-  label:
-    en_US: voicemaker
-    zh_Hans: voicemaker
-    pt_BR: voicemaker
-  description:
-    en_US: voicemaker is the voicemaker.in api
-    zh_Hans: voicemaker 是 voicemaker.in 的 API
-    pt_BR: voicemaker é a API do voicemaker.in
-  icon: icon.svg
-  tags: #
-    - other
-credentials_for_provider: #添加 credentials_for_provider 字段
+credentials_for_provider:
+  base_url:
+    help:
+      en_US: voicemaker doc
+      zh_Hans: 查看 voicemaker  文档
+    label:
+      en_US: voicemaker base url
+      zh_Hans: voicemaker base url
+    placeholder:
+      en_US: Enter the url of your voicemaker, for example https://developer.voicemaker.in
+      zh_Hans: 在此输入 voicemaker 的服务器地址，如 https://developer.voicemaker.in
+    required: false
+    type: text-input
+    url: https://developer.voicemaker.in/apidocs
   serpapi_api_key:
-    type: secret-input
-    required: true
+    help:
+      en_US: Get your voicemaker API key from voicemaker
+      zh_Hans: 从 voicemaker 获取您的 voicemaker API key
     label:
       en_US: voicemaker API key
       zh_Hans: voicemaker API key
     placeholder:
       en_US: Please input your voicemaker API key
       zh_Hans: 请输入你的 voicemaker API key
-    help:
-      en_US: Get your voicemaker API key from voicemaker
-      zh_Hans: 从 voicemaker 获取您的 voicemaker API key
+    required: true
+    type: secret-input
     url: https://developer.voicemaker.in/user/apikeys
-  base_url:
-    type: text-input
-    required: false
-    label:
-      en_US: voicemaker base url
-      zh_Hans: voicemaker base url
-    placeholder:
-      zh_Hans: 在此输入 voicemaker 的服务器地址，如 https://developer.voicemaker.in
-      en_US: Enter the url of your voicemaker, for example https://developer.voicemaker.in
-    help:
-      en_US: voicemaker doc
-      zh_Hans: 查看 voicemaker  文档
-    url: https://developer.voicemaker.in/apidocs
-tools:
-  - tools/voicemaker.yaml
 extra:
   python:
     source: provider/voicemaker.py
+identity:
+  author: nexusai
+  description:
+    en_US: voicemaker is the voicemaker.in api
+    pt_BR: voicemaker é a API do voicemaker.in
+    zh_Hans: voicemaker 是 voicemaker.in 的 API
+  icon: icon.svg
+  label:
+    en_US: voicemaker
+    pt_BR: voicemaker
+    zh_Hans: voicemaker
+  name: voicemaker
+  tags:
+  - other
+tools:
+- tools/voicemaker.yaml

@@ -1,37 +1,36 @@
-identity:
-  author: dupdub-dify
-  name: dupdub
-  label:
-    en_US: DupDub
-    zh_Hans: DupDub
-    pt_BR: DupDub
-  description:
-    en_US: DupDub
-    zh_Hans: DupDub
-    pt_BR: DupDub
-  icon: icon.svg
-  tags:
-    - design
-    - productivity
-tools:
-  - tools/transcribe_speech.yaml
-  - tools/voice_cloning.yaml
-  - tools/get_speaker_id.yaml
-  - tools/dubbing.yaml
+credentials_for_provider:
+  dupdub_token:
+    description:
+      en_US: Your DupDub token
+      pt_BR: Your DupDub token
+      zh_Hans: Your DupDub token
+    label:
+      en_US: DupDub token
+      pt_BR: DupDub token
+      zh_Hans: DupDub token
+    required: true
+    type: secret-input
+    url: https://www.dupdub.com/?utm_source=dify&utm_medium=dify&utm_campaign=dify&utm_id=20250211
 extra:
   python:
     source: provider/dupdub.py
-
-credentials_for_provider:
-  dupdub_token:
-    type: secret-input
-    required: true
-    label:
-      en_US: "DupDub token"
-      zh_Hans: "DupDub token"
-      pt_BR: "DupDub token"
-    description:
-      en_US: "Your DupDub token"
-      zh_Hans: "Your DupDub token"
-      pt_BR: "Your DupDub token"
-    url: https://www.dupdub.com/?utm_source=dify&utm_medium=dify&utm_campaign=dify&utm_id=20250211
+identity:
+  author: nexusai
+  description:
+    en_US: DupDub
+    pt_BR: DupDub
+    zh_Hans: DupDub
+  icon: icon.svg
+  label:
+    en_US: DupDub
+    pt_BR: DupDub
+    zh_Hans: DupDub
+  name: dupdub
+  tags:
+  - design
+  - productivity
+tools:
+- tools/transcribe_speech.yaml
+- tools/voice_cloning.yaml
+- tools/get_speaker_id.yaml
+- tools/dubbing.yaml

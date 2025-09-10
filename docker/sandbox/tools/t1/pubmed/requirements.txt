@@ -1,1 +1,3 @@
-dify_plugin==0.0.1b65
+dify_plugin
+biopython
+requests

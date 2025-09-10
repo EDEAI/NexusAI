@@ -1,50 +1,45 @@
-identity:
-  author: "biow"
-  name: "baidu-ocr"
-  label:
-    en_US: "baidu-ocr"
-    zh_Hans: "百度OCR"
-    pt_BR: "baidu-ocr"
-  description:
-    en_US: "Baidu OCR plugin for text recognition"
-    zh_Hans: "百度OCR文字识别服务插件"
-    pt_BR: "Baidu OCR plugin for text recognition"
-  icon: "baidu_logo.jpeg"
 credentials_for_provider:
-  app_id:
-    type: text-input
-    required: true
-    label:
-      en_US: APP ID
-      zh_Hans: 应用ID
-    placeholder:
-      en_US: Enter your Baidu APP ID
-      zh_Hans: 输入您的百度应用ID
   api_key:
-    type: secret-input
-    required: true
     label:
       en_US: API Key
       zh_Hans: API密钥
     placeholder:
       en_US: Enter your Baidu API Key
       zh_Hans: 输入您的百度API密钥
-  secret_key:
-    type: secret-input
     required: true
+    type: secret-input
+  app_id:
+    label:
+      en_US: APP ID
+      zh_Hans: 应用ID
+    placeholder:
+      en_US: Enter your Baidu APP ID
+      zh_Hans: 输入您的百度应用ID
+    required: true
+    type: text-input
+  secret_key:
     label:
       en_US: Secret Key
       zh_Hans: 安全密钥
     placeholder:
       en_US: Enter your Baidu Secret Key
       zh_Hans: 输入您的百度安全密钥
-tools:
-  # - tools/baidu-ocr.yaml
-  - tools/standard.yaml
-  # - tools/accurate.yaml
-  # - tools/standard_location.yaml
-  # - tools/accurate_location.yaml
-  # - tools/enhanced.yaml
+    required: true
+    type: secret-input
 extra:
   python:
     source: provider/baidu-ocr.py
+identity:
+  author: nexusai
+  description:
+    en_US: Baidu OCR plugin for text recognition
+    pt_BR: Baidu OCR plugin for text recognition
+    zh_Hans: 百度OCR文字识别服务插件
+  icon: baidu_logo.jpeg
+  label:
+    en_US: baidu-ocr
+    pt_BR: baidu-ocr
+    zh_Hans: 百度OCR
+  name: baidu-ocr
+tools:
+- tools/standard.yaml

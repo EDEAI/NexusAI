@@ -1,7 +1,0 @@
-dify_plugin~=0.0.1b67
-sqlalchemy>=2.0.0
-pymysql>=1.1.1
-cx-oracle>=8.3.0
-pymssql>=2.2.7
-psycopg2-binary>=2.9.10
-cryptography==42.0.8

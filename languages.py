@@ -753,6 +753,38 @@ language_packs = {
             Generated agent data:
             {history_agent}
         ''',
+        'agent_correct_system': '''
+            You are an AI agent correction assistant.
+            Please adjust the provided agent data according to the correction parameters I provided.
+            
+            CRITICAL REQUIREMENTS:
+            - You MUST preserve ALL abilities from the input data, including abilities with agent_ability_id=0 (new abilities)
+            - The agent_ability_id, output_format, and status fields MUST be returned exactly as provided
+            - Return ONLY the json structure data of the agent, no redundant content
+            
+            Description of the json structure of agent data:
+            {{
+                "name": "(string type) Agent name",
+                "description": "(string type) Agent description",
+                "obligations": "(string type) Agent functional information (including but not limited to the identity, responsibilities, positions, skills, etc. of the agent)",
+                "abilities": [
+                    {{
+                        "agent_ability_id": "(int type) Ability ID, 0 for new abilities - MUST be preserved exactly",
+                        "name": "(string type) Ability name",
+                        "content": "(string type) Specific content of the ability. When the agent is running, the selected ability content will be submitted to the LLM model as a prompt",
+                        "output_format": "(int type), the output format of the ability, 1: text format, 2: json format, 3: pure code format (excluding non-code content) - MUST be preserved exactly",
+                        "status": "(int type) Ability status, 1: enabled, 2: disabled - MUST be preserved exactly"
+                    }}
+                ]
+            }}
+        ''',
+        'agent_correct_user': '''
+            Correction suggestions:
+            {agent_supplement}
+
+            Proxy data that needs to be corrected:
+            {history_agent}
+        ''',
         'agent_batch_sample_system': '''
             You are an AI agent generation assistant.
             Please generate a complete sample agent information for me according to the agent data structure based on the requirements for batch generation of agents provided by me.
@@ -1137,6 +1169,7 @@ language_packs = {
         'user_does_not_belong_to_this_team': 'User does not belong to this team.',
         'the_current_user_does_not_have_permission': 'The current user does not have permission',
         'invalid_user_id': 'Invalid user ID',
+        'login_access_denied': 'Access denied: insufficient permissions',
         'invalid_role_id': 'Invalid role ID',
         'only_admin_can_switch_member_roles': 'Only administrators can switch member roles',
         'target_user_not_in_current_team': 'Target user is not in the current team',
@@ -1240,7 +1273,172 @@ language_packs = {
         'scheduled_task_repeat_day_of_year_invalid': 'Year repeat day must be between 1-365',
         'scheduled_task_app_not_exists': 'Application does not exist',
         'scheduled_task_app_not_public': 'Application is not public',
-        'scheduled_task_app_no_team_permission': 'No permission to access this application (different team)'
+        'scheduled_task_app_no_team_permission': 'No permission to access this application (different team)',
+        
+        # Workflow node generation messages
+        'api_workflow_success': 'Request successful, please wait',
+        'api_workflow_generate_failed': 'Request failed, please try again later',
+        'api_workflow_correction_failed': 'Request failed, please try again later',
+        'api_workflow_user_prompt_required': 'Prompt is required',
+        'generate_workflow_node_system_prompt': '''
+            You are a professional workflow node generation assistant.
+            Please generate complete workflow node information based on my requirements and the workflow node data structure.
+            **Variable Naming Convention**:
+            After generating workflow node information, you need to perform variable naming checks and optimization. Variable names in "input" and "output" attributes, as well as corresponding function input parameters or variable names in Python 3 code, must comply with code variable naming conventions:
+            - Can only contain letters, numbers, and underscores
+            - Cannot start with a number
+            - Cannot use Python keywords
+            - Use meaningful English words or abbreviations
+            
+            Workflow node data JSON structure description:
+            {{
+                "type": "custom_code",  // Fixed value, can only be custom_code
+                "title": "Node title, should be concise and descriptive",
+                "desc": "Node description, should explain the node's functionality",
+                "input": {{
+                    "name": "input",
+                    "type": "object",
+                    "properties": {{
+                        "variable_name": {{
+                            "name": "Variable name, must comply with code variable naming conventions, can only contain letters, numbers, and underscores, cannot start with a number, cannot use Python keywords",
+                            "type": "Variable type, can only be one of ['string', 'number', 'json', 'file'], 'string' corresponds to Python's str type, 'number' corresponds to Python's int or float type, 'json' corresponds to Python's dict or list type, 'file' type variable value is a file path that can be directly used for file operations",
+                            "value": "Reference value or default value",
+                            "sort_order": "(Integer type) Display sorting",
+                            "max_length": "(Integer type) Maximum length limit, 0 means unlimited"
+                        }}
+                    }},
+                    "sort_order": 0
+                }},
+                "code_dependencies": {{
+                    "python3": ["List of dependency package names"]
+                }},
+                "custom_code": {{
+                    "python3": "Python 3 code, must contain a main function that returns dictionary type data"
+                }},
+                "output": {{
+                    "name": "output",
+                    "type": "object",
+                    "properties": {{
+                        "result_variable": {{
+                            "name": "Variable name, must comply with code variable naming conventions, can only contain letters, numbers, and underscores, cannot start with a number, cannot use Python keywords",
+                            "type": "Variable type, can only be one of ['string', 'number', 'json', 'file'], 'string' corresponds to Python's str type, 'number' corresponds to Python's int or float type, 'json' corresponds to Python's dict or list type, 'file' is used when the variable contains a file path. If the Python function returns a file path, this variable must be set to 'file' type",
+                            "value": null,
+                            "sort_order": "(Integer type) Display sorting"
+                        }}
+                    }},
+                    "sort_order": 0
+                }},
+                "wait_for_all_predecessors": false,
+                "manual_confirmation": false,
+                "flow_data": {{}},
+                "original_node_id": "Default to empty string"
+            }}
+            
+            Special Rules:
+            1. The "type" field must and can only be "custom_code", do not generate other types of nodes.
+            2. "input" defines the input variables of the node. The overall structure is an object type. "properties" contains all input variables, each input variable is a dictionary type.
+            3. "code_dependencies" are the python3 dependencies that need to be installed separately via pip when the node code runs. The overall structure is a dictionary type. The internal "python3" is a fixed key. Each element in the list corresponding to "python3" is a dependency name.
+            4. "custom_code" is the python3 code of the node. The overall structure is a dictionary type. The internal "python3" is a fixed key. The value corresponding to "python3" is python3 code. The code is a string type.
+                **Python 3 Code Generation Specifications**:
+                4.1 Only provide one main function (main function), all code logic is implemented in the main function
+                4.2 Do not provide other functions at the same level as the main function. If you need to encapsulate functions, they must be defined inside the main function
+                4.3 Do not provide function call code. The system will automatically call the main function
+                4.4 The input parameters of the function correspond to the input variables of the node. Variable names and variable types must be completely consistent with the definitions in the "input" attribute
+                4.5 Non-required variables must have default values, variables with default values should be placed at the end of the parameter list
+                4.6 Must explicitly specify the function's return data type as -> dict
+                4.7 The main function must return dictionary type data at the end, corresponding to the output variables of the node. The key names of the dictionary data are the output variable names
+            5. "output" defines the output variables after the node runs. The overall structure is an object type. "properties" contains all output variables, each output variable is a dictionary type.
+            6. Pay attention to the type of output variables. The type of each output variable must strictly match the corresponding data type in the data returned by python3 code: If python3 code returns "dict" or "list", the corresponding output variable type must be set to "json"; if it returns a file path, the corresponding output variable type must be set to "file"; otherwise (for strings, integers, floats, etc.) should be set to "string" or "number" accordingly. Each key in the returned dictionary must correspond to a type-matched output variable.
+
+        ''',
+        'generate_workflow_node_user': '''
+            My requirement:
+            {user_prompt}
+        ''',
+        'correction_workflow_node_system_prompt': '''
+            You are a professional workflow node generation assistant.
+            You have already generated a workflow node. Please adjust the generated workflow node data according to the correction suggestions I provide.
+            **Variable Naming Convention**:
+            After generating workflow node information, you need to perform variable naming checks and optimization. Variable names in "input" and "output" attributes, as well as corresponding function input parameters or variable names in Python 3 code, must comply with code variable naming conventions:
+            - Can only contain letters, numbers, and underscores
+            - Cannot start with a number
+            - Cannot use Python keywords
+            - Use meaningful English words or abbreviations
+            
+            Please note that only workflow node structure data should be returned, no redundant content.
+            
+            Workflow node data JSON structure description:
+            {{
+                "type": "custom_code",  // Fixed value, can only be custom_code
+                "title": "Node title, should be concise and descriptive",
+                "desc": "Node description, should explain the node's functionality",
+                "input": {{
+                    "name": "input",
+                    "type": "object",
+                    "properties": {{
+                        "variable_name": {{
+                            "name": "Variable name, must comply with code variable naming conventions, can only contain letters, numbers, and underscores, cannot start with a number, cannot use Python keywords",
+                            "type": "Variable type, can only be one of ['string', 'number', 'json', 'file'], 'string' corresponds to Python's str type, 'number' corresponds to Python's int or float type, 'json' corresponds to Python's dict or list type, 'file' type variable value is a file path that can be directly used for file operations",
+                            "value": "Reference value or default value",
+                            "sort_order": "(Integer type) Display sorting",
+                            "max_length": "(Integer type) Maximum length limit, 0 means unlimited"
+                        }}
+                    }},
+                    "sort_order": 0
+                }},
+                "code_dependencies": {{
+                    "python3": ["List of dependency package names"]
+                }},
+                "custom_code": {{
+                    "python3": "Python 3 code, must contain a main function that returns dictionary type data"
+                }},
+                "output": {{
+                    "name": "output",
+                    "type": "object",
+                    "properties": {{
+                        "result_variable": {{
+                            "name": "Variable name, must comply with code variable naming conventions, can only contain letters, numbers, and underscores, cannot start with a number, cannot use Python keywords",
+                            "type": "Variable type, can only be one of ['string', 'number', 'json', 'file'], 'string' corresponds to Python's str type, 'number' corresponds to Python's int or float type, 'json' corresponds to Python's dict or list type, 'file' is used when the variable contains a file path. If the Python function returns a file path, this variable must be set to 'file' type",
+                            "value": null,
+                            "sort_order": "(Integer type) Display sorting"
+                        }}
+                    }},
+                    "sort_order": 0
+                }},
+                "wait_for_all_predecessors": false,
+                "manual_confirmation": false,
+                "flow_data": {{}},
+                "original_node_id": "Default to empty string"
+            }}
+            
+            Special Rule Descriptions:
+            1. The "type" field must and can only be "custom_code", do not generate other types of nodes.
+            2. "input" defines the input variables of the node. The overall structure is an object type. "properties" contains all input variables, each input variable is a dictionary type.
+            3. "code_dependencies" are the python3 dependencies that need to be installed separately via pip when the node code runs. The overall structure is a dictionary type. The internal "python3" is a fixed key. Each element in the list corresponding to "python3" is a dependency name.
+            4. "custom_code" is the python3 code of the node. The overall structure is a dictionary type. The internal "python3" is a fixed key. The value corresponding to "python3" is python3 code. The code is a string type.
+                **Python 3 Code Generation Specifications**:
+                4.1 Only provide one main function (main function), all code logic is implemented in the main function
+                4.2 Do not provide other functions at the same level as the main function. If you need to encapsulate functions, they must be defined inside the main function
+                4.3 Do not provide function call code. The system will automatically call the main function
+                4.4 The input parameters of the function correspond to the input variables of the node. Variable names and variable types must be completely consistent with the definitions in the "input" attribute
+                4.5 Non-required variables must have default values, variables with default values should be placed at the end of the parameter list
+                4.6 Must explicitly specify the function's return data type as -> dict
+                4.7 The main function must return dictionary type data at the end, corresponding to the output variables of the node. The key names of the dictionary data are the output variable names
+                4.8 Strictly prohibit conditional statements (if/elif/else), loop statements (for/while), exception handling (try/except)
+                4.9 Strictly prohibit string check operations (in, not in, startswith, endswith, contains)
+                4.10 Strictly prohibit complex logical operations (ternary operators, logical operator combinations, list comprehensions)
+                4.11 Strictly prohibit any code that iterates over integer types
+            5. "output" defines the output variables after the node runs. The overall structure is an object type. "properties" contains all output variables, each output variable is a dictionary type.
+            6. Pay attention to the type of output variables. The type of each output variable must strictly match the corresponding data type in the data returned by python3 code: If python3 code returns "dict" or "list", the corresponding output variable type must be set to "json"; if it returns a file path, the corresponding output variable type must be set to "file"; otherwise (for strings, integers, floats, etc.) should be set to "string" or "number" accordingly. Each key in the returned dictionary must correspond to a type-matched output variable.
+
+        ''',
+        'correction_workflow_node_user': '''
+            Correction suggestions:
+            {correction_prompt}
+            
+            Generated workflow node data:
+            {history_node}
+        '''
     },
     "zh": {
         "agent_run_type_1": "调试运行",
@@ -1587,6 +1785,7 @@ language_packs = {
         'user_does_not_belong_to_this_team': '用户不属于该团队，无法进行切换',
         'the_current_user_does_not_have_permission': '当前用户暂无权限',
         'invalid_user_id': '无效的用户ID',
+        'login_access_denied': '访问被拒绝：权限不足',
         'invalid_role_id': '无效的角色ID',
         'only_admin_can_switch_member_roles': '只有管理员才能切换成员角色',
         'target_user_not_in_current_team': '目标用户不在当前团队中',
@@ -1690,7 +1889,17 @@ language_packs = {
         'scheduled_task_repeat_day_of_year_invalid': '年重复日期必须在1-365之间',
         'scheduled_task_app_not_exists': '应用不存在',
         'scheduled_task_app_not_public': '应用未公开',
-        'scheduled_task_app_no_team_permission': '无权限访问此应用（不同团队）'
+        'scheduled_task_app_no_team_permission': '无权限访问此应用（不同团队）',
+        
+        # 工作流节点生成相关提示
+        'api_workflow_success': '请求成功，请等待',
+        'api_workflow_generate_failed': '请求失败，请稍后再试',
+        'api_workflow_correction_failed': '请求失败，请稍后再试',
+        'api_workflow_user_prompt_required': '提示词不能为空',
+        'generate_workflow_node_user': '''
+            我的需求：
+            {user_prompt}
+        ''',
     }
 }
 
@@ -1749,6 +1958,8 @@ prompt_keys = [
     "regenerate_agent_user",
     "agent_supplement_system",
     "agent_supplement_user",
+    "agent_correct_system",
+    "agent_correct_user",
     "agent_batch_sample_system",
     "agent_batch_sample_user",
     "agent_batch_one_system",
@@ -1759,7 +1970,12 @@ prompt_keys = [
     "generate_skill_system_prompt",
     "generate_skill_user",
     "correction_skill_system_prompt",
-    "correction_skill_user"
+    "correction_skill_user",
+    
+    "generate_workflow_node_system_prompt",
+    "generate_workflow_node_user",
+    "correction_workflow_node_system_prompt",
+    "correction_workflow_node_user"
 ]
 
 # Dictionary to store prompt function descriptions
@@ -1838,6 +2054,8 @@ prompt_descriptions = {
                 "regenerate_agent_user": "AI Regenerate Agent User Prompt",
                 "agent_supplement_system": "AI Correct Agent System Prompt",
                 "agent_supplement_user": "AI Correct Agent User Prompt",
+                "agent_correct_system": "AI Direct Correct Agent System Prompt",
+                "agent_correct_user": "AI Direct Correct Agent User Prompt",
                 "agent_batch_sample_system": "AI Generate Sample Agent System Prompt",
                 "agent_batch_sample_user": "AI Generate Sample Agent User Prompt",
                 "agent_batch_one_system": "AI Batch Generate Agent System Prompt",
@@ -1853,6 +2071,15 @@ prompt_descriptions = {
                 "generate_skill_user": "AI Generate Skill User Prompt",
                 "correction_skill_system_prompt": "AI Correct Skill System Prompt",
                 "correction_skill_user": "AI Correct Skill User Prompt"
+            }
+        },
+        {
+            "group_name": "AI Generate Workflow Node",
+            "prompts": {
+                "generate_workflow_node_system_prompt": "AI Generate Workflow Node System Prompt",
+                "generate_workflow_node_user": "AI Generate Workflow Node User Prompt",
+                "correction_workflow_node_system_prompt": "AI Correct Workflow Node System Prompt",
+                "correction_workflow_node_user": "AI Correct Workflow Node User Prompt"
             }
         }
     ],
@@ -1930,6 +2157,8 @@ prompt_descriptions = {
                 "regenerate_agent_user": "AI重新生成智能体用户提示词",
                 "agent_supplement_system": "AI修正智能体系统提示词",
                 "agent_supplement_user": "AI修正智能体用户提示词",
+                "agent_correct_system": "AI直接修正智能体系统提示词",
+                "agent_correct_user": "AI直接修正智能体用户提示词",
                 "agent_batch_sample_system": "AI生成样例智能体系统提示词",
                 "agent_batch_sample_user": "AI生成样例智能体用户提示词",
                 "agent_batch_one_system": "AI批量生成智能体系统提示词",
@@ -1945,6 +2174,15 @@ prompt_descriptions = {
                 "generate_skill_user": "AI生成技能用户提示词",
                 "correction_skill_system_prompt": "AI修正技能系统提示词",
                 "correction_skill_user": "AI修正技能用户提示词"
+            }
+        },
+        {
+            "group_name": "AI生成工作流节点",
+            "prompts": {
+                "generate_workflow_node_system_prompt": "AI生成工作流节点系统提示词",
+                "generate_workflow_node_user": "AI生成工作流节点用户提示词",
+                "correction_workflow_node_system_prompt": "AI修正工作流节点系统提示词",
+                "correction_workflow_node_user": "AI修正工作流节点用户提示词"
             }
         }
     ]
@@ -2039,7 +2277,11 @@ Always consider the current date and time when providing responses, especially f
 
 Please note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction.
 
-If the user requests any type of chart, diagram, graph, or visual representation (including but not limited to flowcharts, sequence diagrams, Gantt charts, pie charts, bar charts, line graphs, mind maps, organizational charts, network diagrams, etc.), you MUST respond with appropriate Mermaid diagram code. The Mermaid code should be complete, properly formatted, and ready to be rendered in any Mermaid-compatible viewer.
+If the user requests any type of chart, diagram, graph, or visual representation (including but not limited to flowcharts, sequence diagrams, Gantt charts, pie charts, bar charts, line graphs, mind maps, organizational charts, network diagrams, etc.), you MUST respond with complete Mermaid diagram code.
+The Mermaid code must be fully valid and syntactically correct, so that it can be directly rendered in any Mermaid-compatible viewer without errors.
+Always enclose the Mermaid code in proper fenced code blocks using the mermaid language tag.
+If multiple diagram types are possible, choose the one that best fits the user’s request.
+Double-check the logic, structure, and syntax to ensure correctness and renderability before responding.
 === END CONTEXT ==="""
             if isinstance(content, str):
                 content += return_language_prompt

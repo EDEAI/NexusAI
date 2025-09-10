@@ -23,7 +23,7 @@ extra:
   python:
     source: provider/feishu_task.py
 identity:
-  author: Doug Lea
+  author: nexusai
   description:
     en_US: 'Feishu Task, requires the following permissions: task:task:write、contact:user.id:readonly.
 

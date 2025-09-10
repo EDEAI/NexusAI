@@ -120,7 +120,7 @@ async def skill_update(provider: str, tool_category: str = 't1', credentials: Di
             tool.insert(insert_data)
         else:
             # If authorized, update existing credentials.
-            conditions = [{'column': 'user_id', 'value': user_id}, {'column': 'team_id', 'value': team_id}, {'column': 'tool_category', 'value': tool_category}]
+            conditions = {'column': 'id', 'value': tool_result['data']['id']}
             data = {'encrypted_credentials': credentials}
             tool.update(conditions, data)
         return response_success()

@@ -20,7 +20,7 @@ extra:
   python:
     source: provider/did.py
 identity:
-  author: Matri Qi
+  author: nexusai
   description:
     en_US: D-ID is a tool enabling the creation of high-quality, custom videos of
       Digital Humans from a single image.

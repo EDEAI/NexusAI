@@ -16,7 +16,7 @@ extra:
   python:
     source: provider/perplexity.py
 identity:
-  author: langgenius
+  author: nexusai
   description:
     en_US: Perplexity.AI
     zh_Hans: Perplexity.AI

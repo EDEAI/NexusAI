@@ -13,6 +13,7 @@ export default {
     'app.chatroom.mcptool.type.tool': 'Tool',
     
     // MCP Tool Display - UI Labels
+    'app.chatroom.mcptool.toolCalls': 'Tool Calls',
     'app.chatroom.mcptool.inputVariables': 'Input Variables',
     'app.chatroom.mcptool.otherParameters': 'Other Parameters',
     'app.chatroom.mcptool.noParameters': 'No parameters available',
@@ -43,4 +44,4 @@ export default {
     'app.chatroom.mcptool.uploading': 'Uploading...',
     'app.chatroom.mcptool.uploadFile': 'Upload File',
     'app.chatroom.mcptool.remove': 'Remove',
-}; 
+};

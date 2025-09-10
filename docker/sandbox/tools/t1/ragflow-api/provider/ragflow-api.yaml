@@ -1,12 +1,4 @@
 credentials_for_provider:
-  app_url:
-    label:
-      en_US: Api Server Url
-    placeholder:
-      en_US: Api Server Url
-      zh_Hans: Api Server Url, 完整的URL
-    required: true
-    type: text-input
   app_key:
     help:
       en_US: API Key
@@ -16,6 +8,14 @@ credentials_for_provider:
     placeholder:
       en_US: API Key
       zh_Hans: API Key
+    required: true
+    type: text-input
+  app_url:
+    label:
+      en_US: Api Server Url
+    placeholder:
+      en_US: Api Server Url
+      zh_Hans: Api Server Url, 完整的URL
     required: true
     type: text-input
   dify_url:
@@ -29,29 +29,30 @@ credentials_for_provider:
       zh_Hans: Dify Url https://cloud.dify.ai
     required: false
     type: text-input
-identity:
-  author: witmeng
-  name: ragflow-api
-  label:
-    en_US: ragflow-api
-    zh_Hans: ragflow-api
-    pt_BR: ragflow-api
-  description:
-    en_US: a tools for RAGFlow api to list the dataset, document, chunks and add chunks
-    zh_Hans: 一个用于RAGFlow API的工具，用于列出数据集、文档、块并添加块
-    pt_BR: uma ferramenta para RAGFlow API para listar o conjunto de dados, o documento, os chunks e adicionar chunks
-  icon: icon.svg
-tools:
-  - tools/ragflow-api.yaml
-  - tools/list-document.yaml
-  - tools/list-chunks.yaml
-  - tools/add-chunks.yaml
-  - tools/retrieval.yaml
-  - tools/update-document.yaml
-  - tools/list-datasets.yaml
-  - tools/list-file.yaml
-  - tools/create-dataset.yaml
-  - tools/upload-and-parse-documents.yaml
 extra:
   python:
     source: provider/ragflow-api.py
+identity:
+  author: nexusai
+  description:
+    en_US: a tools for RAGFlow api to list the dataset, document, chunks and add chunks
+    pt_BR: uma ferramenta para RAGFlow API para listar o conjunto de dados, o documento,
+      os chunks e adicionar chunks
+    zh_Hans: 一个用于RAGFlow API的工具，用于列出数据集、文档、块并添加块
+  icon: icon.svg
+  label:
+    en_US: ragflow-api
+    pt_BR: ragflow-api
+    zh_Hans: ragflow-api
+  name: ragflow-api
+tools:
+- tools/ragflow-api.yaml
+- tools/list-document.yaml
+- tools/list-chunks.yaml
+- tools/add-chunks.yaml
+- tools/retrieval.yaml
+- tools/update-document.yaml
+- tools/list-datasets.yaml
+- tools/list-file.yaml
+- tools/create-dataset.yaml
+- tools/upload-and-parse-documents.yaml
