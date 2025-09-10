@@ -1,3 +1,4 @@
+import { layout } from "dagre";
 
 export default [
     {
@@ -113,6 +114,11 @@ export default [
     {
         path: '/',
         redirect: '/plaza ',
+    },
+    {
+        path: '/Agent_iframe',
+        component: './Creation/Agents/index_iframe',
+        layout:false
     },
     {
         path: '*',

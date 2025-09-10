@@ -12,13 +12,30 @@ const { REACT_APP_ENV = 'dev' } = process.env;
 const myEnvVar = process.env;
 
 const prevConfig = envConfig[REACT_APP_ENV as keyof typeof envConfig];
-const contConfig = {
+let contConfig = {
     API_URL: myEnvVar.WEB_API_URL || prevConfig.API_URL,
     WS_URL: myEnvVar.WEB_WS_URL || prevConfig.WS_URL,
     CHAT_URL: myEnvVar.WEB_CHAT_URL || prevConfig.CHAT_URL,
     OUTPUT_PATH: myEnvVar.WEB_OUTPUT_PATH || prevConfig.OUTPUT_PATH,
+    IFRAME_TEST_USERNAME: myEnvVar.WEB_IFRAME_TEST_USERNAME || prevConfig.IFRAME_TEST_USERNAME,
+    IFRAME_TEST_PASSWORD: myEnvVar.WEB_IFRAME_TEST_PASSWORD || prevConfig.IFRAME_TEST_PASSWORD,
 };
-console.log(`ENV: ${REACT_APP_ENV}`,contConfig);
+
+// contConfig = prevConfig;
+// Helper function to check variable source
+const getVariableSource = (envVar: string | undefined, configVar: string) => {
+    return envVar ? '🌍 System Environment' : '📄 Config File';
+};
+
+// Enhanced logging with better formatting and variable source tracking
+console.group(`🚀 Nexus AI Configuration - Environment: ${REACT_APP_ENV.toUpperCase()}`);
+// console.log('📋 Configuration Details:', contConfig);
+console.log(`🔗 API URL: ${contConfig.API_URL} ${getVariableSource(myEnvVar.WEB_API_URL, prevConfig.API_URL)}`);
+console.log(`🌐 WebSocket URL: ${contConfig.WS_URL} ${getVariableSource(myEnvVar.WEB_WS_URL, prevConfig.WS_URL)}`);
+console.log(`💬 Chat URL: ${contConfig.CHAT_URL} ${getVariableSource(myEnvVar.WEB_CHAT_URL, prevConfig.CHAT_URL)}`);
+console.log(`📁 Output Path: ${contConfig.OUTPUT_PATH} ${getVariableSource(myEnvVar.WEB_OUTPUT_PATH, prevConfig.OUTPUT_PATH)}`);
+
+console.groupEnd();
 // const contConfig = prevConfig
 export default defineConfig({
     extraPostCSSPlugins: [require('tailwindcss'), require('autoprefixer')],

@@ -379,6 +379,7 @@ export default {
     'workflow.debugTodo': '调试待办',
 
     'workflow.tag.imageUnderstanding': '图片理解',
+    'workflow.tag.localModel': '本地模型',
 
     'workflow.context': '上下文',
     'workflow.form.splitTaskByLine.label': '是否按行拆分任务',

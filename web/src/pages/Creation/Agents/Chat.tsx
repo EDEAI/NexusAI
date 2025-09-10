@@ -6,13 +6,13 @@
  */
 import { getAgentMessageHistory, postAgentChatMessage, PutagentPublish } from '@/api/agents';
 import { ChatRoomContent } from '@/components/ChatRoomContent';
+import { findOption } from '@/components/WorkFlow/components/Form/Select';
 import { ModelImageSupportProvider } from '@/contexts/ModelImageSupportContext';
 import useFileUpload from '@/hooks/useFileUpload';
 import { createPromptFromObject } from '@/py2js/prompt.js';
+import { useModelSelect } from '@/store/modelList';
 import useSocketStore from '@/store/websocket';
 import { getAgentFullscreenState, setAgentFullscreenState } from '@/utils/fullscreenStorage';
-import { useModelSelect } from '@/store/modelList';
-import { findOption } from '@/components/WorkFlow/components/Form/Select';
 import { FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm } from '@ant-design/pro-components';
@@ -118,6 +118,9 @@ interface Props {
         secondjudgingcondition: () => boolean;
         agentupdata: () => void;
     };
+    iframe?: {
+        height: string;
+    };
 }
 
 interface HistoryResponse {
@@ -153,7 +156,7 @@ export default memo((props: Props) => {
     // Function to get model name by config ID
     const getModelName = (modelConfigId: number | string): string => {
         if (!modelConfigId || !options) return '未知模型';
-        
+
         const modelOption = findOption(modelConfigId, { options });
         return modelOption?.label || '未知模型';
     };
@@ -161,9 +164,15 @@ export default memo((props: Props) => {
     // Function to check if model supports image understanding
     const checkImageSupport = (modelConfigId: number | string): boolean => {
         if (!modelConfigId || !options) return false;
-        
+
         const modelOption = findOption(modelConfigId, { options });
         return modelOption?.support_image === 1;
+    };
+    const checkLocalModel = (modelConfigId: number | string): boolean => {
+        if (!modelConfigId || !options) return false;
+
+        const modelOption = findOption(modelConfigId, { options });
+        return modelOption?.model_mode === 2;
     };
 
     const toggleFullscreen = () => {
@@ -180,7 +189,6 @@ export default memo((props: Props) => {
 
     useEffect(() => {
         if (props.data?.detailList?.app?.name != undefined) {
-        
             const id = props.data.detailList.agent_chatroom_id;
             const agentId = props.data.detailList.agent.agent_id;
 
@@ -201,8 +209,6 @@ export default memo((props: Props) => {
                 agent: props.data.detailList.agent,
                 agent_id: agentId,
             };
-
-         
 
             setAgentInfo(newAgentInfo);
 
@@ -271,8 +277,6 @@ export default memo((props: Props) => {
         }
     }, [listenMessage]);
 
-
-
     useEffect(() => {
         if (!initialLoading && messages.length > 0) {
             scrollToBottom();
@@ -280,7 +284,6 @@ export default memo((props: Props) => {
     }, [initialLoading]);
 
     const handleSubmit = async (values: { content: string; file_list: string[] }) => {
-      
         const val = formRef.current?.getFieldsValue();
         if (!val || !values.content?.trim()) return;
 
@@ -402,16 +405,92 @@ export default memo((props: Props) => {
     //       }} agentChatRoomId={agentChatRoomId}/>
 
     //     </div>)
+
+    const ChatHeader = () => (
+        <div
+            className="pb-4 flex gap-[10px] items-center"
+            style={{
+                paddingBottom: '16px',
+            }}
+        >
+            <div className="flex-1 flex items-center font-bold text-base">
+                {props.data?.detailList?.app?.name}
+                {isFullscreen && agentInfo?.agent?.m_config_id && (
+                    <div className="ml-3 flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-blue-700 border shadow-sm">
+                            {getModelName(agentInfo.agent.m_config_id)}
+                            {checkImageSupport(agentInfo.agent.m_config_id) && (
+                                <Tag color="blue" className="text-xs">
+                                    {intl.formatMessage({
+                                        id: 'workflow.tag.imageUnderstanding',
+                                        defaultMessage: 'Image Understanding',
+                                    })}
+                                </Tag>
+                            )}
+                            {checkLocalModel(agentInfo.agent.m_config_id) && (
+                                <Tag color="default" className="text-xs">
+                                    {intl.formatMessage({
+                                        id: 'workflow.tag.localModel',
+                                        defaultMessage: 'Local Model',
+                                    })}
+                                </Tag>
+                            )}
+                        </span>
+                    </div>
+                )}
+            </div>
+
+            <Button
+                type="text"
+                icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                onClick={toggleFullscreen}
+                title={intl.formatMessage({
+                    id: isFullscreen ? 'agent.chat.exit.fullscreen' : 'agent.chat.fullscreen',
+                })}
+            />
+
+            {props.operationbentate == 'false' && (
+                <>
+                    <Button
+                        type="primary"
+                        disabled={props.operationbentate == 'false' ? false : true}
+                        loading={savingInfo}
+                        onClick={handleSaveInfo}
+                        className="min-w-24"
+                    >
+                        {intl.formatMessage({ id: 'agent.btn.savedebug' })}
+                    </Button>
+                    <Button
+                        type="primary"
+                        disabled={props.operationbentate == 'false' ? false : true}
+                        loading={publishing || savingInfo}
+                        onClick={agentPublish}
+                        className="min-w-24"
+                    >
+                        {intl.formatMessage({ id: 'agent.publish' })}
+                    </Button>
+                </>
+            )}
+        </div>
+    );
     return (
         <div
             ref={chatWrapperRef}
-            className={`${
-                isFullscreen
-                    ? 'fixed inset-0 z-50 !h-screen  border border-gray-300 top-[55px] left-0 bg-white p-4'
-                    : '!h-[calc(100vh-65px)] p-4 !pb-0'
-            } box-border transition-all duration-300`}
+            className={
+                props.iframe
+                    ? `w-full`
+                    : `${
+                          isFullscreen
+                              ? 'fixed inset-0 z-50  border border-gray-300 !h-screen top-[55px] left-0 bg-white p-4'
+                              : '!h-[calc(100vh-65px)] p-4 !pb-0'
+                      } box-border transition-all duration-300`
+            }
             style={{
-                height: isFullscreen ? 'calc(100vh - 265px)' : 'calc(100vh - 65px)',
+                height: props.iframe
+                    ? props.iframe.height
+                    : isFullscreen
+                    ? 'calc(100vh - 265px)'
+                    : 'calc(100vh - 65px)',
                 backgroundColor: '#fff',
             }}
         >
@@ -424,89 +503,22 @@ export default memo((props: Props) => {
                     ability_id: 0,
                 }}
                 style={{
-                    height: isFullscreen
+                    height: props.iframe
+                        ? props.iframe.height
+                        : isFullscreen
                         ? 'calc(100vh - 57px - 16px)'
                         : 'calc(100vh - 57px - 16px)',
                 }}
                 className="m-0 flex flex-col overflow-y-auto"
             >
-                <div
-                    className="pb-4 flex gap-[10px] items-center"
-                    style={{
-                        paddingBottom: '16px',
-                    }}
-                >
-                    {/* <ProFormSelect
-                        label={intl.formatMessage({ id: 'agent.selectivepower' })}
-                        name="ability_id"
-                        options={props.data?.abilitiesList}
-                        fieldProps={{
-                            placeholder: intl.formatMessage({ id: 'agent.pleaseselect' }),
-                        }}
-                        formItemProps={{
-                            className: 'mb-0 flex-1',
-                        }}
-                    /> */}
-                    <div className="flex-1 flex items-center font-bold text-base">
-                        {props.data?.detailList?.app?.name}
-                        {isFullscreen && agentInfo?.agent?.m_config_id && (
-                            <div className="ml-3 flex items-center gap-2">
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-blue-700 border shadow-sm">
-                                    {getModelName(agentInfo.agent.m_config_id)}{checkImageSupport(agentInfo.agent.m_config_id) && (
-                                    <Tag color="blue" className="text-xs">
-                                        {intl.formatMessage({
-                                            id: 'workflow.tag.imageUnderstanding',
-                                            defaultMessage: 'Image Understanding',
-                                        })}
-                                    </Tag>
-                                )}
-                                </span>
-                                
-                            </div>
-                        )}
-                    </div>
-
-                    <Button
-                        type="text"
-                        icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
-                        onClick={toggleFullscreen}
-                        title={intl.formatMessage({
-                            id: isFullscreen
-                                ? 'agent.chat.exit.fullscreen'
-                                : 'agent.chat.fullscreen',
-                        })}
-                    />
-
-                    {props.operationbentate == 'false' && (
-                        <>
-                            <Button
-                                type="primary"
-                                disabled={props.operationbentate == 'false' ? false : true}
-                                loading={savingInfo}
-                                onClick={handleSaveInfo}
-                                className="min-w-24"
-                            >
-                                {intl.formatMessage({ id: 'agent.btn.savedebug' })}
-                            </Button>
-                            <Button
-                                type="primary"
-                                disabled={props.operationbentate == 'false' ? false : true}
-                                loading={publishing || savingInfo}
-                                onClick={agentPublish}
-                                className="min-w-24"
-                            >
-                                {intl.formatMessage({ id: 'agent.publish' })}
-                            </Button>
-                        </>
-                    )}
-                </div>
+                {props.iframe ? null : <ChatHeader />}
                 {agentChatRoomId ? (
                     <div
                         className={`w-full flex-1 flex bg-[#fff] overflow-hidden overflow-x-auto ${
                             isFullscreen ? 'max-w-[1400px] mx-auto justify-center' : ''
                         }`}
                         style={{
-                            height: isFullscreen ? 'calc(100vh - 64px)' : 'calc(100vh - 56px)',
+                            height: props.iframe ? props.iframe.height : isFullscreen ? 'calc(100vh - 64px)' : 'calc(100vh - 56px)',
                         }}
                     >
                         <ModelImageSupportProvider>

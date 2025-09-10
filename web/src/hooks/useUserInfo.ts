@@ -113,7 +113,12 @@ const fetchUserInfoGlobal = async (forceRefresh = false): Promise<UserInfo> => {
   // Create the promise for the API request
   pendingPromise = (async () => {
     try {
+      // If current path is Agent_iframe, skip userinfo call
+      if (window?.location?.pathname === '/Agent_iframe'&&!localStorage.getItem('token')) {
+        return globalUserInfo ?? {};
+      }
       const response = await userinfo();
+      
       if (response.code === 0 && response.data) {
         globalUserInfo = response.data;
         globalError = null;

@@ -386,6 +386,7 @@ export default {
     'workflow.debugTodo': 'Debug Todo',
 
     'workflow.tag.imageUnderstanding': 'Image Understanding',
+    'workflow.tag.localModel': 'Local Model',
 
     'workflow.context': 'Context',
     'workflow.form.splitTaskByLine.label': 'Split tasks by line',

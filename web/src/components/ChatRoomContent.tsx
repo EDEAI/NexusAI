@@ -29,7 +29,6 @@ const ChatRoomContentInner: FC<ChatRoomContentProps> = memo(props => {
     } = useChatRoomContext();
     
     useEffect(() => {
-        console.log(chatStatus);
         if (chatStatus == 1) {
             setIsStop(true);
         }

@@ -423,6 +423,15 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     })}
                                                 </Tag>
                                             )}
+
+                                            {option?.data?.model_mode==2 && (
+                                                <Tag color="default" className="text-xs">
+                                                    {intl.formatMessage({
+                                                        id: 'workflow.tag.localModel',
+                                                        defaultMessage: 'Local Model',
+                                                    })}
+                                                </Tag>
+                                            )}
                                         </div>
                                     );
                                 }}
@@ -436,6 +445,14 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                                     {intl.formatMessage({
                                                         id: 'workflow.tag.imageUnderstanding',
                                                         defaultMessage: 'Image Understanding',
+                                                    })}
+                                                </Tag>
+                                            )}
+                                            {findOption(props?.value, { options })?.model_mode==2 && (
+                                                <Tag color="default" className="text-xs">
+                                                    {intl.formatMessage({
+                                                        id: 'workflow.tag.localModel',
+                                                        defaultMessage: 'Local Model',
                                                     })}
                                                 </Tag>
                                             )}
