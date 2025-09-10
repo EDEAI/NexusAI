@@ -94,3 +94,23 @@ export const clearAllAgentFullscreenStates = (): void => {
         console.warn('Failed to clear all agent fullscreen states:', error);
     }
 }; 
+
+
+
+export const checkViewInIframe=()=>{
+    return window?.location?.pathname === '/agent_chat_quickly'
+}
+export const getIframeHostName=()=>{
+    return window?.location?.hostname
+}
+
+export const getIframeChatWsUrl=()=>{
+    return `${getProtocolIsHttps() ? 'wss' : 'ws'}://${getIframeHostName()}/agent_chat_ws`
+}
+
+export const getIframeApiUrl=()=>{
+    return `${getProtocolIsHttps() ? 'https' : 'http'}://${getIframeHostName()}`
+}
+export const getProtocolIsHttps=()=>{
+    return window?.location?.protocol === 'https:'
+}

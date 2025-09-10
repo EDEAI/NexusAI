@@ -2,6 +2,7 @@
  * @LastEditors: biz
  */
 import useSocketStore from '@/store/websocket';
+import { checkViewInIframe, getIframeChatWsUrl, getIframeHostName, getProtocolIsHttps } from '@/utils/fullscreenStorage';
 import { useLatest, useWebSocket } from 'ahooks';
 import { useEffect, useRef } from 'react';
 
@@ -12,7 +13,10 @@ const URL = {
 type ManagerType = 'chat' | 'dealt';
 
 const useWebSocketManager = (type: ManagerType = 'dealt', listen?: Function) => {
-    const url = URL[type];
+    let url = URL[type];
+    if(checkViewInIframe()){
+        url = getIframeChatWsUrl();
+    }
     const addFlowMessage = useSocketStore(state => state.addFlowMessage);
     const timerRef = useRef<NodeJS.Timeout>();
 

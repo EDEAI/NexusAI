@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { userinfo } from '@/api';
+import { checkViewInIframe } from '@/utils/fullscreenStorage';
 
 interface UserInfo {
   uid?: string;
@@ -114,7 +115,7 @@ const fetchUserInfoGlobal = async (forceRefresh = false): Promise<UserInfo> => {
   pendingPromise = (async () => {
     try {
       // If current path is Agent_iframe, skip userinfo call
-      if (window?.location?.pathname === '/Agent_iframe'&&!localStorage.getItem('token')) {
+      if (checkViewInIframe()&&!localStorage.getItem('token')) {
         return globalUserInfo ?? {};
       }
       const response = await userinfo();

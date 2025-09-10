@@ -116,7 +116,7 @@ export default [
         redirect: '/plaza ',
     },
     {
-        path: '/Agent_iframe',
+        path: '/agent_chat_quickly',
         component: './Creation/Agents/index_iframe',
         layout:false
     },

@@ -17,6 +17,7 @@ export namespace REQ_TYPE {
 
 import { request, RequestConfig } from '@umijs/max';
 import { LOGIN_URL } from '.';
+import { checkViewInIframe, getIframeApiUrl, getIframeHostName } from '@/utils/fullscreenStorage';
 export const BASE_URL = API_URL;
 // export const BASE_URL = 'http://192.168.4.80:9472';
 const DEFAULT_CONTENT_TYPE = 'application/json; charset=UTF-8';
@@ -36,7 +37,7 @@ const apiRequest = async <T>(
         headers['Authorization'] = `Bearer ${token}`;
     }
     return request(url, {
-        baseURL: BASE_URL,
+        baseURL: checkViewInIframe()?getIframeApiUrl():BASE_URL,
         method,
         headers,
         ...requestData,
