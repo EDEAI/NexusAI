@@ -44,6 +44,7 @@ class CreateScheduledTaskSchema(BaseModel):
     repeat_month: Optional[int] = Field(None, description="Month for yearly repeat")
     repeat_day_of_year: Optional[int] = Field(None, description="Day of year for yearly repeat")
     task_data: Dict[str, Any] = Field(..., description="Task data")
+    node_confirm_users: Optional[Dict[str, Any]] = Field(None, description="Node confirmation users mapping")
     max_executions: int = Field(0, description="Maximum execution count")
 
 # Update scheduled task request model
@@ -61,6 +62,7 @@ class UpdateScheduledTaskSchema(BaseModel):
     repeat_month: Optional[int] = Field(None, description="Month for yearly repeat")
     repeat_day_of_year: Optional[int] = Field(None, description="Day of year for yearly repeat")
     task_data: Optional[Dict[str, Any]] = Field(None, description="Task data")
+    node_confirm_users: Optional[Dict[str, Any]] = Field(None, description="Node confirmation users mapping")
     max_executions: Optional[int] = Field(None, description="Maximum execution count")
     status: Optional[TaskStatus] = Field(None, description="Task status")
 
@@ -85,6 +87,7 @@ class ScheduledTaskInfo(BaseModel):
     repeat_month: Optional[int]
     repeat_day_of_year: Optional[int]
     task_data: Dict[str, Any]
+    node_confirm_users: Optional[Dict[str, Any]]
     last_run_time: Optional[datetime]
     last_run_status: Optional[ExecutionStatus]
     execution_count: int

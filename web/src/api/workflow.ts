@@ -100,6 +100,46 @@ export const getWorkFlowInfo = async (app_id, publish_status: number | string = 
     });
 };
 
+// Get workflow scheduled task
+// @param {string} app_id - Application ID of the workflow
+// @param {string} workflow_id - Workflow ID
+// @returns {Promise<any>} - Returns a Promise object with the scheduled task information
+export const getWorkflowScheduledTask = async (app_id: string | number, workflow_id: string | number) => {
+    return await aniRequest<any>(`/v1/scheduled_tasks/workflow/${app_id}/${workflow_id}`, {
+        method: 'GET',
+    });
+};
+
+// Create workflow scheduled task
+// @param {object} data - Task creation data
+// @returns {Promise<any>} - Returns a Promise object with the creation result
+export const createWorkflowScheduledTask = async (data: any) => {
+    return await aniRequest<any>(`/v1/scheduled_tasks/create`, {
+        method: 'POST',
+        data,
+    });
+};
+
+// Update workflow scheduled task
+// @param {string | number} task_id - Task ID
+// @param {object} data - Task update data
+// @returns {Promise<any>} - Returns a Promise object with the update result
+export const updateWorkflowScheduledTask = async (task_id: string | number, data: any) => {
+    return await aniRequest<any>(`/v1/scheduled_tasks/update/${task_id}`, {
+        method: 'PUT',
+        data,
+    });
+};
+
+// Delete workflow scheduled task
+// @param {string | number} task_id - Task ID
+// @returns {Promise<any>} - Returns a Promise object with the deletion result
+export const deleteWorkflowScheduledTask = async (task_id: string | number) => {
+    return await aniRequest<any>(`/v1/scheduled_tasks/delete/${task_id}`, {
+        method: 'DELETE',
+    });
+};
+
 // Run workflow
 // @param {string} app_id - Application ID of the workflow
 // @param {object} params - Run parameters

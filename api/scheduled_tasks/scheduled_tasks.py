@@ -127,6 +127,7 @@ async def create_scheduled_task(
         "repeat_month": data.repeat_month,
         "repeat_day_of_year": data.repeat_day_of_year,
         "task_data": data.task_data,
+        "node_confirm_users": data.node_confirm_users,
         "max_executions": data.max_executions,
         "status": 1  # ENABLED
     }
@@ -211,11 +212,14 @@ async def update_scheduled_task(
     if data.start_time is not None:
         update_data["start_time"] = data.start_time
     
-    if data.end_time is not None:
-        # Validate end time
-        start_time = data.start_time if data.start_time else task['start_time']
-        if data.end_time <= start_time:
-            return response_error(get_language_content("scheduled_task_end_time_before_start_time"))
+    # Handle end_time field - check if it's explicitly provided in the request
+    if hasattr(data, 'end_time') and 'end_time' in data.__dict__:
+        if data.end_time is not None:
+            # Validate end time when it's not null
+            start_time = data.start_time if data.start_time else task['start_time']
+            if data.end_time <= start_time:
+                return response_error(get_language_content("scheduled_task_end_time_before_start_time"))
+        # Always include end_time in update_data when explicitly provided (even if null)
         update_data["end_time"] = data.end_time
     
     if data.repeat_type is not None:
@@ -248,6 +252,9 @@ async def update_scheduled_task(
     
     if data.task_data is not None:
         update_data["task_data"] = data.task_data
+    
+    if data.node_confirm_users is not None:
+        update_data["node_confirm_users"] = data.node_confirm_users
     
     if data.max_executions is not None:
         if data.max_executions < 0:
@@ -446,3 +453,40 @@ async def get_scheduled_task_detail(
         return response_error(get_language_content("scheduled_task_not_found"))
     
     return response_success(task)
+
+
+@router.get("/workflow/{app_id}/{workflow_id}", response_model=RespBaseSchema)
+async def get_workflow_scheduled_task(
+    app_id: int,
+    workflow_id: int,
+    userinfo: TokenData = Depends(get_current_user)
+):
+    """
+    Get scheduled task for a specific workflow.
+    
+    This endpoint retrieves the scheduled task associated with a specific
+    workflow within an application. Only one scheduled task per workflow
+    is supported, so this returns either the existing task or null.
+    
+    Parameters:
+    - app_id: ID of the application (required)
+    - workflow_id: ID of the workflow (required)
+    
+    Returns:
+        Success response containing task object if exists, or null if no task found.
+        Task object includes all fields as described in the detail endpoint.
+    
+    Raises:
+        HTTPException: If database operation fails
+    
+    Note:
+        Only non-deleted tasks are returned. The task must belong to the
+        authenticated user for security purposes.
+    """
+    scheduled_tasks_model = ScheduledTasks()
+    
+    # Get scheduled task by workflow
+    task = scheduled_tasks_model.get_scheduled_task_by_workflow(app_id, workflow_id, userinfo.uid)
+    
+    # Ensure data is always a dict for response_success
+    return response_success(task if task is not None else {})

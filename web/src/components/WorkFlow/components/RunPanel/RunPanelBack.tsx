@@ -11,6 +11,7 @@ import {
     DownloadOutlined,
     LoadingOutlined,
     SyncOutlined,
+
 } from '@ant-design/icons';
 import {
     ProCard,
@@ -178,7 +179,7 @@ export default memo(() => {
         );
     });
 
-    const TrackContent = memo(props => {
+    const TrackContent = memo((props: { runList: any[] }) => {
         return (
             <div className="grid gap-2">
                 {props?.runList?.map((item, index) => {
@@ -458,12 +459,6 @@ export default memo(() => {
                             <InputContent loading={loading} onRunResult={runResult}></InputContent>
                         ),
                     },
-                    // {
-                    //     label: intl.formatMessage({ id: 'workflow.result' }),
-                    //     key: '2',
-                    //     disabled: !endRun,
-                    //     children: <ResultContent></ResultContent>,
-                    // },
                     {
                         label: intl.formatMessage({ id: 'workflow.result' }),
                         key: '3',
@@ -498,7 +493,17 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
     const [submitLoading, setSubmitLoading] = useState(false);
     const saveWorkFlow = useSaveWorkFlow();
     const datasetData = useStore(state => state.datasetData);
-  
+    
+
+
+    // Bind form instance
+    const [form] = ProForm.useForm();
+
+
+
+
+
+
 
     useUpdateEffect(() => {
         if (loading == false) {
@@ -533,7 +538,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                 freeFile.addValue(fileVariable);
             });
         input.addProperty(UPLOAD_FILES_KEY, freeFile);
-        const knowledge_base_mapping = nodes[0]?.data?.knowledge_base_mapping || {
+        const knowledge_base_mapping = (nodes[0]?.data as any)?.knowledge_base_mapping || {
             input: {},
             output: {},
         };
@@ -568,17 +573,22 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
     return (
         <>
             <ProForm
+                form={form}
                 loading={submitLoading}
+                layout="vertical"
                 submitter={{
                     resetButtonProps: false,
-                    submitButtonProps: {
-                        className: 'w-full',
-                    },
-                    searchConfig: {
-                        submitText: intl.formatMessage({
-                            id: 'workflow.run',
-                            defaultMessage: '',
-                        }),
+                    render: (props, doms) => {
+                        return (
+                            <Button
+                                type="primary"
+                                className="w-full"
+                                onClick={() => props?.form?.submit?.()}
+                                loading={submitLoading}
+                            >
+                                {intl.formatMessage({ id: 'workflow.run', defaultMessage: '' })}
+                            </Button>
+                        );
                     },
                 }}
                 onFinish={run}
@@ -619,7 +629,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                             ></ProFormTextArea>
                         );
                     })}
-                {nodes[0]?.data?.requires_upload && (
+                {(nodes[0]?.data as any)?.requires_upload && (
                     <div>
                         <Typography.Title level={5}>
                             {intl.formatMessage({ id: 'workflow.uploadFile' })}
@@ -633,36 +643,35 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
                         <ProFormDependency name={['file']}>
                             {({ file }) => {
                                 return (
-                                    (nodes[0]?.data?.import_to_knowledge_base &&
-                                        file?.length > 0 && (
-                                            <div>
-                                                <Typography.Title level={5}>
-                                                    {intl.formatMessage({
-                                                        id: 'workflow.import_to_knowledge_base',
-                                                    })}
-                                                </Typography.Title>
-                                                {file?.map(x => {
-                                                    return (
-                                                        <ProFormSelect
-                                                            key={x.uid}
-                                                            label={x.name}
-                                                            name={`dataset.${x.uid}`}
-                                                            options={datasetData?.list || []}
-                                                            required={true}
-                                                            rules={[
-                                                                {
-                                                                    required: true,
-                                                                    message: intl.formatMessage({
-                                                                        id: 'workflow.select_to_knowledge_base',
-                                                                    }),
-                                                                },
-                                                            ]}
-                                                        ></ProFormSelect>
-                                                    );
+                                    (nodes[0]?.data as any)?.import_to_knowledge_base &&
+                                    file?.length > 0 && (
+                                        <div>
+                                            <Typography.Title level={5}>
+                                                {intl.formatMessage({
+                                                    id: 'workflow.import_to_knowledge_base',
                                                 })}
-                                            </div>
-                                        )) ||
-                                    null
+                                            </Typography.Title>
+                                            {file?.map(x => {
+                                                return (
+                                                    <ProFormSelect
+                                                        key={x.uid}
+                                                        label={x.name}
+                                                        name={`dataset.${x.uid}`}
+                                                        options={datasetData?.list || []}
+                                                        required={true}
+                                                        rules={[
+                                                            {
+                                                                required: true,
+                                                                message: intl.formatMessage({
+                                                                    id: 'workflow.select_to_knowledge_base',
+                                                                }),
+                                                            },
+                                                        ]}
+                                                    ></ProFormSelect>
+                                                );
+                                            })}
+                                        </div>
+                                    )
                                 );
                             }}
                         </ProFormDependency>
@@ -675,7 +684,7 @@ const InputContent = memo(({ onRunResult, loading }: InputContentProps) => {
 
 
 
-const DetailContent = memo(({ endRun }) => {
+const DetailContent = memo(({ endRun }: { endRun: any }) => {
     const intl = useIntl();
     const [messageType, setMessageType] = useState<'success' | 'fail'>('fail');
     const form = useRef(null);

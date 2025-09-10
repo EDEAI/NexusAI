@@ -17,6 +17,9 @@ export namespace REQ_TYPE {
 
 import { request, RequestConfig } from '@umijs/max';
 import { LOGIN_URL } from '.';
+
+// Use the API_URL from global define config (injected by config.ts)
+declare const API_URL: string;
 export const BASE_URL = API_URL;
 // export const BASE_URL = 'http://192.168.4.80:9472';
 const DEFAULT_CONTENT_TYPE = 'application/json; charset=UTF-8';

@@ -71,6 +71,15 @@ class ScheduledTasks(MySQL):
                         # Non-JSON string kept as-is for backward compatibility
                         pass
 
+            # node_confirm_users: If string, try to parse as JSON, keep object (dict/list/scalar)
+            if 'node_confirm_users' in data and data['node_confirm_users'] is not None:
+                if isinstance(data['node_confirm_users'], str):
+                    try:
+                        data['node_confirm_users'] = json.loads(data['node_confirm_users'])
+                    except Exception:
+                        # Non-JSON string kept as-is for backward compatibility
+                        pass
+
             # Set next execution time
             data['next_run_time'] = data.get('start_time')
             
@@ -412,10 +421,6 @@ class ScheduledTasks(MySQL):
             if not app:
                 return False, "scheduled_task_app_not_exists"
             
-            # 2. Check if app is public
-            if app["is_public"] != 1:
-                return False, "scheduled_task_app_not_public"
-            
             # 3. Check if user is the creator
             if app["user_id"] == user_id:
                 return True, ""
@@ -493,31 +498,77 @@ class ScheduledTasks(MySQL):
             print(f"Failed to get pending tasks for execution: {e}")
             return []
 
+    def get_scheduled_task_by_workflow(self, app_id: int, workflow_id: int, user_id: int) -> Optional[Dict[str, Any]]:
+        """
+        Get scheduled task by app_id and workflow_id
+        
+        Args:
+            app_id: Application ID
+            workflow_id: Workflow ID
+            user_id: User ID
+            
+        Returns:
+            Task data if found, None otherwise
+        """
+        try:
+            task = self.select_one(
+                columns="*",
+                conditions=[
+                    {"column": "app_id", "value": app_id},
+                    {"column": "workflow_id", "value": workflow_id},
+                    {"column": "user_id", "value": user_id},
+                    {"column": "status", "op": "!=", "value": 4}  # Exclude deleted records
+                ]
+            )
+            
+            if task:
+                # Parse JSON fields (only when string, for backward compatibility)
+                if task.get('repeat_days') and isinstance(task.get('repeat_days'), str):
+                    try:
+                        task['repeat_days'] = json.loads(task['repeat_days'])
+                    except Exception:
+                        pass
+                if task.get('input') and isinstance(task.get('input'), str):
+                    try:
+                        task['input'] = json.loads(task['input'])
+                    except Exception:
+                        pass
+                if task.get('task_data') and isinstance(task.get('task_data'), str):
+                    try:
+                        task['task_data'] = json.loads(task['task_data'])
+                    except Exception:
+                        pass
+            
+            return task
+        except Exception as e:
+            print(f"Failed to get scheduled task by workflow: {e}")
+            return None
+
     def check_workflow_exists(self, workflow_id: int, app_id: int) -> bool:
         """
-        Check if workflow exists and status is normal
+        Check if workflow exists and is active
         
         Args:
             workflow_id: Workflow ID
             app_id: Application ID
             
         Returns:
-            Whether workflow exists
+            True if workflow exists and is active, False otherwise
         """
         try:
             from core.database.models.workflows import Workflows
             workflows_model = Workflows()
             
             workflow = workflows_model.select_one(
-                columns=["id"],
+                columns=["id", "status"],
                 conditions=[
                     {"column": "id", "value": workflow_id},
                     {"column": "app_id", "value": app_id},
-                    {"column": "status", "value": 1}  # Normal status
+                    {"column": "status", "op": "!=", "value": 4}  # Exclude deleted workflows
                 ]
             )
             
             return workflow is not None
         except Exception as e:
-            print(f"Failed to check if workflow exists: {e}")
+            print(f"Failed to check workflow existence: {e}")
             return False

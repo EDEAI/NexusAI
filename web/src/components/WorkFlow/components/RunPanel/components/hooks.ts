@@ -30,6 +30,11 @@ export const useRunPanelState = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [showPauseResume, setShowPauseResume] = useState(false);
   
+  // Get app_id and workflow_id from store
+  const app_id = useStore(state => state.app_id);
+  const workFlowInfo = useStore(state => state.workFlowInfo);
+  const workflow_id = (workFlowInfo as any)?.workflow?.workflows_id;
+  
   // Use the existing useSaveWorkFlow hook from the project
   const saveWorkFlow = useSaveWorkFlow();
 
@@ -311,5 +316,7 @@ export const useRunPanelState = () => {
     showPauseResume,
     setShowPauseResume,
     handlePauseResume,
+    app_id,
+    workflow_id,
   };
 };
