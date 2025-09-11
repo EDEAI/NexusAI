@@ -263,6 +263,8 @@ async def update_scheduled_task(
     
     if data.status is not None:
         update_data["status"] = data.status.value
+    else:
+        update_data["status"] = 1
     
     # If no update data, return success directly
     if not update_data:

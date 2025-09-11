@@ -465,7 +465,7 @@ class ScheduledTasks(MySQL):
             tasks = self.select(
                 columns=[
                     "id", "name", "description", "task_type", "user_id",
-                    "app_id", "workflow_id", "input", "start_time", "end_time",
+                    "app_id", "workflow_id", "input", "node_confirm_users", "start_time", "end_time",
                     "next_run_time", "repeat_type", "repeat_interval", "repeat_days",
                     "repeat_day_of_month", "repeat_month", "repeat_day_of_year",
                     "task_data", "execution_count", "max_executions", "last_run_time",

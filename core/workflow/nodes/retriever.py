@@ -1,3 +1,4 @@
+import json
 from time import monotonic
 from typing import Any, Dict, List, Optional, Union
 
@@ -77,53 +78,22 @@ class RetrieverNode(Node):
                         self.data['datasets'], 0, 0, workflow_id, app_run_id, user_id, type
                     )
             retrieval_result: List[Document] = retrieval.invoke(get_first_variable_value(self.data['input']))
-            outputs = ArrayVariable(name='output', type='array[object]')
-            for i, segment_obj in enumerate(retrieval_result):
-                segment_var = ObjectVariable(
-                    name=f'segment_{i}',
-                    display_name=f'Segment {i}',
-                    to_string_keys=['content', 'source']
-                )
+            result = []
+            for segment_obj in retrieval_result:
                 index_id = str(segment_obj.metadata['index_id'])
                 segment = DocumentSegments().get_segment_by_index_id(index_id)
                 document = Documents().get_document_by_id(segment['document_id'])
-                segment_var.add_property(
-                    'content',
-                    Variable(
-                        name='content',
-                        display_name='Content',
-                        type='string',
-                        value=segment_obj.page_content
-                    )
-                )
-                segment_var.add_property(
-                    'segment_id',
-                    Variable(
-                        name='segment_id',
-                        display_name='Segment ID',
-                        type='number',
-                        value=segment['id']
-                    )
-                )
-                segment_var.add_property(
-                    'document_id',
-                    Variable(
-                        name='document_id',
-                        display_name='Document ID',
-                        type='number',
-                        value=document['id']
-                    )
-                )
-                segment_var.add_property(
-                    'source',
-                    Variable(
-                        name='source',
-                        display_name='Source',
-                        type='string',
-                        value=document['name']
-                    )
-                )
-                outputs.add_value(segment_var)
+                result.append({
+                    'content': segment_obj.page_content,
+                    'segment_id': segment['id'],
+                    'document_id': document['id'],
+                    'source': document['name']
+                })
+            outputs = Variable(
+                name='output',
+                type='json',
+                value=json.dumps(result, ensure_ascii=False)
+            )
             embedding_tokens = retrieval_token_counter['embedding']
             reranking_tokens = retrieval_token_counter['reranking']
             return {
