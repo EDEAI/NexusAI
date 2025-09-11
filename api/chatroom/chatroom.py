@@ -493,7 +493,7 @@ async def toggle_auto_answer_switch(chatroom_id: int, agent_id: int, agent_setti
 @router.get("/{chatroom_id}/chatroom_message", response_model=ChatRoomResponseBase,
             summary="Get a list of historical messages")
 async def show_chatroom_messages(chatroom_id: int, page: int = 1, page_size: int = 10,
-                                userinfo: TokenData = Depends(get_current_user)):
+                                chat_base_url: str = None, userinfo: TokenData = Depends(get_current_user)):
     """
     Retrieve historical messages for a specific chat room.
 
@@ -513,7 +513,7 @@ async def show_chatroom_messages(chatroom_id: int, page: int = 1, page_size: int
     if not find_chatroom['status']:
         return response_error(get_language_content("chatroom_does_not_exist"))
 
-    chatroom_history_msg = ChatroomMessages().history_chatroom_messages(chatroom_id, page, page_size)
+    chatroom_history_msg = ChatroomMessages().history_chatroom_messages(chatroom_id, page, page_size, chat_base_url)
 
     Chatrooms().update(
         {"column": "id", "value": chatroom_id},
