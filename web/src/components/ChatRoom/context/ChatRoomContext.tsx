@@ -12,6 +12,7 @@ interface ChatRoomContextType {
     instruction: any[];
     setInstruction: (value: any[]) => void;
     id: string | null;
+    agentList?: any;
 }
 
 const ChatRoomContext = createContext<ChatRoomContextType | undefined>(undefined);
@@ -19,9 +20,10 @@ const ChatRoomContext = createContext<ChatRoomContextType | undefined>(undefined
 interface ChatRoomProviderProps {
     children: ReactNode;
     agentChatRoomId?: any;
+    agentList?: any;
 }
 
-export const ChatRoomProvider: React.FC<ChatRoomProviderProps> = ({ children, agentChatRoomId }) => {
+export const ChatRoomProvider: React.FC<ChatRoomProviderProps> = ({ children, agentChatRoomId, agentList }) => {
     // Refs for DOM elements
     const scrollDomRef = useRef(null);
     const upButtonDom = useRef(null);
@@ -47,6 +49,7 @@ export const ChatRoomProvider: React.FC<ChatRoomProviderProps> = ({ children, ag
         instruction,
         setInstruction,
         id,
+        agentList,
     };
 
     return (

@@ -19,9 +19,19 @@ const Agents: React.FC = () => {
     const [Fourthly_abilities_list, setFourthly_abilities_list] = useState(null);
     const [Operationbentate, setOperationbentate] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [iframeHeight, setIframeHeight] = useState(`${window.innerHeight}px`);
 
     useEffect(() => {
         init();
+    }, []);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIframeHeight(`${window.innerHeight}px`);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     const init = async () => {
@@ -122,31 +132,28 @@ const Agents: React.FC = () => {
 
     const agentupdata = () => {};
 
-    const computeIframeHeight = () => {
-        return `${window.innerHeight}px`;
-    };
     return (
-        <div className=" flex bg-white absolute w-full h-full top-0 left-0" style={{ height: computeIframeHeight() }}>
+        <div className=" flex bg-white absolute w-full h-full top-0 left-0" style={{ height: iframeHeight }}>
             {loading ? (
                 <div className="w-full h-full flex items-center justify-center">
                     <Spin size="large" />
                 </div>
             ) : (
-                <Chat
-                    saveInfo={{
-                        firstjudgingcondition,
-                        secondjudgingcondition,
-                        agentupdata,
-                    }}
-                    operationbentate={Operationbentate}
-                    iframe={{
-                        height: computeIframeHeight(),
-                    }}
-                    data={{
-                        abilitiesList: Fourthly_abilities_list,
-                        detailList: Detaillist,
-                    }}
-                />
+            <Chat
+                saveInfo={{
+                    firstjudgingcondition,
+                    secondjudgingcondition,
+                    agentupdata,
+                }}
+                operationbentate={Operationbentate}
+                iframe={{
+                        height: iframeHeight,
+                }}
+                data={{
+                    abilitiesList: Fourthly_abilities_list,
+                    detailList: Detaillist,
+                }}
+            />
             )}
         </div>
     );

@@ -72,8 +72,10 @@ const ChatRoomContentInner: FC<ChatRoomContentProps> = memo(props => {
 });
 
 export const ChatRoomContent: FC<ChatRoomContentProps> = memo(props => {
+    
+
     return (
-        <ChatRoomProvider agentChatRoomId={props.agentChatRoomId}>
+        <ChatRoomProvider agentChatRoomId={props.agentChatRoomId} agentList={props.agentList}>
             <ChatRoomContentInner {...props} />
         </ChatRoomProvider>
     );

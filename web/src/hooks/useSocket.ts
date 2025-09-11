@@ -2,7 +2,7 @@
  * @LastEditors: biz
  */
 import useSocketStore from '@/store/websocket';
-import { checkViewInIframe, getIframeChatWsUrl, getIframeHostName, getProtocolIsHttps } from '@/utils/fullscreenStorage';
+import { checkViewInIframe, getIframeApiUrl, getIframeChatWsUrl, getIframeHostName, getProtocolIsHttps } from '@/utils/fullscreenStorage';
 import { useLatest, useWebSocket } from 'ahooks';
 import { useEffect, useRef } from 'react';
 
@@ -20,8 +20,14 @@ const useWebSocketManager = (type: ManagerType = 'dealt', listen?: Function) => 
     const addFlowMessage = useSocketStore(state => state.addFlowMessage);
     const timerRef = useRef<NodeJS.Timeout>();
 
+    let wsUrl= `${url}?token=${localStorage.getItem('token')}`
+
+    if(checkViewInIframe()){
+        wsUrl = wsUrl+ `&chat_base_url=${getIframeApiUrl()}`
+    }
+
     const { readyState, sendMessage, latestMessage, disconnect, connect } = useWebSocket(
-        `${url}?token=${localStorage.getItem('token')}`,
+       wsUrl,
         {
             reconnectInterval: 1000,
             reconnectLimit: 10,

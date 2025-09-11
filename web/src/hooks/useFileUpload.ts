@@ -35,7 +35,7 @@ export const useFileUpload = (options: UseFileUploadOptions = {}) => {
     } = options;
 
     const handleUpload = () => {
-        // 触发文件选择对话框
+       
         const uploadInput = document.createElement('input');
         uploadInput.type = 'file';
         uploadInput.accept = acceptedFileTypes;
@@ -46,8 +46,7 @@ export const useFileUpload = (options: UseFileUploadOptions = {}) => {
             if (target.files && target.files.length > 0) {
                 setIsUploading(true);
                 const files = Array.from(target.files);
-                
-                // 检查文件大小
+              
                 const oversizedFiles = files.filter(file => file.size / 1024 / 1024 > maxSizeMB);
                 if (oversizedFiles.length > 0) {
                     message.error(`${oversizedFiles.map(f => f.name).join(', ')} ${intl.formatMessage({ id: 'workflow.uploadFileErrorText' })}`);
@@ -55,7 +54,7 @@ export const useFileUpload = (options: UseFileUploadOptions = {}) => {
                     return;
                 }
                 
-                // 上传所有文件
+               
                 const newFiles: UploadedFile[] = [];
                 
                 for (const file of files) {
@@ -77,7 +76,7 @@ export const useFileUpload = (options: UseFileUploadOptions = {}) => {
                         if (result.code === 0) {
                             message.success(`${file.name} ${intl.formatMessage({ id: 'workflow.uploadSuccess' })}`);
                             
-                            // 将文件添加到上传文件列表
+                          
                             if (result.data?.file_id) {
                                 const isImage = isImageFile(file.name);
                                 const fileData: UploadedFile = {

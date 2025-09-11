@@ -10,6 +10,7 @@ import { MessageActions } from './MessageActions';
 import { MCPToolRuntimeData } from '../types/mcp';
 import { hasMessageContent } from '../utils';
 import { useChatRoomContext } from '../context/ChatRoomContext';
+import { checkViewInIframe } from '@/utils/fullscreenStorage';
 
 interface MessageItemProps {
     item: any;
@@ -57,7 +58,7 @@ export const MessageItem: FC<MessageItemProps> = props => {
             {isAgent ? (
                 <Avatar data={item} />
             ) : (
-                <Avatar data={{ avatar: '/icons/user_header.svg' }} />
+                <Avatar data={{ avatar: checkViewInIframe()?'/icons/headportrait/atyun.svg':'/icons/user_header.svg' }} />
             )}
             <div
                 className={`flex1 ${agentChatRoomId ? '' : 'max-w-[560px]'} text-right`}

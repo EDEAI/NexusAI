@@ -103,13 +103,11 @@ export const checkViewInIframe=()=>{
 export const getIframeHostName=()=>{
     return window?.location?.hostname
 }
-
 export const getIframeChatWsUrl=()=>{
     return `${getProtocolIsHttps() ? 'wss' : 'ws'}://${getIframeHostName()}/agent_chat_ws`
 }
-
 export const getIframeApiUrl=()=>{
-    return `${getProtocolIsHttps() ? 'https' : 'http'}://${getIframeHostName()}`
+    return `${getProtocolIsHttps() ? 'https' : 'http'}://${getIframeHostName()}/nexusapi`
 }
 export const getProtocolIsHttps=()=>{
     return window?.location?.protocol === 'https:'

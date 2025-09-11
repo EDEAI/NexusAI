@@ -10,6 +10,7 @@ import { MCPToolRuntimeData } from '../types/mcp';
 import { hasMessageContent } from '../utils';
 import { Tag } from 'antd';
 import { useChatRoomContext } from '../context/ChatRoomContext';
+import { checkViewInIframe } from '@/utils/fullscreenStorage';
 
 interface CurrentMessageProps {
     currentMessage: any;
@@ -41,7 +42,7 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
     if (!hasMessageContent(currentMessage)) {
         return null;
     }
-
+    
     return (
         <div
             className={`w-full flex gap-[15px] pt-[15px] pb-[15px] ${
@@ -51,7 +52,7 @@ export const CurrentMessage: FC<CurrentMessageProps> = props => {
             {currentMessage.is_agent == 1 ? (
                 <Avatar data={currentMessage} />
             ) : (
-                <Avatar data={{ avatar: '/icons/user_header.svg' }} />
+                <Avatar data={{ avatar: checkViewInIframe()?'/icons/headportrait/atyun.svg':'/icons/user_header.svg' }} />
             )}
             <div
                 className={`flex1 ${agentChatRoomId ? '' : 'max-w-[560px]'} text-right`}

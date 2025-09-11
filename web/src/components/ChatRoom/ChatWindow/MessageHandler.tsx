@@ -9,6 +9,7 @@ import { ContentBlock } from '../types';
 import { MCPToolRuntimeData, MCPToolStatus, WorkflowConfirmationStatus } from '../types/mcp';
 import { hasMessageContent } from '../utils';
 import { parseMCPContent, reconstructContentWithUpdatedMCPTools } from '../utils/mcpParser';
+import { useChatRoomContext } from '../context/ChatRoomContext';
 
 export const useMessageHandler = (
     setDisableInput: any,
@@ -31,6 +32,8 @@ export const useMessageHandler = (
 ) => {
     const intl = useIntl();
     const setTruncatable = useChatroomStore(state => state.setTruncatable);
+
+   
 
     const parseInstruction = (data: string): [string, any] | null => {
         try {
@@ -602,6 +605,7 @@ export const useMessageHandler = (
                     is_agent: 1,
                     icon: currentAgent?.icon,
                     name: currentAgent?.name,
+                    avatar: currentAgent?.avatar,
                     content: '',
                     activeMCPTools: [],
                     agent_id: agentId,
@@ -610,7 +614,7 @@ export const useMessageHandler = (
                     // Initialize empty contentBlocks for new streaming message
                     contentBlocks: [],
                 });
-
+                
                 chatReturn.current = true;
 
                 setIsStop(true);

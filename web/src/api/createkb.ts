@@ -1,6 +1,10 @@
+import { checkViewInIframe, getIframeApiUrl } from '@/utils/fullscreenStorage';
 import aniRequest, { BASE_URL } from './request';
 
 export const getUploadUrl = async () => {
+    if(checkViewInIframe()){
+        return `${getIframeApiUrl()}/v1/upload/upload_file?chat_basxe_url=${getIframeApiUrl()}`;
+    }
     return `${BASE_URL}/v1/upload/upload_file`;
 };
 
@@ -17,7 +21,7 @@ export const documentList = async (data: any) => {
 
 // Get supplier and model names
 export const getInforMation = async (embeddingModelConfigId: any) => {
-    const res = await aniRequest<any>(`/v1/vector/get_model_information/${embeddingModelConfigId||0}`, { method: 'GET' });
+    const res = await aniRequest<any>(`/v1/vector/get_model_information`, { method: 'GET' });
     return res;
 };
 
