@@ -16,9 +16,8 @@ from core.database.models import (
     DatasetProcessRules,
     Datasets,
     Documents,
-    ModelConfigurations,
     UploadFiles,
-    DocumentSegments, AppRuns, Models, AgentDatasetRelation, DocumentSegmentRagRecords, RagRecords
+    DocumentSegments, Models, AgentDatasetRelation, DocumentSegmentRagRecords
 )
 from api.utils.auth import aes_decrypt_with_token
 from api.utils.common import *
@@ -133,9 +132,8 @@ async def create_dataset(data: CreateDatasetSchema,userinfo: TokenData = Depends
     is_public = data.is_public
     process_rule_id = data.process_rule_id
     data_source_type = data.data_source_type
-    indexing_mode: Literal[1, 2] = data.indexing_mode
+    embeddings_config_id = data.embeddings_config_id
     try:
-        embeddings_config_id = Models().get_model_by_type(2, team_id, indexing_mode, user_id)['model_config_id']
         collection_name = DatasetManagement.create_dataset(embeddings_config_id)
         retriever_config_dict = {item['key']: item['value'] for item in retriever_config}
         app_id = Apps().insert(
@@ -749,13 +747,11 @@ async def dataset_set(
     name = data.name
     description = data.description
     public = data.public
-    mode = data.mode
+    embeddings_config_id = data.embeddings_config_id
     user_id = userinfo.uid
     team_id = userinfo.team_id
     try:
         dataset_id = Datasets().get_dataset_id(app_id, user_id, 'api_vector_auth', check_is_reindexing=True)
-        if (mode != 1 and mode != 2):
-            return response_error(get_language_content("api_vector_available_model"))
         datasets_data = Datasets().get_dataset_by_id(dataset_id)
         conditions = [
             {'column': 'id', 'value': datasets_data['app_id']},
@@ -769,8 +765,6 @@ async def dataset_set(
             conditions,
             {'name': name, 'description': description, 'is_public': public}
         )
-
-        embeddings_config_id = Models().get_model_by_type(2, team_id, mode, user_id)['model_config_id']
 
         if datasets_data['embedding_model_config_id'] != embeddings_config_id:
             reindex_dataset.delay(dataset_id, embeddings_config_id)
@@ -894,54 +888,21 @@ async def retrieval_history_list(
                     msg, user_id)
         return response_error(msg)
 
-@router.get('/get_model_information/{model_config_id}', response_model=ModelInformationResponse)
-async def get_model_information(model_config_id: int, userinfo: TokenData = Depends(get_current_user)) -> ModelInformationResponse:
+@router.get('/get_model_information', response_model=ModelInformationResponse)
+async def get_model_information(userinfo: TokenData = Depends(get_current_user)) -> ModelInformationResponse:
     """
-    Get model information
-
-    Args:
-        userinfo: TokenData, indicates user information.
-
-     Returns:
-        data: List[Dict], indicates data information.
-            online: Dict, indicates online model information.
-                id: int, indicates local model information.
-                name: str, indicates local model name.
-                mode: int, indicates local model information.
-                suppliers_name: str, indicates local model suppliers name.
-            local: Dict, indicates online model information.
-                id: int, indicates local model information.
-                name: str, indicates local model name.
-                mode: int, indicates local model information.
-                suppliers_name: str, indicates local model suppliers name.
+    Endpoint to retrieve the list of LLM model configurations.
+    
+    Parameters:
+    - userinfo: TokenData, required for user authentication and authorization.
+    
+    Returns:
+    - A successful response containing the list of embedding model configurations.
     """
-    user_id = userinfo.uid
     team_id = userinfo.team_id
-    online_model = Models().get_model_by_type(2, team_id, 1, user_id)
-    local_model = Models().get_model_by_type(2, team_id, 2, user_id)
-    if model_config_id > 0:
-        # Override the default model
-        model = Models().get_model_by_config_id(model_config_id)
-        if model['model_mode'] == 1:
-            online_model = model
-        else:
-            local_model = model
-    data = {
-        'online': {
-            'id': online_model['model_id'],
-            'name': online_model['model_name'],
-            'mode': online_model['model_mode'],
-            'suppliers_name': online_model['supplier_name']
-        },
-        'local': {
-            'id': local_model['model_id'],
-            'name': local_model['model_name'],
-            'mode': local_model['model_mode'],
-            'suppliers_name': local_model['supplier_name']
-        }
-    }
+    result = Models().get_model_config_list(team_id, 2)
 
-    return response_success({'data': data}, get_language_content("api_vector_success"))
+    return response_success({'data': result}, get_language_content("api_vector_success"))
 
 
 @router.get('/retrieval_history_detail/{rag_record_id}', response_model=RetrievalHistoryDetailResponse)

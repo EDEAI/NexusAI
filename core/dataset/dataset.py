@@ -128,10 +128,7 @@ def get_reranker(team_id: int) -> Reranker:
         reranker = all_rerankers[team_id]
     else:
         reranker_config = {}
-        try:
-            reranker_data = models.get_model_by_type(3, team_id, indexing_mode=1)
-        except AssertionError:
-            reranker_data = models.get_model_by_type(3, team_id, indexing_mode=0)
+        reranker_data = models.get_model_by_type(3, team_id)
         for key, value in reranker_data['supplier_config'].items():
             reranker_config[key] = value
         for key, value in reranker_data['model_config'].items():
@@ -257,7 +254,7 @@ class DatasetManagement:
     def get_num_tokens(
         cls, team_id: int, segments: List[Document]
     ) -> Tuple[int, float, str]:
-        embeddings = models.get_model_by_type(2, team_id, 1)
+        embeddings = models.get_model_by_type(2, team_id)
         embeddings_name = embeddings['model_name']
         embeddings_config = embeddings['model_config']
         supplier_name = embeddings['supplier_name']

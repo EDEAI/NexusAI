@@ -129,7 +129,7 @@ class CreateDatasetSchema(BaseModel):
     is_public: int
     process_rule_id: int
     data_source_type: int
-    indexing_mode: int
+    embeddings_config_id: int
     temporary_chatroom_id: int = 0
 
     model_config = {
@@ -142,7 +142,7 @@ class CreateDatasetSchema(BaseModel):
                     "is_public": 1,
                     "process_rule_id": 1,
                     "data_source_type": 1,
-                    "indexing_mode": 2,
+                    "embeddings_config_id": 2,
                     "temporary_chatroom_id": 123  # optional, default is 0
                 }
             ]
@@ -229,7 +229,7 @@ class DatasetSetSchema(BaseModel):
     name: str
     description: str
     public: int
-    mode: int
+    embeddings_config_id: int
 
     model_config = {
         "json_schema_extra": {
@@ -238,7 +238,7 @@ class DatasetSetSchema(BaseModel):
                     "name": '1',
                     "description": '',
                     "public": 1,
-                    "mode": 1
+                    "embeddings_config_id": 1
                 }
             ]
         }

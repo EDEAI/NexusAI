@@ -340,7 +340,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
 
     if mode == 3:
         try:
-            embeddings_config_id = Models().get_model_by_type(2, team_id, 1, uid)['model_config_id']
+            embeddings_config_id = Models().get_model_by_type(2, team_id, uid)['model_config_id']
         except AssertionError as e:
             msg = str(e)
             logger.info('create_dataset: %s desc: Request model %s, Current user id %s', msg, uid)

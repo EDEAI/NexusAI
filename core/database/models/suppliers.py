@@ -26,7 +26,7 @@ class Suppliers(MySQL):
         supplier = self.select_one(columns="*", conditions=[{'column': 'id', 'value': supplier_id}])
         return supplier
 
-    def get_supplier_model_online_list(self, team_id: int) -> List:
+    def get_supplier_model_list(self, team_id: int, model_type: int = 0) -> List:
         """
         Fetches the list of online suppliers along with their models, sorted by model_configurations.sort_order.
 
@@ -42,6 +42,7 @@ class Suppliers(MySQL):
             'models.name AS model_name',
             'models.support_image AS support_image',
             'models.type AS model_type',
+            'models.mode AS model_mode',
             'model_configurations.default_used AS model_default_used',
             'model_configurations.sort_order AS sort_order'
         ]
@@ -51,12 +52,12 @@ class Suppliers(MySQL):
         ]
         conditions = [
             {'column': 'suppliers.status', 'value': 1},
-            {'column': 'suppliers.mode', 'value': 1},
             {'column': 'models.status', 'value': 1},
-            {'column': 'models.mode', 'value': 1},
             {'column': 'model_configurations.team_id', 'value': team_id},
             {'column': 'model_configurations.status', 'value': 1}
         ]
+        if model_type > 0:
+            conditions.append({'column': 'models.type', 'value': model_type})
         order_by = 'suppliers.id ASC, model_configurations.sort_order ASC'
         suppliers = self.select(columns=columns, joins=joins, conditions=conditions, order_by=order_by)
 
