@@ -2,6 +2,7 @@
 import type { RequestConfig } from '@umijs/max';
 import { history } from '@umijs/max';
 import { message } from 'antd';
+import { checkViewInIframe } from './utils/fullscreenStorage';
 const loginPath = '/user/login';
 
 enum ErrorCustomCode {
@@ -86,7 +87,7 @@ export const errorConfig: RequestConfig = {
                     case ErrorCode.LOGIN_EXPIRE:
                         localStorage.removeItem('token');
                         const { location } = history;
-                        if (location.pathname !== loginPath) {
+                        if (location.pathname !== loginPath&&!checkViewInIframe()) {
                             history.push(loginPath);
                         }
                         break;
