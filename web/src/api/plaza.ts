@@ -77,7 +77,7 @@ export const upAgentStatus = async (data: any, id: any, agentId: any) => {
 // Get chatroom messages
 export const getRoomMessage = async (id: any, data: any) => {
     if(checkViewInIframe()){
-        data.chat_base_url = getIframeApiUrl();
+        data.chat_base_url = getIframeApiUrl(true);
     }
     const res = await aniRequest<any>(`/v1/chatroom/${id}/chatroom_message`, {
         method: 'GET',

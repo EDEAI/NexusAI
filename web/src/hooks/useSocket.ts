@@ -23,7 +23,7 @@ const useWebSocketManager = (type: ManagerType = 'dealt', listen?: Function) => 
     let wsUrl= `${url}?token=${localStorage.getItem('token')}`
 
     if(checkViewInIframe()){
-        wsUrl = wsUrl+ `&chat_base_url=${getIframeApiUrl()}`
+        wsUrl = wsUrl+ `&chat_base_url=${getIframeApiUrl(true)}`
     }
 
     const { readyState, sendMessage, latestMessage, disconnect, connect } = useWebSocket(

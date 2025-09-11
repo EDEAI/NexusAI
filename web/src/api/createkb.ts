@@ -3,7 +3,7 @@ import aniRequest, { BASE_URL } from './request';
 
 export const getUploadUrl = async () => {
     if(checkViewInIframe()){
-        return `${getIframeApiUrl()}/v1/upload/upload_file?chat_basxe_url=${getIframeApiUrl()}`;
+        return `${getIframeApiUrl()}/v1/upload/upload_file?chat_basxe_url=${getIframeApiUrl(true)}`;
     }
     return `${BASE_URL}/v1/upload/upload_file`;
 };

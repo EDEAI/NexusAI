@@ -98,17 +98,25 @@ export const clearAllAgentFullscreenStates = (): void => {
 
 
 export const checkViewInIframe=()=>{
-    
+
     return window?.location?.pathname === '/agent_chat_quickly'
 }
 export const getIframeHostName=()=>{
     return window?.location?.hostname
 }
-export const getIframeChatWsUrl=()=>{
-    return `${getProtocolIsHttps() ? 'wss' : 'ws'}://${getIframeHostName()}/agent_chat_ws`
+export const getIframeChatWsUrl=(isGet:Boolean=false)=>{
+    const gets=`${getProtocolIsHttps() ? 'wss' : 'ws'}://${getIframeHostName()}`
+    if(isGet){
+        return gets
+    }
+    return `${gets}/agent_chat_ws`
 }
-export const getIframeApiUrl=()=>{
-    return `${getProtocolIsHttps() ? 'https' : 'http'}://${getIframeHostName()}/nexusapi`
+export const getIframeApiUrl=(isGet:Boolean=false)=>{
+    const gets=`${getProtocolIsHttps() ? 'https' : 'http'}://${getIframeHostName()}`
+    if(isGet){
+        return gets
+    }
+    return `${gets}/nexusapi`
 }
 export const getProtocolIsHttps=()=>{
     return window?.location?.protocol === 'https:'
