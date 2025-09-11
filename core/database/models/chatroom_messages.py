@@ -24,7 +24,7 @@ class ChatroomMessages(MySQL):
     """
     have_updated_time = True
 
-    def history_chatroom_messages(self, chatroom_id: int = 0, page: int = 1, page_size: int = 10):
+    def history_chatroom_messages(self, chatroom_id: int = 0, page: int = 1, page_size: int = 10, chat_base_url: str = None):
         """
         Retrieves historical chat room messages with pagination.
 
@@ -42,6 +42,9 @@ class ChatroomMessages(MySQL):
         :param page_size: The number of messages to retrieve per page. Defaults to 10.
         :type page_size: int
 
+        :param chat_base_url: Optional base URL for file and icon resources. If provided, replaces settings URLs.
+        :type chat_base_url: str
+
         :return: A dictionary containing:
                  - "list": A list of message records, potentially adjusted for pagination.
                  - "total_count": Total number of messages found for the chat room.
@@ -50,6 +53,17 @@ class ChatroomMessages(MySQL):
                  - "page_size": The size of the page used to fetch messages.
         :rtype: dict
         """
+        # Handle chat_base_url parameter
+        if chat_base_url:
+            # Remove trailing slash if present
+            if chat_base_url.endswith('/'):
+                chat_base_url = chat_base_url.rstrip('/')
+            storage_url = f"{chat_base_url}/nexusfile"
+            icon_url = f"{chat_base_url}/nexusicon"
+        else:
+            storage_url = settings.STORAGE_URL
+            icon_url = settings.ICON_URL
+
         # conditions = [
         #     {"column": "chatrooms.id", "value": chatroom_id},
         #     {"column": "chatroom_messages.agent_id", "value": chatroom_id},
@@ -135,14 +149,14 @@ class ChatroomMessages(MySQL):
 
                     if item.get('avatar'):
                         if item['avatar'].find('head_icon') == -1:
-                            item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                            item['avatar'] = f"{storage_url}/upload/{item['avatar']}"
                         else:
-                            item["avatar"] = f"{settings.ICON_URL}/{item['avatar']}"
+                            item["avatar"] = f"{icon_url}/{item['avatar']}"
                     else:
                         if item['icon']:
-                            item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"
+                            item['avatar'] = f"{icon_url}/head_icon/{item['icon']}.png"
                         else:
-                            item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
+                            item['avatar'] = f"{icon_url}/head_icon/1.png"
 
                     if item['file_list']:
                         file_list = []
@@ -153,13 +167,13 @@ class ChatroomMessages(MySQL):
                                     file_data = upload_files.get_file_by_id(file_value)
                                     file_name = file_data['name'] + file_data['extension']
                                     file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
-                                    file_url = f"{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}"
+                                    file_url = f"{storage_url}/upload/{file_path_relative_to_upload_files}"
                                 elif isinstance(file_value, str):
                                     if file_value[0] == '/':
                                         file_value = file_value[1:]
                                     file_path = project_root.joinpath('storage').joinpath(file_value)
                                     file_name = file_path.name
-                                    file_url = f"{settings.STORAGE_URL}/storage/{file_value}"
+                                    file_url = f"{storage_url}/storage/{file_value}"
                                 else:
                                     # This should never happen
                                     raise Exception('Unsupported value type!')
@@ -199,14 +213,14 @@ class ChatroomMessages(MySQL):
 
                         if item.get('avatar'):
                             if item['avatar'].find('head_icon') == -1:
-                                item['avatar'] = f"{settings.STORAGE_URL}/upload/{item['avatar']}"
+                                item['avatar'] = f"{storage_url}/upload/{item['avatar']}"
                             else:
-                                item["avatar"] = f"{settings.ICON_URL}/{item['avatar']}"
+                                item["avatar"] = f"{icon_url}/{item['avatar']}"
                         else:
                             if item['icon']:
-                                item['avatar'] = f"{settings.ICON_URL}/head_icon/{item['icon']}.png"
+                                item['avatar'] = f"{icon_url}/head_icon/{item['icon']}.png"
                             else:
-                                item['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
+                                item['avatar'] = f"{icon_url}/head_icon/1.png"
                         
                         if item['file_list']:
                             file_list = []
@@ -217,13 +231,13 @@ class ChatroomMessages(MySQL):
                                         file_data = upload_files.get_file_by_id(file_value)
                                         file_name = file_data['name'] + file_data['extension']
                                         file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
-                                        file_url = f"{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}"
+                                        file_url = f"{storage_url}/upload/{file_path_relative_to_upload_files}"
                                     elif isinstance(file_value, str):
                                         if file_value[0] == '/':
                                             file_value = file_value[1:]
                                         file_path = project_root.joinpath('storage').joinpath(file_value)
                                         file_name = file_path.name
-                                        file_url = f"{settings.STORAGE_URL}/storage/{file_value}"
+                                        file_url = f"{storage_url}/storage/{file_value}"
                                     else:
                                         # This should never happen
                                         raise Exception('Unsupported value type!')

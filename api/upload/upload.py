@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.post('/upload_file', response_model=UploadFileResponse)
-async def upload_file(file: UploadFile = File(...), userinfo: TokenData = Depends(get_current_user)) -> UploadFileResponse:
+async def upload_file(file: UploadFile = File(...), chat_base_url: str = None, userinfo: TokenData = Depends(get_current_user)) -> UploadFileResponse:
     """
     Upload file to the server
 
@@ -65,5 +65,13 @@ async def upload_file(file: UploadFile = File(...), userinfo: TokenData = Depend
     row['file_id'] = file_id
     if row['path'] and row['path'].startswith('upload_files/'):
         row['path_show'] = row['path'].split('upload_files/')[-1]
-        row['path_show'] = f"{settings.STORAGE_URL}/upload/{row['path_show']}"
+        # Use chat_base_url if provided, otherwise use settings.STORAGE_URL
+        base_url = chat_base_url
+        if base_url and base_url.endswith('/'):
+            base_url = base_url.rstrip('/')
+        if base_url:
+            base_url += '/nexusfile'
+        else:
+            base_url = settings.STORAGE_URL
+        row['path_show'] = f"{base_url}/upload/{row['path_show']}"
     return response_success(row, get_language_content("api_vector_success"))
