@@ -306,7 +306,7 @@ async def agent_delete(request: Request, app_id: int, userinfo: TokenData = Depe
 
 
 @router.get("/agent_info/{app_id}", response_model=ResAgentInfoSchemaUpdate)
-async def agent_info(app_id: int, publish_status: int, userinfo: TokenData = Depends(get_current_user)):
+async def agent_info(app_id: int, publish_status: int, chat_base_url: str = None, userinfo: TokenData = Depends(get_current_user)):
     """
     # ResAgentInfoSchema
     agent info
@@ -320,7 +320,7 @@ async def agent_info(app_id: int, publish_status: int, userinfo: TokenData = Dep
         return response_error(get_language_content("api_agent_info_publish_status_error"))
 
     agents_model = Agents()
-    result = agents_model.agent_info(app_id, publish_status, userinfo.uid, userinfo.team_id)
+    result = agents_model.agent_info(app_id, publish_status, userinfo.uid, userinfo.team_id, chat_base_url)
     if result["status"] != 1:
         return response_error(result["message"])
 

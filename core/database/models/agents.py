@@ -653,7 +653,7 @@ class Agents(MySQL):
             )
             return chatroom_id
 
-    def agent_info(self, app_id: int, publish_status: int, uid: int, team_id: int):
+    def agent_info(self, app_id: int, publish_status: int, uid: int, team_id: int, chat_base_url: str = None):
         """
         Obtain agent info data based on parameters
 
@@ -661,8 +661,19 @@ class Agents(MySQL):
         :param publish_status: Agent publish status 0: Draft 1: Published.
         :param uid: User ID.
         :param team_id: Team ID.
+        :param chat_base_url: Optional base URL for chat resources.
         :return: A dictionary representing the agent info record.
         """
+        # Handle chat_base_url parameter
+        if chat_base_url:
+            # Remove trailing slash if present
+            chat_base_url = chat_base_url.rstrip('/')
+            storage_url = f"{chat_base_url}/nexusfile"
+            icon_url = f"{chat_base_url}/nexusicon"
+        else:
+            storage_url = settings.STORAGE_URL
+            icon_url = settings.ICON_URL
+            
         # get app
         
         from core.database.models.chatrooms import Chatrooms
@@ -692,14 +703,14 @@ class Agents(MySQL):
 
         if app.get('avatar'):
             if app['avatar'].find('head_icon') == -1:
-                app['avatar'] = f"{settings.STORAGE_URL}/upload/{app['avatar']}"
+                app['avatar'] = f"{storage_url}/upload/{app['avatar']}"
             else:
-                app["avatar"] = f"{settings.ICON_URL}/{app['avatar']}"
+                app["avatar"] = f"{icon_url}/{app['avatar']}"
         else:
             if app['icon']:
-                app['avatar'] = f"{settings.ICON_URL}/head_icon/{app['icon']}.png"
+                app['avatar'] = f"{icon_url}/head_icon/{app['icon']}.png"
             else:
-                app['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
+                app['avatar'] = f"{icon_url}/head_icon/1.png"
 
         # get agent
         agent = self.select_one(
