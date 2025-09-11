@@ -104,11 +104,13 @@ class ChatroomManager:
         chatroom_info: Dict[str, int],
         user_id: int,
         team_id: int,
-        user_input: Optional[str] = None
+        user_input: Optional[str] = None,
+        chat_base_url: Optional[str] = None
     ):
         chatroom_id = chatroom_info['id']
         app_id = chatroom_info['app_id']
         file_list = self._file_list_by_chatroom.pop(chatroom_id, None)
+        storage_url = f'{chat_base_url}/nexusfile' if chat_base_url else settings.STORAGE_URL
         
         start_time = time()
         if user_input is None:
@@ -141,13 +143,13 @@ class ChatroomManager:
                             file_data = upload_files.get_file_by_id(file_value)
                             file_name = file_data['name'] + file_data['extension']
                             file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
-                            file_url = f"{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}"
+                            file_url = f'{storage_url}/upload/{file_path_relative_to_upload_files}'
                         elif isinstance(file_value, str):
                             if file_value[0] == '/':
                                 file_value = file_value[1:]
                             file_path = project_root.joinpath('storage').joinpath(file_value)
                             file_name = file_path.name
-                            file_url = f"{settings.STORAGE_URL}/storage/{file_value}"
+                            file_url = f'{storage_url}/storage/{file_value}'
                         else:
                             # This should never happen
                             raise Exception('Unsupported value type!')
@@ -225,7 +227,8 @@ class ChatroomManager:
                     topic,
                     self._mcp_client,
                     self._is_desktop_by_chatroom.get(chatroom_id, False),
-                    self._desktop_mcp_tool_list_by_chatroom.get(chatroom_id)
+                    self._desktop_mcp_tool_list_by_chatroom.get(chatroom_id),
+                    chat_base_url
                 )
                 self._chatrooms[chatroom_id] = chatroom
                 self._workflow_ws_manager.add_chatroom(user_id, chatroom_id)
@@ -268,7 +271,8 @@ class ChatroomManager:
         chatroom_id: int,
         user_id: int,
         team_id: int,
-        user_input: Optional[str] = None
+        user_input: Optional[str] = None,
+        chat_base_url: Optional[str] = None
     ) -> None:
         try:
             # Interrupt all MCP tool uses and wait for the chatroom to be terminated, when the chatroom is resumed
@@ -284,14 +288,14 @@ class ChatroomManager:
                 user_id,
                 check_chat_status = user_input is not None 
             )
-            await self._start_chatroom(chatroom_info, user_id, team_id, user_input)
+            await self._start_chatroom(chatroom_info, user_id, team_id, user_input, chat_base_url)
         except Exception as e:
             logger.exception('ERROR!!')
             await self._ws_manager.send_instruction(chatroom_id, 'ERROR', str(e))
         
     async def _ws_handler(self, connection: ServerConnection):
         try:
-            user_id = self._ws_manager.verify_connection(connection.request.path)
+            user_id, chat_base_url = self._ws_manager.verify_connection(connection.request.path)
         except Exception as e:
             logger.exception('ERROR!!')
             await connection.send(str(e))
@@ -379,7 +383,7 @@ class ChatroomManager:
                                     assert isinstance(data, str), 'User input should be a string.'
                                     user_input = data
                                     logger.info('Starting chatroom %s...', chatroom_id)
-                                    coro = self._handle_data_and_start_chatroom(chatroom_id, user_id, team_id, user_input)
+                                    coro = self._handle_data_and_start_chatroom(chatroom_id, user_id, team_id, user_input, chat_base_url)
                                     self._event_loop.create_task(coro)
                                 case 'STOP':
                                     # Stop the chatroom

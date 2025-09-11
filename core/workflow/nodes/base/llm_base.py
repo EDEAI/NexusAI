@@ -29,6 +29,7 @@ from llm.models import LLMPipeline
 from llm.prompt import create_prompt_from_dict, replace_prompt_with_context
 from llm.messages import Messages, create_messages_from_serialized_format
 
+from config import settings
 from core.helper import truncate_agent_messages_by_token_limit, get_file_content_list
 from core.database.models import (Models, Users)
 
@@ -306,7 +307,8 @@ class LLMBaseNode(Node):
         override_rag_input: Optional[str] = None,
         is_chat: bool = False,
         user_id: int = 0,
-        agent_id: int = 0
+        agent_id: int = 0,
+        chat_base_url: Optional[str] = None,
     ) -> Tuple[Messages, Dict[str, Any]]:
         new_user_prompt = None
         if correct_llm_output:
@@ -461,6 +463,11 @@ class LLMBaseNode(Node):
             user_prompt = input['user_prompt'] if override_rag_input is None else override_rag_input
             rag_result = retrieval_chain.invoke(user_prompt)
             formatted_docs = format_docs(rag_result)
+
+            # Replace storage url with chat base url
+            if chat_base_url:
+                formatted_docs = formatted_docs.replace(settings.STORAGE_URL, f'{chat_base_url}/nexusfile')
+            
             input['formatted_docs'] = formatted_docs
         if new_user_prompt is not None:
             input["user_prompt"] = new_user_prompt
@@ -582,7 +589,8 @@ class LLMBaseNode(Node):
         override_rag_input: Optional[str] = None,
         mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
         chatroom_prompt_args: Optional[Dict[str, Any]] = None,
-        group_messages: bool = False
+        group_messages: bool = False,
+        chat_base_url: Optional[str] = None
     ) -> Tuple[Dict[str, Any], Callable[[], AsyncIterator[AIMessageChunk]]]:
         """
         This function is used to get the model data and the async AI invoke function.
@@ -617,7 +625,8 @@ class LLMBaseNode(Node):
             input=input,
             file_list=file_list,
             correct_llm_output=correct_llm_output,
-            override_rag_input=override_rag_input
+            override_rag_input=override_rag_input,
+            chat_base_url=chat_base_url
         )
         
         if model_info["supplier_name"] in ["Anthropic", "Google"]:

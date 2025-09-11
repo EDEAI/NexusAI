@@ -668,7 +668,7 @@ class Agents(MySQL):
         from core.database.models.chatrooms import Chatrooms
         apps_model = Apps()
         app = apps_model.select_one(
-            columns=["id AS app_id", "user_id", "name", "description", "icon", "icon_background", "is_public", "attrs_are_visible",
+            columns=["id AS app_id", "user_id", "name", "description", "avatar", "icon", "icon_background", "is_public", "attrs_are_visible",
                      "publish_status", "api_token", "enable_api", "created_time", "status"],
             conditions=[
                 {"column": "id", "value": app_id},
@@ -689,6 +689,17 @@ class Agents(MySQL):
         # Generate api_url
         encrypted_id = encrypt_id(app_id)
         app["api_url"] = f'/v1/app-api/{encrypted_id}/run-docs'
+
+        if app.get('avatar'):
+            if app['avatar'].find('head_icon') == -1:
+                app['avatar'] = f"{settings.STORAGE_URL}/upload/{app['avatar']}"
+            else:
+                app["avatar"] = f"{settings.ICON_URL}/{app['avatar']}"
+        else:
+            if app['icon']:
+                app['avatar'] = f"{settings.ICON_URL}/head_icon/{app['icon']}.png"
+            else:
+                app['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
 
         # get agent
         agent = self.select_one(
@@ -776,7 +787,8 @@ class Agents(MySQL):
         if app["user_id"] != uid and app["attrs_are_visible"] != 1:
             input_variables = {
                 "agent_id": agent['agent_id'],
-                "input_variables": agent['input_variables']
+                "input_variables": agent['input_variables'],
+                "published_time": agent['published_time']
             }
 
             data = {
