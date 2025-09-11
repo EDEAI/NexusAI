@@ -10,6 +10,7 @@ import { CurrentConversation } from './CurrentConversation';
 import { MCPToolRuntimeData, MCPToolStatus, getMCPToolStatus } from '../types/mcp';
 import { parseMCPContent, inferUploadedFiles } from '../utils/mcpParser';
 import { useChatRoomContext } from '../context/ChatRoomContext';
+import { checkViewInIframe } from '@/utils/fullscreenStorage';
 
 interface ChatContentProps {
     instruction?: any;
@@ -277,7 +278,7 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
     return (
         <div className="flex-1 min-h-0">
             <div
-                className={`h-full min-h-full overflow-y-auto flex flex-col-reverse items-center scroll-smooth chatroom`}
+                className={`h-full min-h-full overflow-y-auto flex flex-col-reverse items-center scroll-smooth  ${checkViewInIframe()?'px-2':'chatroom'}`}
                 ref={scrollDomRef}
                 onScroll={slideScroll}
             >
