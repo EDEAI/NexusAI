@@ -92,7 +92,7 @@ export const SelectModelConfigId = ({ name, form, proComponentProps, fieldProps 
                                             {imageUnderstandingText}
                                         </Tag>
                                     )}
-                                    {option?.data?.model_mode && (
+                                    {option?.data?.model_mode==2 && (
                                         <Tag color="default" className="text-xs">
                                             {intl.formatMessage({
                                                 id: 'workflow.tag.localModel',
