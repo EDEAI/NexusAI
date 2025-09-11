@@ -2,6 +2,7 @@
  * @LastEditors: biz
  */
 
+import { checkViewInIframe, getIframeApiUrl } from '@/utils/fullscreenStorage';
 import aniRequest from './request';
 
 const agent_info = '/v1/agent/agent_info/';
@@ -14,11 +15,15 @@ const agent_publish = '/v1/agent/agent_publish/';
 const agent_run = '/v1/agent/agent_run';
 
 export const GetagentInfo = async (app_id: any, publish_status?: any) => {
+    const data={
+        publish_status: publish_status == 'true' ? 1 : 0,
+    }
+    if(checkViewInIframe()){
+        data.chat_base_url = getIframeApiUrl(true);
+    }
     const res = await aniRequest<any>(`${agent_info}${app_id}`, {
         method: 'GET',
-        data: {
-            publish_status: publish_status == 'true' ? 1 : 0,
-        },
+        data,
     });
     return res;
 };
