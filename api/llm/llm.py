@@ -20,7 +20,7 @@ async def skill_create(userinfo: TokenData = Depends(get_current_user)):
     """
     # Retrieve the list of LLM model configurations from the database
     team_id = userinfo.team_id
-    result = Models().get_model_config_llm_list(team_id)
+    result = Models().get_model_config_list(team_id, 1)
     
     # Return the result wrapped in a success response
     return response_success({'data': result})

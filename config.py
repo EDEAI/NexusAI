@@ -3442,4 +3442,10 @@ model_type = {
         'type': 'MODERATION'
     }
 }
+
+LOCAL_MODEL_PATHS = {
+    ('HuggingFace', 'text2vec-large-chinese'): './models/text2vec',
+    ('HuggingFace', 'bge-reranker-v2-m3'): './models/bge-reranker-v2-m3',
+}
+
 enable_reranking_on_single_retrival = False

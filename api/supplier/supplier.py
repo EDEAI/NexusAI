@@ -1,10 +1,12 @@
+from pathlib import Path
+
 from fastapi import APIRouter, Depends
 from core.database.models import Suppliers, SupplierConfigurations, Models, ModelConfigurations, Users
 from api.utils.common import response_success, response_error
 from api.utils.jwt import get_current_user
 from api.schema.supplier import OperationResponse, SupplierRequest, SupplierListResponse, ModelSwitchRequest
 from languages import get_language_content
-from config import model_config, model_type
+from config import model_config, model_type, LOCAL_MODEL_PATHS
 from api.utils.jwt import *
 
 router = APIRouter()
@@ -19,11 +21,17 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
     # Simplified dictionary comprehension
     supplier_config_data = {model['supplier']: model for model in model_config}
     # Fetch online suppliers
-    suppliers_data = Suppliers().get_supplier_model_online_list(team_id)
+    suppliers_data = Suppliers().get_supplier_model_list(team_id)
     unique_suppliers = {}
 
     # Process each supplier
     for supplier in suppliers_data:
+        # Check if local model exists
+        if supplier['model_mode'] == 2:
+            model_path = Path(LOCAL_MODEL_PATHS[(supplier['supplier_name'], supplier['model_name'])])
+            if not model_path.exists():
+                continue
+        
         # Get the supplier configuration for the current team
         supplier_configuration = SupplierConfigurations().get_supplier_config_id(supplier['supplier_id'], team_id)
         supplier_config = supplier_configuration['config'] if supplier_configuration else {}
@@ -34,6 +42,7 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
             unique_suppliers[supplier_id] = {
                 'supplier_id': supplier_id,
                 'supplier_name': supplier['supplier_name'],
+                'supplier_mode': supplier['supplier_mode'],
                 'supplier_config': supplier_config,
                 'authorization': 1 if supplier_config else 0,
                 'models': []
@@ -46,6 +55,7 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
                 'model_name': supplier['model_name'],
                 'support_image': supplier['support_image'],
                 'model_type': supplier['model_type'],
+                'model_mode': supplier['model_mode'],
                 'model_default_used': supplier['model_default_used'],
                 'sort_order': supplier['sort_order']
             })
@@ -64,6 +74,7 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
     for supplier in suppliers:
         supplier_id = supplier['supplier_id']
         supplier_name = supplier['supplier_name']
+        supplier_mode = supplier['supplier_mode']
         supplier_config = supplier['supplier_config']
         default_config = supplier_config_data[supplier_name]['config']
 
@@ -77,6 +88,7 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
         supplier_data = {
             'supplier_id': supplier_id,
             'supplier_name': supplier_name,
+            'supplier_mode': supplier_mode,
             'supplier_config': default_config,
             'authorization': 1 if supplier_config else 0,
             'models': []
@@ -91,6 +103,7 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
                     'support_image': model['support_image'],
                     'model_type': model['model_type'],
                     'model_type_name': model_type[model['model_type']]['type'],
+                    'model_mode': model['model_mode'],
                     'model_default_used': model['model_default_used']
                 }
                 supplier_data['models'].append(model_data)
@@ -112,9 +125,11 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
                 model_info = {
                     'supplier_id': supplier_id,
                     'supplier_name': supplier_name,
+                    'supplier_mode': supplier_mode,
                     'models': [{
                         'model_id': model['model_id'],
                         'model_name': model['model_name'],
+                        'model_mode': model['model_mode'],
                         'support_image': model['support_image'],
                         'model_default_used': model['model_default_used']
                     }]
@@ -204,7 +219,6 @@ async def switching_models(model_switch_request: ModelSwitchRequest, userinfo: T
         conditions=[
             {'column': 'models.id', 'value': model_switch_request.model_id},
             {'column': 'models.type', 'value': model_switch_request.type},
-            {'column': 'models.mode', 'value': 1},
             {'column': 'model_configurations.team_id', 'value': team_id}
         ]
     )
@@ -217,7 +231,6 @@ async def switching_models(model_switch_request: ModelSwitchRequest, userinfo: T
         joins=[['inner', 'models', 'model_configurations.model_id = models.id']],
         conditions=[
             {'column': 'models.type', 'value': model_switch_request.type},
-            {'column': 'models.mode', 'value': 1},
             {'column': 'model_configurations.team_id', 'value': team_id}
         ]
     )

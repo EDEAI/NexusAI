@@ -1,4 +1,6 @@
+from pathlib import Path
 from typing import Any, Dict, List, Literal, Tuple
+from config import LOCAL_MODEL_PATHS
 from core.database import MySQL
 from languages import get_language_content
 
@@ -74,9 +76,9 @@ class Models(MySQL):
         assert model, get_language_content('api_vector_available_model')
         return model
 
-    def get_model_config_llm_list(self,team_id: int) -> list:
+    def get_model_config_list(self,team_id: int, model_type: int) -> list:
         '''
-        Find the list of LLM (type=1) model configurations,
+        Find the list of model configurations,
         group by supplier and return supplier info with their model_list.
         Now, suppliers are sorted ascending, and their models are sorted so that
         models with model_default_used==1 appear first, then by sort_order ascending.
@@ -85,6 +87,7 @@ class Models(MySQL):
             columns=[
                 'model_configurations.id AS model_config_id',
                 'models.name AS model_name',
+                'models.mode AS model_mode',
                 'models.support_image AS support_image',
                 'model_configurations.default_used AS model_default_used',
                 'model_configurations.sort_order AS sort_order',
@@ -95,7 +98,7 @@ class Models(MySQL):
                 ['inner', 'model_configurations', 'models.id = model_configurations.model_id'],
                 ['inner', 'suppliers', 'models.supplier_id = suppliers.id']
             ],
-            conditions=[{'column': 'models.type', 'value': 1},
+            conditions=[{'column': 'models.type', 'value': model_type},
                         {'column': 'models.status', 'value': 1},
                         {'column': 'model_configurations.status', 'value': 1},
                         {'column': 'suppliers.status', 'value': 1},
@@ -106,6 +109,12 @@ class Models(MySQL):
 
         grouped = {}
         for r in rows:
+            # Check if local model exists
+            if r['model_mode'] == 2:
+                model_path = Path(LOCAL_MODEL_PATHS[(r['supplier_name'], r['model_name'])])
+                if not model_path.exists():
+                    continue
+            
             sid = r['supplier_id']
             if sid not in grouped:
                 grouped[sid] = {
@@ -116,6 +125,7 @@ class Models(MySQL):
             grouped[sid]['model_list'].append({
                 'model_config_id': r['model_config_id'],
                 'model_name': r['model_name'],
+                'model_mode': r['model_mode'],
                 'model_default_used': r['model_default_used'],
                 'sort_order': r['sort_order'],
                 'support_image': r['support_image']
@@ -155,7 +165,7 @@ class Models(MySQL):
         )
         return models
 
-    def get_model_by_type(self, type_: int, team_id: int, indexing_mode: int = 0, uid: int = 0) -> Dict[str, Any]:
+    def get_model_by_type(self, type_: int, team_id: int, uid: int = 0) -> Dict[str, Any]:
         """
         Get the model details by the type of the model configuration.
         Model type 1: text-generation 2: embeddings 3: reranking 4: speech2text 5: tts 6: text2img 7: moderation
@@ -169,8 +179,6 @@ class Models(MySQL):
             {'column': 'model_configurations.team_id', 'value': team_id},
             {'column': 'models.type', 'value': type_}
         ]
-        if indexing_mode != 0:
-            conditions.append({'column': 'models.mode', 'value': indexing_mode})
 
         model = self.select_one(
             columns=[
