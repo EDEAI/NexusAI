@@ -53,13 +53,12 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     };
 
     const changemodal = async (value: any, id: any) => {
-    
         const data = {
             type: value.model_type,
             model_id: id,
         };
         const res = await postSwitchingModels(data);
-     
+
         ModelSetupList(true);
     };
 
@@ -83,7 +82,6 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     const handleOpenModal = (data: any) => {
         setIsModalOpen2(true);
         setModalSingleData(data);
-     
     };
 
     const uniqueTypeSet = (data: any) => {
@@ -91,7 +89,6 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
         const filteredModels = data.filter(
             model =>
                 uniqueTypeSet.has(model.model_type) &&
-
                 !data
                     .slice(0, data.indexOf(model))
                     .some(prevModel => prevModel.model_type === model.model_type),
@@ -109,7 +106,7 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
         const newdata = suppliers;
         newdata[id].listopen = !newdata[id].listopen;
         setSuppliers(newdata);
-      
+
         // setSuppliers({...suppliers,[id]:{...suppliers[id],listopen:!suppliers[id].listopen}})
         if (id + 1 == pulldownlistid) {
             setPulldownlistid(0);
@@ -119,7 +116,6 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
     };
 
     const InputChange = (e: any, index: any) => {
-      
         const newmodal = JSON.parse(JSON.stringify(modalsingledata));
         // if (newmodal.supplier_config[index].type == 'int' || newmodal.supplier_config[index].type == 'float') {
         //     // if(typeof e ==='number')
@@ -138,9 +134,7 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
         };
         const res = await postSuppliersAuthorize(data);
         if (res.code === 0) {
-            message.success(
-                intl.formatMessage({ id: 'user.saveSuccess', defaultMessage: '' }),
-            );
+            message.success(intl.formatMessage({ id: 'user.saveSuccess', defaultMessage: '' }));
             setIsModalOpen2(false);
             ModelSetupList(true);
         }
@@ -178,26 +172,22 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                                 <div>
                                     {modelslist
                                         ? modelslist.map((item: any, index: any) => {
-                                            const modelOptions= item.suppliers.map(
-                                                (item: any, index: any) => {
-                                                    return {
-                                                        label:item.supplier_name,
-                                                        options: item.models.map(
-                                                            (
-                                                                item: any,
-                                                                index: any,
-                                                            ) => {
-                                                                return {
-                                                                    label: item.model_name,
-                                                                    value: item.model_id,
-                                                                    ...item
-                                                                };
-                                                            },
-                                                        ),
-                                                       
-                                                    };
-                                                },
-                                            )
+                                              const modelOptions = item.suppliers.map(
+                                                  (item: any, index: any) => {
+                                                      return {
+                                                          label: item.supplier_name,
+                                                          options: item.models.map(
+                                                              (item: any, index: any) => {
+                                                                  return {
+                                                                      label: item.model_name,
+                                                                      value: item.model_id,
+                                                                      ...item,
+                                                                  };
+                                                              },
+                                                          ),
+                                                      };
+                                                  },
+                                              );
                                               return (
                                                   <div className="mb-5">
                                                       <div className="mb-2.5">
@@ -222,38 +212,72 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                                                           variant="filled"
                                                           onChange={e => changemodal(item, e)}
                                                           optionRender={option => {
-                                                            return (
-                                                                <div >
-                                                                    {option.label}{' '}
-                                                                    {option?.data?.support_image == 1 && (
-                                                                        <Tag color="blue" className="text-xs">
-                                                                            {intl.formatMessage({
-                                                                                id: 'workflow.tag.imageUnderstanding',
-                                                                                defaultMessage: 'Image Understanding',
-                                                                            })}
-                                                                        </Tag>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        }}
-                                                        labelRender={props => {
-                                                            return (
-                                                                <div title={JSON.stringify(item.suppliers)}>
-                                                                    {props?.label}{' '}
-                                                                    {findOption(props?.value, { options:modelOptions })?.support_image ==
-                                                                        1 && (
-                                                                        <Tag color="blue" className="text-xs">
-                                                                            {intl.formatMessage({
-                                                                                id: 'workflow.tag.imageUnderstanding',
-                                                                                defaultMessage: 'Image Understanding',
-                                                                            })}
-                                                                        </Tag>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        }}
+                                                              return (
+                                                                  <div>
+                                                                      {option.label}{' '}
+                                                                      {option?.data
+                                                                          ?.support_image == 1 && (
+                                                                          <Tag
+                                                                              color="blue"
+                                                                              className="text-xs"
+                                                                          >
+                                                                              {intl.formatMessage({
+                                                                                  id: 'workflow.tag.imageUnderstanding',
+                                                                                  defaultMessage:
+                                                                                      'Image Understanding',
+                                                                              })}
+                                                                          </Tag>
+                                                                      )}
+                                                                      {
+                                                                        option?.data?.model_mode==2 && (
+                                                                          <Tag color="default" className="text-xs">
+                                                                              {intl.formatMessage({
+                                                                                  id: 'workflow.tag.localModel',
+                                                                                  defaultMessage: 'Local Model',
+                                                                              })}
+                                                                          </Tag>
+                                                                        )
+                                                                      }
+                                                                  </div>
+                                                              );
+                                                          }}
+                                                          labelRender={props => {
+                                                              return (
+                                                                  <div
+                                                                      title={JSON.stringify(
+                                                                          item.suppliers,
+                                                                      )}
+                                                                  >
+                                                                      {props?.label}{' '}
+                                                                      {findOption(props?.value, {
+                                                                          options: modelOptions,
+                                                                      })?.support_image == 1 && (
+                                                                          <Tag
+                                                                              color="blue"
+                                                                              className="text-xs"
+                                                                          >
+                                                                              {intl.formatMessage({
+                                                                                  id: 'workflow.tag.imageUnderstanding',
+                                                                                  defaultMessage:
+                                                                                      'Image Understanding',
+                                                                              })}
+                                                                          </Tag>
+                                                                      )}
+                                                                      {findOption(props?.value, {
+                                                                          options: modelOptions,
+                                                                      })?.model_mode==2 && (
+                                                                          <Tag color="default" className="text-xs">
+                                                                              {intl.formatMessage({
+                                                                                  id: 'workflow.tag.localModel',
+                                                                                  defaultMessage: 'Local Model',
+                                                                              })}
+                                                                          </Tag>
+                                                                      )}
+                                                                  </div>
+                                                              );
+                                                          }}
                                                           options={
-                                                            modelOptions
+                                                              modelOptions
 
                                                               // [
                                                               //     {
@@ -319,39 +343,41 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                                                   )}
                                               </div>
                                           </div>
-                                          <div
-                                              className=" w-32 rounded bg-[#FCFCFC] py-1.5 px-2.5"
-                                              style={{
-                                                  border: '1px solid #EBEBEB',
-                                                  boxSizing: 'border-box',
-                                              }}
-                                          >
-                                              <div className="flex justify-between mb-1">
-                                                  <div>Api-KEY </div>
-                                                  <div>
-                                                      <Badge
-                                                          color={
-                                                              item.authorization == 1
-                                                                  ? '#1FDC27'
-                                                                  : '#d8d8d8'
-                                                          }
-                                                      />
-                                                  </div>
-                                              </div>
-                                              <Button
-                                                  icon={<SettingOutlined />}
-                                                  size="small"
-                                                  className="w-full"
-                                                  onClick={() => {
-                                                      handleOpenModal(item);
+                                          {item.supplier_mode != 2 && (
+                                              <div
+                                                  className=" w-32 rounded bg-[#FCFCFC] py-1.5 px-2.5"
+                                                  style={{
+                                                      border: '1px solid #EBEBEB',
+                                                      boxSizing: 'border-box',
                                                   }}
                                               >
-                                                  {intl.formatMessage({
-                                                      id: 'user.settings',
-                                                      defaultMessage: '',
-                                                  })}
-                                              </Button>
-                                          </div>
+                                                  <div className="flex justify-between mb-1">
+                                                      <div>Api-KEY </div>
+                                                      <div>
+                                                          <Badge
+                                                              color={
+                                                                  item.authorization == 1
+                                                                      ? '#1FDC27'
+                                                                      : '#d8d8d8'
+                                                              }
+                                                          />
+                                                      </div>
+                                                  </div>
+                                                  <Button
+                                                      icon={<SettingOutlined />}
+                                                      size="small"
+                                                      className="w-full"
+                                                      onClick={() => {
+                                                          handleOpenModal(item);
+                                                      }}
+                                                  >
+                                                      {intl.formatMessage({
+                                                          id: 'user.settings',
+                                                          defaultMessage: '',
+                                                      })}
+                                                  </Button>
+                                              </div>
+                                          )}
                                       </div>
                                       <div className="w-full bg-[#FCFCFC] px-3.5 py-2.5">
                                           <div
@@ -396,15 +422,29 @@ const ModelSetup: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                                                                 } */}
                                                                   {item.model_type_name}
                                                               </Text>
-                                                              {
-                                                                item.support_image == 1 && (
-                                                                    <Tag color="blue" className="text-xs ml-2">
-                                                                        {intl.formatMessage({
-                                                                            id: 'workflow.tag.imageUnderstanding',
-                                                                            defaultMessage: 'Image Understanding',
-                                                                        })}
-                                                                    </Tag>
-                                                                )}
+                                                              {item.support_image == 1 && (
+                                                                  <Tag
+                                                                      color="blue"
+                                                                      className="text-xs ml-2"
+                                                                  >
+                                                                      {intl.formatMessage({
+                                                                          id: 'workflow.tag.imageUnderstanding',
+                                                                          defaultMessage:
+                                                                              'Image Understanding',
+                                                                      })}
+                                                                  </Tag>
+                                                              )}
+                                                              {item?.model_mode==2 && (
+                                                                  <Tag
+                                                                      color="default"
+                                                                      className="text-xs ml-2"
+                                                                  >
+                                                                      {intl.formatMessage({
+                                                                          id: 'workflow.tag.localModel',
+                                                                          defaultMessage: 'Local Model',
+                                                                      })}
+                                                                  </Tag>
+                                                              )}
                                                           </div>
                                                           <div>
                                                               <Badge

@@ -64,10 +64,6 @@ export const SelectModelConfigId = ({ name, form, proComponentProps, fieldProps 
     //     },
     // );
     const data = useStore(state => state.modelOptionsData);
-    console.log(data);
-
-    
-
     const imageUnderstandingText = intl.formatMessage({
         id: 'workflow.tag.imageUnderstanding',
         defaultMessage: 'Image Understanding',
@@ -96,6 +92,14 @@ export const SelectModelConfigId = ({ name, form, proComponentProps, fieldProps 
                                             {imageUnderstandingText}
                                         </Tag>
                                     )}
+                                    {option?.data?.model_mode && (
+                                        <Tag color="default" className="text-xs">
+                                            {intl.formatMessage({
+                                                id: 'workflow.tag.localModel',
+                                                defaultMessage: 'Local Model',
+                                            })}
+                                        </Tag>
+                                    )}
                                 </div>
                             );
                         },
@@ -114,7 +118,7 @@ export const SelectModelConfigId = ({ name, form, proComponentProps, fieldProps 
                         ...fieldProps,
                     }}
                     {...proComponentProps}
-                
+
                 ></ProFormSelect>
                 // )
             }
@@ -149,14 +153,14 @@ export const SelectVariable = ({
     };
 
     useMount(()=>{
-        if(formRef){    
+        if(formRef){
             setTimeout(()=>{
                 const currentValue = formRef.current?.getFieldsValue(name);
                 console.log(currentValue);
             },1000)
         }
     })
-   
+
     return (
         <ProFormSelect
             placeholder={intl.formatMessage({

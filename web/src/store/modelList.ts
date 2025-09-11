@@ -41,7 +41,7 @@ export const useModelListStore = create<ModelListState>((set) => ({
         try {
             set({ loading: true });
             const res = await getModelList();
-            
+
             if (res.code === 0) {
                 set({ models: Array.isArray(res.data.data) ? res.data.data : [], initialized: true });
             } else {
@@ -49,7 +49,7 @@ export const useModelListStore = create<ModelListState>((set) => ({
             }
         } catch (error) {
             set({ error: error.message });
-            message.error('Failed to fetch models');
+            // message.error('Failed to fetch models');
         } finally {
             set({ loading: false });
         }
@@ -70,7 +70,7 @@ export const useModelSelect = () => {
 
     const select = useMemo(() => {
         const safeModels = Array.isArray(models) ? models : [];
-        
+
         const options = safeModels.map(supplier => ({
             label: supplier.supplier_name,
             options: Array.isArray(supplier.model_list) ? supplier.model_list.map(model => ({
@@ -79,7 +79,7 @@ export const useModelSelect = () => {
                 ...model
             })) : []
         }));
-        
+
         let defaultValue: number | undefined;
         for (const supplier of safeModels) {
             if (Array.isArray(supplier.model_list)) {
@@ -101,4 +101,4 @@ export const useModelSelect = () => {
         ...select,
         loading
     };
-}; 
+};

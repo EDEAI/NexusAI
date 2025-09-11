@@ -1,8 +1,9 @@
 import { datasetSet, documentList, getInforMation } from '@/api/createkb';
 import { PostappsCreate } from '@/api/creation';
+// removed unused imports from custom Select component
 import { createappdata } from '@/utils/useUser';
 import { getLocale, useIntl } from '@umijs/max';
-import { Button, Card, Col, Form, Row, Spin, Switch, message } from 'antd';
+import { Button, Col, Form, message, Row, Select, Spin, Switch, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 const Setup = ({ createkbInfo, fun }: any) => {
     const intl = useIntl();
@@ -14,6 +15,7 @@ const Setup = ({ createkbInfo, fun }: any) => {
     const [ispublice, setispublice] = useState(1);
     const [suppliersdata, setSuppliersdata] = useState(null);
     const [embeddingModelConfigId, setEmbeddingModelConfigId] = useState(null);
+    const [selectedModelId, setSelectedModelId] = useState<number | null>(null);
 
     const [appType, appTypefun] = useState(1);
 
@@ -52,7 +54,7 @@ const Setup = ({ createkbInfo, fun }: any) => {
             name: datacontent.name,
             description: datacontent.description,
             public: ispublice,
-            mode: EmbeddingKey,
+            embeddings_config_id: selectedModelId,
         };
         let res = await datasetSet(data);
         if (res.code == 0) {
@@ -80,6 +82,7 @@ const Setup = ({ createkbInfo, fun }: any) => {
             setispublice(res.data.dataset_detail.is_public);
             EmbeddingKeyfun(res.data.dataset_detail.mode);
             setEmbeddingModelConfigId(res.data.dataset_detail.embedding_model_config_id);
+            setSelectedModelId(res.data.dataset_detail.embedding_model_config_id || null);
             setData({
                 name: res.data.dataset_detail.name,
                 description: res.data.dataset_detail.description,
@@ -92,7 +95,37 @@ const Setup = ({ createkbInfo, fun }: any) => {
     const getInformation = async embeddingModelConfigId => {
         let res = await getInforMation(embeddingModelConfigId);
         if (res.code == 0) {
-            setSuppliersdata(res.data.data);
+            const safeModels = Array.isArray(res?.data?.data) ? res.data.data : [];
+
+            const options = safeModels.map(supplier => ({
+                label: supplier.supplier_name,
+                options: Array.isArray(supplier.model_list)
+                    ? supplier.model_list.map(model => ({
+                          ...model,
+                          label: model.model_name,
+                          value: model.model_config_id,
+                      }))
+                    : [],
+            }));
+
+            let defaultValue;
+            for (const supplier of safeModels) {
+                if (Array.isArray(supplier.model_list)) {
+                    const defaultModel = supplier.model_list.find(
+                        model => model.model_default_used === 1,
+                    );
+                    if (defaultModel) {
+                        defaultValue = defaultModel.model_config_id;
+                        break;
+                    }
+                }
+            }
+        
+            setSuppliersdata({
+                options,
+                defaultValue,
+            });
+            setSelectedModelId(prev => (prev == null ? defaultValue ?? null : prev));
         }
     };
 
@@ -193,17 +226,74 @@ const Setup = ({ createkbInfo, fun }: any) => {
                                                 disabled={createkbInfo.type}
                                             />
                                         </div>
-                                        <div className="pt-[30px] flex items-start text-[12px]">
-                                            <span className="mr-[2px] text-[#E80000] leading-[17px] font-medium">
-                                                *
-                                            </span>
-                                            <span className="text-[#555555] font-medium">
-                                                {intl.formatMessage({
-                                                    id: 'createkb.modelSelect',
-                                                })}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center mt-[15px]">
+                                        {suppliersdata?.options?.length > 0 && (
+                                            <>
+                                                <div className="pt-[30px] flex items-start text-[12px]">
+                                                    <span className="mr-[2px] text-[#E80000] leading-[17px] font-medium">
+                                                        *
+                                                    </span>
+                                                    <span className="text-[#555555] font-medium">
+                                                        {intl.formatMessage({
+                                                            id: 'createkb.modelSelect',
+                                                        })}
+                                                    </span>
+                                                </div>
+
+                                                <Select
+                                                    className="w-full mt-4"
+                                                    value={selectedModelId ?? undefined}
+                                                    onChange={value => setSelectedModelId(value)}
+                                                    options={(suppliersdata?.options || []).map(
+                                                        group => ({
+                                                            label: group.label,
+                                                            options: (group.options || []).map(
+                                                                (opt: any) => ({
+                                                                    ...opt,
+                                                                    label: (
+                                                                        <div>
+                                                                            {opt.label}{' '}
+                                                                            {opt?.support_image ===
+                                                                                1 && (
+                                                                                <Tag
+                                                                                    color="blue"
+                                                                                    className="text-xs"
+                                                                                >
+                                                                                    {intl.formatMessage(
+                                                                                        {
+                                                                                            id: 'workflow.tag.imageUnderstanding',
+                                                                                            defaultMessage:
+                                                                                                'Image Understanding',
+                                                                                        },
+                                                                                    )}
+                                                                                </Tag>
+                                                                            )}
+                                                                            {opt?.model_mode ===
+                                                                                2 && (
+                                                                                <Tag
+                                                                                    color="default"
+                                                                                    className="text-xs"
+                                                                                >
+                                                                                    {intl.formatMessage(
+                                                                                        {
+                                                                                            id: 'workflow.tag.localModel',
+                                                                                            defaultMessage:
+                                                                                                'Local Model',
+                                                                                        },
+                                                                                    )}
+                                                                                </Tag>
+                                                                            )}
+                                                                        </div>
+                                                                    ),
+                                                                    value: opt.value,
+                                                                }),
+                                                            ),
+                                                        }),
+                                                    )}
+                                                    disabled={createkbInfo.type}
+                                                />
+                                            </>
+                                        )}
+                                        {/* <div className="flex items-center mt-[15px]">
                                             <div className="flex">
                                                 <Card
                                                     onClick={() => {
@@ -322,7 +412,7 @@ const Setup = ({ createkbInfo, fun }: any) => {
                                                     </>
                                                 </Card>
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </Form>
                                     <div className="flex items-center mt-[60px]">
                                         <Button
