@@ -1,8 +1,8 @@
 import asyncio
 import json
-import re
 
 from typing import Any, Awaitable, Callable, Dict, Iterable, List, Optional, Set, Tuple, TYPE_CHECKING, Union
+from urllib.parse import parse_qs, urlparse
 
 from jose import JWTError, jwt
 from websockets import (
@@ -27,8 +27,6 @@ INSTRUCTION_TEMPLATE = '--NEXUSAI-INSTRUCTION-{instruction}--'
 SECRET_KEY = settings.ACCESS_TOKEN_SECRET_KEY
 ALGORITHM = 'HS256'
 
-connection_path_pattern = re.compile(r'/\?token=([A-Za-z0-9\.\-_]+)')
-connection_path_pattern_docker = re.compile(r'/ws_chat\?token=([A-Za-z0-9\.\-_]+)')
 
 class WebSocketManager:
     def __init__(self, event_loop: asyncio.BaseEventLoop):
@@ -40,13 +38,14 @@ class WebSocketManager:
         async with serve(callback, '0.0.0.0', settings.CHATROOM_WEBSOCKET_PORT):
             await self._stop_future  # run forever
     
-    def verify_connection(self, connection_path: str) -> int:
-        match_result = (
-            connection_path_pattern.fullmatch(connection_path) or
-            connection_path_pattern_docker.fullmatch(connection_path)
-        )
-        assert match_result, f'Invalid connection path: {connection_path}'
-        token = match_result.group(1)
+    def verify_connection(self, connection_path: str) -> Tuple[int, Optional[str]]:
+        connection = urlparse(connection_path)
+        assert connection.path in ['/', '/ws_chat'], f'Invalid connection path: {connection_path}'
+        query_dict = parse_qs(connection.query)
+
+        # Check token
+        assert 'token' in query_dict, f'Token not found: {connection_path}'
+        token = query_dict['token'][0]
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         except JWTError:
@@ -60,7 +59,13 @@ class WebSocketManager:
         )
         if not stored_token or stored_token.decode('utf-8') != token:
             raise Exception('Invalid token')
-        return user_id
+
+        # Check chat_base_url
+        chat_base_url = query_dict.get('chat_base_url')
+        if chat_base_url is not None:
+            chat_base_url = chat_base_url[0]
+        
+        return user_id, chat_base_url
             
     def parse_instruction(self, instruction_str: str) -> Tuple[str, Optional[Union[int, str, bool, List[Union[int, str]]]]]:
         try:

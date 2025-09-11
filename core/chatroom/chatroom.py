@@ -102,7 +102,8 @@ class Chatroom:
         topic: Optional[str] = None,
         mcp_client: MCPClient = None,
         is_desktop: bool = False,
-        desktop_mcp_tool_list: Optional[List[Dict[str, Any]]] = None
+        desktop_mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
+        chat_base_url: Optional[str] = None
     ) -> None:
         self._user_id = user_id
         self._team_id = team_id
@@ -140,6 +141,7 @@ class Chatroom:
         self._mcp_client = mcp_client
         self._is_desktop = is_desktop
         self._desktop_mcp_tool_list = desktop_mcp_tool_list
+        self._chat_base_url = chat_base_url
         self._mcp_tool_is_using = False
         self._mcp_tool_use_is_interrupted = False
         self._mcp_tool_use_lock = asyncio.Event()
@@ -559,6 +561,11 @@ class Chatroom:
                 mcp_tool_use['result_is_truncated'] = True
                 mcp_tool_use_update_data['result_is_truncated'] = 1
                 result = result[:MCP_TOOL_RESULT_MAX_LEN-3] + '...'
+        
+        # Replace storage URL with chat base URL
+        if self._chat_base_url:
+            result = result.replace(settings.STORAGE_URL, f'{self._chat_base_url}/nexusfile')
+        
         mcp_tool_use['result'] = result
         mcp_tool_use_update_data['result'] = result
         self._update_chatroom_message()
@@ -1008,7 +1015,8 @@ class Chatroom:
                         'topic': self._topic,
                         'chat_file_list': json.dumps([str(file) for file in self._chat_files], ensure_ascii=False)
                     },
-                    group_messages=True
+                    group_messages=True,
+                    chat_base_url=self._chat_base_url
                 ):
                     if not reply_started:
                         await self._ws_manager.start_agent_reply(self._chatroom_id, agent_id, self._ability_id)

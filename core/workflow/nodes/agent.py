@@ -733,6 +733,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         is_desktop: bool = False,
         chatroom_prompt_args: Optional[Dict[str, Any]] = None,
         group_messages: bool = False,
+        chat_base_url: Optional[str] = None,
         **kwargs
     ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
@@ -875,7 +876,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 override_rag_input=override_rag_input,
                 mcp_tool_list=all_mcp_tools,
                 chatroom_prompt_args=chatroom_prompt_args,
-                group_messages=group_messages
+                group_messages=group_messages,
+                chat_base_url=chat_base_url
             )
 
             full_chunk: Optional[AIMessageChunk] = None
