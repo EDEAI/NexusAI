@@ -98,7 +98,7 @@ stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
 
 [program:scheduled_tasks]
-command=python task/timed_execution_of_workflow.py --mode daemon
+command=python task/scheduled_tasks.py --mode daemon
 autostart=true
 autorestart=true
 startretries=3
