@@ -135,7 +135,7 @@ class Models(MySQL):
             supplier['model_list'] = sorted(supplier['model_list'], key=lambda x: (0 if x['model_default_used'] == 1 else 1, x['sort_order']))
         # Sort suppliers by supplier_id ascending
         result = sorted(list(grouped.values()), key=lambda x: x['supplier_id'])
-        return result[0] if len(result) == 1 else result
+        return result
 
     def get_model_information(self, model_ids: Tuple) -> list:
         """
