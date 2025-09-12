@@ -88,6 +88,7 @@ const Agents: React.FC = () => {
             description:'hhhhhhhhhhhhhhhhhhhhh',
             name:`这是由agent[${agent_id}]创建的临时聊天室`,
             max_round:10,
+            is_temporary:1,
             agent:[
                 {
                     agent_id,
