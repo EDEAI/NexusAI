@@ -9,6 +9,7 @@ import { message, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { setLocale } from 'umi';
 import Chat from './Chat';
+import { createRoom } from '@/api/plaza';
 const USERNAME = IFRAME_TEST_USERNAME;
 const PASSWORD = IFRAME_TEST_PASSWORD;
 
@@ -40,9 +41,73 @@ const Agents: React.FC = () => {
             username: USERNAME,
         });
         
-        getAgent();
+        const agent=await getAgent();
+        await createChatRoom(agent.agent.agent_id);
         document.body.style.overflow = 'hidden';
     };
+
+    const setChatroomId=async (agent_id:any,chatroom_id:any)=>{
+        const chatroomIds=localStorage.getItem('agent_chat_quickly_chatroom_ids');
+        let localObj={
+            [agent_id]:chatroom_id
+        }
+        if(chatroomIds){
+            const chatroom_id_obj=JSON.parse(chatroomIds);
+            localObj={
+                ...chatroom_id_obj,
+                [agent_id]:chatroom_id,
+                
+            }
+        }
+        localStorage.setItem('agent_chat_quickly_chatroom_ids',JSON.stringify(localObj));
+    }
+
+    const checkHasChatroomId= (agent_id:any)=>{
+        const chatroomIds=localStorage.getItem('agent_chat_quickly_chatroom_ids');
+        if(chatroomIds){
+            const chatroom_id_obj=JSON.parse(chatroomIds);
+            return chatroom_id_obj[agent_id];
+        }
+    }
+
+    const createChatRoom=async (agent_id:any)=>{
+        const hasChatroomId= checkHasChatroomId(agent_id);
+        if(hasChatroomId){
+            setDetaillist(prev=>{
+                return {
+                    ...prev,
+                    agent_chatroom_id:hasChatroomId
+                }
+            })
+            setTimeout(()=>{
+                setLoading(false);
+            },400)
+            return;
+        }
+        const res= await createRoom({
+            description:'hhhhhhhhhhhhhhhhhhhhh',
+            name:`这是由agent[${agent_id}]创建的临时聊天室`,
+            max_round:10,
+            agent:[
+                {
+                    agent_id,
+                    active:1
+                }
+            ]
+        })
+        if(res.code==0){
+            setChatroomId(agent_id,res.data.chatroom_id);
+            setDetaillist(prev=>{
+                return {
+                    ...prev,
+                    agent_chatroom_id:res.data.chatroom_id
+                }
+            })
+        }
+        setTimeout(()=>{
+            setLoading(false);
+        },400)
+    }
     const handleSubmit = async (values: API.LoginParams) => {
         try {
             //
@@ -108,12 +173,13 @@ const Agents: React.FC = () => {
             return item.status === 1;
         });
 
-        setFourthly_abilities_list(
-            selectlistdata(newabilitieslist).concat([
-                { value: 0, label: intl.formatMessage({ id: 'agent.allability' }) },
-            ]),
-        );
-        setLoading(false);
+        // setFourthly_abilities_list(
+        //     selectlistdata(newabilitieslist).concat([
+        //         { value: 0, label: intl.formatMessage({ id: 'agent.allability' }) },
+        //     ]),
+        // );
+        
+        return data;
     };
 
     const selectlistdata = (list: any) => {

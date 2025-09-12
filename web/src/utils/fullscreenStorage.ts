@@ -98,7 +98,7 @@ export const clearAllAgentFullscreenStates = (): void => {
 
 
 export const checkViewInIframe=()=>{
-
+    // return false
     return window?.location?.pathname === '/agent_chat_quickly'
 }
 export const getIframeHostName=()=>{
