@@ -47,6 +47,9 @@ export interface ContentProps {
 export interface InputContentProps {
   onRunResult: (res: any) => void;
   loading?: boolean;
+  onCancelSchedule?: (taskId: number) => void;
+  appId?: number;
+  workflowId?: number;
 }
 
 export interface DetailContentProps {

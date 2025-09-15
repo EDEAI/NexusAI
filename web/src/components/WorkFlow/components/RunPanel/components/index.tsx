@@ -36,6 +36,8 @@ const RunPanel = memo(() => {
     isPaused,
     showPauseResume,
     handlePauseResume,
+    app_id,
+    workflow_id,
   } = useRunPanelState();
   
   // Process run list updates
@@ -59,6 +61,8 @@ const RunPanel = memo(() => {
             <InputContent 
               loading={loading} 
               onRunResult={runResult}
+              appId={app_id}
+              workflowId={workflow_id ? Number(workflow_id) : undefined}
             />
           ),
         },

@@ -97,6 +97,19 @@ stderr_logfile=logs/supervisor_workflow_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=5
 
+[program:scheduled_tasks]
+command=python task/scheduled_tasks.py --mode daemon
+autostart=true
+autorestart=true
+startretries=3
+priority=20
+stdout_logfile=logs/scheduled_tasks.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+stderr_logfile=logs/scheduled_tasks_err.log
+stderr_logfile_maxbytes=10MB
+stderr_logfile_backups=5
+
 [program:ai_tool]
 command=python task/ai_tool_run.py
 autostart=true

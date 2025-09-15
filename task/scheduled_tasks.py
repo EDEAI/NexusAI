@@ -85,9 +85,16 @@ class ScheduledTaskExecutor:
         
         if not inputs:
             raise ValueError(get_language_content("graph_validation_errors.inputs_cannot_be_empty"))
+
+        last_run = app_runs.select_one(
+            columns=['graph'],
+            conditions={'column': 'scheduled_task_id', 'value': scheduled_task_id},
+            order_by = 'id DESC'
+        )
+        graph_obj = last_run['graph'] if last_run else workflow['graph']
         
         # Correct input validation method: get input definition from start node in graph
-        graph = create_graph_from_dict(workflow['graph'])
+        graph = create_graph_from_dict(graph_obj)
         graph.validate()
         
         # Get input definition from start node
@@ -232,6 +239,8 @@ class ScheduledTaskExecutor:
             
             # Debug: show task's input configuration
             logger.info(f"Task {task_id} input configuration: {task['input']} (type: {type(task['input'])})")
+
+            workflow = Workflows().get_workflow_app(task['workflow_id'])
             
             # Get user info to obtain team_id
             user_info = self.users_model.get_user_by_id(task['user_id'])
@@ -258,21 +267,16 @@ class ScheduledTaskExecutor:
                 return False
             
             # Handle complex input format: if contains nested variable definition structure, extract actual values
-            if 'inputs' in inputs and isinstance(inputs['inputs'], dict):
+            if 'properties' in inputs and isinstance(inputs['properties'], dict):
                 # This is the format created from scheduled task API, need to extract actual values
-                nested_inputs = inputs['inputs']
-                if 'properties' in nested_inputs:
-                    # Extract values from variable definitions
-                    simple_inputs = {}
-                    for key, var_def in nested_inputs['properties'].items():
-                        if isinstance(var_def, dict) and 'value' in var_def:
-                            simple_inputs[key] = var_def['value']
-                        else:
-                            simple_inputs[key] = var_def
-                    inputs = simple_inputs
-                    logger.info(f"Task {task_id}: Extracted simple inputs from complex format: {inputs}")
-                else:
-                    inputs = nested_inputs
+                simple_inputs = {}
+                for key, var_def in inputs['properties'].items():
+                    if isinstance(var_def, dict) and 'value' in var_def:
+                        simple_inputs[key] = var_def['value']
+                    else:
+                        simple_inputs[key] = var_def
+                inputs = simple_inputs
+                logger.info(f"Task {task_id}: Extracted simple inputs from complex format: {inputs}")
             
             # Ensure inputs are in simple key-value format
             if not inputs or not isinstance(inputs, dict):
@@ -290,11 +294,11 @@ class ScheduledTaskExecutor:
                     team_id=team_id,
                     user_id=task['user_id'],
                     app_id=task['app_id'],
-                    run_type=1,  # Use published version
+                    run_type=workflow['publish_status'],
                     run_name=run_name,
                     inputs=inputs,
                     knowledge_base_mapping=None,
-                    node_confirm_users=None,
+                    node_confirm_users=task['node_confirm_users'],
                     data_source_run_id=0,
                     scheduled_task_id=task_id
                 )
