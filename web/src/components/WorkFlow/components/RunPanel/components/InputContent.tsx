@@ -354,16 +354,13 @@ const InputContent = memo(({ onRunResult, loading, onCancelSchedule, appId, work
               // Handle file type variables
               if (item?.createVar?.type === 'file') {
                 return (
-                  <div key={index}>
-                    <Typography.Title level={5}>
-                      {item.createVar.display_name || item.createVar.name}
-                      {item.createVar.required && <span className="text-red-500 ml-1">*</span>}
-                    </Typography.Title>
-                    <UploadDragger
-                      name={`var.${item.createVar.name}`}
-                      multiple={false}
-                    />
-                  </div>
+                  <UploadDragger
+                    key={index}
+                    label={item.createVar.display_name || item.createVar.name}
+                    name={`var.${item.createVar.name}`}
+                    required={item.createVar.required}
+                    multiple={false}
+                  />
                 );
               }
 
