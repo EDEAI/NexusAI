@@ -306,6 +306,7 @@ export default {
     'workflow.vars.required': 'Required',
     'workflow.vars.inputFields': 'Input Fields',
     'workflow.vars.createVariable': 'Create Variable',
+    'workflow.vars.variableType': 'Variable Type',
 
     'workflow.vars.variableName': 'Variable Name',
     'workflow.vars.enterVariableName': 'Please enter the variable name',
