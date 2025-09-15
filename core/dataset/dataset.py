@@ -14,7 +14,7 @@ from langchain_core.documents import Document
 from langchain_core.runnables import chain, Runnable
 from langchain_core.runnables.utils import Input, Output
 
-from config import enable_reranking_on_single_retrival, settings
+from config import enable_reranking_on_single_retrival, LOCAL_MODEL_PATHS, settings
 from core.database.models import (
     Apps,
     DatasetProcessRules,
@@ -80,7 +80,10 @@ def get_embeddings_and_vector_database(
                 }
             case 'Text2vecEmbeddings':
                 embeddings_kwargs = {
-                    'model_name_or_path': './models/text2vec'
+                    'model_name_or_path': LOCAL_MODEL_PATHS[(
+                        embeddings_data['supplier_name'],
+                        embeddings_data['model_name']
+                    )]
                 }
             case _:
                 embeddings_kwargs = {}
@@ -141,7 +144,10 @@ def get_reranker(team_id: int) -> Reranker:
         case 'CrossEncoderReranker':
             reranker_kwargs['model_type'] = reranker_config['model_type']
             reranker_kwargs['model_kwargs'] = {
-                'model_name': './models/bge-reranker-v2-m3'
+                'model_name': LOCAL_MODEL_PATHS[(
+                    reranker_data['supplier_name'],
+                    reranker_data['model_name']
+                )]
             }
         case 'SiliconFlowReranker':
             reranker_kwargs['base_url'] = reranker_config['base_url']

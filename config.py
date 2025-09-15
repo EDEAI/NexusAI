@@ -3444,7 +3444,7 @@ model_type = {
 }
 
 LOCAL_MODEL_PATHS = {
-    ('HuggingFace', 'text2vec-large-chinese'): './models/text2vec',
+    ('HuggingFace', 'text2vec-large-chinese'): './models/text2vec-large-chinese',
     ('HuggingFace', 'bge-reranker-v2-m3'): './models/bge-reranker-v2-m3',
 }
 

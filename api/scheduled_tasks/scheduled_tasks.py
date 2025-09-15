@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Optional
 from core.database.models.scheduled_tasks import ScheduledTasks
+from core.database.models.upload_files import UploadFiles
 from api.schema.scheduled_tasks import *
 from api.schema.base import RespBaseSchema
 from api.utils.common import *
@@ -486,9 +487,29 @@ async def get_workflow_scheduled_task(
         authenticated user for security purposes.
     """
     scheduled_tasks_model = ScheduledTasks()
+    upload_files_model = UploadFiles()
     
     # Get scheduled task by workflow
     task = scheduled_tasks_model.get_scheduled_task_by_workflow(app_id, workflow_id, userinfo.uid)
+
+    if task:
+        file_list = []
+        if task_input := task.get('input'):
+            for k, v in task_input['properties'].items():
+                if v['type'] == 'file':
+                    file_id = v['value']
+                    file_data = upload_files_model.get_file_by_id(file_id)
+                    file_name = file_data['name'] + file_data['extension']
+                    file_path_relative_to_upload_files = Path(file_data['path']).relative_to('upload_files')
+                    file_url = f'{settings.STORAGE_URL}/upload/{file_path_relative_to_upload_files}'
+                    file_list.append({
+                        'name': k,
+                        'variable_name': v['display_name'] if v.get('display_name') else k,
+                        'id': file_id,
+                        'file_name': file_name,
+                        'file_path': file_url
+                    })
+        task['file_list'] = file_list
     
     # Ensure data is always a dict for response_success
     return response_success(task if task is not None else {})

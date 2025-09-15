@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Body, Depends, Query
 from api.schema.tools import toolsResponse, PaginatedToolsResponse, PaginatedToolsData
 from api.utils.common import *
@@ -23,7 +24,7 @@ async def get_tools(
 ):
     try:
         # Fetch the available tool providers and their associated tools.
-        tools = get_docker_sandbox_tools()
+        tools = await asyncio.to_thread(get_docker_sandbox_tools)
         
         # If no tools found, return empty response
         if not tools:
