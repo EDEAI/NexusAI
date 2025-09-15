@@ -111,11 +111,8 @@ const RunForm = memo(({ loading, onFinish, data, onScheduleExecute, onCancelSche
             }
         };
 
-        // Prevent duplicate fetches in React StrictMode by guarding with a static ref on component
-        const keyRef = (RunForm as any)._scheduleCheckKeyRef || ((RunForm as any)._scheduleCheckKeyRef = { current: '' });
-        const newKey = `${appId || ''}-${workflowId || ''}`;
-        if (keyRef.current !== newKey) {
-            keyRef.current = newKey;
+        // Always check scheduled task when appId or workflowId changes
+        if (appId && workflowId) {
             checkScheduledTask();
         }
     }, [appId, workflowId]);
