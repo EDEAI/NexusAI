@@ -455,4 +455,7 @@ export default {
     'workflow.scheduleName': 'Plan Name',
     'workflow.confirmCancelSchedule': 'Confirm Cancel Schedule',
     'workflow.confirmCancelScheduleContent': 'Are you sure you want to cancel the current schedule? This action cannot be undone.',
+    'workflow.inputFiles': 'Input Files',
+    'workflow.variableName': 'Variable Name',
+    'workflow.fileName': 'File Name',
 };

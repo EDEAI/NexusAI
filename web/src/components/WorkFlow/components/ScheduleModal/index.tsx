@@ -391,9 +391,17 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
                 }}
             >
                 {existingTask && (
-                    <>
+                    <div style={{ 
+                        maxHeight: '400px', 
+                        overflowY: 'auto', 
+                        marginBottom: '16px',
+                        border: '1px solid #d9d9d9',
+                        borderRadius: '6px',
+                        padding: '16px'
+                    }}>
                         <Form.Item
                             label={intl.formatMessage({ id: 'workflow.scheduleName', defaultMessage: 'Plan Name' })}
+                            style={{ marginBottom: '16px' }}
                         >
                             <div style={{ padding: '4px 0', color: '#595959' }}>
                                 {existingTask?.name || '-'}
@@ -402,6 +410,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
                         
                         <Form.Item
                             label={intl.formatMessage({ id: 'workflow.title.inputParameters', defaultMessage: 'Input Parameters' })}
+                            style={{ marginBottom: '16px' }}
                         >
                             <div style={{ padding: '4px 0', color: '#595959' }}>
                                 {(() => {
@@ -412,7 +421,9 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
                                             return intl.formatMessage({ id: 'workflow.emptyInput', defaultMessage: 'No input' });
                                         }
                                         const props = input?.properties || input;
-                                        const items = Object.values(props || {});
+                                        const items = Object.values(props || {})
+                                            .filter((item: any) => item.type !== 'file') // Filter out file type variables
+                                            .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0)); // Sort by sort_order in ascending order
                                         if (!items.length) {
                                             return intl.formatMessage({ id: 'workflow.emptyInput', defaultMessage: 'No input' });
                                         }
@@ -465,7 +476,51 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
                                 })()} 
                             </div>
                         </Form.Item>
-                    </>
+                        
+                        {/* Input Files Section */}
+                        {existingTask?.file_list && existingTask.file_list.length > 0 && (
+                            <Form.Item
+                                label={intl.formatMessage({ id: 'workflow.inputFiles', defaultMessage: 'Input Files' })}
+                                style={{ marginBottom: '0' }}
+                            >
+                                <div style={{ padding: '4px 0', color: '#595959' }}>
+                                    {(() => {
+                                        // Render file list
+                                        const renderFileList = (fileList: any[]) => {
+                                            if (!fileList || fileList.length === 0) return null;
+                                            
+                                            return (
+                                            <div>
+                                                {fileList.map((file, index) => (
+                                                    <div key={index} style={{ marginBottom: 8, padding: 8, border: '1px solid #d9d9d9', borderRadius: 4 }}>
+                                                        <div style={{ marginBottom: 4 }}>
+                                                            <strong>{intl.formatMessage({ id: 'workflow.variableName' })}:</strong> {file.variable_name}
+                                                        </div>
+                                                        <div>
+                                                            <strong>{intl.formatMessage({ id: 'workflow.fileName' })}:</strong>{' '}
+                                                            <a 
+                                                                href={file.file_path} 
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                style={{ color: '#1890ff', textDecoration: 'underline', cursor: 'pointer' }}
+                                                                onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#40a9ff'}
+                                                                onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#1890ff'}
+                                                            >
+                                                                {file.file_name}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        );
+                                        };
+
+                                        return renderFileList(existingTask.file_list);
+                                    })()} 
+                                </div>
+                            </Form.Item>
+                        )}
+                    </div>
                 )}
 
                 {/* Schedule Type */}

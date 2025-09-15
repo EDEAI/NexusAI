@@ -448,4 +448,7 @@ export default {
     'workflow.scheduleName': '计划名称',
     'workflow.confirmCancelSchedule': '确认取消计划',
     'workflow.confirmCancelScheduleContent': '确定要取消当前计划吗？取消后将无法恢复。',
+    'workflow.inputFiles': '输入文件',
+    'workflow.variableName': '变量名',
+    'workflow.fileName': '文件名',
 };
