@@ -122,7 +122,16 @@ export default memo(
                                     <Typography.Title level={5}>
                                         {intl.formatMessage({ id: 'agent.log.output' })}
                                     </Typography.Title>
-                                    {logDetail.outputs ? (
+                                    {logDetail.error ? (
+                                        <div className="bg-gray-50 p-4 rounded mt-2 border-l-4 border-red-500">
+                                            <div className="text-red-500 font-medium mb-2">
+                                                {intl.formatMessage({ id: 'agent.log.error' })}
+                                            </div>
+                                            <pre className="whitespace-pre-wrap text-sm text-red-500">
+                                                {logDetail.error}
+                                            </pre>
+                                        </div>
+                                    ) : (logDetail.outputs && logDetail.outputs.value !== undefined && logDetail.outputs.value !== null && logDetail.outputs.value !== '') ? (
                                         <div>
                                             {logDetail?.outputs?.type == 'json' ? (
                                                 (() => {
@@ -226,15 +235,6 @@ export default memo(
                                                 </div>
                                             )}
                                         </div>
-                                    ) : logDetail.error ? (
-                                        <div className="bg-gray-50 p-4 rounded mt-2 border-l-4 border-red-500">
-                                            <div className="text-red-500 font-medium mb-2">
-                                                {intl.formatMessage({ id: 'agent.log.error' })}
-                                            </div>
-                                            <pre className="whitespace-pre-wrap text-sm text-red-500">
-                                                {logDetail.error}
-                                            </pre>
-                                        </div>
                                     ) : (
                                         <div className="bg-gray-50 p-4 rounded mt-2">
                                             <div className="text-sm text-gray-500">
@@ -282,13 +282,15 @@ export default memo(
                                                                         </div>
                                                                         
                                                                         {Array.isArray(toolRecord.files_to_upload) && 
-                                                                            toolRecord.files_to_upload.length > 0 && (
+                                                                            toolRecord.files_to_upload.filter(file => file && file.file_path && file.file_path.trim() !== '').length > 0 && (
                                                                             <div className="mt-3">
                                                                                 <Text strong className="text-sm block mb-2">
                                                                                     {intl.formatMessage({ id: 'app.chatroom.mcptool.inputFiles' })}
                                                                                 </Text>
                                                                                 <div className="space-y-2">
-                                                                                    {toolRecord.files_to_upload.map((file, fileIndex) => (
+                                                                                    {toolRecord.files_to_upload
+                                                                                        .filter(file => file && file.file_path && file.file_path.trim() !== '')
+                                                                                        .map((file, fileIndex) => (
                                                                                         <div key={fileIndex} className="flex items-center justify-between p-2 bg-white border border-gray-200 rounded">
                                                                                             <div className="flex items-center gap-2">
                                                                                                 <FileOutlined className="text-gray-500" />
