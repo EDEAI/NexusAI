@@ -655,11 +655,25 @@ class DatasetManagement:
     def reindex_dataset(cls, dataset_id: int, new_embeddings_config_id: int) -> None:
         dataset = datasets.get_dataset_by_id(dataset_id, check_is_reindexing=True)
         
+        embeddings_config_id = dataset['embedding_model_config_id']
+        new_collection_name = get_new_collection_name()
+        
+        if embeddings_config_id == 0:
+            # Create dataset
+            datasets.update(
+                {'column': 'id', 'value': dataset_id},
+                {
+                    'collection_name': new_collection_name,
+                    'embedding_model_config_id': new_embeddings_config_id
+                }
+            )
+            return
+
+        # ------ Re-index dataset ------
+
         # Initialize old and new vector databases
         collection_name = dataset['collection_name']
-        embeddings_config_id = dataset['embedding_model_config_id']
         _, vdb = get_embeddings_and_vector_database(embeddings_config_id, collection_name)
-        new_collection_name = get_new_collection_name()
         _, new_vdb = get_embeddings_and_vector_database(new_embeddings_config_id, new_collection_name)
 
         # Update dataset status to reindexing
