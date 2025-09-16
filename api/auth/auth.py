@@ -1693,6 +1693,13 @@ async def switch_member_role(role_data: SwitchMemberRoleData, userinfo: TokenDat
             ],
             data=update_data
         )
+
+        user = Users().get_user_by_id(target_user_id)
+        if user['team_id'] == current_team_id:
+            Users().update(
+                {'column': 'id', 'value': target_user_id},
+                {'role': role, 'role_id': new_role_id}
+            )
         
         SQLDatabase.commit()
         SQLDatabase.close()
