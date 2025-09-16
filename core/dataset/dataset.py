@@ -306,12 +306,11 @@ class DatasetManagement:
         return total_num_tokens, round(total_num_tokens * input_pricing, 7), currency
 
     @classmethod
-    def create_dataset(cls, embeddings_config_id: int) -> str:
+    def create_dataset(cls) -> str:
         '''
         Return: dataset_id
         '''
         collection_name = get_new_collection_name()
-        get_embeddings_and_vector_database(embeddings_config_id, collection_name)
         return collection_name
 
     @classmethod

@@ -339,13 +339,7 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
             return response_error(get_language_content("workflow_insert_error"))
 
     if mode == 3:
-        try:
-            embeddings_config_id = Models().get_model_by_type(2, team_id, uid)['model_config_id']
-        except AssertionError as e:
-            msg = str(e)
-            logger.info('create_dataset: %s desc: Request model %s, Current user id %s', msg, uid)
-            return response_error(msg)
-        collection_name = DatasetManagement.create_dataset(embeddings_config_id)
+        collection_name = DatasetManagement.create_dataset()
         retriever_config_dict = {item['key']: item['value'] for item in retriever_config}
         # create database
         database_data = {
@@ -353,12 +347,10 @@ async def apps_base_create(data:ReqAppBaseCreateSchema, userinfo: TokenData = De
             "user_id": uid,
             "app_id": app_id,
             "collection_name":collection_name,
-            "embedding_model_config_id":embeddings_config_id,
             "retriever_config":retriever_config_dict,
             "temporary_chatroom_id": temporary_chatroom_id,
             "created_time": current_time,
-            "updated_time": current_time,
-            "temporary_chatroom_id": temporary_chatroom_id
+            "updated_time": current_time
         }
 
         datasets_model= Datasets()

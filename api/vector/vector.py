@@ -134,7 +134,7 @@ async def create_dataset(data: CreateDatasetSchema,userinfo: TokenData = Depends
     data_source_type = data.data_source_type
     embeddings_config_id = data.embeddings_config_id
     try:
-        collection_name = DatasetManagement.create_dataset(embeddings_config_id)
+        collection_name = DatasetManagement.create_dataset()
         retriever_config_dict = {item['key']: item['value'] for item in retriever_config}
         app_id = Apps().insert(
             {
