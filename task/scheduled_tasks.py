@@ -284,10 +284,6 @@ class ScheduledTaskExecutor:
                 self._update_task_execution_result(task_id, False, "Invalid inputs format after processing")
                 return False
             
-            # Generate run name
-            current_time = datetime.now()
-            run_name = f"Scheduled_Task_{task_id}_{current_time.strftime('%Y%m%d_%H%M%S')}"
-            
             # Call fixed version of workflow execution function
             try:
                 result = self._start_workflow_fixed(
@@ -295,7 +291,7 @@ class ScheduledTaskExecutor:
                     user_id=task['user_id'],
                     app_id=task['app_id'],
                     run_type=workflow['publish_status'],
-                    run_name=run_name,
+                    run_name=task_name,
                     inputs=inputs,
                     knowledge_base_mapping=None,
                     node_confirm_users=task['node_confirm_users'],
