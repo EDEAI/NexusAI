@@ -515,8 +515,11 @@ class ScheduledTaskExecutor:
         
         try:
             while True:
+                start_time = time.monotonic()
                 self.run_once()
-                time.sleep(check_interval)
+                cycle_time = time.monotonic() - start_time
+                if cycle_time < check_interval:
+                    time.sleep(check_interval - cycle_time)
                 
         except KeyboardInterrupt:
             logger.info("Scheduled task daemon stopped by user")
