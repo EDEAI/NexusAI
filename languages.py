@@ -302,11 +302,11 @@ language_packs = {
         "third_party_login_success": "Third-party login successful",
         "user_contact_info_missing": "The current third-party account has been linked to another user",
 
-        "login_time_last_year": "Last year",
-        "login_time_a_month_ago": "A month ago",
-        "login_time_days_ago": "Days ago",
-        "login_time_hours_ago": "Hours ago",
-        "login_time_minutes_ago": "Minutes ago",
+        "login_time_last_year": "Year(s) ago",
+        "login_time_a_month_ago": "Month(s) ago",
+        "login_time_days_ago": "Day(s) ago",
+        "login_time_hours_ago": "Hour(s) ago",
+        "login_time_minutes_ago": "Minute(s) ago",
         "login_time_just": "Just",
         "login_time_never_logged_in": "Never logged in",
         "the_current_third_party_account_has_not_been_authorized_to_login":'The current third-party account has not been authorized to log in',
@@ -1188,7 +1188,7 @@ language_packs = {
         'workflow_administrator': 'Workflow administrator',
         'skill_administrator': 'Skill administrator',
         'roundtable_administrator': 'Roundtable administrator',
-        'knowledge_base_administrator': 'Knowledge_base administrator',
+        'knowledge_base_administrator': 'Knowledge base administrator',
 
         # Role descriptions - optimized for user-friendly display
         'comprehensive_administrator_desc': 'Versatile manager who can create and manage all types of AI applications, including agents, workflows, skills, and more',

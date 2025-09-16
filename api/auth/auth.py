@@ -520,6 +520,7 @@ async def invite_user(keyword: str = None, userinfo: TokenData = Depends(get_cur
       role: When role equals 1, use the frontend language pack; when role equals 2, use user_title.
       keyword: Optional search keyword for nickname and email
     """
+    uid = userinfo.uid
     team_id = userinfo.team_id
     team_member_list = []
     
@@ -564,7 +565,7 @@ async def invite_user(keyword: str = None, userinfo: TokenData = Depends(get_cur
                 role_data = Roles().select_one(columns='*', conditions=[{'column': 'id', 'value': value['role_id']}])
                 if role_data:
                     if role_data['built_in'] == 1:
-                        user_title = get_language_content(role_data['name'])
+                        user_title = get_language_content(role_data['name'], uid)
                     else:
                         user_title = role_data['name']
                 else:
@@ -581,19 +582,19 @@ async def invite_user(keyword: str = None, userinfo: TokenData = Depends(get_cur
                     years = rel_delta.years
 
                     if years >= 1:
-                        time_text = f"{years}{get_language_content('login_time_last_year')}"
+                        time_text = f"{years} {get_language_content('login_time_last_year', uid)}"
                     elif months >= 1:
-                        time_text = f"{months}{get_language_content('login_time_a_month_ago')}"
+                        time_text = f"{months} {get_language_content('login_time_a_month_ago', uid)}"
                     elif days >= 1:
-                        time_text = f"{days}{get_language_content('login_time_days_ago')}"
+                        time_text = f"{days} {get_language_content('login_time_days_ago', uid)}"
                     elif hours >= 1:
-                        time_text = f"{hours:.0f}{get_language_content('login_time_hours_ago')}"
+                        time_text = f"{hours:.0f} {get_language_content('login_time_hours_ago', uid)}"
                     elif minutes >= 1:
-                        time_text = f"{minutes:.0f}{get_language_content('login_time_minutes_ago')}"
+                        time_text = f"{minutes:.0f} {get_language_content('login_time_minutes_ago', uid)}"
                     else:
-                        time_text = {get_language_content('login_time_just')}
+                        time_text = {get_language_content('login_time_just', uid)}
                 else:
-                    time_text = {get_language_content('login_time_never_logged_in')}
+                    time_text = {get_language_content('login_time_never_logged_in', uid)}
 
                 member_info = {
                     'user_id': value['id'],
