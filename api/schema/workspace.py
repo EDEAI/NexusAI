@@ -21,6 +21,7 @@ class WorkflowProcessLog(BaseModel):
     avatar: Optional[str] = None
     chat_room_name: Optional[str] = None
     nickname: Optional[str] = None
+    user_id: Optional[int] = None
     file_list: Optional[List[Dict[str, Any]]] = None
     driver_id: Optional[int] = None
     mode: Optional[int] = None
@@ -150,7 +151,6 @@ class WorkspacWorkflowLogListData(BaseModel):
     app_runs_id: Optional[int] = None
     app_runs_name: Optional[str] = None
     nickname: Optional[str] = None
-    user_id: Optional[int] = None
     icon_background: Optional[str] = None
     icon: Optional[str] = None
     total_tokens: Optional[int] = None

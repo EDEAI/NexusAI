@@ -837,8 +837,7 @@ class Workspaces(MySQL):
                      "app_runs.elapsed_time", "app_runs.finished_time", "app_runs.workflow_id",
                      "app_runs.status AS app_runs_status", "app_runs.completed_steps", "app_runs.total_steps",
                      "app_runs.total_tokens","apps.icon_background", "apps.icon",
-                     "users.nickname",
-                     "users.user_id"
+                     "users.nickname"
                      ],
             joins=[
                 ["left", "app_runs", "apps.id = app_runs.app_id"],
