@@ -4,7 +4,10 @@ from datetime import datetime
 
 
 
-
+class HumanConfirmInfo(BaseModel):
+    user_id: Optional[int] = None
+    nickname: Optional[str] = None
+    
 class WorkflowProcessLog(BaseModel):
     app_run_id: Optional[int] = None
     apps_name: Optional[str] = None
@@ -93,9 +96,6 @@ class AppRunsLog(BaseModel):
     finished_time: Optional[datetime] = None
     created_time: Optional[datetime] = None
 
-class HumanConfirmInfo(BaseModel):
-    user_id: Optional[int] = None
-    nickname: Optional[str] = None
 
 class WorkflowLogInfo(BaseModel):
     id: Optional[int] = None
