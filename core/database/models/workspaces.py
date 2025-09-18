@@ -490,6 +490,42 @@ class Workspaces(MySQL):
 
         if log_list:
             for log in log_list:
+                if log.get('app_run_id') and log.get('workflow_id') > 0 and log.get('need_human_confirm') == 1:
+                    app_node_executions = AppNodeExecutions()
+                    conditions = [
+                        {"column": "app_node_executions.workflow_id", "value": log.get('workflow_id')},
+                        {"column": "app_node_executions.app_run_id", "value": log.get('app_run_id')},
+                        {"column": "app_node_executions.correct_output", "value": 0}
+                    ]
+
+                    app_node_list = app_node_executions.select(
+                        joins=[
+                            ["inner", "app_runs", 'app_runs.id = app_node_executions.app_run_id'],
+                            ["inner", "apps", 'app_runs.app_id = apps.id']
+                        ],
+                        columns=["app_node_executions.id", "app_node_executions.level", "app_node_executions.child_level",
+                                "app_node_executions.edge_id", "app_node_executions.pre_node_id", "app_node_executions.node_id", "app_node_executions.node_name",
+                                "app_node_executions.node_type", "app_node_executions.node_graph", "app_node_executions.inputs",
+                                "app_node_executions.model_data AS mod_data", "app_node_executions.task_id",
+                                "app_node_executions.status",
+                                "app_node_executions.error", "app_node_executions.outputs", "app_node_executions.elapsed_time",
+                                "app_node_executions.created_time", "app_node_executions.updated_time",
+                                "app_node_executions.finished_time","apps.icon_background", "apps.icon", "apps.avatar","app_node_executions.need_human_confirm","app_node_executions.user_id"],
+                        conditions=conditions
+                    )
+                    if app_node_list:
+                        for app_node in app_node_list:
+                            if app_node['need_human_confirm'] == 1:
+                                users = Users()
+                                app_node_user = AppNodeUserRelation()
+                                app_node_user_ids = app_node_user.get_node_user_ids(log.get('app_run_id'), app_node['node_id'])
+                                log['human_confirm_info'] = []
+                                for userId in app_node_user_ids:
+                                    user_info = users.get_user_by_id(userId)
+                                    log['human_confirm_info'].append({
+                                        'user_id': user_info['id'],
+                                        'nickname': user_info['nickname']
+                                    })
                 if log.get('avatar'):
                     if log['avatar'].find('head_icon') == -1:
                         log['avatar'] = f"{settings.STORAGE_URL}/upload/{log['avatar']}"
@@ -731,18 +767,6 @@ class Workspaces(MySQL):
                     )
                     log['file_list'] = []
                     if app_node_list and app_node_list.get('outputs'):
-                        # Handle need_human_confirm logic
-                        if app_node_list.get('need_human_confirm') == 1:
-                            users = Users()
-                            app_node_user = AppNodeUserRelation()
-                            app_node_user_ids = app_node_user.get_node_user_ids(app_runs_id, app_node_list['node_id'])
-                            log['human_confirm_info'] = []
-                            for userId in app_node_user_ids:
-                                user_info = users.get_user_by_id(userId)
-                                log['human_confirm_info'].append({
-                                    'user_id': user_info['id'],
-                                    'nickname': user_info['nickname']
-                                })
                         
                         if app_node_list.get('avatar'):
                             if app_node_list['avatar'].find('head_icon') == -1:
