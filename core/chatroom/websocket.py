@@ -38,7 +38,10 @@ class WebSocketManager:
         async with serve(callback, '0.0.0.0', settings.CHATROOM_WEBSOCKET_PORT):
             await self._stop_future  # run forever
     
-    def verify_connection(self, connection_path: str) -> Tuple[int, Optional[str]]:
+    def verify_connection(self, connection_path: str) -> Tuple[int, int, Optional[str]]:
+        """
+        Verify the connection path and return the user ID, team ID, and chat base URL.
+        """
         connection = urlparse(connection_path)
         assert connection.path in ['/', '/ws_chat'], f'Invalid connection path: {connection_path}'
         query_dict = parse_qs(connection.query)
@@ -51,6 +54,7 @@ class WebSocketManager:
         except JWTError:
             raise Exception('Invalid token')
         assert (user_id := payload.get('uid')), 'Invalid user ID'
+        assert (team_id := payload.get('team_id')), 'Invalid team ID'
 
         stored_token = (
             redis.get(f'third_party_access_token:{user_id}')
@@ -65,7 +69,7 @@ class WebSocketManager:
         if chat_base_url is not None:
             chat_base_url = chat_base_url[0]
         
-        return user_id, chat_base_url
+        return user_id, team_id, chat_base_url
             
     def parse_instruction(self, instruction_str: str) -> Tuple[str, Optional[Union[int, str, bool, List[Union[int, str]]]]]:
         try:

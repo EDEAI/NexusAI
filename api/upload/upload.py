@@ -19,12 +19,12 @@ async def upload_file(file: UploadFile = File(...), chat_base_url: str = None, u
     Upload file to the server
 
     constraint
-        Support TXT, MARKDOWN, PDF, HTML, XLSX, PPTX, DOCX, CSV, each file does not exceed 15MB
+        Support TXT, MARKDOWN, PDF, HTML, XLSX, PPTX, DOCX, CSV, WAV, PNG, JPG, JPEG, each file does not exceed 15MB
 
     Returns:
         The ID of the newly created file.
     """
-    extensions_all = {'.txt', '.md', '.pdf', '.html', '.xlsx', '.pptx', '.docx', '.csv', '.png', '.jpg', '.jpeg'}
+    extensions_all = {'.txt', '.md', '.pdf', '.html', '.xlsx', '.pptx', '.docx', '.csv', '.wav', '.png', '.jpg', '.jpeg'}
     max_file_size = 15 * 1024 * 1024
     user_id = userinfo.uid
     filename = file.filename
