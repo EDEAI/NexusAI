@@ -731,6 +731,19 @@ class Workspaces(MySQL):
                     )
                     log['file_list'] = []
                     if app_node_list and app_node_list.get('outputs'):
+                        # Handle need_human_confirm logic
+                        if app_node_list.get('need_human_confirm') == 1:
+                            users = Users()
+                            app_node_user = AppNodeUserRelation()
+                            app_node_user_ids = app_node_user.get_node_user_ids(app_runs_id, app_node_list['node_id'])
+                            log['human_confirm_info'] = []
+                            for userId in app_node_user_ids:
+                                user_info = users.get_user_by_id(userId)
+                                log['human_confirm_info'].append({
+                                    'user_id': user_info['id'],
+                                    'nickname': user_info['nickname']
+                                })
+                        
                         if app_node_list.get('avatar'):
                             if app_node_list['avatar'].find('head_icon') == -1:
                                 app_node_list['avatar'] = f"{settings.STORAGE_URL}/upload/{app_node_list['avatar']}"

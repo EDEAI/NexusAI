@@ -30,6 +30,7 @@ class WorkflowProcessLog(BaseModel):
     chatroom_id: Optional[int] = None
     agents_data: Optional[List[Dict[str, Any]]] = None
     need_human_confirm: Optional[int] = None
+    human_confirm_info: Optional[List[HumanConfirmInfo]] = None
     percentage: Optional[int] = None
     paused: Optional[int] = None
 class WorkspaceWorkflowProcessLogResponseData(BaseModel):
