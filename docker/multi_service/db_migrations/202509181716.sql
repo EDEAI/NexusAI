@@ -4,6 +4,7 @@ CREATE TABLE `non_llm_records` (
 	`team_id` INT(11) NOT NULL COMMENT 'Team ID',
 	`chatroom_id` INT(11) NOT NULL DEFAULT '0' COMMENT 'Chatroom ID',
 	`model_config_id` INT(11) NOT NULL COMMENT 'Model config ID',
+	`model_type` TINYINT(1) NOT NULL COMMENT 'Model type 1: text-generation 2: embeddings 3: reranking 4: speech2text 5: tts 6: text2img 7: moderation',
 	`input_file_id` INT(11) NOT NULL DEFAULT '0' COMMENT 'Audio file ID',
 	`output_text` TEXT NULL COMMENT 'Output text',
 	`status` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Execute status 0: Cannot execute 1: Can execute 2: Executing 3: Successfully executed 4: Failed to execute ',
@@ -19,6 +20,7 @@ CREATE TABLE `non_llm_records` (
 	INDEX `team_id` (`team_id`),
 	INDEX `chatroom_id` (`chatroom_id`),
 	INDEX `model_config_id` (`model_config_id`),
+	INDEX `model_type` (`model_type`),
 	INDEX `status` (`status`)
 )
 COMMENT='Non-LLM Record Data Table'

@@ -12,6 +12,7 @@ from websockets import (
 
 from .chatroom import Chatroom
 from .websocket import WebSocketManager, WorkflowWebSocketManager
+from celery_app import speech_recognition
 from config import settings
 from core.database.models import (
     AppRuns,
@@ -20,12 +21,10 @@ from core.database.models import (
     ChatroomMessages,
     Chatrooms,
     Models,
-    NonLLMRecords,
     UploadFiles,
     Users
 )
 from core.mcp.client import MCPClient
-from core.speech_recognition import SpeechRecognition
 from languages import get_language_content
 from log import Logger
 
@@ -39,7 +38,6 @@ chatroom_agent_relation = ChatroomAgentRelation()
 chatrooms = Chatrooms()
 chatroom_messages = ChatroomMessages()
 models = Models()
-non_llm_records = NonLLMRecords()
 upload_files = UploadFiles()
 users = Users()
 
@@ -59,47 +57,6 @@ class ChatroomManager:
         self._file_list_by_chatroom: Dict[int, List[Union[int, str]]] = {}
         self._is_desktop_by_chatroom: Dict[int, bool] = {}
         self._desktop_mcp_tool_list_by_chatroom: Dict[int, List[Dict[str, Any]]] = {}
-
-    def _speech_recognition(self, user_id: int, team_id: int, chatroom_id: int, file_id: int) -> str:
-        file_data = upload_files.get_file_by_id(file_id)
-        assert file_data, 'Audio file not found.'
-        # Get model configuration
-        model_info = models.get_model_by_type(4, team_id, user_id)
-        assert model_info, 'Model not found'
-        # Configure speech recognition
-        speech_recognition = SpeechRecognition(supplier=model_info['supplier_name'], config=model_info['supplier_config'])
-        record = {
-            'user_id': user_id,
-            'team_id': team_id,
-            'chatroom_id': chatroom_id,
-            'model_config_id': model_info['model_config_id'],
-            'input_file_id': file_id
-        }
-        start_time = time()
-        try:
-            # Transcribe the audio
-            result = speech_recognition.transcribe_audio(
-                audio_file_path=file_data['path'], 
-                model_config=model_info['model_config']
-            )
-            elapsed_time = time() - start_time
-            record['output_text'] = result['text']
-            record['status'] = 3
-            record['elapsed_time'] = elapsed_time
-            record['input_audio_tokens'] = result['input_audio_tokens']
-            record['prompt_tokens'] = result['prompt_tokens']
-            record['completion_tokens'] = result['completion_tokens']
-            record['total_tokens'] = result['total_tokens']
-            non_llm_records.insert(record)
-            return result['text']
-        except Exception as e:
-            elapsed_time = time() - start_time
-            logger.exception('Error in speech recognition: %s', e)
-            record['status'] = 4
-            record['error'] = str(e)
-            record['elapsed_time'] = elapsed_time
-            non_llm_records.insert(record)
-            raise
 
     def _get_chatroom_info(self, chatroom_id: int, user_id: int, check_chat_status: bool) -> Dict[str, int]:
         chatroom_info = chatrooms.select_one(
@@ -434,7 +391,8 @@ class ChatroomManager:
                                     # User input
                                     assert isinstance(data, int), 'Audio file ID should be an integer.'
                                     file_id = data
-                                    user_input = self._speech_recognition(user_id, team_id, chatroom_id, file_id)
+                                    task = speech_recognition.delay(user_id, team_id, chatroom_id, file_id)
+                                    user_input = await asyncio.to_thread(task.get, timeout=settings.APP_API_TIMEOUT)
                                     assert user_input.strip(), 'No content was recognized.'
                                     logger.info('Starting chatroom %s...', chatroom_id)
                                     coro = self._handle_data_and_start_chatroom(chatroom_id, user_id, team_id, user_input, chat_base_url)

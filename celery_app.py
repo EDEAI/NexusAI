@@ -3,12 +3,14 @@ import os, json
 os.environ['DATABASE_AUTO_COMMIT'] = 'True'
 
 from datetime import datetime
+from time import time
 from typing import List, Dict, Any, Literal, Optional
 from celery import Celery
 
 from config import settings
-from core.database.models import Models, Agents, AppNodeExecutions, AppRuns, Apps, CustomTools, UploadFiles, Workflows
+from core.database.models import Models, Agents, AppNodeExecutions, AppRuns, Apps, CustomTools, NonLLMRecords, UploadFiles, Workflows
 from core.dataset import DatasetManagement, DatasetRetrieval
+from core.speech_recognition import SpeechRecognition
 from core.workflow import (
     ObjectVariable,
     create_variable_from_dict,
@@ -306,6 +308,58 @@ def run_llm_tool(
     elif 'generate_workflow_node_' in ai_tool_type:
         ai_tool.schema_key = "generate_workflow_node_system_prompt"
     return ai_tool.run(app_run_id=app_run_id, return_json=return_json, correct_llm_output=correct_llm_output)
+
+@celery_app.task
+def speech_recognition(user_id: int, team_id: int, chatroom_id: int, file_id: int) -> str:
+    file_data = UploadFiles().get_file_by_id(file_id)
+    assert file_data, 'Audio file not found.'
+    # Get model configuration
+    model_info = Models().get_model_by_type(4, team_id, user_id)
+    assert model_info, 'Model not found'
+    # Configure speech recognition
+    speech_recognition = SpeechRecognition(supplier=model_info['supplier_name'], config=model_info['supplier_config'])
+    non_llm_records = NonLLMRecords()
+    record_id = non_llm_records.insert({
+        'user_id': user_id,
+        'team_id': team_id,
+        'chatroom_id': chatroom_id,
+        'model_config_id': model_info['model_config_id'],
+        'model_type': model_info['model_type'],
+        'input_file_id': file_id,
+        'status': 2
+    })
+    start_time = time()
+    try:
+        # Transcribe the audio
+        result = speech_recognition.transcribe_audio(
+            audio_file_path=file_data['path'], 
+            model_config=model_info['model_config']
+        )
+        elapsed_time = time() - start_time
+        non_llm_records.update(
+            {'column': 'id', 'value': record_id},
+            {
+                'output_text': result['text'],
+                'status': 3,
+                'elapsed_time': elapsed_time,
+                'input_audio_tokens': result['input_audio_tokens'],
+                'prompt_tokens': result['prompt_tokens'],
+                'completion_tokens': result['completion_tokens'],
+                'total_tokens': result['total_tokens'],
+            }
+        )
+        return result['text']
+    except Exception as e:
+        elapsed_time = time() - start_time
+        non_llm_records.update(
+            {'column': 'id', 'value': record_id},
+            {
+                'status': 4,
+                'error': str(e),
+                'elapsed_time': elapsed_time,
+            }
+        )
+        raise
 
 
 # Update Celery application configuration

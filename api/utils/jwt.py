@@ -128,9 +128,11 @@ def verify_token(token: str, credentials_exception):
         )
         from api.utils.auth import set_current_user_id
         set_current_user_id(uid)
+        return token_data
     except JWTError:
         raise credentials_exception
-    return token_data
+    finally:
+        Users().commit()
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     """
