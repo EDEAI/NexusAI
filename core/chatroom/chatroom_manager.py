@@ -392,7 +392,7 @@ class ChatroomManager:
                                     assert isinstance(data, int), 'Audio file ID should be an integer.'
                                     file_id = data
                                     task = speech_recognition.delay(user_id, team_id, chatroom_id, file_id)
-                                    user_input = await asyncio.to_thread(task.get, timeout=settings.APP_API_TIMEOUT)
+                                    user_input = await asyncio.to_thread(task.get, timeout=60)
                                     assert user_input.strip(), 'No content was recognized.'
                                     logger.info('Starting chatroom %s...', chatroom_id)
                                     coro = self._handle_data_and_start_chatroom(chatroom_id, user_id, team_id, user_input, chat_base_url)
