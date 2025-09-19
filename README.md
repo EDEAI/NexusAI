@@ -44,7 +44,7 @@ mkdir -p models storage logs upload_files
 chmod 777 storage logs upload_files
 ```
 
-## Cloning the Embedding and Reranker models for offline mode
+## Optional: Cloning the Embedding and Reranker models for offline mode
 ```bash
 # Enter the model directory
 cd models
@@ -272,7 +272,7 @@ If you want to enable Milvus authentication, refer to [Milvus Authentication](ht
 ## Server deployment
 [Initialize model, storage, and logs directories](#initialize-model-storage-and-logs-directories)
 
-\[Optional: [Cloning the Embedding and Reranker models for offline mode](#cloning-the-embedding-and-reranker-models-for-offline-mode)\]
+\[[Optional: Cloning the Embedding and Reranker models for offline mode](#optional-cloning-the-embedding-and-reranker-models-for-offline-mode)\]
 
 Initialize the database
 ```bash
