@@ -73,7 +73,7 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
 
     team_id = userinfo.team_id
     team_type = Teams().get_team_type_by_id(team_id)
-    if team_type == 2:
+    if not is_temporary and team_type == 2:
         # Check if user is admin in current team
         user_role = UserTeamRelations().get_user_role_by_user_and_team(userinfo.uid, team_id)
         if user_role != 1:
