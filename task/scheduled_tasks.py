@@ -26,12 +26,14 @@ from dateutil.relativedelta import relativedelta
 # Set database auto commit
 os.environ['DATABASE_AUTO_COMMIT'] = 'True'
 
+from celery.exceptions import TimeoutError as CeleryTimeoutError
+from celery_app import asr
 from core.database.models.scheduled_tasks import ScheduledTasks
 from core.database.models.users import Users
 from core.workflow import start_workflow
 from core.workflow.variables import validate_required_variable, create_variable_from_dict
 from core.workflow.graph import create_graph_from_dict
-from core.database.models import Apps, Workflows, AppRuns, AppNodeUserRelation
+from core.database.models import Apps, Workflows, AppRuns, AppNodeUserRelation, NonLLMRecords, UploadFiles
 from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
 from copy import deepcopy
 from log import Logger
@@ -109,24 +111,24 @@ class ScheduledTaskExecutor:
             for key, value in inputs.items():
                 if key in input_obj.properties:
                     input_obj.properties[key].value = value
-            
-            # Provide default values for missing required variables
-            for var_name, var_obj in input_obj.properties.items():
-                if getattr(var_obj, 'required', False) and (var_obj.value is None or var_obj.value == ''):
-                    # Provide default values based on variable type
-                    if var_obj.type == 'string':
-                        var_obj.value = f"default_{var_name}"
-                    elif var_obj.type == 'number':
-                        var_obj.value = 0
-                    elif var_obj.type == 'file':
-                        var_obj.value = None  # File type remains None
-                    else:
-                        var_obj.value = f"default_{var_name}"
-                    
-                    logger.warning(f"Task {workflow['id']}: Missing required variable '{var_name}', using default value: {var_obj.value}")
-            
             # Validate required variables
             validate_required_variable(input_obj)
+
+            for input_var in input_obj.properties.values():
+                if input_var.type == 'file' and isinstance(input_var.value, int):
+                    file_id = input_var.value
+                    file_data = UploadFiles().get_file_by_id(file_id)
+                    if not file_data:
+                        raise Exception(f"File ID {file_id} not found.")
+                    if (
+                        file_data['extension'] in ['.mp3', '.ogg', '.m4a', '.flac', '.wav']
+                        and NonLLMRecords().get_record_by_input_file_id(file_id) is None
+                    ):
+                        task = asr.delay(user_id, team_id, input_var.value)
+                        try:
+                            task.get(timeout=60)
+                        except CeleryTimeoutError:
+                            raise Exception(f"ASR task for file {file_data['name'] + file_data['extension']} timed out.")
             
             # Use processed input object
             validated_inputs = input_obj.to_dict()

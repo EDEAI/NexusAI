@@ -310,12 +310,13 @@ def run_llm_tool(
     return ai_tool.run(app_run_id=app_run_id, return_json=return_json, correct_llm_output=correct_llm_output)
 
 @celery_app.task
-def speech_recognition(user_id: int, team_id: int, chatroom_id: int, file_id: int) -> str:
+def asr(user_id: int, team_id: int, file_id: int, chatroom_id: int = 0) -> str:
     file_data = UploadFiles().get_file_by_id(file_id)
     assert file_data, 'Audio file not found.'
+    assert file_data['extension'] in ['.mp3', '.ogg', '.m4a', '.flac', '.wav'], 'Invalid file type.'
     # Get model configuration
     model_info = Models().get_model_by_type(4, team_id, user_id)
-    assert model_info, 'Model not found'
+    assert model_info, 'Model not found.'
     # Configure speech recognition
     speech_recognition = SpeechRecognition(supplier=model_info['supplier_name'], config=model_info['supplier_config'])
     non_llm_records = NonLLMRecords()

@@ -3,16 +3,17 @@ import sys
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 from typing import Any, Dict, Optional, List
-from core.database.models import CustomTools, Apps, Workflows, AppRuns, AppNodeUserRelation
+from core.database.models import CustomTools, Apps, Workflows, AppRuns, AppNodeUserRelation, NonLLMRecords, UploadFiles
 from core.workflow.variables import create_variable_from_dict, validate_required_variable
 from core.database.models.chatroom_driven_records import ChatroomDrivenRecords
 from core.workflow.graph import create_graph_from_dict
 from languages import get_language_content
 import asyncio
-from celery_app import run_app
+from celery_app import asr, run_app
 from api.utils.common import *
 from datetime import datetime
 from copy import deepcopy
+from celery.exceptions import TimeoutError as CeleryTimeoutError
 
 tools_db = CustomTools()
 apps_db = Apps()
@@ -20,6 +21,8 @@ workflows_db = Workflows()
 appRuns_db = AppRuns()
 appNodeUserRelation_db = AppNodeUserRelation()
 chatroomDrivenRecords_db = ChatroomDrivenRecords()
+nonLLMRecords_db = NonLLMRecords()
+uploadFiles_db = UploadFiles()
 
 
 async def skill_run(
@@ -190,6 +193,22 @@ async def workflow_run(
         
         validate_required_variable(input_obj)
 
+        for input_var in input_obj.properties.values():
+            if input_var.type == 'file' and isinstance(input_var.value, int):
+                file_id = input_var.value
+                file_data = uploadFiles_db.get_file_by_id(file_id)
+                if not file_data:
+                    raise Exception(f"File ID {file_id} not found.")
+                if (
+                    file_data['extension'] in ['.mp3', '.ogg', '.m4a', '.flac', '.wav']
+                    and nonLLMRecords_db.get_record_by_input_file_id(file_id) is None
+                ):
+                    task = asr.delay(user_id, team_id, input_var.value)
+                    try:
+                        await asyncio.to_thread(task.get, timeout=60)
+                    except CeleryTimeoutError:
+                        raise Exception(f"ASR task for file {file_data['name'] + file_data['extension']} timed out.")
+
         # Create app run record
         start_datetime_str = datetime.now().replace(microsecond=0).isoformat(sep='_')
         app_run_data = {
@@ -212,27 +231,6 @@ async def workflow_run(
         apps_db.increment_execution_times(workflow['app_id'])
         apps_db.commit()
 
-        # Run workflow and wait for result
-        # loop = asyncio.get_running_loop()
-        # result = await loop.run_in_executor(
-        #     None,
-        #     redis_client.blpop,
-        #     [f'app_run_{app_run_id}_result'],
-        #     settings.APP_API_TIMEOUT
-        # )
-        
-        # if result is None:
-        #     raise ValueError('Timeout waiting for the workflow to complete')
-            
-        # result = json.loads(result[1])
-        # if result['status'] != 'success':
-        #     raise ValueError(result['message'])
-            
-        # outputs = create_variable_from_dict(result['data'])
-        
-        # return {
-        #     "outputs": flatten_variable_with_values(outputs)
-        # }
         return {'workflow_id': workflow['id'], 'app_run_id': app_run_id}
     except ValueError as e:
         raise ValueError(str(e))

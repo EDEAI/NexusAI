@@ -6,15 +6,16 @@ import yaml
 import time
 from datetime import datetime
 
+from celery.exceptions import TimeoutError as CeleryTimeoutError
 from fastapi import APIRouter, File, Request, Response, UploadFile, WebSocket, WebSocketDisconnect
 from api.utils.common import *
 from api.utils.connection import ConnectionManager
 from api.utils.jwt import *
 from api.schema.workflows import *
 from api.schema.base import *
-from core.database.models import Workflows, AgentDatasetRelation, Apps, AppRuns, AIToolLLMRecords
+from core.database.models import Workflows, AgentDatasetRelation, Apps, AppRuns, AIToolLLMRecords, NonLLMRecords, UploadFiles
 from core.llm.prompt import Prompt
-from celery_app import run_node, run_app
+from celery_app import asr, run_node, run_app
 from pprint import pp
 
 from core.database.models.app_node_user_relation import AppNodeUserRelation
@@ -119,6 +120,8 @@ async def node_run(data: WorkflowsNodeRunSchema,
         node_id: int, Node id
         """
     try:
+        user_id = userinfo.uid
+        team_id = userinfo.team_id
         app_id = data.app_id
         child_node_id = None
         if data.parent_node_id:
@@ -127,7 +130,7 @@ async def node_run(data: WorkflowsNodeRunSchema,
             node_id = data.node_id
         node_data = {}
         workflows_model = Workflows()
-        draft_info = workflows_model.node_run_info(app_id, node_id, userinfo.uid, userinfo.team_id)
+        draft_info = workflows_model.node_run_info(app_id, node_id, user_id, team_id)
         graph = create_graph_from_dict(draft_info['graph'])
         nodes = graph.nodes.to_dict()
         for node_item in nodes:
@@ -149,13 +152,32 @@ async def node_run(data: WorkflowsNodeRunSchema,
         inputs = data.inputs
         if inputs:
             inputs = create_variable_from_dict(inputs)
-
+        for record in context.records:
+            for obj in [record['inputs'], record['outputs']]:
+                if not obj:
+                    continue
+                for input_var in obj.properties.values():
+                    if input_var.type == 'file' and isinstance(input_var.value, int):
+                        file_id = input_var.value
+                        file_data = UploadFiles().get_file_by_id(file_id)
+                        if not file_data:
+                            raise Exception(f"File ID {file_id} not found.")
+                        if (
+                            file_data['extension'] in ['.mp3', '.ogg', '.m4a', '.flac', '.wav']
+                            and NonLLMRecords().get_record_by_input_file_id(file_id) is None
+                        ):
+                            task = asr.delay(user_id, team_id, input_var.value)
+                            try:
+                                await asyncio.to_thread(task.get, timeout=60)
+                            except CeleryTimeoutError:
+                                raise Exception(f"ASR task for file {file_data['name'] + file_data['extension']} timed out.")
+        
         node_data = create_node_from_dict(node_data)
         
         task = run_node.delay(
             node_data.to_dict(),
             inputs.to_dict() if inputs else None,
-            userinfo.uid,
+            user_id,
             draft_info['id'],
             context.to_dict()
         )
@@ -167,6 +189,7 @@ async def node_run(data: WorkflowsNodeRunSchema,
 
         return response_success(result)
     except Exception as e:
+        traceback.print_exc()
         return response_error(str(e))
 
 
@@ -177,7 +200,7 @@ async def run(data: WorkflowsRunSchema,
     workflow run
 
     app_id: int, App id
-    run_type：int, run type 0: draft 1: published
+    run_type: int, run type 0: draft 1: published
     run_name: str, run name
     inputs: user inputs
     node_confirm_users: user node confirm

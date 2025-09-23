@@ -1,7 +1,7 @@
 import re
 from typing import Dict, List, Any
 from .nodes.base import Node
-from . import Variable, ArrayVariable, ObjectVariable, VariableTypes, create_variable_from_dict, replace_value_in_variable
+from .variables import Variable, ArrayVariable, ObjectVariable, VariableTypes, create_variable_from_dict, replace_value_in_variable
 
 class Context:
     """

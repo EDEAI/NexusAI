@@ -11,6 +11,7 @@ from datetime import datetime
 from hashlib import md5
 from typing import Annotated, Any, Dict, Optional
 
+from celery.exceptions import TimeoutError as CeleryTimeoutError
 from fastapi import APIRouter, FastAPI, Header
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.openapi.utils import get_openapi
@@ -18,10 +19,10 @@ from pydantic import BaseModel
 
 from api.utils.common import *
 from core.helper import decrypt_id
-from celery_app import run_app
+from celery_app import asr, run_app
 from config import settings
 from core.database import redis
-from core.database.models import AppRuns, Apps, Agents, Workflows
+from core.database.models import AppRuns, Apps, Agents, NonLLMRecords, Workflows, UploadFiles
 from core.llm import Prompt
 from core.workflow import (
     create_variable_from_dict,
@@ -130,6 +131,23 @@ async def run(
                     if var := input_obj.properties.get(k):
                         var.value = v
                 validate_required_variable(input_obj)
+
+                for input_var in input_obj.properties.values():
+                    if input_var.type == 'file' and isinstance(input_var.value, int):
+                        file_id = input_var.value
+                        file_data = UploadFiles().get_file_by_id(file_id)
+                        if not file_data:
+                            raise Exception(f"File ID {file_id} not found.")
+                        if (
+                            file_data['extension'] in ['.mp3', '.ogg', '.m4a', '.flac', '.wav']
+                            and NonLLMRecords().get_record_by_input_file_id(file_id) is None
+                        ):
+                            task = asr.delay(user_id, team_id, input_var.value)
+                            try:
+                                await asyncio.to_thread(task.get, timeout=60)
+                            except CeleryTimeoutError:
+                                raise Exception(f"ASR task for file {file_data['name'] + file_data['extension']} timed out.")
+                
             except Exception as e:
                 return response_error(str(e))
             
@@ -151,9 +169,7 @@ async def run(
             Apps().commit()
 
             # Run workflow
-            loop = asyncio.get_running_loop()
-            result = await loop.run_in_executor(
-                None,
+            result = await asyncio.to_thread(
                 redis.blpop,
                 [f'app_run_{app_run_id}_result'],
                 settings.APP_API_TIMEOUT

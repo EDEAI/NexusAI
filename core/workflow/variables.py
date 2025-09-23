@@ -350,7 +350,7 @@ def replace_value_in_variable(
     Returns:
     None. The function directly modifies the original_variable's value.
     """
-    from core.database.models import UploadFiles
+    from core.database.models import NonLLMRecords, UploadFiles
     
     if var_name == context_variable.name and isinstance(context_variable, Variable):
         if original_variable.type in ["string", "file", "json"]:
@@ -365,11 +365,13 @@ def replace_value_in_variable(
                             value = file_var_value
                             file_data = UploadFiles().get_file_by_id(file_var_value)
                             file_path = project_root.joinpath(file_data['path'])
+                            file_name = file_data['name'] + file_data['extension']
                         elif isinstance(file_var_value, str):
                             attr = 'path'
                             if file_var_value[0] == '/':
                                 file_var_value = file_var_value[1:]
                             file_path = project_root.joinpath('storage').joinpath(file_var_value)
+                            file_name = file_path.name
                             value = str(file_path)
                         else:
                             # This should never happen
@@ -379,12 +381,32 @@ def replace_value_in_variable(
                             # Add the file variable to the image_list
                             if isinstance(image_list, List):
                                 image_list.append(context_variable)
+                        elif file_path.suffix in ['.mp3', '.ogg', '.m4a', '.flac', '.wav']:
+                            if isinstance(file_var_value, int):
+                                asr_record = NonLLMRecords().get_record_by_input_file_id(file_var_value)
+                                if asr_record:
+                                    variable_string = (
+                                        '\n\n'
+                                        '---\n\n'
+                                        f'##{file_name}\n\n'
+                                        f'**{attr}**: `{value}`\n\n'
+                                        '```\n'
+                                        f'{asr_record["output_text"]}\n'
+                                        '```\n\n'
+                                        '---\n\n'
+                                    )
+                                else:
+                                    # This should never happen
+                                    raise Exception('Audio file ASR record is not found!')
+                            else:
+                                # This should never happen
+                                raise Exception('ASR of audio file output by node is not supported!')
                         else:
                             # Use Markdown for document files
                             variable_string = (
                                 '\n\n'
                                 '---\n\n'
-                                f'##{file_path.name}\n\n'
+                                f'##{file_name}\n\n'
                                 f'**{attr}**: `{value}`\n\n'
                                 '```\n'
                                 f'{convert_document_to_markdown(file_path)}\n'

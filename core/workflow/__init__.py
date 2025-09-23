@@ -2,7 +2,8 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent.parent))
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
+from celery.exceptions import TimeoutError as CeleryTimeoutError
 from .variables import *
 from .edges import *
 from .graph import *
@@ -34,6 +35,9 @@ def start_workflow(
         inputs (dict): Inputs.
         node_confirm_users (Optional[Dict[str, List[int]]], optional): Node confirm users. Defaults to None.
     """
+    from celery_app import asr
+    from core.database.models import NonLLMRecords, UploadFiles
+
     if run_type not in [0, 1]:
         raise Exception('Run type error.')
     run_type = run_type + 1
@@ -59,7 +63,25 @@ def start_workflow(
     if not inputs:
         raise ValueError(get_language_content("graph_validation_errors.inputs_cannot_be_empty"))
     
-    validate_required_variable(create_variable_from_dict(inputs))
+    inputs_var = create_variable_from_dict(inputs)
+    validate_required_variable(inputs_var)
+
+    for input_var in inputs_var.properties.values():
+        if input_var.type == 'file' and isinstance(input_var.value, int):
+            file_id = input_var.value
+            file_data = UploadFiles().get_file_by_id(file_id)
+            if not file_data:
+                raise Exception(f"File ID {file_id} not found.")
+            if (
+                file_data['extension'] in ['.mp3', '.ogg', '.m4a', '.flac', '.wav']
+                and NonLLMRecords().get_record_by_input_file_id(file_id) is None
+            ):
+                task = asr.delay(user_id, team_id, input_var.value)
+                try:
+                    task.get(timeout=60)
+                except CeleryTimeoutError:
+                    raise Exception(f"ASR task for file {file_data['name'] + file_data['extension']} timed out.")
+
     graph = create_graph_from_dict(workflow['graph'])
     graph.validate()
 
