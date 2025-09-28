@@ -1629,11 +1629,6 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                         else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
-                    else:
-                        if app_info.get('icon'):
-                            app_info['avatar'] = f"{settings.ICON_URL}/head_icon/{app_info['icon']}.png"
-                        else:
-                            app_info['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
                     # Update name, description, avatar
                     current_discussion = discussion_item.copy()
                     current_discussion["name"] = app_info.get("name", current_discussion.get("name"))
