@@ -50,6 +50,8 @@ async def get_suppliers_list(userinfo: TokenData = Depends(get_current_user)):
 
         # Add model information to the supplier if available
         if supplier.get('model_id') and supplier.get('model_name'):
+            if supplier['model_type'] == 6:
+                continue  # Temporarily hide text2img models
             unique_suppliers[supplier_id]['models'].append({
                 'model_id': supplier['model_id'],
                 'model_name': supplier['model_name'],

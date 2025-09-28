@@ -85,6 +85,14 @@ def get_embeddings_and_vector_database(
                         embeddings_data['model_name']
                     )]
                 }
+            case 'SentenceTransformerEmbeddings':
+                embeddings_kwargs = {
+                    'model_name': LOCAL_MODEL_PATHS[(
+                        embeddings_data['supplier_name'],
+                        embeddings_data['model_name']
+                    )],
+                    'encode_kwargs': {'normalize_embeddings': True}
+                }
             case _:
                 embeddings_kwargs = {}
         embeddings = Embeddings(embeddings_type, **embeddings_kwargs)
