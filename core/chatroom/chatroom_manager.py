@@ -5,6 +5,7 @@ from pathlib import Path
 from time import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from celery.exceptions import TimeoutError as CeleryTimeoutError
 from websockets import (
     ConnectionClosed,
     ServerConnection
@@ -12,7 +13,7 @@ from websockets import (
 
 from .chatroom import Chatroom
 from .websocket import WebSocketManager, WorkflowWebSocketManager
-from celery_app import speech_recognition
+from celery_app import asr
 from config import settings
 from core.database.models import (
     AppRuns,
@@ -21,6 +22,7 @@ from core.database.models import (
     ChatroomMessages,
     Chatrooms,
     Models,
+    NonLLMRecords,
     UploadFiles,
     Users
 )
@@ -38,6 +40,7 @@ chatroom_agent_relation = ChatroomAgentRelation()
 chatrooms = Chatrooms()
 chatroom_messages = ChatroomMessages()
 models = Models()
+non_llm_records = NonLLMRecords()
 upload_files = UploadFiles()
 users = Users()
 
@@ -391,8 +394,15 @@ class ChatroomManager:
                                     # User input
                                     assert isinstance(data, int), 'Audio file ID should be an integer.'
                                     file_id = data
-                                    task = speech_recognition.delay(user_id, team_id, chatroom_id, file_id)
-                                    user_input = await asyncio.to_thread(task.get, timeout=60)
+                                    record = non_llm_records.get_record_by_input_file_id(file_id)
+                                    if record:
+                                        user_input = record['output_text']
+                                    else:
+                                        asr_task = asr.delay(user_id, team_id, file_id, chatroom_id)
+                                        try:
+                                            user_input = await asyncio.to_thread(asr_task.get, timeout=60)
+                                        except CeleryTimeoutError:
+                                            raise Exception(f"ASR timed out.")
                                     assert user_input.strip(), 'No content was recognized.'
                                     logger.info('Starting chatroom %s...', chatroom_id)
                                     coro = self._handle_data_and_start_chatroom(chatroom_id, user_id, team_id, user_input, chat_base_url)

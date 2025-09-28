@@ -1536,7 +1536,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
             if agent_id:
                 # Query agents and apps tables using join and filter by status=1
                 app_info = agents_model.select_one(
-                    columns=["apps.name", "apps.description", "apps.avatar"],
+                    columns=["apps.name", "apps.description", "apps.avatar", "apps.icon"],
                     joins=[["inner", "apps", "agents.app_id = apps.id"]],
                     conditions=[
                         {"column": "agents.id", "value": agent_id},
@@ -1552,6 +1552,11 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                         else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
+                    else:
+                        if app_info.get('icon'):
+                            app_info['avatar'] = f"{settings.ICON_URL}/head_icon/{app_info['icon']}.png"
+                        else:
+                            app_info['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
                     # Only replace name, description, avatar
                     new_item["name"] = app_info.get("name", new_item.get("name"))
                     new_item["description"] = app_info.get("description", new_item.get("description"))
@@ -1570,7 +1575,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
             if app_id:
                 # Query apps table for details and filter by status=1
                 app_info = apps_model.select_one(
-                    columns=["name", "description", "avatar"], 
+                    columns=["name", "description", "avatar", "icon"], 
                     conditions=[
                         {"column": "id", "value": app_id}, 
                         {"column": "team_id", "value": team_id},
@@ -1584,6 +1589,11 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                         else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
+                    else:
+                        if app_info.get('icon'):
+                            app_info['avatar'] = f"{settings.ICON_URL}/head_icon/{app_info['icon']}.png"
+                        else:
+                            app_info['avatar'] = f"{settings.ICON_URL}/head_icon/1.png"
                     # Only replace name, description, avatar
                     new_item["name"] = app_info.get("name", new_item.get("name"))
                     new_item["description"] = app_info.get("description", new_item.get("description"))
@@ -1605,7 +1615,7 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
             if app_id:
                 # Query apps table for details and filter by status=1
                 app_info = apps_model.select_one(
-                    columns=["name", "description", "avatar"], 
+                    columns=["name", "description", "avatar", "icon"], 
                     conditions=[
                         {"column": "id", "value": app_id}, 
                         {"column": "team_id", "value": team_id},
@@ -1619,6 +1629,8 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
                             app_info["avatar"] = f"{settings.STORAGE_URL}/upload/{app_info['avatar']}"
                         else:
                             app_info["avatar"] = f"{settings.ICON_URL}/{app_info['avatar']}"
+                    else:
+                        del app_info['avatar']
                     # Update name, description, avatar
                     current_discussion = discussion_item.copy()
                     current_discussion["name"] = app_info.get("name", current_discussion.get("name"))

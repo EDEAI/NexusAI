@@ -1,3 +1,7 @@
+from typing import Any, Dict, Optional
+
+from sqlalchemy.util import ordered_column_set
+
 from core.database import MySQL
 
 
@@ -12,3 +16,16 @@ class NonLLMRecords(MySQL):
     """
     have_updated_time = False
     
+    def get_record_by_input_file_id(self, input_file_id: int) -> Optional[Dict[str, Any]]:
+        """
+        Get a record by input file ID.
+        """
+        record = self.select_one(
+            columns=['output_text'],
+            conditions=[
+                {'column': 'input_file_id', 'value': input_file_id},
+                {'column': 'status', 'value': 3}
+            ],
+            order_by='id DESC'
+        )
+        return record

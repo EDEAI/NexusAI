@@ -3,9 +3,15 @@ import base64
 import json
 import uuid
 import datetime
+
+from pathlib import Path
 from typing import List, Optional, Union, Dict, Any, Tuple
 
+from google import genai
 from openai import OpenAI
+from PIL import Image
+from volcenginesdkarkruntime import Ark
+
 from config import settings
 
 
@@ -24,12 +30,17 @@ class ImageGeneration:
         """
         self.supplier = supplier
         self.config = config
+        self.storage_url = settings.STORAGE_URL
         
-        if self.supplier == 'OpenAI':
-            self.client = OpenAI(**config)
-            self.storage_url = settings.STORAGE_URL
-        else:
-            raise ValueError(f"Unsupported supplier: {supplier}")
+        match self.supplier:
+            case 'OpenAI':
+                self.client = OpenAI(**config)
+            case 'Doubao':
+                self.client = Ark(**config) 
+            case 'Google':
+                self.client = genai.Client(**config)
+            case _:
+                raise ValueError(f"Unsupported supplier: {supplier}")
 
     def _create_storage_directory(self) -> Tuple[str, str]:
         """
@@ -52,7 +63,7 @@ class ImageGeneration:
         
         return relative_dir, storage_dir
 
-    def _process_openai_image_response(self, response, model_config: Dict[str, Any] = None) -> Dict[str, Any]:
+    def _process_openai_image_response(self, response, model_config: Dict[str, Any] = None) -> List[Dict[str, Any]]:
         """
         Processes OpenAI API response data, saving images and generating response metadata.
         
@@ -72,7 +83,7 @@ class ImageGeneration:
         result_data = []
         
         for image in response.data:
-            item_data = {}
+            item_data = {"type": "image"}
             
             if hasattr(image, 'url') and image.url:
                 # If API returned a URL, use it directly
@@ -124,7 +135,7 @@ class ImageGeneration:
         
         # Prepare final result with images and usage data
         result = {
-            "images": result_data,
+            "data": result_data,
             "usage": usage_data
         }
         
@@ -152,16 +163,28 @@ class ImageGeneration:
 
         :raises ValueError: If the supplier is not supported.
         """
-        if self.supplier == 'OpenAI':
-            model_config = model_config or {}
-            response = self.client.images.generate(
-                prompt=prompt,
-                **model_config
-            )
-            
-            return self._process_openai_image_response(response, model_config)
-        else:
-            raise ValueError(f"Unsupported supplier: {self.supplier}")
+        model_config = model_config or {}
+        match self.supplier:
+            case 'OpenAI':
+                response = self.client.images.generate(
+                    prompt=prompt,
+                    **model_config
+                )
+                return self._process_openai_image_response(response, model_config)
+            case 'Doubao':
+                response = self.client.images.generate(
+                    prompt=prompt,
+                    **model_config
+                )
+                return self._process_openai_image_response(response, model_config)
+            case 'Google':
+                response = self.client.models.generate_content(
+                    contents=prompt,
+                    **model_config
+                )
+                return response
+            case _:
+                raise ValueError(f"Unsupported supplier: {self.supplier}")
 
     def edit_image(self, image_path: Union[str, List[str]], prompt: str = "", mask_path: Optional[str] = None, model_config: Dict[str, Any] = None) -> Dict[str, Any]:
         """
@@ -188,87 +211,116 @@ class ImageGeneration:
         :raises ValueError: If the supplier is not supported.
         :raises FileNotFoundError: If the image_path or mask_path don't exist.
         """
-        if self.supplier == 'OpenAI':
-            model_config = model_config or {}
-            
-            # Filter model_config to only include parameters supported by the edit API
-            # Define allowed parameters for image editing
-            allowed_params = {"background", "model", "n", "quality", "response_format", "size", "user"}
-            
-            # Create a filtered config with only allowed parameters if they exist in model_config
-            filtered_model_config = {}
-            for param in allowed_params:
-                if param in model_config:
-                    filtered_model_config[param] = model_config[param]
-            
-            # Convert single path to list for consistent processing
-            image_paths = [image_path] if isinstance(image_path, str) else image_path
-            
-            if not image_paths:
-                raise ValueError("At least one image path must be provided")
-            
-            # Check if using DALL-E-2 model
-            is_dalle2 = filtered_model_config.get("model") == "dall-e-2"
-            
-            # For DALL-E-2, only use the first image
-            if is_dalle2 and len(image_paths) > 1:
-                print(f"Note: DALL-E-2 model only supports one input image. Using only the first image: {image_paths[0]}")
-                image_paths = [image_paths[0]]
-            
-            try:
-                # For DALL-E-2, only process the first image
-                if is_dalle2:
-                    if mask_path:
-                        with open(image_paths[0], "rb") as image_file, open(mask_path, "rb") as mask_file:
-                            response = self.client.images.edit(
-                                image=image_file,
-                                mask=mask_file,
-                                prompt=prompt,
-                                **filtered_model_config
-                            )
-                    else:
-                        with open(image_paths[0], "rb") as image_file:
-                            response = self.client.images.edit(
-                                image=image_file,
-                                prompt=prompt,
-                                **filtered_model_config
-                            )
-                # For other models, process all images
-                else:
-                    # Note: OpenAI's current implementation may only support one image at a time
-                    # This is a future-proof implementation for when multiple images are supported
-                    image_files = []
-                    try:
-                        for path in image_paths:
-                            image_files.append(open(path, "rb"))
-                        
+        image_paths = [image_path] if isinstance(image_path, str) else image_path
+        if not image_paths:
+            raise ValueError("At least one image path must be provided")
+        
+        match self.supplier:
+            case 'OpenAI':
+                model_config = model_config or {}
+                
+                # Filter model_config to only include parameters supported by the edit API
+                # Define allowed parameters for image editing
+                allowed_params = {"background", "model", "n", "quality", "response_format", "size", "user"}
+                
+                # Create a filtered config with only allowed parameters if they exist in model_config
+                filtered_model_config = {}
+                for param in allowed_params:
+                    if param in model_config:
+                        filtered_model_config[param] = model_config[param]
+                
+                # Check if using DALL-E-2 model
+                is_dalle2 = filtered_model_config.get("model") == "dall-e-2"
+                
+                # For DALL-E-2, only use the first image
+                if is_dalle2 and len(image_paths) > 1:
+                    print(f"Note: DALL-E-2 model only supports one input image. Using only the first image: {image_paths[0]}")
+                    image_paths = [image_paths[0]]
+                
+                try:
+                    # For DALL-E-2, only process the first image
+                    if is_dalle2:
                         if mask_path:
-                            with open(mask_path, "rb") as mask_file:
+                            with open(image_paths[0], "rb") as image_file, open(mask_path, "rb") as mask_file:
                                 response = self.client.images.edit(
-                                    image=image_files[0] if len(image_files) == 1 else image_files,
+                                    image=image_file,
                                     mask=mask_file,
                                     prompt=prompt,
                                     **filtered_model_config
                                 )
                         else:
-                            response = self.client.images.edit(
-                                image=image_files[0] if len(image_files) == 1 else image_files,
-                                prompt=prompt,
-                                **filtered_model_config
-                            )
-                    finally:
-                        # Ensure all file handles are closed
-                        for file in image_files:
-                            file.close()
-                
+                            with open(image_paths[0], "rb") as image_file:
+                                response = self.client.images.edit(
+                                    image=image_file,
+                                    prompt=prompt,
+                                    **filtered_model_config
+                                )
+                    # For other models, process all images
+                    else:
+                        # Note: OpenAI's current implementation may only support one image at a time
+                        # This is a future-proof implementation for when multiple images are supported
+                        image_files = []
+                        try:
+                            for path in image_paths:
+                                image_files.append(open(path, "rb"))
+                            
+                            if mask_path:
+                                with open(mask_path, "rb") as mask_file:
+                                    response = self.client.images.edit(
+                                        image=image_files[0] if len(image_files) == 1 else image_files,
+                                        mask=mask_file,
+                                        prompt=prompt,
+                                        **filtered_model_config
+                                    )
+                            else:
+                                response = self.client.images.edit(
+                                    image=image_files[0] if len(image_files) == 1 else image_files,
+                                    prompt=prompt,
+                                    **filtered_model_config
+                                )
+                        finally:
+                            # Ensure all file handles are closed
+                            for file in image_files:
+                                file.close()
+                    
+                    return self._process_openai_image_response(response, model_config)
+                except Exception as e:
+                    # Provide more detailed error information
+                    print(f"Error during image edit: {str(e)}")
+                    # Re-raise the exception after logging
+                    raise
+            case 'Doubao':
+                model_config = model_config or {}
+                images = []
+                for image_path in image_paths:
+                    image_path_obj = Path(image_path)
+                    suffix = image_path_obj.suffix
+                    if suffix in ['.jpg', '.jpeg']:
+                        ext = 'jpeg'
+                    elif suffix == '.png':
+                        ext = 'png'
+                    else:
+                        raise Exception(f'Unsupported image format: {suffix}!')
+                    with image_path_obj.open("rb") as img_file:
+                        img_data = base64.b64encode(img_file.read()).decode('utf-8')
+                    img_b64 = f'data:image/{ext};base64,{img_data}'
+                    images.append(img_b64)
+                response = self.client.images.generate(
+                    prompt=prompt,
+                    image=images,
+                    **model_config
+                )
                 return self._process_openai_image_response(response, model_config)
-            except Exception as e:
-                # Provide more detailed error information
-                print(f"Error during image edit: {str(e)}")
-                # Re-raise the exception after logging
-                raise
-        else:
-            raise ValueError(f"Unsupported supplier: {self.supplier}")
+            case 'Google':
+                contents = [prompt]
+                for image_path in image_paths:
+                    contents.append(Image.open(image_path))
+                response = self.client.models.generate_content(
+                    contents=contents,
+                    **model_config
+                )
+            case _:
+                raise ValueError(f"Unsupported supplier: {self.supplier}")
 
     def create_image_variation(self, image_path: str, model_config: Dict[str, Any] = None) -> Dict[str, Any]:
         """
@@ -304,4 +356,4 @@ class ImageGeneration:
             
             return self._process_openai_image_response(response, model_config)
         else:
-            raise ValueError(f"Unsupported supplier: {self.supplier}") 
+            raise ValueError(f"Unsupported supplier: {self.supplier}")

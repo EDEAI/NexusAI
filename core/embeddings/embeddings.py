@@ -13,6 +13,7 @@ from core.database import redis
 _module_lookup = {
     'BaichuanTextEmbeddings': 'core.embeddings.baichuan',
     'OpenAIEmbeddings': 'core.embeddings.openai',
+    'SentenceTransformerEmbeddings': 'core.embeddings.sentence_transformer',
     'Text2vecEmbeddings': 'core.embeddings.text2vec'
 }
 
@@ -30,6 +31,8 @@ class GeneralEmbeddings(Embeddings):
                 namespace = kwargs['model']
             case 'Text2vecEmbeddings':
                 namespace = kwargs['model_name_or_path']
+            case 'SentenceTransformerEmbeddings':
+                namespace = kwargs['model_name']
             case _:
                 namespace = embeddings_type
         store = RedisStore(client=redis)

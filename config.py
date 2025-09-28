@@ -3444,8 +3444,17 @@ model_type = {
 }
 
 LOCAL_MODEL_PATHS = {
-    ('HuggingFace', 'text2vec-large-chinese'): './models/text2vec-large-chinese',
-    ('HuggingFace', 'bge-reranker-v2-m3'): './models/bge-reranker-v2-m3',
+    ('HuggingFace', 'text2vec-large-chinese'):  './models/text2vec-large-chinese',
+    ('HuggingFace', 'bce-embedding-base_v1'):   './models/bce-embedding-base_v1',
+    ('HuggingFace', 'bge-m3'):                  './models/bge-m3',
+    ('HuggingFace', 'Qwen3-Embedding-0.6B'):    './models/Qwen3-Embedding-0.6B',
+    ('HuggingFace', 'Qwen3-Embedding-4B'):      './models/Qwen3-Embedding-4B',
+    ('HuggingFace', 'Qwen3-Embedding-8B'):      './models/Qwen3-Embedding-8B',
+    ('HuggingFace', 'bce-reranker-base_v1'):    './models/bce-reranker-base_v1',
+    ('HuggingFace', 'bge-reranker-v2-m3'):      './models/bge-reranker-v2-m3',
+    ('HuggingFace', 'Qwen3-Reranker-0.6B'):     './models/Qwen3-Reranker-0.6B',
+    ('HuggingFace', 'Qwen3-Reranker-4B'):       './models/Qwen3-Reranker-4B',
+    ('HuggingFace', 'Qwen3-Reranker-8B'):       './models/Qwen3-Reranker-8B',
 }
 
 enable_reranking_on_single_retrival = False

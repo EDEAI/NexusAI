@@ -12,6 +12,7 @@ from langchain_core.documents import BaseDocumentCompressor, Document
 _module_lookup = {
     'CrossEncoderReranker': 'core.reranker.cross_encoder_rerank',
     'SiliconFlowReranker': 'core.reranker.siliconflow',
+    'Qwen3CrossEncoder': 'core.reranker.qwen3',
 }
 
 
@@ -34,7 +35,11 @@ class GeneralReranker(BaseDocumentCompressor):
             case 'CrossEncoderReranker':
                 model_type = kwargs.pop('model_type')
                 model_kwargs = kwargs.pop('model_kwargs')
-                model_class = getattr(cross_encoders, model_type)
+                if module_name := _module_lookup.get(model_type):
+                    module = importlib.import_module(module_name)
+                    model_class = getattr(module, model_type)
+                else:
+                    model_class = getattr(cross_encoders, model_type)
                 model: BaseCrossEncoder = model_class(**model_kwargs)
                 self._reranker: BaseDocumentCompressor = reranker_class(model=model, *args, **kwargs)
             case _:
