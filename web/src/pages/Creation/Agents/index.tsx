@@ -110,6 +110,22 @@ const Agents: React.FC = () => {
             },
         },
     ];
+    const createDefaultInputVariables = () => {
+        const defaultDisplayName = intl.formatMessage({
+            id: 'agent.inputvariable.default.display',
+        });
+        const inputVariables = new ObjectVariable('input', '', '');
+        const defaultVariable = new AgentsVariable(
+            'default_var',
+            'string',
+            '',
+            defaultDisplayName,
+            true,
+            48,
+        );
+        inputVariables.addProperty('default_var', defaultVariable);
+        return inputVariables.toObject();
+    };
     useEffect(() => {
         let params = new URLSearchParams(window.location.search);
         if (!params.get('app_id')) {
