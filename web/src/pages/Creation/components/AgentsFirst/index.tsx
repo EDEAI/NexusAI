@@ -4,9 +4,9 @@ import Avatar from '@/components/ChatAvatar';
 import { findOption } from '@/components/WorkFlow/components/Form/Select';
 import Variable from '@/components/WorkFlow/components/Variable';
 import { useModelSelect } from '@/store/modelList';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { CloseOutlined, DeleteOutlined, FullscreenOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Form, Input, Radio, Select, Switch, Tag } from 'antd';
+import { Button, Form, Input, Radio, Select, Switch, Tag, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import SelectApp from '../../../Plaza/components/CreationChatRoom/selectApp';
 
@@ -76,6 +76,8 @@ const AgentsFirst: React.FC<ChildProps> = ({
     const [selectedWorkflows, setSelectedWorkflows] = useState([]);
     const [showSkillSelect, setShowSkillSelect] = useState(false);
     const [showWorkflowSelect, setShowWorkflowSelect] = useState(false);
+    const [isObligationsFullscreen, setIsObligationsFullscreen] = useState(false);
+    const [obligationsValue, setObligationsValue] = useState('');
     const [AgentsFirstData, setAgentsFirstData] = useState({
         agent_id: 0,
         data: {
@@ -102,16 +104,32 @@ const AgentsFirst: React.FC<ChildProps> = ({
         // setDetaillist({ ...Detaillist, agent: { ...Detaillist.agent, m_config_id: value } })
     };
 
+    useEffect(() => {
+        setObligationsValue(Detaillist?.agent?.obligations ?? '');
+    }, [Detaillist?.agent?.obligations]);
+
+    useEffect(() => {
+        if (!isObligationsFullscreen) {
+            return;
+        }
+        const originalOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = originalOverflow;
+        };
+    }, [isObligationsFullscreen]);
+
     const obligations = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        // Detaillist.agent.obligations = e.target.value
-        setAgentsFirstData({
-            ...AgentsFirstData,
-            data: { ...AgentsFirstData.data, obligations: e.target.value },
-        });
-        setDetaillist({
-            ...Detaillist,
-            agent: { ...Detaillist.agent, obligations: e.target.value },
-        });
+        const value = e.target.value;
+        setObligationsValue(value);
+        setAgentsFirstData(prev => ({
+            ...prev,
+            data: { ...prev.data, obligations: value },
+        }));
+        setDetaillist(prev => ({
+            ...prev,
+            agent: { ...(prev?.agent || {}), obligations: value },
+        }));
     };
 
     const hasDuplicateField = (array: any[], field: string) => {
@@ -463,7 +481,7 @@ const AgentsFirst: React.FC<ChildProps> = ({
                         </div>
                     </Form.Item>
                     <Form.Item className="mb-[30px]" name={'obligations'}>
-                        <div className="w-full">
+                        <div className="relative w-full">
                             <div className="mb-[15px] text-[#555555] text-xs">
                                 <Callword
                                     className="font-medium"
@@ -478,14 +496,25 @@ const AgentsFirst: React.FC<ChildProps> = ({
                             </div>
                             <TextArea
                                 onChange={obligations}
-                                value={
-                                    Detaillist && Detaillist.agent && Detaillist.agent.obligations
-                                }
+                                value={obligationsValue}
                                 placeholder={`Agent${intl.formatMessage({
                                     id: 'agent.functiondescription',
                                 })}`}
                                 autoSize={{ minRows: 8, maxRows: 10 }}
+                                className="pr-[40px]"
                             />
+                            <Tooltip
+                                title={intl.formatMessage({
+                                    id: 'agent.functiondescription.fullscreen',
+                                })}
+                            >
+                                <Button
+                                    type="text"
+                                    className="absolute bottom-[10px] right-[10px] h-auto w-auto p-0 text-base text-[#8C8C8C]"
+                                    icon={<FullscreenOutlined />}
+                                    onClick={() => setIsObligationsFullscreen(true)}
+                                />
+                            </Tooltip>
                         </div>
                     </Form.Item>
                     {!isLoading && (
@@ -884,6 +913,40 @@ const AgentsFirst: React.FC<ChildProps> = ({
                     </div>
                     <div className="h-[30px] w-1"></div>
                 </Form>
+                {isObligationsFullscreen && (
+                    <div className="fixed inset-0 z-[2000] bg-white">
+                        <div className="flex h-full flex-col">
+                            <div className="flex items-center justify-between border-b border-[#F0F0F0] px-6 py-4">
+                                <div className="text-base font-medium text-[#1F2329]">
+                                    {intl.formatMessage({ id: 'agent.functiondescription' })}
+                                </div>
+                                <Tooltip
+                                    title={intl.formatMessage({
+                                        id: 'agent.functiondescription.exitfullscreen',
+                                    })}
+                                >
+                                    <Button
+                                        type="text"
+                                        icon={<CloseOutlined />}
+                                        className="text-lg text-[#8C8C8C]"
+                                        onClick={() => setIsObligationsFullscreen(false)}
+                                    />
+                                </Tooltip>
+                            </div>
+                            <div className="flex-1 px-6 pb-6 pt-4">
+                                <TextArea
+                                    autoFocus
+                                    value={obligationsValue}
+                                    onChange={obligations}
+                                    placeholder={`Agent${intl.formatMessage({
+                                        id: 'agent.functiondescription',
+                                    })}`}
+                                    style={{ height: '100%', resize: 'none' }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
