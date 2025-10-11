@@ -1,4 +1,5 @@
 import { getModelList } from '@/api/workflow';
+import { getLocale } from '@umijs/max';
 import { ObjectVariable, Variable as SkillVariable } from '@/py2js/variables.js';
 let llm_model_list = [];
 
@@ -167,8 +168,24 @@ export const createappdata = (type: string, data?: any): any => {
 };
 
 
+export const createDefaultAgentInputVariables = (displayName: string) => {
+    const inputVariables = new ObjectVariable('input', '', '');
+    const defaultVariable = new SkillVariable(
+        'default_var',
+        'string',
+        '',
+        displayName,
+        true,
+        48,
+    );
+    inputVariables.addProperty('default_var', defaultVariable);
+    return inputVariables.toObject();
+};
+
 export const agentdefault = (): any => {
     return new Promise(async (reslvoe: any) => {
+        const locale = getLocale();
+        const defaultVariableLabel = locale === 'en-US' ? 'Default variable' : '默认变量';
         let data = {
             code: 0,
             detail: '',
@@ -191,7 +208,7 @@ export const agentdefault = (): any => {
                     agent_id: 0,
                     user_id: 33,
                     obligations: null,
-                    input_variables: null,
+                    input_variables: createDefaultAgentInputVariables(defaultVariableLabel),
                     auto_match_ability: 0,
                     default_output_format: 1,
                     m_config_id: 0,

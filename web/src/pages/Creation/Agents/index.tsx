@@ -8,7 +8,7 @@ import { PostappsCreate } from '@/api/creation';
 import { BASE_URL } from '@/api/request';
 import { CURRENT_NODE_ID } from '@/components/WorkFlow/config';
 import { Variable as AgentsVariable, ObjectVariable } from '@/py2js/variables.js';
-import { agentdefault, createappdata } from '@/utils/useUser';
+import { agentdefault, createappdata, createDefaultAgentInputVariables } from '@/utils/useUser';
 import {
     ArrowLeftOutlined,
     CodeOutlined,
@@ -157,7 +157,12 @@ const Agents: React.FC = () => {
             !data.agent.input_variables ||
             _.isEmpty(data.agent.input_variables?.properties)
         ) {
-            data.agent.input_variables = createDefaultInputVariables();
+            const defaultDisplayName = intl.formatMessage({
+                id: 'agent.inputvariable.default.display',
+            });
+            data.agent.input_variables = createDefaultAgentInputVariables(
+                defaultDisplayName,
+            );
         }
         const repositoryID = res.data?.agent_dataset_relation_list?.map((item: any) => {
             return item.dataset_id;
