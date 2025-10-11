@@ -39,6 +39,8 @@ export default {
     'agent.LLMmodel': 'LLM Model',
     'agent.pleaseselect': 'Please select',
     'agent.functiondescription': 'Function Description',
+    'agent.functiondescription.fullscreen': 'Fullscreen edit',
+    'agent.functiondescription.exitfullscreen': 'Exit fullscreen',
     'agent.inputvariable': 'Input Variable',
     'agent.inputvariable.default.display': 'Default variable',
     'agent.add': 'Add ',
