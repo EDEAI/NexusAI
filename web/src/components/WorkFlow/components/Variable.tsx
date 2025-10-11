@@ -6,9 +6,9 @@ import { DeleteOutlined, EditOutlined, FileOutlined, FunctionOutlined, PlusOutli
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm, ProFormRadio, ProFormSwitch, ProFormText } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { useControllableValue, useHover, useMount, useResetState, useUpdateEffect } from 'ahooks';
+import { useHover, useResetState, useUpdateEffect } from 'ahooks';
 import { Button, Modal } from 'antd';
-import { memo, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 interface VariableItem {
     name: string;
@@ -99,17 +99,18 @@ export default memo((props: VariableList) => {
         type: 'string',
     });
     const formRef = useRef<ProFormInstance>();
-    const [variables, setVariables] = useControllableValue(props?.variables || [], {
-        defaultValue: [],
-    });
+    const [variables, setVariables] = useState<VariableItem[]>(props.variables || []);
+    const isHydratingRef = useRef(false);
     const readonly = props.readonly || false;
 
-    useMount(() => {
-        props?.variables && setVariables(props.variables);
-    });
-    const objectTransformFlow = (): ObjectVariable => {
+    useEffect(() => {
+        isHydratingRef.current = true;
+        setVariables(props.variables || []);
+    }, [props.variables]);
+
+    const objectTransformFlow = (sourceVariables: VariableItem[] = variables): ObjectVariable => {
         const flowObjectVariable = new ObjectVariable('input_var', 'Input Object Variable');
-        variables.forEach(item => {
+        sourceVariables.forEach(item => {
             const variable = new FlowVariable(
                 item.name,
                 item.type == 'long_string' ? 'string' : item.type,
@@ -125,10 +126,14 @@ export default memo((props: VariableList) => {
     };
 
     useUpdateEffect(() => {
-        objectTransformFlow();
+        if (isHydratingRef.current) {
+            isHydratingRef.current = false;
+            return;
+        }
+        const flowObject = objectTransformFlow(variables);
         props?.onChange?.({
             value: variables,
-            free: objectTransformFlow(),
+            free: flowObject,
         });
     }, [variables]);
 
