@@ -47,7 +47,8 @@ class AgentCallableItems(MySQL):
                 ["left", "apps", "agent_callable_items.app_id = apps.id"]
             ],
             conditions=[
-                {"column": "agent_callable_items.agent_id", "value": agent_id}
+                {"column": "agent_callable_items.agent_id", "value": agent_id},
+                {"column": "apps.status", "value": 1}
             ]
         )
 

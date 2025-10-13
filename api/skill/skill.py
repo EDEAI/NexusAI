@@ -1,7 +1,7 @@
 import asyncio
 from fastapi import APIRouter
 from core.database.models.tag_bindings import TagBindings
-from core.database.models import CustomTools, Apps
+from core.database.models import AgentCallableItems, CustomTools, Apps
 from api.schema.skill import *
 from api.utils.common import *
 from api.utils.jwt import *
@@ -17,6 +17,7 @@ import os
 import json
 
 router = APIRouter()
+agent_callable_items_db = AgentCallableItems()
 tools_db = CustomTools()
 apps_db = Apps()
 nodes = Nodes()
@@ -203,6 +204,7 @@ async def delete_skill_by_app_id(app_id: int, userinfo: TokenData = Depends(get_
     app_conditions = [{'column': 'id', 'value': app_id}]
     deleted = tools_db.soft_delete(conditions)
     apps_db.soft_delete(app_conditions)
+    agent_callable_items_db.delete({'column': 'app_id', 'value': app_id})
     if not deleted:
         return response_error(get_language_content("skill_not_found"))
     return response_success()
