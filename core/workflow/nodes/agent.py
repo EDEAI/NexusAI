@@ -339,29 +339,31 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             match callable_item['item_type']:
                 case 1:
                     skill = CustomTools().get_skill_by_app_id(callable_item['app_id'])
-                    callable_skills.append(skill)
+                    if skill:
+                        callable_skills.append(skill)
                 case 2:
                     workflow = Workflows().get_workflow_by_app_id(callable_item['app_id'])
-                    graph = create_graph_from_dict(workflow.pop('graph'))
-                    input_variables = graph.nodes.nodes[0].data['input']
-                    workflow['input_variables'] = input_variables.to_dict()
-                    
-                    need_confirm_nodes = []
-                    for node in graph.nodes.nodes:
-                        if node.data['type'] == 'human' or node.data.get("manual_confirmation", False):
-                            node_name = node.data.get("title", "")
-                            node_desc = node.data.get("desc", "")
-                            need_confirm_nodes.append({'node_id': node.id, 'node_name': node_name, 'node_desc': node_desc})
-                            if node.data['type'] == 'recursive_task_execution' and node.data.get('executor_list', None):
-                                for child_node in node.data['executor_list'].nodes:
-                                    need_confirm_nodes.append({
-                                        'node_id': child_node.id,
-                                        'node_name': f"{node_name}.{child_node.data.get('title', '')}",
-                                        'node_desc': child_node.data.get('desc', '')
-                                    })
-                    workflow['need_confirm_nodes'] = need_confirm_nodes
+                    if workflow:
+                        graph = create_graph_from_dict(workflow.pop('graph'))
+                        input_variables = graph.nodes.nodes[0].data['input']
+                        workflow['input_variables'] = input_variables.to_dict()
+                        
+                        need_confirm_nodes = []
+                        for node in graph.nodes.nodes:
+                            if node.data['type'] == 'human' or node.data.get("manual_confirmation", False):
+                                node_name = node.data.get("title", "")
+                                node_desc = node.data.get("desc", "")
+                                need_confirm_nodes.append({'node_id': node.id, 'node_name': node_name, 'node_desc': node_desc})
+                                if node.data['type'] == 'recursive_task_execution' and node.data.get('executor_list', None):
+                                    for child_node in node.data['executor_list'].nodes:
+                                        need_confirm_nodes.append({
+                                            'node_id': child_node.id,
+                                            'node_name': f"{node_name}.{child_node.data.get('title', '')}",
+                                            'node_desc': child_node.data.get('desc', '')
+                                        })
+                        workflow['need_confirm_nodes'] = need_confirm_nodes
 
-                    callable_workflows.append(workflow)
+                        callable_workflows.append(workflow)
         return callable_skills, callable_workflows
         
     def run(

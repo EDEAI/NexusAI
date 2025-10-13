@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from core.database import MySQL
 
+from core.database.models.agent_callable_items import AgentCallableItems
 from core.database.models.agents import Agents
 from core.database.models.app_workflow_relation import AppWorkflowRelations
 from core.database.models.apps import Apps
@@ -392,6 +393,7 @@ class Workflows(MySQL):
             if not delete_app_res:
                 return {"status": 2, "message": "delete app error"}
 
+            AgentCallableItems().delete({'column': 'app_id', 'value': app_id})
             for workflow_val in workflow:
                 # delete agent
                 delete_agent_res = self.soft_delete([{"column": "id", "value": workflow_val["id"]}])
