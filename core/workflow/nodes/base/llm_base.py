@@ -189,7 +189,11 @@ class LLMBaseNode(Node):
                         # else sub_msg is an image, just ignore it
         text = json.dumps(message_list, ensure_ascii=False)
         if mcp_tool_list:
-            text += json.dumps(mcp_tool_list, ensure_ascii=False)
+            if model_config['supplier_name'] == 'Anthropic':
+                #  Make sure to keep ensure_ascii=True, otherwise counting the number of tokens will be extremely inaccurate!!
+                text += json.dumps(mcp_tool_list)
+            else:
+                text += json.dumps(mcp_tool_list, ensure_ascii=False)
         return tokenizer(text)
 
     def _truncate_chatroom_messages_by_token_limit(
