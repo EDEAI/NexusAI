@@ -530,7 +530,8 @@ class Chatroom:
             raise Exception('There is no MCP tool use!')
         mcp_tool_use = self._get_mcp_tool_use(mcp_tool_use_id)
         if mcp_tool_use['result'] is not None:
-            raise Exception('MCP tool use has finished!')
+            self._console_log('MCP tool use has finished!')
+            return
         self._console_log(f'MCP tool result: \033[91m{result}\033[0m\n')
         mcp_tool_use_update_data = {}
         if (
@@ -963,6 +964,7 @@ class Chatroom:
                     {'column': 'status', 'value': 1}
                 ]
             )
+            supplier_name = self._model_configs[self._model_config_ids[agent_id]]['supplier_name']
 
             self._current_agent_message = ''
             prompt_tokens = 0
@@ -999,6 +1001,9 @@ class Chatroom:
 
                 logger.debug('Requesting LLM...')
                 new_text = True
+                current_prompt_tokens = 0
+                current_completion_tokens = 0
+                current_total_tokens = 0
                 async for chunk in agent_node.run_in_chatroom(
                     context=Context(),
                     user_id=self._user_id,
@@ -1117,10 +1122,19 @@ class Chatroom:
                     
                     # Update token counts if token usage is found
                     if token_usage:
-                        prompt_tokens += token_usage.get('input_tokens', 0)
-                        completion_tokens += token_usage.get('output_tokens', 0)
-                        total_tokens += token_usage.get('total_tokens', 0)
+                        if supplier_name == 'Google':
+                            current_prompt_tokens += token_usage.get('input_tokens', 0)
+                            current_completion_tokens += token_usage.get('output_tokens', 0)
+                            current_total_tokens += token_usage.get('total_tokens', 0)
+                        else:
+                            current_prompt_tokens = token_usage.get('input_tokens', 0)
+                            current_completion_tokens = token_usage.get('output_tokens', 0)
+                            current_total_tokens = token_usage.get('total_tokens', 0)
                         
+                prompt_tokens += current_prompt_tokens
+                completion_tokens += current_completion_tokens
+                total_tokens += current_total_tokens
+
                 self._console_log('\n')
                 
                 self._history_messages.append({
