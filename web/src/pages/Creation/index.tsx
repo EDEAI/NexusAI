@@ -1145,7 +1145,7 @@ const Creation: React.FC = () => {
                     </div>
                     <TextArea
                         showCount
-                        maxLength={1000}
+                        maxLength={2000}
                         rows={4}
                         placeholder={intl.formatMessage({ id: 'creation.placeholder.appdescribe' })}
                         onChange={CreationContents}
