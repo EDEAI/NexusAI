@@ -19,35 +19,35 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
     Returns:
         dict: 包含操作结果和文件路径的字典
     """
-    # # Generate a unique filename using UUID
-    # if file_name is None:
-    #     file_name = f"{uuid.uuid4()}.docx"
-    # else:
-    #     # 确保文件名有.docx扩展名
-    #     if not file_name.endswith('.docx'):
-    #         file_name = f"{file_name}.docx"
-    # file_path = f"/storage/{file_name}"
-    
-    # # Ensure directory exists
-    # directory = os.path.dirname(file_path)
-    # if not os.path.exists(directory):
-    #     os.makedirs(directory, exist_ok=True)
-
-
-    # Generate filename
+    # Generate a unique filename using UUID
     if file_name is None:
         file_name = f"{uuid.uuid4()}.docx"
     else:
         # 确保文件名有.docx扩展名
         if not file_name.endswith('.docx'):
             file_name = f"{file_name}.docx"
-    # 使用相对路径的storage文件夹
-    output_dir = "storage"
-    file_path = os.path.join(output_dir, file_name)
+    file_path = f"/storage/{file_name}"
     
     # Ensure directory exists
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir, exist_ok=True)
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
+
+
+    # # Generate filename
+    # if file_name is None:
+    #     file_name = f"{uuid.uuid4()}.docx"
+    # else:
+    #     # 确保文件名有.docx扩展名
+    #     if not file_name.endswith('.docx'):
+    #         file_name = f"{file_name}.docx"
+    # # 使用相对路径的storage文件夹
+    # output_dir = "storage"
+    # file_path = os.path.join(output_dir, file_name)
+    
+    # # Ensure directory exists
+    # if not os.path.exists(output_dir):
+    #     os.makedirs(output_dir, exist_ok=True)
     
     # Create new Word document
     doc = Document()
