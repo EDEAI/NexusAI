@@ -2259,8 +2259,7 @@ def get_language_content(key: str, uid: int = 0, append_ret_lang_prompt: bool = 
             day_of_year = now.timetuple().tm_yday
             
             return_language_prompt = f"""
-
-=== IMPORTANT CONTEXT ===
+================ IMPORTANT NOTICE ================
 CURRENT DATE AND TIME: {current_time}
 DETAILED TIME INFORMATION:
 - Year: {year}
@@ -2282,13 +2281,14 @@ The Mermaid code must be fully valid and syntactically correct, so that it can b
 Always enclose the Mermaid code in proper fenced code blocks using the mermaid language tag.
 If multiple diagram types are possible, choose the one that best fits the user’s request.
 Double-check the logic, structure, and syntax to ensure correctness and renderability before responding.
-=== END CONTEXT ==="""
+==================================================
+"""
             if isinstance(content, str):
-                content += return_language_prompt
+                content = return_language_prompt + "\n\n" + content
             elif isinstance(content, dict):
                 content = content.copy()
                 if 'system' in content:
-                    content['system'] += return_language_prompt
+                    content['system'] = return_language_prompt + "\n\n" + content['system']
         return content
 
     content = language_packs.get(current_language, {})
