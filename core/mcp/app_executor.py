@@ -46,10 +46,9 @@ async def skill_run(
     if skill_id <= 0:
         raise ValueError(get_language_content("skill_id_required"))
 
-    if 'input_variables' not in mcp_tool_args:
-        mcp_tool_args = {'input_variables': mcp_tool_args}
-    
     input_variables: Dict[str, Any] = mcp_tool_args['input_variables']
+    if not input_variables:
+        raise ValueError(get_language_content("input_dict_required"))
 
     # Get skill information
     skill = tools_db.select_one(
