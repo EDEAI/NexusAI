@@ -57,8 +57,6 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
     
     output_dir = get_safe_output_dir()
     file_path = os.path.join(output_dir, file_name)
-    print(f"使用输出目录: {output_dir}")
-    print(f"文件路径: {file_path}")
     
     # Create new PowerPoint presentation
     prs = Presentation()

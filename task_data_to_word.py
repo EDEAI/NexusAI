@@ -27,36 +27,13 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
         if not file_name.endswith('.docx'):
             file_name = f"{file_name}.docx"
     
-    # 智能选择存储目录，避免权限问题
-    def get_safe_output_dir():
-        """获取安全的输出目录"""
-        possible_dirs = [
-            "storage",  # 相对路径，首选
-            "./storage",  # 明确的相对路径
-            os.path.expanduser("~/storage"),  # 用户主目录
-            "/tmp/storage",  # 临时目录
-        ]
-        
-        for dir_path in possible_dirs:
-            try:
-                if not os.path.exists(dir_path):
-                    os.makedirs(dir_path, exist_ok=True)
-                # 测试写权限
-                test_file = os.path.join(dir_path, "test_write.tmp")
-                with open(test_file, 'w') as f:
-                    f.write("test")
-                os.remove(test_file)
-                return dir_path
-            except (PermissionError, OSError):
-                continue
-        
-        # 如果所有目录都失败，使用当前目录
-        return "."
+    # 使用固定的/storage/目录，与1.py保持一致
+    file_path = f"/storage/{file_name}"
     
-    output_dir = get_safe_output_dir()
-    file_path = os.path.join(output_dir, file_name)
-    print(f"使用输出目录: {output_dir}")
-    print(f"文件路径: {file_path}")
+    # 确保目录存在
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
 
 
 
@@ -290,8 +267,6 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
                 import tempfile
                 
                 try:
-                    print(f"正在下载图片: {image_path}")
-                    
                     # 添加请求头，模拟浏览器
                     headers = {
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -303,7 +278,6 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
                     # 检查内容
                     content_length = len(response.content)
                     content_type = response.headers.get('content-type', '').lower()
-                    print(f"图片下载成功，大小: {content_length} 字节，类型: {content_type}")
                     
                     if content_length == 0:
                         raise Exception("下载的图片内容为空")
@@ -325,8 +299,6 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
                         temp_file.write(response.content)
                         temp_path = temp_file.name
                     
-                    print(f"临时文件创建: {temp_path}")
-                    
                     # 验证文件是否创建成功
                     if not os.path.exists(temp_path):
                         raise Exception("临时文件创建失败")
@@ -335,35 +307,28 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
                     if file_size == 0:
                         raise Exception("临时文件为空")
                     
-                    print(f"临时文件大小: {file_size} 字节")
-                    
                     # 添加图片
                     paragraph = doc.add_paragraph()
                     run = paragraph.add_run()
                     run.add_picture(temp_path, width=Inches(4))  # 设置图片宽度为4英寸
                     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
                     
-                    print("图片添加到文档成功")
-                    
                     # 清理临时文件
                     os.unlink(temp_path)
                     
                 except requests.exceptions.Timeout:
-                    print("图片下载超时")
                     placeholder_p = doc.add_paragraph(f"[网络图片下载超时: {image_path}]")
                     placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                     for run in placeholder_p.runs:
                         run.font.italic = True
                         
                 except requests.exceptions.ConnectionError:
-                    print("图片下载连接错误")
                     placeholder_p = doc.add_paragraph(f"[网络图片连接失败: {image_path}]")
                     placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                     for run in placeholder_p.runs:
                         run.font.italic = True
                         
                 except requests.exceptions.HTTPError as e:
-                    print(f"图片下载HTTP错误: {e}")
                     placeholder_p = doc.add_paragraph(f"[网络图片HTTP错误: {image_path}]\n状态码: {e.response.status_code}")
                     placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                     for run in placeholder_p.runs:
@@ -371,12 +336,8 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
                         
                 except Exception as e:
                     # HTTP图片下载失败，尝试备用图片
-                    print(f"图片处理失败: {str(e)}")
-                    
-                    # 尝试使用备用的公共图片
                     backup_url = "https://via.placeholder.com/400x300.png?text=图片加载失败"
                     try:
-                        print(f"尝试备用图片: {backup_url}")
                         backup_response = requests.get(backup_url, timeout=5)
                         backup_response.raise_for_status()
                         
@@ -390,10 +351,8 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
                         paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
                         
                         os.unlink(temp_path)
-                        print("备用图片加载成功")
                         
                     except Exception as backup_e:
-                        print(f"备用图片也失败: {backup_e}")
                         placeholder_p = doc.add_paragraph(f"[网络图片处理失败: {image_path}]\n原始错误: {str(e)}\n备用图片错误: {str(backup_e)}")
                         placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                         for run in placeholder_p.runs:
