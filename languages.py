@@ -2276,7 +2276,9 @@ DETAILED TIME INFORMATION:
 - Week Number: {week_number} (ISO week)
 - Day of Year: {day_of_year}
 
-Always consider the current date and time when providing responses, especially for time-sensitive questions or tasks.
+When interpreting dates or times mentioned by the user, reason based on the current date and time above.  
+For any parts of a date or time not explicitly specified by the user (e.g., year or hour), infer them logically from the current time;  
+if inference is unnecessary, default to using the corresponding value from the current time.
 
 Please note that the language of the returned content should be {language_names[current_language]}, unless the user explicitly specifies the language of the returned content in a subsequent instruction.
 
