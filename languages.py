@@ -50,41 +50,41 @@ language_packs = {
                     NOT inside it.
 
                 ✅ Correct example (for a skill-type tool):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "a": "foo",
                     "b": "bar"
-                }
-                }
+                }}
+                }}
 
                 ✅ Correct example (for a workflow-type tool that also requires node confirmations):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "task_name": "Design Proposal",
                     "priority": "high"
-                },
-                "node_confirm_users": {
+                }},
+                "node_confirm_users": {{
                     "node-1": 0,
                     "node-2": 102
-                }
-                }
+                }}
+                }}
 
                 ❌ Wrong example (do NOT do this):
-                {
+                {{
                 "a": "foo",
                 "b": "bar"
-                }
+                }}
 
                 ❌ Wrong example (do NOT put node_confirm_users inside input_variables):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "task_name": "Design Proposal",
                     "priority": "high",
-                    "node_confirm_users": {
+                    "node_confirm_users": {{
                     "node-1": 0
-                    }
-                }
-                }
+                    }}
+                }}
+                }}
 
                 ⚠️ Important: 
                 If you omit "input_variables" or place unrelated parameters inside it, the tool call will FAIL. 
@@ -138,41 +138,41 @@ language_packs = {
                     NOT inside it.
 
                 ✅ Correct example (for a skill-type tool):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "a": "foo",
                     "b": "bar"
-                }
-                }
+                }}
+                }}
 
                 ✅ Correct example (for a workflow-type tool that also requires node confirmations):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "task_name": "Design Proposal",
                     "priority": "high"
-                },
-                "node_confirm_users": {
+                }},
+                "node_confirm_users": {{
                     "node-1": 0,
                     "node-2": 102
-                }
-                }
+                }}
+                }}
 
                 ❌ Wrong example (do NOT do this):
-                {
+                {{
                 "a": "foo",
                 "b": "bar"
-                }
+                }}
 
                 ❌ Wrong example (do NOT put node_confirm_users inside input_variables):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "task_name": "Design Proposal",
                     "priority": "high",
-                    "node_confirm_users": {
+                    "node_confirm_users": {{
                     "node-1": 0
-                    }
-                }
-                }
+                    }}
+                }}
+                }}
 
                 ⚠️ Important: 
                 If you omit "input_variables" or place unrelated parameters inside it, the tool call will FAIL. 
@@ -224,41 +224,41 @@ language_packs = {
                     NOT inside it.
 
                 ✅ Correct example (for a skill-type tool):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "a": "foo",
                     "b": "bar"
-                }
-                }
+                }}
+                }}
 
                 ✅ Correct example (for a workflow-type tool that also requires node confirmations):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "task_name": "Design Proposal",
                     "priority": "high"
-                },
-                "node_confirm_users": {
+                }},
+                "node_confirm_users": {{
                     "node-1": 0,
                     "node-2": 102
-                }
-                }
+                }}
+                }}
 
                 ❌ Wrong example (do NOT do this):
-                {
+                {{
                 "a": "foo",
                 "b": "bar"
-                }
+                }}
 
                 ❌ Wrong example (do NOT put node_confirm_users inside input_variables):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "task_name": "Design Proposal",
                     "priority": "high",
-                    "node_confirm_users": {
+                    "node_confirm_users": {{
                     "node-1": 0
-                    }
-                }
-                }
+                    }}
+                }}
+                }}
 
                 ⚠️ Important: 
                 If you omit "input_variables" or place unrelated parameters inside it, the tool call will FAIL. 
@@ -311,41 +311,41 @@ language_packs = {
                     NOT inside it.
 
                 ✅ Correct example (for a skill-type tool):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "a": "foo",
                     "b": "bar"
-                }
-                }
+                }}
+                }}
 
                 ✅ Correct example (for a workflow-type tool that also requires node confirmations):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "task_name": "Design Proposal",
                     "priority": "high"
-                },
-                "node_confirm_users": {
+                }},
+                "node_confirm_users": {{
                     "node-1": 0,
                     "node-2": 102
-                }
-                }
+                }}
+                }}
 
                 ❌ Wrong example (do NOT do this):
-                {
+                {{
                 "a": "foo",
                 "b": "bar"
-                }
+                }}
 
                 ❌ Wrong example (do NOT put node_confirm_users inside input_variables):
-                {
-                "input_variables": {
+                {{
+                "input_variables": {{
                     "task_name": "Design Proposal",
                     "priority": "high",
-                    "node_confirm_users": {
+                    "node_confirm_users": {{
                     "node-1": 0
-                    }
-                }
-                }
+                    }}
+                }}
+                }}
 
                 ⚠️ Important: 
                 If you omit "input_variables" or place unrelated parameters inside it, the tool call will FAIL. 
