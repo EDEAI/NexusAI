@@ -881,6 +881,9 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 group_messages=group_messages,
                 chat_base_url=chat_base_url
             )
+            from core.database.models.models import Models
+            model_info = Models().get_model_by_config_id(self.data['model_config_id'])
+            supplier_name = model_info['supplier_name']
 
             full_chunk: Optional[AIMessageChunk] = None
             prompt_tokens = 0
@@ -902,9 +905,14 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 
                 # Update token counts if token usage is found
                 if token_usage:
-                    prompt_tokens += token_usage.get('input_tokens', 0)
-                    completion_tokens += token_usage.get('output_tokens', 0)
-                    total_tokens += token_usage.get('total_tokens', 0)
+                    if supplier_name == 'Google':
+                        prompt_tokens += token_usage.get('input_tokens', 0)
+                        completion_tokens += token_usage.get('output_tokens', 0)
+                        total_tokens += token_usage.get('total_tokens', 0)
+                    else:
+                        prompt_tokens = token_usage.get('input_tokens', 0)
+                        completion_tokens = token_usage.get('output_tokens', 0)
+                        total_tokens = token_usage.get('total_tokens', 0)
                     
                 yield chunk
                 
