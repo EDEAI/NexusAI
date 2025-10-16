@@ -28,13 +28,37 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
         # 确保文件名有.pptx扩展名
         if not file_name.endswith('.pptx'):
             file_name = f"{file_name}.pptx"
-    # 使用相对路径的storage文件夹
-    output_dir = "storage"
-    file_path = os.path.join(output_dir, file_name)
     
-    # Ensure directory exists
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir, exist_ok=True)
+    # 智能选择存储目录，避免权限问题
+    def get_safe_output_dir():
+        """获取安全的输出目录"""
+        possible_dirs = [
+            "storage",  # 相对路径，首选
+            "./storage",  # 明确的相对路径
+            os.path.expanduser("~/storage"),  # 用户主目录
+            "/tmp/storage",  # 临时目录
+        ]
+        
+        for dir_path in possible_dirs:
+            try:
+                if not os.path.exists(dir_path):
+                    os.makedirs(dir_path, exist_ok=True)
+                # 测试写权限
+                test_file = os.path.join(dir_path, "test_write.tmp")
+                with open(test_file, 'w') as f:
+                    f.write("test")
+                os.remove(test_file)
+                return dir_path
+            except (PermissionError, OSError):
+                continue
+        
+        # 如果所有目录都失败，使用当前目录
+        return "."
+    
+    output_dir = get_safe_output_dir()
+    file_path = os.path.join(output_dir, file_name)
+    print(f"使用输出目录: {output_dir}")
+    print(f"文件路径: {file_path}")
     
     # Create new PowerPoint presentation
     prs = Presentation()
