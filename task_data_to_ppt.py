@@ -5,8 +5,14 @@ from pptx.dml.color import RGBColor
 from typing import Dict, Any
 import os
 import uuid
-import requests
 import tempfile
+
+# 尝试导入 requests，如果不存在则设置标志
+try:
+    import requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
 
 def main(data: Dict[str, Any], file_name: str = None) -> dict:
     """
@@ -29,34 +35,13 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
         if not file_name.endswith('.pptx'):
             file_name = f"{file_name}.pptx"
     
-    # 智能选择存储目录，避免权限问题
-    def get_safe_output_dir():
-        """获取安全的输出目录"""
-        possible_dirs = [
-            "storage",  # 相对路径，首选
-            "./storage",  # 明确的相对路径
-            os.path.expanduser("~/storage"),  # 用户主目录
-            "/tmp/storage",  # 临时目录
-        ]
-        
-        for dir_path in possible_dirs:
-            try:
-                if not os.path.exists(dir_path):
-                    os.makedirs(dir_path, exist_ok=True)
-                # 测试写权限
-                test_file = os.path.join(dir_path, "test_write.tmp")
-                with open(test_file, 'w') as f:
-                    f.write("test")
-                os.remove(test_file)
-                return dir_path
-            except (PermissionError, OSError):
-                continue
-        
-        # 如果所有目录都失败，使用当前目录
-        return "."
+    # 使用固定的/storage/目录，与Word脚本保持一致
+    file_path = f"/storage/{file_name}"
     
-    output_dir = get_safe_output_dir()
-    file_path = os.path.join(output_dir, file_name)
+    # 确保目录存在
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
     
     # Create new PowerPoint presentation
     prs = Presentation()
@@ -212,77 +197,162 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
         title_paragraph.font.bold = True
         title_paragraph.alignment = PP_ALIGN.CENTER
         
-        try:
-            # 检查是否是HTTP/HTTPS链接
-            if image_path.startswith(('http://', 'https://')):
+        # 检查是否是HTTP/HTTPS链接
+        if image_path.startswith(('http://', 'https://')):
+            # 检查是否安装了 requests 库
+            if not HAS_REQUESTS:
+                placeholder_shape = slide.shapes.add_textbox(Inches(2), Inches(3), Inches(6), Inches(2))
+                placeholder_frame = placeholder_shape.text_frame
+                placeholder_frame.text = f"[网络图片需要安装requests库: {image_path}]\n请运行: pip install requests"
+                placeholder_paragraph = placeholder_frame.paragraphs[0]
+                placeholder_paragraph.font.name = CHINESE_FONT
+                placeholder_paragraph.font.size = Pt(14)
+                placeholder_paragraph.font.italic = True
+                placeholder_paragraph.alignment = PP_ALIGN.CENTER
+                return slide
+            
+            try:
+                # 添加请求头，模拟浏览器
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
+                
+                response = requests.get(image_path, timeout=10, headers=headers)
+                response.raise_for_status()
+                
+                # 检查内容
+                content_length = len(response.content)
+                content_type = response.headers.get('content-type', '').lower()
+                
+                if content_length == 0:
+                    raise Exception("下载的图片内容为空")
+                
+                # 根据内容类型确定文件扩展名
+                if 'png' in content_type:
+                    suffix = '.png'
+                elif 'jpeg' in content_type or 'jpg' in content_type:
+                    suffix = '.jpg'
+                elif 'gif' in content_type:
+                    suffix = '.gif'
+                elif 'webp' in content_type:
+                    suffix = '.webp'
+                else:
+                    # 从URL路径中提取扩展名
+                    if image_path.lower().endswith('.png'):
+                        suffix = '.png'
+                    elif image_path.lower().endswith(('.jpg', '.jpeg')):
+                        suffix = '.jpg'
+                    elif image_path.lower().endswith('.gif'):
+                        suffix = '.gif'
+                    elif image_path.lower().endswith('.webp'):
+                        suffix = '.webp'
+                    else:
+                        suffix = '.png'  # 默认使用png
+                
+                # 创建临时文件
+                with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
+                    temp_file.write(response.content)
+                    temp_path = temp_file.name
+                
+                # 验证文件是否创建成功
+                if not os.path.exists(temp_path):
+                    raise Exception("临时文件创建失败")
+                
+                file_size = os.path.getsize(temp_path)
+                if file_size == 0:
+                    raise Exception("临时文件为空")
+                
+                # 添加图片
+                left = Inches(2)
+                top = Inches(2)
+                width = Inches(6)
+                slide.shapes.add_picture(temp_path, left, top, width=width)
+                
+                # 清理临时文件
                 try:
-                    response = requests.get(image_path, timeout=10)
-                    response.raise_for_status()
-                    
-                    # 创建临时文件
-                    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as temp_file:
-                        temp_file.write(response.content)
-                        temp_path = temp_file.name
-                    
-                    # 添加图片
-                    left = Inches(2)
-                    top = Inches(2)
-                    width = Inches(6)
-                    slide.shapes.add_picture(temp_path, left, top, width=width)
-                    
-                    # 清理临时文件
                     os.unlink(temp_path)
-                    
-                except Exception as e:
-                    # HTTP图片下载失败，添加占位符
-                    placeholder_shape = slide.shapes.add_textbox(Inches(2), Inches(3), Inches(6), Inches(2))
-                    placeholder_frame = placeholder_shape.text_frame
-                    placeholder_frame.text = f"[网络图片: {image_path}]"
-                    placeholder_paragraph = placeholder_frame.paragraphs[0]
-                    placeholder_paragraph.font.name = CHINESE_FONT
-                    placeholder_paragraph.font.size = Pt(16)
-                    placeholder_paragraph.font.italic = True
-                    placeholder_paragraph.alignment = PP_ALIGN.CENTER
-                    
-            elif os.path.exists(image_path):
-                # 本地图片文件
+                except:
+                    pass
+                
+            except requests.exceptions.Timeout:
+                placeholder_shape = slide.shapes.add_textbox(Inches(2), Inches(3), Inches(6), Inches(2))
+                placeholder_frame = placeholder_shape.text_frame
+                placeholder_frame.text = f"[网络图片下载超时: {image_path}]"
+                placeholder_paragraph = placeholder_frame.paragraphs[0]
+                placeholder_paragraph.font.name = CHINESE_FONT
+                placeholder_paragraph.font.size = Pt(14)
+                placeholder_paragraph.font.italic = True
+                placeholder_paragraph.alignment = PP_ALIGN.CENTER
+                
+            except requests.exceptions.ConnectionError as e:
+                placeholder_shape = slide.shapes.add_textbox(Inches(2), Inches(3), Inches(6), Inches(2))
+                placeholder_frame = placeholder_shape.text_frame
+                placeholder_frame.text = f"[网络图片连接失败: {image_path}]\n错误: {str(e)}"
+                placeholder_paragraph = placeholder_frame.paragraphs[0]
+                placeholder_paragraph.font.name = CHINESE_FONT
+                placeholder_paragraph.font.size = Pt(14)
+                placeholder_paragraph.font.italic = True
+                placeholder_paragraph.alignment = PP_ALIGN.CENTER
+                
+            except requests.exceptions.HTTPError as e:
+                placeholder_shape = slide.shapes.add_textbox(Inches(2), Inches(3), Inches(6), Inches(2))
+                placeholder_frame = placeholder_shape.text_frame
+                placeholder_frame.text = f"[网络图片HTTP错误: {image_path}]\n状态码: {e.response.status_code}"
+                placeholder_paragraph = placeholder_frame.paragraphs[0]
+                placeholder_paragraph.font.name = CHINESE_FONT
+                placeholder_paragraph.font.size = Pt(14)
+                placeholder_paragraph.font.italic = True
+                placeholder_paragraph.alignment = PP_ALIGN.CENTER
+                
+            except Exception as e:
+                # 显示详细错误信息
+                placeholder_shape = slide.shapes.add_textbox(Inches(2), Inches(3), Inches(6), Inches(2))
+                placeholder_frame = placeholder_shape.text_frame
+                placeholder_frame.text = f"[网络图片加载失败: {image_path}]\n错误: {str(e)}"
+                placeholder_paragraph = placeholder_frame.paragraphs[0]
+                placeholder_paragraph.font.name = CHINESE_FONT
+                placeholder_paragraph.font.size = Pt(14)
+                placeholder_paragraph.font.italic = True
+                placeholder_paragraph.alignment = PP_ALIGN.CENTER
+                
+        elif os.path.exists(image_path):
+            # 本地图片文件
+            try:
                 left = Inches(2)
                 top = Inches(2)
                 width = Inches(6)
                 slide.shapes.add_picture(image_path, left, top, width=width)
-                
-            else:
-                # 图片不存在，添加占位符
+            except Exception as e:
                 placeholder_shape = slide.shapes.add_textbox(Inches(2), Inches(3), Inches(6), Inches(2))
                 placeholder_frame = placeholder_shape.text_frame
-                placeholder_frame.text = f"[图片占位符: {image_path}]"
+                placeholder_frame.text = f"[本地图片加载失败: {image_path}]\n错误: {str(e)}"
                 placeholder_paragraph = placeholder_frame.paragraphs[0]
                 placeholder_paragraph.font.name = CHINESE_FONT
-                placeholder_paragraph.font.size = Pt(16)
+                placeholder_paragraph.font.size = Pt(14)
                 placeholder_paragraph.font.italic = True
                 placeholder_paragraph.alignment = PP_ALIGN.CENTER
             
-            # 添加图片说明
-            if image_caption:
-                caption_shape = slide.shapes.add_textbox(Inches(1), Inches(6), Inches(8), Inches(0.5))
-                caption_frame = caption_shape.text_frame
-                caption_frame.text = image_caption
-                caption_paragraph = caption_frame.paragraphs[0]
-                caption_paragraph.font.name = CHINESE_FONT
-                caption_paragraph.font.size = Pt(14)
-                caption_paragraph.font.italic = True
-                caption_paragraph.alignment = PP_ALIGN.CENTER
-                
-        except Exception as e:
-            # 添加错误信息
-            error_shape = slide.shapes.add_textbox(Inches(2), Inches(3), Inches(6), Inches(2))
-            error_frame = error_shape.text_frame
-            error_frame.text = f"[图片加载失败: {image_path}]"
-            error_paragraph = error_frame.paragraphs[0]
-            error_paragraph.font.name = CHINESE_FONT
-            error_paragraph.font.size = Pt(16)
-            error_paragraph.font.italic = True
-            error_paragraph.alignment = PP_ALIGN.CENTER
+        else:
+            # 图片不存在，添加占位符
+            placeholder_shape = slide.shapes.add_textbox(Inches(2), Inches(3), Inches(6), Inches(2))
+            placeholder_frame = placeholder_shape.text_frame
+            placeholder_frame.text = f"[图片文件不存在: {image_path}]"
+            placeholder_paragraph = placeholder_frame.paragraphs[0]
+            placeholder_paragraph.font.name = CHINESE_FONT
+            placeholder_paragraph.font.size = Pt(14)
+            placeholder_paragraph.font.italic = True
+            placeholder_paragraph.alignment = PP_ALIGN.CENTER
+        
+        # 添加图片说明
+        if image_caption:
+            caption_shape = slide.shapes.add_textbox(Inches(1), Inches(6), Inches(8), Inches(0.5))
+            caption_frame = caption_shape.text_frame
+            caption_frame.text = image_caption
+            caption_paragraph = caption_frame.paragraphs[0]
+            caption_paragraph.font.name = CHINESE_FONT
+            caption_paragraph.font.size = Pt(14)
+            caption_paragraph.font.italic = True
+            caption_paragraph.alignment = PP_ALIGN.CENTER
         
         return slide
     

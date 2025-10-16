@@ -259,136 +259,130 @@ def main(data: Dict[str, Any], file_name: str = None) -> dict:
         if not image_path:
             return
         
-        try:
-            # 检查是否是HTTP/HTTPS链接
-            if image_path.startswith(('http://', 'https://')):
-                # 对于HTTP图片，下载到临时文件
-                import requests
-                import tempfile
+        # 检查是否是HTTP/HTTPS链接
+        if image_path.startswith(('http://', 'https://')):
+            # 对于HTTP图片，下载到临时文件
+            import requests
+            import tempfile
+            
+            try:
+                # 添加请求头，模拟浏览器
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
                 
-                try:
-                    # 添加请求头，模拟浏览器
-                    headers = {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-                    }
-                    
-                    response = requests.get(image_path, timeout=10, headers=headers)
-                    response.raise_for_status()
-                    
-                    # 检查内容
-                    content_length = len(response.content)
-                    content_type = response.headers.get('content-type', '').lower()
-                    
-                    if content_length == 0:
-                        raise Exception("下载的图片内容为空")
-                    
-                    # 根据内容类型确定文件扩展名
-                    if 'png' in content_type:
+                response = requests.get(image_path, timeout=10, headers=headers)
+                response.raise_for_status()
+                
+                # 检查内容
+                content_length = len(response.content)
+                content_type = response.headers.get('content-type', '').lower()
+                
+                if content_length == 0:
+                    raise Exception("下载的图片内容为空")
+                
+                # 根据内容类型确定文件扩展名
+                if 'png' in content_type:
+                    suffix = '.png'
+                elif 'jpeg' in content_type or 'jpg' in content_type:
+                    suffix = '.jpg'
+                elif 'gif' in content_type:
+                    suffix = '.gif'
+                elif 'webp' in content_type:
+                    suffix = '.webp'
+                else:
+                    # 从URL路径中提取扩展名
+                    if image_path.lower().endswith('.png'):
                         suffix = '.png'
-                    elif 'jpeg' in content_type or 'jpg' in content_type:
+                    elif image_path.lower().endswith(('.jpg', '.jpeg')):
                         suffix = '.jpg'
-                    elif 'gif' in content_type:
+                    elif image_path.lower().endswith('.gif'):
                         suffix = '.gif'
-                    elif 'webp' in content_type:
+                    elif image_path.lower().endswith('.webp'):
                         suffix = '.webp'
                     else:
                         suffix = '.png'  # 默认使用png
-                    
-                    # 创建临时文件
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
-                        temp_file.write(response.content)
-                        temp_path = temp_file.name
-                    
-                    # 验证文件是否创建成功
-                    if not os.path.exists(temp_path):
-                        raise Exception("临时文件创建失败")
-                    
-                    file_size = os.path.getsize(temp_path)
-                    if file_size == 0:
-                        raise Exception("临时文件为空")
-                    
-                    # 添加图片
-                    paragraph = doc.add_paragraph()
-                    run = paragraph.add_run()
-                    run.add_picture(temp_path, width=Inches(4))  # 设置图片宽度为4英寸
-                    paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                    
-                    # 清理临时文件
-                    os.unlink(temp_path)
-                    
-                except requests.exceptions.Timeout:
-                    placeholder_p = doc.add_paragraph(f"[网络图片下载超时: {image_path}]")
-                    placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                    for run in placeholder_p.runs:
-                        run.font.italic = True
-                        
-                except requests.exceptions.ConnectionError:
-                    placeholder_p = doc.add_paragraph(f"[网络图片连接失败: {image_path}]")
-                    placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                    for run in placeholder_p.runs:
-                        run.font.italic = True
-                        
-                except requests.exceptions.HTTPError as e:
-                    placeholder_p = doc.add_paragraph(f"[网络图片HTTP错误: {image_path}]\n状态码: {e.response.status_code}")
-                    placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                    for run in placeholder_p.runs:
-                        run.font.italic = True
-                        
-                except Exception as e:
-                    # HTTP图片下载失败，尝试备用图片
-                    backup_url = "https://via.placeholder.com/400x300.png?text=图片加载失败"
-                    try:
-                        backup_response = requests.get(backup_url, timeout=5)
-                        backup_response.raise_for_status()
-                        
-                        with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as temp_file:
-                            temp_file.write(backup_response.content)
-                            temp_path = temp_file.name
-                        
-                        paragraph = doc.add_paragraph()
-                        run = paragraph.add_run()
-                        run.add_picture(temp_path, width=Inches(4))
-                        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                        
-                        os.unlink(temp_path)
-                        
-                    except Exception as backup_e:
-                        placeholder_p = doc.add_paragraph(f"[网络图片处理失败: {image_path}]\n原始错误: {str(e)}\n备用图片错误: {str(backup_e)}")
-                        placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                        for run in placeholder_p.runs:
-                            run.font.italic = True
-                        
-            elif os.path.exists(image_path):
-                # 本地图片文件
+                
+                # 创建临时文件
+                with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
+                    temp_file.write(response.content)
+                    temp_path = temp_file.name
+                
+                # 验证文件是否创建成功
+                if not os.path.exists(temp_path):
+                    raise Exception("临时文件创建失败")
+                
+                file_size = os.path.getsize(temp_path)
+                if file_size == 0:
+                    raise Exception("临时文件为空")
+                
+                # 添加图片
                 paragraph = doc.add_paragraph()
                 run = paragraph.add_run()
-                run.add_picture(image_path, width=Inches(4))  # 设置图片宽度为4英寸
+                run.add_picture(temp_path, width=Inches(4))
                 paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 
-            else:
-                # 如果图片不存在，添加占位符
-                placeholder_p = doc.add_paragraph(f"[图片占位符: {image_path}]")
+                # 清理临时文件
+                try:
+                    os.unlink(temp_path)
+                except:
+                    pass
+                
+            except requests.exceptions.Timeout:
+                placeholder_p = doc.add_paragraph(f"[网络图片下载超时: {image_path}]")
+                placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                for run in placeholder_p.runs:
+                    run.font.italic = True
+                    
+            except requests.exceptions.ConnectionError as e:
+                placeholder_p = doc.add_paragraph(f"[网络图片连接失败: {image_path}]\n错误: {str(e)}")
+                placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                for run in placeholder_p.runs:
+                    run.font.italic = True
+                    
+            except requests.exceptions.HTTPError as e:
+                placeholder_p = doc.add_paragraph(f"[网络图片HTTP错误: {image_path}]\n状态码: {e.response.status_code}")
+                placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                for run in placeholder_p.runs:
+                    run.font.italic = True
+                    
+            except Exception as e:
+                # 显示详细错误信息
+                placeholder_p = doc.add_paragraph(f"[网络图片加载失败: {image_path}]\n错误: {str(e)}")
+                placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                for run in placeholder_p.runs:
+                    run.font.italic = True
+                    
+        elif os.path.exists(image_path):
+            # 本地图片文件
+            try:
+                paragraph = doc.add_paragraph()
+                run = paragraph.add_run()
+                run.add_picture(image_path, width=Inches(4))
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            except Exception as e:
+                placeholder_p = doc.add_paragraph(f"[本地图片加载失败: {image_path}]\n错误: {str(e)}")
                 placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 for run in placeholder_p.runs:
                     run.font.italic = True
             
-            # 添加图片说明
-            if image_caption:
-                caption_p = doc.add_paragraph(image_caption)
-                caption_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                for run in caption_p.runs:
-                    run.font.size = Pt(10)
-                    run.font.italic = True
-            
-            # 添加间距
-            doc.add_paragraph()
-            
-        except Exception as e:
-            # 添加错误信息
-            error_p = doc.add_paragraph(f"[图片加载失败: {image_path}]")
-            error_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            for run in error_p.runs:
+        else:
+            # 如果图片不存在，添加占位符
+            placeholder_p = doc.add_paragraph(f"[图片文件不存在: {image_path}]")
+            placeholder_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            for run in placeholder_p.runs:
                 run.font.italic = True
+        
+        # 添加图片说明
+        if image_caption:
+            caption_p = doc.add_paragraph(image_caption)
+            caption_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            for run in caption_p.runs:
+                run.font.size = Pt(10)
+                run.font.italic = True
+        
+        # 添加间距
+        doc.add_paragraph()
     
     # 处理多个图片的函数
     def add_images(images_data):
