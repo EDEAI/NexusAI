@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict, List, Union, Optional
 from sqlalchemy import Table, select, text, and_, or_, func, JSON
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, OperationalError, InvalidRequestError
 from . import SQLDatabase
 from config import settings
 
@@ -125,6 +125,11 @@ class ORM(SQLDatabase):
             return result
         except SQLAlchemyError as e:
             session.rollback()
+            if isinstance(e, (OperationalError, InvalidRequestError)):
+                try:
+                    cls._Session.remove()
+                except:
+                    pass
             raise e
         finally:
             if auto_commit:
@@ -158,6 +163,11 @@ class ORM(SQLDatabase):
             return result.inserted_primary_key[0]
         except SQLAlchemyError as e:
             session.rollback()
+            if isinstance(e, (OperationalError, InvalidRequestError)):
+                try:
+                    cls._Session.remove()
+                except:
+                    pass
             raise e
         finally:
             if auto_commit:
@@ -201,6 +211,11 @@ class ORM(SQLDatabase):
             return result.rowcount > 0
         except SQLAlchemyError as e:
             session.rollback()
+            if isinstance(e, (OperationalError, InvalidRequestError)):
+                try:
+                    cls._Session.remove()
+                except:
+                    pass
             raise e
         finally:
             if auto_commit:
@@ -354,6 +369,11 @@ class ORM(SQLDatabase):
             dict_rows = [dict(zip(columns, row)) for row in rows]
             return dict_rows
         except SQLAlchemyError as e:
+            if isinstance(e, (OperationalError, InvalidRequestError)):
+                try:
+                    cls._Session.remove()
+                except:
+                    pass
             raise e
         finally:
             if is_auto_commit():
@@ -397,6 +417,11 @@ class ORM(SQLDatabase):
             else:
                 return None
         except SQLAlchemyError as e:
+            if isinstance(e, (OperationalError, InvalidRequestError)):
+                try:
+                    cls._Session.remove()
+                except:
+                    pass
             raise e
         finally:
             if is_auto_commit():
@@ -437,6 +462,11 @@ class ORM(SQLDatabase):
             return result.rowcount > 0
         except SQLAlchemyError as e:
             session.rollback()
+            if isinstance(e, (OperationalError, InvalidRequestError)):
+                try:
+                    cls._Session.remove()
+                except:
+                    pass
             raise e
         finally:
             if auto_commit:

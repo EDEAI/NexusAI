@@ -92,6 +92,7 @@ class LLMBaseNode(Node):
                 return lambda text: anthropic.messages.count_tokens(
                     model=model_name,
                     messages=[{'role': 'user', 'content': text}],
+                    timeout=120
                 ).input_tokens
             case 'Tongyi':
                 tokenizer = dashscope.get_tokenizer('qwen-turbo')
@@ -112,7 +113,8 @@ class LLMBaseNode(Node):
                         headers={
                             'Authorization': f'Bearer {api_key}',
                             'Content-Type': 'application/json',
-                        }
+                        },
+                        timeout=120
                     )
                     response_data = response.json()
                     return response_data['data'][0]['total_tokens']
@@ -123,6 +125,7 @@ class LLMBaseNode(Node):
                 return lambda text: client.models.count_tokens(
                     model=model_name,
                     contents=text,
+                    config={'http_options': {'timeout': 120_000}}
                 ).total_tokens
             case _:
                 return lambda _: 0
