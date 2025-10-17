@@ -101,8 +101,7 @@ async def skill_run(
         if var := input_obj.properties.get(k):
             if var.type == 'json' and isinstance(v, (dict, list)):
                 v = json.dumps(v, ensure_ascii=False)
-            else:
-                var.value = v
+            var.value = v
 
     # Execute skill
     task = run_app.delay(app_type="skill", id_=skill_id, user_id=user_id, input_dict=input_obj.to_dict())
@@ -194,8 +193,7 @@ async def workflow_run(
             if var := input_obj.properties.get(k):
                 if var.type == 'json' and isinstance(v, (dict, list)):
                     v = json.dumps(v, ensure_ascii=False)
-                else:
-                    var.value = v
+                var.value = v
         
         validate_required_variable(input_obj)
 
