@@ -738,6 +738,8 @@ class Chatroom:
                     # Check if the skill has input variables that are files and need to be uploaded
                     try:
                         files_to_upload = []
+                        if 'input_variables' not in mcp_tool_use['args']:
+                            mcp_tool_use['args'] = {'input_variables': mcp_tool_use['args']}
                         input_variables: Dict[str, Any] = mcp_tool_use['args']['input_variables']
                         skill_input_variables = skill['input_variables']['properties']
                         for k, v in input_variables.items():

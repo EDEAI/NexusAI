@@ -42,11 +42,11 @@ async def skill_run(
     Returns:
         Dict containing execution results
     """
-    input_variables: Dict[str, Any] = mcp_tool_args['input_variables']
     # Parameter validation
     if skill_id <= 0:
         raise ValueError(get_language_content("skill_id_required"))
 
+    input_variables: Dict[str, Any] = mcp_tool_args['input_variables']
     if not input_variables:
         raise ValueError(get_language_content("input_dict_required"))
 
@@ -99,6 +99,8 @@ async def skill_run(
                 # Str type
                 pass
         if var := input_obj.properties.get(k):
+            if var.type == 'json' and isinstance(v, (dict, list)):
+                v = json.dumps(v, ensure_ascii=False)
             var.value = v
 
     # Execute skill
@@ -189,6 +191,8 @@ async def workflow_run(
                     # Str type
                     pass
             if var := input_obj.properties.get(k):
+                if var.type == 'json' and isinstance(v, (dict, list)):
+                    v = json.dumps(v, ensure_ascii=False)
                 var.value = v
         
         validate_required_variable(input_obj)
