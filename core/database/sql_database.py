@@ -24,6 +24,7 @@ class SQLDatabase:
         if not SQLDatabase._engine:
             SQLDatabase._engine = create_engine(
                 db_url,
+                pool_pre_ping=True,
                 pool_recycle=600,
                 json_serializer=lambda obj: json.dumps(obj, ensure_ascii=False)
             )
