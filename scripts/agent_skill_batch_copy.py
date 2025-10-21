@@ -3,6 +3,7 @@ import pymysql
 
 def main():
     src_agent_app_id = 100
+    target_agent_llm_config_id = 50
     target_team_id = 10
     target_user_id = 21
     with (
@@ -51,11 +52,11 @@ def main():
                 SELECT
                     %s, %s, %s,
                     obligations, input_variables, auto_match_ability,
-                    default_output_format, 0, allow_upload_file,
+                    default_output_format, %s, allow_upload_file,
                     %s, NOW(), NOW(), status
                 FROM agents
                 WHERE app_id = %s AND publish_status = 1;''',
-                [target_team_id, target_user_id, new_agent_app_id, publish_status, src_agent_app_id]
+                [target_team_id, target_user_id, new_agent_app_id, target_agent_llm_config_id, publish_status, src_agent_app_id]
             )
             new_agent_ids.append(cursor.lastrowid)
         print('Copy Agent data', len(new_agent_ids), new_agent_ids)
