@@ -132,5 +132,5 @@ def main():
         
         connection.commit()
 
-
-main()
+if __name__ == '__main__':
+    main()
