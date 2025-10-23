@@ -9,6 +9,7 @@ import { useIntl } from '@umijs/max';
 import { useHover, useResetState, useUpdateEffect } from 'ahooks';
 import { Button, Modal } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
+import isEqual from 'lodash/isEqual';
 
 interface VariableItem {
     name: string;
@@ -101,11 +102,21 @@ export default memo((props: VariableList) => {
     const formRef = useRef<ProFormInstance>();
     const [variables, setVariables] = useState<VariableItem[]>(props.variables || []);
     const isHydratingRef = useRef(false);
+    const latestVariablesRef = useRef<VariableItem[]>(props.variables || []);
     const readonly = props.readonly || false;
 
     useEffect(() => {
+        latestVariablesRef.current = variables;
+    }, [variables]);
+
+    useEffect(() => {
+        const nextVariables = props.variables || [];
+        if (isEqual(nextVariables, latestVariablesRef.current)) {
+            isHydratingRef.current = false;
+            return;
+        }
         isHydratingRef.current = true;
-        setVariables(props.variables || []);
+        setVariables(nextVariables);
     }, [props.variables]);
 
     const objectTransformFlow = (sourceVariables: VariableItem[] = variables): ObjectVariable => {
