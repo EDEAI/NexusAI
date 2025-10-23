@@ -52,11 +52,11 @@ const BugFix: React.FC<ChildProps> = ({
         if (res.code == 0) {
             message.success(intl.formatMessage({ id: 'skill.publishsuccess' }));
             // Update skill status after successful publish
-            setSkillInfo({
-                ...Skillinfo,
+            setSkillInfo((prev: any) => ({
+                ...(prev || {}),
                 publish_status: 1,
                 app_publish_status: 1,
-            });
+            }));
         } else {
             message.error(intl.formatMessage({ id: 'skill.select.value' }));
         }

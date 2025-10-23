@@ -33,13 +33,26 @@ const SkillFirst: React.FC<ChildProps> = ({
     const intl = useIntl();
 
     const SkillFSwitch = (checked: any) => {
-        setSkillInfo({ ...Skillinfo, is_public: checked ? 1 : 0 });
+        setSkillInfo((prev: any) => ({
+            ...(prev || {}),
+            is_public: checked ? 1 : 0,
+        }));
     };
     const attrFirstAPI = (checked: any) => {
-        setSkillInfo({ ...Skillinfo, attrs_are_visible: checked ? 1 : 0 });
+        setSkillInfo((prev: any) => ({
+            ...(prev || {}),
+            attrs_are_visible: checked ? 1 : 0,
+        }));
     };
     const handleVariableChange = (value: any) => {
-        setSkillInfo({ ...Skillinfo, input_variables: value.free });
+        const inputVariables =
+            value?.free && typeof value.free?.toObject === 'function'
+                ? value.free.toObject()
+                : value.free;
+        setSkillInfo((prev: any) => ({
+            ...(prev || {}),
+            input_variables: inputVariables,
+        }));
     };
     //
     const nextStep = (value: any, type: any) => {

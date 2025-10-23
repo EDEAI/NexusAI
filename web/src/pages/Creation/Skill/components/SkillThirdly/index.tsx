@@ -39,10 +39,20 @@ const SkillThirdly: React.FC<ChildProps> = ({
     useEffect(() => {}, []);
     const SkillRadioType = (e: any) => {
         // setSkill_Radio_Type(e.target.value);
-        setSkillInfo({ ...Skillinfo, output_type: e.target.value });
+        setSkillInfo((prev: any) => ({
+            ...(prev || {}),
+            output_type: e.target.value,
+        }));
     };
     const handleVariableChange = (value: any) => {
-        setSkillInfo({ ...Skillinfo, output_variables: value.free });
+        const outputVariables =
+            value?.free && typeof value.free?.toObject === 'function'
+                ? value.free.toObject()
+                : value.free;
+        setSkillInfo((prev: any) => ({
+            ...(prev || {}),
+            output_variables: outputVariables,
+        }));
     };
     const ThirdlyChange = (value: any) => {
         const input_variables = new ObjectVariable('output', '', '');
