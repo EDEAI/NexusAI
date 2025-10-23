@@ -8,7 +8,7 @@ import { ProForm, ProFormDependency, ProFormSelect } from '@ant-design/pro-compo
 import { useIntl } from '@umijs/max';
 import { useLatest, useMount } from 'ahooks';
 import _ from 'lodash';
-import { memo, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { SwitchGroup } from '../../components/Form/Switch';
 import Variable from '../../components/Variable';
 import useStore from '../../store';
@@ -23,7 +23,7 @@ export default memo(({ node }: { node: AppNode }) => {
     const datasetData = useStore(state => state.datasetData);
     const updateNodeData = useStore(state => state.updateNodeData);
     const state = useLatest(nodeInfo);
-    const [variables, setVariables] = useState([]);
+    const [variables, setVariables] = useState<any>(node?.data?.variables || { value: [] });
     useMount(() => {
         setNodeInfo(node);
       
@@ -32,6 +32,14 @@ export default memo(({ node }: { node: AppNode }) => {
             reset();
         }, 200);
     });
+    useEffect(() => {
+        setNodeInfo(_.cloneDeep(node));
+    }, [node]);
+
+    useEffect(() => {
+        setVariables(node?.data?.variables || { value: [] });
+    }, [node?.data?.variables]);
+
     const variableChange = (e: any) => {
         setVariables(e);
         setNodeChange({ ['variables']: e }, { ['variables']: e });
@@ -47,7 +55,7 @@ export default memo(({ node }: { node: AppNode }) => {
         <>
             <div>
                 <Variable
-                    variables={nodeInfo.data['variables']?.value || []}
+                    variables={variables?.value || []}
                     variableTypes={['string', 'number', 'file']}
                     onChange={variableChange}
                 ></Variable>

@@ -5,7 +5,7 @@ import { ProForm, ProFormDependency, ProFormSelect } from '@ant-design/pro-compo
 import { useIntl } from '@umijs/max';
 import { useLatest, useMount } from 'ahooks';
 import _ from 'lodash';
-import { memo, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import {
     SwitchImportToKnowledgeBase,
     SwitchRequiresUpload,
@@ -23,7 +23,7 @@ export default memo(({ node }: { node: AppNode }) => {
     const updateNodeData = useStore(state => state.updateNodeData);
     const datasetData = useStore(state => state.datasetData);
     const state = useLatest(nodeInfo);
-    const [variables, setVariables] = useState([]);
+    const [variables, setVariables] = useState<any>(node?.data?.variables || { value: [] });
     useMount(() => {
         setNodeInfo(node);
         // const fieldNames = Object.keys(formRef.current.getFieldsValue());
@@ -35,6 +35,14 @@ export default memo(({ node }: { node: AppNode }) => {
             reset();
         }, 200);
     });
+    useEffect(() => {
+        setNodeInfo(_.cloneDeep(node));
+    }, [node]);
+
+    useEffect(() => {
+        setVariables(node?.data?.variables || { value: [] });
+    }, [node?.data?.variables]);
+
     const variableChange = (e: any) => {
         setVariables(e);
         setNodeChange({ ['variables']: e });
@@ -48,7 +56,7 @@ export default memo(({ node }: { node: AppNode }) => {
         <>
             <div>
                 <Variable
-                    variables={nodeInfo.data['variables']?.value || []}
+                    variables={variables?.value || []}
                     onChange={variableChange}
                     variableTypes={['string', 'number', 'file']}
                 ></Variable>
