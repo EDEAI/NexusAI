@@ -174,16 +174,18 @@ async def skill_publish(app_id: int, userinfo: TokenData = Depends(get_current_u
     }
     publish_info = tools_db.get_publish_skill_info(user_id, app_id, 1)
 
+    apps_data = {
+        "publish_status": 1,
+        "updated_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
     if publish_info['status'] == 2:
         tool_id = tools_db.insert(tool_data)
+        apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
         return response_success({'id': tool_id})
     else:
         tools_db.update([{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
                          {'column': 'publish_status', 'value': 1}], tool_data)
-        apps_data = {
-            "publish_status": 1,
-            "updated_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
         apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
         return response_success({'id': 0})
 
