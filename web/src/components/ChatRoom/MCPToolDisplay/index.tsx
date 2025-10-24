@@ -17,14 +17,21 @@ import {
     ToolOutlined,
     UserOutlined,
 } from '@ant-design/icons';
-import { Button, Card, Collapse, message, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Collapse, message, Tag, Typography } from 'antd';
 import { FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import { createRenderers } from '../MarkdownRenderer';
-import { getMCPToolStatus, MCPToolData, MCPToolRuntimeData, MCPToolStatus } from '../types/mcp';
+import {
+    getMCPToolStatus,
+    MCPToolData,
+    MCPToolRuntimeData,
+    MCPToolStatus,
+    MCPToolMessage,
+} from '../types/mcp';
 import { useChatRoomContext } from '../context/ChatRoomContext';
 import FileUploadSection from './FileUploadSection';
+import './style.less';
 
 const { Text, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -563,6 +570,22 @@ export const MCPToolDisplay: FC<MCPToolDisplayProps> = ({
     const hasInputFileList =
         inputFileList && Array.isArray(inputFileList) && inputFileList.length > 0;
 
+    const runtimeMessages = runtimeData?.messages || [];
+    const fallbackMessages: MCPToolMessage[] =
+        (!runtimeMessages || runtimeMessages.length === 0) && toolData.msg
+            ? [
+                  {
+                      key: `fallback-${toolData.id}`,
+                      type: 'warning',
+                      text: toolData.msg,
+                      createdAt: 0,
+                      transient: false,
+                      source: 'history',
+                  },
+              ]
+            : [];
+    const allMessages: MCPToolMessage[] = runtimeMessages.length ? runtimeMessages : fallbackMessages;
+
     return (
         <Card className="mb-3 border border-gray-200 shadow-sm" size="small">
             <div className="flex items-center gap-2 mb-2">
@@ -611,6 +634,29 @@ export const MCPToolDisplay: FC<MCPToolDisplayProps> = ({
                     <Text type="danger" className="text-xs">
                         {intl.formatMessage({ id: 'app.chatroom.mcptool.error' })}: {errorMessage}
                     </Text>
+                </div>
+            )}
+
+            {allMessages && allMessages.length > 0 && (
+                <div className="mb-2 space-y-2">
+                    {allMessages.map(messageEntry => (
+                        <Alert
+                            key={messageEntry.key}
+                            type={messageEntry.type}
+                            message={
+                                <span className="text-xs font-medium text-gray-800">
+                                    {messageEntry.text}
+                                </span>
+                            }
+                            showIcon
+                            className={`mcp-tool-message ${
+                                messageEntry.type === 'info'
+                                    ? 'mcp-tool-message-info'
+                                    : 'mcp-tool-message-warning'
+                            }`}
+                            banner={messageEntry.type === 'warning'}
+                        />
+                    ))}
                 </div>
             )}
 

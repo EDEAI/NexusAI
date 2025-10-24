@@ -6,10 +6,17 @@
 import useChatroomStore from '@/store/chatroomstate';
 import { useIntl } from '@umijs/max';
 import { ContentBlock } from '../types';
-import { MCPToolRuntimeData, MCPToolStatus, WorkflowConfirmationStatus } from '../types/mcp';
+import {
+    MCPToolRuntimeData,
+    MCPToolStatus,
+    WorkflowConfirmationStatus,
+    MCPToolMessage,
+    MCPToolMessageType,
+} from '../types/mcp';
 import { hasMessageContent } from '../utils';
 import { parseMCPContent, reconstructContentWithUpdatedMCPTools } from '../utils/mcpParser';
 import { useChatRoomContext } from '../context/ChatRoomContext';
+import { useEffect, useRef } from 'react';
 
 export const useMessageHandler = (
     setDisableInput: any,
@@ -32,6 +39,8 @@ export const useMessageHandler = (
 ) => {
     const intl = useIntl();
     const setTruncatable = useChatroomStore(state => state.setTruncatable);
+    const infoMessageTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+    const latestGetMCPToolRef = useRef<typeof getMCPTool>(getMCPTool);
 
    
 
@@ -203,6 +212,17 @@ export const useMessageHandler = (
             return contentBlocks;
         }
     };
+
+    useEffect(() => {
+        return () => {
+            Object.values(infoMessageTimers.current).forEach(timer => clearTimeout(timer));
+            infoMessageTimers.current = {};
+        };
+    }, []);
+
+    useEffect(() => {
+        latestGetMCPToolRef.current = getMCPTool;
+    }, [getMCPTool]);
 
     const messageHandlers = {
         ERROR: (data: any) => {
@@ -379,6 +399,53 @@ export const useMessageHandler = (
 
             // Create MCP block in contentBlocks for ordered rendering
             createMCPBlock(id);
+        },
+
+        SHOWTOOLMSG: (data: any) => {
+            if (!data) return;
+            const { id, type, msg } = data;
+            if (id === undefined || !type || !msg) {
+                return;
+            }
+
+            const messageType = (type as MCPToolMessageType) || 'info';
+            const messageKey = `runtime-${id}-${Date.now()}-${Math.random()}`;
+            const newMessage: MCPToolMessage = {
+                key: messageKey,
+                type: messageType,
+                text: msg,
+                createdAt: Date.now(),
+                transient: messageType === 'info',
+                source: 'runtime',
+            };
+
+            const existingTool = getMCPTool ? getMCPTool(id) : null;
+            const existingMessages = existingTool?.messages || [];
+            const updatedMessages = [...existingMessages, newMessage];
+
+            updateMCPToolState(id, {
+                messages: updatedMessages,
+                ...(messageType === 'warning' ? { msg } : {}),
+            });
+
+            if (messageType === 'info') {
+                const timeoutId = setTimeout(() => {
+                    const currentToolGetter = latestGetMCPToolRef.current;
+                    const currentTool = currentToolGetter ? currentToolGetter(id) : null;
+                    if (!currentTool?.messages) return;
+                    const filteredMessages = currentTool.messages.filter(
+                        messageEntry =>
+                            messageEntry.key !== messageKey || messageEntry.type !== 'info',
+                    );
+                    if (filteredMessages.length === currentTool.messages.length) {
+                        return;
+                    }
+                    updateMCPToolState(id, { messages: filteredMessages });
+                    delete infoMessageTimers.current[messageKey];
+                }, 3000);
+
+                infoMessageTimers.current[messageKey] = timeoutId;
+            }
         },
 
         WITHMCPTOOLRESULT: (data: any) => {

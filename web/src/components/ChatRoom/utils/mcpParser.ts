@@ -1,7 +1,14 @@
 /*
  * @LastEditors: biz
  */
-import { MCPToolData, ContentBlock, ParsedMCPContent, MCPToolRuntimeData, MCPToolStatus, getMCPToolStatus } from '../types/mcp';
+import {
+    MCPToolData,
+    ContentBlock,
+    ParsedMCPContent,
+    MCPToolRuntimeData,
+    MCPToolStatus,
+    getMCPToolStatus,
+} from '../types/mcp';
 import { ContentBlock as StreamingContentBlock } from '../types';
 import { FileToUpload } from '../types/fileUpload';
 
@@ -79,7 +86,8 @@ export const extractMCPTools = (content: string): { toolData: MCPToolData; start
                 workflow_confirmation_status: rawData.workflow_confirmation_status || null,
                 args: rawData.args || {},
                 result: rawData.result || null,
-                files_to_upload: processedFilesToUpload
+                files_to_upload: processedFilesToUpload,
+                msg: rawData.msg || undefined
             };
             
             // Debug logging for file data extraction
@@ -275,7 +283,8 @@ export const serializeMCPToolToContent = (toolData: MCPToolRuntimeData): string 
             workflow_confirmation_status: toolData.workflow_confirmation_status,
             args: toolData.args,
             result: toolData.result,
-            files_to_upload: toolData.files_to_upload
+            files_to_upload: toolData.files_to_upload,
+            msg: toolData.msg
         };
         
         const jsonContent = JSON.stringify(mcpToolData, null, 0);
