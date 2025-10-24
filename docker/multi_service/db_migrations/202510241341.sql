@@ -8,13 +8,13 @@ INSERT INTO `models` (`id`, `supplier_id`, `name`, `type`, `mode`, `max_context_
 -- Add model configurations for all teams
 -- Claude Sonnet 4.5 (sort_order = 90)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 87, '{"top_k": null, "top_p": null, "timeout": null, "streaming": false, "model_name": "claude-sonnet-4-5-20250929", "max_retries": 2, "temperature": null, "model_kwargs": {}, "default_headers": null, "anthropic_api_url": null, "max_tokens_to_sample": 32000}', 
+SELECT NULL, t.id, 87, '{"top_k": null, "top_p": null, "timeout": null, "streaming": false, "model_name": "claude-sonnet-4-5", "max_retries": 2, "temperature": null, "model_kwargs": {}, "default_headers": null, "anthropic_api_url": null, "max_tokens_to_sample": 32000}', 
        0, 90, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
 -- Claude Haiku 4.5 (sort_order = 91)
 INSERT INTO `model_configurations` (`id`, `team_id`, `model_id`, `config`, `default_used`, `sort_order`, `created_time`, `updated_time`, `status`) 
-SELECT NULL, t.id, 88, '{"top_k": null, "top_p": null, "timeout": null, "streaming": false, "model_name": "claude-haiku-4-5-20251001", "max_retries": 2, "temperature": null, "model_kwargs": {}, "default_headers": null, "anthropic_api_url": null, "max_tokens_to_sample": 32000}', 
+SELECT NULL, t.id, 88, '{"top_k": null, "top_p": null, "timeout": null, "streaming": false, "model_name": "claude-haiku-4-5", "max_retries": 2, "temperature": null, "model_kwargs": {}, "default_headers": null, "anthropic_api_url": null, "max_tokens_to_sample": 32000}', 
        0, 91, CURRENT_TIMESTAMP, NULL, 1
 FROM teams t;
 
