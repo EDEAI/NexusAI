@@ -574,17 +574,24 @@ class Chatroom:
             {'column': 'id', 'value': mcp_tool_use_id},
             mcp_tool_use_update_data
         )
+        if mcp_tool_use['result_is_truncated']:
+            await self._ws_manager.send_instruction(
+                self._chatroom_id,
+                'SHOWTOOLMSG',
+                {
+                    'id': mcp_tool_use['id'],
+                    'type': 'warning',
+                    'msg': get_language_content('msg_mcp_tool_result_is_truncated', uid=self._user_id).format(
+                        length=MCP_TOOL_RESULT_MAX_LEN
+                    )
+                }
+            )
         await self._ws_manager.send_instruction(
             self._chatroom_id,
             'WITHMCPTOOLRESULT',
             {
                 'id': mcp_tool_use_id,
-                'result': result,
-                'msg': (
-                    get_language_content('msg_mcp_tool_result_is_truncated', uid=self._user_id).format(
-                        length=MCP_TOOL_RESULT_MAX_LEN
-                    ) if mcp_tool_use['result_is_truncated'] else ''
-                )
+                'result': result
             }
         )
         if workflow_run_id := mcp_tool_use['workflow_run_id']:
@@ -876,6 +883,7 @@ class Chatroom:
                                     'SHOWTOOLMSG',
                                     {
                                         'id': mcp_tool_use['id'],
+                                        'type': 'info',
                                         'msg': get_language_content('msg_preparing_environment', uid=self._user_id)
                                     }
                                 )
