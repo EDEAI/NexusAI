@@ -8,6 +8,9 @@ import _ from 'lodash';
 import { useEffect, useMemo, useRef } from 'react';
 import CodeEditor from '../Editor/CodeEditor';
 import { UploadDragger } from '../Form/Upload';
+import ReactMarkdown from 'react-markdown';
+import rehypeHighlight from 'rehype-highlight';
+import remarkGfm from 'remark-gfm';
 
 interface InputVariable {
     name: string;
@@ -16,6 +19,7 @@ interface InputVariable {
     sort_order?: number;
     display_name?: string;
     value?: any;
+    description?: string;
 }
 
 interface RenderInputProps {
@@ -29,6 +33,20 @@ export const RenderInput = ({ data, fileMultiple = false }: RenderInputProps) =>
     const inputs = data;
     if (!inputs || _.isEmpty(inputs)) return null;
 
+    const renderDescription = (description?: string) => {
+        if (!description) return null;
+        return (
+            <div className="text-xs text-gray-600 mb-2 markdown-body">
+                <ReactMarkdown
+                    rehypePlugins={[rehypeHighlight]}
+                    remarkPlugins={[remarkGfm]}
+                >
+                    {description}
+                </ReactMarkdown>
+            </div>
+        );
+    };
+
     return (
         <div>
             <Typography.Title level={5}>
@@ -41,32 +59,36 @@ export const RenderInput = ({ data, fileMultiple = false }: RenderInputProps) =>
                 .map((val: any) => {
                     if (val.type === 'number') {
                         return (
-                            <ProFormDigit
-                                key={val.name}
-                                required={val.required}
-                                rules={[
-                                    {
-                                        required: val.required,
-                                        message: intl.formatMessage({
-                                            id: 'workflow.form.parameter.required',
-                                        }),
-                                    },
-                                ]}
-                                name={val.name}
-                                initialValue={val.value}
-                                label={val.display_name || val.name}
-                            />
+                            <div key={val.name} className="mb-4">
+                                {renderDescription(val.description)}
+                                <ProFormDigit
+                                    required={val.required}
+                                    rules={[
+                                        {
+                                            required: val.required,
+                                            message: intl.formatMessage({
+                                                id: 'workflow.form.parameter.required',
+                                            }),
+                                        },
+                                    ]}
+                                    name={val.name}
+                                    initialValue={val.value}
+                                    label={val.display_name || val.name}
+                                />
+                            </div>
                         );
                     }
                     if (val.type === 'file') {
                         return (
-                            <UploadDragger
-                                key={val.name}
-                                name={val.name}
-                                label={val.display_name || val.name}
-                                required={val.required}
-                                multiple={fileMultiple}
-                            />
+                            <div key={val.name} className="mb-4">
+                                {renderDescription(val.description)}
+                                <UploadDragger
+                                    name={val.name}
+                                    label={val.display_name || val.name}
+                                    required={val.required}
+                                    multiple={fileMultiple}
+                                />
+                            </div>
                         );
                     }
                     if (val.type === 'json') {
@@ -108,7 +130,8 @@ export const RenderInput = ({ data, fileMultiple = false }: RenderInputProps) =>
                         };
 
                         return (
-                            <div key={val.name}>
+                            <div key={val.name} className="mb-4">
+                                {renderDescription(val.description)}
                                 <Typography.Title level={5}>
                                     {val.display_name || val.name}
                                     {val.required && <span className="text-red-500 ml-1">*</span>}
@@ -150,21 +173,23 @@ export const RenderInput = ({ data, fileMultiple = false }: RenderInputProps) =>
                         );
                     }
                     return (
-                        <ProFormTextArea
-                            key={val.name}
-                            required={val.required}
-                            rules={[
-                                {
-                                    required: val.required,
-                                    message: intl.formatMessage({
-                                        id: 'workflow.form.parameter.required',
-                                    }),
-                                },
-                            ]}
-                            name={val.name}
-                            initialValue={val.value}
-                            label={val.display_name || val.name}
-                        />
+                        <div key={val.name} className="mb-4">
+                            {renderDescription(val.description)}
+                            <ProFormTextArea
+                                required={val.required}
+                                rules={[
+                                    {
+                                        required: val.required,
+                                        message: intl.formatMessage({
+                                            id: 'workflow.form.parameter.required',
+                                        }),
+                                    },
+                                ]}
+                                name={val.name}
+                                initialValue={val.value}
+                                label={val.display_name || val.name}
+                            />
+                        </div>
                     );
                 })}
         </div>

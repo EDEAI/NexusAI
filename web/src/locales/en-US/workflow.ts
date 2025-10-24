@@ -317,6 +317,8 @@ export default {
     'workflow.vars.isRequired': 'Is Required',
     'workflow.vars.noVariables': 'No Variables',
     'workflow.vars.addVariable': 'Add Variable',
+    'workflow.vars.description': 'Variable Description',
+    'workflow.vars.description.placeholder': 'Add usage notes, formats, or examples for this variable (Markdown supported)',
 
     'workflow.needHumanConfirm': 'Pending',
     'workflow.noHumanConfirm': 'Human confirmation processed',

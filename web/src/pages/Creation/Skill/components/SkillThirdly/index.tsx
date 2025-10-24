@@ -64,6 +64,9 @@ const SkillThirdly: React.FC<ChildProps> = ({
                 item.content,
                 false,
             );
+            if (item.description !== undefined) {
+                variable.description = item.description;
+            }
             input_variables.addProperty(item.name, variable);
         });
         const data = {
@@ -157,6 +160,7 @@ const SkillThirdly: React.FC<ChildProps> = ({
                                             Skillinfo?.output_variables?.properties || {},
                                         )}
                                         onChange={handleVariableChange}
+                                        showDescription
                                     />
                                 </div>
                             )}

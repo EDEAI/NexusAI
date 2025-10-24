@@ -6,6 +6,9 @@ import { useIntl } from '@umijs/max';
 import { Button, Form, Input, message, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
+import ReactMarkdown from 'react-markdown';
+import rehypeHighlight from 'rehype-highlight';
+import remarkGfm from 'remark-gfm';
 
 
 interface ChildProps {
@@ -53,6 +56,9 @@ const SkillFourthly: React.FC<ChildProps> = ({
                     item.content,
                     item.status,
                 );
+                if (item.description !== undefined) {
+                    variable.description = item.description;
+                }
                 input_variables.addProperty(item.name, variable);
             });
             const param = {
@@ -112,54 +118,71 @@ const SkillFourthly: React.FC<ChildProps> = ({
                     {(fields, {}) => (
                         <>
                             <div className="mb-[30px]">
-                                {fields.map(({ key, name, ...restField }) => (
-                                    <div className="w-full h-20 flex justify-start  px-2.5 border-b border-x pt-7 last:rounded-b-lg">
-                                        <Form.Item {...restField} name={[name, 'content']}>
-                                            <Input
-                                                className="w-48 mr-5"
-                                                style={{
-                                                    color: '#213044',
-                                                    fontWeight: '400',
-                                                    fontSize: '12px',
-                                                }}
-                                                variant="borderless"
-                                                disabled
-                                            />
-                                        </Form.Item>
-                                        <Form.Item
-                                            {...restField}
-                                            name={[name, 'value']}
-                                            rules={[
-                                                {
-                                                    required:
-                                                        Fourthlyref.getFieldsValue() &&
-                                                        Fourthlyref.getFieldsValue().users[key]
-                                                            .status == true
-                                                            ? true
-                                                            : false,
-                                                    message: intl.formatMessage({
-                                                        id: 'skill.message.variantcontent',
-                                                    }),
-                                                },
-                                            ]}
+                                {fields.map(({ key, name, ...restField }) => {
+                                    const users = Fourthlyref.getFieldsValue()?.users || [];
+                                    const currentUser = users[key] || {};
+                                    const description = currentUser.description;
+                                    const isRequired = currentUser.status == true;
+                                    return (
+                                        <div
+                                            key={key}
+                                            className="w-full flex flex-col px-2.5 border-b border-x pt-7 last:rounded-b-lg"
                                         >
-                                            <Input
-                                                placeholder={
-                                                    Fourthlyref.getFieldsValue() &&
-                                                    Fourthlyref.getFieldsValue().users[key]
-                                                        .status == true
-                                                        ? intl.formatMessage({
-                                                              id: 'skill.variantcontent.required',
-                                                          })
-                                                        : intl.formatMessage({
-                                                              id: 'skill.variantcontent',
-                                                          })
-                                                }
-                                                style={{ width: '660px' }}
-                                            />
-                                        </Form.Item>
-                                    </div>
-                                ))}
+                                            <div className="flex justify-start">
+                                                <Form.Item {...restField} name={[name, 'description']} hidden>
+                                                    <Input type="hidden" />
+                                                </Form.Item>
+                                                <Form.Item {...restField} name={[name, 'content']}>
+                                                    <Input
+                                                        className="w-48 mr-5"
+                                                        style={{
+                                                            color: '#213044',
+                                                            fontWeight: '400',
+                                                            fontSize: '12px',
+                                                        }}
+                                                        variant="borderless"
+                                                        disabled
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, 'value']}
+                                                    rules={[
+                                                        {
+                                                            required: isRequired,
+                                                            message: intl.formatMessage({
+                                                                id: 'skill.message.variantcontent',
+                                                            }),
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Input
+                                                        placeholder={
+                                                            isRequired
+                                                                ? intl.formatMessage({
+                                                                      id: 'skill.variantcontent.required',
+                                                                  })
+                                                                : intl.formatMessage({
+                                                                      id: 'skill.variantcontent',
+                                                                  })
+                                                        }
+                                                        style={{ width: '660px' }}
+                                                    />
+                                                </Form.Item>
+                                            </div>
+                                            {description ? (
+                                                <div className="w-full text-xs text-[#555] pb-4 pr-5 markdown-body">
+                                                    <ReactMarkdown
+                                                        rehypePlugins={[rehypeHighlight]}
+                                                        remarkPlugins={[remarkGfm]}
+                                                    >
+                                                        {description}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </>
                     )}

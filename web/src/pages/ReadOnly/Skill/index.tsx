@@ -130,9 +130,19 @@ const Skill: React.FC = () => {
                               type: item.type,
                               content: item.display_name,
                               status: item.required,
+                              description: item.description,
                           };
                       })
-                    : [{ name: '', content: '', output_format: 0, status: true, type: 'string' }],
+                    : [
+                          {
+                              name: '',
+                              content: '',
+                              output_format: 0,
+                              status: true,
+                              type: 'string',
+                              description: '',
+                          },
+                      ],
         };
         return codeData;
     };
@@ -219,6 +229,9 @@ const Skill: React.FC = () => {
                 item.content, //display_name
                 item.status ? item.status : false, //required
             );
+            if (item.description !== undefined) {
+                variable.description = item.description;
+            }
             input_variables.addProperty(item.name, variable);
         });
         return input_variables;

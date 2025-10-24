@@ -163,6 +163,7 @@ const ResultDisplay = memo(
                                     title={intl.formatMessage({ id: 'skill.result.input.variables' })}
                                     onChange={handleVariableChange('input')}
                                     variableTypes={['string', 'number', 'json']}
+                                    showDescription
                                 />
                             </div>
                             {/* <div className="h-80 mt-4">
@@ -232,6 +233,7 @@ const ResultDisplay = memo(
                                 title={intl.formatMessage({ id: 'skill.result.output.variables' })}
                                 onChange={handleVariableChange('output')}
                                 variableTypes={['string', 'number', 'json','file']}
+                                showDescription
                             />
                         </div>
 

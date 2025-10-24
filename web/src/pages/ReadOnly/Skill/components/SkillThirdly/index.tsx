@@ -48,6 +48,9 @@ const SkillThirdly: React.FC<ChildProps> = ({
                 item.content,
                 false,
             );
+            if (item.description !== undefined) {
+                variable.description = item.description;
+            }
             input_variables.addProperty(item.name, variable);
         });
         const data = {

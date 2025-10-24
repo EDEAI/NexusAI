@@ -251,7 +251,6 @@ const CreationModal: React.FC<ChildProps> = ({
                         </p>
                         <TextArea
                             showCount
-                            maxLength={2000}
                             rows={4}
                             placeholder={intl.formatMessage({
                                 id: 'creation.placeholder.appdescribe',

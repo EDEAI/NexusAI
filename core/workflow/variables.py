@@ -22,7 +22,8 @@ class Variable:
         required: Optional[bool] = None,
         max_length: Optional[int] = None,
         sort_order: int = 0,
-        sub_type: Optional[str] = None
+        sub_type: Optional[str] = None,
+        description: Optional[str] = None
     ):
         """
         Initializes a Variable object.
@@ -52,13 +53,15 @@ class Variable:
             self.sub_type = sub_type
         else:
             self.sub_type = None
+        if description is not None:
+            self.description = description
         
         if self.type == "string":
             if max_length is None:
                 self.max_length = 0
             else:
                 self.max_length = max_length
-            if self.max_length > 0 and len(self.value) > self.max_length:
+            if self.max_length > 0 and self.value is not None and len(self.value) > self.max_length:
                 raise ValueError(f"Value exceeds maximum length of {self.max_length}")
 
     def to_dict(self) -> Dict[str, Any]:
@@ -81,6 +84,8 @@ class Variable:
             data["max_length"] = self.max_length
         if hasattr(self, "sub_type"):
             data["sub_type"] = self.sub_type
+        if hasattr(self, "description"):
+            data["description"] = self.description
         return data
         
     def to_string(self) -> str:
@@ -304,6 +309,8 @@ def create_variable_from_dict(data: Dict[str, Any]) -> VariableTypes:
         return arr_var
     else:
         kwargs["type"] = data["type"]
+        if "description" in data:
+            kwargs["description"] = data["description"]
         return Variable(**kwargs, value=data.get("value"))
     
 def validate_required_variable(variable: VariableTypes):
@@ -637,7 +644,8 @@ def create_object_variable_from_list(data: List[Dict[str, Any]], name: str = "ro
             required=var_def.get("required", False),
             max_length=var_def.get("max_length", 0),
             sort_order=var_def.get("sort_order", 0),
-            sub_type=var_def.get("sub_type")
+            sub_type=var_def.get("sub_type"),
+            description=var_def.get("description")
         )
         obj_var.add_property(var_def["name"], variable)
     

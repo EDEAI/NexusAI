@@ -4,7 +4,7 @@
 import { Variable as FlowVariable, ObjectVariable } from '@/py2js/variables.js';
 import { DeleteOutlined, EditOutlined, FileOutlined, FunctionOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
-import { ProForm, ProFormRadio, ProFormSwitch, ProFormText } from '@ant-design/pro-components';
+import { ProForm, ProFormRadio, ProFormSwitch, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { useHover, useResetState, useUpdateEffect } from 'ahooks';
 import { Button, Modal } from 'antd';
@@ -17,6 +17,7 @@ interface VariableItem {
     max_length?: number;
     required: boolean | 0 | 1;
     type: string;
+    description?: string;
 }
 
 interface VariableList {
@@ -25,6 +26,7 @@ interface VariableList {
     title?: React.ReactNode;
     variableTypes?: ('string' | 'number' | 'json' | 'file')[];
     readonly?: boolean;
+    showDescription?: boolean;
 }
 
 type VariableProps = VariableItem & {
@@ -98,12 +100,14 @@ export default memo((props: VariableList) => {
         max_length: 48,
         required: true,
         type: 'string',
+        description: '',
     });
     const formRef = useRef<ProFormInstance>();
     const [variables, setVariables] = useState<VariableItem[]>(props.variables || []);
     const isHydratingRef = useRef(false);
     const latestVariablesRef = useRef<VariableItem[]>(props.variables || []);
     const readonly = props.readonly || false;
+    const showDescription = props.showDescription ?? false;
 
     useEffect(() => {
         latestVariablesRef.current = variables;
@@ -129,6 +133,8 @@ export default memo((props: VariableList) => {
                 item.display_name,
                 item.required,
                 item.max_length,
+                item.sort_order,
+                showDescription ? item.description : undefined,
             );
             flowObjectVariable.addProperty(item.name, variable);
         });
@@ -175,6 +181,9 @@ export default memo((props: VariableList) => {
         const item = variables[index];
         if(!item.required){
             item.required = false
+        }
+        if(showDescription && item.description === undefined){
+            item.description = '';
         }
         formRef.current?.setFieldsValue(item);
         setIsModalOpen(true);
@@ -319,6 +328,25 @@ export default memo((props: VariableList) => {
                         name={'required'}
                         label={intl.formatMessage({ id: 'workflow.vars.isRequired' })}
                     ></ProFormSwitch>
+                    {showDescription && (
+                        <ProFormTextArea
+                            name={'description'}
+                            label={intl.formatMessage({
+                                id: 'workflow.vars.description',
+                                defaultMessage: 'Variable Description',
+                            })}
+                            placeholder={intl.formatMessage({
+                                id: 'workflow.vars.description.placeholder',
+                                defaultMessage: 'Add usage notes, formats, or examples (Markdown supported)',
+                            })}
+                            fieldProps={{
+                                allowClear: true,
+                                showCount: true,
+                                rows: 4,
+                                className: 'resize-y'
+                            }}
+                        />
+                    )}
                 </ProForm>
             </Modal>
         </>
