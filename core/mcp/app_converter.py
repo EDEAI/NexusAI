@@ -74,7 +74,7 @@ def skill_to_mcp_tool(skill_data: Dict[str, Any]) -> Dict[str, Any]:
             base_desc = var_info.get("display_name", var_info.get("name", f"Input variable {var_name}"))
             extra_desc = var_info.get("description", "")
             if extra_desc:
-                description = f"{base_desc} - {extra_desc}"
+                description = f"{base_desc}\n{extra_desc}"
             else:
                 description = base_desc
             
