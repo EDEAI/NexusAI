@@ -9,6 +9,7 @@ import { useIntl } from '@umijs/max';
 import { useHover, useResetState, useUpdateEffect } from 'ahooks';
 import { Button, Modal } from 'antd';
 import { memo, useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import isEqual from 'lodash/isEqual';
 
 interface VariableItem {
@@ -27,6 +28,7 @@ interface VariableList {
     variableTypes?: ('string' | 'number' | 'json' | 'file')[];
     readonly?: boolean;
     showDescription?: boolean;
+    renderSuffix?: (item: VariableItem) => ReactNode;
 }
 
 type VariableProps = VariableItem & {
@@ -34,6 +36,7 @@ type VariableProps = VariableItem & {
     onDel: () => void;
     key: number;
     readonly?: boolean;
+    suffix?: React.ReactNode;
 };
 
 const Variable = memo((props: VariableProps) => {
@@ -73,19 +76,20 @@ const Variable = memo((props: VariableProps) => {
                         ></Button>
                     </div>
                 ) : (
-                    <div className="flex items-center gap-2 ">
-                        {(props.required || props.required == 1) && (
-                            <div className="text-slate-500 text-xs">
-                                {intl.formatMessage({
-                                    id: 'workflow.vars.required',
+            <div className="flex items-center gap-2 ">
+                {(props.required || props.required == 1) && (
+                    <div className="text-slate-500 text-xs">
+                        {intl.formatMessage({
+                            id: 'workflow.vars.required',
                                     defaultMessage: '',
                                 })}
-                            </div>
-                        )}
-                        <div>{typeObject[props.type] || props.type}</div>
                     </div>
                 )}
+                <div>{typeObject[props.type] || props.type}</div>
+                {props.suffix}
             </div>
+        )}
+    </div>
         </div>
     );
 });
@@ -233,6 +237,7 @@ export default memo((props: VariableList) => {
                                 readonly={readonly}
                                 onEdit={() => editVariable(index)}
                                 onDel={() => delVariable(index)}
+                                suffix={props.renderSuffix?.(item)}
                             ></Variable>
                         ))
                     )}
