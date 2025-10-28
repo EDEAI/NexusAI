@@ -144,6 +144,11 @@ class Workflows(MySQL):
                             info_data = node.get("data", {}).get("infoData", {})
                             skill_app_id = info_data.get("app_id")
                             skill_user_id = info_data.get("user_id")
+                            print(11111111111111111111111111111111111111111111111111111111111111111111111)
+                            print(skill_app_id)
+                            print(skill_user_id)
+                            print(uid)
+                            print(11111111111111111111111111111111111111111111111111111111111111111111111)
                             
                             # If user_id matches uid, skip processing (show code)
                             if skill_user_id == uid:
@@ -155,9 +160,13 @@ class Workflows(MySQL):
                                     columns=["attrs_are_visible"],
                                     conditions=[{"column": "id", "value": skill_app_id}]
                                 )
-                                
+                                print('****************************123*********************************')
+                                print(app_info)
+                                print(app_info.get("attrs_are_visible"))
+                                print('****************************123*********************************')
                                 # If attrs_are_visible == 0, clear the code field
                                 if app_info and app_info.get("attrs_are_visible") == 0:
+                                    print('****************************456*********************************')
                                     if "code" in info_data:
                                         info_data["code"] = ""
                 
