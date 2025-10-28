@@ -165,12 +165,18 @@ class Workflows(MySQL):
                                 print('****************************123*********************************')
                                 print(app_info)
                                 print(app_info.get("attrs_are_visible"))
+                                print(info_data.get("code"))
                                 print('****************************123*********************************')
                                 # If attrs_are_visible == 0, clear the code field
-                                if app_info and app_info.get("attrs_are_visible") == 0:
-                                    print('****************************456*********************************')
-                                    if "code" in info_data:
-                                        info_data["code"] = ""
+                                if app_info:
+                                    if app_info.get("attrs_are_visible") == 0:
+                                        print('****************************456*********************************')
+                                        if "code" in info_data:
+                                            info_data["code"] = ""
+                                    else:
+                                        print('****************************789*********************************')
+                                        if "code" in info_data:
+                                            info_data["code"] = info_data.get("code")
                 
                 # Update workflows graph with processed data
                 workflows["graph"] = json.dumps(graph_data) if isinstance(workflows["graph"], str) else graph_data
