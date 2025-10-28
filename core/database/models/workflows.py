@@ -150,31 +150,18 @@ class Workflows(MySQL):
                                 columns=["user_id","attrs_are_visible"],
                                 conditions=[{"column": "id", "value": skill_app_id}]
                             )
-                            print(11111111111111111111111111111111111111111111111111111111111111111111111)
-                            print(skill_app_id)
-                            print(app_info)
-                            print(uid)
-                            print(11111111111111111111111111111111111111111111111111111111111111111111111)
                             
                             # If user_id matches uid, skip processing (show code)
                             if app_info.get("user_id") == uid:
                                 continue
                             
                             if skill_app_id:
-                                
-                                print('****************************123*********************************')
-                                print(app_info)
-                                print(app_info.get("attrs_are_visible"))
-                                print(info_data.get("code"))
-                                print('****************************123*********************************')
                                 # If attrs_are_visible == 0, clear the code field
                                 if app_info:
                                     if app_info.get("attrs_are_visible") == 0:
-                                        print('****************************456*********************************')
                                         if "code" in info_data:
                                             info_data["code"] = ""
                                     else:
-                                        print('****************************789*********************************')
                                         if "code" in info_data:
                                             skill_model = CustomTools()
                                             app_info = skill_model.select_one(
