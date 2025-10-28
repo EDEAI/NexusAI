@@ -152,7 +152,7 @@ class Workflows(MySQL):
                             )
                             print(11111111111111111111111111111111111111111111111111111111111111111111111)
                             print(skill_app_id)
-                            print(skill_user_id)
+                            print(app_info)
                             print(uid)
                             print(11111111111111111111111111111111111111111111111111111111111111111111111)
                             
