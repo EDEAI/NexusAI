@@ -3,6 +3,10 @@ import { Tooltip, Empty, Spin } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import UserCon from '../UserCon';
 import { getLocale } from '@umijs/max';
+import {
+    renderWorkflowTooltip,
+    workflowTooltipOverlayStyle,
+} from '../tooltipUtils';
 
 interface NodeItemProps {
     item: {
@@ -38,7 +42,11 @@ interface ToolNodeItemProps extends NodeItemProps {
 }
 
 export const ToolNodeItem = memo(({ item, onDragStart, description }: ToolNodeItemProps) => (
-    <Tooltip placement="right" title={description}>
+    <Tooltip
+        placement="right"
+        title={renderWorkflowTooltip(description)}
+        overlayInnerStyle={workflowTooltipOverlayStyle}
+    >
         <NodeItem item={item} onDragStart={onDragStart} />
     </Tooltip>
 ));
@@ -92,7 +100,11 @@ export const ToolsNodeList = memo(({ items, onDragStart }: ToolsNodeListProps) =
                 <div key={index}>
                     <div className="text-[#333333] mb-2">
                         {category?.identity?.label[lang]}
-                        <Tooltip placement="right" title={category?.identity?.description[lang]}>
+                        <Tooltip
+                            placement="right"
+                            title={renderWorkflowTooltip(category?.identity?.description[lang])}
+                            overlayInnerStyle={workflowTooltipOverlayStyle}
+                        >
                             <QuestionCircleOutlined className="cursor-pointer ml-1" />
                         </Tooltip>
                     </div>

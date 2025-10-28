@@ -12,6 +12,10 @@ import { EDGE_COLOR, NOT_RUN_NODE_TYPE } from '../../config';
 import useStore from '../../store';
 import { BlockEnum } from '../../types';
 import { NodeCustom } from '../nodeDisperse';
+import {
+    renderWorkflowTooltip,
+    workflowTooltipOverlayStyle,
+} from '../../components/tooltipUtils';
 const { Text } = Typography;
 export default memo(
     forwardRef((props: NodeProps & { children: any }) => {
@@ -76,7 +80,12 @@ export default memo(
                         {desc && (
                             <div className="px-1 py-2">
                                 <Text
-                                    ellipsis={{ tooltip: desc }}
+                                    ellipsis={{
+                                        tooltip: {
+                                            title: renderWorkflowTooltip(desc),
+                                            overlayInnerStyle: workflowTooltipOverlayStyle,
+                                        },
+                                    }}
                                     className=" text-xs text-slate-500 break-all"
                                 >
                                     {desc}
