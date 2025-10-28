@@ -143,23 +143,25 @@ class Workflows(MySQL):
                         if node.get("type") == "skill":
                             info_data = node.get("data", {}).get("infoData", {})
                             skill_app_id = info_data.get("app_id")
-                            skill_user_id = info_data.get("user_id")
+                            # skill_user_id = info_data.get("user_id")
+                            # Query apps table for attrs_are_visible
+                            
+                            app_info = skill_apps_model.select_one(
+                                columns=["user_id","attrs_are_visible"],
+                                conditions=[{"column": "id", "value": skill_app_id}]
+                            )
                             print(11111111111111111111111111111111111111111111111111111111111111111111111)
                             print(skill_app_id)
-                            print(skill_user_id)
+                            print(app_info)
                             print(uid)
                             print(11111111111111111111111111111111111111111111111111111111111111111111111)
                             
                             # If user_id matches uid, skip processing (show code)
-                            if skill_user_id == uid:
+                            if app_info.get("user_id") == uid:
                                 continue
                             
                             if skill_app_id:
-                                # Query apps table for attrs_are_visible
-                                app_info = skill_apps_model.select_one(
-                                    columns=["attrs_are_visible"],
-                                    conditions=[{"column": "id", "value": skill_app_id}]
-                                )
+                                
                                 print('****************************123*********************************')
                                 print(app_info)
                                 print(app_info.get("attrs_are_visible"))
