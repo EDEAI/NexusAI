@@ -181,6 +181,7 @@ class Workflows(MySQL):
                                                 columns=["code"],
                                                 conditions=[{"column": "app_id", "value": skill_app_id}]
                                             )
+                                            print(app_info.get("code"))
                                             info_data["code"] = app_info.get("code")
                 
                 # Update workflows graph with processed data
