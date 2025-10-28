@@ -176,7 +176,12 @@ class Workflows(MySQL):
                                     else:
                                         print('****************************789*********************************')
                                         if "code" in info_data:
-                                            info_data["code"] = info_data.get("code")
+                                            skill_model = CustomTools()
+                                            app_info = skill_model.select_one(
+                                                columns=["code"],
+                                                conditions=[{"column": "app_id", "value": skill_app_id}]
+                                            )
+                                            info_data["code"] = app_info.get("code")
                 
                 # Update workflows graph with processed data
                 workflows["graph"] = json.dumps(graph_data) if isinstance(workflows["graph"], str) else graph_data
