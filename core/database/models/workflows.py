@@ -143,6 +143,11 @@ class Workflows(MySQL):
                         if node.get("data", {}).get("entitle") == "Skill":
                             info_data = node.get("data", {}).get("infoData", {})
                             skill_app_id = info_data.get("app_id")
+                            skill_user_id = info_data.get("user_id")
+                            
+                            # If user_id matches uid, skip processing (show code)
+                            if skill_user_id == uid:
+                                continue
                             
                             if skill_app_id:
                                 # Query apps table for attrs_are_visible
