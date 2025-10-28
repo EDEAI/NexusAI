@@ -127,6 +127,42 @@ class Workflows(MySQL):
         if workflows["user_id"] != uid and workflows["status"] != 1:
             return {"status": 2, "message": "The workflow status is not normal"}
 
+        # Process graph field to filter skill nodes based on attrs_are_visible
+        if workflows.get("graph"):
+            import json
+            try:
+                graph_data = json.loads(workflows["graph"]) if isinstance(workflows["graph"], str) else workflows["graph"]
+                
+                # Process views.nodes
+                if "views" in graph_data and "nodes" in graph_data["views"]:
+                    from core.database.models.apps import Apps
+                    apps_model = Apps()
+                    
+                    for node in graph_data["views"]["nodes"]:
+                        # Only process Skill nodes
+                        if node.get("data", {}).get("entitle") == "Skill":
+                            info_data = node.get("data", {}).get("infoData", {})
+                            skill_app_id = info_data.get("app_id")
+                            
+                            if skill_app_id:
+                                # Query apps table for attrs_are_visible
+                                app_info = apps_model.select_one(
+                                    columns=["attrs_are_visible"],
+                                    conditions=[{"column": "id", "value": skill_app_id}]
+                                )
+                                
+                                # If attrs_are_visible == 0, clear the code field
+                                if app_info and app_info.get("attrs_are_visible") == 0:
+                                    if "code" in info_data:
+                                        info_data["code"] = ""
+                
+                # Update workflows graph with processed data
+                workflows["graph"] = json.dumps(graph_data) if isinstance(workflows["graph"], str) else graph_data
+                
+            except Exception as e:
+                # If processing fails, keep original graph data
+                pass
+
         data = {
             "app": app,
             "workflow": workflows
