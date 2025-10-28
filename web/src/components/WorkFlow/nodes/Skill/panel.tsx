@@ -7,7 +7,7 @@ import { useIntl } from '@umijs/max';
 import { useLatest } from 'ahooks';
 import { Button, Collapse, Empty, Popover, Space, Typography } from 'antd';
 import _ from 'lodash';
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import CodeEditor from '../../components/Editor/CodeEditor';
 import {
@@ -35,10 +35,14 @@ export default memo(({ node }: { node: AppNode }) => {
 
     // const getVariables = useVariables();
     const [editorOptions, setEditorOptions] = useState([]);
+    useEffect(() => {
+        skillInfo(node);
+    }, []);
+
     useNodeIdUpdate((nodeId, upNode) => {
         if (!upNode) return;
-        skillInfo();
         setNodeInfo(upNode);
+        skillInfo(upNode);
         // const fieldNames = Object.keys(formRef.current.getFieldsValue());
         // fieldNames.forEach((e) => {
         //     formRef.current.setFieldsValue({ [e]: nodeInfo.data[e] });
@@ -53,21 +57,32 @@ export default memo(({ node }: { node: AppNode }) => {
         setEditorOptions(vars);
     });
 
-    const skillInfo = async () => {
-        if (!node.data['baseData']?.app_id) return;
+    const skillInfo = async (currentNode?: AppNode) => {
+        const targetNode = currentNode || node;
+        if (!targetNode.data['baseData']?.app_id) return;
         let res;
-        if (node?.data['infoData']) {
+        if (targetNode?.data['infoData']) {
             res = {
                 code: 0,
-                data: node?.data['infoData'],
+                data: targetNode?.data['infoData'],
             };
         } else {
-            res = await getSkillInfo(node.data['baseData']?.app_id);
+            res = await getSkillInfo(targetNode.data['baseData']?.app_id);
         }
 
         if (res.code == 0) {
-            updateNodeData(node.id, {
+            updateNodeData(targetNode.id, {
                 infoData: res.data,
+            });
+            setNodeInfo(prev => {
+                if (!prev || prev.id !== targetNode.id) return prev;
+                return {
+                    ...prev,
+                    data: {
+                        ...(prev.data || {}),
+                        infoData: res.data,
+                    },
+                };
             });
             if (res.data?.input_variables?.properties) {
                 setInputList(Object.values(res.data?.input_variables?.properties));
@@ -78,15 +93,20 @@ export default memo(({ node }: { node: AppNode }) => {
     const setNodeChange = (addItem: { [key: string]: any }, allValues) => {
         updateNodeData(node.id, allValues);
     };
-    function isValidJson(str) {
-        try {
-            console.log('str', str);
-
-            return JSON.parse(str);
-        } catch (e) {
-            console.error(e);
-            return false;
+    function isValidJson(source) {
+        if (!source) return null;
+        if (typeof source === 'object') {
+            return source;
         }
+        if (typeof source === 'string') {
+            try {
+                return JSON.parse(source);
+            } catch (e) {
+                console.error(e);
+                return null;
+            }
+        }
+        return null;
     }
 
     const skillInfoData = nodeInfo?.data?.infoData;
@@ -290,28 +310,25 @@ export default memo(({ node }: { node: AppNode }) => {
                                                 </Typography.Title>
                                                 {renderVariableCards(extractVariables.outputVariables)}
                                             </div>
-                                            <div>
-                                                <Typography.Title level={5}>
-                                                    {intl.formatMessage({
-                                                        id: 'workflow.label.code',
-                                                        defaultMessage: '',
-                                                    })}
-                                                </Typography.Title>
-                                                <div className="h-80">
-                                                    <CodeEditor
-                                                        language="python3"
-                                                        value={
-                                                            nodeInfo?.data?.infoData?.code &&
-                                                            isValidJson(
-                                                                nodeInfo?.data?.infoData?.code || {},
-                                                            )?.python3
-                                                        }
-                                                        readOnly
-                                                        onChange={() => {}}
-                                                        title={`python3`}
-                                                    ></CodeEditor>
+                                            {skillInfoData?.code && isValidJson(skillInfoData.code)?.python3 ? (
+                                                <div>
+                                                    <Typography.Title level={5}>
+                                                        {intl.formatMessage({
+                                                            id: 'workflow.label.code',
+                                                            defaultMessage: '',
+                                                        })}
+                                                    </Typography.Title>
+                                                    <div className="h-80">
+                                                        <CodeEditor
+                                                            language="python3"
+                                                            value={isValidJson(skillInfoData.code)?.python3}
+                                                            readOnly
+                                                            onChange={() => {}}
+                                                            title={`python3`}
+                                                        ></CodeEditor>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            ) : null}
                                         </Space>
                                     </>
                                 ),
