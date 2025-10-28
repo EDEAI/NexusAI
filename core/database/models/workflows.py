@@ -154,7 +154,7 @@ class Workflows(MySQL):
                                 # If attrs_are_visible == 0, clear the code field
                                 if app_info and app_info.get("attrs_are_visible") == 0:
                                     if "code" in info_data:
-                                        info_data["code"] = ""
+                                        info_data["code"] = "{}"
                 
                 # Update workflows graph with processed data
                 workflows["graph"] = json.dumps(graph_data) if isinstance(workflows["graph"], str) else graph_data
