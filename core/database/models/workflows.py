@@ -140,7 +140,7 @@ class Workflows(MySQL):
                     
                     for node in graph_data["views"]["nodes"]:
                         # Only process Skill nodes
-                        if node.get("data", {}).get("entitle") == "Skill":
+                        if node.get("type") == "skill":
                             info_data = node.get("data", {}).get("infoData", {})
                             skill_app_id = info_data.get("app_id")
                             skill_user_id = info_data.get("user_id")
@@ -159,7 +159,7 @@ class Workflows(MySQL):
                                 # If attrs_are_visible == 0, clear the code field
                                 if app_info and app_info.get("attrs_are_visible") == 0:
                                     if "code" in info_data:
-                                        info_data["code"] = "{}"
+                                        info_data["code"] = ""
                 
                 # Update workflows graph with processed data
                 workflows["graph"] = json.dumps(graph_data) if isinstance(workflows["graph"], str) else graph_data
