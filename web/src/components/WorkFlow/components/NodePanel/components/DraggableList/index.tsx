@@ -12,6 +12,8 @@ import { getLocale } from '@umijs/max';
 import { Tooltip } from 'antd';
 import React, { memo } from 'react';
 import UserCon, { UserConProps } from '../../../UserCon';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface DraggableListProps {
     list: any[];
@@ -110,6 +112,22 @@ interface ToolNodeListProps {
     onItemClick?: (item: any) => void;
 }
 
+const tooltipOverlayInnerStyle: React.CSSProperties = {
+    maxHeight: 'min(60vh, 420px)',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    maxWidth: 400,
+};
+
+const renderTooltipContent = (content?: string) => {
+    if (!content) return null;
+    return (
+        <div className="workflow-tooltip-markdown">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        </div>
+    );
+};
+
 interface NodeWrapperProps {
     children: React.ReactNode;
     onDragStart: DraggableListProps['onDragStart'];
@@ -141,7 +159,11 @@ const BaseNodeItem = memo(
         typeBadge,
         onItemClick,
     }: BaseNodeItemProps & { onItemClick?: (item: any) => void }) => (
-        <Tooltip placement="right" title={item?.baseData?.description || item?.data?.descTools}>
+        <Tooltip
+            placement="right"
+            title={renderTooltipContent(item?.baseData?.description || item?.data?.descTools)}
+            overlayInnerStyle={tooltipOverlayInnerStyle}
+        >
             <div>
                 <NodeWrapper
                     onDragStart={onDragStart}
@@ -168,7 +190,11 @@ const WorkflowNodeItem = memo(
         typeBadge,
         onItemClick,
     }: WorkflowNodeItemProps & { onItemClick?: (item: any) => void }) => (
-        <Tooltip placement="right" title={item.baseData?.description}>
+        <Tooltip
+            placement="right"
+            title={renderTooltipContent(item.baseData?.description)}
+            overlayInnerStyle={tooltipOverlayInnerStyle}
+        >
             <div>
                 <NodeWrapper
                     onDragStart={onDragStart}
@@ -228,7 +254,11 @@ const ToolNodeItem = memo(
         };
 
         return (
-            <Tooltip placement="right" title={tool?.description?.human?.[lang]}>
+            <Tooltip
+                placement="right"
+                title={renderTooltipContent(tool?.description?.human?.[lang])}
+                overlayInnerStyle={tooltipOverlayInnerStyle}
+            >
                 <div>
                     <NodeWrapper
                         onDragStart={onDragStart}
@@ -263,7 +293,14 @@ const ToolCategory = memo(
                         icon={category?.identity?.icon}
                         typeBadge={typeBadge}
                     />
-                    <Tooltip placement="right" title={category?.identity?.description?.[lang]||category?.identity?.description?.['en_US']}>
+                    <Tooltip
+                        placement="right"
+                        title={renderTooltipContent(
+                            category?.identity?.description?.[lang] ||
+                                category?.identity?.description?.['en_US'],
+                        )}
+                        overlayInnerStyle={tooltipOverlayInnerStyle}
+                    >
                         <QuestionCircleOutlined className="cursor-pointer ml-1" />
                     </Tooltip>
                 </div>
