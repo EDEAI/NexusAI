@@ -36,11 +36,8 @@ export const RenderInput = ({ data, fileMultiple = false }: RenderInputProps) =>
     const renderDescription = (description?: string) => {
         if (!description) return null;
         return (
-            <div className="text-xs text-gray-600 mb-2 markdown-body">
-                <ReactMarkdown
-                    rehypePlugins={[rehypeHighlight]}
-                    remarkPlugins={[remarkGfm]}
-                >
+            <div className="mt-1 text-xs text-gray-600 markdown-body">
+                <ReactMarkdown rehypePlugins={[rehypeHighlight]} remarkPlugins={[remarkGfm]}>
                     {description}
                 </ReactMarkdown>
             </div>
@@ -58,9 +55,14 @@ export const RenderInput = ({ data, fileMultiple = false }: RenderInputProps) =>
                 .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
                 .map((val: any) => {
                     if (val.type === 'number') {
+                        const labelContent = (
+                            <div className="flex flex-col">
+                                <span>{val.display_name || val.name}</span>
+                                {renderDescription(val.description)}
+                            </div>
+                        );
                         return (
                             <div key={val.name} className="mb-4">
-                                {renderDescription(val.description)}
                                 <ProFormDigit
                                     required={val.required}
                                     rules={[
@@ -73,18 +75,23 @@ export const RenderInput = ({ data, fileMultiple = false }: RenderInputProps) =>
                                     ]}
                                     name={val.name}
                                     initialValue={val.value}
-                                    label={val.display_name || val.name}
+                                    label={labelContent}
                                 />
                             </div>
                         );
                     }
                     if (val.type === 'file') {
+                        const labelContent = (
+                            <div className="flex flex-col">
+                                <span>{val.display_name || val.name}</span>
+                                {renderDescription(val.description)}
+                            </div>
+                        );
                         return (
                             <div key={val.name} className="mb-4">
-                                {renderDescription(val.description)}
                                 <UploadDragger
                                     name={val.name}
-                                    label={val.display_name || val.name}
+                                    label={labelContent}
                                     required={val.required}
                                     multiple={fileMultiple}
                                 />
@@ -131,11 +138,11 @@ export const RenderInput = ({ data, fileMultiple = false }: RenderInputProps) =>
 
                         return (
                             <div key={val.name} className="mb-4">
-                                {renderDescription(val.description)}
                                 <Typography.Title level={5}>
                                     {val.display_name || val.name}
                                     {val.required && <span className="text-red-500 ml-1">*</span>}
                                 </Typography.Title>
+                                {renderDescription(val.description)}
                                 <Form.Item
                                     name={val.name}
                                     rules={[
@@ -172,9 +179,14 @@ export const RenderInput = ({ data, fileMultiple = false }: RenderInputProps) =>
                             </div>
                         );
                     }
+                    const labelContent = (
+                        <div className="flex flex-col">
+                            <span>{val.display_name || val.name}</span>
+                            {renderDescription(val.description)}
+                        </div>
+                    );
                     return (
                         <div key={val.name} className="mb-4">
-                            {renderDescription(val.description)}
                             <ProFormTextArea
                                 required={val.required}
                                 rules={[
@@ -187,7 +199,7 @@ export const RenderInput = ({ data, fileMultiple = false }: RenderInputProps) =>
                                 ]}
                                 name={val.name}
                                 initialValue={val.value}
-                                label={val.display_name || val.name}
+                                label={labelContent}
                             />
                         </div>
                     );
