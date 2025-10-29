@@ -309,6 +309,17 @@ export default {
     "workflow.vars.isRequired": "是否必填",
     "workflow.vars.noVariables": "暂无变量",
     "workflow.vars.addVariable": "添加变量",
+    "workflow.vars.description": "变量说明",
+    "workflow.vars.description.placeholder": "填写变量使用说明、输入示例或格式要求（支持 Markdown）",
+
+    "workflow.general.yes": "是",
+    "workflow.general.no": "否",
+
+    "workflow.skill.description": "技能描述",
+    "workflow.skill.inputVariables": "输入变量",
+    "workflow.skill.outputVariables": "输出变量",
+    "workflow.skill.viewDescription": "查看变量说明",
+    "workflow.skill.noDescription": "暂无变量说明",
 
     "workflow.needHumanConfirm":"需要人工确认",
     "workflow.noHumanConfirm":"已处理人工确认",

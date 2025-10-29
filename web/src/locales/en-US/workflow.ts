@@ -317,6 +317,17 @@ export default {
     'workflow.vars.isRequired': 'Is Required',
     'workflow.vars.noVariables': 'No Variables',
     'workflow.vars.addVariable': 'Add Variable',
+    'workflow.vars.description': 'Variable Description',
+    'workflow.vars.description.placeholder': 'Add usage notes, formats, or examples for this variable (Markdown supported)',
+
+    'workflow.general.yes': 'Yes',
+    'workflow.general.no': 'No',
+
+    'workflow.skill.description': 'Skill Description',
+    'workflow.skill.inputVariables': 'Input Variables',
+    'workflow.skill.outputVariables': 'Output Variables',
+    'workflow.skill.viewDescription': 'View Description',
+    'workflow.skill.noDescription': 'No description provided',
 
     'workflow.needHumanConfirm': 'Pending',
     'workflow.noHumanConfirm': 'Human confirmation processed',

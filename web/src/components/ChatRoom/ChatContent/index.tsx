@@ -7,7 +7,7 @@ import { useLocation, useParams } from 'umi';
 import { MeetingSummaryButton } from '../ActionButtons/MeetingSummaryButton';
 import { MessageItem } from '../MessageDisplay/MessageItem';
 import { CurrentConversation } from './CurrentConversation';
-import { MCPToolRuntimeData, MCPToolStatus, getMCPToolStatus } from '../types/mcp';
+import { MCPToolRuntimeData, MCPToolStatus, getMCPToolStatus, MCPToolMessage } from '../types/mcp';
 import { parseMCPContent, inferUploadedFiles } from '../utils/mcpParser';
 import { useChatRoomContext } from '../context/ChatRoomContext';
 import { checkViewInIframe } from '@/utils/fullscreenStorage';
@@ -95,6 +95,7 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
                         workflow_confirmation_status: null,
                         args: {},
                         result: null,
+                        messages: [],
                         ...updates
                     }
                 };
@@ -140,28 +141,56 @@ export const ChatContent: FC<ChatContentProps> = memo(props => {
                         if (block.type === 'mcp-tool' && block.toolData) {
                             const toolData = block.toolData;
                             
-                            // Register MCP tool in conversation state if not already exists
-                            if (!mcpTools[toolData.id]) {
-                                const status = inferHistoricalMCPToolStatus(toolData);
-                                
-                                setMcpTools(prev => ({
+                            const status = inferHistoricalMCPToolStatus(toolData);
+                            setMcpTools(prev => {
+                                const existingTool = prev[toolData.id];
+                                const existingMessages = existingTool?.messages || [];
+                                let nextMessages = existingMessages;
+
+                                if (toolData.msg) {
+                                    const alreadyExists = existingMessages.some(
+                                        messageEntry =>
+                                            messageEntry.type === 'warning' &&
+                                            messageEntry.text === toolData.msg,
+                                    );
+                                    if (!alreadyExists) {
+                                        const warningMessage: MCPToolMessage = {
+                                            key: `history-${toolData.id}-${toolData.msg}`,
+                                            type: 'warning',
+                                            text: toolData.msg,
+                                            createdAt: Date.now(),
+                                            transient: false,
+                                            source: 'history',
+                                        };
+                                        nextMessages = [...existingMessages, warningMessage];
+                                    }
+                                }
+
+                                return {
                                     ...prev,
                                     [toolData.id]: {
                                         id: toolData.id,
                                         name: toolData.name,
-                                        skill_or_workflow_name: toolData.skill_or_workflow_name || toolData.name,
+                                        skill_or_workflow_name:
+                                            toolData.skill_or_workflow_name || toolData.name,
                                         workflow_run_id: toolData.workflow_run_id || 0,
-                                        workflow_confirmation_status: toolData.workflow_confirmation_status || null,
+                                        workflow_confirmation_status:
+                                            toolData.workflow_confirmation_status || null,
                                         args: toolData.args || {},
                                         result: toolData.result || null,
                                         status,
-                                        isWorkflow: toolData.skill_or_workflow_name ? 
-                                            toolData.skill_or_workflow_name.toLowerCase().includes('workflow') : false,
+                                        isWorkflow: toolData.skill_or_workflow_name
+                                            ? toolData.skill_or_workflow_name
+                                                  .toLowerCase()
+                                                  .includes('workflow')
+                                            : false,
                                         files_to_upload: toolData.files_to_upload || [],
-                                        uploaded_files: inferUploadedFiles(toolData)
-                                    }
-                                }));
-                            }
+                                        uploaded_files: inferUploadedFiles(toolData),
+                                        messages: nextMessages,
+                                        msg: toolData.msg || existingTool?.msg,
+                                    },
+                                };
+                            });
                         }
                     });
                 }

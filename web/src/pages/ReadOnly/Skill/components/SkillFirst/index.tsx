@@ -1,10 +1,12 @@
 import Callword from '@/components/callword';
 import Variable from '@/components/WorkFlow/components/Variable';
 import { useIntl } from '@umijs/max';
-import { Form, Input, Switch } from 'antd';
+import { Form, Switch } from 'antd';
 import React, { useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeHighlight from 'rehype-highlight';
+import remarkGfm from 'remark-gfm';
 
-const { TextArea } = Input;
 interface ChildProps {
     FirstValue: (value: any) => void;
     FirstSkillref: any;
@@ -62,8 +64,13 @@ const SkillFirst: React.FC<ChildProps> = ({
                             <div className="text-[#555555] text-xs  mb-[15px]">
                                 {intl.formatMessage({ id: 'skill.appdescription' })}
                             </div>
-                            <div className="text-[#555555] w-full my-2 p-[15px] flex text-xs  items-center bg-[#F7F7F7] rounded-lg">
-                                {Skillinfo && Skillinfo.description}
+                            <div className="text-[#555555] w-full my-2 p-[15px] text-xs bg-[#F7F7F7] rounded-lg markdown-body">
+                                <ReactMarkdown
+                                    rehypePlugins={[rehypeHighlight]}
+                                    remarkPlugins={[remarkGfm]}
+                                >
+                                    {(Skillinfo && Skillinfo.description) || ''}
+                                </ReactMarkdown>
                             </div>
                         </Form.Item>
                     </>
@@ -86,8 +93,13 @@ const SkillFirst: React.FC<ChildProps> = ({
                             <div className="text-[#555555] text-xs  mb-[15px]">
                                 {intl.formatMessage({ id: 'skill.appdescription' })}
                             </div>
-                            <div className="text-[#555555] w-full my-2 p-[15px] flex text-xs  items-center bg-[#F7F7F7] rounded-lg">
-                                {Skillinfo && Skillinfo.description}
+                            <div className="text-[#555555] w-full my-2 p-[15px] text-xs bg-[#F7F7F7] rounded-lg markdown-body">
+                                <ReactMarkdown
+                                    rehypePlugins={[rehypeHighlight]}
+                                    remarkPlugins={[remarkGfm]}
+                                >
+                                    {(Skillinfo && Skillinfo.description) || ''}
+                                </ReactMarkdown>
                             </div>
                         </Form.Item>
                         <Form.Item className="mb-[30px]">

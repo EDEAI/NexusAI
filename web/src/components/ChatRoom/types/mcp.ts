@@ -2,6 +2,17 @@
  * @LastEditors: biz
  */
 
+export type MCPToolMessageType = 'info' | 'warning';
+
+export interface MCPToolMessage {
+    key: string;
+    type: MCPToolMessageType;
+    text: string;
+    createdAt: number;
+    transient?: boolean;
+    source?: 'runtime' | 'history';
+}
+
 export interface MCPToolData {
     name: string;
     skill_or_workflow_name: string;
@@ -15,6 +26,7 @@ export interface MCPToolData {
     result: any;
     id?: string | number;
     files_to_upload?: import('./fileUpload').FileToUpload[];
+    msg?: string;
 }
 
 export interface WorkflowConfirmationStatus {
@@ -36,6 +48,8 @@ export interface MCPToolRuntimeData extends MCPToolData {
     files_to_upload?: import('./fileUpload').FileToUpload[];
     uploaded_files?: import('./fileUpload').FileToUpload[];
     error?: string;
+    messages?: MCPToolMessage[];
+    msg?: string;
 }
 
 export interface ContentBlock {

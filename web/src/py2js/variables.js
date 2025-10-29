@@ -11,7 +11,8 @@ export class Variable {
         display_name = undefined,
         required = undefined,
         max_length = 0,
-        sort_order = 0
+        sort_order = 0,
+        description = undefined
     ) {
         this.name = name; // Variable name
         this.type = type; // Variable type, can be 'string', 'number', or 'file/json'
@@ -23,6 +24,9 @@ export class Variable {
             this.required = required; // Indicates if the variable is required
         }
         this.sort_order = sort_order; // Sort order of the variable
+        if (description !== undefined) {
+            this.description = description;
+        }
         if (this.type === 'string') {
             this.max_length = max_length; // Maximum length for string variables
             if (this.max_length > 0 && this.value.length > this.max_length) {
@@ -47,6 +51,9 @@ export class Variable {
         }
         if (this.type == 'string' && 'max_length' in this) {
             data.max_length = this.max_length;
+        }
+        if ('description' in this) {
+            data.description = this.description;
         }
         return data;
     }
@@ -204,7 +211,9 @@ export function createVariableFromObject(data) {
         if (data.type === 'string' && 'max_length' in data) variableArgs.push(data.max_length);
         else variableArgs.push(0);
         
-        if ('sort_order' in data) variableArgs.push(data.sort_order);
+        const sortOrder = 'sort_order' in data ? data.sort_order : 0;
+        variableArgs.push(sortOrder);
+        if ('description' in data) variableArgs.push(data.description);
         
         return new Variable(...variableArgs);
     }

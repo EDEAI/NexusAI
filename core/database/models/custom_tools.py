@@ -64,25 +64,26 @@ class CustomTools(MySQL):
         input_variables = skill['input_variables']
         skill_publish_status = skill['publish_status']
         if app["user_id"] != user_id and app["attrs_are_visible"] != 1:
-            skill = {
-                "name": app['name'],
-                "description": app['description'],
-                "is_public": app['is_public'],
-                "attrs_are_visible": app['attrs_are_visible'],
-                "team_id": team_id,
-                "user_id": user_id,
-                "app_id": app['app_id'],
-                "nickname": user_data['nickname'],
-                "publish_status": skill_publish_status,
-                "is_creator": 0 if app["user_id"] != user_id else 1,
-                "input_variables": input_variables,
-                "app_publish_status": app["app_publish_status"],
-                "created_time": skill["created_time"],
-                "id": skill["id"],
-                "published_time": skill["published_time"],
-                "status": skill["status"],
-                "updated_time": skill["updated_time"]
-            }
+            # skill = {
+            #     "name": app['name'],
+            #     "description": app['description'],
+            #     "is_public": app['is_public'],
+            #     "attrs_are_visible": app['attrs_are_visible'],
+            #     "team_id": team_id,
+            #     "user_id": user_id,
+            #     "app_id": app['app_id'],
+            #     "nickname": user_data['nickname'],
+            #     "publish_status": skill_publish_status,
+            #     "is_creator": 0 if app["user_id"] != user_id else 1,
+            #     "input_variables": input_variables,
+            #     "app_publish_status": app["app_publish_status"],
+            #     "created_time": skill["created_time"],
+            #     "id": skill["id"],
+            #     "published_time": skill["published_time"],
+            #     "status": skill["status"],
+            #     "updated_time": skill["updated_time"]
+            # }
+            skill['code'] = ""
             return {'status': 1, 'message': 'ok', 'data': skill}
         else:
             return {'status': 1, 'message': 'ok', 'data': skill}

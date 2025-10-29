@@ -12,6 +12,10 @@ import { getLocale } from '@umijs/max';
 import { Tooltip } from 'antd';
 import React, { memo } from 'react';
 import UserCon, { UserConProps } from '../../../UserCon';
+import {
+    renderWorkflowTooltip,
+    workflowTooltipOverlayStyle,
+} from '../../../tooltipUtils';
 
 interface DraggableListProps {
     list: any[];
@@ -141,7 +145,11 @@ const BaseNodeItem = memo(
         typeBadge,
         onItemClick,
     }: BaseNodeItemProps & { onItemClick?: (item: any) => void }) => (
-        <Tooltip placement="right" title={item?.baseData?.description || item?.data?.descTools}>
+        <Tooltip
+            placement="right"
+            title={renderWorkflowTooltip(item?.baseData?.description || item?.data?.descTools)}
+            overlayInnerStyle={workflowTooltipOverlayStyle}
+        >
             <div>
                 <NodeWrapper
                     onDragStart={onDragStart}
@@ -168,7 +176,11 @@ const WorkflowNodeItem = memo(
         typeBadge,
         onItemClick,
     }: WorkflowNodeItemProps & { onItemClick?: (item: any) => void }) => (
-        <Tooltip placement="right" title={item.baseData?.description}>
+        <Tooltip
+            placement="right"
+            title={renderWorkflowTooltip(item.baseData?.description)}
+            overlayInnerStyle={workflowTooltipOverlayStyle}
+        >
             <div>
                 <NodeWrapper
                     onDragStart={onDragStart}
@@ -228,7 +240,11 @@ const ToolNodeItem = memo(
         };
 
         return (
-            <Tooltip placement="right" title={tool?.description?.human?.[lang]}>
+            <Tooltip
+                placement="right"
+                title={renderWorkflowTooltip(tool?.description?.human?.[lang])}
+                overlayInnerStyle={workflowTooltipOverlayStyle}
+            >
                 <div>
                     <NodeWrapper
                         onDragStart={onDragStart}
@@ -263,7 +279,14 @@ const ToolCategory = memo(
                         icon={category?.identity?.icon}
                         typeBadge={typeBadge}
                     />
-                    <Tooltip placement="right" title={category?.identity?.description?.[lang]||category?.identity?.description?.['en_US']}>
+                    <Tooltip
+                        placement="right"
+                        title={renderWorkflowTooltip(
+                            category?.identity?.description?.[lang] ||
+                                category?.identity?.description?.['en_US'],
+                        )}
+                        overlayInnerStyle={workflowTooltipOverlayStyle}
+                    >
                         <QuestionCircleOutlined className="cursor-pointer ml-1" />
                     </Tooltip>
                 </div>
