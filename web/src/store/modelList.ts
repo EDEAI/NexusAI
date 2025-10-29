@@ -1,10 +1,7 @@
-/*
- * @LastEditors: biz
- */
 import { create } from 'zustand';
-import { getModelList } from '@/api/workflow';
-import { message } from 'antd';
 import { useEffect, useMemo } from 'react';
+import { getModelList } from '@/api/workflow';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 export interface ModelConfig {
     model_config_id: number;
@@ -29,44 +26,84 @@ interface ModelListState {
     loading: boolean;
     error: string | null;
     initialized: boolean;
-    fetchModels: () => Promise<void>;
+    currentTeamId: number | null;
+    fetchModels: (teamId?: number | null, force?: boolean) => Promise<void>;
+    reset: () => void;
 }
 
-export const useModelListStore = create<ModelListState>((set) => ({
+export const useModelListStore = create<ModelListState>((set, get) => ({
     models: [],
     loading: false,
     error: null,
     initialized: false,
-    fetchModels: async () => {
+    currentTeamId: null,
+    fetchModels: async (teamId = null, force = false) => {
+        const state = get();
+        const normalizedTeamId = teamId ?? null;
+        const isSameTeam = state.currentTeamId === normalizedTeamId;
+
+        if (!force && state.initialized && isSameTeam) {
+            return;
+        }
+
+        set(prevState => ({
+            ...prevState,
+            loading: true,
+            error: null,
+            ...(isSameTeam ? {} : { models: [], initialized: false }),
+        }));
+
         try {
-            set({ loading: true });
             const res = await getModelList();
 
             if (res.code === 0) {
-                set({ models: Array.isArray(res.data.data) ? res.data.data : [], initialized: true });
+                set(prevState => ({
+                    ...prevState,
+                    models: Array.isArray(res.data?.data) ? res.data.data : [],
+                    initialized: true,
+                    currentTeamId: normalizedTeamId,
+                    loading: false,
+                }));
             } else {
                 throw new Error(res.message || 'Failed to fetch models');
             }
         } catch (error) {
-            set({ error: error.message });
-            // message.error('Failed to fetch models');
-        } finally {
-            set({ loading: false });
+            set(prevState => ({
+                ...prevState,
+                error: error instanceof Error ? error.message : String(error),
+                loading: false,
+                initialized: false,
+            }));
         }
+    },
+    reset: () => {
+        set({
+            models: [],
+            loading: false,
+            error: null,
+            initialized: false,
+            currentTeamId: null,
+        });
     },
 }));
 
 export const useModelSelect = () => {
     const models = useModelListStore(state => state.models);
     const loading = useModelListStore(state => state.loading);
-    const initialized = useModelListStore(state => state.initialized);
     const fetchModels = useModelListStore(state => state.fetchModels);
+    const reset = useModelListStore(state => state.reset);
+
+    const { userInfo } = useUserInfo();
+    const teamId = userInfo?.team_id ?? null;
 
     useEffect(() => {
-        if (!initialized) {
-            fetchModels();
+        if (teamId === null) {
+            reset();
+            return;
         }
-    }, [initialized, fetchModels]);
+
+        fetchModels(teamId);
+    }, [teamId, fetchModels, reset]);
 
     const select = useMemo(() => {
         const safeModels = Array.isArray(models) ? models : [];
