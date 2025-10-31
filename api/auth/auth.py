@@ -86,7 +86,7 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
     else:
         access_token = create_access_token(
             data={"uid": user["id"], "team_id": user["team_id"], "nickname": user["nickname"], "phone": user["phone"],
-                  "email": user["email"],"inviter_id": user["inviter_id"],"role": user["role"]}
+                  "email": user["email"],"inviter_id": user["inviter_id"],"role": user["role"],"tenant_id": user["tenant_id"]}
         )
         # Store token in Redis
         redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60  # expiration time (using token expiration time)

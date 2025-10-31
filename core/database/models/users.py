@@ -73,7 +73,7 @@ class Users(MySQL):
 
     def get_user_by_id(self, user_id: int) -> Optional[Dict[str, Any]]:
         user = self.select_one(
-            columns=['team_id', 'id', 'nickname'],
+            columns=['team_id', 'id', 'nickname', 'tenant_id'],
             conditions=[
                 {'column': 'id', 'value': user_id},
                 {'column': 'status', 'value': 1}

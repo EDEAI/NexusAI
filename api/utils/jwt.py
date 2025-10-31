@@ -21,6 +21,7 @@ ALGORITHM = "HS256"
 class TokenData(BaseModel):
     uid: Optional[int] = None
     team_id: Optional[int] = None
+    tenant_id: Optional[int] = None
     nickname: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
@@ -86,6 +87,8 @@ def verify_token(token: str, credentials_exception):
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
+        tenant_id = user_info['tenant_id'] if user_info else 0
+
         if user_info['team_id']!= team_id:
             user_info = UserTeamRelations().select_one(
                 columns="*",
@@ -117,6 +120,7 @@ def verify_token(token: str, credentials_exception):
         token_data = TokenData(
             uid=uid,
             team_id=team_id,
+            tenant_id=tenant_id,
             nickname=nickname,
             phone=phone,
             email=email,

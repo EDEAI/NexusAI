@@ -31,9 +31,9 @@ class Teams(MySQL):
 
     def get_team_type_by_id(self, team_id: int) -> int:
         """
-        根据team_id查询对应的type字段。
-        :param team_id: 团队ID
-        :return: type字段的值，如果未找到则返回None。
+        Query the corresponding type field based on the team_id.
+        :param team_id: Team ID
+        :return: The value of the type field. If not found, return None.
         """
         team = self.select_one(
             columns=["type"],

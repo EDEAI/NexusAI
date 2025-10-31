@@ -44,7 +44,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(  # Create access token for the authenticated user
-        data={"uid": user["id"],"team_id": user["team_id"],"nickname": user["nickname"],"phone": user["phone"],"email": user["email"]}
+        data={"uid": user["id"],"team_id": user["team_id"],"nickname": user["nickname"],"phone": user["phone"],"email": user["email"],"tenant_id": user.get("tenant_id", 0)}
     )
     return {"access_token": access_token, "token_type": "bearer"}  # Return the access token
 
