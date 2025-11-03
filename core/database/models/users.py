@@ -148,8 +148,8 @@ class Users(MySQL):
             #     update_data['position'] = position
             if avatar and avatar.strip():
                 update_data['avatar'] = avatar
-            if language and language.strip():
-                update_data['language'] = language
+            # if language and language.strip():
+            #     update_data['language'] = language
             # if phone:
             #     update_data['phone'] = phone
             # if email:
@@ -283,8 +283,8 @@ class Users(MySQL):
             #     update_data['position'] = position
             if avatar and avatar.strip():
                 update_data['avatar'] = avatar
-            if language and language.strip():
-                update_data['language'] = language
+            # if language and language.strip():
+            #     update_data['language'] = language
             if phone and phone.strip():
                 update_data['phone'] = phone
             if email and email.strip():
@@ -481,8 +481,8 @@ class Users(MySQL):
             #     update_data['position'] = position
             if avatar and avatar.strip():
                 update_data['avatar'] = avatar
-            if language and language.strip():
-                update_data['language'] = language
+            # if language and language.strip():
+            #     update_data['language'] = language
             # if phone:
             #     update_data['phone'] = phone
             # if email:
