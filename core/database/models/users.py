@@ -103,7 +103,7 @@ class Users(MySQL):
                 ["left", "users", "user_three_parties.user_id = users.id"],
             ],
             conditions=[
-                # {'column': 'user_three_parties.platform', 'value': platform},
+                {'column': 'user_three_parties.platform', 'value': platform},
                 {'column': 'user_three_parties.openid', 'value': openid},
                 {'column': 'users.status', 'value': 1}
             ]
