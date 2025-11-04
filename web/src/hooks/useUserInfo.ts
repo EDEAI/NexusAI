@@ -80,6 +80,22 @@ const fetchUserInfoGlobal = async (forceRefresh = false): Promise<UserInfo> => {
 
   // Check if we should use cached data
   if (!forceRefresh) {
+    // When running inside iframe route, avoid triggering userinfo request automatically.
+    if (checkViewInIframe()) {
+      // Ensure locale stays consistent with whatever we already know.
+      if (globalUserInfo) {
+        syncLocaleWithLanguage(globalUserInfo.language);
+        return globalUserInfo;
+      }
+      const { userInfo: cachedUserInfo, isExpired } = getUserInfoWithTimestamp();
+      if (cachedUserInfo && !isExpired) {
+        syncLocaleWithLanguage(cachedUserInfo.language);
+        return cachedUserInfo;
+      }
+      syncLocaleWithLanguage(globalUserInfo?.language);
+      return (globalUserInfo ?? {}) as UserInfo;
+    }
+
     // Check if we have recent cached data in memory
     if (globalUserInfo && (now - lastFetchTime) < CACHE_DURATION) {
       syncLocaleWithLanguage(globalUserInfo.language);
