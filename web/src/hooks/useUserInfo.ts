@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { userinfo } from '@/api';
 import { checkViewInIframe } from '@/utils/fullscreenStorage';
+import { syncLocaleWithLanguage } from '@/utils/locale';
 
-interface UserInfo {
+export interface UserInfo {
   uid?: string;
   email?: string;
   nickname?: string;
@@ -17,7 +18,7 @@ interface UseUserInfoReturn {
   userInfo: UserInfo | null;
   loading: boolean;
   error: string | null;
-  refreshUserInfo: () => Promise<void>;
+  refreshUserInfo: (forceRefresh?: boolean) => Promise<UserInfo | undefined>;
   updateUserInfo: (newUserInfo: Partial<UserInfo>) => void;
 }
 
@@ -79,8 +80,25 @@ const fetchUserInfoGlobal = async (forceRefresh = false): Promise<UserInfo> => {
 
   // Check if we should use cached data
   if (!forceRefresh) {
+    // When running inside iframe route, avoid triggering userinfo request automatically.
+    if (checkViewInIframe()) {
+      // Ensure locale stays consistent with whatever we already know.
+      if (globalUserInfo) {
+        syncLocaleWithLanguage(globalUserInfo.language);
+        return globalUserInfo;
+      }
+      const { userInfo: cachedUserInfo, isExpired } = getUserInfoWithTimestamp();
+      if (cachedUserInfo && !isExpired) {
+        syncLocaleWithLanguage(cachedUserInfo.language);
+        return cachedUserInfo;
+      }
+      syncLocaleWithLanguage(globalUserInfo?.language);
+      return (globalUserInfo ?? {}) as UserInfo;
+    }
+
     // Check if we have recent cached data in memory
     if (globalUserInfo && (now - lastFetchTime) < CACHE_DURATION) {
+      syncLocaleWithLanguage(globalUserInfo.language);
       return globalUserInfo;
     }
 
@@ -95,6 +113,7 @@ const fetchUserInfoGlobal = async (forceRefresh = false): Promise<UserInfo> => {
         lastFetchTime = now;
         notifySubscribers();
       }
+      syncLocaleWithLanguage(cachedUserInfo.language);
       return cachedUserInfo;
     }
   }
@@ -102,6 +121,7 @@ const fetchUserInfoGlobal = async (forceRefresh = false): Promise<UserInfo> => {
   // Prevent too frequent requests
   if (!forceRefresh && (now - lastFetchTime) < MIN_REQUEST_INTERVAL) {
     if (globalUserInfo) {
+      syncLocaleWithLanguage(globalUserInfo.language);
       return globalUserInfo;
     }
   }
@@ -116,7 +136,8 @@ const fetchUserInfoGlobal = async (forceRefresh = false): Promise<UserInfo> => {
     try {
       // If current path is Agent_iframe, skip userinfo call
       if (checkViewInIframe()&&!localStorage.getItem('token')) {
-        return globalUserInfo ?? {};
+        syncLocaleWithLanguage(globalUserInfo?.language);
+        return globalUserInfo ?? ({} as UserInfo);
       }
       const response = await userinfo();
       
@@ -132,6 +153,7 @@ const fetchUserInfoGlobal = async (forceRefresh = false): Promise<UserInfo> => {
         window.dispatchEvent(new CustomEvent('userInfoUpdated', { 
           detail: { type: 'userInfoUpdated' } 
         }));
+        syncLocaleWithLanguage(response.data.language);
         
         return response.data;
       } else {
@@ -175,6 +197,7 @@ export const useUserInfo = (): UseUserInfoReturn => {
         // Use cached data if it's still valid
         globalUserInfo = cachedUserInfo;
         lastFetchTime = Date.now();
+        syncLocaleWithLanguage(cachedUserInfo.language);
         triggerUpdate();
       } else {
         // Fetch fresh data if no valid cache
@@ -192,9 +215,10 @@ export const useUserInfo = (): UseUserInfoReturn => {
 
   const refreshUserInfo = useCallback(async (forceRefresh = true) => {
     try {
-      await fetchUserInfoGlobal(forceRefresh);
+      return await fetchUserInfoGlobal(forceRefresh);
     } catch (error) {
       console.error('Failed to refresh user info:', error);
+      return undefined;
     }
   }, []);
 
@@ -206,6 +230,7 @@ export const useUserInfo = (): UseUserInfoReturn => {
       
       // Update localStorage with timestamp
       setUserInfoWithTimestamp(updatedUserInfo);
+      syncLocaleWithLanguage(updatedUserInfo.language);
       
       // Trigger custom event
       window.dispatchEvent(new CustomEvent('userInfoUpdated', { 

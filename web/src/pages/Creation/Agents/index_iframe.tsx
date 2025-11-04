@@ -7,7 +7,6 @@ import { API } from '@/types/api';
 import { useIntl } from '@umijs/max';
 import { message, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { setLocale } from 'umi';
 import Chat from './Chat';
 import { createRoom } from '@/api/plaza';
 const USERNAME = IFRAME_TEST_USERNAME;
@@ -127,13 +126,10 @@ const Agents: React.FC = () => {
             return false;
         }
     };
-    const { refreshUserInfo, userInfo } = useUserInfo();
+    const { refreshUserInfo } = useUserInfo();
     const fetchUserInfo = async () => {
         await refreshUserInfo();
         creationsearchdata('SET', 6, false, '');
-        setTimeout(() => {
-            setLocale(userInfo?.language == 'en' ? 'en-US' : 'zh-CN');
-        }, 100);
     };
     const getAgent = async (app_id?: any) => {
         let params = new URLSearchParams(window.location.search);
