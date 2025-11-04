@@ -11,7 +11,6 @@ import {
     Helmet,
     history,
     SelectLang,
-    setLocale,
     useIntl,
     useModel,
 } from '@umijs/max';
@@ -87,14 +86,11 @@ const Login: React.FC = () => {
     const { initialState, setInitialState } = useModel('@@initialState');
     const { styles } = useStyles();
     const intl = useIntl();
-    const { refreshUserInfo, userInfo } = useUserInfo();
+    const { refreshUserInfo } = useUserInfo();
 
     const fetchUserInfo = async () => {
         await refreshUserInfo();
         creationsearchdata('SET', 6, false, '');
-        setTimeout(() => {
-            setLocale(userInfo?.language == 'en' ? 'en-US' : 'zh-CN');
-        }, 100);
     };
 
     const handleSubmit = async (values: API.LoginParams) => {

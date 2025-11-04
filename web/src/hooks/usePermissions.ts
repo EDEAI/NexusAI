@@ -1,7 +1,7 @@
 // Custom hook for managing user permissions
 
 import { useCallback } from 'react';
-import { useUserInfo } from './useUserInfo';
+import { useUserInfo, type UserInfo } from './useUserInfo';
 import { 
   hasPermission, 
   hasAnyPermission, 
@@ -19,12 +19,6 @@ interface Permission {
   updated_at?: string;
 }
 
-interface UserInfo {
-  permissions?: Permission[];
-  role?: number;
-  [key: string]: any;
-}
-
 interface UsePermissionsReturn {
   userInfo: UserInfo | null;
   loading: boolean;
@@ -34,7 +28,7 @@ interface UsePermissionsReturn {
   hasAllPermissions: (permissionIds: number[]) => boolean;
   isTeamAdmin: () => boolean;
   getUserPermissionIds: () => number[];
-  refreshUserInfo: () => Promise<void>;
+  refreshUserInfo: (forceRefresh?: boolean) => Promise<UserInfo | undefined>;
 }
 
 /**
