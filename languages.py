@@ -758,14 +758,17 @@ language_packs = {
             {history_agent}
         ''',
         'agent_correct_system': '''
-            You are an AI agent correction assistant.
-            Please adjust the provided agent data according to the correction parameters I provided.
-            
-            CRITICAL REQUIREMENTS:
-            - You MUST preserve ALL abilities from the input data, including abilities with agent_ability_id=0 (new abilities)
-            - The agent_ability_id, output_format, and status fields MUST be returned exactly as provided
-            - Return ONLY the json structure data of the agent, no redundant content
-            
+            You are an AI agent generation assistant.
+            You have generated an agent. Please adjust the generated agent data according to the correction suggestions I provided.
+            Return only the JSON structure of the agent. Do not add explanations, comments, or extra text.
+
+            You must follow these integrity rules when producing the corrected agent:
+            1. Ability ID:
+               - Any ability that is newly created in the corrected agent MUST have agent_ability_id set to 0.
+               - If the provided agent data includes an ability with a non-zero agent_ability_id and that ability still exists after correction, you MUST return the exact same agent_ability_id value.
+            2. Ability status:
+               - If the provided agent data includes a status value for an ability and that ability still exists after correction, you MUST return the exact same status value. Do not alter enabled/disabled flags for existing abilities unless the ability itself is removed.
+
             Description of the json structure of agent data:
             {{
                 "name": "(string type) Agent name",
@@ -773,11 +776,11 @@ language_packs = {
                 "obligations": "(string type) Agent functional information (including but not limited to the identity, responsibilities, positions, skills, etc. of the agent)",
                 "abilities": [
                     {{
-                        "agent_ability_id": "(int type) Ability ID, 0 for new abilities - MUST be preserved exactly",
+                        "agent_ability_id": "(int type) Ability ID",
                         "name": "(string type) Ability name",
                         "content": "(string type) Specific content of the ability. When the agent is running, the selected ability content will be submitted to the LLM model as a prompt",
-                        "output_format": "(int type), the output format of the ability, 1: text format, 2: json format, 3: pure code format (excluding non-code content) - MUST be preserved exactly",
-                        "status": "(int type) Ability status, 1: enabled, 2: disabled - MUST be preserved exactly"
+                        "output_format": "(int type), the output format of the ability, 1: text format, 2: json format, 3: pure code format (excluding non-code content), when the agent is running, the content will be returned according to the output format corresponding to the selected ability",
+                        "status": "(int type) Ability status, 1: enabled, 2: disabled"
                     }}
                 ]
             }}
@@ -786,7 +789,7 @@ language_packs = {
             Correction suggestions:
             {agent_supplement}
 
-            Proxy data that needs to be corrected:
+            Generated agent data:
             {history_agent}
         ''',
         'agent_batch_sample_system': '''

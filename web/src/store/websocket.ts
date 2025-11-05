@@ -179,6 +179,7 @@ type MessageType =
     | 'workflow_run_progress'
     | 'workflow_need_human_confirm'
     | 'generate_agent_batch'
+    | 'generate_agent_correct'
     | 'chat_message_llm_return';
 
 type TypedMessageMap = {
@@ -186,6 +187,7 @@ type TypedMessageMap = {
     workflow_run_progress: WorkflowRunProgress[];
     workflow_need_human_confirm: WorkflowNeedHumanConfirm[];
     generate_agent_batch: any[];
+    generate_agent_correct: any[];
     [key: string]: any[];
 };
 

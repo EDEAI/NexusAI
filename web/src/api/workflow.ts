@@ -589,6 +589,29 @@ export const agentSupplement = async (supplement_prompt: string, app_run_id: str
     });
 };
 
+export interface AgentCorrectAbility {
+    agent_ability_id: number;
+    name: string;
+    content: string;
+    status: number;
+    output_format: number;
+}
+
+export interface AgentCorrectParams {
+    name: string;
+    description: string;
+    obligations: string;
+    abilities: AgentCorrectAbility[];
+    agent_supplement?: string;
+}
+
+export const agentCorrect = async (data: AgentCorrectParams) => {
+    return await aniRequest<any>(`/v1/agent/agent_correct`, {
+        method: 'POST',
+        data,
+    });
+};
+
 interface AgentAbility {
     content: string;
     name: string;
