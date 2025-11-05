@@ -849,7 +849,7 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
             app_run_id=app_run_id,
             ai_tool_type=1,
             inputs=input_,
-            run_type=1,
+            run_type=3,
             user_prompt=data.agent_supplement
         )
 
