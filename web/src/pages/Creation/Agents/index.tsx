@@ -857,6 +857,8 @@ const Agents: React.FC = () => {
                     const putBasedata = {
                         agent_id: agent_id,
                         data: {
+                            name: Detaillist?.app?.name,
+                            description: Detaillist?.app?.description,
                             is_public: Detaillist.app.is_public,
                             enable_api: Detaillist.app.enable_api,
                             attrs_are_visible: Detaillist.app.attrs_are_visible,

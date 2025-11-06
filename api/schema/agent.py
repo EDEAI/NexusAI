@@ -30,6 +30,8 @@ class CallableList(BaseModel):
     item_type: int
 
 class ReqAgentBaseCreateSchema(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
     is_public: Optional[int] = None
     attrs_are_visible: Optional[int] = None
     enable_api: Optional[int] = None

@@ -115,6 +115,8 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
     """
 
     update_data = data.dict(exclude_unset=True)
+    app_name = data.name
+    app_description = data.description
     is_public = data.is_public
     attrs_are_visible = data.attrs_are_visible
     enable_api = data.enable_api
@@ -212,9 +214,22 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
         return response_error(get_language_content("api_agent_base_update_default_output_format_error"))
 
     agents_model = Agents()
-    result = agents_model.agent_base_update(agent_id, userinfo.uid, userinfo.team_id, is_public, enable_api,
-                                            obligations, input_variables, dataset_ids, m_config_id, allow_upload_file,
-                                            default_output_format, attrs_are_visible)
+    result = agents_model.agent_base_update(
+        agent_id,
+        userinfo.uid,
+        userinfo.team_id,
+        is_public,
+        enable_api,
+        obligations,
+        input_variables,
+        dataset_ids,
+        m_config_id,
+        allow_upload_file,
+        default_output_format,
+        attrs_are_visible,
+        app_name,
+        app_description,
+    )
     if result["status"] != 1:
         return response_error(result["message"])
     app_id = result["data"]["app_id"]
@@ -1687,5 +1702,4 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
             processed_data["order"] = data["order"]
 
     return response_success(processed_data, get_language_content("api_agent_success"))
-
 
