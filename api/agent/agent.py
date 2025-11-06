@@ -770,10 +770,11 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
 
     Args:
         data (ReqAgentCorrectSchema): Request data containing:
-            name (str): Agent name
-            description (str): Agent description
-            obligations (str): Agent obligations
-            abilities (List[AgentAbilitiesData]): Agent abilities list
+            name (str): Agent name (optional)
+            description (str): Agent description (optional)
+            obligations (str): Agent obligations (optional)
+            abilities (List[AgentAbilitiesData]): Agent abilities list (optional)
+            agent_supplement (str): Correction requirements (required)
         userinfo (TokenData): User authentication information
 
     Returns:
@@ -784,33 +785,28 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
     Raises:
         - Returns error if agent correction fails
     """
-    # Validate required fields
-    if not data.name:
-        return response_error(get_language_content("api_agent_abilities_set_abilities_name_required"))
-    if not data.description:
-        return response_error(get_language_content("api_agent_abilities_set_abilities_content_required"))
-    if not data.obligations:
-        return response_error(get_language_content("agent_empty_obligation"))
+    # Validate required field
+    if not data.agent_supplement:
+        return response_error(get_language_content("api_agent_supplement_prompt_required"))
 
     # Validate abilities if provided
     if data.abilities:
         for ability in data.abilities:
-            if not ability.name:
-                return response_error(get_language_content("api_agent_abilities_set_abilities_name_required"))
-            if not ability.content:
-                return response_error(get_language_content("api_agent_abilities_set_abilities_content_required"))
-            if ability.status not in [1, 2]:
+            # if ability.name and not ability.content:
+            #     return response_error(get_language_content("api_agent_abilities_set_abilities_content_required"))
+            if ability.status and ability.status not in [1, 2]:
                 return response_error(get_language_content("api_agent_abilities_set_abilities_status_error"))
-            if ability.output_format not in [0, 1, 2, 3]:
+            if ability.output_format and ability.output_format not in [0, 1, 2, 3]:
                 return response_error(get_language_content("api_agent_abilities_set_output_format_error"))
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     try:
         # Create new app run for agent correction
         app_runs_model = AppRuns()
         app_run_data = {
             "user_id": userinfo.uid,
-            "app_id": 0,  # Set app_id to 0 for agent correction
+            "app_id": 0,
             "name": f"Agent_Correction_{current_time}",
             "created_time": current_time,
             "updated_time": current_time,
@@ -821,23 +817,23 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
         if not app_run_id:
             return response_error(get_language_content("api_agent_generate_failed"))
 
-        # Prepare system and user prompts
-        system_prompt = get_language_content('agent_correct_system', userinfo.uid)
-        
-        # Prepare history_agent data in the format matching system prompt structure
+        # Use provided parameters as history_agent
         history_agent = {
             "name": data.name or "",
             "description": data.description or "",
             "obligations": data.obligations or "",
             "abilities": [ability.dict() for ability in data.abilities] if data.abilities else []
         }
+
+        # Prepare system and user prompts
+        system_prompt = get_language_content('agent_correct_system', userinfo.uid)
         
         # Convert history_agent to formatted JSON string
         history_agent_str = json.dumps(history_agent, ensure_ascii=False, indent=2)
         
         user_prompt = get_language_content('agent_correct_user', userinfo.uid, False)
         user_prompt = user_prompt.format(
-            agent_supplement=data.agent_supplement or "",
+            agent_supplement=data.agent_supplement,
             history_agent=history_agent_str
         )
 

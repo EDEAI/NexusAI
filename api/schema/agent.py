@@ -178,7 +178,7 @@ class ReqAgentCorrectSchema(BaseModel):
     description: Optional[str] = None
     obligations: Optional[str] = None
     abilities: Optional[List[AgentAbilitiesData]] = None
-    agent_supplement: Optional[str] = None
+    agent_supplement: str
 
 
 class ReqAgentBatchSample(BaseModel):
