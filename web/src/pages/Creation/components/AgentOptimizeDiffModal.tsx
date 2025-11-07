@@ -1,7 +1,7 @@
 import DiffViewer from '@/components/common/DiffViewer';
 import type { AgentCorrectAbility } from '@/api/workflow';
 import { useIntl } from '@umijs/max';
-import { Badge, Button, Modal, Tag } from 'antd';
+import { Badge, Button, Modal, Spin, Tag } from 'antd';
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 
@@ -27,6 +27,7 @@ interface AgentOptimizeDiffModalProps {
     open: boolean;
     current?: AgentOptimizeData | null;
     optimized?: AgentOptimizeData | null;
+    loading?: boolean;
     abilityComparisons: AbilityComparison[];
     onApply: () => void;
     onCancel: () => void;
@@ -45,6 +46,7 @@ const AgentOptimizeDiffModal: React.FC<AgentOptimizeDiffModalProps> = ({
     open,
     current,
     optimized,
+    loading = false,
     abilityComparisons,
     onApply,
     onCancel,
@@ -92,6 +94,7 @@ const AgentOptimizeDiffModal: React.FC<AgentOptimizeDiffModalProps> = ({
     const statusTitle = intl.formatMessage({ id: 'agent.capabilitystatus' });
     const outputTitle = intl.formatMessage({ id: 'agent.enableall' });
     const continueText = intl.formatMessage({ id: 'agent.optimize.continue' });
+    const optimizedLoading = loading && !optimized;
 
     const footerButtons = [
         <Button key="cancel" onClick={onCancel} disabled={applying || continuing}>
@@ -137,37 +140,52 @@ const AgentOptimizeDiffModal: React.FC<AgentOptimizeDiffModalProps> = ({
                             <div className="text-xs uppercase text-gray-500">{headerLabel.current}</div>
                             <div className="mt-1 text-sm font-medium text-gray-900">{current?.name ?? '--'}</div>
                         </div>
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                            <div className="text-xs uppercase text-gray-500">{headerLabel.optimized}</div>
-                            <div className="mt-1 text-sm font-medium text-blue-700">{optimized?.name ?? '--'}</div>
-                        </div>
+                        <Spin spinning={optimizedLoading}>
+                            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 min-h-[76px]">
+                                <div className="text-xs uppercase text-gray-500">{headerLabel.optimized}</div>
+                                <div className="mt-1 text-sm font-medium text-blue-700">
+                                    {optimized?.name ?? '--'}
+                                </div>
+                            </div>
+                        </Spin>
                     </div>
                 </section>
 
                 <section className="space-y-3">
                     <h3 className="text-sm font-semibold text-gray-700">{descriptionTitle}</h3>
-                    <DiffViewer original={current?.description ?? ''} modified={optimized?.description ?? ''} />
+                    <Spin spinning={optimizedLoading}>
+                        <DiffViewer original={current?.description ?? ''} modified={optimized?.description ?? ''} />
+                    </Spin>
                 </section>
 
                 <section className="space-y-3">
                     <h3 className="text-sm font-semibold text-gray-700">{obligationTitle}</h3>
-                    <DiffViewer original={current?.obligations ?? ''} modified={optimized?.obligations ?? ''} />
+                    <Spin spinning={optimizedLoading}>
+                        <DiffViewer original={current?.obligations ?? ''} modified={optimized?.obligations ?? ''} />
+                    </Spin>
                 </section>
 
                 <section className="space-y-4">
                     <h3 className="text-sm font-semibold text-gray-700">{abilityTitle}</h3>
                     <div className="space-y-4">
-                        {abilityComparisons.map(item => {
-                            const idLabel =
-                                item.agent_ability_id && item.agent_ability_id > 0
-                                    ? `#${item.agent_ability_id}`
-                                    : intl.formatMessage({ id: 'agent.optimize.diff.ability.new' });
+                        {optimizedLoading && (
+                            <div className="rounded-lg border border-blue-200 bg-blue-50 p-6 flex justify-center">
+                                <Spin />
+                            </div>
+                        )}
+                        {!optimizedLoading && (
+                            <>
+                                {abilityComparisons.map(item => {
+                                    const idLabel =
+                                        item.agent_ability_id && item.agent_ability_id > 0
+                                            ? `#${item.agent_ability_id}`
+                                            : intl.formatMessage({ id: 'agent.optimize.diff.ability.new' });
 
-                            const showRemovedOnly = !item.optimized && item.current;
-                            const showAddedOnly = item.optimized && !item.current;
+                                    const showRemovedOnly = !item.optimized && item.current;
+                                    const showAddedOnly = item.optimized && !item.current;
 
-                            return (
-                                <div
+                                    return (
+                                        <div
                                     key={`${item.index}-${item.agent_ability_id}`}
                                     className={classNames(
                                         'rounded-lg border p-4 space-y-3',
@@ -248,8 +266,10 @@ const AgentOptimizeDiffModal: React.FC<AgentOptimizeDiffModalProps> = ({
                                         modified={item.optimized?.content ?? ''}
                                     />
                                 </div>
-                            );
-                        })}
+                                    );
+                                })}
+                            </>
+                        )}
                     </div>
                 </section>
             </div>

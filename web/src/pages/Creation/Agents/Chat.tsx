@@ -458,7 +458,6 @@ export default memo((props: Props) => {
                             type="default"
                             className="min-w-24"
                             disabled={props.optimizeLoading}
-                            loading={props.optimizeLoading}
                             onClick={props.onOpenOptimize}
                         >
                             {intl.formatMessage({ id: 'agent.optimize.button' })}
