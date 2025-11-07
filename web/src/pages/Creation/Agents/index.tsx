@@ -331,7 +331,6 @@ const Agents: React.FC = () => {
             setOptimizeJob(null);
             setPendingDiffBaseData(null);
             setNextOptimizeInputData(null);
-            setDiffVisible(true);
         } catch (error) {
             message.error(intl.formatMessage({ id: 'agent.optimize.error.invalid' }));
             setOptimizeLoading(false);
@@ -506,7 +505,6 @@ const Agents: React.FC = () => {
         }
         const baseData = normalizeAgentData(currentData);
         setNextOptimizeInputData(baseData);
-        setPendingDiffBaseData(baseData);
         setOptimizePrompt('');
         setOptimizeModalVisible(true);
     };
@@ -528,7 +526,6 @@ const Agents: React.FC = () => {
         }
         const baseData = normalizeAgentData(optimizedData);
         setNextOptimizeInputData(baseData);
-        setPendingDiffBaseData(baseData);
         setOptimizePrompt('');
         setOptimizeModalVisible(true);
     };
@@ -556,17 +553,22 @@ const Agents: React.FC = () => {
             setNextOptimizeInputData(baseData);
         }
         try {
+            setOptimizeModalVisible(false);
+            setOptimizePrompt('');
+            setPendingDiffBaseData(baseData);
+            setDiffBaseData(baseData);
+            setOptimizedData(null);
+            setAbilityComparisons([]);
+            setDiffVisible(true);
             setOptimizeLoading(true);
+
             const payload: AgentCorrectParams = {
                 ...baseData,
                 agent_supplement: promptText,
             };
             const res = await agentCorrect(payload);
             if (res?.code === 0 && res?.data) {
-                setPendingDiffBaseData(baseData);
                 setOptimizeJob(res.data);
-                setOptimizeModalVisible(false);
-                setOptimizePrompt('');
             } else {
                 const errorMsg =
                     res?.detail ||
@@ -574,10 +576,12 @@ const Agents: React.FC = () => {
                     intl.formatMessage({ id: 'agent.optimize.error.failed' });
                 message.error(errorMsg);
                 setOptimizeLoading(false);
+                resetDiffState();
             }
         } catch (error: any) {
             message.error(error?.message || intl.formatMessage({ id: 'agent.optimize.error.failed' }));
             setOptimizeLoading(false);
+            resetDiffState();
         }
     };
 
@@ -1229,6 +1233,7 @@ const Agents: React.FC = () => {
                 open={diffVisible}
                 current={diffBaseData}
                 optimized={optimizedData}
+                loading={optimizeLoading && !optimizedData}
                 abilityComparisons={abilityComparisons}
                 onApply={handleApplyOptimizedResult}
                 onCancel={handleDiffCancel}
