@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from core.database import MySQL
 from core.database.models.datasets import Datasets
 from core.database.models.apps import Apps
@@ -144,9 +144,23 @@ class Agents(MySQL):
             "page_size": page_size
         }
 
-    def agent_base_update(self, agent_id: int, uid: int = 0, team_id: int = 0, is_public: int = 0, enable_api: int = 0,
-                          obligations: str = "", input_variables: Dict[str, Any] = None, dataset_ids: List[int] = None,
-                          m_config_id: int = 0, allow_upload_file: int = 0, default_output_format: int = 1, attrs_are_visible: int = 0):
+    def agent_base_update(
+        self,
+        agent_id: int,
+        uid: int = 0,
+        team_id: int = 0,
+        is_public: int = 0,
+        enable_api: int = 0,
+        obligations: str = "",
+        input_variables: Dict[str, Any] = None,
+        dataset_ids: List[int] = None,
+        m_config_id: int = 0,
+        allow_upload_file: int = 0,
+        default_output_format: int = 1,
+        attrs_are_visible: int = 0,
+        app_name: Optional[str] = None,
+        app_description: Optional[str] = None,
+    ):
         """
         Update base agent data based on parameters
 
@@ -221,6 +235,10 @@ class Agents(MySQL):
                 "enable_api": enable_api,
                 "updated_time": current_time
             }
+            if app_name is not None:
+                apps_data["name"] = app_name
+            if app_description is not None:
+                apps_data["description"] = app_description
             apps_model = Apps()
             apps_update_res = apps_model.update({"column": "id", "value": agent["app_id"]}, apps_data)
             if not apps_update_res:
@@ -1046,4 +1064,3 @@ class Agents(MySQL):
             agent_ids.append(agent["id"])
 
         return agent_ids
-

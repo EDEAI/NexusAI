@@ -115,6 +115,8 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
     """
 
     update_data = data.dict(exclude_unset=True)
+    app_name = data.name
+    app_description = data.description
     is_public = data.is_public
     attrs_are_visible = data.attrs_are_visible
     enable_api = data.enable_api
@@ -212,9 +214,22 @@ async def agent_base_update(request: Request, agent_id: int, data: ReqAgentBaseC
         return response_error(get_language_content("api_agent_base_update_default_output_format_error"))
 
     agents_model = Agents()
-    result = agents_model.agent_base_update(agent_id, userinfo.uid, userinfo.team_id, is_public, enable_api,
-                                            obligations, input_variables, dataset_ids, m_config_id, allow_upload_file,
-                                            default_output_format, attrs_are_visible)
+    result = agents_model.agent_base_update(
+        agent_id,
+        userinfo.uid,
+        userinfo.team_id,
+        is_public,
+        enable_api,
+        obligations,
+        input_variables,
+        dataset_ids,
+        m_config_id,
+        allow_upload_file,
+        default_output_format,
+        attrs_are_visible,
+        app_name,
+        app_description,
+    )
     if result["status"] != 1:
         return response_error(result["message"])
     app_id = result["data"]["app_id"]
@@ -770,10 +785,11 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
 
     Args:
         data (ReqAgentCorrectSchema): Request data containing:
-            name (str): Agent name
-            description (str): Agent description
-            obligations (str): Agent obligations
-            abilities (List[AgentAbilitiesData]): Agent abilities list
+            name (str): Agent name (optional)
+            description (str): Agent description (optional)
+            obligations (str): Agent obligations (optional)
+            abilities (List[AgentAbilitiesData]): Agent abilities list (optional)
+            agent_supplement (str): Correction requirements (required)
         userinfo (TokenData): User authentication information
 
     Returns:
@@ -784,33 +800,28 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
     Raises:
         - Returns error if agent correction fails
     """
-    # Validate required fields
-    if not data.name:
-        return response_error(get_language_content("api_agent_abilities_set_abilities_name_required"))
-    if not data.description:
-        return response_error(get_language_content("api_agent_abilities_set_abilities_content_required"))
-    if not data.obligations:
-        return response_error(get_language_content("agent_empty_obligation"))
+    # Validate required field
+    if not data.agent_supplement:
+        return response_error(get_language_content("api_agent_supplement_prompt_required"))
 
     # Validate abilities if provided
     if data.abilities:
         for ability in data.abilities:
-            if not ability.name:
-                return response_error(get_language_content("api_agent_abilities_set_abilities_name_required"))
-            if not ability.content:
-                return response_error(get_language_content("api_agent_abilities_set_abilities_content_required"))
-            if ability.status not in [1, 2]:
+            # if ability.name and not ability.content:
+            #     return response_error(get_language_content("api_agent_abilities_set_abilities_content_required"))
+            if ability.status and ability.status not in [1, 2]:
                 return response_error(get_language_content("api_agent_abilities_set_abilities_status_error"))
-            if ability.output_format not in [0, 1, 2, 3]:
+            if ability.output_format and ability.output_format not in [0, 1, 2, 3]:
                 return response_error(get_language_content("api_agent_abilities_set_output_format_error"))
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     try:
         # Create new app run for agent correction
         app_runs_model = AppRuns()
         app_run_data = {
             "user_id": userinfo.uid,
-            "app_id": 0,  # Set app_id to 0 for agent correction
+            "app_id": 0,
             "name": f"Agent_Correction_{current_time}",
             "created_time": current_time,
             "updated_time": current_time,
@@ -821,23 +832,23 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
         if not app_run_id:
             return response_error(get_language_content("api_agent_generate_failed"))
 
-        # Prepare system and user prompts
-        system_prompt = get_language_content('agent_correct_system', userinfo.uid)
-        
-        # Prepare history_agent data in the format matching system prompt structure
+        # Use provided parameters as history_agent
         history_agent = {
             "name": data.name or "",
             "description": data.description or "",
             "obligations": data.obligations or "",
             "abilities": [ability.dict() for ability in data.abilities] if data.abilities else []
         }
+
+        # Prepare system and user prompts
+        system_prompt = get_language_content('agent_correct_system', userinfo.uid)
         
         # Convert history_agent to formatted JSON string
         history_agent_str = json.dumps(history_agent, ensure_ascii=False, indent=2)
         
         user_prompt = get_language_content('agent_correct_user', userinfo.uid, False)
         user_prompt = user_prompt.format(
-            agent_supplement=data.agent_supplement or "",
+            agent_supplement=data.agent_supplement,
             history_agent=history_agent_str
         )
 
@@ -849,7 +860,7 @@ async def agent_correct(data: ReqAgentCorrectSchema, userinfo: TokenData = Depen
             app_run_id=app_run_id,
             ai_tool_type=1,
             inputs=input_,
-            run_type=1,
+            run_type=3,
             user_prompt=data.agent_supplement
         )
 
@@ -1691,5 +1702,4 @@ async def process_agent_file(userinfo: TokenData = Depends(get_current_user)):
             processed_data["order"] = data["order"]
 
     return response_success(processed_data, get_language_content("api_agent_success"))
-
 

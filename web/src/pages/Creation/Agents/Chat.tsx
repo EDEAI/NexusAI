@@ -118,6 +118,8 @@ interface Props {
         secondjudgingcondition: () => boolean;
         agentupdata: () => void;
     };
+    onOpenOptimize?: () => void;
+    optimizeLoading?: boolean;
     iframe?: {
         height: string;
     };
@@ -451,6 +453,16 @@ export default memo((props: Props) => {
 
             {props.operationbentate == 'false' && (
                 <>
+                    {props.onOpenOptimize && (
+                        <Button
+                            type="default"
+                            className="min-w-24"
+                            disabled={props.optimizeLoading}
+                            onClick={props.onOpenOptimize}
+                        >
+                            {intl.formatMessage({ id: 'agent.optimize.button' })}
+                        </Button>
+                    )}
                     <Button
                         type="primary"
                         disabled={props.operationbentate == 'false' ? false : true}

@@ -588,7 +588,7 @@ async def skill_direct_correction(data: ReqSkillDirectCorrectionSchema, userinfo
             app_run_id=app_run_id,
             ai_tool_type=2,  # Skill generator type
             inputs=input_,
-            run_type=1,
+            run_type=3,
             user_prompt=data.correction_prompt
         )
 

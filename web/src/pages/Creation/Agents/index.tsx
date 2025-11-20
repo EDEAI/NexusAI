@@ -5,6 +5,7 @@ import {
     PutagentOutputset,
 } from '@/api/agents';
 import { PostappsCreate } from '@/api/creation';
+import { agentCorrect, AgentCorrectAbility, AgentCorrectParams } from '@/api/workflow';
 import { BASE_URL } from '@/api/request';
 import { CURRENT_NODE_ID } from '@/components/WorkFlow/config';
 import { Variable as AgentsVariable, ObjectVariable } from '@/py2js/variables.js';
@@ -18,17 +19,29 @@ import {
 } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
-import { Button, Form, Menu, message, Spin, Splitter } from 'antd';
+import { Button, Form, Menu, message, Modal, Spin, Splitter } from 'antd';
 import _ from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { history } from 'umi';
 import AgentsFirst from '../components/AgentsFirst';
 import AgentsFourthly from '../components/AgentsFourthly';
 import AgentsSecond from '../components/AgentsSecond';
+import AgentOptimizeDiffModal, { AbilityComparison } from '../components/AgentOptimizeDiffModal';
+import AgentOptimizeModal from '../components/AgentOptimizeModal';
+import useSocketStore from '@/store/websocket';
 import Chat from './Chat';
 import Log from './Log';
 
 type MenuItem = Required<MenuProps>['items'][number];
+
+type AgentOptimizeData = Omit<AgentCorrectParams, 'agent_supplement'>;
+
+interface PendingOptimizeJob {
+    app_run_id: number;
+    record_id: number;
+}
+
+type NormalizedAbility = AgentCorrectAbility & { index?: number };
 
 const Agents: React.FC = () => {
     const intl = useIntl();
@@ -60,6 +73,19 @@ const Agents: React.FC = () => {
         second: false,
         fourthly: false,
     });
+    const [optimizeModalVisible, setOptimizeModalVisible] = useState(false);
+    const [optimizePrompt, setOptimizePrompt] = useState('');
+    const [diffBaseData, setDiffBaseData] = useState<AgentOptimizeData | null>(null);
+    const [pendingDiffBaseData, setPendingDiffBaseData] = useState<AgentOptimizeData | null>(null);
+    const [nextOptimizeInputData, setNextOptimizeInputData] = useState<AgentOptimizeData | null>(null);
+    const [optimizedData, setOptimizedData] = useState<AgentOptimizeData | null>(null);
+    const [optimizeLoading, setOptimizeLoading] = useState(false);
+    const [optimizeJob, setOptimizeJob] = useState<PendingOptimizeJob | null>(null);
+    const [abilityComparisons, setAbilityComparisons] = useState<AbilityComparison[]>([]);
+    const [diffVisible, setDiffVisible] = useState(false);
+    const agentCorrectMessages = useSocketStore(state =>
+        state.getTypedMessages('generate_agent_correct'),
+    );
     const items: MenuItem[] = [
         {
             key: '1',
@@ -248,6 +274,72 @@ const Agents: React.FC = () => {
         setLoading(false);
     };
 
+    useEffect(() => {
+        if (!optimizeJob) {
+            return;
+        }
+        const messagesArray = Array.isArray(agentCorrectMessages)
+            ? agentCorrectMessages
+            : [];
+        if (!messagesArray.length) {
+            return;
+        }
+        const matched = [...messagesArray]
+            .reverse()
+            .find(
+                (item: any) =>
+                    item?.data?.app_run_id === optimizeJob.app_run_id &&
+                    item?.data?.exec_data?.exec_id === optimizeJob.record_id,
+            );
+        if (!matched) {
+            return;
+        }
+        const status = matched?.data?.status;
+        if (status !== 3) {
+            const errorMessage =
+                matched?.data?.exec_data?.error ||
+                matched?.data?.error ||
+                intl.formatMessage({ id: 'agent.optimize.error.failed' });
+            message.error(errorMessage);
+            setOptimizeLoading(false);
+            setOptimizeJob(null);
+            setPendingDiffBaseData(null);
+            setNextOptimizeInputData(null);
+            return;
+        }
+        const rawValue = matched?.data?.exec_data?.outputs?.value;
+        try {
+            let payload = rawValue;
+            if (typeof payload === 'string') {
+                payload = JSON.parse(payload);
+            }
+            if (typeof payload === 'string') {
+                payload = JSON.parse(payload);
+            }
+            const normalized = normalizeAgentData(payload);
+            const baseDataForDiff = pendingDiffBaseData || diffBaseData || null;
+            const effectiveBase = baseDataForDiff || normalized;
+            setDiffBaseData(effectiveBase);
+            setOptimizedData(normalized);
+            setAbilityComparisons(
+                buildAbilityComparisonList(
+                    effectiveBase?.abilities || [],
+                    normalized.abilities || [],
+                ),
+            );
+            setOptimizeLoading(false);
+            setOptimizeJob(null);
+            setPendingDiffBaseData(null);
+            setNextOptimizeInputData(null);
+        } catch (error) {
+            message.error(intl.formatMessage({ id: 'agent.optimize.error.invalid' }));
+            setOptimizeLoading(false);
+            setOptimizeJob(null);
+            setPendingDiffBaseData(null);
+            setNextOptimizeInputData(null);
+        }
+    }, [agentCorrectMessages, optimizeJob, intl, pendingDiffBaseData, diffBaseData]);
+
     const objecttoarray = (obj?: any) => {
         const codeData = {
             users:
@@ -278,6 +370,320 @@ const Agents: React.FC = () => {
     const selectlistdata = (list: any) => {
         return list.map((item: any) => {
             return { value: item.agent_ability_id, label: item.name };
+        });
+    };
+
+    const normalizeAgentData = (data: any): AgentOptimizeData => {
+        const abilities: AgentCorrectAbility[] = Array.isArray(data?.abilities)
+            ? data.abilities.map((item: any) => ({
+                  agent_ability_id: Number(item?.agent_ability_id ?? 0),
+                  name: item?.name ?? '',
+                  content: item?.content ?? '',
+                  status:
+                      typeof item?.status === 'number'
+                          ? item.status
+                          : item?.status === false
+                          ? 2
+                          : 1,
+                  output_format: Number(item?.output_format ?? 0),
+              }))
+            : [];
+        return {
+            name: data?.name ?? '',
+            description: data?.description ?? '',
+            obligations: data?.obligations ?? '',
+            abilities,
+        };
+    };
+
+    const extractCurrentAgentData = (): AgentOptimizeData | null => {
+        if (!Detaillist) {
+            return null;
+        }
+        const abilityFormValues = Sformref.getFieldValue('users') || [];
+        const abilities: AgentCorrectAbility[] = Array.isArray(abilityFormValues)
+            ? abilityFormValues
+                  .filter((item: any) => !!item)
+                  .map((item: any) => ({
+                      agent_ability_id: Number(item?.agent_ability_id ?? 0),
+                      name: item?.name ?? '',
+                      content: item?.content ?? '',
+                      status:
+                          typeof item?.status === 'boolean'
+                              ? item.status
+                                  ? 1
+                                  : 2
+                              : Number(item?.status ?? 1),
+                      output_format: Number(item?.output_format ?? 0),
+                  }))
+                  .filter((item: AgentCorrectAbility) => item.name || item.content)
+            : [];
+        const obligationsField = Ffromref.getFieldValue('obligations');
+        return {
+            name: Detaillist?.app?.name ?? '',
+            description: Detaillist?.app?.description ?? '',
+            obligations:
+                obligationsField !== undefined
+                    ? obligationsField
+                    : Detaillist?.agent?.obligations ?? '',
+            abilities,
+        };
+    };
+
+    const buildAbilityComparisonList = (
+        currentAbilities: AgentCorrectAbility[] = [],
+        optimizedAbilities: AgentCorrectAbility[] = [],
+    ): AbilityComparison[] => {
+        const currentList: NormalizedAbility[] = currentAbilities.map((item, index) => ({
+            ...item,
+            index,
+        }));
+        const optimizedList: NormalizedAbility[] = optimizedAbilities.map((item, index) => ({
+            ...item,
+            index,
+        }));
+
+        const optimizedById = new Map<number, NormalizedAbility>();
+        const optimizedZeroQueue: NormalizedAbility[] = [];
+
+        optimizedList.forEach(item => {
+            if (item.agent_ability_id && item.agent_ability_id > 0) {
+                optimizedById.set(item.agent_ability_id, item);
+            } else {
+                optimizedZeroQueue.push(item);
+            }
+        });
+
+        const usedOptimizedIndex = new Set<number>();
+        const comparisons: AbilityComparison[] = [];
+        let zeroCursor = 0;
+
+        currentList.forEach(item => {
+            let optimizedMatch: NormalizedAbility | undefined;
+            if (item.agent_ability_id && item.agent_ability_id > 0) {
+                optimizedMatch = optimizedById.get(item.agent_ability_id);
+                if (optimizedMatch) {
+                    usedOptimizedIndex.add(optimizedMatch.index ?? 0);
+                }
+            } else if (zeroCursor < optimizedZeroQueue.length) {
+                optimizedMatch = optimizedZeroQueue[zeroCursor];
+                usedOptimizedIndex.add(optimizedMatch.index ?? 0);
+                zeroCursor += 1;
+            }
+
+            comparisons.push({
+                agent_ability_id: item.agent_ability_id ?? 0,
+                index: comparisons.length,
+                current: item,
+                optimized: optimizedMatch,
+            });
+        });
+
+        optimizedList.forEach(item => {
+            const index = item.index ?? 0;
+            if (usedOptimizedIndex.has(index)) {
+                return;
+            }
+            comparisons.push({
+                agent_ability_id: item.agent_ability_id ?? 0,
+                index: comparisons.length,
+                optimized: item,
+            });
+        });
+
+        return comparisons;
+    };
+
+    const handleOpenOptimizeModal = () => {
+        if (!Detaillist || optimizeLoading) {
+            return;
+        }
+        const currentData = extractCurrentAgentData();
+        if (!currentData) {
+            message.warning(intl.formatMessage({ id: 'agent.optimize.error.noData' }));
+            return;
+        }
+        const baseData = normalizeAgentData(currentData);
+        setNextOptimizeInputData(baseData);
+        setOptimizePrompt('');
+        setOptimizeModalVisible(true);
+    };
+
+    const handleOptimizeCancel = () => {
+        if (optimizeLoading && optimizeJob) {
+            return;
+        }
+        setOptimizeModalVisible(false);
+        if (!optimizeLoading) {
+            setPendingDiffBaseData(null);
+            setNextOptimizeInputData(null);
+        }
+    };
+
+    const handleContinueOptimize = () => {
+        if (!optimizedData || optimizeLoading) {
+            return;
+        }
+        const baseData = normalizeAgentData(optimizedData);
+        setNextOptimizeInputData(baseData);
+        setOptimizePrompt('');
+        setOptimizeModalVisible(true);
+    };
+
+    const handleOptimizeSubmit = async () => {
+        if (optimizeLoading) {
+            return;
+        }
+        if (secondjudgingcondition()) {
+            return;
+        }
+        const promptText = optimizePrompt.trim();
+        if (!promptText) {
+            message.warning(intl.formatMessage({ id: 'agent.optimize.error.required' }));
+            return;
+        }
+        let baseData = nextOptimizeInputData;
+        if (!baseData) {
+            const currentData = extractCurrentAgentData();
+            if (!currentData) {
+                message.warning(intl.formatMessage({ id: 'agent.optimize.error.noData' }));
+                return;
+            }
+            baseData = normalizeAgentData(currentData);
+            setNextOptimizeInputData(baseData);
+        }
+        try {
+            setOptimizeModalVisible(false);
+            setOptimizePrompt('');
+            setPendingDiffBaseData(baseData);
+            setDiffBaseData(baseData);
+            setOptimizedData(null);
+            setAbilityComparisons([]);
+            setDiffVisible(true);
+            setOptimizeLoading(true);
+
+            const payload: AgentCorrectParams = {
+                ...baseData,
+                agent_supplement: promptText,
+            };
+            const res = await agentCorrect(payload);
+            if (res?.code === 0 && res?.data) {
+                setOptimizeJob(res.data);
+            } else {
+                const errorMsg =
+                    res?.detail ||
+                    res?.message ||
+                    intl.formatMessage({ id: 'agent.optimize.error.failed' });
+                message.error(errorMsg);
+                setOptimizeLoading(false);
+                resetDiffState();
+            }
+        } catch (error: any) {
+            message.error(error?.message || intl.formatMessage({ id: 'agent.optimize.error.failed' }));
+            setOptimizeLoading(false);
+            resetDiffState();
+        }
+    };
+
+    const resetDiffState = () => {
+        setDiffVisible(false);
+        setOptimizedData(null);
+        setDiffBaseData(null);
+        setPendingDiffBaseData(null);
+        setNextOptimizeInputData(null);
+        setAbilityComparisons([]);
+    };
+
+    const handleApplyOptimizedResult = () => {
+        if (!optimizedData) {
+            return;
+        }
+        setDetaillist((prev: any) => {
+            if (!prev) return prev;
+            const existingAbilities = prev.agent?.agent_abilities_list || [];
+            const zeroExisting = existingAbilities.filter(
+                (item: any) => !item.agent_ability_id || item.agent_ability_id === 0,
+            );
+            let zeroCursor = 0;
+            const updatedAbilities = optimizedData.abilities.map(item => {
+                const abilityId = item.agent_ability_id ?? 0;
+                let baseAbility = null;
+                if (abilityId > 0) {
+                    baseAbility =
+                        existingAbilities.find(
+                            (ability: any) => ability.agent_ability_id === abilityId,
+                        ) || null;
+                } else {
+                    baseAbility = zeroExisting[zeroCursor] || null;
+                    zeroCursor += 1;
+                }
+                return {
+                    ...(baseAbility || {}),
+                    agent_ability_id: abilityId,
+                    name: item.name,
+                    content: item.content,
+                    status: item.status ?? 1,
+                    output_format: item.output_format ?? 0,
+                };
+            });
+            return {
+                ...prev,
+                app: {
+                    ...prev.app,
+                    name: optimizedData.name,
+                    description: optimizedData.description,
+                },
+                agent: {
+                    ...prev.agent,
+                    obligations: optimizedData.obligations,
+                    agent_abilities_list: updatedAbilities,
+                },
+            };
+        });
+
+        Ffromref.setFieldsValue({
+            ...Ffromref.getFieldsValue(),
+            obligations: optimizedData.obligations,
+        });
+
+        Sformref.setFieldsValue({
+            users: optimizedData.abilities.map(item => ({
+                agent_ability_id: item.agent_ability_id ?? 0,
+                name: item.name,
+                content: item.content,
+                status: item.status === 1,
+                output_format: item.output_format ?? 0,
+            })),
+        });
+
+        const updatedOptions = selectlistdata(optimizedData.abilities);
+        setAgent_select_list(updatedOptions);
+        setAgent_select_list_old(updatedOptions);
+
+        const enabledAbilities = optimizedData.abilities.filter(item => item.status === 1);
+        setFourthly_abilities_list(
+            selectlistdata(enabledAbilities).concat([
+                { value: 0, label: intl.formatMessage({ id: 'agent.allability' }) },
+            ]),
+        );
+
+        resetDiffState();
+        message.success(intl.formatMessage({ id: 'agent.optimize.apply.success' }));
+    };
+
+    const handleDiffCancel = () => {
+        if (!diffVisible) {
+            return;
+        }
+        Modal.confirm({
+            centered: true,
+            title: intl.formatMessage({ id: 'agent.optimize.diff.confirm.title' }),
+            content: intl.formatMessage({ id: 'agent.optimize.diff.confirm.content' }),
+            okText: intl.formatMessage({ id: 'agent.optimize.diff.confirm.ok' }),
+            cancelText: intl.formatMessage({ id: 'agent.optimize.diff.confirm.cancel' }),
+            onOk: () => {
+                resetDiffState();
+            },
         });
     };
 
@@ -455,6 +861,8 @@ const Agents: React.FC = () => {
                     const putBasedata = {
                         agent_id: agent_id,
                         data: {
+                            name: Detaillist?.app?.name,
+                            description: Detaillist?.app?.description,
                             is_public: Detaillist.app.is_public,
                             enable_api: Detaillist.app.enable_api,
                             attrs_are_visible: Detaillist.app.attrs_are_visible,
@@ -593,7 +1001,7 @@ const Agents: React.FC = () => {
     return (
         <div className=" flex bg-white" style={{ height: 'calc(100vh - 56px)' }}>
             <div className="flex flex-col w-[300px]" style={{ height: 'calc(100vh - 56px)' }}>
-                <div className="flex w-full items-center bg-white px-[30px] pt-[30px] border-[#e5e7eb] border-solid border-r">
+                <div className="flex w-full items-center bg-white px-[30px] pt-[30px] border-[#e5e7eb] border-solid border-r gap-2">
                     <Button
                         type="link"
                         shape="circle"
@@ -608,6 +1016,7 @@ const Agents: React.FC = () => {
                                 : intl.formatMessage({ id: 'agent.back' })}
                         </span>
                     </Button>
+                    <div className="ml-auto" />
                 </div>
                 <div className="w-full flex-1 px-[30px] py-[30px] bg-white border-[#e5e7eb] border-solid border-r">
                     <Menu
@@ -790,6 +1199,8 @@ const Agents: React.FC = () => {
                                     secondjudgingcondition,
                                     agentupdata,
                                 }}
+                                onOpenOptimize={handleOpenOptimizeModal}
+                                optimizeLoading={optimizeLoading}
                                 operationbentate={Operationbentate}
                                 data={{
                                     abilitiesList: Fourthly_abilities_list,
@@ -805,6 +1216,31 @@ const Agents: React.FC = () => {
                     )}
                 </Splitter>
             </div>
+            <AgentOptimizeModal
+                open={optimizeModalVisible}
+                loading={optimizeLoading}
+                title={intl.formatMessage({ id: 'agent.optimize.modal.title' })}
+                description={intl.formatMessage({ id: 'agent.optimize.modal.desc' })}
+                placeholder={intl.formatMessage({ id: 'agent.optimize.modal.placeholder' })}
+                okText={intl.formatMessage({ id: 'agent.optimize.submit' })}
+                cancelText={intl.formatMessage({ id: 'agent.optimize.cancel' })}
+                value={optimizePrompt}
+                onChange={setOptimizePrompt}
+                onOk={handleOptimizeSubmit}
+                onCancel={handleOptimizeCancel}
+            />
+            <AgentOptimizeDiffModal
+                open={diffVisible}
+                current={diffBaseData}
+                optimized={optimizedData}
+                loading={optimizeLoading && !optimizedData}
+                abilityComparisons={abilityComparisons}
+                onApply={handleApplyOptimizedResult}
+                onCancel={handleDiffCancel}
+                onContinue={optimizedData ? handleContinueOptimize : undefined}
+                applying={optimizeLoading}
+                continuing={optimizeLoading && !!optimizeJob}
+            />
         </div>
     );
 };
