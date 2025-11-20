@@ -67,16 +67,26 @@ class SandboxBaseNode(Node):
                 'file': (str, int)  # File type's value is actually a str or int
             }
             for param_name, param_props in input_params.items():
-                # Skip validation if the parameter has a default value and no value is provided
-                if param_name not in func_params or (func_params[param_name] is not None and param_props.value is None):
+                if param_name not in func_params:
+                    continue
+
+                raw_value = param_props.value
+                # Treat missing / empty string values as "not provided" so optional number fields don't break validation
+                if raw_value is None or (isinstance(raw_value, str) and raw_value.strip() == ''):
                     continue
 
                 expected_type_name = param_props.type
                 expected_type = type_map[expected_type_name]
                 if expected_type_name == 'json':
-                    params_value = json.loads(param_props.value)
+                    # Allow both serialized JSON strings and already parsed dict/list values
+                    params_value = raw_value
+                    if isinstance(raw_value, str):
+                        try:
+                            params_value = json.loads(raw_value)
+                        except json.JSONDecodeError:
+                            raise ValueError(f"Invalid JSON format for parameter '{param_name}': {raw_value}")
                 else:
-                    params_value = param_props.value
+                    params_value = raw_value
                 if not isinstance(params_value, expected_type):
                     raise TypeError(
                         f"Parameter '{param_name}' is expected to be of type '{expected_type_name}' "
@@ -90,6 +100,10 @@ class SandboxBaseNode(Node):
             kv = []
             for key, val in input_params.items():
                 var_value = val.value
+                if val.type == 'number':
+                    # Default empty/None number inputs to 0 so downstream code doesn't break
+                    if var_value is None or (isinstance(var_value, str) and var_value.strip() == ''):
+                        var_value = 0
                 if val.type == 'file':
                     # Get file path
                     if isinstance(var_value, int):
