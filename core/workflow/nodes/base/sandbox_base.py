@@ -38,13 +38,26 @@ class SandboxBaseNode(Node):
 
         # Helper function to get the type annotation of a function parameter
         def get_annotation_type(annotation):
-            print(annotation)
             if annotation is None:
                 return None
             if isinstance(annotation, ast.Name):
                 return annotation.id
-            elif isinstance(annotation.value, ast.Name):
-                return annotation.value.id
+            # e.g., typing.Dict / custom.module.Type
+            if isinstance(annotation, ast.Attribute):
+                if isinstance(annotation.value, ast.Name):
+                    return f"{annotation.value.id}.{annotation.attr}"
+                return annotation.attr
+            # e.g., Dict[str, int] or list[str]
+            if isinstance(annotation, ast.Subscript):
+                if isinstance(annotation.value, ast.Name):
+                    return annotation.value.id
+                if isinstance(annotation.value, ast.Attribute):
+                    return f"{get_annotation_type(annotation.value)}"
+            # Support union types (PEP604) like dict | list
+            if isinstance(annotation, ast.BinOp) and isinstance(annotation.op, ast.BitOr):
+                left = get_annotation_type(annotation.left)
+                right = get_annotation_type(annotation.right)
+                return f"{left}|{right}"
             return None
 
         # Helper function to parse the code and retrieve the function definition from the AST
