@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, Dict, Any,List
+from typing import Optional, Dict, Any, List, Union
 from datetime import datetime
 
 class ReqSkillCreateSchema(BaseModel):
@@ -19,6 +19,8 @@ class ReqSkillCreateSchema(BaseModel):
     status: int
 
 class ReqSkillUpdateSchema(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
     config: Optional[Dict[str, Any]] = None
     input_variables: Optional[Dict[str, Any]] = None
     dependencies: Optional[Dict[str, Any]] = None
@@ -131,11 +133,11 @@ class ReqSkillCorrectionSchema(BaseModel):
 class ReqSkillDirectCorrectionSchema(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    input_variables: Optional[Dict[str, Any]] = None
+    input_variables: Optional[Union[List[Dict[str, Any]], Dict[str, Any]]] = None
     dependencies: Optional[Dict[str, Any]] = None
-    code: Optional[str] = None
+    code: Optional[Union[str, Dict[str, Any]]] = None
     output_type: Optional[int] = None
-    output_variables: Optional[Dict[str, Any]] = None
+    output_variables: Optional[Union[List[Dict[str, Any]], Dict[str, Any]]] = None
     correction_prompt: Optional[str] = None
 
 class ResSkillCorrectionData(BaseModel):
@@ -170,7 +172,5 @@ class ReqSkillDebugSchema(BaseModel):
     output_type: int  # 1:text 2:database 3:code 4:document
     output_variables: dict
     test_input: Dict[str, Any]  # Input data for testing
-
-
 
 

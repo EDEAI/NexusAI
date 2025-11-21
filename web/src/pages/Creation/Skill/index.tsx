@@ -1,6 +1,6 @@
 import { PostappsCreate } from '@/api/creation';
 import { GetskillInfo, PutskillUpdate } from '@/api/skill';
-import { skillDebug } from '@/api/workflow';
+import { skillDebug, skillDirectCorrection, SkillDirectCorrectionParams } from '@/api/workflow';
 import BeforeCreate from '@/components/SkillCreate/BeforeCreate';
 import CodeEditor from '@/components/WorkFlow/components/Editor/CodeEditor';
 import RenderInput from '@/components/WorkFlow/components/RunForm/RenderInput';
@@ -16,14 +16,25 @@ import {
 import { ProForm, ProFormInstance } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
-import { Button, Form, Menu, message, Spin, Splitter } from 'antd';
+import { Button, Form, Menu, message, Modal, Spin, Splitter } from 'antd';
 import _ from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
+import useSocketStore from '@/store/websocket';
 import SkillFirst from './components/SkillFirst';
 import SkillSecond from './components/SkillSecond';
 import SkillThirdly from './components/SkillThirdly';
 import BugFix from './BugFix';
-import { useLatest } from 'ahooks';
+import SkillOptimizeModal from '../components/SkillOptimizeModal';
+import SkillOptimizeDiffModal, {
+    SkillOptimizeData,
+    SkillVariableComparison,
+    SkillVariableInfo,
+} from '../components/SkillOptimizeDiffModal';
+
+interface PendingOptimizeJob {
+    app_run_id: number;
+    record_id: number;
+}
 
 const Skill: React.FC = () => {
     const intl = useIntl();
@@ -42,6 +53,20 @@ const Skill: React.FC = () => {
     const [skillid, setSkillid] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isCreate, setIsCreate] = useState(false);
+    const [optimizeModalVisible, setOptimizeModalVisible] = useState(false);
+    const [optimizePrompt, setOptimizePrompt] = useState('');
+    const [diffBaseData, setDiffBaseData] = useState<SkillOptimizeData | null>(null);
+    const [pendingDiffBaseData, setPendingDiffBaseData] = useState<SkillOptimizeData | null>(null);
+    const [nextOptimizeInputData, setNextOptimizeInputData] = useState<SkillOptimizeData | null>(null);
+    const [optimizedData, setOptimizedData] = useState<SkillOptimizeData | null>(null);
+    const [optimizeLoading, setOptimizeLoading] = useState(false);
+    const [optimizeJob, setOptimizeJob] = useState<PendingOptimizeJob | null>(null);
+    const [inputComparisons, setInputComparisons] = useState<SkillVariableComparison[]>([]);
+    const [outputComparisons, setOutputComparisons] = useState<SkillVariableComparison[]>([]);
+    const [diffVisible, setDiffVisible] = useState(false);
+    const skillCorrectMessages = useSocketStore(state =>
+        state.getTypedMessages('generate_skill_correct'),
+    );
 
     const [skillmenudisabled, setskillmenudisabled] = useState({
         first: false,
@@ -228,6 +253,8 @@ const Skill: React.FC = () => {
                 setSkillid(newres.data.id);
                 
                 const data = {
+                    name: Skillinfo?.name || '',
+                    description: Skillinfo?.description || '',
                     input_variables: Skillinfo.input_variables
                         ? Skillinfo.input_variables
                         : arraytoobject(FirstSkillref.getFieldsValue()),
@@ -276,6 +303,8 @@ const Skill: React.FC = () => {
                 };
             } else {
                 const data = {
+                    name: Skillinfo?.name || '',
+                    description: Skillinfo?.description || '',
                     input_variables: Skillinfo.input_variables
                         ? Skillinfo.input_variables
                         : arraytoobject(FirstSkillref.getFieldsValue()),
@@ -349,6 +378,404 @@ const Skill: React.FC = () => {
             input_variables.addProperty(item.name, variable);
         });
         return input_variables;
+    };
+
+    const normalizeVariableArray = (variables?: any): SkillVariableInfo[] => {
+        if (!variables) return [];
+        const mapItem = (item: any): SkillVariableInfo => ({
+            name: item?.name || '',
+            type: item?.type || 'string',
+            required:
+                typeof item?.required === 'boolean'
+                    ? item.required
+                    : typeof item?.status === 'boolean'
+                    ? item.status
+                    : false,
+            display_name: item?.display_name || item?.content || item?.name || '',
+            description: item?.description || '',
+        });
+        if (Array.isArray(variables)) {
+            return variables.map(mapItem);
+        }
+        if (variables?.properties) {
+            return Object.values(variables.properties).map(mapItem);
+        }
+        return [];
+    };
+
+    const createVariableObjectFromArray = (
+        list: SkillVariableInfo[],
+        type: 'input' | 'output',
+    ) => {
+        const variableObject = new ObjectVariable(type === 'input' ? 'input' : 'output', '', '');
+        list.forEach(item => {
+            if (!item.name) {
+                return;
+            }
+            const variable = new SkillVariable(
+                item.name,
+                item.type || 'string',
+                '',
+                item.display_name || item.name,
+                item.required ?? false,
+            );
+            if (item.description !== undefined) {
+                variable.description = item.description;
+            }
+            variableObject.addProperty(item.name, variable);
+        });
+        return variableObject;
+    };
+
+    const convertCodeToString = (codeValue: any): string => {
+        if (!codeValue) return '';
+        if (typeof codeValue === 'string') {
+            try {
+                const parsed = JSON.parse(codeValue);
+                if (parsed && typeof parsed === 'object' && typeof parsed.python3 === 'string') {
+                    return parsed.python3;
+                }
+            } catch {
+                return codeValue;
+            }
+            return codeValue;
+        }
+        if (typeof codeValue === 'object' && codeValue !== null) {
+            if (typeof codeValue.python3 === 'string') {
+                return codeValue.python3;
+            }
+            return JSON.stringify(codeValue);
+        }
+        return '';
+    };
+
+    const normalizeSkillData = (data: any): SkillOptimizeData => {
+        const dependencies =
+            Array.isArray(data?.dependencies) || typeof data?.dependencies === 'string'
+                ? { python3: Array.isArray(data?.dependencies) ? data.dependencies : [data.dependencies] }
+                : {
+                      python3: Array.isArray(data?.dependencies?.python3)
+                          ? data.dependencies.python3
+                          : [],
+                  };
+        const codeString = convertCodeToString(data?.code);
+        return {
+            name: data?.name || '',
+            description: data?.description || '',
+            input_variables: normalizeVariableArray(data?.input_variables),
+            dependencies,
+            code: {
+                python3: codeString,
+            },
+            output_type:
+                typeof data?.output_type === 'number' && data.output_type > 0
+                    ? data.output_type
+                    : 1,
+            output_variables: normalizeVariableArray(data?.output_variables),
+        };
+    };
+
+    const extractCurrentSkillData = (): SkillOptimizeData | null => {
+        if (!Skillinfo) {
+            return null;
+        }
+        const inputList = normalizeVariableArray(Skillinfo.input_variables);
+        const outputList = normalizeVariableArray(Skillinfo.output_variables);
+        const dependenciesList = Array.isArray(SkillRelyOn)
+            ? SkillRelyOn
+            : Array.isArray(Skillinfo?.dependencies?.python3)
+            ? Skillinfo.dependencies.python3
+            : [];
+        const codeSource = Newcode || Skillinfo?.code;
+        const codeString = convertCodeToString(codeSource);
+
+        return {
+            name: Skillinfo.name || '',
+            description: Skillinfo.description || '',
+            input_variables: inputList,
+            dependencies: {
+                python3: dependenciesList,
+            },
+            code: {
+                python3: codeString,
+            },
+            output_type: Skillinfo.output_type || 1,
+            output_variables: outputList,
+        };
+    };
+
+    const mapVariablesForApi = (list: SkillVariableInfo[]) =>
+        list.map(item => ({
+            name: item.name,
+            type: item.type,
+            required: item.required ?? false,
+            display_name: item.display_name || item.name,
+            description: item.description || '',
+        }));
+
+    const buildVariableComparisons = (
+        currentList: SkillVariableInfo[] = [],
+        optimizedList: SkillVariableInfo[] = [],
+    ): SkillVariableComparison[] => {
+        const getKey = (item: SkillVariableInfo, index: number) =>
+            item?.name && item.name.trim() ? item.name : `__index_${index}`;
+        const optimizedMap = new Map<string, { item: SkillVariableInfo; index: number }>();
+        optimizedList.forEach((item, index) => {
+            optimizedMap.set(getKey(item, index), { item, index });
+        });
+        const usedKeys = new Set<string>();
+        const comparisons: SkillVariableComparison[] = currentList.map((item, index) => {
+            const key = getKey(item, index);
+            const match = optimizedMap.get(key)?.item;
+            if (match) {
+                usedKeys.add(key);
+            }
+            return {
+                name: item.name || key,
+                current: item,
+                optimized: match,
+            };
+        });
+
+        optimizedList.forEach((item, index) => {
+            const key = getKey(item, index);
+            if (!usedKeys.has(key)) {
+                comparisons.push({
+                    name: item.name || key,
+                    optimized: item,
+                });
+            }
+        });
+
+        return comparisons;
+    };
+
+    const buildSkillDirectPayload = (
+        baseData: SkillOptimizeData,
+        promptText: string,
+    ): SkillDirectCorrectionParams => ({
+        name: baseData.name,
+        description: baseData.description,
+        input_variables: mapVariablesForApi(baseData.input_variables),
+        dependencies: baseData.dependencies,
+        code: baseData.code,
+        output_type: baseData.output_type,
+        output_variables: mapVariablesForApi(baseData.output_variables),
+        correction_prompt: promptText,
+    });
+
+    const resetDiffState = () => {
+        setDiffVisible(false);
+        setOptimizedData(null);
+        setDiffBaseData(null);
+        setPendingDiffBaseData(null);
+        setNextOptimizeInputData(null);
+        setInputComparisons([]);
+        setOutputComparisons([]);
+        setOptimizeJob(null);
+        setOptimizeLoading(false);
+    };
+
+    const handleOpenOptimizeModal = () => {
+        if (optimizeLoading) {
+            return;
+        }
+        if (!Skillinfo) {
+            message.warning(intl.formatMessage({ id: 'skill.optimize.error.noData' }));
+            return;
+        }
+        const currentData = extractCurrentSkillData();
+        if (!currentData) {
+            message.warning(intl.formatMessage({ id: 'skill.optimize.error.noData' }));
+            return;
+        }
+        setNextOptimizeInputData(currentData);
+        setOptimizePrompt('');
+        setOptimizeModalVisible(true);
+    };
+
+    const handleOptimizeCancel = () => {
+        if (optimizeLoading && optimizeJob) {
+            return;
+        }
+        setOptimizeModalVisible(false);
+        if (!optimizeLoading) {
+            setNextOptimizeInputData(null);
+        }
+    };
+
+    const handleContinueOptimize = () => {
+        if (!optimizedData || optimizeLoading) {
+            return;
+        }
+        const baseData = normalizeSkillData(optimizedData);
+        setNextOptimizeInputData(baseData);
+        setOptimizePrompt('');
+        setOptimizeModalVisible(true);
+    };
+
+    const handleOptimizeSubmit = async () => {
+        if (optimizeLoading) {
+            return;
+        }
+        const promptText = optimizePrompt.trim();
+        if (!promptText) {
+            message.warning(intl.formatMessage({ id: 'skill.optimize.error.required' }));
+            return;
+        }
+        let baseData = nextOptimizeInputData;
+        if (!baseData) {
+            const currentData = extractCurrentSkillData();
+            if (!currentData) {
+                message.warning(intl.formatMessage({ id: 'skill.optimize.error.noData' }));
+                return;
+            }
+            baseData = currentData;
+            setNextOptimizeInputData(baseData);
+        }
+        try {
+            setOptimizeModalVisible(false);
+            setOptimizePrompt('');
+            setPendingDiffBaseData(baseData);
+            setDiffBaseData(baseData);
+            setOptimizedData(null);
+            setInputComparisons([]);
+            setOutputComparisons([]);
+            setDiffVisible(true);
+            setOptimizeLoading(true);
+
+            const payload: SkillDirectCorrectionParams = buildSkillDirectPayload(baseData, promptText);
+            const res = await skillDirectCorrection(payload);
+            if (res?.code === 0 && res?.data) {
+                setOptimizeJob(res.data);
+            } else {
+                const errorMsg =
+                    res?.detail ||
+                    res?.message ||
+                    intl.formatMessage({ id: 'skill.optimize.error.failed' });
+                message.error(errorMsg);
+                resetDiffState();
+            }
+        } catch (error) {
+            message.error(intl.formatMessage({ id: 'skill.optimize.error.failed' }));
+            resetDiffState();
+        }
+    };
+
+    useEffect(() => {
+        if (!optimizeJob) {
+            return;
+        }
+        const messagesArray = Array.isArray(skillCorrectMessages) ? skillCorrectMessages : [];
+        if (!messagesArray.length) {
+            return;
+        }
+        const matched = [...messagesArray]
+            .reverse()
+            .find(
+                item =>
+                    item?.data?.app_run_id === optimizeJob.app_run_id &&
+                    item?.data?.exec_data?.exec_id === optimizeJob.record_id,
+            );
+        if (!matched) {
+            return;
+        }
+        if (matched?.data?.status !== 3) {
+            const errorMessage =
+                matched?.data?.exec_data?.error ||
+                matched?.data?.error ||
+                intl.formatMessage({ id: 'skill.optimize.error.failed' });
+            message.error(errorMessage);
+            setOptimizeLoading(false);
+            setOptimizeJob(null);
+            setPendingDiffBaseData(null);
+            setNextOptimizeInputData(null);
+            return;
+        }
+        const rawValue = matched?.data?.exec_data?.outputs?.value;
+        try {
+            let payload = rawValue;
+            if (typeof payload === 'string') {
+                payload = JSON.parse(payload);
+            }
+            if (typeof payload === 'string') {
+                payload = JSON.parse(payload);
+            }
+            const normalized = normalizeSkillData(payload);
+            const effectiveBase = pendingDiffBaseData || diffBaseData || normalized;
+            setDiffBaseData(effectiveBase);
+            setOptimizedData(normalized);
+            setInputComparisons(
+                buildVariableComparisons(
+                    effectiveBase?.input_variables || [],
+                    normalized.input_variables || [],
+                ),
+            );
+            setOutputComparisons(
+                buildVariableComparisons(
+                    effectiveBase?.output_variables || [],
+                    normalized.output_variables || [],
+                ),
+            );
+            setOptimizeLoading(false);
+            setOptimizeJob(null);
+            setPendingDiffBaseData(null);
+            setNextOptimizeInputData(null);
+        } catch (error) {
+            message.error(intl.formatMessage({ id: 'skill.optimize.error.invalid' }));
+            setOptimizeLoading(false);
+            setOptimizeJob(null);
+            setPendingDiffBaseData(null);
+            setNextOptimizeInputData(null);
+        }
+    }, [skillCorrectMessages, optimizeJob, intl, pendingDiffBaseData, diffBaseData]);
+
+    const handleApplyOptimizedResult = () => {
+        if (!optimizedData) {
+            return;
+        }
+        const inputObject = createVariableObjectFromArray(optimizedData.input_variables, 'input');
+        const outputObject = createVariableObjectFromArray(optimizedData.output_variables, 'output');
+        const dependenciesList = optimizedData.dependencies?.python3 || [];
+        const codeString = JSON.stringify({
+            python3: optimizedData.code?.python3 || '',
+        });
+
+        setSkillInfo((prev: any) => ({
+            ...(prev || {}),
+            name: optimizedData.name,
+            description: optimizedData.description,
+            input_variables: inputObject,
+            dependencies: {
+                python3: dependenciesList,
+            },
+            code: codeString,
+            output_type: optimizedData.output_type,
+            output_variables: outputObject,
+        }));
+        setSkillRelyOn(dependenciesList);
+        setNewcode(codeString);
+        FirstSkillref.setFieldsValue(objecttoarray(inputObject));
+        Thirdlyref.setFieldsValue(objecttoarray(outputObject));
+        Fourthlyref.setFieldsValue(objecttoarray(inputObject));
+        message.success(intl.formatMessage({ id: 'skill.optimize.apply.success' }));
+        resetDiffState();
+    };
+
+    const handleDiffCancel = () => {
+        if (!diffVisible) {
+            return;
+        }
+        Modal.confirm({
+            centered: true,
+            title: intl.formatMessage({ id: 'skill.optimize.diff.confirm.title' }),
+            content: intl.formatMessage({ id: 'skill.optimize.diff.confirm.content' }),
+            okText: intl.formatMessage({ id: 'skill.optimize.diff.confirm.ok' }),
+            cancelText: intl.formatMessage({ id: 'skill.optimize.diff.confirm.cancel' }),
+            onOk: () => {
+                resetDiffState();
+            },
+        });
     };
 
 
@@ -522,10 +949,38 @@ const Skill: React.FC = () => {
                             skillupdata={skillupdata}
                             isCreate={isCreate}
                             setSkillInfo={setSkillInfo}
+                            onOpenOptimize={!loading && Skillinfo ? handleOpenOptimizeModal : undefined}
+                            optimizeLoading={optimizeLoading}
                         />
                     </Splitter.Panel>
                 </Splitter>
             </div>
+            <SkillOptimizeModal
+                open={optimizeModalVisible}
+                loading={optimizeLoading}
+                title={intl.formatMessage({ id: 'skill.optimize.modal.title' })}
+                description={intl.formatMessage({ id: 'skill.optimize.modal.desc' })}
+                placeholder={intl.formatMessage({ id: 'skill.optimize.modal.placeholder' })}
+                okText={intl.formatMessage({ id: 'skill.optimize.submit' })}
+                cancelText={intl.formatMessage({ id: 'skill.optimize.cancel' })}
+                value={optimizePrompt}
+                onChange={setOptimizePrompt}
+                onOk={handleOptimizeSubmit}
+                onCancel={handleOptimizeCancel}
+            />
+            <SkillOptimizeDiffModal
+                open={diffVisible}
+                current={diffBaseData}
+                optimized={optimizedData}
+                loading={optimizeLoading && !optimizedData}
+                inputComparisons={inputComparisons}
+                outputComparisons={outputComparisons}
+                onApply={handleApplyOptimizedResult}
+                onCancel={handleDiffCancel}
+                onContinue={optimizedData ? handleContinueOptimize : undefined}
+                applying={optimizeLoading}
+                continuing={optimizeLoading && !!optimizeJob}
+            />
         </div>
     );
 };

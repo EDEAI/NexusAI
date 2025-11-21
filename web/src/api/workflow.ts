@@ -735,6 +735,32 @@ export const skillCorrection = async (app_run_id:string,correction_prompt) => {
         },
     });
 };
+
+export interface SkillVariablePayload {
+    name: string;
+    type?: string;
+    required?: boolean;
+    display_name?: string;
+    description?: string;
+}
+
+export interface SkillDirectCorrectionParams {
+    name: string;
+    description: string;
+    input_variables?: SkillVariablePayload[];
+    dependencies?: { python3?: string[] };
+    code?: { python3?: string };
+    output_type?: number;
+    output_variables?: SkillVariablePayload[];
+    correction_prompt: string;
+}
+
+export const skillDirectCorrection = async (data: SkillDirectCorrectionParams) => {
+    return await aniRequest<any>(`/v1/skill/skill_direct_correction`, {
+        method: 'POST',
+        data,
+    });
+};
 export const skillDataCreate= async (createData) => {
     return await aniRequest<any>(`/v1/skill/skill_data_create`, {
         method: 'POST',

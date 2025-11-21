@@ -155,7 +155,7 @@ const Team: React.FC<TeamProps> = ({ isModalOpen, setIsModalOpen }) => {
                 // Refresh user info to update role cache
                 await refreshUserInfo();
                 
-                window.location.reload();
+                window.location.href = '/plaza';
             }
         } finally {
 
