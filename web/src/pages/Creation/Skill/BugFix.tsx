@@ -23,6 +23,8 @@ interface ChildProps {
     isCreate: boolean;
     setSkillInfo: (value: any) => void;
     readOnly?: boolean;
+    onOpenOptimize?: () => void;
+    optimizeLoading?: boolean;
 }
 const BugFix: React.FC<ChildProps> = ({
     FourthlyValue,
@@ -36,6 +38,8 @@ const BugFix: React.FC<ChildProps> = ({
     isCreate,
     setSkillInfo,
     readOnly = false,
+    onOpenOptimize,
+    optimizeLoading,
 }) => {
     const intl = useIntl();
     const [skillRun, setSkillRun] = useState<any>(null);
@@ -245,6 +249,17 @@ const BugFix: React.FC<ChildProps> = ({
                 </div>
                 {!readOnly && (
                     <>
+                        {onOpenOptimize && (
+                            <div>
+                                <Button
+                                    className="min-w-24 mr-4"
+                                    disabled={optimizeLoading}
+                                    onClick={onOpenOptimize}
+                                >
+                                    {intl.formatMessage({ id: 'skill.optimize.button' })}
+                                </Button>
+                            </div>
+                        )}
                         <div>
                             <Button type="primary" className="min-w-24" onClick={handleSave}>
                                 {intl.formatMessage({ id: 'skill.btn.save' })}

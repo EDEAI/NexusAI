@@ -1028,6 +1028,9 @@ language_packs = {
         'api_skill_success': 'success',
         'api_skill_generate_failed': 'Request failed, please try again later',
         'api_skill_correction_failed': 'Request failed, please try again later',
+        'api_skill_name_required': 'Skill name is required',
+        'api_skill_description_required': 'Skill description is required',
+        'api_skill_correction_prompt_required': 'Correction prompt is required',
         'api_skill_user_prompt_required': 'Prompt is required',
         'generate_skill_system_prompt': '''
             You are a python tool generation assistant.
@@ -1043,7 +1046,8 @@ language_packs = {
                         "name":"variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
                         "type":"Variable type, including ['string', 'number', 'json', 'file'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python, 'file' type variable value is a file path that can be directly used for file operations",
                         "required":"(bool type), whether the variable is required: True means required, False means non-required",
-                        "display_name":"variable display name, which can be used as a description of the function and purpose of the variable"
+                        "display_name":"variable display name, which can be used as a description of the function and purpose of the variable",
+                        "description":"(string type) variable description, clearly and concisely explain the meaning, expected content and usage examples of the variable"
                     }}
                 ],
                 "dependencies": {{
@@ -1057,7 +1061,8 @@ language_packs = {
                     {{
                         "name": "variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
                         "type": "Variable type, including ['string', 'number', 'json', 'file'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python, 'file' is used when the variable contains a file path. If a Python function returns a file path, this variable must be set to 'file' type",
-                        "display_name": "Variable display name, can be used as a description of the function and purpose of the variable"
+                        "display_name": "Variable display name, can be used as a description of the function and purpose of the variable",
+                        "description":"(string type) variable description, clearly and concisely explain the meaning, expected content and usage examples of the variable"
                     }}
                 ]
             }}
@@ -1097,7 +1102,8 @@ language_packs = {
                         "name":"variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
                         "type":"Variable type, including ['string', 'number', 'json', 'file'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python, 'file' type variable value is a file path that can be directly used for file operations",
                         "required":"(bool type), whether the variable is required: True means required, False means non-required",
-                        "display_name":"variable display name, which can be used as a description of the function and purpose of the variable"
+                        "display_name":"variable display name, which can be used as a description of the function and purpose of the variable",
+                        "description":"(string type) variable description, clearly and concisely explain the meaning, expected content and usage examples of the variable"
                     }}
                 ],
                 "dependencies": {{
@@ -1111,7 +1117,8 @@ language_packs = {
                     {{
                         "name": "variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
                         "type": "Variable type, including ['string', 'number', 'json', 'file'], 'string' corresponds to the str type in Python, 'number' corresponds to the int or float type in Python, 'json' corresponds to the dict or list type in Python, 'file' is used when the variable contains a file path. If a Python function returns a file path, this variable must be set to 'file' type",
-                        "display_name": "Variable display name, can be used as a description of the function and purpose of the variable"
+                        "display_name": "Variable display name, can be used as a description of the function and purpose of the variable",
+                        "description":"(string type) variable description, clearly and concisely explain the meaning, expected content and usage examples of the variable"
                     }}
                 ]
             }}
@@ -1755,6 +1762,9 @@ language_packs = {
         'api_skill_success': '请求成功，请等待',
         'api_skill_generate_failed': '请求失败，请稍后再试',
         'api_skill_correction_failed': '请求失败，请稍后再试',
+        'api_skill_name_required': '技能名称不能为空',
+        'api_skill_description_required': '技能描述不能为空',
+        'api_skill_correction_prompt_required': '优化建议不能为空',
         'api_skill_user_prompt_required': '提示词不能为空',
         'skill_validation_failed': '技能验证失败',
         'skill_create_success': '技能创建成功',

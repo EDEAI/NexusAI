@@ -180,6 +180,7 @@ type MessageType =
     | 'workflow_need_human_confirm'
     | 'generate_agent_batch'
     | 'generate_agent_correct'
+    | 'generate_skill_correct'
     | 'chat_message_llm_return';
 
 type TypedMessageMap = {
@@ -188,6 +189,7 @@ type TypedMessageMap = {
     workflow_need_human_confirm: WorkflowNeedHumanConfirm[];
     generate_agent_batch: any[];
     generate_agent_correct: any[];
+    generate_skill_correct: any[];
     [key: string]: any[];
 };
 

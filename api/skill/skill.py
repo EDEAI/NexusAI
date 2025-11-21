@@ -108,27 +108,39 @@ async def skill_update(app_id: int, tool: ReqSkillUpdateSchema, userinfo: TokenD
     if 'attrs_are_visible' in update_data and update_data['attrs_are_visible'] not in [0, 1]:
         return response_error(get_language_content("api_agent_base_update_attrs_are_visible_error"))
     try:
+        apps_data = {
+            "updated_time": update_data['updated_time']
+        }
+
         if 'is_public' in update_data:
-            apps_data = {
-                "is_public": update_data['is_public'],
-                "updated_time": update_data['updated_time']
-            }
-            apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
+            apps_data['is_public'] = update_data['is_public']
             del update_data['is_public']
 
         if 'attrs_are_visible' in update_data:
-            apps_data = {
-                "attrs_are_visible": update_data['attrs_are_visible'],
-                "updated_time": update_data['updated_time']
-            }
-            apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
+            apps_data['attrs_are_visible'] = update_data['attrs_are_visible']
             del update_data['attrs_are_visible']
-        conditions = [{'column': 'app_id', 'value': app_id}, {'column': 'user_id', 'value': user_id},
-                      {'column': 'publish_status', 'value': 0}]
-        tools_db.update(conditions, update_data)
+
+        if 'name' in update_data:
+            apps_data['name'] = update_data['name']
+            del update_data['name']
+
+        if 'description' in update_data:
+            apps_data['description'] = update_data['description']
+            del update_data['description']
+
+        if len(apps_data.keys()) > 1:  # updated_time plus at least one field
+            apps_db.update([{'column': 'id', 'value': app_id}], apps_data)
+
+        if update_data:
+            conditions = [
+                {'column': 'app_id', 'value': app_id},
+                {'column': 'user_id', 'value': user_id},
+                {'column': 'publish_status', 'value': 0}
+            ]
+            tools_db.update(conditions, update_data)
 
         return response_success()
-    except:
+    except Exception:
         return response_error(get_language_content("update_error"))
 
 
@@ -534,11 +546,6 @@ async def skill_direct_correction(data: ReqSkillDirectCorrectionSchema, userinfo
         4. Creates new LLM execution record for correction
         5. Returns record IDs for tracking correction progress
     """
-    # Validate required fields
-    if not data.name:
-        return response_error(get_language_content("api_skill_name_required"))
-    if not data.description:
-        return response_error(get_language_content("api_skill_description_required"))
     if not data.correction_prompt:
         return response_error(get_language_content("api_skill_correction_prompt_required"))
 
