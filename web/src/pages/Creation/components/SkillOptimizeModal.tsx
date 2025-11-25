@@ -1,5 +1,6 @@
 import { Alert, Input, Modal } from 'antd';
 import React from 'react';
+import './optimize-modal.less';
 
 const { TextArea } = Input;
 
@@ -49,9 +50,10 @@ const SkillOptimizeModal: React.FC<SkillOptimizeModalProps> = ({
             <div className="space-y-4 py-2">
                 <Alert type="info" message={description} showIcon />
                 <TextArea
-                    autoSize={{ minRows: 4, maxRows: 8 }}
-                    maxLength={800}
+                    rows={4}
                     showCount
+                    className="optimize-textarea"
+                    style={{ resize: 'vertical' }}
                     placeholder={placeholder}
                     value={value}
                     onChange={e => onChange(e.target.value)}
