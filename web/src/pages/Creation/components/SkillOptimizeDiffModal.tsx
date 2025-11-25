@@ -44,6 +44,9 @@ interface SkillOptimizeDiffModalProps {
     onContinue?: () => void;
     applying?: boolean;
     continuing?: boolean;
+    nameTitleOverride?: string;
+    descriptionTitleOverride?: string;
+    showOutputType?: boolean;
 }
 
 const SkillOptimizeDiffModal: React.FC<SkillOptimizeDiffModalProps> = ({
@@ -58,6 +61,9 @@ const SkillOptimizeDiffModal: React.FC<SkillOptimizeDiffModalProps> = ({
     onContinue,
     applying = false,
     continuing = false,
+    nameTitleOverride,
+    descriptionTitleOverride,
+    showOutputType = true,
 }) => {
     const intl = useIntl();
     const optimizedLoading = loading && !optimized;
@@ -70,8 +76,9 @@ const SkillOptimizeDiffModal: React.FC<SkillOptimizeDiffModalProps> = ({
     );
     const removedText = intl.formatMessage({ id: 'skill.optimize.diff.removed' });
     const addedText = intl.formatMessage({ id: 'skill.optimize.diff.added' });
-    const nameTitle = intl.formatMessage({ id: 'skill.appname' });
-    const descriptionTitle = intl.formatMessage({ id: 'skill.appdescription' });
+    const nameTitle = nameTitleOverride || intl.formatMessage({ id: 'skill.appname' });
+    const descriptionTitle =
+        descriptionTitleOverride || intl.formatMessage({ id: 'skill.appdescription' });
     const inputsTitle = intl.formatMessage({ id: 'skill.optimize.diff.inputs' });
     const outputsTitle = intl.formatMessage({ id: 'skill.optimize.diff.outputs' });
     const dependenciesTitle = intl.formatMessage({ id: 'skill.optimize.diff.dependencies' });
@@ -287,25 +294,27 @@ const SkillOptimizeDiffModal: React.FC<SkillOptimizeDiffModalProps> = ({
                     </Spin>
                 </section>
 
-                <section className="space-y-4">
-                    <h3 className="text-sm font-semibold text-gray-700">{outputTypeTitle}</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="rounded-lg border border-gray-200 p-3">
-                            <div className="text-xs uppercase text-gray-500">{headerLabel.current}</div>
-                            <div className="mt-1 text-sm font-medium text-gray-900">
-                                {outputTypeMap[current?.output_type as 1 | 2 | 3 | 4] || outputTypeLabel}
-                            </div>
-                        </div>
-                        <Spin spinning={optimizedLoading}>
-                            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 min-h-[76px]">
-                                <div className="text-xs uppercase text-gray-500">{headerLabel.optimized}</div>
-                                <div className="mt-1 text-sm font-medium text-blue-700">
-                                    {outputTypeMap[optimized?.output_type as 1 | 2 | 3 | 4] || outputTypeLabel}
+                {showOutputType && (
+                    <section className="space-y-4">
+                        <h3 className="text-sm font-semibold text-gray-700">{outputTypeTitle}</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="rounded-lg border border-gray-200 p-3">
+                                <div className="text-xs uppercase text-gray-500">{headerLabel.current}</div>
+                                <div className="mt-1 text-sm font-medium text-gray-900">
+                                    {outputTypeMap[current?.output_type as 1 | 2 | 3 | 4] || outputTypeLabel}
                                 </div>
                             </div>
-                        </Spin>
-                    </div>
-                </section>
+                            <Spin spinning={optimizedLoading}>
+                                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 min-h-[76px]">
+                                    <div className="text-xs uppercase text-gray-500">{headerLabel.optimized}</div>
+                                    <div className="mt-1 text-sm font-medium text-blue-700">
+                                        {outputTypeMap[optimized?.output_type as 1 | 2 | 3 | 4] || outputTypeLabel}
+                                    </div>
+                                </div>
+                            </Spin>
+                        </div>
+                    </section>
+                )}
 
                 <section className="space-y-4">
                     <h3 className="text-sm font-semibold text-gray-700">{outputsTitle}</h3>

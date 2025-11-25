@@ -62,7 +62,13 @@ export type AppState = {
     teamDatasetData: any;
     modelOptionsData: any;
     loadingWorkflowData:boolean;
+    drawerOptimizeDisabled: boolean;
+    customCodeOptimizeHandlers: Record<string, () => void>;
+    triggerCustomCodeOptimize: (nodeId: string) => void;
+    updateSelectedNodeData: (nodeId: string, newData: Partial<AppNodeData>) => void;
     setLoadingWorkflowData: (data:boolean) => void;
+    setDrawerOptimizeDisabled: (disabled: boolean) => void;
+    setCustomCodeOptimizeHandler: (nodeId: string, handler?: () => void) => void;
     setModelOptionsData: (data: any) => void;
     getNode: (nodeId: string) => AppNode;
     setShowChildNode: (value: any) => void;
@@ -277,4 +283,3 @@ export interface NodeTypeRules {
         };
     };
 }
-

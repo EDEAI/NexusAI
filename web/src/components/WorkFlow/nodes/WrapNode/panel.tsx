@@ -2,7 +2,7 @@
  * @LastEditors: biz
  */
 import useScrollBarDetect from '@/hooks/useScrollBarDetect';
-import { CaretRightFilled, CloseOutlined } from '@ant-design/icons';
+import { CaretRightFilled, CloseOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { ProForm, ProFormText } from '@ant-design/pro-components';
 import { useIntl, useSearchParams } from '@umijs/max';
 import { useReactFlow } from '@xyflow/react';
@@ -31,10 +31,11 @@ const NodeForm = memo(({ node, updateNodeData }: NodeFormParams) => {
     const setShowChildNode = useStore(state => state.setShowChildNode);
     const showChildNode = useStore(state => state.showChildNode);
     const getNode = useStore(state => state.getNode);
+    const triggerCustomCodeOptimize = useStore(state => state.triggerCustomCodeOptimize);
+    const drawerOptimizeDisabled = useStore(state => state.drawerOptimizeDisabled);
 
     const setNodeChange = useCallback(
         (_changedValues, allValues) => {
-            // updateNodeData(node?.id, allValues);
             if (node?.data?.['isChild']) {
                 const parentNode = getNode(node?.id);
                 const executor_list = _.cloneDeep(parentNode?.data?.executor_list);
@@ -52,16 +53,23 @@ const NodeForm = memo(({ node, updateNodeData }: NodeFormParams) => {
                 updateNodeData(node.id, allValues);
             }
         },
-        [node?.id, updateNodeData, showChildNode],
+        [node?.id, updateNodeData, showChildNode, getNode],
     );
 
     const [searchParams] = useSearchParams();
     const publishStatus = searchParams.get('type') == 'true';
 
     useEffect(() => {
-        formRef?.current?.setFieldsValue({ desc: node?.data['desc'] || '' });
-        formRef?.current?.setFieldsValue({ title: node?.data['title'] || '' });
-    }, [node.id, showChildNode]);
+        const currentValues = formRef?.current?.getFieldsValue?.() || {};
+        const nextTitle = node?.data['title'] || '';
+        const nextDesc = node?.data['desc'] || '';
+        if (currentValues?.title !== nextTitle) {
+            formRef?.current?.setFieldsValue({ title: nextTitle });
+        }
+        if (currentValues?.desc !== nextDesc) {
+            formRef?.current?.setFieldsValue({ desc: nextDesc });
+        }
+    }, [node.id, showChildNode, node?.data['title'], node?.data['desc']]);
     const runNode = () => {
         setTimeout(() => {
             setRunPanelNodeShow(node);
@@ -128,6 +136,20 @@ const NodeForm = memo(({ node, updateNodeData }: NodeFormParams) => {
                     name="title"
                     className="font-bold"
                 ></ProFormText>
+                {!publishStatus && (
+                    <Tooltip
+                        title={intl.formatMessage({
+                            id: 'workflow.customcode.optimize.tooltip'
+                        })}
+                    >
+                        <Button
+                            shape="circle"
+                            icon={<ThunderboltOutlined />}
+                            onClick={() => triggerCustomCodeOptimize(node?.id)}
+                            disabled={drawerOptimizeDisabled}
+                        />
+                    </Tooltip>
+                )}
                 {!publishStatus && !NOT_RUN_NODE_TYPE.includes(node?.type as BlockEnum) && (
                     <Tooltip
                         title={intl.formatMessage({
