@@ -45,8 +45,40 @@ const useStore = create(
             handleList: [],
             workflowEditInfo: {},
             loadingWorkflowData:true,
+            drawerOptimizeDisabled: false,
+            customCodeOptimizeHandlers: {},
             setLoadingWorkflowData:(data:boolean) => {
                 set({ loadingWorkflowData: data });
+            },
+            setDrawerOptimizeDisabled: (disabled: boolean) => {
+                set({ drawerOptimizeDisabled: disabled });
+            },
+            setCustomCodeOptimizeHandler: (nodeId: string, handler?: () => void) => {
+                const handlers = get().customCodeOptimizeHandlers || {};
+                const nextHandlers = { ...handlers };
+                if (handler) {
+                    nextHandlers[nodeId] = handler;
+                } else {
+                    delete nextHandlers[nodeId];
+                }
+                set({ customCodeOptimizeHandlers: nextHandlers });
+            },
+            triggerCustomCodeOptimize: (nodeId: string) => {
+                const handler = get().customCodeOptimizeHandlers?.[nodeId];
+                handler && handler();
+            },
+            updateSelectedNodeData: (nodeId: string, newData: Partial<AppNodeData>) => {
+                const selectedNode = get().selectedNode;
+                if (selectedNode?.id !== nodeId) return;
+                set({
+                    selectedNode: {
+                        ...selectedNode,
+                        data: {
+                            ...selectedNode.data,
+                            ..._.cloneDeep(newData),
+                        },
+                    },
+                });
             },
             setModelOptionsData: data => {
                 set({ modelOptionsData: data });
@@ -629,27 +661,15 @@ const useStore = create(
             },
             updateNodeData: (nodeId, newData) => {
                 const clonedNewData = _.cloneDeep(newData);
-                const selectNode: AppNode = get().selectedNode;
-                // if(selectNode?.id==nodeId){
-                //     set({
-                //         selectedNode:{
-                //             ...selectNode,
-                //             data:{
-                //                 ...selectNode.data,
-                //                 ...clonedNewData,
-                //             }
-                //         }
-                //     })
-                // }
+                const updatedNodes = get().nodes.map(node => {
+                    const mergeData = {
+                        ...node.data,
+                        ...clonedNewData,
+                    };
+                    return node.id === nodeId ? { ...node, data: mergeData } : node;
+                });
                 set({
-                    nodes: get().nodes.map(node => {
-                        const mergeData = {
-                            ...node.data,
-                            ...clonedNewData,
-                        };
-
-                        return node.id === nodeId ? { ...node, data: mergeData } : node;
-                    }),
+                    nodes: updatedNodes,
                 });
             },
             updateNodeFromId: (nodeId, newNodeData) => {

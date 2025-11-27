@@ -319,6 +319,16 @@ export default {
     'workflow.vars.addVariable': 'Add Variable',
     'workflow.vars.description': 'Variable Description',
     'workflow.vars.description.placeholder': 'Add usage notes, formats, or examples for this variable (Markdown supported)',
+    'workflow.customcode.optimize.tooltip': 'AI generate/optimize custom code',
+    'workflow.customcode.optimize.modal.title': 'AI Build Custom Code',
+    'workflow.customcode.optimize.modal.desc':
+        'AI will refine node name, description, inputs/outputs, dependencies, and code based on your instructions.',
+    'workflow.customcode.optimize.modal.placeholder':
+        'Describe the logic, inputs/outputs, dependencies, or performance goals you expect',
+    'workflow.customcode.optimize.submit': 'Submit',
+    'workflow.customcode.optimize.cancel': 'Cancel',
+    'workflow.customcode.optimize.diff.name': 'Node Name',
+    'workflow.customcode.optimize.diff.description': 'Node Description',
 
     'workflow.general.yes': 'Yes',
     'workflow.general.no': 'No',
