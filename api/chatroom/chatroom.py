@@ -81,9 +81,16 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
     uid =  userinfo.uid
     user_info = get_uid_user_info(uid)
     if user_info['role']!=1:
-        return_status = Roles().check_role_deletable(user_info['role_id'],5)
-        if not return_status:
-            return response_error(get_language_content("the_current_user_does_not_have_permission"))
+        if is_temporary ==1:
+            return_status = Roles().check_role_deletable(user_info['role_id'],1)
+            if not return_status:
+                return_status = Roles().check_role_deletable(user_info['role_id'],5)
+                if not return_status:
+                    return response_error(get_language_content("the_current_user_does_not_have_permission"))
+        else:
+            return_status = Roles().check_role_deletable(user_info['role_id'],5)
+            if not return_status:
+                return response_error(get_language_content("the_current_user_does_not_have_permission"))
 
     if not name:
         return response_error(get_language_content("chatroom_name_is_required"))
