@@ -12,6 +12,8 @@ class ChatRoomInfoBase(BaseModel):
     description: Optional[str] = None
     chatroom_id: Optional[int] = None
     app_id: Optional[int] = None
+    enable_api: Optional[int] = None
+    api_url: Optional[str] = None
     chat_status: Optional[int] = None
     active: Optional[int] = None
     chatroom_status: Optional[int] = None
@@ -36,6 +38,7 @@ class ReqChatroomCreateSchema(BaseModel):
     max_round: int
     agent: List[AgentModel]
     is_temporary: int = 0
+    enable_api: Optional[int] = None
 
 
 class ReqChatroomUpdateSchema(BaseModel):
@@ -43,6 +46,7 @@ class ReqChatroomUpdateSchema(BaseModel):
     description: str
     max_round: int
     agent: List[AgentModel]
+    enable_api: Optional[int] = None
 
 
 class AgentListData(BaseModel):
@@ -148,6 +152,8 @@ class ChatRoomDetailBase(BaseModel):
     description: Optional[str] = None
     is_public: Optional[int] = None
     execution_times: Optional[int] = None
+    enable_api: Optional[int] = None
+    api_url: Optional[str] = None
 
 
 class ChatRoomDetailInfo(BaseModel):

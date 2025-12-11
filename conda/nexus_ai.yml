@@ -72,9 +72,9 @@ dependencies:
   - openjpeg=2.4.0
   - openssl=3.0.17
   - pillow=10.4.0
-  # - pip=24.0
+  - pip=24.0
   - poppler=24.09.0
-  # - python=3.10.13
+  - python=3.10.13
   - pysocks=1.7.1
   - pytorch=2.3.1
   - pytorch-cuda=12.1

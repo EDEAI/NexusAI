@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 from datetime import datetime
 # from api.utils.ai_tool import call_llm_for_ai_tool
-from core.helper import truncate_messages_by_token_limit
+from core.helper import truncate_messages_by_token_limit, generate_api_token, encrypt_id
 
 from core.database.models import AppRuns
 from api.utils.auth import get_uid_user_info
@@ -69,6 +69,7 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
     max_round: int = chat_data['max_round']
     agent = chat_data['agent']
     is_temporary: int = chat_data.get('is_temporary', 0)
+    enable_api = chat_data.get('enable_api')
     mode: int = 5
 
     team_id = userinfo.team_id
@@ -113,6 +114,9 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
             if missing_keys:
                 return response_error(get_language_content("chatroom_agent_item_missing_keys"))
 
+    if enable_api not in [0, 1]:
+        return response_error(get_language_content("api_agent_base_update_enable_api_error"))
+
     app_id = Apps().insert(
         {
             'team_id': userinfo.team_id,
@@ -120,7 +124,9 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
             'name': name,
             'description': description,
             'mode': mode,
-            'status': 1
+            'status': 1,
+            'enable_api': enable_api,
+            'api_token': generate_api_token()
         }
     )
     chatroom_id = Chatrooms().insert(
@@ -236,6 +242,9 @@ async def show_chatroom_details(chatroom_id: int, userinfo: TokenData = Depends(
         )
 
     chat_info = Apps().get_app_by_id(find_chatroom['app_id'])
+    if chat_info.get('mode') == 5:
+        encrypted_id = encrypt_id(chat_info['id'])
+        chat_info['api_url'] = f'/v1/chatroom-api/{encrypted_id}/docs'
     agent_list = ChatroomAgentRelation().show_chatroom_agent(chatroom_id)
 
     for agent in agent_list:
@@ -338,6 +347,9 @@ async def update_chatroom(chatroom_id: int, chat_request: ReqChatroomUpdateSchem
     max_round: int = chat_data['max_round']
     # agent = chat_data['agent']
     new_agents: List[AgentModel] = chat_data['agent']
+    enable_api = chat_data.get('enable_api', 0)
+    if enable_api is None:
+        enable_api = 0
     mode: int = 5
     find_chatroom = Chatrooms().search_chatrooms_id(chatroom_id, userinfo.uid)
     if not find_chatroom['status']:
@@ -375,6 +387,28 @@ async def update_chatroom(chatroom_id: int, chat_request: ReqChatroomUpdateSchem
         if not return_status:
             return response_error(get_language_content("the_current_user_does_not_have_permission"))
 
+    app_record = Apps().select_one(
+        columns=["id", "api_token", "enable_api"],
+        conditions=[
+            {"column": "id", "value": find_chatroom['app_id']},
+            {"column": "team_id", "value": userinfo.team_id},
+            {"column": "user_id", "value": userinfo.uid},
+            {"column": "mode", "value": 5},
+            {"column": "status", "op": "in", "value": [1, 2]}
+        ]
+    )
+    if not app_record:
+        return response_error(get_language_content("api_agent_info_app_error"))
+
+    if enable_api is None:
+        enable_api = app_record.get('enable_api', 0)
+    if enable_api not in [0, 1]:
+        return response_error(get_language_content("api_agent_base_update_enable_api_error"))
+
+    updated_token = app_record['api_token']
+    if enable_api and not updated_token:
+        updated_token = generate_api_token()
+
     Apps().update(
         [
             {"column": "id", "value": find_chatroom['app_id']},
@@ -383,7 +417,9 @@ async def update_chatroom(chatroom_id: int, chat_request: ReqChatroomUpdateSchem
             {"column": "mode", "value": 5},
         ], {
             'name': name,
-            'description': description
+            'description': description,
+            'enable_api': enable_api,
+            'api_token': updated_token
         }
     )
 

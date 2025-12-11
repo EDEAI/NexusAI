@@ -34,7 +34,7 @@ export default {
     'agent.appdescription': 'Agent Description',
     'agent.teamvisibility': 'Team Visibility',
     'agent.attrVisible':'Attribute Visible',
-    'agent.APIswitch': 'Enable API',
+    'agent.APIswitch': 'API Access',
     'agent.filesupload': 'Allow File Upload',
     'agent.LLMmodel': 'LLM Model',
     'agent.pleaseselect': 'Please select',

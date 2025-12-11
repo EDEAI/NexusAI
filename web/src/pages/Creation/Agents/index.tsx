@@ -1057,7 +1057,7 @@ const Agents: React.FC = () => {
                         >
                             <div className="mr-[20px] text-base font-medium text-[#213044] -mt-1">
                                 <DesktopOutlined className="mr-3" />
-                                {intl.formatMessage({ id: 'agent.visit' })} API
+                                {intl.formatMessage({ id: 'component.api.docs' })}
                             </div>
                         </div>
                     ) : null}

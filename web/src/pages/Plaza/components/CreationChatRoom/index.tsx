@@ -6,6 +6,7 @@ import { Button, Col, Form, Input, InputNumber, message, Row } from 'antd';
 import { throttle } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'umi';
+import { Switch } from 'antd';
 import Agent from './selectApp';
 import ChatAvatar from '@/components/ChatAvatar';
 const { TextArea } = Input;
@@ -38,6 +39,7 @@ const ChatroomDetial: React.FC<CreationChatRoom> = param => {
         // is_public: 0,
         // active: 0,
         agent: [],
+        enable_api: 0,
     });
     // Agent selected list
     const [checkAgentList, setcheckAgentList] = useState([]);
@@ -112,6 +114,7 @@ const ChatroomDetial: React.FC<CreationChatRoom> = param => {
                 description: info.description,
                 max_round: res.data.max_round ? res.data.max_round : 10,
                 agent: res.data.agent_list,
+                enable_api: info.enable_api ?? 0,
             });
             setcheckAgentList(res.data.agent_list);
         }
@@ -146,6 +149,7 @@ const ChatroomDetial: React.FC<CreationChatRoom> = param => {
             Title: '',
             Description: '',
             MaxRound: 10,
+            enable_api: roomdataUse.enable_api === 1,
         });
         setRoomdataUse({
             ...roomdataUse,
@@ -153,6 +157,7 @@ const ChatroomDetial: React.FC<CreationChatRoom> = param => {
             description: '',
             max_round: 10,
             agent: [],
+            enable_api: 0,
         });
         setcheckAgentList([]);
         isCreateRooms.current = false;
@@ -337,6 +342,25 @@ const ChatroomDetial: React.FC<CreationChatRoom> = param => {
                                                         id: 'app.create_chatroom.label_4',
                                                     })}
                                                 </span>
+                                            </div>
+                                            <div className="pt-[15px] pb-[5px] flex items-center gap-x-[10px]">
+                                                <span className="text-[12px] text-[#213044]">
+                                                    {intl.formatMessage({ id: 'component.api.access' })}
+                                                </span>
+                                                <Switch
+                                                    checked={roomdataUse.enable_api === 1}
+                                                    onChange={checked => {
+                                                        setRoomdataUse({
+                                                            ...roomdataUse,
+                                                            enable_api: checked ? 1 : 0,
+                                                        });
+                                                    }}
+                                                />
+                                                {roomdataUse.enable_api === 1 && (
+                                                    <span className="text-[12px] text-[#999]">
+                                                        {intl.formatMessage({ id: 'component.api.tooltip' })}
+                                                    </span>
+                                                )}
                                             </div>
                                             <div className="pt-[15px] pb-[20px] overflow-hidden w-full">
                                                 <Row gutter={[15, 15]}>
