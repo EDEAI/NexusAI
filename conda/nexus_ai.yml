@@ -150,6 +150,7 @@ dependencies:
       - ecdsa==0.19.0
       - effdet==0.4.1
       - email-validator==2.2.0
+      - emails==0.6
       - emoji==2.12.1
       - environs==9.5.0
       - et-xmlfile==2.0.0
@@ -387,8 +388,7 @@ dependencies:
       - xlrd==2.0.1
       - xlsxwriter==3.2.0
       - xxhash==3.4.1
+      - yagmail==0.15.293
       - yarg==0.1.9
       - yarl==1.9.4
-      - yagmail==0.15.293
-      - emails==0.6
 prefix: /root/anaconda3/envs/nexus_ai
