@@ -926,7 +926,7 @@ async def account_binding_with_three_parties(user_return_data: AccountBindingWit
     find_user_team_type_not_two = UserTeamRelations().select_one(
         columns=['id'], 
         conditions=[
-            {'column': 'team_id', 'value': team_type_id},
+            {'column': 'team_id', 'value': team_type_id['id']},
             {'column': 'user_id', 'value': user_id}
         ]
     )
@@ -975,7 +975,7 @@ async def account_binding_with_three_parties(user_return_data: AccountBindingWit
     if find_user_team_type_not_two is None:
         user_team_data = {
             'user_id':user_id,
-            'team_id':team_type_id,
+            'team_id':team_type_id['id'],
             'role':2,
             'role_id':1,
             'inviter_id':0,
