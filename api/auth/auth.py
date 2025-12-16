@@ -926,7 +926,7 @@ async def account_binding_with_three_parties(user_return_data: AccountBindingWit
     find_user_team_type_not_two = UserTeamRelations().select_one(
         columns=['id'], 
         conditions=[
-            {'column': 'team_id', 'value': team_type_id['id']},
+            {'column': 'team_id', 'value': team_type_id},
             {'column': 'user_id', 'value': user_id}
         ]
     )
