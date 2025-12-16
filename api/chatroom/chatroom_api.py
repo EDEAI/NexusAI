@@ -1,13 +1,15 @@
 import re
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Annotated, Optional
 from urllib.parse import urlparse
 
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Header, Request
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.openapi.utils import get_openapi
 from pydantic import BaseModel
 from jose import jwt
+from starlette.datastructures import URL
 
 from api.utils.common import response_error, response_success
 from config import settings
@@ -18,10 +20,6 @@ from core.helper import decrypt_id, encrypt_id
 
 router = APIRouter()
 
-SESSION_TOKEN_TYPE = 'chatroom_api'
-# Keep the session short-lived to limit exposure of a leaked URL
-SESSION_EXPIRE_SECONDS = 3600
-
 
 def _parse_bearer_token(authorization: str) -> Optional[str]:
     match = re.fullmatch(r'Bearer (.+)', authorization or '')
@@ -30,17 +28,20 @@ def _parse_bearer_token(authorization: str) -> Optional[str]:
     return match.group(1)
 
 
-def _build_ws_url(token: str) -> str:
-    api_base = urlparse(settings.WEB_API_URL)
-    scheme = 'wss' if api_base.scheme == 'https' else 'ws'
-    host = api_base.hostname or '127.0.0.1'
-    port = settings.CHATROOM_WEBSOCKET_PORT
-    return f'{scheme}://{host}:{port}/ws_chat?token={token}'
+def _build_ws_url(request_url: URL, token: str) -> str:
+    scheme = 'wss' if request_url.scheme == 'https' else 'ws'
+    if request_url.hostname == 'nexus-api.atyun.com':
+        hostname = 'nexus-chat.atyun.com'
+        port = ''
+    else:
+        hostname = request_url.hostname
+        port = f':{settings.CHATROOM_WEBSOCKET_PORT}'
+    return f'{scheme}://{hostname}{port}/?token={token}'
 
 
 def _get_app(app_id: int, api_token: str):
     app = Apps().select_one(
-        columns=['id', 'team_id', 'user_id', 'enable_api', 'status', 'mode', 'api_token', 'description'],
+        columns=['id', 'team_id', 'user_id', 'enable_api', 'status', 'mode', 'api_token', 'name', 'description'],
         conditions=[
             {'column': 'id', 'value': app_id},
             {'column': 'status', 'value': 1},
@@ -56,12 +57,12 @@ def _get_app(app_id: int, api_token: str):
 class SessionResponse(BaseModel):
     ws_url: str
     session_id: str
-    expires_in: int
     session_name: str
 
 
 @router.post('/{encrypted_chatroom_app_id}/session')
 async def create_chatroom_session(
+    request: Request,
     authorization: Annotated[str, Header(description='API key')],
     encrypted_chatroom_app_id: str,
 ):
@@ -96,7 +97,7 @@ async def create_chatroom_session(
         {
             'team_id': app['team_id'],
             'user_id': app['user_id'],
-            'name': '新会话',
+            'name': app.get('name', 'New Session'),
             'description': app.get('description', ''),
             'mode': 5,
             'status': 1,
@@ -110,6 +111,7 @@ async def create_chatroom_session(
             'team_id': base_chatroom['team_id'],
             'user_id': base_chatroom['user_id'],
             'app_id': session_app_id,
+            'base_chatroom_id': base_chatroom['id'],
             'max_round': base_chatroom['max_round'],
             'status': 1,
             'is_temporary': 1
@@ -128,25 +130,22 @@ async def create_chatroom_session(
             }
         )
 
-    exp = datetime.now(timezone.utc) + timedelta(seconds=SESSION_EXPIRE_SECONDS)
     payload = {
-        'type': SESSION_TOKEN_TYPE,
+        'type': 'chatroom_api',
         'chatroom_id': session_chatroom_id,
-        'session_id': session_app_id,
-        'exp': exp
+        'session_id': session_app_id
     }
     session_token = jwt.encode(payload, settings.ACCESS_TOKEN_SECRET_KEY, algorithm='HS256')
-    redis.setex(f'chatroom_api_token:{session_app_id}', SESSION_EXPIRE_SECONDS, session_token)
 
     encrypted_session_id = encrypt_id(session_app_id)
-    ws_url = _build_ws_url(session_token)
+    ws_url = _build_ws_url(request.url, session_token)
 
     return response_success(
         {
             'ws_url': ws_url,
             'session_id': encrypted_session_id,
-            'expires_in': SESSION_EXPIRE_SECONDS,
-            'session_name': '新会话'
+            'session_chatroom_id': session_chatroom_id,
+            'session_name': app.get('name', 'New Session')
         }
     )
 
@@ -186,9 +185,6 @@ async def get_session_messages(
     if app is None:
         return response_error('Invalid app API token, or the app is not enabled for API.')
 
-    if not redis.get(f'chatroom_api_token:{raw_session_app_id}'):
-        return response_error('Session has expired or is invalid')
-
     chatroom_history_msg = ChatroomMessages().history_chatroom_messages(
         session_chatroom['id'], page, page_size, chat_base_url
     )
@@ -206,7 +202,7 @@ async def get_session_messages(
 
 
 @router.get('/{encrypted_chatroom_app_id}/openapi')
-async def chatroom_api_openapi(encrypted_chatroom_app_id: str):
+async def chatroom_api_openapi(request: Request, encrypted_chatroom_app_id: str):
     """
     Generate OpenAPI schema for chatroom API.
     """
@@ -216,7 +212,7 @@ async def chatroom_api_openapi(encrypted_chatroom_app_id: str):
         return response_error('Invalid URL')
 
     app = Apps().select_one(
-        columns=['name', 'description'],
+        columns=['name', 'description', 'api_token'],
         conditions=[
             {'column': 'id', 'value': app_id},
             {'column': 'status', 'value': 1},
@@ -226,6 +222,8 @@ async def chatroom_api_openapi(encrypted_chatroom_app_id: str):
     )
     if app is None:
         return response_error('App is not enabled for API.')
+    
+    ws_url = _build_ws_url(request.url, '{session_token}')
 
     dummy_router = APIRouter()
 
@@ -234,20 +232,27 @@ async def chatroom_api_openapi(encrypted_chatroom_app_id: str):
         response_model=SessionResponse
     )
     async def _session_endpoint(
-        authorization: Annotated[str, Header(description='API key, format: "Bearer <api_token>"')],
+        authorization: Annotated[str, Header(description=f'API key, which should be "Bearer {app["api_token"]}" for this APP')],
     ):
         pass
 
     @dummy_router.get(
-        f'/v1/chatroom-api/session/{{session_id}}/messages'
+        '/v1/chatroom-api/session/{session_id}/messages'
     )
     async def _messages_endpoint(
-        authorization: Annotated[str, Header(description='API key, format: "Bearer <api_token>"')],
+        authorization: Annotated[str, Header(description=f'API key, which should be "Bearer {app["api_token"]}" for this APP')],
         session_id: str,
         page: int = 1,
         page_size: int = 10,
         chat_base_url: Optional[str] = None
     ):
+        pass
+
+    @dummy_router.get(
+        "/ws-docs",
+        description=Path(__file__).parent.joinpath('websocket.md').read_text().replace('{{chatroom_ws_url}}', ws_url)
+    )
+    async def websocket_docs():
         pass
 
     openapi_schema = get_openapi(

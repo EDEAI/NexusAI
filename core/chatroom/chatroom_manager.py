@@ -301,7 +301,7 @@ class ChatroomManager:
         
     async def _ws_handler(self, connection: ServerConnection):
         try:
-            user_id, team_id, chat_base_url = self._ws_manager.verify_connection(connection.request.path)
+            session_chatroom_id, user_id, team_id, chat_base_url = self._ws_manager.verify_connection(connection.request.path)
         except Exception as e:
             logger.exception('ERROR!!')
             await connection.send(str(e))
@@ -323,6 +323,8 @@ class ChatroomManager:
                             # Enter a chatroom
                             assert chatroom_id == 0, 'You should not ENTER twice.'
                             assert isinstance(data, int), 'Chatroom ID should be an integer.'
+                            if session_chatroom_id != 0:
+                                assert data == session_chatroom_id, 'You are not authorized to enter this chatroom.'
                             chatroom_info = self._get_chatroom_info(data, user_id, check_chat_status=False)  # Also check if the chatroom is available
                             chatroom_id = data
                             last_message_id = self._get_last_message_id(chatroom_id)
