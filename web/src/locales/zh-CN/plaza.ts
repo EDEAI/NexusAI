@@ -79,6 +79,12 @@ export default {
     'app.chatroom.sidebar.agent_button': '清除记忆',
     'app.chatroom.sidebar.agent_tips': '圆桌中必须存在至少1个智能体',
     'app.chatroom.sidebar.cleartips': '记忆清除成功',
+    'app.chatroom.api.access': 'API 访问',
+    'app.chatroom.api.docs': 'API 文档',
+    'app.chatroom.api.enable_tip': '开启后可通过 API 访问',
+    'app.chatroom.api.enable_success': 'API 已开启',
+    'app.chatroom.api.disable_success': 'API 已关闭',
+    'app.chatroom.api.update_failed': 'API 设置更新失败',
 
     'app.chatroom.sidebar.othe_title': '其他圆桌',
     'app.chatroom.sidebar.othe_status': '空闲',

@@ -34,7 +34,7 @@ export default {
     'agent.appdescription': '智能体描述',
     'agent.teamvisibility': '是否团队可见',
     'agent.attrVisible': '属性是否可见',
-    'agent.APIswitch': '是否开启API',
+    'agent.APIswitch': 'API 访问',
     'agent.filesupload': '是否允许上传文件',
     'agent.LLMmodel': 'LLM模型',
     'agent.pleaseselect': '请选择',

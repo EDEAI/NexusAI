@@ -10,6 +10,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { history, useParams } from 'umi';
 import Agent from '../CreationChatRoom/selectApp';
 import useChatroomStore from '@/store/chatroomstate';
+import { BASE_URL } from '@/api/request';
 interface siderPm {
     roomDetail?: any;
     setAgent?:any
@@ -70,6 +71,8 @@ const Sider: React.FC<siderPm> = porpos => {
                             ...res.data.chat_info,
                             max_round: res.data.max_round,
                             smart_selection: res.data.smart_selection,
+                            api_url: res.data.chat_info?.api_url,
+                            enable_api: res.data.chat_info?.enable_api ?? 0,
                         };
                     });
                     setSelectedAgent(res.data.agent_list);
@@ -160,6 +163,7 @@ const Sider: React.FC<siderPm> = porpos => {
             description: chatRoomdetial.description,
             name: chatRoomdetial.name,
             max_round: chatRoomdetial.max_round,
+            enable_api: chatRoomdetial.enable_api ?? 0,
         };
         let res = await updataRoom({ ...updataObject, agent: agentLists }, id);
         if (res.code == 0) {
@@ -191,6 +195,34 @@ const Sider: React.FC<siderPm> = porpos => {
             };
         });
     };
+    const toggleApiAccess = async (checked: boolean) => {
+        const enable_api = checked ? 1 : 0;
+        const agentLists = selectedAgent.map(({ agent_id, active = 1 }: any) => ({
+            agent_id,
+            active,
+        }));
+        let updataObject = {
+            description: chatRoomdetial.description,
+            name: chatRoomdetial.name,
+            max_round: chatRoomdetial.max_round,
+            enable_api,
+            agent: agentLists,
+        };
+        const res = await updataRoom(updataObject, id);
+        if (res.code === 0) {
+            setchatRoomdetial((pre: any) => ({
+                ...pre,
+                enable_api,
+            }));
+            messageApi.success(
+                enable_api
+                    ? intl.formatMessage({ id: 'app.chatroom.api.enable_success' })
+                    : intl.formatMessage({ id: 'app.chatroom.api.disable_success' })
+            );
+        } else {
+            messageApi.error(intl.formatMessage({ id: 'app.chatroom.api.update_failed' }));
+        }
+    };
     useEffect(() => {
         getRoomDetails();
         getRoomRecent();
@@ -204,8 +236,8 @@ const Sider: React.FC<siderPm> = porpos => {
                 id="sider"
             >
                 <div className="flex flex-col  h-full">
-                    <div className="w-full flex  justify-start px-[30px]">
-                        <div className="py-[20px] text-[14px] text-[#213044] font-[500] flex gap-x-[10px] items-center w-full">
+                    <div className="w-full flex justify-between items-center px-[30px] py-[16px]">
+                        <div className="text-[14px] text-[#213044] font-[500] flex gap-x-[10px] items-center min-w-0">
                             <div
                                 className="cursor-pointer flex items-center shrink-0"
                                 onClick={() => {
@@ -225,6 +257,59 @@ const Sider: React.FC<siderPm> = porpos => {
                             <div className="flex-1 min-w-0 truncate">{chatRoomdetial.name}</div>
                         </div>
                     </div>
+                    <div className="px-[20px] pb-[12px]">
+                        <div className="flex flex-col gap-y-[10px] border border-[#f0f0f0] rounded-[6px] p-[12px] bg-[#fafafa]">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-x-[6px] text-[13px] text-[#333]">
+                                    <span>{intl.formatMessage({ id: 'component.api.access' })}</span>
+                                    <Tooltip
+                                        overlayStyle={{ fontSize: '12px' }}
+                                        title={intl.formatMessage({ id: 'component.api.tooltip' })}
+                                    >
+                                        <QuestionCircleOutlined className="cursor-pointer text-[#666] text-[12px]" />
+                                    </Tooltip>
+                                </div>
+                                <div className="flex items-center gap-x-[6px]">
+                                    {chatRoomdetial.enable_api === 1 && chatRoomdetial.api_url && (
+                                        <Button
+                                            type="link"
+                                            size="small"
+                                            onClick={() => {
+                                                window.open(BASE_URL + chatRoomdetial.api_url, '_blank');
+                                            }}
+                                        >
+                                            {intl.formatMessage({ id: 'component.api.docs' })}
+                                        </Button>
+                                    )}
+                                    <Switch
+                                        size="small"
+                                        checked={chatRoomdetial.enable_api === 1}
+                                        onChange={toggleApiAccess}
+                                        disabled={disableInput}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-x-[6px] text-[13px] text-[#333]">
+                                    <span>{intl.formatMessage({ id: 'app.chatroom_list.switch' })}</span>
+                                    <Tooltip
+                                        overlayStyle={{ fontSize: '12px' }}
+                                        title={intl.formatMessage({
+                                            id: 'app.chatroom.sidebar.chatroom_switch_tips',
+                                        })}
+                                    >
+                                        <QuestionCircleOutlined className="cursor-pointer text-[#666] text-[12px]" />
+                                    </Tooltip>
+                                </div>
+                                <Switch
+                                    size="small"
+                                    checked={chatRoomdetial.smart_selection == 1}
+                                    onChange={openRoomstatus}
+                                    disabled={disableInput}
+                                ></Switch>
+                            </div>
+                        </div>
+                    </div>
                     {/* <div className='pb-[20px] text-[14px] text-[#213044] font-[500] px-[30px]'>{chatRoomdetial.name}</div> */}
                     <div className="h-[360px]">
                         <div className="pb-[20px] border-b-[1px] px-[10px]">
@@ -235,35 +320,6 @@ const Sider: React.FC<siderPm> = porpos => {
                                             id: 'app.chatroom.sidebar.agent_title',
                                         })}
                                     </span>
-                                    {/* <div onClick={addAgent}>
-                                        <img
-                                            src="/icons/edit_icon_1.svg"
-                                            className="w-[16px] h-[16px] shrink-0"
-                                        ></img>
-                                    </div> */}
-                                </div>
-                                <div className="shrink-0 flex items-center">
-                                    <Tooltip
-                                        className="pr-[2px]"
-                                        overlayStyle={{ fontSize: '12px' }}
-                                        title={intl.formatMessage({
-                                            id: 'app.chatroom.sidebar.chatroom_switch_tips',
-                                        })}
-                                    >
-                                        <QuestionCircleOutlined className="cursor-pointer text-[#666] text-[12px]" />
-                                    </Tooltip>
-                                    <span className="text-[12px] text-[#666] pr-[5px]">
-                                        {intl.formatHTMLMessage({ id: 'app.chatroom_list.switch' })}
-                                    </span>
-                                    {/* onChange={()=>{openRoomstatus(i)}} */}
-                                    <Switch
-                                        size="small"
-                                        defaultChecked
-                                        className="w-[28px]"
-                                        checked={chatRoomdetial.smart_selection == 1}
-                                        onChange={openRoomstatus}
-                                        disabled={disableInput}
-                                    ></Switch>
                                 </div>
                                 {/* <span className='shrink-0'><DownOutlined size={14} color='#444444'/></span> */}
                                 {/* <img src="/icons/plaza_add.svg" className="w-[16px] h-[16px] shrink-0" onClick={addAgent}></img> */}
