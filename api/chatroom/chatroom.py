@@ -69,7 +69,9 @@ async def create_chatroom(chat_request: ReqChatroomCreateSchema, userinfo: Token
     max_round: int = chat_data['max_round']
     agent = chat_data['agent']
     is_temporary: int = chat_data.get('is_temporary', 0)
-    enable_api = chat_data.get('enable_api')
+    enable_api = chat_data.get('enable_api', 0)
+    if enable_api is None:
+        enable_api = 0
     mode: int = 5
 
     team_id = userinfo.team_id
