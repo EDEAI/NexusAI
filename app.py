@@ -37,7 +37,7 @@ from api.chatroom.chatroom_api import router as chatroom_api_router
 
 original_uvicorn_is_alive = uvicorn.supervisors.multiprocess.Process.is_alive
 def patched_is_alive(self) -> bool:
-    timeout = 20
+    timeout = 30
     return original_uvicorn_is_alive(self, timeout)
 uvicorn.supervisors.multiprocess.Process.is_alive = patched_is_alive
 
