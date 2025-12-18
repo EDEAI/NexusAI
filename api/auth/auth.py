@@ -76,6 +76,12 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
                 [{'column': 'id', 'value': user['id']}],
                 user_update_data
             )
+            print('---------------------------------------------------------')
+            SQLDatabase.commit()  # 添加这一行
+            SQLDatabase.close()   # 添加这一行
+            print(user_info['team_id'])
+            print('---------------------------------------------------------')
+
             user['team_id'] = user_info['team_id']
     # Check if a valid token already exists in Redis
     redis_key = f"access_token:{user['id']}"
