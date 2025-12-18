@@ -73,6 +73,9 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
                 "role_id":user_info['role_id']
             }
             print('------------------------------------LOGIN TEAM SWITCH DEBUG----------------------------------------------')
+            # Print database connection info
+            from config import settings
+            print(f'[DEBUG 0] Database Info - Host: {settings.MYSQL_HOST}, Port: {settings.MYSQL_PORT}, DB: {settings.MYSQL_DB}, User: {settings.MYSQL_USER}')
             print(f'[DEBUG 1] Before update - User ID: {user["id"]}, Current team_id: {user["team_id"]}, Target team_id: {user_info["team_id"]}')
             
             # Execute update
@@ -104,6 +107,18 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
                 conditions=[{'column': 'id', 'value': user['id']}]
             )
             print(f'[DEBUG 5] After commit - Query result team_id: {user_after_commit["team_id"] if user_after_commit else "None"}')
+            
+            # Execute raw SQL to verify
+            try:
+                raw_query = f"SELECT id, team_id, role, role_id FROM users WHERE id = {user['id']}"
+                raw_result = SQLDatabase.execute_query(raw_query)
+                raw_row = raw_result.fetchone()
+                if raw_row:
+                    print(f'[DEBUG 5.5] Raw SQL query result - id: {raw_row[0]}, team_id: {raw_row[1]}, role: {raw_row[2]}, role_id: {raw_row[3]}')
+                else:
+                    print(f'[DEBUG 5.5] Raw SQL query returned no results')
+            except Exception as e:
+                print(f'[DEBUG 5.5] Raw SQL query failed: {str(e)}')
             
             # Close session
             SQLDatabase.close()
