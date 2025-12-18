@@ -174,6 +174,33 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
         )
         print(f'[DEBUG 8] After updata_login_ip - Database team_id: {user_after_ip_update["team_id"] if user_after_ip_update else "None"}')
 
+    # Final verification - create a completely new connection
+    print(f'[DEBUG 9] Login function about to return')
+    try:
+        import pymysql
+        from config import settings
+        # Create a new direct database connection
+        conn = pymysql.connect(
+            host=settings.MYSQL_HOST,
+            port=settings.MYSQL_PORT,
+            user=settings.MYSQL_USER,
+            password=settings.MYSQL_PASSWORD,
+            database=settings.MYSQL_DB,
+            charset='utf8mb4'
+        )
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT id, team_id, role, role_id FROM users WHERE id = {user['id']}")
+        result = cursor.fetchone()
+        if result:
+            print(f'[DEBUG 10] Direct PyMySQL query - id: {result[0]}, team_id: {result[1]}, role: {result[2]}, role_id: {result[3]}')
+        else:
+            print(f'[DEBUG 10] Direct PyMySQL query - No result')
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f'[DEBUG 10] Direct PyMySQL query failed: {str(e)}')
+    
+    print(f'[DEBUG 11] Returning token with team_id in memory: {user["team_id"]}')
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post('/register_team', response_model=ResRegisterTeamSchema)
