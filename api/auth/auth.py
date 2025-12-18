@@ -72,24 +72,44 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
                 "inviter_id":user_info['inviter_id'], 
                 "role_id":user_info['role_id']
             }
-            print('------------------------------------212312132----------------------------------------------')
-            print(f'[LOGIN DEBUG] Before update - User ID: {user["id"]}, Current team_id: {user["team_id"]}, Target team_id: {user_info["team_id"]}')
+            print('------------------------------------LOGIN TEAM SWITCH DEBUG----------------------------------------------')
+            print(f'[DEBUG 1] Before update - User ID: {user["id"]}, Current team_id: {user["team_id"]}, Target team_id: {user_info["team_id"]}')
+            
+            # Execute update
             update_result = Users().update(
                 [{'column': 'id', 'value': user['id']}],
                 user_update_data
             )
-            print(f'[LOGIN DEBUG] Update result: {update_result}')
-            SQLDatabase.commit()
-            SQLDatabase.close()
-            print(f'[LOGIN DEBUG] After commit - New team_id: {user_info["team_id"]}')
+            print(f'[DEBUG 2] Update result: {update_result}')
             
-            # Verify the update by querying the database
-            updated_user = Users().select_one(
+            # Query before commit (should see uncommitted data in same session)
+            user_before_commit = Users().select_one(
                 columns=['team_id', 'role', 'role_id'],
                 conditions=[{'column': 'id', 'value': user['id']}]
             )
-            print(f'[LOGIN DEBUG] Verification query - Database team_id: {updated_user["team_id"] if updated_user else "None"}')
-            print('----------------------------------------------------------------------------------')
+            print(f'[DEBUG 3] Before commit - Query result team_id: {user_before_commit["team_id"] if user_before_commit else "None"}')
+            
+            # Commit transaction
+            try:
+                SQLDatabase.commit()
+                print(f'[DEBUG 4] Commit successful')
+            except Exception as e:
+                print(f'[DEBUG 4] Commit failed: {str(e)}')
+                SQLDatabase.rollback()
+                raise
+            
+            # Query after commit (should see committed data)
+            user_after_commit = Users().select_one(
+                columns=['team_id', 'role', 'role_id'],
+                conditions=[{'column': 'id', 'value': user['id']}]
+            )
+            print(f'[DEBUG 5] After commit - Query result team_id: {user_after_commit["team_id"] if user_after_commit else "None"}')
+            
+            # Close session
+            SQLDatabase.close()
+            print(f'[DEBUG 6] Session closed')
+            print('------------------------------------END DEBUG----------------------------------------------')
+            
             user['team_id'] = user_info['team_id']
     # Check if a valid token already exists in Redis
     redis_key = f"access_token:{user['id']}"
