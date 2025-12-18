@@ -72,16 +72,24 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
                 "inviter_id":user_info['inviter_id'], 
                 "role_id":user_info['role_id']
             }
-            Users().update(
+            print('------------------------------------212312132----------------------------------------------')
+            print(f'[LOGIN DEBUG] Before update - User ID: {user["id"]}, Current team_id: {user["team_id"]}, Target team_id: {user_info["team_id"]}')
+            update_result = Users().update(
                 [{'column': 'id', 'value': user['id']}],
                 user_update_data
             )
-            print('---------------------------------------------------------')
-            SQLDatabase.commit()  # 添加这一行
-            SQLDatabase.close()   # 添加这一行
-            print(user_info['team_id'])
-            print('---------------------------------------------------------')
-
+            print(f'[LOGIN DEBUG] Update result: {update_result}')
+            SQLDatabase.commit()
+            SQLDatabase.close()
+            print(f'[LOGIN DEBUG] After commit - New team_id: {user_info["team_id"]}')
+            
+            # Verify the update by querying the database
+            updated_user = Users().select_one(
+                columns=['team_id', 'role', 'role_id'],
+                conditions=[{'column': 'id', 'value': user['id']}]
+            )
+            print(f'[LOGIN DEBUG] Verification query - Database team_id: {updated_user["team_id"] if updated_user else "None"}')
+            print('----------------------------------------------------------------------------------')
             user['team_id'] = user_info['team_id']
     # Check if a valid token already exists in Redis
     redis_key = f"access_token:{user['id']}"
