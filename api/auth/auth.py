@@ -72,58 +72,29 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
                 "inviter_id":user_info['inviter_id'], 
                 "role_id":user_info['role_id']
             }
-            print('------------------------------------LOGIN TEAM SWITCH DEBUG----------------------------------------------')
-            # Print database connection info
-            from config import settings
-            print(f'[DEBUG 0] Database Info - Host: {settings.MYSQL_HOST}, Port: {settings.MYSQL_PORT}, DB: {settings.MYSQL_DB}, User: {settings.MYSQL_USER}')
-            print(f'[DEBUG 1] Before update - User ID: {user["id"]}, Current team_id: {user["team_id"]}, Target team_id: {user_info["team_id"]}')
-            
-            # Execute update
-            update_result = Users().update(
+            Users().update(
                 [{'column': 'id', 'value': user['id']}],
                 user_update_data
             )
-            print(f'[DEBUG 2] Update result: {update_result}')
-            
-            # Query before commit (should see uncommitted data in same session)
-            user_before_commit = Users().select_one(
-                columns=['team_id', 'role', 'role_id'],
-                conditions=[{'column': 'id', 'value': user['id']}]
-            )
-            print(f'[DEBUG 3] Before commit - Query result team_id: {user_before_commit["team_id"] if user_before_commit else "None"}')
-            
-            # DON'T commit here - we'll commit at the end
-            print(f'[DEBUG 4] Update executed, will commit at end of login')
-            
-            # Query after commit (should see committed data)
-            user_after_commit = Users().select_one(
-                columns=['team_id', 'role', 'role_id'],
-                conditions=[{'column': 'id', 'value': user['id']}]
-            )
-            print(f'[DEBUG 5] After commit - Query result team_id: {user_after_commit["team_id"] if user_after_commit else "None"}')
-            
-            # Execute raw SQL to verify using ORM's execute_query
-            try:
-                from core.database.orm import ORM
-                raw_query = f"SELECT id, team_id, role, role_id FROM users WHERE id = {user['id']}"
-                print(f'[DEBUG 5.5] Executing raw SQL: {raw_query}')
-                session = ORM.get_session()
-                from sqlalchemy import text
-                raw_result = session.execute(text(raw_query))
-                raw_row = raw_result.fetchone()
-                if raw_row:
-                    print(f'[DEBUG 5.6] Raw SQL result - id: {raw_row[0]}, team_id: {raw_row[1]}, role: {raw_row[2]}, role_id: {raw_row[3]}')
-                else:
-                    print(f'[DEBUG 5.6] Raw SQL returned no results')
-            except Exception as e:
-                print(f'[DEBUG 5.6] Raw SQL failed: {str(e)}')
-            
-            # DON'T close session yet - let's see if that's the issue
-            # SQLDatabase.close()
-            print(f'[DEBUG 6] Session NOT closed (testing)')
-            print('------------------------------------END DEBUG----------------------------------------------')
-            
+
             user['team_id'] = user_info['team_id']
+            user['role'] = user_info['role']
+            user['inviter_id'] = user_info['inviter_id']
+            user['role_id'] = user_info['role_id']
+            
+            # Update Redis token with new team_id
+            redis_key = f"access_token:{user['id']}"
+            existing_token = redis.get(redis_key)
+            if existing_token:
+                # Create new token with updated team information
+                access_token = create_access_token(
+                    data={"uid": user["id"], "team_id": user["team_id"], "nickname": user["nickname"], "phone": user["phone"],
+                          "email": user["email"],"inviter_id": user["inviter_id"],"role": user["role"]}
+                )
+                # Update Redis with new token
+                redis_expiry_seconds = ACCESS_TOKEN_EXPIRE_MINUTES * 60
+                redis.set(redis_key, access_token, ex=redis_expiry_seconds)
+    
     # Check if a valid token already exists in Redis
     redis_key = f"access_token:{user['id']}"
     existing_token = redis.get(redis_key)
@@ -144,81 +115,10 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
     set_current_user_id(user["id"])
     set_current_language(user["id"],user_language)  # set current language
 
-    # Update login IP without calling updata_login_ip (to avoid multiple commits)
     client_ip = request.client.host
     if client_ip:
-        print(f'[DEBUG 7] Updating login IP inline')
-        current_time = datetime.now()
-        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
-        Users().update(
-            [{'column': 'phone', 'value': form_data.username, 'logic': 'or'},{'column': 'email', 'value': form_data.username}],
-            {'last_login_ip': client_ip,'last_login_time': formatted_time}
-        )
-        print(f'[DEBUG 7.5] Login IP updated')
+        updata_login_ip(form_data.username, client_ip)
 
-    # Final verification - create a completely new connection
-    print(f'[DEBUG 9] Login function about to return')
-    try:
-        import pymysql
-        from config import settings
-        # Create a new direct database connection
-        conn = pymysql.connect(
-            host=settings.MYSQL_HOST,
-            port=settings.MYSQL_PORT,
-            user=settings.MYSQL_USER,
-            password=settings.MYSQL_PASSWORD,
-            database=settings.MYSQL_DB,
-            charset='utf8mb4'
-        )
-        cursor = conn.cursor()
-        cursor.execute(f"SELECT id, team_id, role, role_id FROM users WHERE id = {user['id']}")
-        result = cursor.fetchone()
-        if result:
-            print(f'[DEBUG 10] Direct PyMySQL query - id: {result[0]}, team_id: {result[1]}, role: {result[2]}, role_id: {result[3]}')
-        else:
-            print(f'[DEBUG 10] Direct PyMySQL query - No result')
-        cursor.close()
-        conn.close()
-    except Exception as e:
-        print(f'[DEBUG 10] Direct PyMySQL query failed: {str(e)}')
-    
-    # NOW commit everything at once
-    print(f'[DEBUG 8] Committing all changes')
-    try:
-        SQLDatabase.commit()
-        print(f'[DEBUG 8.5] Final commit successful')
-    except Exception as e:
-        print(f'[DEBUG 8.5] Final commit failed: {str(e)}')
-        SQLDatabase.rollback()
-        raise
-    finally:
-        SQLDatabase.close()
-        print(f'[DEBUG 9] Session closed')
-    
-    # Verify with direct connection after commit
-    print(f'[DEBUG 10] Final verification')
-    try:
-        import pymysql
-        from config import settings
-        conn = pymysql.connect(
-            host=settings.MYSQL_HOST,
-            port=settings.MYSQL_PORT,
-            user=settings.MYSQL_USER,
-            password=settings.MYSQL_PASSWORD,
-            database=settings.MYSQL_DB,
-            charset='utf8mb4'
-        )
-        cursor = conn.cursor()
-        cursor.execute(f"SELECT id, team_id, role, role_id FROM users WHERE id = {user['id']}")
-        result = cursor.fetchone()
-        if result:
-            print(f'[DEBUG 11] After final commit - Direct query: id={result[0]}, team_id={result[1]}, role={result[2]}, role_id={result[3]}')
-        cursor.close()
-        conn.close()
-    except Exception as e:
-        print(f'[DEBUG 11] Final verification failed: {str(e)}')
-    
-    print(f'[DEBUG 12] Returning token with team_id: {user["team_id"]}')
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post('/register_team', response_model=ResRegisterTeamSchema)
