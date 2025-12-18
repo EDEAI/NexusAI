@@ -157,7 +157,22 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
 
     client_ip = request.client.host
     if client_ip:
+        print(f'[DEBUG 7] Before updata_login_ip - user_id: {user["id"]}')
+        # Query team_id before updata_login_ip
+        user_before_ip_update = Users().select_one(
+            columns=['team_id'],
+            conditions=[{'column': 'id', 'value': user['id']}]
+        )
+        print(f'[DEBUG 7.5] Before updata_login_ip - Database team_id: {user_before_ip_update["team_id"] if user_before_ip_update else "None"}')
+        
         updata_login_ip(form_data.username, client_ip)
+        
+        # Query team_id after updata_login_ip
+        user_after_ip_update = Users().select_one(
+            columns=['team_id'],
+            conditions=[{'column': 'id', 'value': user['id']}]
+        )
+        print(f'[DEBUG 8] After updata_login_ip - Database team_id: {user_after_ip_update["team_id"] if user_after_ip_update else "None"}')
 
     return {"access_token": access_token, "token_type": "bearer"}
 
