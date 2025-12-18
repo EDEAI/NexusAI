@@ -92,19 +92,8 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
             )
             print(f'[DEBUG 3] Before commit - Query result team_id: {user_before_commit["team_id"] if user_before_commit else "None"}')
             
-            # Commit transaction
-            try:
-                SQLDatabase.commit()
-                print(f'[DEBUG 4] Commit successful')
-                
-                # Force flush to ensure data is written
-                session = SQLDatabase.get_session()
-                session.flush()
-                print(f'[DEBUG 4.5] Session flushed')
-            except Exception as e:
-                print(f'[DEBUG 4] Commit failed: {str(e)}')
-                SQLDatabase.rollback()
-                raise
+            # DON'T commit here - we'll commit at the end
+            print(f'[DEBUG 4] Update executed, will commit at end of login')
             
             # Query after commit (should see committed data)
             user_after_commit = Users().select_one(
@@ -129,9 +118,9 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
             except Exception as e:
                 print(f'[DEBUG 5.6] Raw SQL failed: {str(e)}')
             
-            # Close session
-            SQLDatabase.close()
-            print(f'[DEBUG 6] Session closed')
+            # DON'T close session yet - let's see if that's the issue
+            # SQLDatabase.close()
+            print(f'[DEBUG 6] Session NOT closed (testing)')
             print('------------------------------------END DEBUG----------------------------------------------')
             
             user['team_id'] = user_info['team_id']
@@ -155,24 +144,17 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
     set_current_user_id(user["id"])
     set_current_language(user["id"],user_language)  # set current language
 
+    # Update login IP without calling updata_login_ip (to avoid multiple commits)
     client_ip = request.client.host
     if client_ip:
-        print(f'[DEBUG 7] Before updata_login_ip - user_id: {user["id"]}')
-        # Query team_id before updata_login_ip
-        user_before_ip_update = Users().select_one(
-            columns=['team_id'],
-            conditions=[{'column': 'id', 'value': user['id']}]
+        print(f'[DEBUG 7] Updating login IP inline')
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        Users().update(
+            [{'column': 'phone', 'value': form_data.username, 'logic': 'or'},{'column': 'email', 'value': form_data.username}],
+            {'last_login_ip': client_ip,'last_login_time': formatted_time}
         )
-        print(f'[DEBUG 7.5] Before updata_login_ip - Database team_id: {user_before_ip_update["team_id"] if user_before_ip_update else "None"}')
-        
-        updata_login_ip(form_data.username, client_ip)
-        
-        # Query team_id after updata_login_ip
-        user_after_ip_update = Users().select_one(
-            columns=['team_id'],
-            conditions=[{'column': 'id', 'value': user['id']}]
-        )
-        print(f'[DEBUG 8] After updata_login_ip - Database team_id: {user_after_ip_update["team_id"] if user_after_ip_update else "None"}')
+        print(f'[DEBUG 7.5] Login IP updated')
 
     # Final verification - create a completely new connection
     print(f'[DEBUG 9] Login function about to return')
@@ -200,7 +182,43 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
     except Exception as e:
         print(f'[DEBUG 10] Direct PyMySQL query failed: {str(e)}')
     
-    print(f'[DEBUG 11] Returning token with team_id in memory: {user["team_id"]}')
+    # NOW commit everything at once
+    print(f'[DEBUG 8] Committing all changes')
+    try:
+        SQLDatabase.commit()
+        print(f'[DEBUG 8.5] Final commit successful')
+    except Exception as e:
+        print(f'[DEBUG 8.5] Final commit failed: {str(e)}')
+        SQLDatabase.rollback()
+        raise
+    finally:
+        SQLDatabase.close()
+        print(f'[DEBUG 9] Session closed')
+    
+    # Verify with direct connection after commit
+    print(f'[DEBUG 10] Final verification')
+    try:
+        import pymysql
+        from config import settings
+        conn = pymysql.connect(
+            host=settings.MYSQL_HOST,
+            port=settings.MYSQL_PORT,
+            user=settings.MYSQL_USER,
+            password=settings.MYSQL_PASSWORD,
+            database=settings.MYSQL_DB,
+            charset='utf8mb4'
+        )
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT id, team_id, role, role_id FROM users WHERE id = {user['id']}")
+        result = cursor.fetchone()
+        if result:
+            print(f'[DEBUG 11] After final commit - Direct query: id={result[0]}, team_id={result[1]}, role={result[2]}, role_id={result[3]}')
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f'[DEBUG 11] Final verification failed: {str(e)}')
+    
+    print(f'[DEBUG 12] Returning token with team_id: {user["team_id"]}')
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post('/register_team', response_model=ResRegisterTeamSchema)
