@@ -128,14 +128,27 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         callable_skills: List[Dict[str, Any]],
         callable_workflows: List[Dict[str, Any]],
         direct_output: bool = False,
-        is_chat: bool = False
+        is_chat: bool = False,
+        use_data_calculation_prefix: bool = False
     ) -> Tuple[Optional[int], Dict[str, Any]]:
         agent_id = agent['id']
+        common_prefix = get_language_content(
+            'agent_system_prompt_common_prefix',
+            uid=user_id,
+            append_ret_lang_prompt=False
+        )
+        if use_data_calculation_prefix:
+            common_prefix += get_language_content(
+                'agent_system_prompt_common_prefix_with_data_calculation',
+                uid=user_id,
+                append_ret_lang_prompt=False
+            )
         input_ = {
             'id_': agent_id,
             'name': agent['name'],
             'description': agent['description'],
             'obligations': agent['obligations'],
+            'agent_system_prompt_common_prefix': common_prefix,
             'team_members': get_language_content(
                 'agent_team_members',
                 append_ret_lang_prompt=False
@@ -865,7 +878,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             
             _, input_ = self._prepare_prompt(
                 agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets),
-                callable_skills, callable_workflows, True, True
+                callable_skills, callable_workflows, True, True, True
             )
             model_data, ainvoke = await asyncio.to_thread(
                 self.get_ainvoke_func,

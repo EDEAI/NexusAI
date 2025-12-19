@@ -11,7 +11,7 @@ async def _run_code(code_dependencies: Dict[str, List[str]], custom_code: Dict[s
     from core.workflow.nodes.base import SandboxBaseNode
     node = SandboxBaseNode(
         type='custom_code',
-        title='Run Code',
+        title='Code Runner',
         code_dependencies=code_dependencies,
         custom_code=custom_code
     )
@@ -51,7 +51,7 @@ def get_builtin_tool_list() -> List[Dict[str, Any]]:
             "properties": {
                 "params": {
                     "type": "string",
-                    "description": "A JSON string containing the parameters for the code execution.",
+                    "description": "A JSON string that includes the Python code to run, any required dependencies, and descriptions of the output variables.",
                 }
             },
             "required": ["params"]
@@ -62,5 +62,5 @@ def get_builtin_tool_list() -> List[Dict[str, Any]]:
 
 def get_builtin_tool_name(tool: str) -> str:
     return {
-        'run_code': 'Run Code'
+        'run_code': 'Code Runner'
     }.get(tool, tool)
