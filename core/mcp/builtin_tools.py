@@ -7,13 +7,13 @@ sys.path.append(str(Path(__file__).absolute().parent.parent))
 from typing import Any, Dict, List
 
 
-async def _run_code(code_dependencies: List[str], custom_code: str, output_variable_descriptions: List[Dict[str, str]]) -> str:
+async def _run_code(code_dependencies: Dict[str, List[str]], custom_code: Dict[str, str], output_variable_descriptions: List[Dict[str, str]]) -> str:
     from core.workflow.nodes.base import SandboxBaseNode
     node = SandboxBaseNode(
         type='custom_code',
         title='Run Code',
-        code_dependencies={'python3': code_dependencies},
-        custom_code={'python3': custom_code}
+        code_dependencies=code_dependencies,
+        custom_code=custom_code
     )
     result = await asyncio.to_thread(
         node.run_custom_code,
