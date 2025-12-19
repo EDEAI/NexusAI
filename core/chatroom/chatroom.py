@@ -24,7 +24,7 @@ from core.database.models import (
 from core.helper import get_file_content_list
 from core.llm import Prompt
 from core.mcp.app_executor import skill_run, workflow_run
-from core.mcp.builtin_tools import run_tool
+from core.mcp.builtin_tools import get_builtin_tool_name, run_tool
 from core.mcp.client import MCPClient
 from core.workflow.context import Context
 from core.workflow.graph import create_graph_from_dict
@@ -829,6 +829,9 @@ class Chatroom:
                         mcp_tool_use['result'] = result
                         mcp_tool_use_update_data['result'] = result
                         mcp_tool_use_update_data['status'] = 5  # Failed
+            elif match := builtin_tool_pattern.fullmatch(mcp_tool_use['name']):
+                builtin_tool = match.group(1)
+                mcp_tool_use['skill_or_workflow_name'] = get_builtin_tool_name(builtin_tool)
             self._update_chatroom_message()
             mcp_tool_use_records.update(
                 {'column': 'id', 'value': mcp_tool_use['id']},

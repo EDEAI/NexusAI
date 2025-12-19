@@ -37,7 +37,8 @@ async def _run_code(code_dependencies: List[str], custom_code: str, output_varia
 
 async def run_tool(tool_name: str, tool_args: Dict[str, Any]) -> str:
     if tool_name == 'run_code':
-        return await _run_code(tool_args.get('code_dependencies', []), tool_args['custom_code'], tool_args.get('output_variable_descriptions', []))
+        args = json.loads(tool_args['params'])
+        return await _run_code(args.get('code_dependencies', []), args['code'], args.get('output_variable_descriptions', []))
     else:
         raise ValueError(f'Unknown tool: {tool_name}')
 
@@ -48,40 +49,18 @@ def get_builtin_tool_list() -> List[Dict[str, Any]]:
         "inputSchema": {
             "type": "object",
             "properties": {
-                "code_dependencies": {
-                    "type": "array",
-                    "description": "List of Python package dependencies required for the code execution",
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": []
-                },
-                "custom_code": {
+                "params": {
                     "type": "string",
-                    "description": "The Python3 code to execute in the sandbox environment"
-                },
-                "output_variable_descriptions": {
-                    "type": "array",
-                    "description": "List of output variables with their descriptions",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "description": "The name of the output variable"
-                            },
-                            "description": {
-                                "type": "string",
-                                "description": "Description of what the output variable represents"
-                            }
-                        },
-                        "required": ["name", "description"]
-                    },
-                    "default": []
+                    "description": "A JSON string containing the parameters for the code execution.",
                 }
             },
-            "required": ["custom_code"]
+            "required": ["params"]
         }
     }
     
     return [run_code]
+
+def get_builtin_tool_name(tool: str) -> str:
+    return {
+        'run_code': 'Run Code'
+    }.get(tool, tool)
