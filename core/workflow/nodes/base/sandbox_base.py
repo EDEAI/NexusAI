@@ -366,7 +366,7 @@ class SandboxBaseNode(Node):
         # Check if the venv directory and its python binary exist
         return (os.path.exists(venv_path))
         
-    def run_custom_code(self):
+    def run_custom_code(self, is_tool=False):
         """
         Executes the custom code provided by the user, ensuring that necessary validations
         and preparations are made before actually running the code.
@@ -384,7 +384,7 @@ class SandboxBaseNode(Node):
             # Extract necessary information from the node's data
             code_dependencies = self.data['code_dependencies'] if self.data.get('code_dependencies') else {}
             custom_code = self.data['custom_code']
-            input = self.data['input']
+            input = self.data.get('input')
             output = self.data.get('output')
             tool_type = self.data.get('tool_type')  # Get tool_type if available
             tool_name = self.data.get('tool_name')  # Get tool_name if available
@@ -394,8 +394,11 @@ class SandboxBaseNode(Node):
                 code = custom_code['python3']
                 packages = code_dependencies.get('python3', [])  # Get the required packages for Python
                 # Validate the python code
-                verify_code = self.check_code(input, output, code)
-                print(verify_code)
+                if is_tool:
+                    verify_code = code
+                else:
+                    verify_code = self.check_code(input, output, code)
+                    print(verify_code)
                 # Create the data payload with custom_unique_id instead of flow_id
                 data = {
                     "custom_unique_id": str(uuid.uuid4()),

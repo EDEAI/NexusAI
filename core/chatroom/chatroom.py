@@ -24,6 +24,7 @@ from core.database.models import (
 from core.helper import get_file_content_list
 from core.llm import Prompt
 from core.mcp.app_executor import skill_run, workflow_run
+from core.mcp.builtin_tools import run_tool
 from core.mcp.client import MCPClient
 from core.workflow.context import Context
 from core.workflow.graph import create_graph_from_dict
@@ -50,6 +51,7 @@ workflows = Workflows()
 
 skill_pattern = re.compile(r'nexusai__skill-(\d+)')
 workflow_pattern = re.compile(r'nexusai__workflow-(\d+)')
+builtin_tool_pattern = re.compile(r'nexusai__builtin-(\w+)')
 MCP_TOOL_RESULT_MAX_LEN = 65535
 
 class Chatroom:
@@ -537,6 +539,7 @@ class Chatroom:
         if (
             skill_pattern.fullmatch(mcp_tool_use['name'])
             or workflow_pattern.fullmatch(mcp_tool_use['name'])
+            or builtin_tool_pattern.fullmatch(mcp_tool_use['name'])
         ):
             mcp_tool_use['workflow_confirmation_status'] = None
             mcp_tool_use_update_data['workflow_run_status'] = None
@@ -678,7 +681,8 @@ class Chatroom:
                 mcp_tool_name = mcp_tool_use['name']
                 skill_match = skill_pattern.fullmatch(mcp_tool_name)
                 workflow_match = workflow_pattern.fullmatch(mcp_tool_name)
-                if skill_match or workflow_match:
+                builtin_tool_match = builtin_tool_pattern.fullmatch(mcp_tool_name)
+                if skill_match or workflow_match or builtin_tool_match:
                     result = json.dumps({
                         'status': 'failed',
                         'message': f'Error executing tool {mcp_tool_name}: {result}'
@@ -860,21 +864,23 @@ class Chatroom:
             mcp_tool_args = mcp_tool_use['args']
             skill_match = skill_pattern.fullmatch(mcp_tool_name)
             workflow_match = workflow_pattern.fullmatch(mcp_tool_name)
-            if skill_match or workflow_match:
+            builtin_tool_match = builtin_tool_pattern.fullmatch(mcp_tool_name)
+            if skill_match or workflow_match or builtin_tool_match:
                 if result := mcp_tool_use['result'] is None:
                     try:
                         logger.debug('Invoking MCP tool: %s', mcp_tool_name)
                         logger.debug('MCP tool args: %s', mcp_tool_args)
 
-                        # Wait for the user to upload files
-                        input_variables: Dict[str, Any] = mcp_tool_args['input_variables']
-                        while any(v == 'need_upload' for k, v in input_variables.items() if k.startswith('file_parameter__')):
-                            try:
-                                self._mcp_tool_use_lock.clear()
-                                await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
-                            except asyncio.TimeoutError:
-                                await self.stop_all_mcp_tool_uses('Timeout')
-                                return
+                        if skill_match or workflow_match:
+                            # Wait for the user to upload files
+                            input_variables: Dict[str, Any] = mcp_tool_args['input_variables']
+                            while any(v == 'need_upload' for k, v in input_variables.items() if k.startswith('file_parameter__')):
+                                try:
+                                    self._mcp_tool_use_lock.clear()
+                                    await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
+                                except asyncio.TimeoutError:
+                                    await self.stop_all_mcp_tool_uses('Timeout')
+                                    return
                         
                         if skill_match:
                             if not SandboxBaseNode.check_venv_exists(mcp_tool_use['skill_dependencies']):
@@ -923,6 +929,16 @@ class Chatroom:
                                 {'column': 'id', 'value': mcp_tool_use['id']},
                                 {'app_run_id': workflow_run_id}
                             )
+                        elif builtin_tool_match:
+                            result = await asyncio.wait_for(
+                                run_tool(
+                                    builtin_tool_match.group(1),
+                                    mcp_tool_args
+                                ),
+                                timeout=3600
+                            )
+                            result = json.dumps(result, ensure_ascii=False)
+                            await self.set_mcp_tool_result(mcp_tool_use['id'], result)
                     except asyncio.TimeoutError:
                         await self.stop_all_mcp_tool_uses('Timeout')
                         return

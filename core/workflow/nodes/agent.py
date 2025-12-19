@@ -24,6 +24,7 @@ from core.database.models import (
 from core.dataset import DatasetRetrieval
 from core.llm.prompt import Prompt, replace_prompt_with_context
 from core.mcp.app_converter import convert_callable_items_to_mcp_tools
+from core.mcp.builtin_tools import get_builtin_tool_list
 from languages import get_language_content
 from log import Logger
 from core.helper import push_to_websocket_queue
@@ -854,6 +855,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     )
 
             all_mcp_tools = []
+            all_mcp_tools.extend(get_builtin_tool_list())
             callable_skills, callable_workflows = self._get_callable_items()
             app_tools = convert_callable_items_to_mcp_tools(callable_skills, callable_workflows)
             all_mcp_tools.extend(app_tools)
