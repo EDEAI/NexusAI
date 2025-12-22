@@ -49,16 +49,19 @@ language_packs = {
             6.3 Pay attention to the input parameters of the tools. If a parameter name starts with "file_parameter__" and the parameter type is "string", this indicates that the parameter actually requires a file. You need to find the most suitable file variable value from the "Chat file list" I provide based on the current parameter name and description to use as the value for this parameter. If you cannot find a suitable file variable to use, please use "need_upload" as the value for this parameter, indicating that this parameter requires the user to upload a file. Note that files uploaded by users in this way will NOT appear in the "Chat file list", and the file content will not and does not need to be provided to you.
 
         ''',
-        "agent_system_prompt_common_prefix_with_data_calculation": '''
-            Additional rule for large-scale data calculations:
-            - When planning tasks, if you determine that the requirement (whether explicitly requested by the user or inferred from your own task plan) involves statistical/aggregation/computation over more than 10 records/items (or any non-trivial calculation where manual reasoning is error-prone), you MUST NOT do the calculations purely in your head.
-            - In that case, you MUST generate runnable Python 3 code and execute it in a sandbox via the tool named "nexusai__builtin-run_code".
-            - Important exception to the general “do not repeatedly call the same tool” rule: "nexusai__builtin-run_code" MAY be called multiple times, but only when you have multiple distinct calculation goals (e.g., different metrics, filters, groupings, time windows, or derived outputs). For the same calculation goal on the same source data, do NOT call it again; reuse the previous result instead of recomputing.
-            - You must base the code on the complete and accurate source data found in the "Conversation history" that I provide later (including tool outputs, retrieved documents, and any datasets shown in that history). Do not truncate, approximate, or fabricate any data values.
-            - If the dataset size is <= 10 and the computation is trivial, you may compute directly without running code.
+	        "agent_system_prompt_common_prefix_with_data_calculation": '''
+	            Additional rule for large-scale data calculations:
+	            - When planning tasks, if you determine that the requirement (whether explicitly requested by the user or inferred from your own task plan) involves statistical/aggregation/computation over more than 10 records/items (or any non-trivial calculation where manual reasoning is error-prone), you MUST NOT do the calculations purely in your head.
+	            - In that case, you MUST generate runnable Python 3 code and execute it in a sandbox via the tool named "nexusai__builtin-run_code".
+	            - Important exception to the general “do not repeatedly call the same tool” rule: "nexusai__builtin-run_code" MAY be called multiple times, but only when you have multiple distinct calculation goals (e.g., different metrics, filters, groupings, time windows, or derived outputs). For the same calculation goal on the same source data, do NOT call it again; reuse the previous result instead of recomputing.
+	            - You must base the code on the complete and accurate source data found in the "Conversation history" that I provide later (including tool outputs, retrieved documents, and any datasets shown in that history). Do not truncate, approximate, or fabricate any data values.
+	            - If the dataset size is <= 10 and the computation is trivial, you may compute directly without running code.
+	            - When triggering "nexusai__builtin-run_code", you MUST call the tool (tool_call) and put the payload JSON into {"params": "<JSON string>"}. Do NOT output the payload as normal text.
+	            - If the tool returns failed/stderr/traceback, you MUST fix the code based on the error and retry the tool call (up to 3 attempts). If the tool succeeds, reuse the result and do not re-run the same calculation.
+	            - Output gating (MUST): for any computed numbers derived from >10 records (e.g., sum/avg/count/rate, top-N, grouping, percentile, median), you MUST NOT present the computed result to the user until after you have obtained the tool execution result. Do not “pre-calculate” or “estimate” results in text.
 
-            How to generate the executable-code tool input:
-            Use the following specification to produce a JSON payload that contains dependencies, runnable Python 3 code, and output variable descriptions. This JSON payload will be used as the input to "nexusai__builtin-run_code".
+	            How to generate the executable-code tool input:
+	            Use the following specification to produce a JSON payload that contains dependencies, runnable Python 3 code, and output variable descriptions. This JSON payload will be used as the input to "nexusai__builtin-run_code".
 
             Based on the data processing requirements plan and the source data provided,
             please generate real, executable Python 3 code that can be run directly to complete the required data processing tasks.
@@ -69,8 +72,6 @@ language_packs = {
             - Can only contain letters, numbers, and underscores
             - Cannot start with a number
             - Cannot use Python keywords
-
-            Please note that only the structure data defined below is returned, and no redundant content is returned.
 
             Code data json structure description:
             {
@@ -115,10 +116,12 @@ language_packs = {
                 before the main function definition.
                 These variables MUST be assigned with real, concrete data derived from the actual user input
                 or the current conversation context.
+                For any dataset you use, you MUST copy the complete data verbatim from the "Conversation history" I provide later.
+                Do NOT take only the first N records, do NOT manually rewrite the data, and do NOT omit any fields or records.
                 Do NOT use placeholder values, mock values, or example data.
 
                 If the real data is of list or dict type, you MUST NOT assign it directly.
-                Instead, you MUST assign it as a JSON string (string type) at the beginning of the code,
+                Instead, you MUST assign it as a string at the beginning of the code,
                 and then explicitly parse it into a Python list or dict using json.loads inside the code
                 before it is used by the main function.
 

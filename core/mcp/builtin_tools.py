@@ -11,7 +11,7 @@ async def _run_code(code_dependencies: Dict[str, List[str]], custom_code: Dict[s
     from core.workflow.nodes.base import SandboxBaseNode
     node = SandboxBaseNode(
         type='custom_code',
-        title='Code Runner',
+        title='Agent Action Engine',
         code_dependencies=code_dependencies,
         custom_code=custom_code
     )
@@ -38,7 +38,13 @@ async def _run_code(code_dependencies: Dict[str, List[str]], custom_code: Dict[s
 async def run_tool(tool_name: str, tool_args: Dict[str, Any]) -> str:
     if tool_name == 'run_code':
         args = json.loads(tool_args['params'])
-        return await _run_code(args.get('code_dependencies', []), args['code'], args.get('output_variable_descriptions', []))
+        code = args.get('code', '')
+        if isinstance(code, str):
+            code = {'python3': code}
+        dependencies = args.get('dependencies', args.get('code_dependencies', {}))
+        if isinstance(dependencies, list):
+            dependencies = {'python3': dependencies}
+        return await _run_code(dependencies, code, args.get('output_variable_descriptions', []))
     else:
         raise ValueError(f'Unknown tool: {tool_name}')
 
@@ -62,5 +68,5 @@ def get_builtin_tool_list() -> List[Dict[str, Any]]:
 
 def get_builtin_tool_name(tool: str) -> str:
     return {
-        'run_code': 'Code Runner'
+        'run_code': 'Agent Action Engine'
     }.get(tool, tool)
