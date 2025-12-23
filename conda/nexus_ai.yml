@@ -226,6 +226,7 @@ dependencies:
       - langchain-google-genai==4.1.2
       - langchain-google-vertexai==3.2.0
       - langchain-groq==1.1.1
+      - langchain-huggingface==1.2.0
       - langchain-milvus==0.3.2
       - langchain-mistralai==1.1.1
       - langchain-nvidia-ai-endpoints==1.0.0

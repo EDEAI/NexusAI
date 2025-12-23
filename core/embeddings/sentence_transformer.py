@@ -1,17 +1,16 @@
 
 from typing import List
 
-from langchain_community.embeddings.sentence_transformer \
-    import SentenceTransformerEmbeddings as OriginalSentenceTransformerEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 
-class SentenceTransformerEmbeddings(OriginalSentenceTransformerEmbeddings):
+class SentenceTransformerEmbeddings(HuggingFaceEmbeddings):
     model_config = {
         "extra": "allow",
         "arbitrary_types_allowed": True,
     }
 
-    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
         """Compute doc embeddings using a HuggingFace transformer model.
 
         Args:
@@ -19,15 +18,11 @@ class SentenceTransformerEmbeddings(OriginalSentenceTransformerEmbeddings):
 
         Returns:
             List of embeddings, one for each text.
+
         """
-        texts = list(map(lambda x: x.replace("\n", " "), texts))
-        embeddings = self.client.encode(
-            texts, show_progress_bar=self.show_progress, **self.encode_kwargs
-        )
+        return self._embed(texts, self.encode_kwargs)
 
-        return embeddings.tolist()
-
-    def embed_query(self, text: str) -> List[float]:
+    def embed_query(self, text: str) -> list[float]:
         """Compute query embeddings using a HuggingFace transformer model.
 
         Args:
@@ -35,6 +30,12 @@ class SentenceTransformerEmbeddings(OriginalSentenceTransformerEmbeddings):
 
         Returns:
             Embeddings for the text.
+
         """
-        return self.embed_documents([text])[0]
+        embed_kwargs = (
+            self.query_encode_kwargs
+            if len(self.query_encode_kwargs) > 0
+            else self.encode_kwargs
+        )
+        return self._embed([text], embed_kwargs)[0]
     
