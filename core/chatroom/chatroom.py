@@ -1130,7 +1130,7 @@ class Chatroom:
                                                 item_text, agent_message, new_text
                                             )
                                             new_text = False
-                                    elif item['type'] == 'tool_use':
+                                    elif item['type'] in ['tool_use', 'input_json_delta']:
                                         # Tool use has been handled in the tool_call_chunks
                                         pass
                                     else:
