@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 import torch
 
-from langchain.retrievers.document_compressors.cross_encoder import BaseCrossEncoder
+from langchain_classic.retrievers.document_compressors.cross_encoder import BaseCrossEncoder
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers.models.qwen2.tokenization_qwen2_fast import Qwen2TokenizerFast
 from transformers.models.qwen3.modeling_qwen3 import Qwen3ForCausalLM
