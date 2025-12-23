@@ -250,7 +250,7 @@ async def chatroom_api_openapi(request: Request, encrypted_chatroom_app_id: str)
 
     @dummy_router.get(
         "/ws-docs",
-        description=Path(__file__).parent.joinpath('websocket.md').read_text().replace('{{chatroom_ws_url}}', ws_url, count=1)
+        description=Path(__file__).parent.joinpath('websocket.md').read_text().replace('{{chatroom_ws_url}}', ws_url, 1)
     )
     async def websocket_docs():
         pass
