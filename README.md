@@ -1,5 +1,3 @@
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/edeai-nexusai-badge.png)](https://mseep.ai/app/edeai-nexusai)
-
 # **NexusAI: The Future of Intelligent Collaboration**
 
 
