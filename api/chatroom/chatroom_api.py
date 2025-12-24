@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from jose import jwt
 from starlette.datastructures import URL
 
+from api.schema.chat import SessionResponse, SessionMessagesResponse
 from api.utils.common import response_error, response_success
 from config import settings
 from core.database import redis
@@ -54,13 +55,7 @@ def _get_app(app_id: int, api_token: str):
     return app
 
 
-class SessionResponse(BaseModel):
-    ws_url: str
-    session_id: str
-    session_name: str
-
-
-@router.post('/{encrypted_chatroom_app_id}/session')
+@router.post('/{encrypted_chatroom_app_id}/session', response_model=SessionResponse)
 async def create_chatroom_session(
     request: Request,
     authorization: Annotated[str, Header(description='API key')],
@@ -68,6 +63,15 @@ async def create_chatroom_session(
 ):
     """
     Create a short-lived chatroom session and return the websocket URL.
+
+    Parameters:
+    - encrypted_chatroom_app_id: The encrypted chatroom app ID.
+
+    Returns:
+    - ws_url: The websocket URL for the chatroom session.
+    - session_id: The encrypted session ID.
+    - session_chatroom_id: The session chatroom ID to pass to the websocket.
+    - session_name: The name of the session.
     """
     try:
         app_id = decrypt_id(encrypted_chatroom_app_id)
@@ -150,7 +154,7 @@ async def create_chatroom_session(
     )
 
 
-@router.get('/session/{session_id}/messages')
+@router.get('/session/{session_id}/messages', response_model=SessionMessagesResponse)
 async def get_session_messages(
     authorization: Annotated[str, Header(description='API key')],
     session_id: str,
@@ -160,6 +164,55 @@ async def get_session_messages(
 ):
     """
     Fetch chatroom messages for a temporary session.
+
+    Parameters:
+    - session_id: The encrypted session ID.
+    - page: The page number for pagination.
+    - page_size: The number of messages per page.
+    - chat_base_url: The base URL for chatroom messages.
+
+    Returns:
+    - list: The list of session messages.
+        - name (Optional[str]):
+            Display name of the agent.
+        - description (Optional[str]):
+            Description of the agent.
+        - icon (Optional[str]):
+            Icon of the agent.
+        - avatar (Optional[str]):
+            Avatar image URL of the agent.
+        - icon_background (Optional[str]):
+            Background for the icon.
+
+        - id (int):
+            Unique identifier of the message.
+        - chatroom_id (int):
+            ID of the chatroom this message belongs to.
+        - app_run_id (int):
+            Application run ID.
+        - user_id (int):
+            User ID if the message is sent by a user.
+        - file_list (List[int]):
+            Attached files or resources related to the message.
+        - agent_id (int):
+            Agent ID if the message is sent by an agent.
+        - ability_id (int):
+            Agent ability ID associated with the message.
+        - message (str):
+            Raw message text.
+        - content (str):
+            Raw message text.
+        - is_read (int):
+            Read status of the message (e.g. 0 = unread, 1 = read).
+        - is_agent (int):
+            Whether the sender is an agent (e.g. 0 = user, 1 = agent).
+        - created_time (str):
+            Message creation timestamp in ISO format.
+
+    - total_count: The total count of messages.
+    - total_pages: The total number of pages.
+    - page: The current page number.
+    - page_size: The number of messages per page.
     """
     api_token = _parse_bearer_token(authorization)
     if not api_token:
@@ -234,10 +287,23 @@ async def chatroom_api_openapi(request: Request, encrypted_chatroom_app_id: str)
     async def _session_endpoint(
         authorization: Annotated[str, Header(description=f'API key, which should be "Bearer {app["api_token"]}" for this APP')],
     ):
+        """
+        Create a short-lived chatroom session and return the websocket URL.
+
+        Parameters:
+        - encrypted_chatroom_app_id: The encrypted chatroom app ID.
+
+        Returns:
+        - ws_url: The websocket URL for the chatroom session.
+        - session_id: The encrypted session ID.
+        - session_chatroom_id: The session chatroom ID to pass to the websocket.
+        - session_name: The name of the session.
+        """
         pass
 
     @dummy_router.get(
-        '/v1/chatroom-api/session/{session_id}/messages'
+        f'/v1/chatroom-api/session/{{session_id}}/messages',
+        response_model=SessionMessagesResponse
     )
     async def _messages_endpoint(
         authorization: Annotated[str, Header(description=f'API key, which should be "Bearer {app["api_token"]}" for this APP')],
@@ -246,6 +312,58 @@ async def chatroom_api_openapi(request: Request, encrypted_chatroom_app_id: str)
         page_size: int = 10,
         chat_base_url: Optional[str] = None
     ):
+        """
+        Fetch chatroom messages for a temporary session.
+
+        Parameters:
+        - session_id: The encrypted session ID.
+        - page: The page number for pagination.
+        - page_size: The number of messages per page.
+        - chat_base_url: The base URL for chatroom messages.
+
+        Returns:
+        - list: The list of session messages.
+            - name (Optional[str]):
+                Display name of the agent.
+            - description (Optional[str]):
+                Description of the agent.
+            - icon (Optional[str]):
+                Icon of the agent.
+            - avatar (Optional[str]):
+                Avatar image URL of the agent.
+            - icon_background (Optional[str]):
+                Background for the icon.
+
+            - id (int):
+                Unique identifier of the message.
+            - chatroom_id (int):
+                ID of the chatroom this message belongs to.
+            - app_run_id (int):
+                Application run ID.
+            - user_id (int):
+                User ID if the message is sent by a user.
+            - file_list (List[int]):
+                Attached files or resources related to the message.
+            - agent_id (int):
+                Agent ID if the message is sent by an agent.
+            - ability_id (int):
+                Agent ability ID associated with the message.
+            - message (str):
+                Raw message text.
+            - content (str):
+                Raw message text.
+            - is_read (int):
+                Read status of the message (e.g. 0 = unread, 1 = read).
+            - is_agent (int):
+                Whether the sender is an agent (e.g. 0 = user, 1 = agent).
+            - created_time (str):
+                Message creation timestamp in ISO format.
+
+        - total_count: The total count of messages.
+        - total_pages: The total number of pages.
+        - page: The current page number.
+        - page_size: The number of messages per page.
+        """
         pass
 
     @dummy_router.get(
