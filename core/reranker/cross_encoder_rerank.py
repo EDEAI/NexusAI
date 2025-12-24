@@ -7,7 +7,7 @@ from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
 
 
-from langchain.retrievers.document_compressors.cross_encoder import BaseCrossEncoder
+from langchain_classic.retrievers.document_compressors.cross_encoder import BaseCrossEncoder
 
 
 class CrossEncoderReranker(BaseDocumentCompressor):

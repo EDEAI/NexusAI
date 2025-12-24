@@ -2,8 +2,8 @@ import importlib
 
 from typing import List
 
-from langchain.embeddings import CacheBackedEmbeddings
-from langchain.storage.encoder_backed import EncoderBackedStore
+from langchain_classic.embeddings import CacheBackedEmbeddings
+from langchain_classic.storage.encoder_backed import EncoderBackedStore
 from langchain_community import embeddings
 from langchain_community.storage import RedisStore
 from langchain_core.embeddings import Embeddings

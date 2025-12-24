@@ -21,8 +21,6 @@ from langchain_community.chat_models.moonshot import MoonshotChat
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_community.chat_models import ChatOllama
 from langchain_community.chat_models import ChatSparkLLM
-from langchain_together import ChatTogether
-from langchain_google_vertexai import ChatVertexAI
 from langchain_community.chat_models import VolcEngineMaasChat
 from langchain_community.chat_models import QianfanChatEndpoint
 from langchain_community.chat_models import ChatZhipuAI
@@ -377,25 +375,6 @@ class LLMPipeline:
             }
             '''
             self.llm = ChatSparkLLM(**config)
-        elif self.supplier == 'Together_AI':
-            '''
-            config = {
-                "model": "meta-llama/Llama-3-8b-chat-hf",  # Model name to use.
-                "api_key": "your_together_api_key",  # Automatically inferred from env var `TOGETHER_API_KEY` if not provided.
-                "base_url": "https://api.together.ai/v1/",  # Base URL path for API requests, leave blank if not using a proxy or service emulator.
-            }
-            '''
-            self.llm = ChatTogether(**config)
-        elif self.supplier == 'VertexAI':
-            '''
-            config = {
-                "model": "chat-bison",  # Underlying model name.
-                "examples": None,  # Optional. List of example messages.
-                "convert_system_message_to_human": False,  # Deprecated. Setting this parameter to True is discouraged since new Gemini models support System Messages.
-                "response_mime_type": None,  # Optional. Output response mimetype of the generated candidate text. Supported in Gemini 1.5 and later models.
-            }
-            '''
-            self.llm = ChatVertexAI(**config)
         elif self.supplier == 'VolcEngineMaas':
             '''
             config = {
