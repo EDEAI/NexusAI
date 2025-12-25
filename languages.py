@@ -1168,9 +1168,12 @@ language_packs = {
                    db=int(os.getenv("REDIS_DB", "0")),
                    password=os.getenv("REDIS_PASSWORD", "")
                )
-               result = r.blpop([f"sandbox_callback:{callback_token}"], timeout=120)
-               if result:
-                   payload = json.loads(result[1])
+               item = r.blpop([f"sandbox_callback:{callback_token}"], timeout=120)
+               if not item:
+                   # Timeout waiting for callback payload
+                   return {"status": "timeout"}
+               _, data = item
+               data = json.loads(data)
         ''',
         'generate_skill_user': '''
             My requirements:
@@ -1247,9 +1250,13 @@ language_packs = {
                    db=int(os.getenv("REDIS_DB", "0")),
                    password=os.getenv("REDIS_PASSWORD", "")
                )
-               result = r.blpop([f"sandbox_callback:{{callback_token}}"], timeout=120)
-               if result:
-                   payload = json.loads(result[1])
+               item = r.blpop([f"sandbox_callback:{{callback_token}}"], timeout=120)
+               if not item:
+                   # Timeout waiting for callback payload
+                   return {"status": "timeout"}
+
+               _, data = item
+               data = json.loads(data)
         ''',
         'correction_skill_user': '''
             Correction suggestion:
