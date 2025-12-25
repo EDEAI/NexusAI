@@ -74,20 +74,20 @@ language_packs = {
             - Cannot use Python keywords
 
             Code data json structure description:
-            {
-                "dependencies": {
+            {{
+                "dependencies": {{
                     "python3": []
-                },
-                "code": {
+                }},
+                "code": {{
                     "python3": "python3 code. The code must be directly runnable."
-                },
+                }},
                 "output_variable_descriptions": [
-                    {
+                    {{
                         "name": "variable name, must comply with the code variable naming conventions and can only contain letters, numbers, and underscores, cannot start with a number, and cannot use Python keywords",
                         "description": "variable description, clearly and concisely explain the meaning and usage of the output variable"
-                    }
+                    }}
                 ]
-            }
+            }}
 
             Special rule description:
 
@@ -1147,7 +1147,30 @@ language_packs = {
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
             7. File write restrictions: when the code involves file write operations, the target file path must start with "/storage". For example: /storage/my_folder/my_file.txt.
                File return requirements: if the code needs to return the file path, the return value must start with "file://" so that the system can correctly identify it as a file type. For example: file:///storage/my_folder/my_file.txt.
+            8. Async callback blocking (Redis): If the tool needs to block and wait for a third-party async callback, you MUST use Redis blocking wait and the fixed callback API.
+               - Callback API: /v1/third-party/sandbox-callback?token=<callback_token>
+               - Parameters: token is in the query string; the callback payload is JSON body.
+               - Redis env vars: REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_PASSWORD (available inside the Docker sandbox).
+               - Redis key prefix MUST be: sandbox_callback:{callback_token}
+               - Recommended dependency: add "redis" to python3 dependencies when needed.
+               Example (Python):
+               import os
+               import uuid
+               import json
+               import redis
 
+               callback_token = str(uuid.uuid4())
+               callback_url = f"{base_url}/v1/third-party/sandbox-callback?token={callback_token}"
+
+               r = redis.Redis(
+                   host=os.getenv("REDIS_HOST"),
+                   port=int(os.getenv("REDIS_PORT", "6379")),
+                   db=int(os.getenv("REDIS_DB", "0")),
+                   password=os.getenv("REDIS_PASSWORD", "")
+               )
+               result = r.blpop([f"sandbox_callback:{callback_token}"], timeout=120)
+               if result:
+                   payload = json.loads(result[1])
         ''',
         'generate_skill_user': '''
             My requirements:
@@ -1203,6 +1226,30 @@ language_packs = {
             6. "output_type" is the output type of the tool. All types are provided in the tool data json structure description above. Note that the output type of the tool does not depend on the data type returned by the python3 code, but on the overall execution intent of the python3 code
             7. File write restrictions: when the code involves file write operations, the target file path must start with "/storage". For example: /storage/my_folder/my_file.txt.
                File return requirements: if the code needs to return the file path, the return value must start with "file://" so that the system can correctly identify it as a file type. For example: file:///storage/my_folder/my_file.txt.
+            8. Async callback blocking (Redis): If the tool needs to block and wait for a third-party async callback, you MUST use Redis blocking wait and the fixed callback API.
+               - Callback API: /v1/third-party/sandbox-callback?token=<callback_token>
+               - Parameters: token is in the query string; the callback payload is JSON body.
+               - Redis env vars: REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_PASSWORD (available inside the Docker sandbox).
+               - Redis key prefix MUST be: sandbox_callback:{{callback_token}}
+               - Recommended dependency: add "redis" to python3 dependencies when needed.
+               Example (Python):
+               import os
+               import uuid
+               import json
+               import redis
+
+               callback_token = str(uuid.uuid4())
+               callback_url = f"{{base_url}}/v1/third-party/sandbox-callback?token={{callback_token}}"
+
+               r = redis.Redis(
+                   host=os.getenv("REDIS_HOST"),
+                   port=int(os.getenv("REDIS_PORT", "6379")),
+                   db=int(os.getenv("REDIS_DB", "0")),
+                   password=os.getenv("REDIS_PASSWORD", "")
+               )
+               result = r.blpop([f"sandbox_callback:{{callback_token}}"], timeout=120)
+               if result:
+                   payload = json.loads(result[1])
         ''',
         'correction_skill_user': '''
             Correction suggestion:

@@ -235,6 +235,12 @@ export default {
     'customcode.notice.file.return': 'File Return Requirement',
     'customcode.notice.file.return.desc': 'If your code needs to return a file path, the return value must start with "file://" for the system to correctly identify it as a file type.',
     'customcode.notice.file.return.example': 'Example: file:///storage/my_folder/my_file.txt',
+    'customcode.notice.async.wait': 'Async Callback Blocking',
+    'customcode.notice.async.wait.desc': 'If you need to block and wait for a third-party async callback, you must use Redis blocking wait and the fixed callback API.',
+    'customcode.notice.async.wait.api': 'Callback API: /v1/third-party/sandbox-callback?token=<callback_token>',
+    'customcode.notice.async.wait.params': 'Parameters: token in query; callback payload is JSON body.',
+    'customcode.notice.async.wait.redis': 'Redis env vars: REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_PASSWORD (available inside Docker). Key prefix: sandbox_callback:{callback_token}',
+    'customcode.notice.async.wait.example': 'Example (Python):\ncallback_token = str(uuid.uuid4())\ncallback_url = f\"{base_url}/v1/third-party/sandbox-callback?token={callback_token}\"\nr = redis.Redis(host=os.getenv(\"REDIS_HOST\"), port=int(os.getenv(\"REDIS_PORT\", \"6379\")), db=int(os.getenv(\"REDIS_DB\", \"0\")), password=os.getenv(\"REDIS_PASSWORD\", \"\"))\nresult = r.blpop([f\"sandbox_callback:{callback_token}\"], timeout=120)',
     
     // Chat interface additional translations
     'agent.chat.waiting': 'Thinking...',

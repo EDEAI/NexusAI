@@ -95,7 +95,14 @@ ${intl.formatMessage({ id: 'customcode.notice.file.write.example' })}
 
 ${intl.formatMessage({ id: 'customcode.notice.file.return' })}：
 ${intl.formatMessage({ id: 'customcode.notice.file.return.desc' })}
-${intl.formatMessage({ id: 'customcode.notice.file.return.example' })}`}
+${intl.formatMessage({ id: 'customcode.notice.file.return.example' })}
+
+${intl.formatMessage({ id: 'customcode.notice.async.wait' })}：
+${intl.formatMessage({ id: 'customcode.notice.async.wait.desc' })}
+${intl.formatMessage({ id: 'customcode.notice.async.wait.api' })}
+${intl.formatMessage({ id: 'customcode.notice.async.wait.params' })}
+${intl.formatMessage({ id: 'customcode.notice.async.wait.redis' })}
+${intl.formatMessage({ id: 'customcode.notice.async.wait.example' })}`}
                 </div>
                 <Form.Item>
                     <div className="">{intl.formatMessage({ id: 'skill.code' })}</div>

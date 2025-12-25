@@ -230,6 +230,12 @@ export default {
     'customcode.notice.file.return': '文件返回要求',
     'customcode.notice.file.return.desc': '如果代码需要返回文件路径，该返回值必须以"file://"开头，以便系统正确识别为文件类型。',
     'customcode.notice.file.return.example': '例如：file:///storage/my_folder/my_file.txt',
+    'customcode.notice.async.wait': '异步回推阻塞等待',
+    'customcode.notice.async.wait.desc': '如需阻塞等待第三方异步回推结果，必须使用 Redis 阻塞等待 + 固定回推 API。',
+    'customcode.notice.async.wait.api': '回推 API：/v1/third-party/sandbox-callback?token=<callback_token>',
+    'customcode.notice.async.wait.params': '参数说明：token 放在 query；回推内容为 JSON body。',
+    'customcode.notice.async.wait.redis': 'Redis 连接环境变量：REDIS_HOST、REDIS_PORT、REDIS_DB、REDIS_PASSWORD（Docker 内已注入，可直接使用）。Key 固定前缀：sandbox_callback:{callback_token}',
+    'customcode.notice.async.wait.example': '示例（Python）：\ncallback_token = str(uuid.uuid4())\ncallback_url = f\"{base_url}/v1/third-party/sandbox-callback?token={callback_token}\"\nr = redis.Redis(host=os.getenv(\"REDIS_HOST\"), port=int(os.getenv(\"REDIS_PORT\", \"6379\")), db=int(os.getenv(\"REDIS_DB\", \"0\")), password=os.getenv(\"REDIS_PASSWORD\", \"\"))\nresult = r.blpop([f\"sandbox_callback:{callback_token}\"], timeout=120)',
 
     // Chat interface additional translations
     'agent.chat.waiting': '思考中...',

@@ -26,6 +26,7 @@ from api.mcp_servers import router as mcp_servers_router
 from api.roles import router as roles_router
 from api.prompt_editor import router as prompt_editor_router
 from api.scheduled_tasks import router as scheduled_tasks_router
+from api.third_party import router as third_party_router
 
 from api.workflow.node import router as node_router
 from api.supplier import router as supplier_router
@@ -98,6 +99,7 @@ app.include_router(roles_router, prefix='/v1/roles', tags=["roles"])
 app.include_router(prompt_editor_router, prefix='/prompt-editor', tags=["prompt-editor"])
 app.include_router(scheduled_tasks_router, prefix='/v1/scheduled_tasks', tags=["scheduled_tasks"])
 app.include_router(chatroom_api_router, prefix='/v1/chatroom-api', tags=["chatroom-api"])
+app.include_router(third_party_router, prefix='/v1/third-party', tags=["third-party"])
 
 
 

@@ -75,7 +75,14 @@ const SkillCreate = memo(() => {
                                 
                                 ${intl.formatMessage({ id: 'customcode.notice.file.return' })}：
                                 ${intl.formatMessage({ id: 'customcode.notice.file.return.desc' })}
-                                ${intl.formatMessage({ id: 'customcode.notice.file.return.example' })}`}
+                                ${intl.formatMessage({ id: 'customcode.notice.file.return.example' })}
+
+                                ${intl.formatMessage({ id: 'customcode.notice.async.wait' })}：
+                                ${intl.formatMessage({ id: 'customcode.notice.async.wait.desc' })}
+                                ${intl.formatMessage({ id: 'customcode.notice.async.wait.api' })}
+                                ${intl.formatMessage({ id: 'customcode.notice.async.wait.params' })}
+                                ${intl.formatMessage({ id: 'customcode.notice.async.wait.redis' })}
+                                ${intl.formatMessage({ id: 'customcode.notice.async.wait.example' })}`}
                             ><WarningOutlined className='text-red-900 cursor-pointer' /></Tooltip>
                         </div>
                     }
