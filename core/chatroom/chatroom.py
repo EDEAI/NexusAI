@@ -96,6 +96,7 @@ class Chatroom:
         absent_agent_ids: Sequence[int],
         max_round: int,
         smart_selection: bool,
+        thinking: bool,
         ws_manager: WebSocketManager,
         workflow_ws_manager: WorkflowWebSocketManager,
         user_message: str,
@@ -121,6 +122,7 @@ class Chatroom:
         self._get_model_configs(all_agent_ids, absent_agent_ids)
         self._max_round = max_round
         self._smart_selection = smart_selection
+        self._thinking = thinking
         self._ws_manager = ws_manager
         self._workflow_ws_manager = workflow_ws_manager
         self._user_message = user_message
@@ -984,6 +986,9 @@ class Chatroom:
                 'message': mcp_tool_use['result']
             })
 
+    def set_thinking(self, thinking: bool) -> None:
+        self._thinking = thinking
+
     async def _talk_to_agent(self, agent_id: int) -> None:
         reply_started = False
         try:
@@ -1035,6 +1040,7 @@ class Chatroom:
                 current_prompt_tokens = 0
                 current_completion_tokens = 0
                 current_total_tokens = 0
+                current_chunk_type = 'text'
                 async for chunk in agent_node.run_in_chatroom(
                     context=Context(),
                     user_id=self._user_id,
@@ -1052,7 +1058,8 @@ class Chatroom:
                         'chat_file_list': json.dumps([str(file) for file in self._chat_files], ensure_ascii=False)
                     },
                     group_messages=True,
-                    chat_base_url=self._chat_base_url
+                    chat_base_url=self._chat_base_url,
+                    thinking=self._thinking
                 ):
                     if not reply_started:
                         await self._ws_manager.start_agent_reply(self._chatroom_id, agent_id, self._ability_id)
@@ -1064,6 +1071,17 @@ class Chatroom:
                         app_runs.set_chatroom_message_id(self._current_agent_run_id, self._current_agent_message_id)
                         continue
                     if hasattr(chunk, 'tool_call_chunks') and (tool_call_chunks := chunk.tool_call_chunks):
+                        if current_chunk_type == 'thinking':
+                            self._console_log('\n\033[36m')
+                            item_text = '<<<thinking-end>>>'
+                            agent_message += item_text
+                            self._current_agent_message += item_text
+                            await self._ws_manager.send_agent_reply(
+                                self._chatroom_id,
+                                item_text, agent_message, new_text
+                            )
+                            new_text = False
+                        current_chunk_type = 'tool_call'
                         for tool_call_chunk in tool_call_chunks:
                             if tool_call_chunk['type'] == 'tool_call_chunk':
                                 mcp_tool_index = tool_call_chunk['index'] or 0
@@ -1108,6 +1126,17 @@ class Chatroom:
                                 raise Exception(f'Unsupported tool call chunk type: {tool_call_chunk["type"]}')
                     if content := chunk.content:
                         if isinstance(content, str):
+                            if current_chunk_type == 'thinking':
+                                self._console_log('\n\033[36m')
+                                item_text = '<<<thinking-end>>>'
+                                agent_message += item_text
+                                self._current_agent_message += item_text
+                                await self._ws_manager.send_agent_reply(
+                                    self._chatroom_id,
+                                    item_text, agent_message, new_text
+                                )
+                                new_text = False
+                            current_chunk_type = 'text'
                             self._console_log(content)
                             agent_message += content
                             self._current_agent_message += content
@@ -1120,6 +1149,17 @@ class Chatroom:
                             for item in content:
                                 if isinstance(item, dict):
                                     if item['type'] == 'text':
+                                        if current_chunk_type == 'thinking':
+                                            self._console_log('\n\033[36m')
+                                            item_text = '<<<thinking-end>>>'
+                                            agent_message += item_text
+                                            self._current_agent_message += item_text
+                                            await self._ws_manager.send_agent_reply(
+                                                self._chatroom_id,
+                                                item_text, agent_message, new_text
+                                            )
+                                            new_text = False
+                                        current_chunk_type = 'text'
                                         item_text: str = item['text']
                                         if item_text:
                                             self._console_log(item_text)
@@ -1133,6 +1173,28 @@ class Chatroom:
                                     elif item['type'] in ['tool_use', 'input_json_delta']:
                                         # Tool use has been handled in the tool_call_chunks
                                         pass
+                                    elif item['type'] == 'thinking':
+                                        if current_chunk_type != 'thinking':
+                                            self._console_log('\n\033[0mThinking: \033[91m')
+                                            item_text = '<<<thinking-start>>>'
+                                            agent_message += item_text
+                                            self._current_agent_message += item_text
+                                            await self._ws_manager.send_agent_reply(
+                                                self._chatroom_id,
+                                                item_text, agent_message, new_text
+                                            )
+                                            new_text = False
+                                        current_chunk_type = 'thinking'
+                                        item_text: Optional[str] = item.get('thinking')
+                                        if item_text:
+                                            self._console_log(item_text)
+                                            agent_message += item_text
+                                            self._current_agent_message += item_text
+                                            await self._ws_manager.send_agent_reply(
+                                                self._chatroom_id,
+                                                item_text, agent_message, new_text
+                                            )
+                                            new_text = False
                                     else:
                                         raise Exception(f'Unsupported content item type: {item}')
                                 else:
@@ -1167,12 +1229,14 @@ class Chatroom:
                 total_tokens += current_total_tokens
 
                 self._console_log('\n')
-                
-                self._history_messages.append({
-                    'agent_id': agent_id,
-                    'type': 'text',
-                    'message': agent_message
-                })
+                self._history_messages.extend(self._split_agent_message(
+                    {
+                        'agent_id': agent_id,
+                        'type': 'text',
+                        'topic': self._topic,
+                        'message': agent_message
+                    }
+                ))
 
                 if not self._mcp_tool_uses:
                     # No MCP tool use, stop invoking the LLM
@@ -1299,7 +1363,7 @@ class Chatroom:
         topic = message['topic']
         content = message['message']
         
-        pattern = r'<<<mcp-tool-start>>>(.*?)<<<mcp-tool-end>>>'
+        pattern = r'<<<(.*?)-start>>>(.*?)<<<(.*?)-end>>>'
         # Find all matches
         matches = list(re.finditer(pattern, content, re.DOTALL))
         if not matches:
@@ -1322,22 +1386,33 @@ class Chatroom:
                         'message': text_content
                     })
             
-            # Add tool call messages
-            mcp_tool = json.loads(match.group(1))
-            
-            result.append({
-                'agent_id': agent_id,
-                'topic': topic,
-                'type': 'tool_use',
-                'message': json.dumps({'name': mcp_tool['name'], 'args': mcp_tool['args']}, ensure_ascii=False)
-            })
-            
-            result.append({
-                'agent_id': 0,
-                'topic': topic,
-                'type': 'tool_result',
-                'message': mcp_tool['result']
-            })
+            if match.group(1) != match.group(3):
+                continue
+
+            message_type = match.group(1)
+            match message_type:
+                case 'mcp-tool':
+                    # Add tool call messages
+                    mcp_tool = json.loads(match.group(2))
+                    
+                    result.append({
+                        'agent_id': agent_id,
+                        'topic': topic,
+                        'type': 'tool_use',
+                        'message': json.dumps({'name': mcp_tool['name'], 'args': mcp_tool['args']}, ensure_ascii=False)
+                    })
+                    
+                    result.append({
+                        'agent_id': 0,
+                        'topic': topic,
+                        'type': 'tool_result',
+                        'message': mcp_tool['result']
+                    })
+                case 'thinking':
+                    # NOT add thinking message
+                    continue
+                case _:
+                    raise Exception(f'Unsupported message type: {message_type}')
             
             last_end = match.end()
         

@@ -497,7 +497,8 @@ class LLMBaseNode(Node):
         agent_id: int = 0,
         mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
         chatroom_prompt_args: Optional[Dict[str, Any]] = None,
-        group_messages: bool = False
+        group_messages: bool = False,
+        thinking: bool = False
     ) -> Tuple[Dict[str, Any], str, int, int, int]:
         """
         Workflow node invokes the LLM model to generate text using the language model.
@@ -526,6 +527,13 @@ class LLMBaseNode(Node):
         llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
         if return_json and not (model_info["supplier_name"] == "OpenAI" and model_info["model_name"] in ["o1-preview", "o1-mini"]):
             llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
+        if thinking:
+            if model_info["supplier_name"] == "Anthropic":
+                if 'claude-3-haiku' not in llm_config["model_name"]:
+                    llm_config["thinking"] = {
+                        "type": "enabled",
+                        "budget_tokens": 10_000
+                    }
         llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config, schema_key=self.schema_key)
 
         messages, input = self._prepare_messages_and_input(
@@ -597,7 +605,8 @@ class LLMBaseNode(Node):
         mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
         chatroom_prompt_args: Optional[Dict[str, Any]] = None,
         group_messages: bool = False,
-        chat_base_url: Optional[str] = None
+        chat_base_url: Optional[str] = None,
+        thinking: bool = False
     ) -> Tuple[Dict[str, Any], Callable[[], AsyncIterator[AIMessageChunk]]]:
         """
         This function is used to get the model data and the async AI invoke function.
@@ -623,6 +632,13 @@ class LLMBaseNode(Node):
         llm_config = {**model_info["supplier_config"], **model_info["model_config"]}
         if return_json and not (model_info["supplier_name"] == "OpenAI" and model_info["model_name"] in ["o1-preview", "o1-mini"]):
             llm_config["model_kwargs"] = {"response_format": {"type": "json_object"}}
+        if thinking:
+            if model_info["supplier_name"] == "Anthropic":
+                if 'claude-3-haiku' not in llm_config["model_name"]:
+                    llm_config["thinking"] = {
+                        "type": "enabled",
+                        "budget_tokens": 10_000
+                    }
         llm_pipeline = LLMPipeline(supplier=model_info["supplier_name"], config=llm_config, schema_key=self.schema_key)
         messages, input = self._prepare_messages_and_input(
             app_run_id=app_run_id,

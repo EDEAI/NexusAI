@@ -60,6 +60,7 @@ class ChatroomManager:
         self._file_list_by_chatroom: Dict[int, List[Union[int, str]]] = {}
         self._is_desktop_by_chatroom: Dict[int, bool] = {}
         self._desktop_mcp_tool_list_by_chatroom: Dict[int, List[Dict[str, Any]]] = {}
+        self._thinking_by_chatroom: Dict[int, bool] = {}
 
     def _get_chatroom_info(self, chatroom_id: int, user_id: int, check_chat_status: bool) -> Dict[str, int]:
         chatroom_info = chatrooms.select_one(
@@ -227,6 +228,7 @@ class ChatroomManager:
                     user_id, team_id, chatroom_id, app_run_id, bool(chatroom_info['is_temporary']),
                     all_agent_ids, absent_agent_ids,
                     chatroom_info['max_round'], bool(chatroom_info['smart_selection']),
+                    self._thinking_by_chatroom.get(chatroom_id, False),
                     self._ws_manager, self._workflow_ws_manager,
                     user_message, user_message_id,
                     self._ability_id_by_chatroom.get(chatroom_id, 0),
@@ -385,6 +387,13 @@ class ChatroomManager:
                                     assert isinstance(mcp_tool_use_id := data['id'], int), f'Invalid MCP tool use ID: {mcp_tool_use_id}'
                                     assert isinstance(result := data['result'], str), f'Invalid MCP tool result: {result}'
                                     await self._chatrooms[chatroom_id].set_mcp_tool_result(mcp_tool_use_id, result)
+                                case 'ENABLETHINKING':
+                                    # Enable thinking
+                                    assert isinstance(data, bool), 'Enable thinking should be a boolean.'
+                                    self._thinking_by_chatroom[chatroom_id] = data
+                                    if chatroom_id in self._chatrooms:
+                                        self._chatrooms[chatroom_id].set_thinking(data)
+                                    await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                                 case 'INPUT':
                                     # User input
                                     assert isinstance(data, str), 'User input should be a string.'
