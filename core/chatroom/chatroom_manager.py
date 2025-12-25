@@ -334,6 +334,7 @@ class ChatroomManager:
                             await self._ws_manager.send_instruction_by_connection(connection, 'OK')
                             if last_message_id and last_message_id > chatroom_info['initial_message_id']:
                                 await self._ws_manager.send_instruction_by_connection(connection, 'TRUNCATABLE', True)
+                            await self._ws_manager.send_instruction_by_connection(connection, 'THINKING', self._thinking_by_chatroom.get(chatroom_id, False))
                         case 'TRUNCATE':
                             # Truncate chat history
                             assert isinstance(data, int), 'Chatroom ID should be an integer.'
@@ -393,7 +394,7 @@ class ChatroomManager:
                                     self._thinking_by_chatroom[chatroom_id] = data
                                     if chatroom_id in self._chatrooms:
                                         self._chatrooms[chatroom_id].set_thinking(data)
-                                    await self._ws_manager.send_instruction_by_connection(connection, 'OK')
+                                    await self._ws_manager.send_instruction(chatroom_id, 'THINKING', data)
                                 case 'INPUT':
                                     # User input
                                     assert isinstance(data, str), 'User input should be a string.'
