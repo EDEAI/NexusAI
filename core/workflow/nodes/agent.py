@@ -403,6 +403,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
         chatroom_prompt_args: Optional[Dict[str, Any]] = None,
         group_messages: bool = False,
+        thinking: bool = False,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -554,7 +555,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 agent_id=agent_id,
                 mcp_tool_list=all_mcp_tools,
                 chatroom_prompt_args=chatroom_prompt_args,
-                group_messages=group_messages
+                group_messages=group_messages,
+                thinking=thinking
             )
             model_data['tools'] = all_mcp_tools
             print(model_data)
@@ -750,6 +752,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         chatroom_prompt_args: Optional[Dict[str, Any]] = None,
         group_messages: bool = False,
         chat_base_url: Optional[str] = None,
+        thinking: bool = False,
         **kwargs
     ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
@@ -894,7 +897,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 mcp_tool_list=all_mcp_tools,
                 chatroom_prompt_args=chatroom_prompt_args,
                 group_messages=group_messages,
-                chat_base_url=chat_base_url
+                chat_base_url=chat_base_url,
+                thinking=thinking
             )
             from core.database.models.models import Models
             model_info = Models().get_model_by_config_id(self.data['model_config_id'])
