@@ -10,8 +10,9 @@ import { createRenderers } from '../MarkdownRenderer';
 import { MCPToolDisplay } from '../MCPToolDisplay';
 import { ContentBlock } from '../types';
 import { MCPToolRuntimeData } from '../types/mcp';
-import { downloadFile } from '../utils';
+import { downloadFile, parseThinkingBlocks } from '../utils';
 import { parseMCPContent } from '../utils/mcpParser';
+import { ThinkingBlock } from './ThinkingBlock';
 import moment from 'moment';
 
 interface MessageContentProps {
@@ -45,8 +46,54 @@ export const MessageContent: FC<MessageContentProps> = props => {
         contentBlocks,
     } = props;
 
-    // Use saved parsedContent if available, otherwise parse on-demand
     const parsedContent = item?.parsedContent || parseMCPContent(content);
+
+    const renderTextContent = (textContent: string, blockIndex: number = 0) => {
+        const parsedThinking = parseThinkingBlocks(textContent);
+
+        if (parsedThinking.parts.length === 1 && parsedThinking.parts[0].type === 'text') {
+            return (
+                <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}
+                    components={createRenderers(index, intl, isCurrentMessage)}
+                >
+                    {parsedThinking.parts[0].content}
+                </ReactMarkdown>
+            );
+        }
+
+        return (
+            <>
+                {parsedThinking.parts.map((part, partIndex) => {
+                    if (part.type === 'thinking') {
+                        return (
+                            <ThinkingBlock
+                                key={`thinking-${blockIndex}-${partIndex}`}
+                                content={part.content}
+                                isComplete={part.isComplete || false}
+                                index={index}
+                                intl={intl}
+                                isCurrentMessage={isCurrentMessage}
+                            />
+                        );
+                    } else if (part.content) {
+                        return (
+                            <ReactMarkdown
+                                key={`text-${blockIndex}-${partIndex}`}
+                                remarkPlugins={[remarkGfm]}
+                                rehypePlugins={[rehypeHighlight]}
+                                components={createRenderers(index, intl, isCurrentMessage)}
+                            >
+                                {part.content}
+                            </ReactMarkdown>
+                        );
+                    }
+                    return null;
+                })}
+            </>
+        );
+    };
 
     // Note: MCP tools are now processed when historical messages are loaded,
     // so we don't need to register them here during render
@@ -73,22 +120,12 @@ export const MessageContent: FC<MessageContentProps> = props => {
 
             {/* Render text content - supports both contentBlocks and traditional parsedContent modes */}
             {contentBlocks && contentBlocks.length > 0 ? (
-                // New: contentBlocks rendering mode for streaming messages
                 <div>
                     {contentBlocks.map((block, blockIndex) => (
                         <div key={`content-block-${blockIndex}`}>
                             {block.type === 'text'
-                                ? block.content && (
-                                      <ReactMarkdown
-                                          remarkPlugins={[remarkGfm]}
-                                          rehypePlugins={[rehypeHighlight]}
-                                          components={createRenderers(index, intl,isCurrentMessage)}
-                                      >
-                                          {block.content}
-                                      </ReactMarkdown>
-                                  )
-                                : // MCP tool block
-                                  block.toolId &&
+                                ? block.content && renderTextContent(block.content, blockIndex)
+                                : block.toolId &&
                                   getMCPTool && (
                                       <MCPToolDisplay
                                           toolData={{
@@ -113,18 +150,11 @@ export const MessageContent: FC<MessageContentProps> = props => {
                     ))}
                 </div>
             ) : parsedContent.hasMCPTools ? (
-                // Legacy: parsedContent rendering mode for historical messages
                 <div>
                     {parsedContent.blocks.map((block, blockIndex) => (
                         <div key={blockIndex}>
                             {block.type === 'text' ? (
-                                <ReactMarkdown
-                                    remarkPlugins={[remarkGfm]}
-                                    rehypePlugins={[rehypeHighlight]}
-                                    components={createRenderers(index, intl)}
-                                >
-                                    {block.content}
-                                </ReactMarkdown>
+                                renderTextContent(block.content, blockIndex)
                             ) : (
                                 block.toolData && (
                                     <MCPToolDisplay
@@ -141,14 +171,7 @@ export const MessageContent: FC<MessageContentProps> = props => {
                     ))}
                 </div>
             ) : (
-                // Default: simple text rendering
-                <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeHighlight]}
-                    components={createRenderers(index, intl)}
-                >
-                    {content}
-                </ReactMarkdown>
+                renderTextContent(content)
             )}
 
             {/* For current messages, only show activeMCPTools when contentBlocks is not available (backward compatibility) */}

@@ -1174,27 +1174,28 @@ class Chatroom:
                                         # Tool use has been handled in the tool_call_chunks
                                         pass
                                     elif item['type'] == 'thinking':
-                                        if current_chunk_type != 'thinking':
-                                            self._console_log('\n\033[0mThinking: \033[91m')
-                                            item_text = '<<<thinking-start>>>'
-                                            agent_message += item_text
-                                            self._current_agent_message += item_text
-                                            await self._ws_manager.send_agent_reply(
-                                                self._chatroom_id,
-                                                item_text, agent_message, new_text
-                                            )
-                                            new_text = False
-                                        current_chunk_type = 'thinking'
-                                        item_text: Optional[str] = item.get('thinking')
-                                        if item_text:
-                                            self._console_log(item_text)
-                                            agent_message += item_text
-                                            self._current_agent_message += item_text
-                                            await self._ws_manager.send_agent_reply(
-                                                self._chatroom_id,
-                                                item_text, agent_message, new_text
-                                            )
-                                            new_text = False
+                                        if self._thinking:
+                                            if current_chunk_type != 'thinking':
+                                                self._console_log('\n\033[0mThinking: \033[91m')
+                                                item_text = '<<<thinking-start>>>'
+                                                agent_message += item_text
+                                                self._current_agent_message += item_text
+                                                await self._ws_manager.send_agent_reply(
+                                                    self._chatroom_id,
+                                                    item_text, agent_message, new_text
+                                                )
+                                                new_text = False
+                                            current_chunk_type = 'thinking'
+                                            item_text: Optional[str] = item.get('thinking')
+                                            if item_text:
+                                                self._console_log(item_text)
+                                                agent_message += item_text
+                                                self._current_agent_message += item_text
+                                                await self._ws_manager.send_agent_reply(
+                                                    self._chatroom_id,
+                                                    item_text, agent_message, new_text
+                                                )
+                                                new_text = False
                                     else:
                                         raise Exception(f'Unsupported content item type: {item}')
                                 else:
