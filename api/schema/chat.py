@@ -12,6 +12,8 @@ class ChatRoomInfoBase(BaseModel):
     description: Optional[str] = None
     chatroom_id: Optional[int] = None
     app_id: Optional[int] = None
+    enable_api: Optional[int] = None
+    api_url: Optional[str] = None
     chat_status: Optional[int] = None
     active: Optional[int] = None
     chatroom_status: Optional[int] = None
@@ -36,6 +38,7 @@ class ReqChatroomCreateSchema(BaseModel):
     max_round: int
     agent: List[AgentModel]
     is_temporary: int = 0
+    enable_api: Optional[int] = None
 
 
 class ReqChatroomUpdateSchema(BaseModel):
@@ -43,6 +46,7 @@ class ReqChatroomUpdateSchema(BaseModel):
     description: str
     max_round: int
     agent: List[AgentModel]
+    enable_api: Optional[int] = None
 
 
 class AgentListData(BaseModel):
@@ -148,6 +152,8 @@ class ChatRoomDetailBase(BaseModel):
     description: Optional[str] = None
     is_public: Optional[int] = None
     execution_times: Optional[int] = None
+    enable_api: Optional[int] = None
+    api_url: Optional[str] = None
 
 
 class ChatRoomDetailInfo(BaseModel):
@@ -259,3 +265,44 @@ class ChatHistoryListSingle(BaseModel):
 
 class ChatRoomHistorySingle(BaseModel):
     data: Optional[ChatHistoryListSingle] = None
+
+class SessionInfo(BaseModel):
+    ws_url: str
+    session_id: str
+    session_chatroom_id: int
+    session_name: str
+
+class SessionResponse(ResponseBase):
+    data: SessionInfo
+
+class SessionMessageItem(BaseModel):
+    name: Optional[str]
+    description: Optional[str]
+    icon: Optional[str]
+    avatar: Optional[str]
+    icon_background: Optional[str]
+
+    id: int
+    chatroom_id: int
+    app_run_id: int
+    user_id: int
+
+    file_list: Optional[List[int]]
+    agent_id: int
+    ability_id: int
+
+    message: str
+    is_read: int
+    created_time: str
+    is_agent: int
+    content: str
+
+class SessionMessageList(BaseModel):
+    list: List[SessionMessageItem]
+    total_count: int
+    total_pages: int
+    page: int
+    page_size: int
+
+class SessionMessagesResponse(ResponseBase):
+    data: SessionMessageList

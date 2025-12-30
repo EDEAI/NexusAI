@@ -78,6 +78,8 @@ API_KEY = "Kp7wRJ9LzF3qX2hN"
 # Virtual environment cache directory
 VENV_CACHE_DIR = '/app/venv_cache'
 
+SANDBOX_MAX_ALIVE_SECONDS = int(os.environ.get("SANDBOX_MAX_ALIVE_SECONDS", 300))
+
 # Request model for running code
 class CodeRequest(BaseModel):
     custom_unique_id: str
@@ -270,7 +272,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '{tool_name}'))
                 firejail_cmd,
                 capture_output=True,
                 text=True,
-                timeout=300  # 300 second timeout
+                timeout=SANDBOX_MAX_ALIVE_SECONDS
             )
             stdout, stderr = result.stdout.strip(), result.stderr.strip()
             
@@ -285,7 +287,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '{tool_name}'))
             return stdout, stderr
             
     except subprocess.TimeoutExpired:
-        return "", "Execution timed out after 300 seconds"
+        return "", f"Execution timed out after {SANDBOX_MAX_ALIVE_SECONDS} seconds"
     except Exception as e:
         logger.error(f"Error executing user code: {str(e)}")
         return "", f"Execution failed: {str(e)}"

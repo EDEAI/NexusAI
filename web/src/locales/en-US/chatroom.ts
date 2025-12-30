@@ -44,4 +44,8 @@ export default {
     'app.chatroom.mcptool.uploading': 'Uploading...',
     'app.chatroom.mcptool.uploadFile': 'Upload File',
     'app.chatroom.mcptool.remove': 'Remove',
+
+    // Thinking Block
+    'app.chatroom.thinking.content': 'Thinking Content',
+    'app.chatroom.thinking.inProgress': 'Thinking...',
 };

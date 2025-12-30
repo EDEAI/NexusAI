@@ -24,6 +24,7 @@ from core.database.models import (
 from core.dataset import DatasetRetrieval
 from core.llm.prompt import Prompt, replace_prompt_with_context
 from core.mcp.app_converter import convert_callable_items_to_mcp_tools
+from core.mcp.builtin_tools import get_builtin_tool_list
 from languages import get_language_content
 from log import Logger
 from core.helper import push_to_websocket_queue
@@ -127,14 +128,27 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         callable_skills: List[Dict[str, Any]],
         callable_workflows: List[Dict[str, Any]],
         direct_output: bool = False,
-        is_chat: bool = False
+        is_chat: bool = False,
+        use_data_calculation_prefix: bool = False
     ) -> Tuple[Optional[int], Dict[str, Any]]:
         agent_id = agent['id']
+        common_prefix = get_language_content(
+            'agent_system_prompt_common_prefix',
+            uid=user_id,
+            append_ret_lang_prompt=False
+        )
+        if use_data_calculation_prefix:
+            common_prefix += get_language_content(
+                'agent_system_prompt_common_prefix_with_data_calculation',
+                uid=user_id,
+                append_ret_lang_prompt=False
+            )
         input_ = {
             'id_': agent_id,
             'name': agent['name'],
             'description': agent['description'],
             'obligations': agent['obligations'],
+            'agent_system_prompt_common_prefix': common_prefix,
             'team_members': get_language_content(
                 'agent_team_members',
                 append_ret_lang_prompt=False
@@ -389,6 +403,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         mcp_tool_list: Optional[List[Dict[str, Any]]] = None,
         chatroom_prompt_args: Optional[Dict[str, Any]] = None,
         group_messages: bool = False,
+        thinking: bool = False,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -540,7 +555,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 agent_id=agent_id,
                 mcp_tool_list=all_mcp_tools,
                 chatroom_prompt_args=chatroom_prompt_args,
-                group_messages=group_messages
+                group_messages=group_messages,
+                thinking=thinking
             )
             model_data['tools'] = all_mcp_tools
             print(model_data)
@@ -736,6 +752,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
         chatroom_prompt_args: Optional[Dict[str, Any]] = None,
         group_messages: bool = False,
         chat_base_url: Optional[str] = None,
+        thinking: bool = False,
         **kwargs
     ) -> AsyncIterator[Union[AIMessageChunk, int]]:
         try:
@@ -854,6 +871,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                     )
 
             all_mcp_tools = []
+            all_mcp_tools.extend(get_builtin_tool_list())
             callable_skills, callable_workflows = self._get_callable_items()
             app_tools = convert_callable_items_to_mcp_tools(callable_skills, callable_workflows)
             all_mcp_tools.extend(app_tools)
@@ -863,7 +881,7 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
             
             _, input_ = self._prepare_prompt(
                 agent, workflow_id, app_run_id, user_id, type, node_exec_id, task, bool(datasets),
-                callable_skills, callable_workflows, True, True
+                callable_skills, callable_workflows, True, True, True
             )
             model_data, ainvoke = await asyncio.to_thread(
                 self.get_ainvoke_func,
@@ -879,7 +897,8 @@ class AgentNode(ImportToKBBaseNode, LLMBaseNode):
                 mcp_tool_list=all_mcp_tools,
                 chatroom_prompt_args=chatroom_prompt_args,
                 group_messages=group_messages,
-                chat_base_url=chat_base_url
+                chat_base_url=chat_base_url,
+                thinking=thinking
             )
             from core.database.models.models import Models
             model_info = Models().get_model_by_config_id(self.data['model_config_id'])

@@ -5,6 +5,7 @@ import math
 from typing import Any, Dict
 import os
 from config import settings
+from core.helper import encrypt_id
 from datetime import datetime, timedelta
 
 
@@ -155,7 +156,8 @@ class Chatrooms(MySQL):
                 "chatrooms.smart_selection",
                 "chatrooms.is_temporary",
                 "chatrooms.last_chat_time",
-                "apps.id as app_id"
+                "apps.id as app_id",
+                "apps.enable_api"
             ],
             joins=[
                 ["left", "apps", "chatrooms.app_id = apps.id"]
@@ -169,6 +171,8 @@ class Chatrooms(MySQL):
         for chat_item in chatroom_list:
             chat_item['last_chat_time_display'] = self.format_wechat_time(chat_item['last_chat_time'])
             chat_item['agent_list'] = []
+            encrypted_id = encrypt_id(chat_item['app_id'])
+            chat_item['api_url'] = f'/v1/chatroom-api/{encrypted_id}/docs'
             agent_list = ChatroomAgentRelation().select(
                 columns=["agent_id", "chatroom_id"],
                 conditions=[

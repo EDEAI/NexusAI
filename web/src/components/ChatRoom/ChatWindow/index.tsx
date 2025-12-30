@@ -141,6 +141,7 @@ export const Chatwindow: FC<chatwindowParameters> = memo(props => {
         if (readyState == 1) {
             if (id) {
                 sendMessage(JSON.stringify(['ENTER', parseInt(id)]));
+                sendMessage(JSON.stringify(['ENABLETHINKING', true]));
             }
         }
     }, [readyState]);

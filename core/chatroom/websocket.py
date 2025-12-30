@@ -14,6 +14,7 @@ from websockets import (
 
 from config import settings
 from core.database import redis
+from core.database.models.chatrooms import Chatrooms
 from log import Logger
 
 
@@ -38,7 +39,7 @@ class WebSocketManager:
         async with serve(callback, '0.0.0.0', settings.CHATROOM_WEBSOCKET_PORT):
             await self._stop_future  # run forever
     
-    def verify_connection(self, connection_path: str) -> Tuple[int, int, Optional[str]]:
+    def verify_connection(self, connection_path: str) -> Tuple[int, int, int, Optional[str]]:
         """
         Verify the connection path and return the user ID, team ID, and chat base URL.
         """
@@ -53,23 +54,42 @@ class WebSocketManager:
             payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         except JWTError:
             raise Exception('Invalid token')
-        assert (user_id := payload.get('uid')), 'Invalid user ID'
-        assert (team_id := payload.get('team_id')), 'Invalid team ID'
+        session_chatroom_id = 0
+        token_type = payload.get('type')
+        if token_type == 'chatroom_api':
+            session_id = payload.get('session_id')
+            chatroom_id = payload.get('chatroom_id')
+            assert session_id and chatroom_id, 'Invalid chatroom session'
+            chatroom = Chatrooms().select_one(
+                columns=['user_id', 'team_id'],
+                conditions=[
+                    {'column': 'id', 'value': chatroom_id},
+                    {'column': 'is_temporary', 'value': 1},
+                    {'column': 'status', 'value': 1}
+                ]
+            )
+            assert chatroom, 'Chatroom session not found'
+            session_chatroom_id = chatroom_id
+            user_id = chatroom['user_id']
+            team_id = chatroom['team_id']
+        else:
+            assert (user_id := payload.get('uid')), 'Invalid user ID'
+            assert (team_id := payload.get('team_id')), 'Invalid team ID'
 
-        stored_token = (
-            redis.get(f'third_party_access_token:{user_id}')
-            if payload.get('openid')
-            else redis.get(f'access_token:{user_id}')
-        )
-        if not stored_token or stored_token.decode('utf-8') != token:
-            raise Exception('Invalid token')
+            stored_token = (
+                redis.get(f'third_party_access_token:{user_id}')
+                if payload.get('openid')
+                else redis.get(f'access_token:{user_id}')
+            )
+            if not stored_token or stored_token.decode('utf-8') != token:
+                raise Exception('Invalid token')
 
         # Check chat_base_url
         chat_base_url = query_dict.get('chat_base_url')
         if chat_base_url is not None:
             chat_base_url = chat_base_url[0]
         
-        return user_id, team_id, chat_base_url
+        return session_chatroom_id, user_id, team_id, chat_base_url
             
     def parse_instruction(self, instruction_str: str) -> Tuple[str, Optional[Union[int, str, bool, List[Union[int, str]]]]]:
         try:

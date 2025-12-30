@@ -197,10 +197,11 @@ HTTP_WRITE_TIMEOUT: 600
 HTTP_RESPONSE_MAX_BINARY_SIZE: 10485760
 HTTP_RESPONSE_MAX_TEXT_SIZE: 1048576
 
-# Sandbox service connection configuration and workers number configuration
+# Sandbox service connection configuration, workers number, and max process lifetime
 SANDBOX_HOST: 127.0.0.1
 SANDBOX_PORT: 9464
 SANDBOX_FASTAPI_WORKERS: 2
+SANDBOX_MAX_ALIVE_SECONDS: 300
 
 # Default configuration for LLM model
 # Default supplier configuration ID (corresponding to the primary key of the supplier_configurations data table)
@@ -371,7 +372,9 @@ docker pull edeai/sandbox:<tag>
 # SANDBOX_PORT should be consistent with `.env`
 # The mounted local directory should be changed to the real path
 # SANDBOX_FASTAPI_WORKERS: The number of workers for the sandbox service
-docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -v NexusAI/upload_files:/upload_files -v NexusAI/docker/volumes/venv_cache:/app/venv_cache -v NexusAI/docker/sandbox/tools:/app/tools:ro -v NexusAI/docker/volumes/logs/sandbox:/app/logs -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<tag>
+# SANDBOX_MAX_ALIVE_SECONDS: Maximum sandbox process lifetime
+# If you need Redis blocking wait inside sandbox, include REDIS_HOST/REDIS_PORT/REDIS_DB/REDIS_PASSWORD.
+docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -v NexusAI/upload_files:/upload_files -v NexusAI/docker/volumes/venv_cache:/app/venv_cache -v NexusAI/docker/sandbox/tools:/app/tools:ro -v NexusAI/docker/volumes/logs/sandbox:/app/logs -e SANDBOX_FASTAPI_WORKERS=2 -e SANDBOX_MAX_ALIVE_SECONDS=300 edeai/sandbox:<tag>
 ```
 
 ## WEB deployment
@@ -461,7 +464,9 @@ docker pull edeai/sandbox:<new tag>
 # SANDBOX_PORT should be consistent with `.env`
 # The mounted local directory should be changed to the real path
 # SANDBOX_FASTAPI_WORKERS: The number of workers for the sandbox service
-docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -v NexusAI/upload_files:/upload_files -v NexusAI/docker/volumes/venv_cache:/app/venv_cache -v NexusAI/docker/sandbox/tools:/app/tools:ro -v NexusAI/docker/volumes/logs/sandbox:/app/logs -e SANDBOX_FASTAPI_WORKERS=2 edeai/sandbox:<new tag>
+# SANDBOX_MAX_ALIVE_SECONDS: Maximum sandbox process lifetime
+# If you need Redis blocking wait inside sandbox, include REDIS_HOST/REDIS_PORT/REDIS_DB/REDIS_PASSWORD.
+docker run -d --privileged -p <SANDBOX_PORT>:8001 -v NexusAI/storage:/storage -v NexusAI/upload_files:/upload_files -v NexusAI/docker/volumes/venv_cache:/app/venv_cache -v NexusAI/docker/sandbox/tools:/app/tools:ro -v NexusAI/docker/volumes/logs/sandbox:/app/logs -e SANDBOX_FASTAPI_WORKERS=2 -e SANDBOX_MAX_ALIVE_SECONDS=300 edeai/sandbox:<new tag>
 ```
 
 4. Note that the updated content in `.env.template` is synchronized to `.env`, and the updated content in `web/config/envConfig.ts.template` is synchronized to `web/config/envConfig.ts`

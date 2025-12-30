@@ -9,13 +9,14 @@ import {
     DesktopOutlined,
     EditOutlined,
     PieChartOutlined,
+    QuestionCircleOutlined,
     SettingOutlined,
 } from '@ant-design/icons';
 import { ProForm, ProFormSwitch } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
 import { useUpdateEffect } from 'ahooks';
 import type { MenuProps } from 'antd';
-import { Menu, Popover } from 'antd';
+import { Menu, Popover, Tooltip } from 'antd';
 import React, { useRef, useState } from 'react';
 import { useIntl } from 'umi';
 import useSaveWorkFlow from '../../saveWorkFlow';
@@ -45,10 +46,18 @@ const WorkFlowLeftMenu: React.FC = () => {
                     >
                         <ProFormSwitch
                             name="is_public"
-                            label={intl.formatMessage({
-                                id: 'component.label.teamVisible',
-                                defaultMessage: '',
-                            })}
+                            label={
+                                <div className="flex items-center gap-1">
+                                    <span>{intl.formatMessage({ id: 'component.label.teamVisible' })}</span>
+                                    <Tooltip
+                                        title={intl.formatMessage({
+                                            id: 'component.api.teamVisible.tooltip',
+                                        })}
+                                    >
+                                        <QuestionCircleOutlined className="text-xs text-gray-500" />
+                                    </Tooltip>
+                                </div>
+                            }
                         ></ProFormSwitch>
                         <ProFormSwitch
                             tooltip={
@@ -66,7 +75,14 @@ const WorkFlowLeftMenu: React.FC = () => {
                             }}
                             disabled={workFlowInfo?.app?.publish_status != '1'}
                             name="enable_api"
-                            label="API"
+                            label={
+                                <div className="flex items-center gap-1">
+                                    <span>{intl.formatMessage({ id: 'component.api.access' })}</span>
+                                    <Tooltip title={intl.formatMessage({ id: 'component.api.tooltip' })}>
+                                        <QuestionCircleOutlined className="text-xs text-gray-500" />
+                                    </Tooltip>
+                                </div>
+                            }
                         ></ProFormSwitch>
                     </ProForm>
                 </div>
@@ -112,15 +128,15 @@ const WorkFlowLeftMenu: React.FC = () => {
             key: '2',
             icon: <DesktopOutlined />,
             label: intl.formatMessage({
-                id: 'component.menu.accessAPI',
-                defaultMessage: 'API',
+                id: 'component.api.docs',
+                defaultMessage: 'API Docs',
             }),
             title: !canToApi
                 ? intl.formatMessage({
-                      id: 'component.tooltip.enableAPIFirst',
-                      defaultMessage: 'API',
-                  })
-                : intl.formatMessage({ id: 'component.menu.accessAPI', defaultMessage: 'API' }),
+                    id: 'component.tooltip.enableAPIFirst',
+                    defaultMessage: 'API',
+                })
+                : intl.formatMessage({ id: 'component.api.docs' }),
             disabled: !canToApi,
         },
         {
@@ -200,15 +216,30 @@ const WorkFlowLeftMenu: React.FC = () => {
                             >
                                 <ProFormSwitch
                                     name="is_public"
-                                    label={intl.formatMessage({
-                                        id: 'component.label.teamVisible',
-                                        defaultMessage: '',
-                                    })}
+                                    label={
+                                        <div className="flex items-center gap-1">
+                                            <span>{intl.formatMessage({ id: 'component.label.teamVisible' })}</span>
+                                            <Tooltip
+                                                title={intl.formatMessage({
+                                                    id: 'component.api.teamVisible.tooltip',
+                                                })}
+                                            >
+                                                <QuestionCircleOutlined className="text-xs text-gray-500" />
+                                            </Tooltip>
+                                        </div>
+                                    }
                                 ></ProFormSwitch>
                                 <ProFormSwitch
                                     disabled={!workFlowInfo?.app?.api_url}
                                     name="enable_api"
-                                    label="API"
+                                    label={
+                                        <div className="flex items-center gap-1">
+                                            <span>{intl.formatMessage({ id: 'component.api.access' })}</span>
+                                            <Tooltip title={intl.formatMessage({ id: 'component.api.tooltip' })}>
+                                                <QuestionCircleOutlined className="text-xs text-gray-500" />
+                                            </Tooltip>
+                                        </div>
+                                    }
                                 ></ProFormSwitch>
                             </ProForm>
                         </div>

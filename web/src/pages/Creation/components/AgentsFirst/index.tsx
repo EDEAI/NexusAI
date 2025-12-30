@@ -4,7 +4,7 @@ import Avatar from '@/components/ChatAvatar';
 import { findOption } from '@/components/WorkFlow/components/Form/Select';
 import Variable from '@/components/WorkFlow/components/Variable';
 import { useModelSelect } from '@/store/modelList';
-import { CloseOutlined, DeleteOutlined, FullscreenOutlined, PlusOutlined } from '@ant-design/icons';
+import { CloseOutlined, DeleteOutlined, FullscreenOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import { Button, Form, Input, Radio, Select, Switch, Tag, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -381,8 +381,14 @@ const AgentsFirst: React.FC<ChildProps> = ({
                                 />
                             </div>
                             <div className="mb-[30px]  font-medium">
-                                <div className="mb-[15px] text-[#555555] text-xs">
-                                    {intl.formatMessage({ id: 'agent.APIswitch' })}
+                                <div className="mb-[15px] text-[#555555] text-xs flex items-center gap-x-[6px]">
+                                    <span>{intl.formatMessage({ id: 'component.api.access' })}</span>
+                                    <Tooltip
+                                        overlayStyle={{ fontSize: '12px' }}
+                                        title={intl.formatMessage({ id: 'component.api.tooltip' })}
+                                    >
+                                        <QuestionCircleOutlined className="cursor-pointer text-[#666] text-[12px]" />
+                                    </Tooltip>
                                 </div>
                                 <Switch
                                     size="small"

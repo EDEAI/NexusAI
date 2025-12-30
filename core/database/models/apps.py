@@ -3,7 +3,7 @@ from core.database import MySQL
 import math
 from core.database.models.app_workflow_relation import AppWorkflowRelations
 from core.database.models.tag_bindings import TagBindings
-from core.helper import generate_api_token
+from core.helper import generate_api_token, encrypt_id
 from languages import get_language_content
 from core.database.models.datasets import Datasets
 from config import settings
@@ -28,7 +28,10 @@ class Apps(MySQL):
                 'description',
                 'is_public',
                 'execution_times',
-                'icon'
+                'icon',
+                'enable_api',
+                'api_token',
+                'mode'
             ],
             conditions=[
                 {'column': 'id', 'value': app_id},
@@ -36,6 +39,9 @@ class Apps(MySQL):
             ]
         )
         assert app, 'No available app!'
+        if app.get('mode') == 5:
+            encrypted_id = encrypt_id(app['id'])
+            app['api_url'] = f'/v1/chatroom-api/{encrypted_id}/docs'
         return app
 
     def get_app_by_is_public(self, app_id: int, team_id: int) -> Dict[str, Any]:

@@ -20,6 +20,7 @@ __pycache__
 /prompt.py
 /prompt.py.backup_*
 .trae
+AGENTS.md
 task_data_to_word.py
 task_data_to_ppt.py
 task_data.py

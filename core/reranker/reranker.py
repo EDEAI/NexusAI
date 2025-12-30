@@ -2,8 +2,8 @@ import importlib
 
 from typing import List, Optional, Sequence
 
-from langchain.retrievers import document_compressors
-from langchain.retrievers.document_compressors.cross_encoder import BaseCrossEncoder
+from langchain_classic.retrievers import document_compressors
+from langchain_classic.retrievers.document_compressors.cross_encoder import BaseCrossEncoder
 from langchain_community import cross_encoders
 from langchain_community import document_compressors as lcc_document_compressors
 from langchain_core.callbacks import Callbacks

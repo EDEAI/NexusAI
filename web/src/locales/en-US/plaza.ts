@@ -76,6 +76,12 @@ export default {
     'app.chatroom.sidebar.agent_button': 'Clear Memory',
     'app.chatroom.sidebar.agent_tips': 'There must be at least 1 agent present in the Round Table',
     'app.chatroom.sidebar.cleartips': 'Memory Cleared Successfully',
+    'app.chatroom.api.access': 'API Access',
+    'app.chatroom.api.docs': 'API Docs',
+    'app.chatroom.api.enable_tip': 'Enable to access via API',
+    'app.chatroom.api.enable_success': 'API enabled',
+    'app.chatroom.api.disable_success': 'API disabled',
+    'app.chatroom.api.update_failed': 'Failed to update API settings',
 
     'app.chatroom.sidebar.othe_title': 'Other Round Tables',
     'app.chatroom.sidebar.othe_status': 'Idle',

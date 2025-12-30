@@ -24,6 +24,7 @@ from core.database.models import (
 from core.helper import get_file_content_list
 from core.llm import Prompt
 from core.mcp.app_executor import skill_run, workflow_run
+from core.mcp.builtin_tools import get_builtin_tool_name, run_tool
 from core.mcp.client import MCPClient
 from core.workflow.context import Context
 from core.workflow.graph import create_graph_from_dict
@@ -50,6 +51,7 @@ workflows = Workflows()
 
 skill_pattern = re.compile(r'nexusai__skill-(\d+)')
 workflow_pattern = re.compile(r'nexusai__workflow-(\d+)')
+builtin_tool_pattern = re.compile(r'nexusai__builtin-(\w+)')
 MCP_TOOL_RESULT_MAX_LEN = 65535
 
 class Chatroom:
@@ -94,6 +96,7 @@ class Chatroom:
         absent_agent_ids: Sequence[int],
         max_round: int,
         smart_selection: bool,
+        thinking: bool,
         ws_manager: WebSocketManager,
         workflow_ws_manager: WorkflowWebSocketManager,
         user_message: str,
@@ -119,6 +122,7 @@ class Chatroom:
         self._get_model_configs(all_agent_ids, absent_agent_ids)
         self._max_round = max_round
         self._smart_selection = smart_selection
+        self._thinking = thinking
         self._ws_manager = ws_manager
         self._workflow_ws_manager = workflow_ws_manager
         self._user_message = user_message
@@ -537,6 +541,7 @@ class Chatroom:
         if (
             skill_pattern.fullmatch(mcp_tool_use['name'])
             or workflow_pattern.fullmatch(mcp_tool_use['name'])
+            or builtin_tool_pattern.fullmatch(mcp_tool_use['name'])
         ):
             mcp_tool_use['workflow_confirmation_status'] = None
             mcp_tool_use_update_data['workflow_run_status'] = None
@@ -678,7 +683,8 @@ class Chatroom:
                 mcp_tool_name = mcp_tool_use['name']
                 skill_match = skill_pattern.fullmatch(mcp_tool_name)
                 workflow_match = workflow_pattern.fullmatch(mcp_tool_name)
-                if skill_match or workflow_match:
+                builtin_tool_match = builtin_tool_pattern.fullmatch(mcp_tool_name)
+                if skill_match or workflow_match or builtin_tool_match:
                     result = json.dumps({
                         'status': 'failed',
                         'message': f'Error executing tool {mcp_tool_name}: {result}'
@@ -825,6 +831,9 @@ class Chatroom:
                         mcp_tool_use['result'] = result
                         mcp_tool_use_update_data['result'] = result
                         mcp_tool_use_update_data['status'] = 5  # Failed
+            elif match := builtin_tool_pattern.fullmatch(mcp_tool_use['name']):
+                builtin_tool = match.group(1)
+                mcp_tool_use['skill_or_workflow_name'] = get_builtin_tool_name(builtin_tool)
             self._update_chatroom_message()
             mcp_tool_use_records.update(
                 {'column': 'id', 'value': mcp_tool_use['id']},
@@ -860,21 +869,23 @@ class Chatroom:
             mcp_tool_args = mcp_tool_use['args']
             skill_match = skill_pattern.fullmatch(mcp_tool_name)
             workflow_match = workflow_pattern.fullmatch(mcp_tool_name)
-            if skill_match or workflow_match:
+            builtin_tool_match = builtin_tool_pattern.fullmatch(mcp_tool_name)
+            if skill_match or workflow_match or builtin_tool_match:
                 if result := mcp_tool_use['result'] is None:
                     try:
                         logger.debug('Invoking MCP tool: %s', mcp_tool_name)
                         logger.debug('MCP tool args: %s', mcp_tool_args)
 
-                        # Wait for the user to upload files
-                        input_variables: Dict[str, Any] = mcp_tool_args['input_variables']
-                        while any(v == 'need_upload' for k, v in input_variables.items() if k.startswith('file_parameter__')):
-                            try:
-                                self._mcp_tool_use_lock.clear()
-                                await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
-                            except asyncio.TimeoutError:
-                                await self.stop_all_mcp_tool_uses('Timeout')
-                                return
+                        if skill_match or workflow_match:
+                            # Wait for the user to upload files
+                            input_variables: Dict[str, Any] = mcp_tool_args['input_variables']
+                            while any(v == 'need_upload' for k, v in input_variables.items() if k.startswith('file_parameter__')):
+                                try:
+                                    self._mcp_tool_use_lock.clear()
+                                    await asyncio.wait_for(self._mcp_tool_use_lock.wait(), timeout=3600)
+                                except asyncio.TimeoutError:
+                                    await self.stop_all_mcp_tool_uses('Timeout')
+                                    return
                         
                         if skill_match:
                             if not SandboxBaseNode.check_venv_exists(mcp_tool_use['skill_dependencies']):
@@ -923,6 +934,16 @@ class Chatroom:
                                 {'column': 'id', 'value': mcp_tool_use['id']},
                                 {'app_run_id': workflow_run_id}
                             )
+                        elif builtin_tool_match:
+                            result = await asyncio.wait_for(
+                                run_tool(
+                                    builtin_tool_match.group(1),
+                                    mcp_tool_args
+                                ),
+                                timeout=3600
+                            )
+                            result = json.dumps(result, ensure_ascii=False)
+                            await self.set_mcp_tool_result(mcp_tool_use['id'], result)
                     except asyncio.TimeoutError:
                         await self.stop_all_mcp_tool_uses('Timeout')
                         return
@@ -964,6 +985,9 @@ class Chatroom:
                 'type': 'tool_result',
                 'message': mcp_tool_use['result']
             })
+
+    def set_thinking(self, thinking: bool) -> None:
+        self._thinking = thinking
 
     async def _talk_to_agent(self, agent_id: int) -> None:
         reply_started = False
@@ -1016,6 +1040,7 @@ class Chatroom:
                 current_prompt_tokens = 0
                 current_completion_tokens = 0
                 current_total_tokens = 0
+                current_chunk_type = 'text'
                 async for chunk in agent_node.run_in_chatroom(
                     context=Context(),
                     user_id=self._user_id,
@@ -1033,7 +1058,8 @@ class Chatroom:
                         'chat_file_list': json.dumps([str(file) for file in self._chat_files], ensure_ascii=False)
                     },
                     group_messages=True,
-                    chat_base_url=self._chat_base_url
+                    chat_base_url=self._chat_base_url,
+                    thinking=self._thinking
                 ):
                     if not reply_started:
                         await self._ws_manager.start_agent_reply(self._chatroom_id, agent_id, self._ability_id)
@@ -1045,6 +1071,17 @@ class Chatroom:
                         app_runs.set_chatroom_message_id(self._current_agent_run_id, self._current_agent_message_id)
                         continue
                     if hasattr(chunk, 'tool_call_chunks') and (tool_call_chunks := chunk.tool_call_chunks):
+                        if current_chunk_type == 'thinking':
+                            self._console_log('\n\033[36m')
+                            item_text = '<<<thinking-end>>>'
+                            agent_message += item_text
+                            self._current_agent_message += item_text
+                            await self._ws_manager.send_agent_reply(
+                                self._chatroom_id,
+                                item_text, agent_message, new_text
+                            )
+                            new_text = False
+                        current_chunk_type = 'tool_call'
                         for tool_call_chunk in tool_call_chunks:
                             if tool_call_chunk['type'] == 'tool_call_chunk':
                                 mcp_tool_index = tool_call_chunk['index'] or 0
@@ -1089,6 +1126,17 @@ class Chatroom:
                                 raise Exception(f'Unsupported tool call chunk type: {tool_call_chunk["type"]}')
                     if content := chunk.content:
                         if isinstance(content, str):
+                            if current_chunk_type == 'thinking':
+                                self._console_log('\n\033[36m')
+                                item_text = '<<<thinking-end>>>'
+                                agent_message += item_text
+                                self._current_agent_message += item_text
+                                await self._ws_manager.send_agent_reply(
+                                    self._chatroom_id,
+                                    item_text, agent_message, new_text
+                                )
+                                new_text = False
+                            current_chunk_type = 'text'
                             self._console_log(content)
                             agent_message += content
                             self._current_agent_message += content
@@ -1101,6 +1149,17 @@ class Chatroom:
                             for item in content:
                                 if isinstance(item, dict):
                                     if item['type'] == 'text':
+                                        if current_chunk_type == 'thinking':
+                                            self._console_log('\n\033[36m')
+                                            item_text = '<<<thinking-end>>>'
+                                            agent_message += item_text
+                                            self._current_agent_message += item_text
+                                            await self._ws_manager.send_agent_reply(
+                                                self._chatroom_id,
+                                                item_text, agent_message, new_text
+                                            )
+                                            new_text = False
+                                        current_chunk_type = 'text'
                                         item_text: str = item['text']
                                         if item_text:
                                             self._console_log(item_text)
@@ -1111,9 +1170,32 @@ class Chatroom:
                                                 item_text, agent_message, new_text
                                             )
                                             new_text = False
-                                    elif item['type'] == 'tool_use':
+                                    elif item['type'] in ['tool_use', 'input_json_delta']:
                                         # Tool use has been handled in the tool_call_chunks
                                         pass
+                                    elif item['type'] == 'thinking':
+                                        if self._thinking:
+                                            if current_chunk_type != 'thinking':
+                                                self._console_log('\n\033[0mThinking: \033[91m')
+                                                item_text = '<<<thinking-start>>>'
+                                                agent_message += item_text
+                                                self._current_agent_message += item_text
+                                                await self._ws_manager.send_agent_reply(
+                                                    self._chatroom_id,
+                                                    item_text, agent_message, new_text
+                                                )
+                                                new_text = False
+                                            current_chunk_type = 'thinking'
+                                            item_text: Optional[str] = item.get('thinking')
+                                            if item_text:
+                                                self._console_log(item_text)
+                                                agent_message += item_text
+                                                self._current_agent_message += item_text
+                                                await self._ws_manager.send_agent_reply(
+                                                    self._chatroom_id,
+                                                    item_text, agent_message, new_text
+                                                )
+                                                new_text = False
                                     else:
                                         raise Exception(f'Unsupported content item type: {item}')
                                 else:
@@ -1148,12 +1230,14 @@ class Chatroom:
                 total_tokens += current_total_tokens
 
                 self._console_log('\n')
-                
-                self._history_messages.append({
-                    'agent_id': agent_id,
-                    'type': 'text',
-                    'message': agent_message
-                })
+                self._history_messages.extend(self._split_agent_message(
+                    {
+                        'agent_id': agent_id,
+                        'type': 'text',
+                        'topic': self._topic,
+                        'message': agent_message
+                    }
+                ))
 
                 if not self._mcp_tool_uses:
                     # No MCP tool use, stop invoking the LLM
@@ -1280,7 +1364,7 @@ class Chatroom:
         topic = message['topic']
         content = message['message']
         
-        pattern = r'<<<mcp-tool-start>>>(.*?)<<<mcp-tool-end>>>'
+        pattern = r'<<<(.*?)-start>>>(.*?)<<<(.*?)-end>>>'
         # Find all matches
         matches = list(re.finditer(pattern, content, re.DOTALL))
         if not matches:
@@ -1303,22 +1387,33 @@ class Chatroom:
                         'message': text_content
                     })
             
-            # Add tool call messages
-            mcp_tool = json.loads(match.group(1))
-            
-            result.append({
-                'agent_id': agent_id,
-                'topic': topic,
-                'type': 'tool_use',
-                'message': json.dumps({'name': mcp_tool['name'], 'args': mcp_tool['args']}, ensure_ascii=False)
-            })
-            
-            result.append({
-                'agent_id': 0,
-                'topic': topic,
-                'type': 'tool_result',
-                'message': mcp_tool['result']
-            })
+            if match.group(1) != match.group(3):
+                continue
+
+            message_type = match.group(1)
+            match message_type:
+                case 'mcp-tool':
+                    # Add tool call messages
+                    mcp_tool = json.loads(match.group(2))
+                    
+                    result.append({
+                        'agent_id': agent_id,
+                        'topic': topic,
+                        'type': 'tool_use',
+                        'message': json.dumps({'name': mcp_tool['name'], 'args': mcp_tool['args']}, ensure_ascii=False)
+                    })
+                    
+                    result.append({
+                        'agent_id': 0,
+                        'topic': topic,
+                        'type': 'tool_result',
+                        'message': mcp_tool['result']
+                    })
+                case 'thinking':
+                    # NOT add thinking message
+                    continue
+                case _:
+                    raise Exception(f'Unsupported message type: {message_type}')
             
             last_end = match.end()
         

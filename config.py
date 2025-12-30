@@ -49,6 +49,9 @@ class Settings(BaseSettings):
 
     SANDBOX_HOST: str = os.environ.get('SANDBOX_HOST', os.getenv('SANDBOX_HOST'))
     SANDBOX_PORT: int = int(os.environ.get('SANDBOX_PORT', os.getenv('SANDBOX_PORT', 8001)))
+    SANDBOX_MAX_ALIVE_SECONDS: int = int(
+        os.environ.get('SANDBOX_MAX_ALIVE_SECONDS', os.getenv('SANDBOX_MAX_ALIVE_SECONDS', 300))
+    )
 
     DEFAULT_LLM_SUPPLIER_CONFIG_ID: int = int(
         os.environ.get('DEFAULT_LLM_SUPPLIER_CONFIG_ID', os.getenv('DEFAULT_LLM_SUPPLIER_CONFIG_ID', 1)))

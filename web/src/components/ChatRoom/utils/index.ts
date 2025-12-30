@@ -3,6 +3,7 @@
  */
 import React, { ReactNode } from 'react';
 import { ContentDetectionConfig, MessageContentAnalysis, MessageWithContent } from '../types';
+export * from './thinkingParser';
 
 // Download file utility function
 export const downloadFile = (url: string, filename: string) => {

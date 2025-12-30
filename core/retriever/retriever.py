@@ -1,6 +1,6 @@
 from typing import Any, List, Optional
 
-from langchain import retrievers
+from langchain_classic import retrievers
 from langchain_community import retrievers as lcc_retrievers
 from langchain_core.callbacks.manager import (
     AsyncCallbackManagerForRetrieverRun,
